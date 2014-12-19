@@ -1,0 +1,140 @@
+--[[
+Изменения script_version:
+	3 - сохранение поля job_online
+	5 - сохранение поля was_in_smart_terrain
+	6 - сохранение поля death_droped
+]]
+
+class "se_stalker"	(cse_alife_human_stalker)
+--------------------
+function se_stalker:__init (section) super (section)
+	db.offline_objects[self.id] = db.offline_objects[self.id] and empty_table(db.offline_objects[self.id]) or {}
+end
+--------------------
+function se_stalker:can_switch_offline()
+	if self.group_id ~= 65535 then
+		return true
+	end
+	return cse_alife_human_stalker.can_switch_offline(self)
+end
+--------------------
+function se_stalker:can_switch_online()
+	if self.group_id ~= 65535 then
+		return true
+	end
+	return cse_alife_human_stalker.can_switch_online(self)
+end
+
+function se_stalker:switch_online()
+	--alun_utils.printf("se_stalker:switch_online() [%s]",self:name())
+	cse_alife_human_stalker.switch_online(self)
+end
+
+function se_stalker:switch_offline()
+	cse_alife_human_stalker.switch_offline(self)
+end
+--------------------
+function se_stalker:STATE_Write(packet)
+	cse_alife_human_stalker.STATE_Write (self, packet)
+	if self.online then
+		packet:w_stringZ(tostring(level and level.object_by_id(self.id) and level.object_by_id(self.id):level_vertex_id()))
+	else
+		packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].level_vertex_id))
+	end
+	packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].active_section))
+	packet:w_bool(self.death_droped or false)
+end
+--------------------
+function se_stalker:STATE_Read(packet, size)
+	--alun_utils.debug_write("\nse_stalker:STATE_Read "..self:name().." START")
+	cse_alife_human_stalker.STATE_Read (self, packet, size)
+	if self.script_version > 10 then
+		local old_lvid = packet:r_stringZ()
+		if db.offline_objects[self.id] == nil then
+			db.offline_objects[self.id] = {}
+		end
+		db.offline_objects[self.id].active_section = packet:r_stringZ()
+		if db.offline_objects[self.id].active_section == "nil" then
+			db.offline_objects[self.id].active_section = nil
+		end
+		if old_lvid ~= "nil" then
+			db.offline_objects[self.id].level_vertex_id = tonumber(old_lvid)
+		end
+	end
+	self.death_droped = packet:r_bool() or nil
+	--alun_utils.debug_write("se_stalker:STATE_Read "..self:name().." END\n")
+end
+--------------------
+function se_stalker:on_before_register()
+end
+--------------------
+function se_stalker:on_register()
+	--alun_utils.debug_write("\nse_stalker:on_register "..self:name().." START")
+	cse_alife_human_stalker.on_register( self )
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+
+	local obj_ini = self:spawn_ini()
+
+	if db.offline_objects[self.id] == nil then
+		db.offline_objects[self.id] = {}
+	end
+--	db.offline_objects[self.id].level_vertex_id = self.m_level_vertex_id
+
+	--printf("registering stalker %s ", self:name())
+	--' Отключаем старый метод выбора смарттеррейнов.
+	self:brain():can_choose_alife_tasks(false)
+
+	--' Выбор смарта
+	local smart = utils.cfg_get_string(obj_ini, "logic", "smart_terrain", self, false, "", "")
+	local smart_obj = SIMBOARD.smarts_by_names[smart]
+	if smart_obj == nil then
+		return
+	end
+	smart_obj:register_npc(self)
+	--alun_utils.debug_write("se_stalker:on_register "..self:name().." END")
+end
+--------------------
+function se_stalker:on_unregister()
+	local strn_id = self:smart_terrain_id()
+	if strn_id ~= 65535 then
+		local smart = alife():object(strn_id)
+		if smart ~= nil then
+			smart:unregister_npc(self)
+		end
+	end
+	db.offline_objects[self.id] = nil
+	unregister_story_object_by_id(self.id)
+	cse_alife_human_stalker.on_unregister(self)
+end
+--------------------
+function se_stalker:on_spawn()
+	cse_alife_human_stalker.on_spawn(self)
+	-- Alundaio
+	if (axr_main) then axr_main.se_stalker_on_spawn(self) end
+	-- Alundaio
+end
+--------------------
+function se_stalker:on_death(killer)
+	cse_alife_human_stalker.on_death(self, killer)
+
+	smart_terrain.on_death(self)
+
+	local squad = self.group_id and self.group_id < 65535 and alife():object(self.group_id)
+	if (squad) then
+		squad:on_npc_death(self,killer)
+	end
+end
+--------------------
+function se_stalker:update()
+	cse_alife_human_stalker.update(self)
+end
+--'Торговец
+class "se_trader" (cse_alife_trader)
+function se_trader:__init (section) super (section)
+
+end
+
+function se_trader:keep_saved_data_anyway()
+	return true
+end

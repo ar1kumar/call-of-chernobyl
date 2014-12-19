@@ -1,0 +1,53 @@
+[esc_2_12_nimble_items] ;Предметы на заказ
+icon = ui_inGame2_Osobiy_zakaz
+prior = 2
+storyline = false
+title = {-esc_2_12_order_ready_task} esc_2_12_nimble_items_wait_order_name, esc_2_12_nimble_items_get_order_name
+descr = {-esc_2_12_order_ready_task} esc_2_12_nimble_items_wait_order_text, esc_2_12_nimble_items_get_order_text
+target = {-esc_2_12_order_ready_task} nil, esc_2_12_stalker_nimble
+condlist_0 = {-esc_2_12_order_in_process -esc_2_12_order_refused} complete
+condlist_1 = {-esc_2_12_order_in_process +esc_2_12_order_refused} reversed
+
+[esc_m_trader_task_1]
+icon = ui_inGame2_Odin_vistrel
+prior = 2
+storyline = false 
+title = esc_m_trader_task_1_name
+descr = esc_m_trader_task_1_text
+job_descr = esc_m_trader_task_1_about
+repeat_timeout = 3600
+target_functor = esc_m_trader_task_target
+on_init = %=on_init_bounty_hunt(esc_m_trader_bounty_target_id:stalker:killer:bandit) -esc_m_trader_task_1_complete%
+on_complete = %+esc_m_trader_task_1_complete%
+precondition = {-esc_m_trader_task_1_complete} true, false
+condlist_0 = {!bounty_by_id_exists(esc_m_trader_bounty_target_id)} fail
+
+[esc_m_trader_task_2]
+icon = ui_inGame2_Issledovanie_anomaliy
+prior = 2
+storyline = false 
+title = esc_m_trader_task_2_name
+descr = esc_m_trader_task_2_text
+job_descr = esc_m_trader_task_2_about
+repeat_timeout = 86400
+target_functor = esc_m_trader_task_target
+on_complete = %+esc_m_trader_task_2_complete =remove_task_companion(esc_2_12_stalker_fanat_squad)%
+on_fail = %=remove_task_companion(esc_2_12_stalker_fanat_squad)%
+precondition = {-esc_m_trader_task_2_complete =sim_avail(esc_smart_terrain_7_11) =smart_stayed_squad_count_ge_by_faction(esc_smart_terrain_7_11:bandit:1)} true, false
+condlist_0 = {!sim_avail(esc_smart_terrain_7_11)} fail, {!smart_squad_by_faction_in_radius(esc_smart_terrain_7_11:bandit:75)} complete
+
+; esc_2_12_stalker_wolf
+[esc_2_12_stalker_wolf_task_1]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 2
+storyline = false
+title = esc_2_12_stalker_wolf_task_1_name
+descr = esc_2_12_stalker_wolf_task_1_text
+job_descr = esc_2_12_stalker_wolf_task_1_about
+target_functor = esc_2_12_stalker_wolf_task_target
+status_functor = check_smart_under_faction_control
+on_init = %=find_smart_under_faction_control(esc_2_12_stalker_wolf_task_1_id:monster) -esc_2_12_stalker_wolf_task_1_complete%
+precondition = {-esc_2_12_stalker_wolf_task_1_complete =all_avail_smart_stayed_squad_count_ge_by_faction(monster:1:false:7200)} true, false
+repeat_timeout = 7200
+on_complete = %+esc_2_12_stalker_wolf_task_1_complete =pstor_reset(esc_2_12_stalker_wolf_task_1_id) =pstor_reset(esc_2_12_stalker_wolf_task_1_target_id)%
+on_fail = %=pstor_reset(esc_2_12_stalker_wolf_task_1_id) =pstor_reset(esc_2_12_stalker_wolf_task_1_target_id)%

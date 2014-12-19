@@ -1,0 +1,33 @@
+;bandit trader
+[logic@val_smart_terrain_7_4_bandit_trader]
+suitable = {=check_npc_name(val_smart_terrain_7_4_bandit_trader_stalker)} true
+prior = 200
+active = animpoint@trade
+level_spot = trader
+trade = misc\trade\trade_bandit.ltx
+can_select_weapon = false
+
+[animpoint@trade]
+cover_name = val_smart_terrain_7_4_bandit_trader_smart_cover
+reach_movement = walk_noweap
+avail_animations = animpoint_sit_normal
+reach_distance = 3
+on_info = {!npc_in_zone(val_gunnery_zone)} %=teleport_npc(val_smart_terrain_trader_walker_2_walk)%
+out_restr = val_gunnery_zone
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+invulnerable = true
+meet = meet@trade
+
+[meet@trade]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true

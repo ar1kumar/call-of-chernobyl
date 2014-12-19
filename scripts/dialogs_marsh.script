@@ -1,0 +1,38 @@
+
+------ ecolog_companion_task_1
+
+function ecolog_companion_task_1_complete(a,b)
+	return xr_conditions.has_task_target_anomaly() ~= true and xr_conditions.squad_in_zone(nil,nil,{"ecolog_companion_task_1","mar_smart_terrain_base_sr_no_assault"}) or false
+end
+
+function ecolog_companion_task_1_not_complete(a,b)
+	return not ecolog_companion_task_1_complete(a,b)
+end 
+
+function ecolog_companion_task_1_complete_task(a,b)
+	task_manager.get_task_manager():set_task_completed("mar_base_owl_stalker_trader_task_3")
+	a:stop_talk()
+	b:stop_talk()
+end
+
+function ecolog_companion_task_1_give_reward(a,b)
+	dialogs.relocate_money(db.actor,math.random(2500,4000),"in")
+	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"ecolog", 10})
+	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"csky", 5})
+	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"killer", 10})
+end
+
+---------- mar_base_stalker_barmen_task
+
+function mar_base_stalker_barmen_task_1_complete(a,b)
+	dialogs.relocate_money(db.actor,math.random(1000,2500),"in")
+	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"csky", 10})
+end
+
+function mar_base_stalker_barmen_task_2_complete(a,b)
+	dialogs.relocate_money(db.actor,math.random(1000,1500),"in")
+	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"csky", 10})
+	if (math.random() <= 0.5) then
+		coc_treasure_manager.create_random_stash()
+	end
+end

@@ -1,0 +1,65 @@
+------------------------------------
+-- HELPERS
+------------------------------------
+
+----------------------------------------------------------------------------------------------
+-- Status Functors
+----------------------------------------------------------------------------------------------
+function check_smart_under_faction_control(task,task_id)
+	local smart_id = alun_utils.load_var(db.actor,task_id.."_id")
+	if not (smart_id) then 
+		return "fail"
+	end 
+	
+	local smrt = SIMBOARD.smarts[smart_id]
+	if not (smrt) then 
+		return "fail"
+	end 
+	
+	local smart = smrt.smrt
+	if not (smart) then 
+		return "fail"
+	end 
+	
+	local task_id_by_faction = {
+		["mar_base_stalker_barmen_task_1"] = "monster",
+		["mar_base_stalker_barmen_task_2"] = "bandit",
+		["esc_2_12_stalker_wolf_task_1"] = "monster",
+		["jup_b220_trapper_task_1"] = "monster"
+	}
+	
+	local player_id = task_id_by_faction[task_id]
+	if not (player_id) then
+		alun_utils.printf("task_status_functor.smart_under_faction_control: Task not properly configured")
+		return 
+	end
+	
+	local tg = time_global()
+	if (__check_smart_time and tg < __check_smart_time) then 
+		return 
+	end
+	__check_smart_time = tg+3000
+	
+	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
+		for id,squad in pairs(SIMBOARD.squads) do
+			if (squad) and simulation_objects.is_on_the_same_level(squad, smart) and (player_id == "monster" and sim_squad_scripted.is_squad_monster[squad.player_id]) or (squad.player_id == player_id) then
+				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id or squad.position:distance_to_sqr(smart.position) <= 2500) then
+					alun_utils.save_var(db.actor,task_id.."_target_id",squad.id)
+					--alun_utils.printf("task_id = %s squad_id = %s",task_id,squad.id)
+					return
+				end
+			end
+		end
+	end
+	
+	if not (smart.is_on_actor_level) then 
+		return "fail"
+	end
+
+	local last_target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
+	if (last_target_id and axr_task_manager.actor_tagged_squad_by_id[last_target_id] ~= true) then
+		return "fail"
+	end
+	
+	return "complete"	
+end

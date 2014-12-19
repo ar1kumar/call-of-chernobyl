@@ -1,0 +1,17 @@
+function actor_dont_has_yan_ecolog_semenov_task_1(a,b)
+	return not xr_conditions.has_task_not_completed(nil,nil,{"yan_ecolog_semenov_task_1"})
+end 
+
+function actor_has_yan_ecolog_semenov_task_1(a,b)
+	return xr_conditions.has_task_not_completed(nil,nil,{"yan_ecolog_semenov_task_1"})
+end
+
+function yan_ecolog_semenov_task_1_complete(a,b)
+	dialogs.relocate_money_to_actor(a,b,math.random(4000,4500))
+	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"ecolog", 10})
+	local npc = get_story_object("yan_ecolog_semenov")
+	if (npc) then 
+		alun_utils.save_var(npc,"yan_ecolog_semenov_task_1_count",nil)
+	end
+	task_manager.get_task_manager():set_task_completed("yan_ecolog_semenov_task_1")
+end

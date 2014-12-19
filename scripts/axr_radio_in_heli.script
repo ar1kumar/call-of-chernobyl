@@ -1,0 +1,220 @@
+--Copyright (C) 2014 Alundaio
+--This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+
+--------------------------------------
+actid = 188116
+evaid = 188116
+--------------------------------------
+
+local allowed_communities = { 
+								["army"] = true,
+								["monolith"] = true
+							}
+
+local function set_generic_scheme(npc, ini, stype)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"radio_in_heli","radio_in_heli")
+end
+
+local function npc_add_precondition(action)
+	action:add_precondition(world_property(evaid,false))
+end
+
+local good_acts = {
+					[xr_actions_id.smartcover_action] = true,
+					[xr_actions_id.smartcover_action+2] = true,
+					[xr_actions_id.wounded_exist] = true
+					}
+					
+-----------------------------------------------------------------------------------------
+--								ON GAME START
+-----------------------------------------------------------------------------------------
+function on_game_start()
+	load_scheme("axr_radio_in_heli","radio_in_heli",0)
+	callback_register("set_generic_scheme",set_generic_scheme)
+	callback_register("npc_add_precondition",npc_add_precondition)
+end
+
+-----------------------------------------------------------------------------------------
+--								EVALUATOR RADIO IN HELI
+-----------------------------------------------------------------------------------------
+class "evaluator_radio_in_heli" (property_evaluator)
+function evaluator_radio_in_heli:__init(npc,name,storage) super (nil, name)
+	self.st = storage
+	self.st.stage = 1
+end
+
+function evaluator_radio_in_heli:evaluate()
+	--alun_utils.debug_write("eva_radio_in_heli")
+	local npc = self.object
+	
+	if not (npc:alive()) then 
+		return false 
+	end
+	
+	if (empty(db.heli)) then 
+		return false 
+	end
+	
+	if (good_acts[npc:motivation_action_manager():current_action_id()])then
+		return false
+	end
+	
+	local squad = get_object_squad(npc)
+	if not (squad) then 
+		return false 
+	end
+	
+	if not (squad:commander_id() == npc:id()) then 
+		return false 
+	end
+	
+	if (get_object_story_id(squad.id)) then 
+		return false 
+	end
+
+	if (get_object_story_id(npc:id())) then 
+		return false 
+	end
+	
+	local be = npc:best_enemy()
+	if not (be) then 
+		return false 
+	end
+	
+	if (squad.radio_for_help) then
+		local be_id = be:id()
+		if (be_id == 0) then 
+			alun_utils.save_var(db.actor,"heli_enemy_flag",true)
+		else
+			db.storage[be:id()].heli_enemy_flag = true
+		end
+		if (time_global() < squad.radio_for_help) then 
+			return false
+		end
+	end
+	squad.radio_for_help = nil
+
+	if (xr_wounded.is_wounded(npc)) then 
+		return false 
+	end
+
+	if (self.st.stage == 1) then 
+		local vid = alun_utils.find_close_cover(npc,npc:position(),be:position())
+		--alun_utils.printf("vid=%s",vid)
+		if (vid) then
+			self.st.vid = utils.send_to_nearest_accessible_vertex(npc,vid)
+			self.st.stage = 2
+			return true
+		end
+	elseif (self.st.stage == 2) then
+		return true
+	end 
+	
+	return false
+end
+
+-----------------------------------------------------------------------------------------
+--								ACTION RADIO IN HELI
+-----------------------------------------------------------------------------------------
+class "action_radio_in_heli" (action_base)
+function action_radio_in_heli:__init (npc,name,storage) super (nil,name)
+	self.st = storage
+end
+function action_radio_in_heli:initialize()
+	action_base.initialize(self)
+	local npc = self.object
+	npc:set_desired_position()
+	npc:set_desired_direction()
+end
+
+function action_radio_in_heli:execute()
+	action_base.execute(self)
+
+	--alun_utils.debug_write("act_radio_in_heli")
+	if (self.st.vid == nil) then
+		self.st.stage = 1
+		return
+	end
+	
+	local npc = self.object
+	
+	if (npc:level_vertex_id() ~= self.st.vid) then 
+		self.st.vid = utils.send_to_nearest_accessible_vertex(npc,self.st.vid)
+	else 
+		local tg = time_global()
+		self.st.state = not self.st.state and random_choice("guard_rac","hide_rac") or self.st.state
+		state_mgr.set_state(npc,self.st.state)
+		
+		self.st.__timer = not self.st.__timer and tg+5000 or self.st.__timer
+		if (self.st.__timer and tg < self.st.__timer) then 
+			return
+		end
+		self.st.stage = 1
+		
+		local squad = get_object_squad(npc)
+		if (squad) then
+			xr_sound.set_sound_play(npc:id(),"backup")
+			squad.radio_for_help = tg+60000
+			for id,heli in pairs(db.heli) do
+				heli_alife.force_target_destination(id,squad.id)
+			end
+			if (xr_combat_ignore.fighting_with_actor_npcs[npc:id()]) then 
+				alun_utils.save_var(db.actor,"heli_enemy_flag",true)
+			end
+		end
+	end
+end
+
+function action_radio_in_heli:finalize()
+    action_base.finalize(self)
+	self.st.stage = 1
+end
+
+function add_to_binder(npc,ini,scheme,section,storage)
+	local manager = npc:motivation_action_manager()
+
+	-- Evaluators
+	if (npc:section() == "actor_visual_stalker" or allowed_communities[character_community(npc)] == nil) then
+		manager:add_evaluator(evaid,property_evaluator_const(false))
+	else
+		manager:add_evaluator(evaid,evaluator_radio_in_heli(npc,"eva_radio_in_heli",storage))
+	end
+
+	local action = action_radio_in_heli(npc,"act_radio_in_heli",storage)
+	action:add_precondition(world_property(stalker_ids.property_alive,true))
+	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+	action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
+	action:add_precondition(world_property(evaid,true))
+	action:add_effect(world_property(evaid,false))
+
+	if (rx_ff) then 
+		action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+	end
+	if rx_gl then
+		action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
+	end
+	if xrs_facer then
+		action:add_precondition(world_property(xrs_facer.evid_facer,false))
+	end
+
+	manager:add_action(actid,action)
+
+	local p = {
+				stalker_ids.action_combat_planner,
+				xr_actions_id.state_mgr + 2,
+				xr_actions_id.alife
+	}
+	for i=1,#p do
+		action = manager:action(p[i])
+		if (action) then
+			action:add_precondition(world_property(evaid,false))
+		end
+	end
+end
+
+function disable_scheme(npc, stype)
+	local st = db.storage[npc:id()]["radio_in_heli"]
+	if st then
+		st.enabled = false
+	end
+end

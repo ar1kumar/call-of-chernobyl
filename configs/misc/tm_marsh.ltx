@@ -1,0 +1,67 @@
+[mar_base_owl_stalker_trader_task_1]
+icon = ui_inGame2_PD_Torgovets_informatsiey
+prior = 2
+storyline = false
+title = mar_base_owl_stalker_trader_task_1_name
+descr = mar_base_owl_stalker_trader_task_1_text
+job_descr = mar_base_owl_stalker_trader_task_1_about
+target_functor = mar_base_owl_stalker_trader_task_target
+precondition = {-mar_base_owl_stalker_trader_task_1_complete} true, false
+on_complete = %+mar_base_owl_stalker_trader_task_1_complete}%
+on_init = %=give_actor(mar_base_owl_stalker_trader_task_1_pda)%
+
+[mar_base_owl_stalker_trader_task_2]
+icon = ui_inGame2_Evakuatsiya
+prior = 2
+storyline = false
+title = mar_base_owl_stalker_trader_task_2_name
+descr = mar_base_owl_stalker_trader_task_2_text
+job_descr = mar_base_owl_stalker_trader_task_2_about
+target_functor = mar_base_owl_stalker_trader_task_target
+precondition = {+mar_base_owl_stalker_trader_task_1_complete -mar_base_owl_stalker_trader_discount_1} true, false
+on_complete = %+mar_base_owl_stalker_trader_discount_1%
+
+[mar_base_owl_stalker_trader_task_3]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 2
+storyline = false
+title = mar_base_owl_stalker_trader_task_3_name
+descr = mar_base_owl_stalker_trader_task_3_text
+job_descr = mar_base_owl_stalker_trader_task_3_about
+target_functor = mar_base_owl_stalker_trader_task_target
+on_init = %=setup_companion_task(ecolog_companion_task_1:mar_smart_terrain_base) -ecolog_companion_task_1_started -ecolog_companion_task_1_force_started%
+precondition = {!squad_exist(ecolog_companion_task_1)} true, false
+repeat_timeout = 86400
+on_complete = %=remove_special_task_squad(ecolog_companion_task_1)%
+on_fail = %=fail_mar_base_owl_stalker_trader_task_3%
+condlist_0 = {!squad_exist(ecolog_companion_task_1)} fail
+
+[mar_base_stalker_barmen_task_1]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 2
+storyline = false
+title = mar_base_stalker_barmen_task_1_name
+descr = mar_base_stalker_barmen_task_1_text
+job_descr = mar_base_stalker_barmen_task_1_about
+target_functor = mar_base_stalker_barmen_task_target
+status_functor = check_smart_under_faction_control
+on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_1_id:monster) -mar_base_stalker_barmen_task_1_complete%
+precondition = {-mar_base_stalker_barmen_task_1_complete =all_avail_smart_stayed_squad_count_ge_by_faction(monster:1:false:7200)} true, false
+repeat_timeout = 7200
+on_complete = %+mar_base_stalker_barmen_task_1_complete =pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
+on_fail = %=pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
+
+[mar_base_stalker_barmen_task_2]
+icon = ui_inGame2_Odin_vistrel
+prior = 2
+storyline = false 
+title = mar_base_stalker_barmen_task_2_name
+descr = mar_base_stalker_barmen_task_2_text
+job_descr = mar_base_stalker_barmen_task_2_about
+repeat_timeout = 86400
+target_functor = mar_base_stalker_barmen_task_target
+status_functor = check_smart_under_faction_control
+on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_2_id:bandit) -mar_base_stalker_barmen_task_2_complete%
+precondition = {-mar_base_stalker_barmen_task_2_complete =all_avail_smart_stayed_squad_count_ge_by_faction(bandit:1:false:7200)} true, false
+on_complete = %+mar_base_stalker_barmen_task_2_complete =pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
+on_fail = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%

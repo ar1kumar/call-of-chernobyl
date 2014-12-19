@@ -1,0 +1,123 @@
+[logic@guard_1]
+active = camper@guard_1
+suitable = {=target_squad_name(mar_smart_terrain_base_lager_squad) !surge_started} true
+prior = 100
+
+[logic@guard_2]
+active = camper@guard_2
+suitable = {=target_squad_name(mar_smart_terrain_base_lager_squad) !surge_started} true
+prior = 100
+
+[logic@mar_base_animpoint_kamp1]
+active = animpoint@mar_base_animpoint_kamp1
+suitable = {=target_squad_name(mar_smart_terrain_base_lager_squad) !surge_started} true
+prior = 100
+
+[logic@mar_base_animpoint_kamp2]
+active = animpoint@mar_base_animpoint_kamp2
+suitable = {=target_squad_name(mar_smart_terrain_base_lager_squad) !surge_started} true
+prior = 100
+
+[logic@mar_base_animpoint_kamp3]
+active = animpoint@mar_base_animpoint_kamp3
+suitable = {=target_squad_name(mar_smart_terrain_base_lager_squad) !surge_started} true
+prior = 100
+
+[logic@mar_base_animpoint_kamp4]
+active = animpoint@mar_base_animpoint_kamp4
+suitable = {=target_squad_name(mar_smart_terrain_base_lager_squad) !surge_started} true
+prior = 100
+
+[animpoint@mar_base_animpoint_kamp1]
+cover_name = mar_base_animpoint_kamp1
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@mar_base_animpoint_kamp2]
+cover_name = mar_base_animpoint_kamp2
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@mar_base_animpoint_kamp3]
+cover_name = mar_base_animpoint_kamp3
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@mar_base_animpoint_kamp4]
+cover_name = mar_base_animpoint_kamp4
+use_camp = true
+turn_on_campfire = true
+
+[camper@guard_1]
+path_walk = intro_walk
+path_look = intro_look
+turn_on_campfire = true
+
+[camper@guard_2]
+path_walk = main_walk
+path_look = main_look
+turn_on_campfire = true
+
+[walker@mar_smart_terrain_base_surge_def]
+def_state_standing = sit
+def_state_moving = assault
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_base_dog_doctor)} true
+turn_on_campfire = false
+
+[logic@mar_smart_terrain_base_surge_def]
+suitable = {=target_squad_name(mar_smart_terrain_base_lager_squad) =surge_started} true
+prior = 100
+
+[logic@mar_smart_terrain_base_surge_work_1]:logic@mar_smart_terrain_base_surge_def
+active = walker@mar_smart_terrain_base_surge_work_1
+
+[logic@mar_smart_terrain_base_surge_work_2]:logic@mar_smart_terrain_base_surge_def
+active = walker@mar_smart_terrain_base_surge_work_2
+
+[logic@mar_smart_terrain_base_surge_work_3]:logic@mar_smart_terrain_base_surge_def
+active = walker@mar_smart_terrain_base_surge_work_3
+
+[logic@mar_smart_terrain_base_surge_work_4]:logic@mar_smart_terrain_base_surge_def
+active = walker@mar_smart_terrain_base_surge_work_4
+
+[logic@mar_smart_terrain_base_surge_work_5]:logic@mar_smart_terrain_base_surge_def
+active = walker@mar_smart_terrain_base_surge_work_5
+
+[logic@mar_smart_terrain_base_surge_work_6]:logic@mar_smart_terrain_base_surge_def
+active = walker@mar_smart_terrain_base_surge_work_6
+
+[walker@mar_smart_terrain_base_surge_work_1]:walker@mar_smart_terrain_base_surge_def
+path_walk = surge_hide_1_walk
+path_look = surge_hide_1_look
+;out_restr = mar_base_surge_hide_a3
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_base_dog_doctor)} true
+
+[walker@mar_smart_terrain_base_surge_work_2]:walker@mar_smart_terrain_base_surge_def
+path_walk = surge_hide_2_walk
+path_look = surge_hide_2_look
+;out_restr = mar_base_surge_hide_a3
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_base_dog_doctor)} true
+
+[walker@mar_smart_terrain_base_surge_work_3]:walker@mar_smart_terrain_base_surge_def
+path_walk = surge_hide_3_walk
+path_look = surge_hide_2_look
+;out_restr = mar_base_surge_hide_a3
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_base_dog_doctor)} true
+
+[walker@mar_smart_terrain_base_surge_work_4]:walker@mar_smart_terrain_base_surge_def
+path_walk = surge_hide_4_walk
+path_look = surge_hide_3_look
+;out_restr = mar_base_surge_hide_a3
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_base_dog_doctor)} true
+
+[walker@mar_smart_terrain_base_surge_work_5]:walker@mar_smart_terrain_base_surge_def
+path_walk = surge_hide_5_walk
+path_look = surge_hide_3_look
+;out_restr = mar_base_surge_hide_a3
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_base_dog_doctor)} true
+
+[walker@mar_smart_terrain_base_surge_work_6]:walker@mar_smart_terrain_base_surge_def
+path_walk = surge_hide_6_walk
+path_look = surge_hide_4_look
+;out_restr = mar_base_surge_hide_a3
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_base_dog_doctor)} true

@@ -1,0 +1,195 @@
+--[[-----------------------------------------------------------------------\\--
+	:: PRIVATE ::
+--\\-----------------------------------------------------------------------]]--
+
+local tostring, math_floor, math_abs, string_join, string_rep, select, pairs
+	= tostring, math.floor, math.abs, string.join, string.rep, select, pairs
+
+
+--[[-------------------------------------------------------------------\\--
+	:: ini_file
+--\\-------------------------------------------------------------------]]--
+
+-- 2013-08-29 12:12: ~Xetrill: For anyone wondering, it's no accident that these
+-- local functions don't have a 'default' argument.
+-- Because that's basically a mistake in Lua (a code-smell).
+-- Just us 'or', i.e.: "ini:sr_string(sect, prop) or your_default_value".
+local function ini_file_sr_string(self, section, entry)
+	return self:line_exist(section, entry) and self:r_string(section, entry)
+end
+local function ini_file_sr_string_wq(self, section, entry)
+	return self:line_exist(section, entry) and self:r_string_wq(section, entry)
+end
+
+local function ini_file_sr_s32(self, section, entry)
+	return self:line_exist(section, entry) and self:r_s32(section, entry)
+end
+local function ini_file_sr_u32(self, section, entry)
+	return self:line_exist(section, entry) and self:r_u32(section, entry)
+end
+
+local function ini_file_sr_float(self, section, entry)
+	return self:line_exist(section, entry) and self:r_float(section, entry)
+end
+
+local function ini_file_sr_bool(self, section, entry)
+	return self:line_exist(section, entry) and self:r_bool(section, entry)
+end
+
+
+--[[-------------------------------------------------------------------\\--
+	:: buffer
+--\\-------------------------------------------------------------------]]--
+
+local function _insert_thousand_separator(amount)
+	local formatted = tostring(amount)
+	while true do
+		formatted, c = formatted:gsub('^(-?%d+)(%d%d%d)', '%1,%2')
+		if c == 0 then
+			break
+		end
+	end
+	return formatted
+end
+
+local function _round(val, decimal)
+	if decimal then
+		return floor((val * 10 ^ decimal) + 0.5) / (10 ^ decimal)
+	else
+		return floor(val + 0.5)
+	end
+end
+
+local function buffer_append_number(self, color)
+	local str_amount, formatted, famount, remainder
+
+	prefix     = prefix or ''
+	decimal    = decimal or 2
+	neg_prefix = neg_prefix or '-'
+
+	famount = math_floor(math_abs(_round(amount, decimal)))
+
+	formatted = _insert_thousand_separator(famount)
+
+	if decimal > 0 then
+		remainder = tostring(_round(math_abs(amount) - famount, decimal)):sub(3)
+		formatted = string_join('', formatted, '.', remainder, string_rep('0', decimal - remainder:len()))
+	end
+
+	if amount < 0 then
+		if neg_prefix == '()' then
+			formatted = string_join(formatted, '(', ')')
+
+		else
+			formatted = string_join('', neg_prefix, formatted)
+		end
+	end
+
+	return self:append(prefix, formatted)
+end
+
+local function buffer_append_color(self, ...)
+	if select('#', ...) == 0 then
+		self:append('%c[default]')
+	elseif select('#', ...) == 1 then
+		self:append('%c[', tostring(select(1, ...)), ']')
+	elseif select('#', ...) == 3 then
+		self:append('%c[255,', string_join(',', ...), ']')
+	elseif select('#', ...) == 4 then
+		self:append('%c[', string_join(',', ...), ']')
+	else
+		self:append('%c[255,255,0,255]')
+	end
+	return self
+end
+
+local function buffer_append_money(self, amount, color)
+	if color == nil then
+		self:append_number(amount)
+	else
+		self:append_color(color)
+		self:append_number(amount)
+		self:append_color(color)
+	end
+	return self:append(' RU')
+end
+
+local function buffer_append_format(self, fmt, arg1, ...)
+	if select('#', ...) == 0 then
+		return self:append(fmt:format(arg1))
+	else
+		return self:append(fmt:format(arg1, ...))
+	end
+end
+
+
+local EXPORTS_LUABIND = {
+	['ini_file'] = {
+		['sr_bool']      = ini_file_sr_bool,
+		['sr_float']     = ini_file_sr_float,
+		['sr_s32']       = ini_file_sr_s32,
+		['sr_string']    = ini_file_sr_string,
+		['sr_string_wq'] = ini_file_sr_string_wq,
+		['sr_u32']       = ini_file_sr_u32,
+	},
+}
+
+local EXPORTS_LIBRARY = {
+	['buffer'] = {
+		['append_number'] = buffer_append_number,
+		['append_format'] = buffer_append_format,
+		['append_color']  = buffer_append_color,
+		['append_money']  = buffer_append_money,
+	}
+}
+
+
+--[[-----------------------------------------------------------------------\\--
+	:: PUBLIC ::
+--\\-----------------------------------------------------------------------]]--
+
+__FILE__ = 'xs_extend'
+
+loaded = false
+
+function export()
+	if loaded then
+		return
+	end
+	for cls, lst in pairs(EXPORTS_LUABIND) do
+		if _G[cls] == nil then
+			abort("[xs_extend.export]: Cannot extend not yet loaded class '%s'.", cls)
+		end
+		for name, func in pairs(lst) do
+			_G[cls][name] = func
+		end
+	end
+	local _R
+ 	for lib, lst in pairs(EXPORTS_LIBRARY) do
+		if _G[lib] == nil then
+			abort("[xs_extend.export]: Cannot extend not yet loaded library '%s'.", lib)
+		end
+		for name, func in pairs(lst) do
+			_G[lib][name] = func
+		end
+	end
+	loaded = true
+end
+
+function undo()
+	if not loaded then
+		return
+	end
+	for cls, lst in pairs(EXPORTS_LUABIND) do
+		for name, func in pairs(lst) do
+			_G[cls][name] = nil
+		end
+	end
+	local _R
+	for lib, lst in pairs(EXPORTS_LIBRARY) do
+		for name, func in pairs(lst) do
+			_G[lib][name] = nil
+		end
+	end
+	loaded = false
+end

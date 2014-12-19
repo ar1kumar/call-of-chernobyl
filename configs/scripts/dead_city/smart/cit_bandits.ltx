@@ -1,0 +1,17 @@
+[smart_terrain]
+squad_id = 1
+max_population = 6
+respawn_params = respawn@cit_bandits
+respawn_idle = 15000
+
+[respawn@cit_bandits]
+spawn_bandit@advanced
+spawn_bandit@master
+
+[spawn_bandit@advanced]
+spawn_squads = bandit_sim_squad_novice, bandit_sim_squad_advanced
+spawn_num = 3
+
+[spawn_bandit@master]
+spawn_squads = bandit_sim_squad_advanced, bandit_sim_squad_advanced, bandit_sim_squad_veteran
+spawn_num = 3

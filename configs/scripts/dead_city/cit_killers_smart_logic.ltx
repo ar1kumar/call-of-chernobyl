@@ -1,0 +1,68 @@
+;merc trader
+[logic@cit_killers_merc_trader]
+suitable = {=check_npc_name(cit_killers_merc_trader_stalker)} true
+prior = 200
+active = animpoint@stand
+level_spot = trader
+trade = misc\trade\trade_mercenary.ltx
+can_select_weapon = false
+
+[animpoint@stand]
+cover_name = cit_killers_merc_trader_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@trader
+on_info = {!npc_in_zone(merc_trader_in_restr)} %=teleport_npc(cit_killers_merc_trader_spawn)%
+out_restr = mil_trader_in_restr
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@trader]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+
+;merc mechanic
+[logic@cit_killers_merc_mechanic]
+suitable = {=check_npc_name(cit_killers_merc_mechanic_stalker)} true
+prior = 200
+active = animpoint@stand2
+level_spot = mechanic
+can_select_weapon = false
+
+[animpoint@stand2]
+cover_name = cit_killers_merc_mechanic_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@mechanic
+on_info = {!npc_in_zone(merc_mechanic_in_restr)} %=teleport_npc(cit_killers_merc_mechanic_spawn)%
+out_restr = merc_mechanic_in_restr
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@mechanic]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true

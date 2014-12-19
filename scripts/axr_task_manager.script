@@ -1,0 +1,136 @@
+---------------------------
+-- task manager extender
+-- by Alundaio
+
+actor_tagged_squad_by_id = {}
+-----------------------------------------------------------------------------
+--								PRIVATE
+-----------------------------------------------------------------------------
+local function npc_on_death_callback(npc,who)
+	local npc_id = npc:id()
+	local id = alun_utils.load_var(db.actor,"esc_m_trader_bounty_target_id")
+	if (id and npc_id == id) then
+		alun_utils.printf("esc_m_trader_bounty_target_id=%s tagged_by_actor=%s",npc_id,db.storage[id] and db.storage[id].tagged_by_actor)
+		if (db.storage[npc_id] and db.storage[npc_id].tagged_by_actor == true) or (who and (who:id() == 0 or who:has_info("npcx_is_companion"))) then
+			task_manager.get_task_manager():set_task_completed("esc_m_trader_task_1")
+		end
+		alun_utils.save_var(db.actor,"esc_m_trader_bounty_target_id",nil)
+	end
+	id = alun_utils.load_var(db.actor,"zat_b7_bandit_boss_sultan_bounty_target_id")
+	if (id and npc_id == id) then
+		if (db.storage[npc_id] and db.storage[npc_id].tagged_by_actor == true) or (who and (who:id() == 0 or who:has_info("npcx_is_companion"))) then
+			task_manager.get_task_manager():set_task_completed("zat_b7_bandit_boss_sultan_task_1")
+		end
+		alun_utils.save_var(db.actor,"zat_b7_bandit_boss_sultan_bounty_target_id",nil)
+	end
+end 
+
+local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
+	local id = who and who:id()
+	if not (id) then 
+		return 
+	end
+	if (id == 0 or who:has_info("npcx_is_companion")) then
+		local npc_id = npc:id()
+		if (db.storage[npc_id]) then 
+			db.storage[npc_id].tagged_by_actor = true
+		end
+	end
+end
+
+local function squad_on_npc_death(squad,se_npc,killer)
+	local npc_id = se_npc and se_npc.id
+	local st = npc_id and db.storage[npc_id]
+	if (st and st.tagged_by_actor) or (killer and (killer.id == 0 or alife():has_info(killer.id,"npcx_is_companion"))) then 
+		actor_tagged_squad_by_id[squad.id] = true
+	end
+end
+
+local skipped_tasks = {}
+local function actor_on_leave_dialog(se_actor)
+	empty_table(skipped_tasks)
+end 
+
+-----------------------------------------------------------------------------
+--								ON GAME START
+-----------------------------------------------------------------------------
+function on_game_start()
+	callback_register("npc_on_death_callback",npc_on_death_callback)
+	callback_register("npc_on_hit_callback",npc_on_hit_callback)
+	callback_register("monster_on_death_callback",npc_on_death_callback)
+	callback_register("monster_on_hit_callback",npc_on_hit_callback)
+	callback_register("squad_on_npc_death",squad_on_npc_death)
+	callback_register("actor_on_leave_dialog",actor_on_leave_dialog)
+end
+
+------------------------------------------------------------------------------
+--								PUBLIC
+------------------------------------------------------------------------------
+-- automated ordered tasks
+-- tasks must be named <section>_task_<number>
+-- m_trader (ie. Sidrovich) use npc:name() instead
+function get_first_available_task(npc,skip)
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	
+	local sec = npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	local task_id = sec.."1"
+	
+	local count = 1
+	while (task_manager.task_ini:section_exist(task_id)) do
+		--alun_utils.printf("task_id=%s skipped=%s",task_id,skipped_tasks[task_id])
+		if (skipped_tasks[task_id] ~= true and task_info[task_id] == nil and xr_conditions.has_completed_task_prerequisites(nil,nil,{task_id})) then
+			if (skip) then 
+				skipped_tasks[task_id] = true
+				return
+			else
+				return task_id
+			end
+		end
+		count = count + 1
+		task_id = sec..tostring(count)
+	end
+end
+
+function get_random_available_task(npc)
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	
+	local sec = npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	local task_id = sec.."1"
+	
+	local avail = {}
+	local count = 1
+	while (task_manager.task_ini:section_exist(task_id)) do
+		if (task_info[task_id] == nil and xr_conditions.has_completed_task_prerequisites(nil,nil,{task_id})) then 
+			table.insert(avail,task_id)
+		end
+		count = count + 1
+		task_id = sec..tostring(count)
+	end
+	
+	if (#avail > 0) then 
+		return avail[math.random(#avail)]
+	end
+end
+
+function get_task_job_description(task)
+	return alun_utils.read_from_ini(task_manager.task_ini,task,"job_descr","string")
+end 
+
+function npc_has_task_to_give(npc)
+	return get_first_available_task(npc) ~= nil
+end
+
+function npc_give_first_available_ordered_task(npc)
+	local new_task = get_first_available_task(npc)
+	if not (new_task) then 
+		return 
+	end 
+
+	task_manager.get_task_manager():give_task(new_task)
+end
+
+function clear_skipped_tasks()
+	empty_table(skipped_tasks)
+end

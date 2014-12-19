@@ -1,0 +1,234 @@
+--[[-----------------------------------------------------------------------\\--
+	:: PRIVATE ::
+--\\-----------------------------------------------------------------------]]--
+
+local type, concat, insert, remove, flines, tostring
+	= type, table.concat, table.insert, table.remove, io.lines, tostring
+
+
+local m_cwd
+local m_roots = {}
+
+
+local function isGamePath()
+	return s and s:len() > 2 and s:sub(1, 1) == '$' and s:sub(-1) == '$'
+end
+
+
+--[[-----------------------------------------------------------------------\\--
+	:: PUBLIC ::
+--\\-----------------------------------------------------------------------]]--
+
+__FILE__ = "xs_fs"
+
+function trailingSlash(path)
+	if path:find("\\", path:len(), true) ~= nil then
+		return path
+	end
+	return path .. "\\"
+end
+
+function basename(path)
+	if path:sub(-1) == '\\' then
+		path = path:sub(1, path:len() - 1)
+	end
+
+	do
+		local markDir = path:find('\\[^\\]*$')
+		local markExt = path:find('.', markDir or 1, true)
+
+		if markDir and markExt then
+			return path:sub(markDir + 1, markExt - 1)
+		elseif markDir and not markExt then
+			return path:sub(markDir + 1)
+		elseif not markDir and markExt then
+			return path:sub(1, markExt - 1)
+		end
+	end
+
+	return path
+end
+
+-- Takes a relative path and combines it with a root path.
+-- Note: This is a 'dump' implementation, it's just some string operations.
+-- @param path  the relative path to be rooted.
+-- @param root  the root path (can be a fsgame.ltx reference)
+-- @return the rooted path
+function rootPath(path, root)
+	if isGamePath(root) then
+		root = gamePath(root)
+	end
+
+	if path:find(root, 1, true) then
+		return path
+	end
+
+	return trailingSlash(root) .. path
+end
+
+-- Takes a full (or absolute) path and unroots it, via the given root path.
+function leafPath(fullpath, root)
+	if isGamePath(root) then
+		root = gamePath(root)
+	end
+	if fullpath:find(root, 1, true) ~= nil then
+		return fullpath:sub(root:len() + 1)
+	else
+		return fullpath
+	end
+end
+
+function getDirectory(path, up)
+	if not path or path:len() == 0 then
+		return nil
+	end
+
+	local dirs = xs_utils.split('\\', path)
+	if dirs[#dirs]:find('.', -4, true) then
+		remove(dirs)
+	end
+
+	up = up or 0
+	while up > 0 do
+		remove(dirs)
+		up = up - 1
+	end
+
+	return concat(dirs, '\\')
+end
+
+-- Retrieves all INI/LTX sections from the specified file, it does so by reading
+-- the file line for line and parsing the relevant information.
+-- Note, that this function DOES NOT cache any results and should therefore be
+-- using with caution and care, and of course rarely.
+-- @games CS, CoP
+-- @param string path  The file to parse.
+-- @param boolean deep  [Optional, default: true]
+--					  If true then #includes will be parsed and processed.
+-- @return table A listing of all sections from the file specified with path.
+function listSections(path, deep)
+	if deep == nil then
+		deep = true
+	end
+
+	local root = gamePath('$game_config$')
+	path = rootPath(path, root)
+
+	local work = { path }
+	local list = {}
+	local trim = xs_utils.trim
+
+	repeat
+		local file = remove(work)
+
+		-- TODO: Change to use ini_file() instead of Lua's IO. This allows for reading files
+		-- from the game's .db archives too.
+		for line in flines(file) do
+			repeat
+				local line = trim(line)
+				if line:len() == 0 then
+					break
+				end
+
+				if deep and line:sub(1, 8) == '#include' then
+					local b = line:find('"', 8, true) + 1
+					local e = line:find('"', b, true) - 1
+					insert(work, rootPath(line:sub(b, e), getDirectory(file)))
+					break
+				end
+
+				if line:sub(1, 1) ~= '[' then
+					break
+				end
+
+				local mark = (line:find(']', 2, true) or 0) - 1
+				if mark < 0 then
+					break
+				end
+
+				insert(list, line:sub(2, mark))
+			until true
+		end
+	until #work == 0
+
+	return list
+end
+
+function getcwd()
+	if m_cwd == nil then
+		if io.cwd then
+			m_cwd = io.cwd()
+		elseif _G.getFS then
+			m_cwd = _G.getFS():update_path("$fs_root$", "") or ""
+		else
+			-- to run from command line
+			local p = io.popen('cd')
+			m_cwd = trailingSlash(getDirectory(p:read('*l'), 2))
+			p:close()
+		end
+	end
+	return m_cwd
+end
+
+function gamePath(root, ...)
+	if type(root) ~= 'string' or root:sub(1, 1) ~= '$' then
+		abort('[xs_fs.gamePath]: Invalid #1 argument: %s.' ,tostring(root))
+	end
+
+	if #m_roots == 0 then
+		m_roots['$fs_root$'] = trailingSlash(getcwd())
+
+		local trim, map, split -- We Don't Want No[oo] Glo[ooo]bal Lookups!
+			= xs_utils.trim, xs_utils.map, xs_utils.split
+
+		local paths = {}
+		for line in flines(m_roots['$fs_root$'] .. 'fsgame.ltx') do
+			repeat
+				line = trim(line)
+
+				if line:len() == 0 or line:find(';', 1, true) == 1 then -- say no to waste
+					break
+				end
+
+				local mark = line:find('=', 1, true)
+				if mark == nil then -- what did you do?!
+					break -- abort() here? after all it means fsgame.ltx is screwed up
+				end
+
+				local key   = trim(line:sub(1, mark - 1))
+				local parts = map(split("|", line:sub(mark + 1)), trim)
+
+				-- parts[1]: (string-boolean, required) recursive
+				-- parts[2]: (string-boolean, required) 'notif' huh? STALKER has NO resource management, so?
+				-- parts[3]: (string, required) root key OR absolute path (app_data_root)
+				-- parts[4]: (string, optional) relative path
+				-- parts[5]: (string, optional) windows wildcard mask (*.ext)
+				-- parts[6]: (string, optional) description
+
+				if #parts > 3 then
+					paths[key] = { path = parts[4], root = parts[3] }
+				elseif parts[3]:sub(1, 1) == '$' then
+					paths[key] = { path = '',	    root = parts[3] }
+				else
+					paths[key] = { path = parts[3] }
+				end
+			until true
+
+			-- This requires that $app_data_root$ is the very first entry in fsgame.ltx
+			-- and that $fs_root$ has already been discoverd.
+			for key, info in pairs(paths) do
+				if info.root ~= nil then
+					m_roots[key] = trailingSlash(m_roots[info.root]) .. trailingSlash(info.path)
+				else
+					m_roots[key] = trailingSlash(info.path)
+				end
+			end
+		end
+	end
+
+	if ... == nil then
+		return m_roots[root]
+	else
+		return m_roots[root] .. concat({ ... }, '\\')
+	end
+end

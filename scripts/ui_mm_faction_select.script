@@ -1,0 +1,313 @@
+-- Faction Select for Call of Chernobyl
+-- alundaio
+--[[
+Copyright (C) 2015 Alundaio
+This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
+--]]
+
+------------------
+-- on_game_load()
+------------------
+local set_money
+local function on_game_load()
+	local config = axr_main.config
+	if not (config) then 
+		return 
+	end
+	
+	-- FACTION NEW GAME START
+	local se_actor = alife():object(db.actor:id())
+	local need_save
+	
+	local new_character_name = config:GetValue("temp","new_game_character_name",3)
+	if (new_character_name and new_character_name ~= "") then 
+		config:SetValue("temp","new_game_character_name")
+		need_save = true
+		
+		local data = stpk_utils.get_actor_data(se_actor)
+		data.character_name = new_character_name
+		stpk_utils.set_actor_data(data,se_actor)
+	end
+	
+	local faction = config:GetValue("temp","new_game_faction",3)
+	if (faction and faction ~= "") then 
+		config:SetValue("temp","new_game_faction")
+		need_save = true
+		
+		local gs = game.translate_string
+
+		local faction_to_position = {					   -- {level_name, gvid, lvid}
+											["stalker"] 	= {"l01_escape",462,40972,vector():set(-212.7,-23.2,-123)},
+											["bandit"] 		= {"l04_darkvalley",1460,223690,vector():set(49.5,11.4,47)},
+											["csky"] 		= {"k00_marsh"},
+											["killer"] 		= {"l09_deadcity",2307,107828,vector():set(-41.2,7.4,21.3)},
+											["army"] 		= {"l03_agroprom",991,68684,vector():set(-146.78,4.99,-199.86)},
+											["dolg"] 		= {"l05_bar",1679,56643,vector():set(224.99,-5.24,130.84)},
+											["freedom"] 	= {"l07_military",2135,297226,vector():set(8.07,-7.27,17.08)},
+											["ecolog"] 		= {"jupiter",4297,343417,vector():set(-220.33,-3.53,69.54)},
+											["monolith"] 	= {"l11_pripyat",2896,98949,vector():set(0.05,0.12,0.99)}
+		}
+		
+		if (faction_to_position[faction]) then
+			local t = faction_to_position[faction]
+			if (t) then 
+				alun_utils.jump_to_level(t[1],t[2],t[3],t[4])
+			end
+			
+			-- faction diversity
+			if (faction == "killer") then 
+				task_manager.get_task_manager():give_task("esc_m_trader_task_1")
+			end
+			
+			local data = stpk_utils.get_actor_data(se_actor)
+			data.specific_character = "actor_"..faction
+			stpk_utils.set_actor_data(data,se_actor)
+			
+			db.actor:set_character_community("actor_"..faction, 0, 0)
+			
+			local _xml = alun_utils.XmlParser():loadFile(alun_utils.fspath("$game_config$").."gameplay\\character_desc_general.xml")
+			_xml = alun_utils.XmlFindNodeWithPropertyValue(_xml,"specific_character","id","actor_"..faction)
+			if (_xml) then
+				local supplies = alun_utils.XmlGetNodeValue(_xml,"supplies")
+				if (supplies) then 
+					supplies = alun_utils.str_explode(supplies,"\\n")
+					local ini = system_ini()
+					local sim = alife()
+					for i=2,#supplies do
+						local sec = alun_utils.str_explode(supplies[i],"=")
+						if (ini:section_exist(sec[1])) then
+							sec[2] = sec[2] and tonumber(sec[2]) or 1
+							for ii=1,sec[2] do
+								sim:create(sec[1],db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+							end
+						end
+					end
+				end
+				
+				local money_max = alun_utils.XmlGetNodePropertyValue(_xml,"money","max")
+				if (money_max) then
+					money_max = tonumber(money_max)
+					if (money_max > 0) then
+						set_money = money_max-1
+					end
+				end
+			end
+		end
+	end
+
+	if (need_save) then 
+		config:Save()
+	end
+end
+
+function actor_on_update()
+	if (set_money) then 
+		db.actor:give_money(set_money)
+		set_money = nil
+	end
+	
+	callback_unregister("actor_on_update",this.actor_on_update)
+end
+
+------------------
+-- on_game_start()
+------------------
+function on_game_start()
+	callback_register("on_game_load",on_game_load)
+	callback_register("actor_on_update",actor_on_update)
+end 
+
+--------------------------------------------------------------
+-- faction_ui
+--------------------------------------------------------------
+
+class "faction_ui" (CUIScriptWnd)
+function faction_ui:__init(owner) super()
+	self.owner = owner
+	
+	self.selected_faction = nil
+	self.f = {"stalker","bandit","csky","dolg","freedom","killer","army","ecolog","monolith"}
+	self:InitControls(self.f)
+	self:InitCallBacks(self.f)
+end
+
+function faction_ui:__finalize()
+end
+
+function faction_ui:InitControls(f)
+	self:SetWndRect				(Frect():set(0,0,1024,768))
+	self:Enable					(true)
+
+	local xml					= CScriptXmlInit()
+	xml:ParseFile				("ui_mm_faction_select.xml")
+
+	xml:InitStatic				("background", self)
+	self.dialog					= xml:InitStatic("main_dialog:dialog", self)
+	
+	-- Menu Quit
+	local btn = xml:Init3tButton("main_dialog:btn_back", self.dialog)
+	self:Register(btn,"btn_back")
+	
+	-- Menu Start Game
+	btn = xml:Init3tButton("main_dialog:btn_submit", self.dialog)
+	self:Register(btn,"btn_submit")
+	
+	-- character_name edit box
+	xml:InitStatic("main_dialog:cap_character_name", self.dialog)
+	self.character_name = xml:InitEditBox("main_dialog:input_character_name",self.dialog)
+	self:Register(self.character_name,"input_character_name")
+	-- Set Default Name
+	self.character_name:SetText("Strelok")
+	
+	-- Faction select menu
+	xml:InitStatic("main_dialog:cap_faction_name", self.dialog)
+	self.disp_faction_name = xml:InitTextWnd("main_dialog:disp_faction_name", self.dialog)
+	
+	local pw
+	for i=1,#f do
+		self["btn_"..self.f[i]] = xml:Init3tButton("main_dialog:faction_"..f[i],self.dialog)
+		self["btn_"..f[i].."_inactive"] = xml:Init3tButton("main_dialog:faction_"..f[i].."_inactive", self.dialog)
+		self:Register(self["btn_"..f[i].."_inactive"],"btn_"..f[i].."_inactive_select")
+	end
+	
+	-- Faction description window
+	xml:InitStatic("main_dialog:description:background", self.dialog)
+	xml:InitFrame("main_dialog:description:list_frame",self.dialog)
+	self.scroll_v = xml:InitScrollView("main_dialog:description:scroll_v", self.dialog)
+	
+	self.desc_text = xml:InitTextWnd("main_dialog:description:desc_win", nil)
+	self.scroll_v:AddWindow(self.desc_text, true)
+end 
+
+function faction_ui:InitCallBacks(f)
+	self:AddCallback("btn_back", ui_events.BUTTON_CLICKED, self.OnQuit, self)
+	self:AddCallback("btn_submit", ui_events.BUTTON_CLICKED, self.OnStartGame, self)
+	self:AddCallback("list_factions", ui_events.LIST_ITEM_SELECT, self.OnSelectFactionList,		self)
+	
+	for i=1,#f do 
+		self:AddCallback("btn_"..f[i].."_inactive_select", ui_events.BUTTON_CLICKED, self["OnFaction_"..f[i]], self)
+	end
+end
+
+function faction_ui:OnFactionSelect(faction)
+	local gs = game.translate_string
+	local desc = gs("st_faction_"..faction.."_desc") .. "\\n \\n \\n"
+	
+	local _xml = alun_utils.XmlParser():loadFile(alun_utils.fspath("$game_config$").."gameplay\\character_desc_general.xml")
+	_xml = alun_utils.XmlFindNodeWithPropertyValue(_xml,"specific_character","id","actor_"..faction)
+	if (_xml) then
+	
+		local money_max = alun_utils.XmlGetNodePropertyValue(_xml,"money","max")
+		if (money_max) then
+			desc = desc .. "%c[0,245,245,220]Money: %c[0,188,210,238]".. money_max .. " RU\\n \\n"
+		end
+		
+		local supplies = alun_utils.XmlGetNodeValue(_xml,"supplies")
+		if (supplies) then 
+			desc = desc .. "%c[0,245,245,220]Equipment:\\n"
+
+			supplies = alun_utils.str_explode(supplies,"\\n")
+			local ini = system_ini()
+			for i=2,#supplies do
+				local sec = alun_utils.str_explode(supplies[i],"=")
+				if (ini:section_exist(sec[1])) then
+					local itm_name = gs(alun_utils.read_from_ini(ini,sec[1],"inv_name","string",""))
+					sec[2] = sec[2] and tonumber(sec[2]) or 1
+					if (sec[2] > 1) then 
+						desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(sec[2]).."\\n"
+					else
+						desc = desc .. "   %c[0,188,210,238]".. itm_name .."\\n"
+					end
+				end
+			end
+		end
+	end
+	
+	self.selected_faction = faction
+	
+	for i=1,#self.f do
+		self["btn_"..self.f[i]]:Show(false)
+		self["btn_"..self.f[i].."_inactive"]:Show(true)
+	end
+	
+	self["btn_"..faction]:Show(true)
+	self["btn_"..faction.."_inactive"]:Show(false)
+	
+	self.disp_faction_name:SetText(gs("st_faction_"..faction))
+	self.desc_text:SetText(desc)
+end
+
+function faction_ui:OnFaction_stalker()
+	self:OnFactionSelect("stalker")
+end
+function faction_ui:OnFaction_bandit()
+	self:OnFactionSelect("bandit")
+end
+function faction_ui:OnFaction_csky()
+	self:OnFactionSelect("csky")
+end
+function faction_ui:OnFaction_dolg()
+	self:OnFactionSelect("dolg")
+end
+function faction_ui:OnFaction_freedom()
+	self:OnFactionSelect("freedom")
+end
+function faction_ui:OnFaction_killer()
+	self:OnFactionSelect("killer")
+end
+function faction_ui:OnFaction_army()
+	self:OnFactionSelect("army")
+end
+function faction_ui:OnFaction_ecolog()
+	self:OnFactionSelect("ecolog")
+end
+function faction_ui:OnFaction_monolith()
+	self:OnFactionSelect("monolith")
+end
+
+
+function faction_ui:OnKeyboard(dik, keyboard_action)
+	local res = CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if res==false then
+		local bind = dik_to_bind(dik)
+		if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+			if dik == DIK_keys.DIK_ESCAPE then
+				self:OnQuit()
+			elseif (dik == DIK_keys.DIK_S) then 
+			end
+		end
+	end
+	return res
+end
+
+function faction_ui:OnQuit()
+	self.owner:ShowDialog(true)
+	self.owner:Show(true)
+	self:HideDialog()
+	self:Show(false)
+end
+
+function faction_ui:OnStartGame()
+	-- start game anyway if no config or axr_main script
+	if not (axr_main and axr_main.config) then 
+		self.owner:StartGame()
+		return
+	end 
+	
+	local character_name = self.character_name:GetText()
+	if (character_name == "") then
+		-- don't start game with no name. TODO: Add msgbox warning
+		return
+	end
+
+	if (self.selected_faction) then 
+		axr_main.config:SetValue("temp","new_game_faction",self.selected_faction)
+	end
+	-- Store info in temp config so it can be read on next game load
+	axr_main.config:SetValue("temp","new_game_character_name",character_name)
+	axr_main.config:Save()
+	
+	-- Start the game
+	self.owner:StartGame()
+end
+
