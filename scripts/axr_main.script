@@ -1,9 +1,12 @@
 --[[
-Copyright (C) 2014 Alundaio
+Copyright (C) 2012-2015 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 
 Callback and module manager for easy plug-in based script management
 by Alundaio
+
+TODO: Split up some features into their own scripts, such as event queue, sound_threshold check and marshal 
+also consider moving MAX_SQUADS to sim_squad_scripted.script
 --]]
 
 local alife, game_graph, pairs, marshal, level = alife, game_graph, pairs, _G.marshal, level
@@ -27,6 +30,9 @@ MAX_SQUADS 				= 256			-- Non-storied Squads above this count will randomly be r
 config = alun_utils.cfg_file(alun_utils.fspath("$game_data$").."axr_options.ini")
 
 -- Valid Callbacks (named intercepts to avoid namespace conflicts)
+-- 
+-- You must register a callback before or during on_game_load (ie. bind_actor net_spawn)
+-- All unused callbacks will have their table deleted from intercepts (see on_game_load for implementation)
 local intercepts = {
 	-- _g.script
 
@@ -116,6 +122,7 @@ local intercepts = {
 	actor_on_torch_disabled		= {},
 	actor_on_info_callback		= {},
 	actor_on_leave_dialog		= {},
+	actor_on_hit_callback		= {},
 
 	-- bind_monster.script
 	monster_on_update				= {},
@@ -128,8 +135,10 @@ local intercepts = {
 	physic_object_on_hit_callback 	= {},
 	physic_object_on_use_callback 	= {},
 
-	-- Custom saving feature (uses Xetril's lua.jit dll)
+	-- axr_main (custom)
 	on_level_changing				= {},
+	
+	-- Custom saving feature (uses Xetril's lua.jit dll)
 	save_state						= {},
 	load_state						= {}
 }
@@ -236,9 +245,15 @@ local function remove_non_story_squads(p)
 	local board = SIMBOARD
 	local gg = game_graph()
 	local se_actor = alife():actor()
+
+	-- if you don't want certain ids to be removed from game at any point, such as random alife squads used for tasks, check for them here
+	local exclude = { 
+					[task_functor.get_squad_id_by_task_var("esc_m_trader_bounty_target_id",true) or 65535] = true,
+					[task_functor.get_squad_id_by_task_var("zat_b7_bandit_boss_sultan_bounty_target_id",true) or 65535] = true
+					}
 	
 	for id,squad in pairs(board.squads) do
-		if (squad and squad.m_game_vertex_id and sor:get_story_id(id) == nil) then
+		if (squad and squad.m_game_vertex_id and not exclude[id] and sor:get_story_id(id) == nil) then
 			-- simulation_objects.sim_dist_to(se_actor,squad) > 2000
 			if (gg:vertex(db.actor:game_vertex_id()):level_id() ~= gg:vertex(squad.m_game_vertex_id):level_id()) then
 				create_delayed_event(squad.id,"remove_squad",math.random(1,220),remove_squad,squad.id)
@@ -280,6 +295,7 @@ end
 									ON GAME START
 
 	Register modules here. Their on_game_start functions should register callbacks they need.
+	
 --]]
 function on_game_start()
 	-- CoP
@@ -326,8 +342,10 @@ end
 -------------------
 function se_actor_on_register(actor)
 	--alun_utils.debug_write("se_actor_on_register")
-	for i=1, #intercepts.se_actor_on_register do
-		intercepts.se_actor_on_register[i](actor)
+	if (intercepts.se_actor_on_register) then
+		for i=1, #intercepts.se_actor_on_register do
+			intercepts.se_actor_on_register[i](actor)
+		end
 	end
 end
 
@@ -336,8 +354,10 @@ end
 -------------------
 function se_actor_on_unregister(actor)
 	--alun_utils.debug_write("se_actor_on_unregister")
-	for i=1, #intercepts.se_actor_on_unregister do
-		intercepts.se_actor_on_unregister[i](actor)
+	if (intercepts.se_actor_on_unregister) then
+		for i=1, #intercepts.se_actor_on_unregister do
+			intercepts.se_actor_on_unregister[i](actor)
+		end
 	end
 end
 
@@ -378,6 +398,7 @@ function on_game_load()
 		end
 	end
 
+	-- Every game load we want to make sure there are no more then MAX_SQUADS existing for stability purposes
 	if (count > MAX_SQUADS) then
 		create_delayed_event(0,"remove_non_story_squads",60,remove_non_story_squads,count)
 	end
@@ -393,6 +414,13 @@ function on_game_load()
 	alun_utils.printf("axr_main.on_game_load: There are %s object ids in use.",count)
 	--]]
 
+	-- clean up intercepts table if callbacks are unused
+	-- if needed this can be removed so that callbacks can be registered any time, not just before or during on_game_load
+	for i=1,#intercepts do 
+		if (#intercepts[i] == 0) then 
+			intercepts[i] = nil
+		end
+	end
 end
 
 -------------------
@@ -400,8 +428,10 @@ end
 -------------------
 function on_game_end()
 	--alun_utils.debug_write("on_game_end")
-	for i=1, #intercepts.on_game_end do
-		intercepts.on_game_end[i]()
+	if (intercepts.on_game_end) then
+		for i=1, #intercepts.on_game_end do
+			intercepts.on_game_end[i]()
+		end
 	end
 end
 
@@ -410,8 +440,10 @@ end
 ---------------------
 function on_pstor_load_all(obj,packet)
 	--alun_utils.debug_write("on_pstor_load_all")
-	for i=1, #intercepts.on_pstor_load_all do
-		intercepts.on_pstor_load_all[i](obj,packet)
+	if (intercepts.on_pstor_load_all) then
+		for i=1, #intercepts.on_pstor_load_all do
+			intercepts.on_pstor_load_all[i](obj,packet)
+		end
 	end
 end
 
@@ -420,18 +452,22 @@ end
 -------------------
 function actor_on_init(se_actor)
 	--alun_utils.debug_write("actor_on_init")
-	for i=1, #intercepts.actor_on_init do
-		intercepts.actor_on_init[i](se_actor)
+	if (intercepts.actor_on_init) then
+		for i=1, #intercepts.actor_on_init do
+			intercepts.actor_on_init[i](se_actor)
+		end
 	end
 end
 
 -------------------
 -- actor_on_info_callback(npc,info_id)
 -------------------
-function actor_on_info_callback(npc,info_id)
+function actor_on_info_callback(binder,npc,info_id)
 	--alun_utils.debug_write("actor_on_info_callback "..tostring(info_id))
-	for i=1, #intercepts.actor_on_info_callback do
-		intercepts.actor_on_info_callback[i](npc,info_id)
+	if (intercepts.actor_on_info_callback) then
+		for i=1, #intercepts.actor_on_info_callback do
+			intercepts.actor_on_info_callback[i](npc,info_id)
+		end
 	end
 end
 
@@ -445,9 +481,12 @@ local actor_talking
 actor_light = nil
 function actor_on_update(se_actor,delta)
 	--alun_utils.debug_write("actor_on_update")
-	for i=1, #intercepts.actor_on_update do
-		if (intercepts.actor_on_update[i]) then
-			intercepts.actor_on_update[i](se_actor,delta)
+	local _aupdate = intercepts.actor_on_update
+	if (_aupdate) then
+		for i=1, #_aupdate do
+			if (_aupdate[i]) then
+				_aupdate[i](se_actor,delta)
+			end
 		end
 	end
 
@@ -475,16 +514,19 @@ function actor_on_update(se_actor,delta)
 	end
 	upd_dtimer = tg + 250
 
-	if (db.actor:is_talking() and not actor_talking) then 
-		actor_talking = true
-	elseif (db.actor:is_talking() ~= true and actor_talking) then 
-		actor_talking = nil
-		for i=1, #intercepts.actor_on_leave_dialog do
-			intercepts.actor_on_leave_dialog[i](se_actor)
+	if (intercepts.actor_on_leave_dialog) then
+		if (db.actor:is_talking() and not actor_talking) then 
+			actor_talking = true
+		elseif (db.actor:is_talking() ~= true and actor_talking) then 
+			actor_talking = nil
+			for i=1, #intercepts.actor_on_leave_dialog do
+				intercepts.actor_on_leave_dialog[i](se_actor)
+			end
 		end
 	end
 	
 	-- Are-wide sound decrement
+	-- comment block this routine if need to optimize
 	actor_sound_incr = actor_sound_incr and actor_sound_incr - 0.25
 	if (actor_sound_incr and actor_sound_incr < 0) then
 		actor_sound_incr = 0
@@ -501,18 +543,23 @@ function actor_on_update(se_actor,delta)
 
 	local wpn = db.actor:active_item()
 	if (wpn) then
-		if (alun_utils.item_is_fa(wpn)) then
-			local inmag = wpn:get_ammo_in_magazine()
-			if (inmag == 0) then
-				if not (actor_reload) then
-					actor_reload = true
-					actor_on_weapon_no_ammo(wpn)
+		local firearm = alun_utils.item_is_fa(wpn)
+		if (firearm) then
+		
+			if (intercepts.actor_on_weapon_no_ammo) then
+				local inmag = wpn:get_ammo_in_magazine()
+				if (inmag == 0) then
+					if not (actor_reload) then
+						actor_reload = true
+						actor_on_weapon_no_ammo(wpn)
+					end
+				else
+					actor_reload = nil
 				end
-			else
-				actor_reload = nil
 			end
 
 			-- Area-wide sound threshold (Check sim_board how it's used)
+			-- comment block this routine if need to optimize
 			local se_obj = alife():object(wpn:id())
 			local data = se_obj and stpk_utils.get_weapon_data(se_obj)
 			if (data.weapon_state == 5) then
@@ -535,11 +582,18 @@ function actor_on_update(se_actor,delta)
 			end
 		end
 
-		if (wpn:section() == "wpn_binoc" or alun_utils.addon_attached(wpn,"sc")) then
-			if (device().fov < 50) then
-				if not (actor_scope) then
-					actor_scope = true
-					actor_on_weapon_zoom_in(wpn)
+		if (intercepts.actor_on_weapon_zoom_in) then
+			if (wpn:section() == "wpn_binoc" or (firearm and alun_utils.addon_attached(wpn,"sc"))) then
+				if (device().fov < 50) then
+					if not (actor_scope) then
+						actor_scope = true
+						actor_on_weapon_zoom_in(wpn)
+					end
+				else
+					if (actor_scope) then
+						actor_scope = nil
+						actor_on_weapon_zoom_out(wpn)
+					end
 				end
 			else
 				if (actor_scope) then
@@ -547,22 +601,19 @@ function actor_on_update(se_actor,delta)
 					actor_on_weapon_zoom_out(wpn)
 				end
 			end
-		else
-			if (actor_scope) then
-				actor_scope = nil
-				actor_on_weapon_zoom_out(wpn)
-			end
 		end
 	end
 
-	local torch = db.actor:object("device_torch")
-	if (torch and not actor_light and torch:torch_enabled()) then
-		actor_light = true
-		actor_on_torch_enabled()
-	elseif (torch and not torch:torch_enabled()) then
-		if (actor_light) then
-			actor_light = false
-			actor_on_torch_disabled()
+	if (intercepts.actor_on_torch_enabled) then
+		local torch = db.actor:object("device_torch")
+		if (torch and not actor_light and torch:torch_enabled()) then
+			actor_light = true
+			actor_on_torch_enabled()
+		elseif (torch and not torch:torch_enabled()) then
+			if (actor_light) then
+				actor_light = false
+				actor_on_torch_disabled()
+			end
 		end
 	end
 end
@@ -615,45 +666,89 @@ end
 -------------------
 -- actor_on_item_take(item)
 -------------------
-function actor_on_item_take(item)
-	for i=1, #intercepts.actor_on_item_take do
-		intercepts.actor_on_item_take[i](item)
+function actor_on_item_take(binder,item)
+	if isArtefact(item) then
+		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
+		if anomal_zone ~= nil then
+			anomal_zone:on_artefact_take(item)
+		else
+			bind_anomaly_zone.artefact_ways_by_id[item:id()] = nil
+		end
+		local artefact = item:get_artefact()
+		artefact:FollowByPath("NULL",0,vector():set(500,500,500))
+		xr_statistic.inc_founded_artefacts_counter(item:id())
+	end
+	treasure_manager.get_treasure_manager():on_item_take(item:id())
+	
+	if (intercepts.actor_on_item_take) then
+		for i=1, #intercepts.actor_on_item_take do
+			intercepts.actor_on_item_take[i](item)
+		end
 	end
 end
 
 -------------------
 -- actor_on_item_take_from_box(box,item)
 -------------------
-function actor_on_item_take_from_box(box,item)
-	for i=1, #intercepts.actor_on_item_take_from_box do
-		intercepts.actor_on_item_take_from_box[i](box,item)
+function actor_on_item_take_from_box(binder,box,item)
+	if (intercepts.actor_on_item_take_from_box) then
+		for i=1, #intercepts.actor_on_item_take_from_box do
+			intercepts.actor_on_item_take_from_box[i](box,item)
+		end
 	end
 end
 
 -------------------
 -- actor_on_item_drop(item)
 -------------------
-function actor_on_item_drop(item)
-	for i=1, #intercepts.actor_on_item_drop do
-		intercepts.actor_on_item_drop[i](item)
+function actor_on_item_drop(binder,item)
+	if (intercepts.actor_on_item_drop) then
+		for i=1, #intercepts.actor_on_item_drop do
+			intercepts.actor_on_item_drop[i](item)
+		end
 	end
 end
 
 -------------------
 -- actor_on_item_use(item)
 -------------------
-function actor_on_item_use(item)
-	for i=1, #intercepts.actor_on_item_use do
-		intercepts.actor_on_item_use[i](item)
+function actor_on_item_use(binder,item)
+	local sec = item:section()
+	if (sec == "drug_anabiotic") then 
+		xr_effects.disable_ui_only(db.actor, nil)
+		level.add_cam_effector("camera_effects\\surge_02.anm", 10, false, "bind_stalker.anabiotic_callback")
+		level.add_pp_effector("surge_fade.ppe", 11, false)
+		give_info("anabiotic_in_process")
+		local con = get_console()
+		_G.mus_vol = con:get_float("snd_volume_music")
+		_G.amb_vol = con:get_float("snd_volume_eff")
+		con:execute("snd_volume_music 0")
+		con:execute("snd_volume_eff 0")
+	elseif (atmosfear) and (sec == "drug_psy_blockade" or sec == "drug_radioprotector" or sec == "drug_antidot") then
+		local boost_time = system_ini():r_float(sec,"boost_time")
+		xr_logic.pstor_store(db.actor,sec.."_expiration",atmosfear.CTimeAddSec(game.get_game_time(),boost_time*level.get_time_factor()))
+	end 
+	
+	if (intercepts.actor_on_item_use) then
+		for i=1, #intercepts.actor_on_item_use do
+			intercepts.actor_on_item_use[i](item,sec)
+		end
 	end
 end
 
 -------------------
 -- actor_on_trade(item)
 -------------------
-function actor_on_trade(item,sell_bye,money)
-	for i=1, #intercepts.actor_on_trade do
-		intercepts.actor_on_trade[i](item,sell_bye,money)
+function actor_on_trade(binder,item,sell_bye,money)
+	if sell_bye == true then
+		 game_stats.money_trade_update (money)
+	else
+		 game_stats.money_trade_update (-money)
+	end
+	if (intercepts.actor_on_trade) then
+		for i=1, #intercepts.actor_on_trade do
+			intercepts.actor_on_trade[i](item,sell_bye,money)
+		end
 	end
 end
 
@@ -661,22 +756,25 @@ end
 -- actor_on_save(bind_stalker,packet)
 -------------------
 function actor_on_save(binder,packet)
-	local sim,gg = alife(),game_graph()
-	local actor_gv = sim and gg:vertex(sim:actor().m_game_vertex_id)
-	
-	if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
-		alun_utils.printf("actor changing level")
-		if (REMOVE_ME_LC) then
-			local sim = alife()
-			local se_obj = sim:object(REMOVE_ME_LC)
-			if (se_obj) then
-				alun_utils.printf("removing temp level_changer %s",se_obj:name())
-				sim:release(se_obj,true)
-			end
-		end
+
+	if (intercepts.on_level_changing) then
+		local sim,gg = alife(),game_graph()
+		local actor_gv = sim and gg:vertex(sim:actor().m_game_vertex_id)
 		
-		for i=1,#intercepts.on_level_changing do 
-			intercepts.on_level_changing[i]()
+		if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
+			alun_utils.printf("actor changing level")
+			if (REMOVE_ME_LC) then
+				local sim = alife()
+				local se_obj = sim:object(REMOVE_ME_LC)
+				if (se_obj) then
+					alun_utils.printf("removing temp level_changer %s",se_obj:name())
+					sim:release(se_obj,true)
+				end
+			end
+			
+			for i=1,#intercepts.on_level_changing do 
+				intercepts.on_level_changing[i]()
+			end
 		end
 	end
 	
@@ -691,8 +789,10 @@ function actor_on_save(binder,packet)
 		if (savegame) then
 			packet:w_stringZ(path)
 
-			for i=1, #intercepts.save_state do
-				intercepts.save_state[i](m_data)
+			if (intercepts.save_state) then
+				for i=1, #intercepts.save_state do
+					intercepts.save_state[i](m_data)
+				end
 			end
 
 			for id,t in pairs(db.storage) do
@@ -752,8 +852,10 @@ function actor_on_load(binder,packet)
 
 		alun_utils.printf("axr_main: loading custom data %s", path)
 
-		for i=1, #intercepts.load_state do
-			intercepts.load_state[i](m_data)
+		if (intercepts.load_state) then
+			for i=1, #intercepts.load_state do
+				intercepts.load_state[i](m_data)
+			end
 		end
 
 		return
@@ -765,12 +867,29 @@ function actor_on_load(binder,packet)
 end
 
 -------------------
+-- actor_on_hit_callback(npc,amount,local_direction,who,bone_index)
+-------------------
+function actor_on_hit_callback(binder,npc,amount,local_direction,who,bone_index)
+	if (amount <= 0) then
+		return
+	end
+	--alun_utils.debug_write("npc_on_hit_callback")
+	if (intercepts.actor_on_hit_callback) then
+		for i=1, #intercepts.actor_on_hit_callback do
+			intercepts.actor_on_hit_callback[i](npc,amount,local_direction,who,bone_index)
+		end
+	end
+end
+
+-------------------
 -- se_stalker_on_spawn(se_npc)
 -------------------
 function se_stalker_on_spawn(se_npc)
 	--alun_utils.debug_write("se_stalker_on_spawn"..tostring(se_npc and se_npc:name()))
-	for i=1, #intercepts.se_stalker_on_spawn do
-		intercepts.se_stalker_on_spawn[i](se_npc)
+	if (intercepts.se_stalker_on_spawn) then
+		for i=1, #intercepts.se_stalker_on_spawn do
+			intercepts.se_stalker_on_spawn[i](se_npc)
+		end
 	end
 end
 
@@ -778,8 +897,10 @@ end
 -- npc_on_use(npc,who)
 -------------------
 function npc_on_use(npc,who)
-	for i=1, #intercepts.npc_on_use do
-		intercepts.npc_on_use[i](npc,who)
+	if (intercepts.npc_on_use) then
+		for i=1, #intercepts.npc_on_use do
+			intercepts.npc_on_use[i](npc,who)
+		end
 	end
 end
 
@@ -788,8 +909,10 @@ end
 -------------------
 function npc_on_item_take(npc,item)
 	--alun_utils.debug_write("npc_on_item_take")
-	for i=1, #intercepts.npc_on_item_take do
-		intercepts.npc_on_item_take[i](npc,item)
+	if (intercepts.npc_on_item_take) then
+		for i=1, #intercepts.npc_on_item_take do
+			intercepts.npc_on_item_take[i](npc,item)
+		end
 	end
 end
 
@@ -798,8 +921,10 @@ end
 -------------------
 function npc_on_item_drop(npc,item)
 	--alun_utils.debug_write("npc_on_item_drop")
-	for i=1, #intercepts.npc_on_item_drop do
-		intercepts.npc_on_item_drop[i](npc,item)
+	if (intercepts.npc_on_item_drop) then
+		for i=1, #intercepts.npc_on_item_drop do
+			intercepts.npc_on_item_drop[i](npc,item)
+		end
 	end
 end
 
@@ -808,8 +933,10 @@ end
 -------------------
 function npc_on_net_spawn(npc,se_npc)
 	--alun_utils.debug_write("npc_on_net_spawn")
-	for i=1, #intercepts.npc_on_net_spawn do
-		intercepts.npc_on_net_spawn[i](npc,se_npc)
+	if (intercepts.npc_on_net_spawn) then
+		for i=1, #intercepts.npc_on_net_spawn do
+			intercepts.npc_on_net_spawn[i](npc,se_npc)
+		end
 	end
 end
 
@@ -818,8 +945,10 @@ end
 -------------------
 function npc_on_net_destroy(npc)
 	--alun_utils.debug_write("npc_on_net_destroy")
-	for i=1, #intercepts.npc_on_net_destroy do
-		intercepts.npc_on_net_destroy[i](npc)
+	if (intercepts.npc_on_net_destroy) then
+		for i=1, #intercepts.npc_on_net_destroy do
+			intercepts.npc_on_net_destroy[i](npc)
+		end
 	end
 end
 
@@ -828,13 +957,21 @@ end
 -------------------
 function npc_on_update(npc,st)
 	--alun_utils.debug_write("npc_on_update")
-	for i=1, #intercepts.npc_on_update do
-		intercepts.npc_on_update[i](npc,st)
+	local _nupdate = intercepts.npc_on_update
+	if (_nupdate) then
+		for i=1, #_nupdate do
+			_nupdate[i](npc,st)
+		end
 	end
 
-	if (npc:alive()) then
-		local wpn = npc:best_weapon()
-		if (wpn and alun_utils.item_is_fa(wpn)) then
+	if not (npc:alive()) then
+		return 
+	end 
+	
+	local wpn = npc:best_weapon()
+	if (wpn and alun_utils.item_is_fa(wpn)) then
+	
+		if (intercepts.npc_on_weapon_no_ammo) then
 			local inmag = wpn:get_ammo_in_magazine()
 			if (inmag == 0) then
 				if not (st.weapon_reload) then
@@ -844,7 +981,9 @@ function npc_on_update(npc,st)
 			else
 				st.weapon_reload = nil
 			end
+		end
 
+		if (intercepts.npc_on_weapon_sight) then
 			local sight_type = npc:sight_params().m_sight_type
 			if (sight_type) and (sight_type == 4 or sight_type == 9 or sight_type == 10) then
 				if not (st.sight_type) then
@@ -857,8 +996,9 @@ function npc_on_update(npc,st)
 					npc_on_weapon_unsight(npc,wpn,st,sight_type)
 				end
 			end
+		end
 
-			--[[
+		if (intercepts.npc_on_weapon_state_change) then
 			local sobj = alife():object(wpn:id())
 			local data = stpk_utils.get_weapon_data(sobj)
 
@@ -866,7 +1006,6 @@ function npc_on_update(npc,st)
 				npc_on_weapon_state_change(npc,wpn,st,data.weapon_state)
 				st.weapon_state = data.weapon_state
 			end
-			--]]
 		end
 	end
 end
@@ -876,8 +1015,10 @@ end
 -------------------
 function npc_on_weapon_state_change(npc,wpn,st,state)
 	--alun_utils.debug_write("npc_on_weapon_state_change")
-	for i=1, #intercepts.npc_on_weapon_state_change do
-		intercepts.npc_on_weapon_state_change[i](npc,wpn,st,state)
+	if (intercepts.npc_on_weapon_state_change) then
+		for i=1, #intercepts.npc_on_weapon_state_change do
+			intercepts.npc_on_weapon_state_change[i](npc,wpn,st,state)
+		end
 	end
 end
 
@@ -913,8 +1054,10 @@ end
 -- npc_on_weapon_strapped(npc,weapon)
 -------------------
 function npc_on_weapon_strapped(npc,wpn)
-	for i=1, #intercepts.npc_on_weapon_strapped do
-		intercepts.npc_on_weapon_strapped[i](npc,wpn)
+	if (intercepts.npc_on_weapon_strapped) then
+		for i=1, #intercepts.npc_on_weapon_strapped do
+			intercepts.npc_on_weapon_strapped[i](npc,wpn)
+		end
 	end
 end
 
@@ -922,8 +1065,10 @@ end
 -- npc_on_weapon_unstrapped(npc,weapon)
 -------------------
 function npc_on_weapon_unstrapped(npc,wpn)
-	for i=1, #intercepts.npc_on_weapon_unstrapped do
-		intercepts.npc_on_weapon_unstrapped[i](npc,wpn)
+	if (intercepts.npc_on_weapon_unstrapped) then
+		for i=1, #intercepts.npc_on_weapon_unstrapped do
+			intercepts.npc_on_weapon_unstrapped[i](npc,wpn)
+		end
 	end
 end
 
@@ -931,8 +1076,10 @@ end
 -- npc_on_weapon_drop(npc,weapon)
 -------------------
 function npc_on_weapon_drop(npc,wpn)
-	for i=1, #intercepts.npc_on_weapon_drop do
-		intercepts.npc_on_weapon_drop[i](npc,wpn)
+	if (intercepts.npc_on_weapon_drop) then
+		for i=1, #intercepts.npc_on_weapon_drop do
+			intercepts.npc_on_weapon_drop[i](npc,wpn)
+		end
 	end
 end
 
@@ -940,8 +1087,10 @@ end
 -- npc_on_weapon_fire(npc,weapon)
 -------------------
 function npc_on_weapon_fire(npc,wpn)
-	for i=1, #intercepts.npc_on_weapon_fire do
-		intercepts.npc_on_weapon_fire[i](npc,wpn)
+	if (intercepts.npc_on_weapon_fire) then
+		for i=1, #intercepts.npc_on_weapon_fire do
+			intercepts.npc_on_weapon_fire[i](npc,wpn)
+		end
 	end
 end
 
@@ -950,8 +1099,10 @@ end
 -------------------
 function npc_add_precondition(action)
 	--alun_utils.debug_write("npc_add_precondition")
-	for i=1, #intercepts.npc_add_precondition do
-		intercepts.npc_add_precondition[i](action)
+	if (intercepts.npc_add_precondition) then
+		for i=1, #intercepts.npc_add_precondition do
+			intercepts.npc_add_precondition[i](action)
+		end
 	end
 end
 
@@ -960,8 +1111,10 @@ end
 -------------------
 function npc_on_hear_callback(obj,who_id,s_type,sound_dist,sound_power,sound_position)
 	--alun_utils.debug_write("npc_on_hear_callback")
-	for i=1, #intercepts.npc_on_hear_callback do
-		intercepts.npc_on_hear_callback[i](obj,who_id,s_type,sound_dist,sound_power,sound_position)
+	if (intercepts.npc_on_hear_callback) then
+		for i=1, #intercepts.npc_on_hear_callback do
+			intercepts.npc_on_hear_callback[i](obj,who_id,s_type,sound_dist,sound_power,sound_position)
+		end
 	end
 end
 
@@ -970,8 +1123,10 @@ end
 -------------------
 function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
 	--alun_utils.debug_write("npc_on_hit_callback")
-	for i=1, #intercepts.npc_on_hit_callback do
-		intercepts.npc_on_hit_callback[i](npc,amount,local_direction,who,bone_index)
+	if (intercepts.npc_on_hit_callback) then
+		for i=1, #intercepts.npc_on_hit_callback do
+			intercepts.npc_on_hit_callback[i](npc,amount,local_direction,who,bone_index)
+		end
 	end
 end
 
@@ -981,8 +1136,10 @@ end
 function npc_on_death_callback(npc,who)
 	--alun_utils.printf("death_callback for %s killed by %s",npc:name(),who:name())
 	--alun_utils.debug_write("npc_on_death_callback")
-	for i=1, #intercepts.npc_on_death_callback do
-		intercepts.npc_on_death_callback[i](npc,who)
+	if (intercepts.npc_on_death_callback) then
+		for i=1, #intercepts.npc_on_death_callback do
+			intercepts.npc_on_death_callback[i](npc,who)
+		end
 	end
 end
 
@@ -991,8 +1148,10 @@ end
 -------------------
 function npc_on_get_all_from_corpse(npc,corpse)
 	--alun_utils.debug_write("npc_on_get_all_from_corpse")
-	for i=1, #intercepts.npc_on_get_all_from_corpse do
-		intercepts.npc_on_get_all_from_corpse[i](npc,corpse)
+	if (intercepts.npc_on_get_all_from_corpse) then
+		for i=1, #intercepts.npc_on_get_all_from_corpse do
+			intercepts.npc_on_get_all_from_corpse[i](npc,corpse)
+		end
 	end
 end
 
@@ -1000,8 +1159,10 @@ end
 -- npc_on_fighting_actor(npc)
 -------------------
 function npc_on_fighting_actor(npc)
-	for i=1, #intercepts.npc_on_fighting_actor do
-		intercepts.npc_on_fighting_actor[i](npc)
+	if (intercepts.npc_on_fighting_actor) then
+		for i=1, #intercepts.npc_on_fighting_actor do
+			intercepts.npc_on_fighting_actor[i](npc)
+		end
 	end
 end
 
@@ -1009,8 +1170,10 @@ end
 -- npc_on_item_take_from_box(npc,box,item)
 --------------------
 function npc_on_item_take_from_box(npc,box_item)
-	for i=1, #intercepts.npc_on_item_take_from_box do
-		intercepts.npc_on_item_take_from_box[i](npc,box,item)
+	if (intercepts.npc_on_item_take_from_box) then
+		for i=1, #intercepts.npc_on_item_take_from_box do
+			intercepts.npc_on_item_take_from_box[i](npc,box,item)
+		end
 	end
 end
 
@@ -1018,8 +1181,10 @@ end
 -- squad_on_update(squad)
 -------------------
 function squad_on_update(squad)
-	for i=1, #intercepts.squad_on_update do
-		intercepts.squad_on_update[i](squad)
+	if (intercepts.squad_on_update) then
+		for i=1, #intercepts.squad_on_update do
+			intercepts.squad_on_update[i](squad)
+		end
 	end
 end
 
@@ -1028,8 +1193,10 @@ end
 -------------------
 function squad_on_npc_creation(squad,npc,smart)
 	--alun_utils.debug_write(alun_utils.sr("squad_on_npc_creation squad=%s npc=%s smart=%s",squad and squad:name(),npc and npc:name(),smart and smart:name()))
-	for i=1, #intercepts.squad_on_npc_creation do
-		intercepts.squad_on_npc_creation[i](squad,npc,smart)
+	if (intercepts.squad_on_npc_creation) then
+		for i=1, #intercepts.squad_on_npc_creation do
+			intercepts.squad_on_npc_creation[i](squad,npc,smart)
+		end
 	end
 end
 
@@ -1038,8 +1205,10 @@ end
 -------------------
 function squad_on_npc_death(squad,npc,killer)
 	--alun_utils.debug_write("squad_on_npc_death")
-	for i=1, #intercepts.squad_on_npc_death do
-		intercepts.squad_on_npc_death[i](squad,npc,killer)
+	if (intercepts.squad_on_npc_death) then
+		for i=1, #intercepts.squad_on_npc_death do
+			intercepts.squad_on_npc_death[i](squad,npc,killer)
+		end
 	end
 end
 
@@ -1047,8 +1216,10 @@ end
 -- squad_on_unregister(self)
 -------------------
 function squad_on_unregister(squad)
-	for i=1, #intercepts.squad_on_unregister do
-		intercepts.squad_on_unregister[i](squad)
+	if (intercepts.squad_on_unregister) then
+		for i=1, #intercepts.squad_on_unregister do
+			intercepts.squad_on_unregister[i](squad)
+		end
 	end
 end
 
@@ -1057,9 +1228,11 @@ end
 -- squad_can_switch_offline(self)
 -------------------
 function squad_can_switch_offline(squad,npc)
-	for i=1, #intercepts.squad_can_switch_offline do
-		if (intercepts.squad_can_switch_offline[i](squad) == false) then
-			return false
+	if (intercepts.squad_can_switch_offline) then 
+		for i=1, #intercepts.squad_can_switch_offline do
+			if (intercepts.squad_can_switch_offline[i](squad) == false) then
+				return false
+			end
 		end
 	end
 end
@@ -1068,36 +1241,42 @@ end
 -- squad_assign_new_target(squad)
 -------------------
 function squad_assign_new_target(squad)
-	local id
-	for i=1, #intercepts.squad_assign_new_target do
-		id = intercepts.squad_assign_new_target[i](squad)
-		if (id) then
-			break
+	if (intercepts.squad_assign_new_target) then
+		local id
+		for i=1, #intercepts.squad_assign_new_target do
+			id = intercepts.squad_assign_new_target[i](squad)
+			if (id) then
+				break
+			end
 		end
+		return id
 	end
-	return id
 end
 
 -------------------
 -- squad_can_help_actor(squad)
 -------------------
 function squad_can_help_actor(squad)
-	local flag
-	for i=1, #intercepts.squad_can_help_actor do
-		flag = intercepts.squad_can_help_actor[i](squad)
-		if (flag) then
-			break
+	if (intercepts.squad_can_help_actor) then 
+		local flag
+		for i=1, #intercepts.squad_can_help_actor do
+			flag = intercepts.squad_can_help_actor[i](squad)
+			if (flag) then
+				break
+			end
 		end
+		return flag
 	end
-	return flag
 end
 
 -------------------
 -- squad_on_add_npc(squad,npc,spawn_section,spawn_position,lv_id,gv_id)
 -------------------
 function squad_on_add_npc(squad,npc,spawn_section,spawn_position,lv_id,gv_id)
-	for i=1, #intercepts.squad_on_add_npc do
-		intercepts.squad_on_add_npc[i](squad,npc,spawn_section,spawn_position,lv_id,gv_id)
+	if (intercepts.squad_on_add_npc) then
+		for i=1, #intercepts.squad_on_add_npc do
+			intercepts.squad_on_add_npc[i](squad,npc,spawn_section,spawn_position,lv_id,gv_id)
+		end
 	end
 end
 
@@ -1106,8 +1285,10 @@ end
 -------------------
 function set_generic_scheme(npc, ini, stype)
 	--alun_utils.debug_write("set_generic_scheme start")
-	for i=1, #intercepts.set_generic_scheme do
-		intercepts.set_generic_scheme[i](npc, ini,stype)
+	if (intercepts.set_generic_scheme) then 
+		for i=1, #intercepts.set_generic_scheme do
+			intercepts.set_generic_scheme[i](npc, ini,stype)
+		end
 	end
 	--alun_utils.debug_write("set_generic_scheme end")
 end
@@ -1116,8 +1297,10 @@ end
 -- scheme_reset(npc,scheme,section,st)
 -------------------
 function scheme_reset(npc,scheme,section,st)
-	for i=1, #intercepts.scheme_reset do
-		intercepts.scheme_reset[i](npc,scheme,section,st)
+	if (intercepts.scheme_reset) then
+		for i=1, #intercepts.scheme_reset do
+			intercepts.scheme_reset[i](npc,scheme,section,st)
+		end
 	end
 end
 
@@ -1125,8 +1308,10 @@ end
 -- scheme_disable(npc,stype)
 -------------------
 function scheme_disable(npc,stype)
-	for i=1, #intercepts.scheme_disable do
-		intercepts.scheme_disable[i](npc,stype)
+	if (intercepts.scheme_disable) then
+		for i=1, #intercepts.scheme_disable do
+			intercepts.scheme_disable[i](npc,stype)
+		end
 	end
 end
 
@@ -1134,8 +1319,10 @@ end
 -- scheme_deactivate(npc,scheme,st)
 -------------------
 function scheme_deactivate(npc,scheme,st)
-	for i=1, #intercepts.scheme_deactivate do
-		intercepts.scheme_deactivate[i](npc,scheme,st)
+	if (intercepts.scheme_deactivate) then
+		for i=1, #intercepts.scheme_deactivate do
+			intercepts.scheme_deactivate[i](npc,scheme,st)
+		end
 	end
 end
 
@@ -1144,8 +1331,10 @@ end
 -------------------
 function monster_on_update(npc,st)
 	--alun_utils.debug_write("monster_on_update")
-	for i=1, #intercepts.monster_on_update do
-		intercepts.monster_on_update[i](npc,st)
+	if (intercepts.monster_on_update) then
+		for i=1, #intercepts.monster_on_update do
+			intercepts.monster_on_update[i](npc,st)
+		end
 	end
 end
 
@@ -1154,8 +1343,10 @@ end
 -------------------
 function monster_on_hit_callback(obj,amount,local_direction,who,bone_index)
 	--alun_utils.debug_write("monster_on_hit_callback")
-	for i=1, #intercepts.monster_on_hit_callback do
-		intercepts.monster_on_hit_callback[i](obj,amount,local_direction,who,bone_index)
+	if (intercepts.monster_on_hit_callback) then
+		for i=1, #intercepts.monster_on_hit_callback do
+			intercepts.monster_on_hit_callback[i](obj,amount,local_direction,who,bone_index)
+		end
 	end
 end
 
@@ -1164,8 +1355,10 @@ end
 -------------------
 function monster_on_death_callback(obj,who)
 	--alun_utils.debug_write("monster_on_death_callback")
-	for i=1, #intercepts.monster_on_death_callback do
-		intercepts.monster_on_death_callback[i](obj,who)
+	if (intercepts.monster_on_death_callback) then
+		for i=1, #intercepts.monster_on_death_callback do
+			intercepts.monster_on_death_callback[i](obj,who)
+		end
 	end
 end
 
@@ -1174,8 +1367,10 @@ end
 -------------------
 function monster_on_net_spawn(obj)
 	--alun_utils.debug_write("monster_on_net_spawn")
-	for i=1, #intercepts.monster_on_net_spawn do
-		intercepts.monster_on_net_spawn[i](obj)
+	if (intercepts.monster_on_net_spawn) then
+		for i=1, #intercepts.monster_on_net_spawn do
+			intercepts.monster_on_net_spawn[i](obj)
+		end
 	end
 end
 
@@ -1183,8 +1378,10 @@ end
 -- monster_on_actor_use_callback(obj,who)
 -------------------
 function monster_on_actor_use_callback(obj,who)
-	for i=1, #intercepts.monster_on_actor_use_callback do
-		intercepts.monster_on_actor_use_callback[i](obj,who)
+	if (intercepts.monster_on_actor_use_callback) then
+		for i=1, #intercepts.monster_on_actor_use_callback do
+			intercepts.monster_on_actor_use_callback[i](obj,who)
+		end
 	end
 end
 
@@ -1197,8 +1394,11 @@ function main_menu_on_init(menu)
 	if (closecaption and closecaption.main_menu_on_init) then
 		closecaption.main_menu_on_init(menu)
 	end
-	for i=1, #intercepts.main_menu_on_init do
-		intercepts.main_menu_on_init[i](menu)
+	
+	if (intercepts.main_menu_on_init) then 
+		for i=1, #intercepts.main_menu_on_init do
+			intercepts.main_menu_on_init[i](menu)
+		end
 	end
 end
 
@@ -1209,8 +1409,10 @@ function main_menu_on_quit(menu)
 	if (closecaption and closecaption.main_menu_on_quit) then
 		closecaption.main_menu_on_quit(menu)
 	end
-	for i=1, #intercepts.main_menu_on_quit do
-		intercepts.main_menu_on_quit[i](menu)
+	if (intercepts.main_menu_on_quit) then
+		for i=1, #intercepts.main_menu_on_quit do
+			intercepts.main_menu_on_quit[i](menu)
+		end
 	end
 end
 
@@ -1218,8 +1420,10 @@ end
 -- main_menu_on_keyboard(dik,keyboard_action,self)
 ------------------
 function main_menu_on_keyboard(dik,keyboard_action,menu)
-	for i=1, #intercepts.main_menu_on_keyboard do
-		intercepts.main_menu_on_keyboard[i](dik,keyboard_action,menu)
+	if (intercepts.main_menu_on_keyboard) then
+		for i=1, #intercepts.main_menu_on_keyboard do
+			intercepts.main_menu_on_keyboard[i](dik,keyboard_action,menu)
+		end
 	end
 end
 
@@ -1229,8 +1433,10 @@ end
 function opt_menu_on_init(menu)
 	axr_main_options.opt_menu_on_init(menu)
 
-	for i=1, #intercepts.opt_menu_on_init do
-		intercepts.opt_menu_on_init[i](menu)
+	if (intercepts.opt_menu_on_init) then
+		for i=1, #intercepts.opt_menu_on_init do
+			intercepts.opt_menu_on_init[i](menu)
+		end
 	end
 end
 
@@ -1240,8 +1446,10 @@ end
 function opt_menu_on_accept(menu,optMgr,console)
 	axr_main_options.opt_menu_on_accept(menu,optMgr,console)
 
-	for i=1, #intercepts.opt_menu_on_accept do
-		intercepts.opt_menu_on_accept[i](menu,optMgr,console)
+	if (intercepts.opt_menu_on_accept) then
+		for i=1, #intercepts.opt_menu_on_accept do
+			intercepts.opt_menu_on_accept[i](menu,optMgr,console)
+		end
 	end
 end
 
@@ -1251,8 +1459,10 @@ end
 function opt_menu_on_set_values(menu,optMgr)
 	axr_main_options.opt_menu_on_set_values(menu,optMgr)
 
-	for i=1, #intercepts.opt_menu_on_set_values do
-		intercepts.opt_menu_on_set_values[i](menu,optMgr)
+	if (intercepts.opt_menu_on_set_values) then
+		for i=1, #intercepts.opt_menu_on_set_values do
+			intercepts.opt_menu_on_set_values[i](menu,optMgr)
+		end
 	end
 end
 
@@ -1260,8 +1470,10 @@ end
 -- physic_object_on_use_callback(obj,who)
 ------------------
 function physic_object_on_use_callback(obj,who)
-	for i=1, #intercepts.physic_object_on_use_callback do
-		intercepts.physic_object_on_use_callback[i](obj,who)
+	if (intercepts.physic_object_on_use_callback) then
+		for i=1, #intercepts.physic_object_on_use_callback do
+			intercepts.physic_object_on_use_callback[i](obj,who)
+		end
 	end
 end
 
@@ -1269,8 +1481,10 @@ end
 -- physic_object_on_hit_callback(obj, amount, local_direction, who, bone_index)
 ------------------
 function physic_object_on_hit_callback(obj, amount, local_direction, who, bone_index)
-	for i=1, #intercepts.physic_object_on_hit_callback do
-		intercepts.physic_object_on_hit_callback[i](obj, amount, local_direction, who, bone_index)
+	if (intercepts.physic_object_on_hit_callback) then
+		for i=1, #intercepts.physic_object_on_hit_callback do
+			intercepts.physic_object_on_hit_callback[i](obj, amount, local_direction, who, bone_index)
+		end
 	end
 end
 
@@ -1289,7 +1503,7 @@ end
 function on_save_game_save(fname)
 	last_save = fname
 	
-	-- force all queued actions to trigger
+	-- because the queue does not persist through saves we must force all queued actions to trigger
 	event_queue(true)
 
 	--alun_utils.printf("collectgarbage before=%sKb",collectgarbage("count")*1024)

@@ -5,12 +5,12 @@ trade = misc\trade\bar_visitors_barman_stalker_trader.ltx
 prior = 200
 can_select_weapon = false
 level_spot = trader
-combat_ignore = combat_ignore
-;inv_max_weight = 10000
 
 [walker@general]
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
 use_camp = false
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
@@ -59,7 +59,3 @@ meet_on_talking = false
 
 [danger_condition@barman]
 ignore_distance       = 0
-
-[combat_ignore]
-combat_ignore_cond = true
-combat_ignore_keep_when_attacked = true

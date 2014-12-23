@@ -59,15 +59,11 @@ far_distance			= 0
 far_anim				= nil
 far_snd					= nil
 far_victim				= nil
-use 					= {=is_wounded} true, {!is_squad_commander} false
+use 					= {=is_wounded} true, {!is_squad_commander} false, {=dist_to_actor_le(3)} true, false
+allow_break				= true
+use_text				= nil
 trade_enable 			= {=is_wounded} false, true
 meet_dialog				= {=is_wounded} axr_companion_medkit, nil
-
-[meet@ecolog_companion_task_1]:meet
-meet_dialog	= {=is_wounded} axr_companion_medkit, {=squad_in_zone(ecolog_companion_task_1:mar_smart_terrain_base_sr_no_assault)} ecolog_companion_task_1_dialog, nil
-
-[meet@ecolog_companion_task_2]:meet
-meet_dialog	= {=is_wounded} axr_companion_medkit, {=check_nearest_smart_dist_le(40:jup_b41)} ecolog_companion_task_2_dialog, nil
 
 [actor_dialogs]
 disable = dm_ordered_task_dialog, dm_traveler_dialog, dm_actor_become_guide_to_companion_dialog, dm_universal_dialog, about_quests_dialog_dolg, about_quests_dialog_freedom, about_quests_dialog_bandit, about_quests_dialog_stalkers
@@ -75,8 +71,15 @@ disable = dm_ordered_task_dialog, dm_traveler_dialog, dm_actor_become_guide_to_c
 ;===============================================
 ;            		 active sections
 ;===============================================
+;___________________ECOLOG_________________
+[meet@ecolog_companion_task_1]:meet
+meet_dialog	= {=is_wounded} axr_companion_medkit, {=squad_in_zone(ecolog_companion_task_1:mar_smart_terrain_base_sr_no_assault)} ecolog_companion_task_1_dialog, nil
+
+[meet@ecolog_companion_task_2]:meet
+meet_dialog	= {=is_wounded} axr_companion_medkit, {=check_nearest_smart_dist_le(40:jup_b41)} ecolog_companion_task_2_dialog, nil
+
 [beh@base]:beh@general
-on_info1 = {=check_squad_name(ecolog_companion_task_1)} beh@ecolog_companion_task_1, {=check_squad_name(ecolog_companion_task_2)} beh@ecolog_companion_task_2, {=check_squad_name(yan_ecolog_semenov_squad)} beh@yan_ecolog_semenov_task_1
+on_info1 = {=check_squad_name(ecolog_companion_task_1)} beh@ecolog_companion_task_1, {=check_squad_name(ecolog_companion_task_2)} beh@ecolog_companion_task_2, {=check_squad_name(yan_ecolog_semenov_squad)} beh@yan_ecolog_semenov_task_1, {=check_squad_name(bandit_companion_task_1)} beh@bandit_companion_task_1
 
 [beh@ecolog_companion_task_1]:beh@general
 meet = meet@ecolog_companion_task_1
@@ -91,6 +94,18 @@ on_info2 = {-ecolog_companion_task_2_force_started =dist_to_actor_le(3)} %+ecolo
 [beh@yan_ecolog_semenov_task_1]:beh@general
 mutant_corpse_analysis = {=is_squad_commander !check_yan_ecolog_semenov_task_1_stage_1_complete} true
 on_info1 = {-yan_ecolog_semenov_task_1_complete_force_dialog =dist_to_actor_le(3) =check_yan_ecolog_semenov_task_1_stage_1_complete =check_yan_ecolog_semenov_task_1_stage_2_complete} %+yan_ecolog_semenov_task_1_complete +yan_ecolog_semenov_task_1_complete_force_dialog =force_talk(true)%
+
+;___________________BANDIT_________________
+[meet@bandit_companion_task_1]:meet
+meet_dialog	= {=is_wounded} axr_companion_medkit, bandit_companion_task_1_dialog
+
+;TODO: Add logic to rob stalkers
+[beh@bandit_companion_task_1]:beh@general
+meet = meet@bandit_companion_task_1
+;on_info1 = 
+on_info2 = {-bandit_companion_task_1_force_started =dist_to_actor_le(3)} %+bandit_companion_task_1_force_started =force_talk(true)%
+corpse_detection_enabled = true
+
 
 ;====================================================================
 ; 				special scenario active sections

@@ -34,7 +34,7 @@ end
 ---------------------------------------------------------------------------------------------------------------
 -- Initialize a task to find a faction stayed at a smart anywhere on actor current level. ID of smart is tracked in pstor by a given var name
 -- param 1 - var name
--- param 2 - faction a.k.a. squad behavior/player_id
+-- param 2+ - faction a.k.a. squad behavior/player_id
 function find_smart_under_faction_control(actor,npc,p)
 	if not (p[1]) then 
 		return 
@@ -47,21 +47,17 @@ function find_smart_under_faction_control(actor,npc,p)
 			if (smrt) then 
 				for k,squad in pairs(smrt.squads) do
 					if (squad and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
-						if (p[2] == "monster" and sim_squad_scripted.is_squad_monster[squad.player_id] or squad.player_id == p[2]) then
-							target_id = smart.id
-							break
+						for i=2,#p do
+							if (p[i] == "monster" and sim_squad_scripted.is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
+								alun_utils.save_var(db.actor,p[1],smart.id)
+								return
+							end
 						end
 					end
 				end
 			end
 		end
 	end
-	
-	if not (target_id) then 
-		return 
-	end
-	
-	alun_utils.save_var(db.actor,p[1],target_id)
 end
 
 -- remove a companion squad by story id
@@ -143,16 +139,23 @@ function give_mar_base_owl_stalker_trader_task_3_reward(actor,npc,p)
 	--alun_utils.save_var(db.actor,"task_companion_slot_1",nil)
 end 
 
-function fail_mar_base_owl_stalker_trader_task_3(actor,npc,p)
-	inc_faction_goodwill_to_actor(db.actor, nil, {"ecolog", -10})
-	inc_faction_goodwill_to_actor(db.actor, nil, {"csky", -10})
-	--alun_utils.save_var(db.actor,"task_companion_slot_1",nil)
-end 
+function fail_task_dec_goodwill(actor,npc,p)
+	local amt = tonumber(p[1]) or 10
+	for i=2,#p do 
+		inc_faction_goodwill_to_actor(db.actor, nil, {p[i], -(amt)})
+	end
+end
 
-function fail_jup_b6_scientist_tech_task_1(actor,npc,p)
-	inc_faction_goodwill_to_actor(db.actor, nil, {"ecolog", -10})
-	inc_faction_goodwill_to_actor(db.actor, nil, {"csky", -10})
-end 
+function complete_task_inc_goodwill(actor,npc,p)
+	local amt = tonumber(p[1]) or 10
+	for i=2,#p do 
+		inc_faction_goodwill_to_actor(db.actor, nil, {p[i], amt})
+	end
+end
+
+function reward_money(actor,npc,p)
+	dialogs.relocate_money(db.actor,tonumber(p[1] or 0),"in")
+end
 
 function remove_special_task_squad(actor,npc,p)
 	level.add_pp_effector("black.ppe", 1313, false)
@@ -172,6 +175,11 @@ function setup_companion_task(actor,npc,p)
 		return 
 	end 
 	
+	if not (system_ini():section_exist(p[1])) then 
+		alun_utils.printf("setup_companion_task: Trying to setup companion squad with a non-existent section!")
+		return
+	end 
+	
 	local squad = alife():create(p[1],smart.position,smart.m_level_vertex_id,smart.m_game_vertex_id)
 	squad:create_npc(smart)
 	squad:set_squad_relation()
@@ -186,7 +194,9 @@ function setup_companion_task(actor,npc,p)
 
 	--alun_utils.save_var(db.actor,p[3] or "task_companion_slot_1",squad.id)
 	create_delayed_event(0,"add_special_task_squad",5,add_special_task_squad,squad.id)
-	
+end
+
+function setup_task_target_anomaly(actor,npc,p)
 	local targets = {}
 	for k,v in pairs(db.anomaly_by_name) do 
 		table.insert(targets,k)
@@ -198,7 +208,7 @@ function setup_companion_task(actor,npc,p)
 	
 	local target_name = targets[math.random(#targets)]
 	alun_utils.save_var(db.actor,"task_target_anomaly",target_name)
-end 
+end
 
 
 function force_talk(actor,npc,p)

@@ -11,99 +11,42 @@ meet = meet
 path_walk = yan_walker_saharov_walk
 path_look = yan_walker_saharov_look
 on_info = {+yan_actor_away_saharov} camper@1
-combat_ignore_cond = true
-combat_ignore_keep_when_attacked = true
-invulnerable = true
+combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_keep_when_attacked = {!is_enemy_actor_or_companion} true, false
+invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
-;def_state_moving1 = yan_professor_walk
-;def_state_moving2 = yan_professor_walk
-;def_state_moving3 = yan_professor_walk
-;def_state_standing = yan_professor_wait
 out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
 
-[camper@1]
+[camper@default]
 meet = meet
-path_walk = yan_camper_saharov_walk
-path_look = yan_camper_saharov_look
-combat_ignore_cond = true
-combat_ignore_keep_when_attacked = true
-invulnerable = true
+combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_keep_when_attacked = {!is_enemy_actor_or_companion} true, false
+invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
-;def_state_moving1 = yan_professor_walk
-;def_state_moving2 = yan_professor_walk
-;def_state_moving3 = yan_professor_walk
-;def_state_standing = yan_professor_wait
-;--on_info = {+yan_otnesti_doc_saharavy} camper@2
-;on_info = {+yan_vzyal_quest_doc} camper@3 ;last
+out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
+
+[camper@1]:camper@default
+path_walk = yan_camper_saharov_walk
+path_look = yan_camper_saharov_look
 on_info = {-yan_actor_away_saharov} walker
-;on_info2 = {+yan_quest_levsha !talking -yan_ui_disabled} remark@sakharov_start_operation %+yan_ui_disabled%
-out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
 
-[camper@2]
-meet = meet
+[camper@2]:camper@default
 path_walk = yan_camper_saharov_walk
 path_look = yan_camper_saharov_look
-combat_ignore_cond = true
-combat_ignore_keep_when_attacked = true
-invulnerable = true
-gather_items_enabled = false
-help_wounded_enabled = false
-corpse_detection_enabled = false
-;def_state_moving1 = yan_professor_walk
-;def_state_moving2 = yan_professor_walk
-;def_state_moving3 = yan_professor_walk
-;def_state_standing = yan_professor_wait
-;meet = meet@has_item
-out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
 
-[camper@3]
+[camper@3]:camper@default
 path_walk = yan_walker_saharov_walk
 path_look = yan_walker_saharov_look
-combat_ignore_cond = true
-combat_ignore_keep_when_attacked = true
-invulnerable = true
-gather_items_enabled = false
-help_wounded_enabled = false
-corpse_detection_enabled = false
-;def_state_moving1 = yan_professor_walk
-;def_state_moving2 = yan_professor_walk
-;def_state_moving3 = yan_professor_walk
-;def_state_standing = yan_professor_wait
-meet = meet
-;meet = meet@has_no_item
 on_info = {+yan_actor_away_saharov} camper@3_1
-out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
 
-
-;[remark@sakharov_start_operation]
-;anim = rac_sakharov
-;target = actor
-;meet = no_meet
-;combat_ignore_cond = true
-;on_signal = sound_end | camper@1 %=play_sound(yan_professr_reply_actor:stalker:yan_st_levsha_name)%
-;out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
-
-[camper@3_1]
+[camper@3_1]:camper@default
 path_walk = yan_walker_saharov_walk
 path_look = yan_walker_saharov_look
-combat_ignore_cond = true
-combat_ignore_keep_when_attacked = true
-invulnerable = true
-gather_items_enabled = false
-help_wounded_enabled = false
-corpse_detection_enabled = false
-;def_state_moving1 = yan_professor_walk
-;def_state_moving2 = yan_professor_walk
-;def_state_moving3 = yan_professor_walk
-;def_state_standing = yan_professor_wait
-meet = meet
-;meet = meet@has_no_item
 on_info = {-yan_actor_away_saharov} walker
-out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
 
 [meet]
 close_snd_hello = yan_stalker_sakharov_greeting
@@ -118,11 +61,3 @@ close_snd_distance = 3
 use = {=actor_enemy} false, true
 allow_break = false
 trade_enable = true
-
-;[meet@has_item]:meet
-;meet_dialog = yan_scientist_bring_documents
-
-;[meet@has_no_item]:meet
-;meet_dialog = yan_scientist_hello_dialog
-
-[dont_spawn_character_supplies]

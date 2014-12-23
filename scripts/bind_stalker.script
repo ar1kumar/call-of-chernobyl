@@ -1,20 +1,17 @@
-function init    (obj)
-				xr_motivator.AddToMotivator(obj)
+-- Callbacks are handled by axr_main
+-- To keep everything modular, register for callbacks instead of editing script directly
+-- This way, to disable your features, all someone has to do is comment a single line in axr_main.on_game_start
+-- or even better, remove the *.script
+-- alundaio
+
+function init(obj)
+	xr_motivator.AddToMotivator(obj)
 end
 
-function actor_init    (npc)
-				npc:bind_object(actor_binder(npc))
+function actor_init(npc)
+	npc:bind_object(actor_binder(npc))
 end
 
-local game_difficulty_by_num = {
-				[0] = "gd_novice",
-				[1] = "gd_stalker",
-				[2] = "gd_veteran",
-				[3] = "gd_master"
-				}
-
-local weapon_hide = {}
-local primary_objects_filled = false
 ----------------------------------------------------------------------------------------------------------------------
 class "actor_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
@@ -22,16 +19,14 @@ function actor_binder:__init (obj) super(obj)
 	self.bCheckStart = false
 	self.weather_manager = level_weathers.get_weather_manager()
 	self.surge_manager = surge_manager.get_surge_manager()
-	--self.actor_detector = xr_detector.actor_detector()
+
 	self.last_level_name = "nil"
 	self.deimos_intensity = nil
---	self.actor_weapon_on_start = true
-	self.loaded_active_slot = 3
-	self.loaded_slot_applied = false
+
 	self.last_detective_achievement_spawn_time 	= nil
 	self.last_mutant_hunter_achievement_spawn_time	= nil
 	-- Alundaio
-	if (axr_main) then axr_main.actor_on_init(self) end
+	axr_main.actor_on_init(self)
 	-- End Alundaio
 	-- AtmosFear
 	if (atmosfear) then self.atmosfear=atmosfear.get_atmosfear() end
@@ -47,7 +42,7 @@ function actor_binder:net_spawn(data)
 	self.bCheckStart = true
 	self.weapon_hide = false -- спрятано или нет оружие при разговоре.
 	self.weapon_hide_in_dialog = false
-	weapon_hide = {} -- устанавливаем глобальный дефолтовый флаг.
+
 	if object_binder.net_spawn(self,data) == false then
 		return false
 	end
@@ -59,19 +54,16 @@ function actor_binder:net_spawn(data)
 	if self.st.disable_input_time == nil then
 		level.enable_input()
 	end
-	--xr_s.on_game_load()                                    --' Distemper 03.2008 --
+
 	self.weather_manager:reset()
-	--' Загружаем настройки дропа
 	death_manager.init_drop_settings()
-	--'Устанавливаем ссылку на таскменеджер
 	self.task_manager = task_manager.get_task_manager()
 	self.spawn_frame = device().frame
 	self.already_jumped = false
 	self.loaded = false
-	--benchmark.main()							          --' Distemper 06.2008 --
 
 	-- alundaio
-	if (axr_main) then axr_main.on_game_load() end
+	axr_main.on_game_load()
 	if (xrs_debug_tools) then xrs_debug_tools.on_game_load() end
 	-- end alundaio
 
@@ -101,8 +93,11 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.level_border_exit, nil)
 	self.object:set_callback(callback.take_item_from_box, nil)
 	self.object:set_callback(callback.use_object, nil)
-	--log("--------->"..tostring(_G.amb_vol))
-	--log("--------->"..tostring(_G.mus_vol))
+	self.object:set_callback(callback.hit, nil)
+	if (callback.key_press) then
+		self.object:set_callback(callback.key_press, nil)
+	end
+
 	if(_G.amb_vol~=0) then
 		get_console():execute("snd_volume_eff "..tostring(_G.amb_vol))
 		_G.amb_vol = 0
@@ -115,10 +110,9 @@ function actor_binder:net_destroy()
 		sr_psy_antenna.psy_antenna:destroy()
 		sr_psy_antenna.psy_antenna = false
 	end
-	--xrs_dyn_music.finish_theme()
-	--xr_s.on_actor_destroy()
+
 	-- Alundaio
-	if (axr_main) then axr_main.on_game_end() end
+	axr_main.on_game_end()
 	-- Alundaio
 	object_binder.net_destroy(self)
 end
@@ -129,93 +123,18 @@ function actor_binder:reinit()
 	db.storage[npc_id] = empty_table(db.storage[npc_id])
 	self.st = db.storage[npc_id]
 
-	self.object:set_callback(callback.inventory_info, self.info_callback, self)
-	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
-	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)
-	self.object:set_callback(callback.trade_sell_buy_item, self.on_trade, self) -- for game stats
 	self.object:set_callback(callback.task_state, self.task_callback, self)
-	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
-	self.object:set_callback(callback.use_object, self.use_inventory_item, self)
-end
-----------------------------------------------------------------------------------------------------------------------
-function actor_binder:take_item_from_box(box, item)
-	local box_name = box:name()
-	-- Alundaio
-	if (axr_main) then axr_main.actor_on_item_take_from_box(box,item) end
-	-- End Alundaio
-end
-----------------------------------------------------------------------------------------------------------------------
-function actor_binder:info_callback(npc, info_id)
-	--if (axr_main and dev_debug) then
-		--alun_utils.printf("info_callback: %s",info_id)
-	--end
-	-- Alundaio
-	if (axr_main) then axr_main.actor_on_info_callback(npc,info_id) end
-	-- Alundaio
-end
-----------------------------------------------------------------------------------------------------------------------
-function actor_binder:on_trade (item, sell_bye, money)
-	if sell_bye == true then
-		 game_stats.money_trade_update (money)
-	else
-		 game_stats.money_trade_update (-money)
-	end
-	-- Alundaio
-	if (axr_main) then axr_main.actor_on_trade(item,sell_bye,money) end
-	-- End Alundaio
-end
-----------------------------------------------------------------------------------------------------------------------
-function actor_binder:on_item_take (obj)
-	if isArtefact(obj) then
-		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[obj:id()]
-		if anomal_zone ~= nil then
-			anomal_zone:on_artefact_take(obj)
-		else
-			bind_anomaly_zone.artefact_ways_by_id[obj:id()] = nil
-		end
-		local artefact = obj:get_artefact()
-		artefact:FollowByPath("NULL",0,vector():set(500,500,500))
-		xr_statistic.inc_founded_artefacts_counter(obj:id())
-	end
-	treasure_manager.get_treasure_manager():on_item_take(obj:id())
-
-	-- Alundaio
-	if (axr_main) then axr_main.actor_on_item_take(obj) end
-	-- End Alundaio
-end
-----------------------------------------------------------------------------------------------------------------------
-function actor_binder:on_item_drop (obj)
-	-- Alundaio
-	if (axr_main) then axr_main.actor_on_item_drop(obj) end
-	-- End Alundaio
-end
-
-function actor_binder:use_inventory_item(obj)
-	if not (obj) then
-		return 
-	end 
 	
-	-- Alundaio
-	if (axr_main) then axr_main.actor_on_item_use(obj) end
-	-- End Alundaio
-		
-	local sec = obj:section()
-	local level,game = level,game
-	
-	if (sec == "drug_anabiotic") then 
-		xr_effects.disable_ui_only(db.actor, nil)
-		level.add_cam_effector("camera_effects\\surge_02.anm", 10, false, "bind_stalker.anabiotic_callback")
-		level.add_pp_effector("surge_fade.ppe", 11, false)
-		give_info("anabiotic_in_process")
-		local con = get_console()
-		_G.mus_vol = con:get_float("snd_volume_music")
-		_G.amb_vol = con:get_float("snd_volume_eff")
-		con:execute("snd_volume_music 0")
-		con:execute("snd_volume_eff 0")
-	elseif (atmosfear) and (sec == "drug_psy_blockade" or sec == "drug_radioprotector" or sec == "drug_antidot") then
-		local boost_time = system_ini():r_float(sec,"boost_time")
-		xr_logic.pstor_store(db.actor,sec.."_expiration",atmosfear.CTimeAddSec(game.get_game_time(),boost_time*level.get_time_factor()))
-	end 
+	self.object:set_callback(callback.inventory_info, axr_main.actor_on_info_callback, self)
+	self.object:set_callback(callback.on_item_take, axr_main.actor_on_item_take, self)
+	self.object:set_callback(callback.on_item_drop, axr_main.actor_on_item_drop, self)
+	self.object:set_callback(callback.trade_sell_buy_item, axr_main.actor_on_trade, self)
+	self.object:set_callback(callback.take_item_from_box, axr_main.actor_on_item_take_from_box, self)
+	self.object:set_callback(callback.use_object, axr_main.actor_on_item_use, self)
+	self.object:set_callback(callback.hit, axr_main.actor_on_hit_callback, self)
+	if (callback.key_press) then
+		self.object:set_callback(callback.key_press, axr_main.key_press, self)
+	end
 end
 
 function anabiotic_callback()
@@ -276,24 +195,29 @@ function actor_binder:update(delta)
 	if not (db.actor:alive()) then
 		return
 	end
+	
+	if self.bCheckStart then -- first update after netspawn
+		--printf("SET DEFAULT INFOS")
+		if not has_alife_info("global_dialogs") then
+			self.object:give_info_portion("global_dialogs")
+		end
+		if not has_alife_info("level_changer_icons") then
+			self.object:give_info_portion("level_changer_icons")
+		end
+		pda.fill_primary_objects()
+		self.object:activate_slot(2)
+		self.bCheckStart = false
+	end
 
 	self.task_manager:update()
 
-	-- Вызов апдейта переноса игрока проводником
-	if travel_func ~= nil then
-		travel_func()
-	end
-
 	-- DEBUG slowdown
 	--slowdown.update()
-	local time = time_global()
+	
 	game_stats.update (delta, self.object)
 
 	-- апдейт погоды
 	self.weather_manager:update()
-
-	self:check_detective_achievement()
-	self:check_mutant_hunter_achievement()
 
 	--' Апдейт саундменеджера
 	xr_sound.update(self.object:id())
@@ -325,24 +249,6 @@ function actor_binder:update(delta)
 	if sr_psy_antenna.psy_antenna then
 		sr_psy_antenna.psy_antenna:update(delta)
 	end
-
-	if self.bCheckStart then
-		--printf("SET DEFAULT INFOS")
-		if not has_alife_info("global_dialogs") then
-			self.object:give_info_portion("global_dialogs")
-		end
-		if not has_alife_info("level_changer_icons") then
-			self.object:give_info_portion("level_changer_icons")
-		end
-		self.bCheckStart = false
-	end
---	device().precache_frame  == 0 and
-	if not self.loaded_slot_applied then
-		self.object:activate_slot(self.loaded_active_slot)
-		self.loaded_slot_applied = true
-	end
-
-	--xr_s.on_actor_update(delta)
 
 	if(self.surge_manager) then
 		if(self.f_surge_manager_loaded ~= true) then
@@ -378,22 +284,19 @@ function actor_binder:update(delta)
 	-- Апдейт доступности для симуляции.
 	simulation_objects.get_sim_obj_registry():update_avaliability(alife():actor())
 
-	if not self.loaded then
-		get_console():execute("dump_infos")
-		self.loaded = true
-	end
-	treasure_manager.get_treasure_manager():update()
-
-	if not(primary_objects_filled) then
-		pda.fill_primary_objects()
-		primary_objects_filled = true
-	end
-	pda.fill_sleep_zones()
-
 	-- alundaio
-	if (axr_main) then axr_main.actor_on_update(self,delta) end
+	axr_main.actor_on_update(self,delta)
 	if (xrs_debug_tools) then xrs_debug_tools.on_actor_update(self,delta) end
 	-- alundaio
+	
+	local tg = time_global()
+	if (self.last_update and tg < self.last_update) then
+		return
+	end
+	self.last_update = tg + 3000
+
+	pda.fill_sleep_zones()
+	treasure_manager.get_treasure_manager():update()
 	
 	--alun_utils.debug_write("actor update END")
 end
@@ -459,7 +362,7 @@ function actor_binder:save(packet)
 	end
 
 	--alundaio
-	if (axr_main) then axr_main.actor_on_save(self,packet) end
+	axr_main.actor_on_save(self,packet)
 	-- alundaio end
 	set_save_marker(packet, "save", true, "actor_binder")
 	--alun_utils.debug_write("--------------- actor_binder:save -------- End")
@@ -470,6 +373,12 @@ function actor_binder:load(reader)
 	set_save_marker(reader, "load", false, "actor_binder")
 	object_binder.load(self, reader)
 
+	local game_difficulty_by_num = {
+				[0] = "gd_novice",
+				[1] = "gd_stalker",
+				[2] = "gd_veteran",
+				[3] = "gd_master"
+				}
 	local dif = game_difficulty_by_num[reader:r_u8()]
 	if not (dif) then
 		set_save_marker(reader, "load", true, "actor_binder")
@@ -521,82 +430,7 @@ function actor_binder:load(reader)
 		self.last_mutant_hunter_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
 	end
 	--alundaio
-	if (axr_main) then axr_main.actor_on_load(self,reader) end
+	axr_main.actor_on_load(self,reader)
 	-- end alundaio
 	set_save_marker(reader, "load", true, "actor_binder")
-end
-
---*************************************************************
---*					Подспаун вещей в ящики					  *
---*************************************************************
-local detective_achievement_items 		= {	"medkit",
-											"antirad",
-											"bandage"}
-
-local mutant_hunter_achievement_items	= {	"ammo_5.45x39_ap",
-											"ammo_5.56x45_ap",
-											"ammo_9x39_ap",
-											"ammo_5.56x45_ap",
-											"ammo_12x76_zhekan"}
-
-local function spawn_achivement_items(items_table, count, inv_box_story_id)
-	local inv_box = alife():object(get_story_object_id(inv_box_story_id))
-	for i = 1,count do
-		alife():create(items_table[math.random(#items_table)],
-						inv_box.position,
-						inv_box.m_level_vertex_id,
-						inv_box.m_game_vertex_id,
-						inv_box.id)
-	end
-end
-
-function actor_binder:check_detective_achievement()
-	if not has_alife_info("detective_achievement_gained") then
-		return
-	end
-	if self.last_detective_achievement_spawn_time == nil then
-		self.last_detective_achievement_spawn_time = game.get_game_time()
-	end
-	if game.get_game_time():diffSec(self.last_detective_achievement_spawn_time) > 43200 then
-		spawn_achivement_items(detective_achievement_items, 4, "zat_a2_actor_treasure")
-		xr_effects.send_tip(db.actor, nil, {"st_detective_news","got_medicine"})
-		self.last_detective_achievement_spawn_time = game.get_game_time()
-	end
-end
-
-function actor_binder:check_mutant_hunter_achievement()
-	if not has_alife_info("mutant_hunter_achievement_gained") then
-		return
-	end
-	if self.last_mutant_hunter_achievement_spawn_time == nil then
-		self.last_mutant_hunter_achievement_spawn_time = game.get_game_time()
-	end
-	if game.get_game_time():diffSec(self.last_mutant_hunter_achievement_spawn_time) > 43200 then
-		spawn_achivement_items(mutant_hunter_achievement_items, 5, "jup_b202_actor_treasure")
-		xr_effects.send_tip(db.actor, nil, {"st_mutant_hunter_news","got_ammo"})
-		self.last_mutant_hunter_achievement_spawn_time = game.get_game_time()
-	end
-
-end
-
-----------------------------------------------------------------------------------------------------------------------
-
-function check_for_weapon_hide_by_zones()
-	for k,v in pairs(weapon_hide) do
-		if v == true then
-			return true
-		end
-	end
-	return false
-end
-
--- Weapon functions
-function hide_weapon(zone_id)
-	--printf("[WEAPON_CONTROL]:hiding weapon from zone [%s] in section [%s]!!!", zone_id, db.storage[zone_id].active_section)
-	weapon_hide[zone_id] = true
-end
-
-function restore_weapon(zone_id)
-	--printf("[WEAPON_CONTROL]:restoring weapon from zone [%s] in section [%s]!!!", zone_id, db.storage[zone_id].active_section)
-	weapon_hide[zone_id] = false
 end

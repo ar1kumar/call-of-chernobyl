@@ -11,16 +11,7 @@ local currentPPEfactor = 0.001
 local currentTime = 0
 local currentIndik=nil
 local fadeFactor=0
-local immuned_to_surge_squads = {
-						["monster_predatory_day"] 	= true,
-						["monster_predatory_night"] = true,
-						["monster_vegetarian"] 		= true,
-						["monster_zombied_day"] 	= true,
-						["monster_zombied_night"] 	= true,
-						["monster_special"] 		= true,
-						["monster"]					= true,
-						["zombied"]					= true
-						 }
+
 
 class "FalloutManager"
 function FalloutManager:__init()
@@ -398,16 +389,43 @@ function FalloutManager:hit_all_unhided(hitPower)
 	h.direction = vector():set(0,0,1)
 	h.draftsman = db.actor
 
+	local immuned_to_surge_squads = {
+						["monster_predatory_day"] 	= true,
+						["monster_predatory_night"] = true,
+						["monster_vegetarian"] 		= true,
+						["monster_zombied_day"] 	= true,
+						["monster_zombied_night"] 	= true,
+						["monster_special"] 		= true,
+						["monster"]					= true,
+						["zombied"]					= true
+						}
+						 
 	local board = SIMBOARD
 	for k,v in pairs(board.squads) do
 		local squad = v
-		if(check_squad_level(squad.id)) then
-			if(check_squad_community_and_story_id(squad.id)) then
-				local squad_npcs = get_squad_members(squad.id)
-				for kk,vv in pairs(squad_npcs) do
-					local obj = alife():object(kk)
-					if(obj and not(get_object_story_id(obj.id))) then
-						if(check_squad_smart_props(squad.id)) then
+		if(get_object_story_id(squad.id) ~= nil and immuned_to_surge_squads[squad.player_id] ~= true and check_squad_level(squad.id)) then
+			local squad_npcs = get_squad_members(squad.id)
+			for kk,vv in pairs(squad_npcs) do
+				local obj = alife():object(kk)
+				if(obj and not(get_object_story_id(obj.id))) then
+					if(check_squad_smart_props(squad.id)) then
+						printf("Releasing npc [%s] from squad [%s] because of surge!",obj:name(), squad:name())
+						local cl_obj = level.object_by_id(obj.id)
+						if cl_obj ~= nil then
+							h.draftsman = cl_obj
+							cl_obj:hit(h)
+						else
+							--obj:hit(h)
+						end
+					else
+						local release = true
+						for i = 1,#self.covers do
+							local sr = self.covers[i]
+							if(sr and sr:inside(obj.position)) then
+								release = false
+							end
+						end
+						if(release) then
 							printf("Releasing npc [%s] from squad [%s] because of surge!",obj:name(), squad:name())
 							local cl_obj = level.object_by_id(obj.id)
 							if cl_obj ~= nil then
@@ -415,24 +433,6 @@ function FalloutManager:hit_all_unhided(hitPower)
 								cl_obj:hit(h)
 							else
 								--obj:hit(h)
-							end
-						else
-							local release = true
-							for i = 1,#self.covers do
-								local sr = self.covers[i]
-								if(sr and sr:inside(obj.position)) then
-									release = false
-								end
-							end
-							if(release) then
-								printf("Releasing npc [%s] from squad [%s] because of surge!",obj:name(), squad:name())
-								local cl_obj = level.object_by_id(obj.id)
-								if cl_obj ~= nil then
-									h.draftsman = cl_obj
-									cl_obj:hit(h)
-								else
-									--obj:hit(h)
-								end
 							end
 						end
 					end
@@ -464,29 +464,6 @@ function check_squad_level(squad_id)
 	return false	-- can't delete squad on other level
 end
 
-function check_squad_community_and_story_id(squad_id)
-	local squad = alife():object(squad_id)
-	if(squad) then
-		if(immuned_to_surge_squads[squad.player_id]) then
-			return false	-- can't delete squad immune to surge
-		end
-		if(get_object_story_id(squad.id)) then
-			return false	-- can't delete squad with story id
-		end
-	end
-	return true
-end
-
-function check_squad_community(squad_id)
-	local squad = alife():object(squad_id)
-	if(squad) then
-		if(immuned_to_surge_squads[squad.player_id]) then
-			return false	-- can't delete squad immune to surge
-		end
-	end
-	return true
-end
-
 function check_squad_smart_props(squad_id)
 	local squad = alife():object(squad_id)
 	if(squad) then
@@ -500,8 +477,6 @@ function check_squad_smart_props(squad_id)
 	end
 	return false	-- can't delete squad in his smart if squad is in cover
 end
-
-
 
 function FalloutManager:geigerSound(hitPower)
 	local delay = ((0.8-hitPower)*1000)
@@ -569,9 +544,6 @@ function FalloutManager:displayIndicators(power)
 		end
 	end
 	--self.atmosfear.debugMessages[19]:SetText("indik="..currentIndikName)
-
-
-
 end
 
 

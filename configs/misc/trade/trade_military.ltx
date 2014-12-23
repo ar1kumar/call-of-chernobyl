@@ -1,8 +1,22 @@
 [trader]
 buy_condition = trade_generic_buy
 sell_condition = trade_generic_sell
-
 buy_item_condition_factor = 0.7
+
+buy_supplies = supplies_generic
+discounts = {=actor_goodwill_ge(army:1200)} discount_3, {=actor_goodwill_ge(army:1000)} discount_2, discount_1
+
+[discount_1]
+buy =  1
+sell = 0.80
+
+[discount_2]
+buy =  1
+sell = 0.85
+
+[discount_3]
+buy =  1.1
+sell = 1.1
 
 [trade_generic_buy]
 ;alundaio

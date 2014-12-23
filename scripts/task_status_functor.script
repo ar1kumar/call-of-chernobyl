@@ -21,32 +21,30 @@ function check_smart_under_faction_control(task,task_id)
 		return "fail"
 	end 
 	
-	local task_id_by_faction = {
-		["mar_base_stalker_barmen_task_1"] = "monster",
-		["mar_base_stalker_barmen_task_2"] = "bandit",
-		["esc_2_12_stalker_wolf_task_1"] = "monster",
-		["jup_b220_trapper_task_1"] = "monster"
-	}
-	
-	local player_id = task_id_by_faction[task_id]
-	if not (player_id) then
-		alun_utils.printf("task_status_functor.smart_under_faction_control: Task not properly configured")
-		return 
+	--in case sim_avail is set true during the player's task
+	if not(smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then 
+		return "fail"
 	end
+	
+	local faction_list = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	
 	local tg = time_global()
 	if (__check_smart_time and tg < __check_smart_time) then 
-		return 
+		return
 	end
 	__check_smart_time = tg+3000
 	
 	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
 		for id,squad in pairs(SIMBOARD.squads) do
-			if (squad) and simulation_objects.is_on_the_same_level(squad, smart) and (player_id == "monster" and sim_squad_scripted.is_squad_monster[squad.player_id]) or (squad.player_id == player_id) then
+			if (squad) and simulation_objects.is_on_the_same_level(squad, smart) then
 				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id or squad.position:distance_to_sqr(smart.position) <= 2500) then
-					alun_utils.save_var(db.actor,task_id.."_target_id",squad.id)
-					--alun_utils.printf("task_id = %s squad_id = %s",task_id,squad.id)
-					return
+					for i=1,#faction_list do
+						if (faction_list[i] == "monster" and sim_squad_scripted.is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
+							alun_utils.save_var(db.actor,task_id.."_target_id",squad.id)
+							--alun_utils.printf("task_id = %s squad_id = %s",task_id,squad.id)
+							return
+						end
+					end
 				end
 			end
 		end
@@ -62,4 +60,66 @@ function check_smart_under_faction_control(task,task_id)
 	end
 	
 	return "complete"	
+end
+
+function check_if_killed_enough(task,task_id)
+	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
+	if not (p[1]) then
+		alun_utils.printf("task_status_function not set up properly! check_if_killed_enough needs an extra param for squad story id! task_id=%s",task_id)
+		return 
+	end 
+	
+	local squad = get_story_squad(p[1])
+	if not (squad) then 
+		return
+	end
+	
+	local id = squad:commander_id()
+	local npc = db.storage[id] and db.storage[id].object
+	if not (npc) then 
+		return 
+	end
+	
+	local total_kill_count, npc
+	for k in self:squad_members() do
+		local npc = db.storage[k.id] and db.storage[k.id].object
+		if (npc) then 
+			total_kill_count = total_kill_count + (alun_utils.load_var(npc,"s_kill_count") or 0)
+		end
+	end
+	
+	if (total_kill_count >= tonumber(p[2] or 5)) then 
+		return "complete"
+	end
+end
+
+function check_if_looted_enough(task,task_id)
+	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
+	if not (p[1]) then
+		alun_utils.printf("task_status_function not set up properly! check_if_looted_enough needs an extra param for squad story id! task_id=%s",task_id)
+		return 
+	end 
+	
+	local squad = get_story_squad(p[1])
+	if not (squad) then 
+		return
+	end
+	
+	local id = squad:commander_id()
+	local npc = db.storage[id] and db.storage[id].object
+	if not (npc) then 
+		return 
+	end
+	
+	local total_loot_count, npc
+	for k in self:squad_members() do
+		local npc = db.storage[k.id] and db.storage[k.id].object
+		if (npc) then 
+			total_loot_count = total_loot_count + (alun_utils.load_var(npc,"s_loot_count") or 0)
+		end
+	end
+	
+	if (total_loot_count >= tonumber(p[2] or 5)) then 
+		return "complete"
+	end
 end

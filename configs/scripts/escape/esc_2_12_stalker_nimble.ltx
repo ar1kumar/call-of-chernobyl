@@ -11,9 +11,9 @@ avail_animations = animpoint_sit_ass
 use_camp = false
 ;reach_distance = 1.5
 meet = meet@base
-combat_ignore_cond = true
-combat_ignore_keep_when_attacked = true
-invulnerable = true
+combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_keep_when_attacked = {!is_enemy_actor_or_companion} true, false
+invulnerable = {!actor_enemy} true, false
 ;out_restr = zat_a2_sr_noweap
 on_info = {-esc_2_12_nimble_can_go !npc_talking} %+esc_2_12_nimble_can_go%, {+esc_2_12_nimble_can_go =npc_talking} %-esc_2_12_nimble_can_go%
 on_info2 = {=is_dark_night} sleeper@sleeper_1
@@ -42,7 +42,7 @@ combat_ignore_keep_when_attacked = true
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 path_main = nimble_sleeper
 meet = no_meet
 on_info = {!is_dark_night} animpoint@base

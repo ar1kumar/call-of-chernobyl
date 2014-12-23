@@ -123,6 +123,17 @@ function get_companion_count()
 	return count
 end
 
+function list_actor_squad_by_id()
+	local t = {}
+	for i=1,max_actor_squad_size do
+		local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
+		if (c) then
+			table.insert(t,c)
+		end
+	end
+	return t
+end 
+
 function setup_companion_logic(npc)
 	local ltx = ini_file("scripts\\beh_companion.ltx")
 	local ltx_name = "scripts\\beh_companion.ltx"

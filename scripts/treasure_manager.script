@@ -1,3 +1,6 @@
+-- TODO: Currently disabled, maybe re-enable it for cop levels...
+
+
 local treasure_manager = nil
 class "CTreasureManager"
 function CTreasureManager:__init()
@@ -110,6 +113,11 @@ function CTreasureManager:update()
 	if (coc_treasure_manager) then
 		return
 	end
+	
+	local level_name = level.name()
+	if not (level_name == "jupiter" or level_name == "zaton" or level_name == "pripyat" or level_name == "jupiter_underground" or level_name == "labx8") then 
+		return
+	end
 
 	if not(self.items_spawned) then
 			for k,v in pairs(self.secrets) do
@@ -117,33 +125,28 @@ function CTreasureManager:update()
 			end
 		self.items_spawned = true
 	end
-	local global_time = time_global()
-	if(self.check_time and global_time-self.check_time<=500) then
-		return
-	end
-	self.check_time = global_time
-
-		for k,v in pairs(self.secrets) do
-				if(v.given) then
-		 	if(v.empty) then
-							local sect = xr_logic.pick_section_from_condlist(db.actor, nil, v.empty)
-							if(sect=="true") and not v.checked then
-									level.map_remove_object_spot(self.secret_restrs[k], "treasure")
-									xr_statistic.inc_founded_secrets_counter()
-									v.empty = nil
+	
+	for k,v in pairs(self.secrets) do
+		if(v.given) then
+			if(v.empty) then
+				local sect = xr_logic.pick_section_from_condlist(db.actor, nil, v.empty)
+				if(sect=="true") and not v.checked then
+					level.map_remove_object_spot(self.secret_restrs[k], "treasure")
+					xr_statistic.inc_founded_secrets_counter()
+					v.empty = nil
 					v.checked = true
-									printf("Empty secret [%s] remove map spot!", k)
-							end
-			elseif(v.refreshing and v.checked) then
-							local sect = xr_logic.pick_section_from_condlist(db.actor, nil, v.refreshing)
-							if(sect=="true") then
-									v.given = false
-									v.checked = false
-									printf("Given secret [%s] now is avaliable!", k)
-							end
-			end
+					printf("Empty secret [%s] remove map spot!", k)
 				end
+			elseif(v.refreshing and v.checked) then
+				local sect = xr_logic.pick_section_from_condlist(db.actor, nil, v.refreshing)
+				if(sect=="true") then
+					v.given = false
+					v.checked = false
+					printf("Given secret [%s] now is avaliable!", k)
+				end
+			end
 		end
+	end
 end
 
 function CTreasureManager:spawn_treasure(treasure_id)

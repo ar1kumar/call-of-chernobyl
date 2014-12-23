@@ -8,15 +8,14 @@ level_spot = mechanic
 cover_name = jup_a6_animpoint_tech
 reach_distance = 10
 avail_animations = animpoint_sit_normal
-combat_ignore_cond = false
 out_restr = jup_a6_sr_noweap
-combat_ignore_cond = true
-combat_ignore_keep_when_attacked = false
+combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_keep_when_attacked = {!is_enemy_actor_or_companion} true, false
 meet = meet
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
-invulnerable = true 
+invulnerable = {!actor_enemy} true, false
 
 [meet]
 close_anim 		= nil

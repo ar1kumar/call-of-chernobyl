@@ -249,6 +249,11 @@ function is_enemy_actor(enemy, npc)
 	return enemy:id() == 0
 end
 
+function is_enemy_actor_or_companion(enemy,npc)
+	local id = enemy:id()
+	return id == 0 and true or alife():has_info(id,"npcx_is_companion") or false
+end
+
 -- current enemy at a distance greater than or equal to the specified Distance
 -- для combat_ignore
 -- param 1 - distance^2
@@ -992,7 +997,7 @@ end
 
 function actor_enemy(actor, npc)
 	local t = db.storage[npc:id()].death
-	return npc:relation(actor) == game_object.enemy or (t ~= nil and t.killer == actor:id())
+	return npc:relation(actor) >= game_object.enemy or (t ~= nil and t.killer == actor:id())
 end
 
 function actor_friend(actor, npc)
@@ -2531,12 +2536,17 @@ end
 
 -- Returns true if squads by behavior faction (player_id) of a given count exist at smart out of squads currently entered in smart
 -- param1 - smart_name 
--- param2 - faction aka player_id
--- param3 - greater than equal to number
--- param4 - check squads with scripted target (usually quest squads)
--- param5 - check if stay time is less than equal given seconds
+-- param2 - greater than equal to number
+-- param3 - check if stay time is less than equal given seconds
+-- param4 - include check for squads with scripted target (usually quest squads)
+-- param5+ - faction aka player_id
+
 function smart_stayed_squad_count_ge_by_faction(actor,npc,p)
-	local smart = p[1] and p[2] and p[3] and SIMBOARD.smarts_by_names[p[1]]
+	if (#p < 5) then 
+		return false 
+	end 
+	
+	local smart = SIMBOARD.smarts_by_names[p[1]]
 	if not (smart) then 
 		return false 
 	end 
@@ -2548,28 +2558,36 @@ function smart_stayed_squad_count_ge_by_faction(actor,npc,p)
 
 	local count = 0
 	for k,squad in pairs(smrt.squads) do
-		if (squad and simulation_objects.is_on_the_same_level(squad, smart) and squad.current_target_id and squad.current_target_id == smart.id and (p[2] == "monster" and sim_squad_scripted.is_squad_monster[squad.player_id] or squad.player_id == p[2])) then
+		if (squad and simulation_objects.is_on_the_same_level(squad, smart) and squad.current_target_id and squad.current_target_id == smart.id) then
 			if (p[4] == "true" or not squad:get_script_target()) then
-				if (p[5] == nil or squad.stay_time and game.get_game_time():diffSec(squad.stay_time) <= tonumber(p[5])) then
-					count = count + 1
+				if (p[3] == "nil" or squad.stay_time and game.get_game_time():diffSec(squad.stay_time) <= tonumber(p[3])) then
+					for i=5,#p do 
+						if (p[i] == "monster" and sim_squad_scripted.is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
+							count = count + 1
+							if (count >= tonumber(p[2])) then 
+								return true 
+							end
+							break
+						end
+					end
 				end
 			end
 		end
 	end
 	
-	return count >= tonumber(p[3])
+	return false
 end 
 
 -- checks all smarts on actor level with above function
--- param1 - faction aka player_id
--- param2 - greater than equal to number
+-- param1 - greater than equal to number
+-- param2 - check if stay time is less than equal given seconds
 -- param3 - allow check for target_smart param for squads; such as scripted target.
--- param4 - check if stay time is less than equal given seconds
+-- param4+ - faction aka player_id
 function all_avail_smart_stayed_squad_count_ge_by_faction(actor,npc,p)
-	if (p[1] and p[2]) then
+	if (#p >= 4) then
 		for name,v in pairs(SIMBOARD.smarts_by_names) do
 			if (v.is_on_actor_level) and (v.sim_avail == nil or v.sim_avail and xr_logic.pick_section_from_condlist(actor, v, v.sim_avail) == "true") then
-				if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,p[1],p[2],p[3],p[4]}) == true) then 
+				if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,unpack(p)}) == true) then 
 					return true 
 				end
 			end
@@ -2681,9 +2699,20 @@ function trading(actor, npc)
 	return db.storage[id].trade and db.storage[id].trade.trading
 end
 
+function npc_in_actor_community(actor,npc,p)
+	return string.find(character_community(db.actor),comm) ~= nil
+end 
+
 function actor_community(actor,npc,p)
 	if (character_community(db.actor) == p[1]) then 
 		return true 
+	end
+	return false
+end
+
+function actor_goodwill_ge(actor,npc,p)
+	if (p[1] and p[2]) then
+		return relation_registry.community_goodwill(p[1], db.actor:id()) >= tonumber(p[2])
 	end
 	return false
 end

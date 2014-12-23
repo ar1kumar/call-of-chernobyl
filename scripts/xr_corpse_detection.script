@@ -234,6 +234,12 @@ function get_all_from_corpse(npc)
 		xr_sound.set_sound_play(id,"corpse_loot_bad")
 	end
 
+	local count = alun_utils.load_var(npc,"s_loot_count") or 0
+	if (count >= 255) then 
+		count = 254
+	end
+	alun_utils.save_var(npc,"s_loot_count",count+1)
+	
 	if (axr_main) then
 		axr_main.npc_on_get_all_from_corpse(npc,corpse_npc)
 	end

@@ -165,6 +165,7 @@ function dm_init_companion_patrol(dialog)
 		add_dialog(1,6,"axr_phrase_actor_give_command_nevermind")
 end
 
+--[[
 function dm_actor_become_companion_guide_precond(actor, npc)
 	if not (axr_companions) then return false end
 	if not (axr_companions.Enabled) then return false end
@@ -183,13 +184,6 @@ function dm_actor_become_companion_guide_precond(actor, npc)
 		return false
 	end
 
-	--local smart = xr_gulag.get_npc_smart(npc)
-	--if (smart) then
-		--if smart:name() == "jup_b41" then
-			--return false
-		--end
-	--end
-
 	local npc_squad = get_object_squad(npc)
 
 	if (npc_squad.current_action and npc_squad.current_action == 1) then
@@ -207,7 +201,7 @@ end
 function squad_action_description_for_travelling(actor,npc)
 	local target_obj = alife():object(target_id)
 	local smart_name = target_obj:name()
-	local travel_class = get_travel_class()
+	local travel_class = travel_manager.get_travel_class()
 
 	local desc = travel_class.smart_to_stringtables[smart_name]
 	if desc == nil then
@@ -227,6 +221,8 @@ function precond_squad_target_is_smart(actor,npc)
 	local target_clsid = target_obj:clsid()
 	return target_clsid == clsid.smart_terrain
 end
+
+--]]
 
 --[[
 	Become Companion Dialog Preconditions

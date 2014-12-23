@@ -291,6 +291,14 @@ function motivator_binder:death_callback(victim, who)
 		xr_statistic.inc_killed_stalkers_counter()
 		xr_statistic.set_best_monster(self.object)
 	end
+	
+	if (IsStalker(who) and who:alive()) then
+		local count = xr_logic.pstor_retrieve(who,"s_kill_count") or 0
+		if (count >= 255) then 
+			count = 254
+		end
+		xr_logic.pstor_store(who,"s_kill_count",count)
+	end
 
 	local known_info = utils.cfg_get_string(self.st.ini,self.st.section_logic , "known_info", self.object, false, "", nil)
 	if (known_info) then

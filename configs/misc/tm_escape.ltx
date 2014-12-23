@@ -33,7 +33,7 @@ repeat_timeout = 86400
 target_functor = esc_m_trader_task_target
 on_complete = %+esc_m_trader_task_2_complete =remove_task_companion(esc_2_12_stalker_fanat_squad)%
 on_fail = %=remove_task_companion(esc_2_12_stalker_fanat_squad)%
-precondition = {-esc_m_trader_task_2_complete =sim_avail(esc_smart_terrain_7_11) =smart_stayed_squad_count_ge_by_faction(esc_smart_terrain_7_11:bandit:1)} true, false
+precondition = {-esc_m_trader_task_2_complete =sim_avail(esc_smart_terrain_7_11) =smart_stayed_squad_count_ge_by_faction(esc_smart_terrain_7_11:1:nil:false:bandit)} true, false
 condlist_0 = {!sim_avail(esc_smart_terrain_7_11)} fail, {!smart_squad_by_faction_in_radius(esc_smart_terrain_7_11:bandit:75)} complete
 
 ; esc_2_12_stalker_wolf
@@ -46,8 +46,9 @@ descr = esc_2_12_stalker_wolf_task_1_text
 job_descr = esc_2_12_stalker_wolf_task_1_about
 target_functor = esc_2_12_stalker_wolf_task_target
 status_functor = check_smart_under_faction_control
+status_functor_params = monster
 on_init = %=find_smart_under_faction_control(esc_2_12_stalker_wolf_task_1_id:monster) -esc_2_12_stalker_wolf_task_1_complete%
-precondition = {-esc_2_12_stalker_wolf_task_1_complete =all_avail_smart_stayed_squad_count_ge_by_faction(monster:1:false:7200)} true, false
+precondition = {-esc_2_12_stalker_wolf_task_1_complete =all_avail_smart_stayed_squad_count_ge_by_faction(1:7200:false:monster)} true, false
 repeat_timeout = 7200
 on_complete = %+esc_2_12_stalker_wolf_task_1_complete =pstor_reset(esc_2_12_stalker_wolf_task_1_id) =pstor_reset(esc_2_12_stalker_wolf_task_1_target_id)%
 on_fail = %=pstor_reset(esc_2_12_stalker_wolf_task_1_id) =pstor_reset(esc_2_12_stalker_wolf_task_1_target_id)%

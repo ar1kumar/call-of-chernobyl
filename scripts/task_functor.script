@@ -6,112 +6,104 @@
 -----------------------------------------------------------
 local function under_faction_control_target_id(task_id)
 	local smart_id = alun_utils.load_var(db.actor,task_id.."_id")
+	if not (smart_id) then
+		alun_utils.printf("task_functor.under_faction_control_target_id is nil")
+		return 
+	end
 	local sim = alife()
 	local smart = smart_id and sim:object(smart_id)
+	if not (smart) then
+		alun_utils.printf("task_functor.under_faction_control_target_id smart by id is nil")
+		return 
+	end 
+	
 	local target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
 	local se_target = target_id and sim:object(target_id)
-	if (smart) then 
-		if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
-		--if (se_target) then
-			return target_id
-		else 
-			return smart_id
+
+	if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
+		return target_id
+	end 
+
+	return smart_id
+end
+
+-- used by axr_main also, to exclude squad ids for deletion
+function get_squad_id_by_task_var(var_name,no_check_online)
+	local npc_id = db.actor and alun_utils.load_var(db.actor,var_name)
+	if not (npc_id) then 
+		return 
+	end 
+	
+	-- by default npc's id is returned instead if game_object is online
+	if not (no_check_online) then
+		local npc = npc_id and db.storage[npc_id] and db.storage[npc_id].object
+		if (npc) then 
+			return npc_id
+		end
+	end
+	
+	local sim = alife()
+	local se_npc = sim:object(npc_id)
+	if not (se_npc) then 
+		return 
+	end 
+	
+	local squad = se_npc.group_id and se_npc.group_id ~= 65535 and sim:object(se_npc.group_id)
+	if not (squad) then
+		if (no_check_online) then 
+			return
+		end
+		return npc_id
+	end 
+
+	return squad.id	
+end
+---------------------------------------------------------
+-- TASK FUNCTORS
+---------------------------------------------------------
+-- Yantar
+function yan_ecolog_semenov_task_target(task_id,field,p)
+	if (id == "yan_ecolog_semenov_task_1") then
+		local npc = get_story_object("yan_ecolog_semenov")
+		if (npc) then
+			if (xr_conditions.check_yan_ecolog_semenov_task_1_stage_1_complete(nil,npc)) then
+				local smart = SIMBOARD.smarts_by_names["yan_smart_terrain_6_4"]
+				if (smart) then 
+					return smart.id
+				end
+			end
+		end
+		local squad = get_story_squad("yan_ecolog_semenov_squad")
+		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
+			return squad.id
 		end
 	end
 end
 
----------------------------------------------------------
--- TASK FUNCTORS
----------------------------------------------------------
-function zat_b7_bandit_boss_sultan_task_target(id,field,p)
-	if (id == "zat_b7_bandit_boss_sultan_task_1") then 
-		local npc_id = db.actor and alun_utils.load_var(db.actor,"zat_b7_bandit_boss_sultan_bounty_target_id")
-		if not (npc_id) then 
-			return 
-		end 
-		
-		local npc = npc_id and db.storage[npc_id] and db.storage[npc_id].object
-		if (npc) then 
-			return npc_id
-		end 
-		
-		local sim = alife()
-		local se_npc = sim:object(npc_id)
-		if not (se_npc) then 
-			return 
-		end 
-		
-		local squad = se_npc.group_id and se_npc.group_id ~= 65535 and sim:object(se_npc.group_id)
-		if not (squad) then 
-			return npc_id
-		end 
-
-		return squad.id	
+-- Marsh
+function mar_base_stalker_barmen_task_target(task_id,field,p)
+	if not (db.actor) then 
+		return 
 	end
-end 
-
-function esc_m_trader_task_target(id,field,p)
-	if (id == "esc_m_trader_task_1") then
-		local npc_id = db.actor and alun_utils.load_var(db.actor,"esc_m_trader_bounty_target_id")
-		if not (npc_id) then 
-			return 
-		end 
-		
-		local npc = npc_id and db.storage[npc_id] and db.storage[npc_id].object
-		if (npc) then 
-			return npc_id
-		end 
-		
-		local sim = alife()
-		local se_npc = sim:object(npc_id)
-		if not (se_npc) then 
-			return 
-		end 
-		
-		local squad = se_npc.group_id and se_npc.group_id ~= 65535 and sim:object(se_npc.group_id)
-		if not (squad) then 
-			return npc_id
-		end 
-
-		return squad.id
-	elseif (id == "esc_m_trader_task_2") then 
-		local smart = SIMBOARD.smarts_by_names["esc_smart_terrain_7_11"]
-		return smart and smart.id or nil
+	
+	if (id == "mar_base_stalker_barmen_task_1") then
+		return under_faction_control_target_id(task_id)
+	elseif (id == "mar_base_stalker_barmen_task_2") then 
+		return under_faction_control_target_id(task_id)
 	end
-end 
+end
 
-function jup_b6_scientist_tech_task_target(id,field,p)
-	if (id == "jup_b6_scientist_tech_task_1") then 
-		local squad = get_story_squad("ecolog_companion_task_2")
-		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
-			return squad.id
-		end
-		local n = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
-		if (n) then 
-			local anomaly = db.anomaly_by_name[n]
-			if (anomaly and anomaly.object) then 
-				return anomaly.object:id()
-			end
-		else 
-			local smart = SIMBOARD.smarts_by_names["jup_b41"]
-			if (smart) then 
-				return smart.id
-			end
-		end	
-	end
-end 
-
-function mar_base_owl_stalker_trader_task_target(id,field,p)
-	if (id == "mar_base_owl_stalker_trader_task_1") then 
+function mar_base_owl_stalker_trader_task_target(task_id,field,p)
+	if (task_id == "mar_base_owl_stalker_trader_task_1") then 
 		local npc = get_story_object("esc_2_12_stalker_nimble")
 		return npc and npc:id() or nil
-	elseif (id == "mar_base_owl_stalker_trader_task_2") then
+	elseif (task_id == "mar_base_owl_stalker_trader_task_2") then
 		for id,obj in pairs(db.heli) do 
 			if (obj and obj.id) then 
 				return id
 			end
 		end
-	elseif (id == "mar_base_owl_stalker_trader_task_3") then 
+	elseif (task_id == "mar_base_owl_stalker_trader_task_3") then 
 		local squad = get_story_squad("ecolog_companion_task_1")
 		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
 			return squad.id
@@ -131,53 +123,85 @@ function mar_base_owl_stalker_trader_task_target(id,field,p)
 	end
 end
 
-function yan_ecolog_semenov_task_target(id,field,p)
-	if (id == "yan_ecolog_semenov_task_1") then
-		local npc = get_story_object("yan_ecolog_semenov")
-		if (npc) then
-			if (xr_conditions.check_yan_ecolog_semenov_task_1_stage_1_complete(nil,npc)) then
-				local smart = SIMBOARD.smarts_by_names["yan_smart_terrain_6_4"]
-				if (smart) then 
-					return smart.id
-				end
-			end
-		end
-		local squad = get_story_squad("yan_ecolog_semenov_squad")
+-- Escape
+function esc_2_12_stalker_wolf_task_target(task_id,field,p)
+	if not (db.actor) then 
+		return 
+	end
+	if (task_id == "esc_2_12_stalker_wolf_task_1") then 
+		return under_faction_control_target_id(task_id)
+	end
+end
+
+function esc_m_trader_task_target(task_id,field,p)
+	if (task_id == "esc_m_trader_task_1") then
+		return get_squad_id_by_task_var("esc_m_trader_bounty_target_id") --add to axr_main remove_non_story_squads to ensure squad never removed
+	elseif (task_id == "esc_m_trader_task_2") then 
+		local smart = SIMBOARD.smarts_by_names["esc_smart_terrain_7_11"]
+		return smart and smart.id or nil
+	end
+end 
+
+-- Darkvalley
+function val_smart_terrain_7_4_bandit_trader_stalker_task_target(task_id,field,p)
+	if not (db.actor) then 
+		return 
+	end
+	
+	if (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_1") then
+		return under_faction_control_target_id(task_id)
+	elseif (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_2") then 
+		return under_faction_control_target_id(task_id)
+	elseif (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_3") then 
+		local squad = get_story_squad("bandit_companion_task_1")
 		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
 			return squad.id
 		end
 	end
 end
 
-function mar_base_stalker_barmen_task_target(id,field,p)
+-- Jupiter
+function jup_b220_trapper_task_target(task_id,field,p)
 	if not (db.actor) then 
 		return 
 	end
-	
-	if (id == "mar_base_stalker_barmen_task_1") then
-		return under_faction_control_target_id(id)
-	elseif (id == "mar_base_stalker_barmen_task_2") then 
+	if (task_id == "jup_b220_trapper_task_1") then 
 		return under_faction_control_target_id(id)
 	end
 end
+function jup_b6_scientist_tech_task_target(task_id,field,p)
+	if (task_id == "jup_b6_scientist_tech_task_1") then 
+		local squad = get_story_squad("ecolog_companion_task_2")
+		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
+			return squad.id
+		end
+		local n = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
+		if (n) then 
+			local anomaly = db.anomaly_by_name[n]
+			if (anomaly and anomaly.object) then 
+				return anomaly.object:id()
+			end
+		else 
+			local smart = SIMBOARD.smarts_by_names["jup_b41"]
+			if (smart) then 
+				return smart.id
+			end
+		end	
+	end
+end 
 
-function jup_b220_trapper_task_target(id,field,p)
-	if not (db.actor) then 
-		return 
+-- Zaton
+function zat_b7_bandit_boss_sultan_task_target(task_id,field,p)
+	if (task_id == "zat_b7_bandit_boss_sultan_task_1") then 
+		return get_squad_id_by_task_var("zat_b7_bandit_boss_sultan_bounty_target_id") --add to axr_main remove_non_story_squads to ensure squad never removed
 	end
-	if (id == "jup_b220_trapper_task_1") then 
-		return under_faction_control_target_id(id)
-	end
-end
+end 
 
-function esc_2_12_stalker_wolf_task_target(id,field,p)
-	if not (db.actor) then 
-		return 
-	end
-	if (id == "esc_2_12_stalker_wolf_task_1") then 
-		return under_faction_control_target_id(id)
-	end
-end
+--[[
+==================================================================
+
+==================================================================
+--]]
 
 function condlist(id, field, p)
 	local cond_string = p
@@ -261,7 +285,7 @@ end
 --' Функторы цели квеста (должны возвращать id персонажа)
 --'*************************************************************************************
 
-function target_condlist(id, field, p)
+function target_condlist(task_id, field, p)
 	local cond_string = p
 
 	local parsed_condlist = xr_logic.parse_condlist(nil, "task", "task_condlist", cond_string)
@@ -280,7 +304,7 @@ function target_condlist(id, field, p)
 	return target_obj_id
 end
 
-function zat_b29_adv_target(id, field, p)
+function zat_b29_adv_target(task_id, field, p)
 	local target_obj_id = "zat_a2_stalker_barmen"
 	local af = nil
 	local actor = get_story_object("actor")

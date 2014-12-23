@@ -117,6 +117,11 @@ function CGeneralTask:__init(id)
 			self.spot = "secondary_task_location_complex_timer"
 		end
 	end
+	
+	if (self.target_functor == nil or task_functor[self.target_functor] == nil) then 
+		alun_utils.printf("task_id=%s | target_functor not set properly, it's either missing or misnamed, check tm_*.ltx and task_functor.script",id)
+	end 
+	
 	self.current_target = task_functor[self.target_functor](self.id, "target", self.target)
 	self.dont_send_update_news = utils.cfg_get_bool(task_ini, id, "dont_send_update_news", nil, false, false)
 end
