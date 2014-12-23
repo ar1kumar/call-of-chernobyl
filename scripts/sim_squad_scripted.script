@@ -662,7 +662,7 @@ end
 local function set_relation(npc1, npc2, new_relation)
 	local goodwill = tonumber(new_relation) or new_relation == "enemy" and -1000 or new_relation == "friend" and 1000 or 0
 	if npc1 and npc2 then
-		alun_utils.printf("set_relation %s",npc1)
+		alun_utils.printf("set_relation %s",npc1:name())
 		npc1:force_set_goodwill(goodwill, npc2.id)
 	else
 		abort("Npc not set in goodwill function!!!")
