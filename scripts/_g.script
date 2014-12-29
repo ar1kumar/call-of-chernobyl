@@ -262,8 +262,10 @@ end
 
 function random_choice(...)
 	local arg = {...}
-	local r = math.random(1, #arg)
-	return arg[r]
+	if (#arg > 0) then
+		local r = math.random(1, #arg)
+		return arg[r]
+	end
 end
 
 function set_current_time (hour, min, sec)
