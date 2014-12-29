@@ -5,9 +5,9 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 
 function set_new_scheme_and_logic(npc,scheme,section,logic,gulag,ini_filename)
 	local st = db.storage[npc:id()]
-	xr_logic.pstor_store(npc,"old_active_section", st.active_section)
-	xr_logic.pstor_store(npc,"old_section_logic", st.section_logic)
-	xr_logic.pstor_store(npc,"old_ini_filename", st.ini_filename)
+	--xr_logic.pstor_store(npc,"old_active_section", st.active_section)
+	--xr_logic.pstor_store(npc,"old_section_logic", st.section_logic)
+	--xr_logic.pstor_store(npc,"old_ini_filename", st.ini_filename)
 
 	-- Store new ini
 	db.storage[npc:id()].ini_filename = ini_filename
@@ -26,8 +26,14 @@ end
 
 function restore_scheme_and_logic(npc)
 	local st = db.storage[npc:id()]
-
+	st.ini_filename = "<customdata>"
+	st.ini = xr_logic.get_customdata_or_ini_file(npc, st.ini_filename)
+	st.active_section = nil
+	st.active_scheme = nil
+	st.section_logic = "logic"
+	xr_logic.switch_to_section(npc,nil,nil)
 	-- Load old logic
+	--[[
 	st.ini_filename = xr_logic.pstor_retrieve(npc,"old_ini_filename", st.loaded_ini_filename)
 	--st.ini = ini_file(st.ini_filename)
 	if (not st.ini_filename) or (string.find(st.ini_filename,"*")) or (string.find(st.ini_filename,"<customdata>")) then
@@ -48,7 +54,7 @@ function restore_scheme_and_logic(npc)
 		xr_logic.switch_to_section(npc,st.ini,section)
 		db.storage[npc:id()].overrides = xr_logic.cfg_get_overrides(st.ini, section, npc)
 	end
-
+	--]]
 end
 
 function reset_logic(npc,st)

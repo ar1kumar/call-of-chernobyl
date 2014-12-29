@@ -119,7 +119,7 @@ function CGeneralTask:__init(id)
 	end
 	
 	if (self.target_functor == nil or task_functor[self.target_functor] == nil) then 
-		alun_utils.printf("task_id=%s | target_functor not set properly, it's either missing or misnamed, check tm_*.ltx and task_functor.script",id)
+		printf("task_id=%s | target_functor not set properly, it's either missing or misnamed, check tm_*.ltx and task_functor.script",id)
 	end 
 	
 	self.current_target = task_functor[self.target_functor](self.id, "target", self.target)
@@ -239,7 +239,7 @@ function CGeneralTask:check_task(tm)
 		if t ~= nil then
 			--' Проверка на валидность
 			if valid_values[t] ~= true then
-				abort("Invalid task status [%s] for task [%s]", t, self.name)
+				printf("Invalid task status [%s] for task [%s]", t, self.name)
 			end
 			self.last_check_task = t
 			return

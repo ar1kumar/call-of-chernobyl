@@ -118,7 +118,7 @@ end
 function simulation_board:register_smart(obj)
 	--alun_utils.debug_write(alun_utils.sr("simulation_board:register_smart %s",obj and obj:name()))
 	if self.smarts[obj.id] ~= nil then
-		abort("Smart already exist in list [%s]", obj:name())
+		printf("Smart already exist in list [%s]", obj:name())
 		return
 	end
 
@@ -162,7 +162,7 @@ function simulation_board:create_squad(spawn_smart, sq_id)
 	--alun_utils.debug_write(alun_utils.sr("simulation_board:create_squad spawn_smart=%s sq_id=%s",spawn_smart and spawn_smart:name(),sq_id))
 	local squad_id = tostring(sq_id)
 	if not (system_ini():section_exist(squad_id)) then
-		alun_utils.printf("squad section does not exist: %s",squad_id)
+		printf("squad section does not exist: %s",squad_id)
 		return
 	end
 
@@ -199,7 +199,7 @@ local function release_object(p)
 	end
 
 	if not (se_obj.marked_for_release) then
-		--alun_utils.printf("safe released squad %s",se_obj:name())
+		--printf("safe released squad %s",se_obj:name())
 		sim:release(se_obj,true)
 		se_obj.marked_for_release = true
 	end
@@ -309,7 +309,7 @@ function simulation_board:fill_start_position()
 					if (smart) then
 						squad = self:create_squad(smart, id)
 					else
-						alun_utils.printf("Wrong smart name [%s] in start position", tostring(v))
+						printf("Wrong smart name [%s] in start position", tostring(v))
 					end
 				end
 			end

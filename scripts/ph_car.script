@@ -128,7 +128,7 @@ function action_car:reset_scheme(loading)
 	    if self.st.path_walk then
 	        self.path_walk = patrol(self.st.path_walk)
 	        if not self.path_walk then
-		        abort("object '%s': unable to find path_walk '%s' on the map", self.object:name(), self.st.path_walk)
+		        printf("object '%s': unable to find path_walk '%s' on the map", self.object:name(), self.st.path_walk)
 	        end
 
             self:start_car()
@@ -137,7 +137,7 @@ function action_car:reset_scheme(loading)
 	        --if not self.path_walk_info then
 		    self.path_walk_info = utils.path_parse_waypoints(self.st.path_walk)
 	        if not self.path_walk_info then
-		        abort("object '%s': path_walk ('%s'): unable to obtain path_walk_info from path",
+		        printf("object '%s': path_walk ('%s'): unable to obtain path_walk_info from path",
 			        self.object:name(), self.st.path_walk)
 	        end
 	        --end
@@ -257,7 +257,7 @@ function action_car:reset_scheme(loading)
 	                self.def_fire_rep = -1
 	            else
 	                local c = tonumber(self.st.fire_rep)
-		            self.def_fire_rep = if_then_else(c > 0, c, 0)
+		            self.def_fire_rep = c > 0 and c or 0
 		        end
 		    else
 		        self.def_fire_rep = 0
@@ -272,14 +272,14 @@ function action_car:reset_scheme(loading)
 	            printf("car <state>: firetarget = points")
 		        self.path_fire = patrol(self.st.path_fire)
 		        if not self.path_fire then
-			        abort("object '%s': unable to find path_fire '%s' on the map",
+			        printf("object '%s': unable to find path_fire '%s' on the map",
 				        self.object:name(), self.st.path_fire)
 		        end
 
 	            if not self.path_fire_info then
 		            self.path_fire_info = utils.path_parse_waypoints(self.st.path_fire)
 	                if not self.path_fire_info then
-		                abort("object '%s': path_fire ('%s'): unable to obtain path_fire_info from path",
+		                printf("object '%s': path_fire ('%s'): unable to obtain path_fire_info from path",
 			                self.object:name(), self.st.path_fire)
 	                end
 	            end
@@ -574,7 +574,7 @@ function action_car:walk_arrival_callback(index)
         if next_idx >= 0 then
 	        local fw = self.path_walk_info[next_idx]["fw"]
 	        if fw then
-		        self.fire_wait = if_then_else(fw == "true", true, false)
+		        self.fire_wait = fw == "true"
 	        else
 	            self.fire_wait = false
 	        end
@@ -585,7 +585,7 @@ function action_car:walk_arrival_callback(index)
 	                self.fire_rep = -1
 	            else
 	                local c = tonumber(fr)
-		            self.fire_rep = if_then_else(c > 0, c, 0)
+		            self.fire_rep = c > 0 and c or 0
 		        end
 	        else
 	            self.fire_rep = self.def_fire_rep
@@ -594,7 +594,7 @@ function action_car:walk_arrival_callback(index)
 	        self.fire_wait = false
 	        self.fire_rep = self.def_fire_rep
 	    end
-        printf("car <fire>: fire_wait = %s", if_then_else(self.fire_wait, "true", "false"))
+        printf("car <fire>: fire_wait = %s", self.fire_wait and "true" or "false")
         printf("car <fire>: fire_rep = %d", self.fire_rep)
     end
 
@@ -791,23 +791,23 @@ function action_car:fire_arrival_callback(cur_index)
 
 	    local ff = self.path_fire_info[idx]["ff"]
 	    if ff then
-		    self.fire_forward = if_then_else(ff == "true", true, false)
+		    self.fire_forward = ff == "true"
 		else
 		    self.fire_forward = false
 	    end
 
 	    local fb = self.path_fire_info[idx]["fb"]
 	    if fb then
-		    self.fire_backward = if_then_else(fb == "true", true, false)
+		    self.fire_backward = fb == "true"
 		else
 		    self.fire_backward = false
 	    end
 
 	    local f = self.path_fire_info[idx]["f"]
 	    if f then
-		    self.state_shooting = if_then_else(f == "true", state_shooting_on, state_none)
+		    self.state_shooting = f == "true" and state_shooting_on or state_none
 	    else
-		    self.state_shooting = if_then_else(self.st.auto_fire, state_shooting_on, state_none)
+		    self.state_shooting = self.st.auto_fire and state_shooting_on or state_none
 	    end
 
 	    local ft = self.path_fire_info[idx]["ft"]
@@ -822,7 +822,7 @@ function action_car:fire_arrival_callback(cur_index)
 		    self.state_shooting = if_then_else(self.st.auto_fire, state_shooting_on, state_none)
 		    self.fire_time = def_min_fire_time
 	end
-    printf("car <fire>: state_shooting = %s", if_then_else(self.state_shooting ~= 0, "true", "false"))
+    printf("car <fire>: state_shooting = %s",self.state_shooting ~= 0)
     --printf("car <fire>: auto_fire = %s", if_then_else(self.st.auto_fire, "true", "false"))
     printf("car <fire>: fire_time = %f", self.fire_time)
 

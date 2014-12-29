@@ -141,7 +141,7 @@ function action_mgun:reset_scheme(loading)
             if level.patrol_path_exists(self.path_fire) then
                 self.path_fire_point = patrol(self.path_fire):point(0)
             else
-                abort("[ph_minigun] patrol path %s doesnt exist.", tostring(self.path_fire))
+                printf("[ph_minigun] patrol path %s doesnt exist.", tostring(self.path_fire))
             end
         end
 
@@ -261,7 +261,7 @@ function action_mgun:update(delta)
 			local st = db.storage[owner]
 			if (st) then
 				if (st.rx_dont_shoot) then
-					alun_utils.printf("action_mgun rx_dont_shoot")
+					printf("action_mgun rx_dont_shoot")
 					self.st.target_id = nil
 					self.state_shooting = state_none
 					self:set_shooting(self.state_shooting)

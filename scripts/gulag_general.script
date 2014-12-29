@@ -7,7 +7,7 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 
 This script was re-written to overcome some serious performance issues caused by creating new ltx files
 on every load when most of the time this information goes unchanged. Remember, if you use this and you make
-a change to the gulag by adding new waypoints through all.spawn then you need to delete the contents of configs\gulag
+a change to the gulag by adding new waypoints through all.spawn or LE then you need to delete the contents of configs\gulag
 
 Another reason this was re-written is because it alters the job tables used by smart_terrain.script. GSC made
 the job system very inefficient by putting tables inside of tables which required deep recursion to find a job
@@ -15,7 +15,7 @@ when you can simply put them all in one table and sort by priority. Indexing the
 allows to step through the table once per update for NPCs who already have a job and are just scanning for a higher
 priority job to switch to; This improves performance substantually.
 
-
+TODO: Further optimize by replacing string concat with table.concat, though it's not important now that most of it is only generated once
 ----------
 Notes:
 ----------
@@ -91,7 +91,7 @@ local job_type_by_scheme = {
 	["companion"]   	= "point_job",
 	["beh"]         	= "point_job",
 	["campfire_point"] 	= "point_job",
-	["heli_move"]		= "path_job"
+	["heli_move"]		= "heli_path_job"
 }
 
 function get_job_prior(job)
@@ -350,8 +350,8 @@ job_info_by_job_type_id = {
 	[14]   	= {job_type = "point_job", 		prior = 60, precondition_function = precond_surge},	 						-- beh_surge
 	[15]	= {job_type = "point_job", 		prior = 59, precondition_function = precond_trade_job},						-- beh_trader
 	[16]   	= {job_type = "point_job", 		prior = 40},																-- mob home
-	[17]	= {job_type = "path_job", 		prior = 45},																-- heli_move
-	[18]	= {job_type = "path_job", 		prior = 100, precondition_function = precond_heli_hide, prefix_name = ""},	-- heli_hide
+	[17]	= {job_type = "heli_path_job", 	prior = 45},																-- heli_move
+	[18]	= {job_type = "heli_path_job", 	prior = 100, precondition_function = precond_heli_hide, prefix_name = ""},	-- heli_hide
 	[19]    = {job_type = "point_job",	 	prior = 3}
 }
 
@@ -1098,18 +1098,6 @@ mute 			  = false
 				job_ltx = job_ltx.."path_look = heli_"..i.."_fly_look\n"
 			end
 
-			if (smart.safe_restr and xr_gulag.job_in_restrictor(smart, smart.safe_restr, name)) then
-				job_ltx = job_ltx .. "invulnerable = {=npc_in_zone("..smart.safe_restr..")} true\n"
-			end
-
-			if (smart.def_restr) then
-				--job_ltx = job_ltx .."out_restr = "..smart.def_restr..","..combat_restrictor.get_job_restrictor(name).."\n"
-			end
-
-			if (smart.base_on_actor_control and smart.base_on_actor_control.ignore_zone and xr_gulag.job_in_restrictor(smart, smart.base_on_actor_control.ignore_zone, name)) then
-				job_ltx = job_ltx .."combat_ignore_cond = {=npc_in_zone("..smart.base_on_actor_control.ignore_zone..")} true\ncombat_ignore_keep_when_attacked = true\n"
-			end
-
 			ltx = ltx.."\n\n"..job_ltx
 		end
 		i = i + 1
@@ -1260,7 +1248,7 @@ local function add_exclusive_job(smart,sect, work_field, smart_ini, job_table)
 	local ini_path = "\scripts\\"..work
 	local fs = getFS()
 	if fs:exist("$game_config$",ini_path) == nil then
-		abort("there is no configuration file [%s]", ini_path)
+		printf("there is no configuration file [%s]", ini_path)
 		return
 	end
 
@@ -1276,7 +1264,7 @@ local function add_exclusive_job(smart,sect, work_field, smart_ini, job_table)
 	local job_type = job_type_by_scheme[scheme]
 
 	if not (job_type) then
-		abort("gulag_general.add_exclusive_job(): Invalid job_type! job_type = %s scheme = %s",job_type,scheme)
+		printf("gulag_general.add_exclusive_job(): Invalid job_type! job_type = %s scheme = %s",job_type,scheme)
 		return
 	end
 
@@ -1329,8 +1317,8 @@ function load_job(smart)
 
 	-- Use a gulag if it already exists, saves tons of memory and cuts loading time down drastically
 	if (file_exists(alun_utils.fspath("$game_gulag$")..gname..".ltx")) then
-		--generate_ltx = false
-		--alun_utils.printf("Not generating dynamic ltx")
+		generate_ltx = false
+		--printf("Not generating dynamic ltx")
 	end
 
 	ltx = nil

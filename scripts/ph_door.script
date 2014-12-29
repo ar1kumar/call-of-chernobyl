@@ -13,7 +13,6 @@ function action_door:__init(obj, storage)
 	self.object = obj
 	self.st = storage
 	self.snd_obj = nil
-	
 	storage.door_action = self
 end
 function action_door:reset_scheme(loading)
@@ -64,7 +63,17 @@ end
 function action_door:update(delta)
 	--printf("_bp: action_door:update()", delta)
 	if not self.initialized then
-		abort("object '%s': door failed to initialize", self.object:name())
+		printf("object '%s': door failed to initialize", self.object:name())
+	end
+	
+	-- clear recent openers
+	if (self.initiator) then
+		local tg = time_global()
+		if (self._last_update and tg < self._last_update) then
+			return
+		end
+		self._last_update = tg + 500
+		self.initiator = nil
 	end
 
 	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
@@ -248,10 +257,24 @@ function action_door:try_switch()
 end
 
 function action_door:use_callback(door, actor)
-	--alun_utils.printf("door=%s actor=%s",door and door:name(),actor and actor:name())
+	alun_utils.printf("door=%s actor=%s",door and door:name(),actor and actor:name())
 	if self.st.locked then
 		if self.st.snd_open_start then
             xr_sound.set_sound_play(self.object:id(), self.st.snd_open_start)
+		end
+	end
+	
+	local id = actor and actor:id()
+	
+	if (id and id ~= 0) then 
+		if (self.initiator and db.storage[id] and db.storage[id].meet) then
+			-- Too many NPC trying to open the damn door, tell him to GTFO
+			db.storage[id].meet.gtfo = true
+			return
+		end
+
+		if not (self.initiator) then 
+			self.initiator = id
 		end
 	end
 

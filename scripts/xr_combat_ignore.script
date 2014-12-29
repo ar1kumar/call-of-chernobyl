@@ -57,7 +57,7 @@ local function npc_on_update(npc,st)
 			local cid = se_obj.group_id and se_obj.group_id ~= 65535 and se_obj.group_id or id
 			if (cid and safe_zone_npcs[cid]) then
 				db.storage[id].heli_enemy_flag = nil
-				if (tg > safe_zone_npcs[cid] + 120000) then
+				if (tg > safe_zone_npcs[cid] + 20000) then
 					safe_zone_npcs[cid] = nil
 				end
 			else
@@ -184,7 +184,7 @@ function is_enemy(obj,enemy,no_memory)
 		if (obj_is_stalker and community ~= "zombied" and not is_monster) then
 			local se_obj = obj.se_obj or alife():object(id)
 			if (not se_obj) then
-				--alun_utils.printf("xr_combat_ignore: Critical Error dial 911 se_obj is nil!")
+				--printf("xr_combat_ignore: Critical Error dial 911 se_obj is nil!")
 				return false
 			end
 

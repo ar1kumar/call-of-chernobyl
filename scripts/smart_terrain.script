@@ -79,7 +79,6 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 class "se_smart_terrain" (cse_alife_smart_zone)
 function se_smart_terrain:__init(section) super(section)
-	self.population		= 0
 	self.npc_by_job_section = {}
 	self.dead_time = {}
 	self.npc_info  = {}
@@ -143,14 +142,14 @@ function se_smart_terrain:read_params()
 	local ini = self:spawn_ini()
 
 	if not ini:section_exist( "smart_terrain" ) then
-		abort( "[smart_terrain %s] no configuration!", self:name() )
+		printf( "[smart_terrain %s] no configuration!", self:name() )
 		self.disabled = true
 		return
 	end
 
 	local filename = utils.cfg_get_string(ini, "smart_terrain", "cfg", 	self, false, "")
 	if not (filename) then
-		alun_utils.printf("no configuration file defined in spawn ini for %s",self:name())
+		printf("no configuration file defined in spawn ini for %s",self:name())
 		--filename = "scripts\\"..tostring(self.level_name).."\\smart\\"..self:name()..".ltx"
 	end
 
@@ -159,7 +158,7 @@ function se_smart_terrain:read_params()
 		if fs:exist("$game_config$",filename) then
 			ini = ini_file(filename)
 		else
-			abort("There is no configuration file [%s] in smart_terrain [%s]", filename, 	self:name())
+			printf("There is no configuration file [%s] in smart_terrain [%s]", filename, 	self:name())
 		end
 	end
 	
@@ -168,12 +167,12 @@ function se_smart_terrain:read_params()
 	self.sim_type		= utils.cfg_get_string(ini, "smart_terrain", "sim_type", 		self, false, "", "default")
 
 	--if valid_territory[self.sim_type] == nil then
-		--abort("Wrong sim_type value [%s] in smart [%s]", self.sim_type, self:name())
+		--printf("Wrong sim_type value [%s] in smart [%s]", self.sim_type, self:name())
 	--end
 
 	self.squad_id		= utils.cfg_get_number(ini, "smart_terrain", "squad_id", 		self, false, 0)
 	self.respawn_sector = utils.cfg_get_string(ini, "smart_terrain", "respawn_sector", 	self, false, "")
-	self.respawn_radius  = utils.cfg_get_number(ini, "smart_terrain", "respawn_radius", 	self, false, 150)^2
+	self.respawn_radius  = utils.cfg_get_number(ini, "smart_terrain", "respawn_radius", 	self, false, 100)^2
 	if self.respawn_sector ~= nil then
 		if self.respawn_sector == "default" then
 			self.respawn_sector = "all"
@@ -227,13 +226,13 @@ function se_smart_terrain:read_params()
 	end 
 	
 	if not ini:section_exist(respawn_params) then
-		abort("Wrong smart_terrain respawn_params section [%s](there is no section)", respawn_params)
+		printf("Wrong smart_terrain respawn_params section [%s](there is no section)", respawn_params)
 		return
 	end
 
 	local n = ini:line_count(respawn_params)
 	if n == 0 then
-		abort("Wrong smart_terrain respawn_params section [%s](empty params)", respawn_params)
+		printf("Wrong smart_terrain respawn_params section [%s](empty params)", respawn_params)
 		return
 	end
 
@@ -244,11 +243,11 @@ function se_smart_terrain:read_params()
 	for j=0,n-1 do
 		local result, prop_name, prop_condlist = ini:r_line(respawn_params,j,"","")
 		if not ini:section_exist(prop_name) then
-			abort("Wrong smatr_terrain respawn_params section [%s] prop [%s](there is no section)", respawn_params, prop_name)
+			printf("Wrong smatr_terrain respawn_params section [%s] prop [%s](there is no section)", respawn_params, prop_name)
 		else
 			local spawn_num = utils.cfg_get_string(ini, prop_name, "spawn_num", 	self, false, "", nil)
 			if not (spawn_num) then 
-				abort("Wrong smatr_terrain respawn_params section [%s] prop [%s] line [spawn_num](there is no line)", respawn_params, prop_name)
+				printf("Wrong smatr_terrain respawn_params section [%s] prop [%s] line [spawn_num](there is no line)", respawn_params, prop_name)
 			else
 				spawn_num = xr_logic.parse_condlist(nil, prop_name, "spawn_num", spawn_num)
 				self.respawn_params[prop_name] 			= {}
@@ -265,7 +264,7 @@ function se_smart_terrain:read_params()
 					spawn_squads = utils.parse_names(spawn_squads)
 					self.respawn_params[prop_name].squads = spawn_squads
 				else
-					abort("Wrong smatr_terrain respawn_params section [%s] prop [%s] line [spawn_squads](there is no line)", respawn_params, prop_name)
+					printf("Wrong smatr_terrain respawn_params section [%s] prop [%s] line [spawn_squads](there is no line)", respawn_params, prop_name)
 					return
 				end
 			end
@@ -277,12 +276,12 @@ function se_smart_terrain:fill_npc_info(obj)
 	--alun_utils.debug_write(alun_utils.sr("%s:fill_npc_info %s",self:name(),obj and obj:name()))
 	local cls = obj.clsid and obj:clsid()
 	if not (cls) then 
-		return alun_utils.printf("fill_npc_info invalid clsid for %s",obj and obj:name())
+		return printf("fill_npc_info invalid clsid for %s",obj and obj:name())
 	end
 	
 	local stype = IsStalker(nil,cls) and 0 or IsMonster(nil,cls) and 1 or IsHelicopter(nil,cls) and 3 or nil
 	if not (stype) then 
-		return alun_utils.printf("fill_npc_info invalid stype for %s [clsid=%s]",obj and obj:name(),cls)
+		return printf("fill_npc_info invalid stype for %s [clsid=%s]",obj and obj:name(),cls)
 	end 
 	
 	local npc_info 			= {}
@@ -315,7 +314,7 @@ function se_smart_terrain:register_npc(obj)
 	
 	local cls = obj.clsid and obj:clsid()
 	if not (cls) then 
-		return alun_utils.printf("register_npc no clsid! %s",obj and obj:name())
+		return printf("register_npc no clsid! %s",obj and obj:name())
 	end 
 	
 	-- dynamic companions cannot register
@@ -375,7 +374,7 @@ function se_smart_terrain:unregister_npc(obj)
 		xr_logic.initialize_obj(st.object, st, false, db.actor, stype)
 	end
 
-	--abort("self.npc_info[obj.id] = nil !!! obj.id=%s  [%s]", obj.id,obj:name())
+	--printf("self.npc_info[obj.id] = nil !!! obj.id=%s  [%s]", obj.id,obj:name())
 end
 
 function se_smart_terrain:clear_dead(obj)
@@ -389,7 +388,7 @@ function se_smart_terrain:clear_dead(obj)
 	
 	self:clear_job(obj.id,true)
 
-	--abort("clear_dead():self.npc_info[obj.id] = nil !!! obj.id=%s  [%s]", obj.id,obj:name())
+	--printf("clear_dead():self.npc_info[obj.id] = nil !!! obj.id=%s  [%s]", obj.id,obj:name())
 end
 
 function se_smart_terrain:task(obj)
@@ -404,6 +403,21 @@ function se_smart_terrain:task(obj)
 
 	return self.npc_info[obj.id] and self.npc_info[obj.id].job and self.npc_info[obj.id].job.alife_task or self.smart_alife_task
 end
+
+local function validate_patrol_path(path_name,gg)
+	local p = patrol(path_name)
+	local ret = true
+	if (p) then 
+		local cnt = p:count()
+		for i=0,cnt-1 do
+			if not (gg:valid_vertex_id(p:game_vertex_id(i))) then 
+				printf("validate_patrol_path WARNING: %s: invalid game_vertex_id for point %s",path_name,i)
+				ret = false
+			end
+		end
+	end
+	return ret
+end 
 
 function se_smart_terrain:load_jobs()
 	if (self.disabled) then
@@ -434,12 +448,12 @@ function se_smart_terrain:load_jobs()
 				section = job.section
 				ltx = job.ltx or self.ltx
 				if not (ltx:line_exist(section,"active")) then
-					abort("gulag: ltx=%s  no 'active' in section %s", self.ltx_name, section)
+					printf("gulag: ltx=%s  no 'active' in section %s", self.ltx_name, section)
 				else
 					active_section = ltx:r_string(section, "active")
 
 					job_type = gulag_general.get_job_type(job)
-					if (job_type == "path_job") then
+					if (job_type == "path_job" or job_type == "heli_path_job") then
 						path_field = "nil"
 						
 						path_field = 	(ltx:line_exist(active_section,"path_walk") and "path_walk" 
@@ -450,7 +464,7 @@ function se_smart_terrain:load_jobs()
 										or "nil")
 
 						if (path_field == "nil") then
-							abort("smart_terrain.load_jobs(): Cannot find path_field in section %s. ini_path=%s",active_section,job.ini_path)
+							printf("smart_terrain.load_jobs(): Cannot find path_field in section %s. ini_path=%s",active_section,job.ini_path)
 						else
 							prefix_name = gulag_general.get_job_prefix_name(job)
 							if (prefix_name) then 
@@ -465,11 +479,16 @@ function se_smart_terrain:load_jobs()
 								end
 							end
 							
+							job.alife_task = self.smart_alife_task
+							
 							if (level.patrol_path_exists(path_name)) then
-								job.alife_task = CALifeSmartTerrainTask(path_name)
-							else 
-								abort("%s:load_jobs() There is no such patrol path %s",self:name(),path_name)
-								job.alife_task = self.smart_alife_task
+								if not (job_type == "heli_path_job") then
+									if (validate_patrol_path(path_name,gg)) then
+										job.alife_task = CALifeSmartTerrainTask(path_name)
+									end
+								end
+							else
+								printf("%s:load_jobs() There is no such patrol path %s",self:name(),path_name)
 							end
 						end
 					elseif (job_type == "smartcover_job") then
@@ -477,7 +496,7 @@ function se_smart_terrain:load_jobs()
 						smartcover = se_smart_cover.registered_smartcovers[smartcover_name]
 
 						if not (smartcover) then
-							abort("There is an exclusive job with wrong smatrcover name [%s]  smartterrain [%s]", tostring(smartcover_name), self:name())
+							printf("There is an exclusive job with wrong smatrcover name [%s]  smartterrain [%s]", tostring(smartcover_name), self:name())
 						else 
 							job.alife_task = smartcover and CALifeSmartTerrainTask(smartcover.m_game_vertex_id, smartcover.m_level_vertex_id) or self.smart_alife_task
 						end
@@ -560,13 +579,13 @@ function se_smart_terrain:select_npc_job(npc_info)
 	--alun_utils.debug_write(alun_utils.sr("%s:select_npc_job %s",self:name()))
 	
 	if not (npc_info and npc_info.se_obj and npc_info.stype) then 
-		return alun_utils.printf("%s no npc_info!",self:name())
+		return printf("%s no npc_info!",self:name())
 	end
 	
 	-- reference job table according to race
 	local jobs = npc_info.stype == 0 and self.stalker_jobs or npc_info.stype == 1 and self.monster_jobs or npc_info.stype == 3 and self.heli_jobs
 	if not (jobs) then 
-		return alun_utils.printf("%s no job table for %s [stype = %s]",self:name(),npc_info.se_obj:name(),npc_info.stype)
+		return printf("%s no job table for %s [stype = %s]",self:name(),npc_info.se_obj:name(),npc_info.stype)
 	end
 	
 	local new_job
@@ -716,33 +735,33 @@ end
 function se_smart_terrain:setup_logic(npc)
 	--alun_utils.debug_write(self:name().." setup_logic "..tostring(npc and npc:name()))
 	if not (npc) then
-		alun_utils.printf("%s.setup_logic: NPC is nil",self:name())
+		printf("%s.setup_logic: NPC is nil",self:name())
 		return
 	end
 
 	local npc_info = self.npc_info[npc:id()]
 	if not (npc_info) then
-		alun_utils.printf("%s.setup_logic: npc_info is nil! for id=%s",self:name(),npc:id())
+		printf("%s.setup_logic: npc_info is nil! for id=%s",self:name(),npc:id())
 		return
 	end
 	
 	if not (npc_info.se_obj) then
-		alun_utils.printf("%s.setup_logic: npc_info.se_obj is nil! for id=%s",self:name(),npc:id())
+		printf("%s.setup_logic: npc_info.se_obj is nil! for id=%s",self:name(),npc:id())
 		return 
 	end
 
 	local job = npc_info.job
 	if not (job) then
-		alun_utils.printf("%s.setup_logic: npc_info has no job! for id=%s",self:name(),npc:id())
+		printf("%s.setup_logic: npc_info has no job! for id=%s",self:name(),npc:id())
 		self:unregister_npc(npc_info.se_obj)
 		self:register_npc(npc_info.se_obj)
 		return
 	end
 
-	--[[
+	--[[ fixed elsewhere now
 	-- sanity; Not sure why this happens. It happens in all 3 Stalker games, NPCs try to switch logic for a job on another level, causes waypoint/path crashes. Re-register NPC
 	if not (self.is_on_actor_level) then
-		alun_utils.printf("%s.setup_logic: npc is trying to setup logic for a job on another level! npc=%s job=%s",self:name(),npc:name(),job.section)
+		printf("%s.setup_logic: npc is trying to setup logic for a job on another level! npc=%s job=%s",self:name(),npc:name(),job.section)
 		self:unregister_npc(npc_info.se_obj)
 		--self:register_npc(npc_info.se_obj)
 		return
@@ -752,7 +771,7 @@ function se_smart_terrain:setup_logic(npc)
 	local gg = game_graph()
 	local level = gg:vertex(npc:game_vertex_id()):level_id()
 	if (level ~= gg:vertex(self.m_game_vertex_id):level_id() or level ~= gg:vertex(alife():actor().m_game_vertex_id):level_id()) then
-		alun_utils.printf("%s.setup_logic: npc is trying to setup logic for a job on another level! npc=%s job=%s npc_level_id=%s",self:name(),npc:name(),job.section,level)
+		printf("%s.setup_logic: npc is trying to setup logic for a job on another level! npc=%s job=%s npc_level_id=%s",self:name(),npc:name(),job.section,level)
 		self:unregister_npc(npc_info.se_obj)
 		--self:register_npc(npc_info.se_obj)
 		return
@@ -766,10 +785,10 @@ function se_smart_terrain:setup_logic(npc)
 
 	local sect = xr_logic.determine_section_to_activate(npc, ltx, job.section, db.actor)
 	if utils.get_scheme_by_section(job.section) == "nil" then
-		abort("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
+		printf("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
 	end
 
-	--alun_utils.printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
+	--printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
 	xr_logic.activate_by_section(npc, ltx, sect, job.prefix_name or self:name(), false)
 end
 
@@ -798,7 +817,7 @@ function se_smart_terrain:switch_to_desired_job(npc)
 		self:select_npc_job(self.npc_info[npc_id])
 		return
 	end
-
+	
 	-- No changing npc, find new job
 	if self.npc_info[changing_npc_id] == nil then
 		self.npc_info[npc_id].job = nil
@@ -858,7 +877,7 @@ function se_smart_terrain:STATE_Write(packet)
 		n = n + 1
 	end
 
-	--alun_utils.printf("%s:STATE_Write   JobCount=%s",self:name(),n)
+	--printf("%s:STATE_Write   JobCount=%s",self:name(),n)
 	alun_utils.w_stpk(packet,"u8",n,"npc_info count")
 	for id,info in pairs(self.npc_info) do
 		alun_utils.w_stpk(packet,"u16",id,"npc_info id")
@@ -945,7 +964,7 @@ function se_smart_terrain:STATE_Read(packet, size)
 	end
 
 	if (self.npc_info[65535]) then
-		alun_utils.printf("%s:STATE_Read: invalid id in npc_info table. Check for save corruption or error in smart_terrain job system.")
+		printf("%s:STATE_Read: invalid id in npc_info table. Check for save corruption or error in smart_terrain job system.")
 		self.npc_info[65535] = nil
 	end
 
@@ -1439,6 +1458,11 @@ function se_smart_terrain:try_respawn()
 		local dist_to_actor = se_actor.position:distance_to_sqr(self.position)
 		if (dist_to_actor < self.respawn_radius) then
 			return
+		elseif (dist_to_actor <= 10000) then
+			-- make sure actor's back is turned; less chance to see squad spawn in
+			if not (alun_utils.angle_diff(db.actor:direction(), db.actor:position():sub(self.position))<90 and self.position:distance_to(db.actor:position()) > 2.5) then 
+				return 
+			end
 		end
 	elseif (self.respawn_only_level) then
 		return
@@ -1480,7 +1504,7 @@ function se_smart_terrain:try_respawn()
 						SIMBOARD:setup_squad_and_group(m.object)
 					end
 				else
-					alun_utils.printf("call respawn failed for %s, check squad descriptions",sect_to_spawn)
+					printf("call respawn failed for %s, check squad descriptions",sect_to_spawn)
 					return
 				end
 			elseif (sect_to_spawn_params.helicopter) then

@@ -68,6 +68,7 @@ function remove_task_companion(actor,npc,p)
 	end 
 	
 	squad.scripted_target = nil
+	squad.current_action = nil
 	axr_companions.companion_squads[squad.id] = nil
 	
 	for k in squad:squad_members() do
@@ -87,10 +88,8 @@ function add_task_companion(actor,npc,p)
 	for k in squad:squad_members() do
 		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id))
 		if (npc) then
-			npc:give_info_portion("npcx_is_companion")
+			axr_companions.add_special_task_npc_to_actor_squad(npc)
 			npc:give_info_portion("npcx_beh_cannot_dismiss")
-			axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
-			axr_companions.setup_companion_logic(npc)
 		end
 	end
 end
@@ -131,14 +130,6 @@ function on_init_bounty_hunt(actor,npc,p)
 	alun_utils.save_var(db.actor,p[1],target_id)
 end 
 
-function give_mar_base_owl_stalker_trader_task_3_reward(actor,npc,p)
-	dialogs.relocate_money(db.actor,2500,"in")
-	inc_faction_goodwill_to_actor(db.actor, nil, {"ecolog", 10})
-	inc_faction_goodwill_to_actor(db.actor, nil, {"csky", 10})
-	inc_faction_goodwill_to_actor(db.actor, nil, {"killer", 10})
-	--alun_utils.save_var(db.actor,"task_companion_slot_1",nil)
-end 
-
 function fail_task_dec_goodwill(actor,npc,p)
 	local amt = tonumber(p[1]) or 10
 	for i=2,#p do 
@@ -150,6 +141,9 @@ function complete_task_inc_goodwill(actor,npc,p)
 	local amt = tonumber(p[1]) or 10
 	for i=2,#p do 
 		inc_faction_goodwill_to_actor(db.actor, nil, {p[i], amt})
+	end
+	if (db.actor:character_reputation()+2 <= 10000) then
+		db.actor:change_character_reputation(2)
 	end
 end
 
@@ -166,7 +160,7 @@ function reset_task_target_anomaly(actor,npc,p)
 	alun_utils.save_var(db.actor,"task_target_anomaly",nil)
 end 
 
--- Spawn a squad that will become actor companion for anomaly target task
+-- Spawn a squad that will become actor companion for special tasks
 -- param 1 - squad section 
 -- param 2 - smart
 function setup_companion_task(actor,npc,p)
@@ -176,7 +170,7 @@ function setup_companion_task(actor,npc,p)
 	end 
 	
 	if not (system_ini():section_exist(p[1])) then 
-		alun_utils.printf("setup_companion_task: Trying to setup companion squad with a non-existent section!")
+		printf("setup_companion_task: Trying to setup companion squad with a non-existent section!")
 		return
 	end 
 	
@@ -517,7 +511,7 @@ function run_postprocess(actor, npc, p)
 			printf("adding complex effector [%s], id [%s], from [%s]", p[1], tostring(p[2]), tostring(npc:name()))
 			level.add_complex_effector(p[1], num)
 		else
-			abort("Complex effector section is no set! [%s]", tostring(p[1]))
+			printf("Complex effector section is no set! [%s]", tostring(p[1]))
 		end
 	end
 end
@@ -747,7 +741,7 @@ function teleport_npc(actor, npc, p)
 	local patrol_point = p[1]
 	local patrol_point_index = p[2] or 0
 	if patrol_point == nil then
-		abort("Wrong parameters in 'teleport_npc' function!!!")
+		printf("Wrong parameters in 'teleport_npc' function!!!")
 	end
 	local position = patrol(patrol_point):point(patrol_point_index)
 	reset_animation(npc)
@@ -760,12 +754,12 @@ function teleport_npc_by_story_id(actor, npc, p)
 	local patrol_point = p[2]
 	local patrol_point_index = p[3] or 0
 	if story_id == nil or patrol_point == nil then
-		abort("Wrong parameters in 'teleport_npc_by_story_id' function!!!")
+		printf("Wrong parameters in 'teleport_npc_by_story_id' function!!!")
 	end
 	local position = patrol(tostring(patrol_point)):point(patrol_point_index)
 	local npc_id = get_story_object_id(story_id)
 	if npc_id == nil then
-		abort("There is no story object with id [%s]", story_id)
+		printf("There is no story object with id [%s]", story_id)
 	end
 	local cl_object = level.object_by_id(npc_id)
 	if cl_object then
@@ -780,14 +774,14 @@ function teleport_squad(actor, npc, p)
 	local squad_story_id = p[1]
 	local patrol_point = p[2]
 	local patrol_point_index = p[3] or 0
-	--alun_utils.printf("teleport squad [%s][%s][%s]",p[1],p[2],p[3])
+	--printf("teleport squad [%s][%s][%s]",p[1],p[2],p[3])
 	if squad_story_id == nil or patrol_point == nil then
-		abort("Wrong parameters in 'teleport_squad' function!!!")
+		printf("Wrong parameters in 'teleport_squad' function!!!")
 	end
 	local position = patrol(patrol_point):point(patrol_point_index)
 	local squad = get_story_squad(squad_story_id)
 	if squad == nil then
-		abort("There is no squad with story id [%s]", squad_story_id)
+		printf("There is no squad with story id [%s]", squad_story_id)
 	end
 	squad:set_squad_position(position)
 end
@@ -961,7 +955,7 @@ function hit_obj(actor, npc, p)
 	local sid = nil
 
 	if not obj then
---    abort("HIT_OBJ [%s]. Target object does not exist", npc:name())
+--    printf("HIT_OBJ [%s]. Target object does not exist", npc:name())
 		return
 	end
 
@@ -992,7 +986,7 @@ function hit_obj_chemical(actor, npc, p)
 	local sid = nil
 
 	if not obj then
---    abort("HIT_OBJ [%s]. Target object does not exist", npc:name())
+--    printf("HIT_OBJ [%s]. Target object does not exist", npc:name())
 		return
 	end
 
@@ -1023,7 +1017,7 @@ function hit_obj_fire_wound(actor, npc, p)
 	local sid = nil
 
 	if not obj then
---    abort("HIT_OBJ [%s]. Target object does not exist", npc:name())
+--    printf("HIT_OBJ [%s]. Target object does not exist", npc:name())
 		return
 	end
 
@@ -1113,7 +1107,7 @@ end
 -- Хитует нпс от нпс, если задан один параметр (стори айди), то нпс с таким стори айди хитнет нпс у которого вызвали эту функцию.
 -- если задано 2 стори айди , то нпс с 1-ым стори айди хитнет нпс со 2-ым стори айди.
 function hit_npc_from_npc(actor, npc, p)
-	if p == nil then abort("Invalid parameter in function 'hit_npc_from_npc'!!!!") end
+	if p == nil then printf("Invalid parameter in function 'hit_npc_from_npc'!!!!") end
 	local h = hit()
 	local hitted_npc = npc
 	h.draftsman = get_story_object(p[1])
@@ -1153,7 +1147,7 @@ function restore_health(actor, npc)
 end
 
 function make_enemy(actor, npc, p)
-	if p == nil then abort("Invalid parameter in function 'hit_npc_from_npc'!!!!") end
+	if p == nil then printf("Invalid parameter in function 'hit_npc_from_npc'!!!!") end
 	local h = hit()
 	local hitted_npc = npc
 	h.draftsman = get_story_object(p[1])
@@ -1299,7 +1293,7 @@ function turn_off_underpass_lamps(actor, npc)
 			obj:get_hanging_lamp():turn_off()
 		else
 			printf("function 'turn_off_underpass_lamps' lamp [%s] does not exist", tostring(k))
-			--abort("function 'turn_off_underpass_lamps' lamp [%s] does not exist", tostring(k))
+			--printf("function 'turn_off_underpass_lamps' lamp [%s] does not exist", tostring(k))
 		end
 	end
 end
@@ -1311,7 +1305,7 @@ function turn_off(actor, npc, p)
 		obj = get_story_object(v)
 
 		if not obj then
-			abort("TURN_OFF. Target object with story_id [%s] does not exist", v)
+			printf("TURN_OFF. Target object with story_id [%s] does not exist", v)
 			return
 		end
 		obj:get_hanging_lamp():turn_off()
@@ -1330,7 +1324,7 @@ function turn_on(actor, npc, p)
 		obj = get_story_object(v)
 
 		if not obj then
-			abort("TURN_ON [%s]. Target object does not exist", npc:name())
+			printf("TURN_ON [%s]. Target object does not exist", npc:name())
 			return
 		end
 		obj:get_hanging_lamp():turn_on()
@@ -1341,7 +1335,7 @@ end
 function turn_on_and_force(actor, npc, p)
 	local obj = get_story_object(p[1])
 	if not obj then
-		abort("TURN_ON_AND_FORCE. Target object does not exist")
+		printf("TURN_ON_AND_FORCE. Target object does not exist")
 		return
 	end
 	if p[2] == nil then p[2] = 55 end
@@ -1355,7 +1349,7 @@ end
 function turn_off_and_force(actor, npc, p)
 	local obj = get_story_object(p[1])
 	if not obj then
-		abort("TURN_OFF [%s]. Target object does not exist", npc:name())
+		printf("TURN_OFF [%s]. Target object does not exist", npc:name())
 		return
 	end
 	obj:stop_particles("weapons\\light_signal", "link")
@@ -1557,16 +1551,16 @@ function spawn_object(actor, obj, p)
 		--' p[2] - имя патрульного пути где спа унить.
 	local spawn_sect = p[1]
 	if spawn_sect == nil then
-		abort("Wrong spawn section for 'spawn_object' function %s. For object %s", tostring(spawn_sect), obj:name())
+		printf("Wrong spawn section for 'spawn_object' function %s. For object %s", tostring(spawn_sect), obj:name())
 	end
 
 	local path_name = p[2]
 	if path_name == nil then
-		abort("Wrong path_name for 'spawn_object' function %s. For object %s", tostring(path_name), obj:name())
+		printf("Wrong path_name for 'spawn_object' function %s. For object %s", tostring(path_name), obj:name())
 	end
 
 	if not level.patrol_path_exists(path_name) then
-		abort("Path %s doesnt exist. Function 'spawn_object' for object %s ", tostring(path_name), obj:name())
+		printf("Path %s doesnt exist. Function 'spawn_object' for object %s ", tostring(path_name), obj:name())
 	end
 	local ptr = patrol(path_name)
 	local index = p[3] or 0
@@ -1620,16 +1614,16 @@ function spawn_corpse(actor, obj, p)
 		--' p[2] - имя патрульного пути где спаунить.
 	local spawn_sect = p[1]
 	if spawn_sect == nil then
-		abort("Wrong spawn section for 'spawn_corpse' function %s. For object %s", tostring(spawn_sect), obj:name())
+		printf("Wrong spawn section for 'spawn_corpse' function %s. For object %s", tostring(spawn_sect), obj:name())
 	end
 
 	local path_name = p[2]
 	if path_name == nil then
-		abort("Wrong path_name for 'spawn_corpse' function %s. For object %s", tostring(path_name), obj:name())
+		printf("Wrong path_name for 'spawn_corpse' function %s. For object %s", tostring(path_name), obj:name())
 	end
 
 	if not level.patrol_path_exists(path_name) then
-		abort("Path %s doesnt exist. Function 'spawn_corpse' for object %s ", tostring(path_name), obj:name())
+		printf("Path %s doesnt exist. Function 'spawn_corpse' for object %s ", tostring(path_name), obj:name())
 	end
 	local ptr = patrol(path_name)
 	local index = p[3] or 0
@@ -1647,10 +1641,10 @@ function spawn_object_in(actor, obj, p)
 	--' p[2] - стори айди обьекта в который спавнить
 	local spawn_sect = p[1]
 	if spawn_sect == nil then
-		abort("Wrong spawn section for 'spawn_object' function %s. For object %s", tostring(spawn_sect), obj:name())
+		printf("Wrong spawn section for 'spawn_object' function %s. For object %s", tostring(spawn_sect), obj:name())
 	end
 	if p[2] == nil then
-		abort("Wrong target_name for 'spawn_object_in' function %s. For object %s", tostring(target_name), obj:name())
+		printf("Wrong target_name for 'spawn_object_in' function %s. For object %s", tostring(target_name), obj:name())
 	end
 --	local box = alife():object(target_name)
 --	if(box==nil) then
@@ -1661,11 +1655,11 @@ function spawn_object_in(actor, obj, p)
 	if target_obj_id ~= nil then
 		box = alife():object(target_obj_id)
 		if box == nil then
-			abort("There is no such object %s", p[2])
+			printf("There is no such object %s", p[2])
 		end
 		alife():create(spawn_sect,vector(),0,0,target_obj_id)
 	else
-		abort("object is nil %s", tostring(p[2]))
+		printf("object is nil %s", tostring(p[2]))
 	end
 end
 
@@ -1675,14 +1669,14 @@ function spawn_npc_in_zone(actor, obj, p)
 	--' p[2] - имя зоны в которой спаунить.
 	local spawn_sect = p[1]
 	if spawn_sect == nil then
-		abort("Wrong spawn section for 'spawn_object' function %s. For object %s", tostring(spawn_sect), obj:name())
+		printf("Wrong spawn section for 'spawn_object' function %s. For object %s", tostring(spawn_sect), obj:name())
 	end
 	local zone_name = p[2]
 	if zone_name == nil then
-		abort("Wrong zone_name for 'spawn_object' function %s. For object %s", tostring(zone_name), obj:name())
+		printf("Wrong zone_name for 'spawn_object' function %s. For object %s", tostring(zone_name), obj:name())
 	end
 	if db.zone_by_name[zone_name] == nil then
-		abort("Zone %s doesnt exist. Function 'spawn_object' for object %s ", tostring(zone_name), obj:name())
+		printf("Zone %s doesnt exist. Function 'spawn_object' for object %s ", tostring(zone_name), obj:name())
 	end
 	local zone = db.zone_by_name[zone_name]
 --	printf("spawn_npc_in_zone: spawning %s at zone %s, squad %s", tostring(p[1]), tostring(p[2]), tostring(p[3]))
@@ -1701,7 +1695,7 @@ function destroy_object(actor, obj, p)
 		sobj = alife():object(obj:id())
 	else
 		if p[1] == nil or p[2] == nil then
-			abort("Wrong parameters in destroy_object function!!!")
+			printf("Wrong parameters in destroy_object function!!!")
 		end
 		local target_str = nil
 		if p[3] ~= nil then
@@ -1713,10 +1707,10 @@ function destroy_object(actor, obj, p)
 		if target_id == nil then
 			if obj:object("af_quest_b14_twisted") then --Yasti: Added to combat ID issues if twisted artifact has been put into a container
 				target_id = obj:object("af_quest_b14_twisted"):id()
-				alun_utils.printf("Attempt to repair incorrect af_quest_b14_twisted has been successful")
+				printf("Attempt to repair incorrect af_quest_b14_twisted has been successful")
 			else
 				printf("You are trying to set non-existant target [%s] for object [%s] in section [%s]", target_str, obj:name(), db.storage[obj:id()].active_section)
-				alun_utils.printf("You are trying to set non-existant target [%s] for object [%s] in section [%s]", target_str, obj:name(), db.storage[obj:id()].active_section)
+				printf("You are trying to set non-existant target [%s] for object [%s] in section [%s]", target_str, obj:name(), db.storage[obj:id()].active_section)
 			end
 		end
 		sobj = alife():object(target_id)
@@ -1729,7 +1723,7 @@ function destroy_object(actor, obj, p)
 	local sim = alife()
 	if (axr_main) then
 		if (dev_debug) then
-			alun_utils.printf("xr_effects.destroy_object: se_obj = %s",sobj:name())
+			printf("xr_effects.destroy_object: se_obj = %s",sobj:name())
 		end
 		create_delayed_event(sobj.id,"safe_release",1,alun_utils.release_object,sobj.id)
 		return
@@ -1804,7 +1798,7 @@ function play_sound(actor, obj, p)
 
 	if obj and IsStalker(obj) then
 		if not obj:alive() then
-			abort("Stalker [%s][%s] is dead, but you wants to say something for you: [%s]!", tostring(obj:id()), tostring(obj:name()), p[1])
+			printf("Stalker [%s][%s] is dead, but you wants to say something for you: [%s]!", tostring(obj:id()), tostring(obj:name()), p[1])
 		end
 	end
 
@@ -1858,12 +1852,12 @@ end
 
 function update_faction_brain(actor, obj, p)
 	if p[1] == nil then
-		abort("Wrong parameters update_faction_brain")
+		printf("Wrong parameters update_faction_brain")
 	end
 	local board = SIMBOARD
 	local player = board.players[ p[1] ]
 	if player == nil then
-		abort("Can't find player %s", tostring(p[1]))
+		printf("Can't find player %s", tostring(p[1]))
 	end
 	player:faction_brain_update()
 end
@@ -1875,23 +1869,23 @@ function create_squad(actor, obj, p)
 	end
 	local squad_id = p[1]
 	if squad_id == nil then
-		abort("Wrong squad identificator [NIL] in create_squad function")
+		printf("Wrong squad identificator [NIL] in create_squad function")
 	end
 	local smart_name = p[2]
 	if smart_name == nil then
-		abort("Wrong smart name [NIL] in create_squad function")
+		printf("Wrong smart name [NIL] in create_squad function")
 	end
 
 	local ltx = system_ini()
 
 	if not ltx:section_exist(squad_id) then
-		abort("Wrong squad identificator [%s]. Squad descr doesnt exist.", tostring(squad_id))
+		printf("Wrong squad identificator [%s]. Squad descr doesnt exist.", tostring(squad_id))
 	end
 
 	local board = SIMBOARD
 	local smart = board.smarts_by_names[smart_name]
 	if smart == nil then
-		abort("Wrong smart_name [%s] for [%s] faction in create_squad function", tostring(smart_name), tostring(player_name))
+		printf("Wrong smart_name [%s] for [%s] faction in create_squad function", tostring(smart_name), tostring(player_name))
 	end
 
 	local squad = board:create_squad(smart, squad_id)
@@ -1921,7 +1915,7 @@ function create_squad_member(actor, obj, p)
 	local level_vertex_id	= nil
 	local game_vertex_id	= nil
 	if story_id == nil then
-		abort("Wrong squad identificator [NIL] in 'create_squad_member' function")
+		printf("Wrong squad identificator [NIL] in 'create_squad_member' function")
 	end
 	local board = SIMBOARD
 	local squad = get_story_squad(story_id)
@@ -1971,7 +1965,7 @@ end
 function remove_squad(actor, obj, p)
 	local story_id = p[1]
 	if story_id == nil then
-		abort("Wrong squad identificator [NIL] in remove_squad function")
+		printf("Wrong squad identificator [NIL] in remove_squad function")
 	end
 	local squad = get_story_squad(story_id)
 	if squad == nil then
@@ -1985,7 +1979,7 @@ end
 function kill_squad(actor, obj, p)
 	local story_id = p[1]
 	if story_id == nil then
-		abort("Wrong squad identificator [NIL] in kill_squad function")
+		printf("Wrong squad identificator [NIL] in kill_squad function")
 	end
 	local squad = get_story_squad(story_id)
 	if squad == nil then
@@ -2013,7 +2007,7 @@ function heal_squad(actor, obj, p)
 		health_mod = math.ceil(p[2]/100)
 	end
 	if story_id == nil then
-		abort("Wrong squad identificator [NIL] in heal_squad function")
+		printf("Wrong squad identificator [NIL] in heal_squad function")
 	end
 	local squad = get_story_squad(story_id)
 	if squad == nil then
@@ -2031,7 +2025,7 @@ end
 function update_squad(actor, obj, p)
 	local squad_id = p[1]
 	if squad_id == nil then
-		abort("Wrong squad identificator [NIL] in remove_squad function")
+		printf("Wrong squad identificator [NIL] in remove_squad function")
 	end
 	local board = SIMBOARD
 	local squad = board.squads[squad_id]
@@ -2046,7 +2040,7 @@ end
 function clear_smart_terrain(actor, obj, p)
 	local smart_name = p[1]
 	if smart_name == nil then
-		abort("Wrong squad identificator [NIL] in clear_smart_terrain function")
+		printf("Wrong squad identificator [NIL] in clear_smart_terrain function")
 	end
 
 	local board = SIMBOARD
@@ -2069,7 +2063,7 @@ end
 --[[
 function set_actor_faction(actor, obj, p)
 	if p[1] == nil then
-		abort("Wrong parameters")
+		printf("Wrong parameters")
 	end
 	SIMBOARD:set_actor_community(p[1])
 end
@@ -2079,7 +2073,7 @@ end
 --'-----------------------------------------------------------------------------------
 function give_task(actor, obj, p)
 	if p[1] == nil then
-		abort("No parameter in give_task function.")
+		printf("No parameter in give_task function.")
 	end
 	task_manager.get_task_manager():give_task(p[1])
 end
@@ -2224,7 +2218,7 @@ function inc_faction_goodwill_to_actor(actor, npc, p)
 	if delta and community then
 		game_relations.change_factions_community_num(community,actor:id(), tonumber(delta))
 	else
-		abort("Wrong parameters in function 'inc_faction_goodwill_to_actor'")
+		printf("Wrong parameters in function 'inc_faction_goodwill_to_actor'")
 	end
 end
 
@@ -2234,7 +2228,7 @@ function dec_faction_goodwill_to_actor(actor, npc, p)
 	if delta and community then
 		game_relations.change_factions_community_num(community,actor:id(), -tonumber(delta))
 	else
-		abort("Wrong parameters in function 'dec_faction_goodwill_to_actor'")
+		printf("Wrong parameters in function 'dec_faction_goodwill_to_actor'")
 	end
 end
 
@@ -2245,7 +2239,7 @@ function add_custom_static(actor, npc, p)
 		get_hud():AddCustomStatic(p[1], true)
 		get_hud():GetCustomStatic(p[1]):wnd():SetTextST(p[2])
 	else
-		abort("Invalid parameters in function add_custom_static!!!")
+		printf("Invalid parameters in function add_custom_static!!!")
 	end
 end
 
@@ -2253,7 +2247,7 @@ function remove_custom_static(actor, npc, p)
 	if p[1] ~= nil then
 		get_hud():RemoveCustomStatic(p[1])
 	else
-		abort("Invalid parameters in function remove_custom_static!!!")
+		printf("Invalid parameters in function remove_custom_static!!!")
 	end
 end
 ]]--
@@ -2267,7 +2261,7 @@ end
 -----------------------------------------------------------------------
 function give_treasure (actor, npc, p)
 	if p == nil then
-		abort("Required parameter is [NIL]")
+		printf("Required parameter is [NIL]")
 	end
 	for k,v in pairs(p) do
 		treasure_manager.get_treasure_manager():give_treasure(v)
@@ -2387,7 +2381,7 @@ end
 function make_actor_visible_to_squad(actor,npc,p)
 	local story_id = p and p[1]
 	local squad = get_story_squad(story_id)
-	if squad == nil then abort("There is no squad with id[%s]", story_id) end
+	if squad == nil then printf("There is no squad with id[%s]", story_id) end
 	for k in squad:squad_members() do
 		local obj = level.object_by_id(k.id)
 		if obj ~= nil then
@@ -2421,7 +2415,7 @@ end
 
 function add_map_spot(actor, npc, p)
 	if(p[1]==nil) then
-		abort("Story id for add map spot function is not set")
+		printf("Story id for add map spot function is not set")
 	else
 		local story_id = tonumber(p[1])
 		local id = id_by_sid(story_id)
@@ -2440,14 +2434,14 @@ function add_map_spot(actor, npc, p)
 				level.map_add_object_spot_ser(id, p[2], p[3])
 			end
 		else
-			abort("Wrong story id or name [%s] for map spot function", tostring(story_id))
+			printf("Wrong story id or name [%s] for map spot function", tostring(story_id))
 		end
 	end
 end
 
 function remove_map_spot(actor, npc, p)
 	if(p[1]==nil) then
-		abort("Story id for add map spot function is not set")
+		printf("Story id for add map spot function is not set")
 	else
 		local story_id = tonumber(p[1])
 		local id = id_by_sid(story_id)
@@ -2463,7 +2457,7 @@ function remove_map_spot(actor, npc, p)
 				level.map_remove_object_spot(id, p[2])
 			end
 		else
-			abort("Wrong story id or name [%s] for map spot function", tostring(story_id))
+			printf("Wrong story id or name [%s] for map spot function", tostring(story_id))
 		end
 	end
 end
@@ -2472,36 +2466,36 @@ end
 -- Anomal fields support
 function enable_anomaly(actor, npc, p)
 	if p[1] == nil then
-		abort("Story id for enable_anomaly function is not set")
+		printf("Story id for enable_anomaly function is not set")
 	end
 
 	local obj = get_story_object(p[1])
 	if not obj then
-		abort("There is no object with story_id %s for enable_anomaly function", tostring(p[1]))
+		printf("There is no object with story_id %s for enable_anomaly function", tostring(p[1]))
 	end
 	obj:enable_anomaly()
 end
 
 function disable_anomaly(actor, npc, p)
 	if p[1] == nil then
-		abort("Story id for disable_anomaly function is not set")
+		printf("Story id for disable_anomaly function is not set")
 	end
 
 	local obj = get_story_object(p[1])
 	if not obj then
-		abort("There is no object with story_id %s for disable_anomaly function", tostring(p[1]))
+		printf("There is no object with story_id %s for disable_anomaly function", tostring(p[1]))
 	end
 	obj:disable_anomaly()
 end
 
 function launch_signal_rocket(actor, obj, p)
 	if p==nil then
-		abort("Signal rocket name is not set!")
+		printf("Signal rocket name is not set!")
 	end
 	if db.signal_light[p[1]] then
 		db.signal_light[p[1]]:launch()
 	else
-		abort("No such signal rocket: [%s] on level", tostring(p[1]))
+		printf("No such signal rocket: [%s] on level", tostring(p[1]))
 	end
 end
 
@@ -2580,14 +2574,14 @@ function relocate_item(actor, npc, p)
 				to_obj:id())
 		end
 	else
-		abort("Couldn't relocate item to NULL")
+		printf("Couldn't relocate item to NULL")
 	end
 end
 
 -- Сделать сквады врагами, передаются два сквада set_squads_enemies(squad_name_1:squad_name_2)
 function set_squads_enemies(actor, npc, p)
 	if (p[1] == nil or p[2] == nil) then
-		abort("Wrong parameters in function set_squad_enemies")
+		printf("Wrong parameters in function set_squad_enemies")
 		return
 	end
 
@@ -2636,7 +2630,7 @@ end
 --						1 - полувидимый
 --						2 - полностью видимый
 function set_bloodsucker_state(actor, npc, p)
-	if (p and p[1]) == nil then abort("Wrong parameters in function 'set_bloodsucker_state'!!!") end
+	if (p and p[1]) == nil then printf("Wrong parameters in function 'set_bloodsucker_state'!!!") end
 	local state = p[1]
 	if p[2] ~= nil then
 		state = p[2]
@@ -2660,14 +2654,14 @@ end
 
 --Функция отнятия предмета у игрока
 function remove_item(actor, npc, p)
-	if (p and p[1]) == nil then abort("Wrong parameters in function 'remove_item'!!!") end
+	if (p and p[1]) == nil then printf("Wrong parameters in function 'remove_item'!!!") end
 	local item = p[1]
 
 	local obj = db.actor:object(item)
 	if obj ~= nil then
 		alife():release(alife():object(obj:id()), true)
 	else
-		abort("Actor has no such item!")
+		printf("Actor has no such item!")
 	end
 	news_manager.relocate_item(db.actor, "out", item)
 end
@@ -2676,7 +2670,7 @@ end
 function scenario_autosave(actor, npc, p)
 	local save_name = p[1]
 	if save_name == nil then
-		abort("You are trying to use scenario_autosave without save name")
+		printf("You are trying to use scenario_autosave without save name")
 	end
 
 	-- clear excess corpses everytime player saves
@@ -2727,7 +2721,7 @@ end
 
 function zat_b29_create_random_infop(actor, npc, p)
 	if p[2] == nil then
-		abort("Not enough parameters for zat_b29_create_random_infop!")
+		printf("Not enough parameters for zat_b29_create_random_infop!")
 	end
 
 	local amount_needed = p[1]
@@ -2809,7 +2803,7 @@ function relocate_item_b29(actor, npc, p)
 				to_obj:id())
 		end
 	else
-		abort("Couldn't relocate item to NULL")
+		printf("Couldn't relocate item to NULL")
 	end
 end
 
@@ -2835,12 +2829,12 @@ function jup_b202_inventory_box_relocate(actor, npc)
 end
 
 function clear_box(actor, npc, p)
-	if (p and p[1]) == nil then abort("Wrong parameters in function 'clear_box'!!!") end
+	if (p and p[1]) == nil then printf("Wrong parameters in function 'clear_box'!!!") end
 
 	local inv_box = get_story_object(p[1])
 
 	if inv_box == nil then
-		abort("There is no object with story_id [%s]", tostring(p[1]))
+		printf("There is no object with story_id [%s]", tostring(p[1]))
 	end
 
 	local items_table = {}
@@ -2893,7 +2887,7 @@ end
 
 function forward_game_time(actor, npc, p)
 	if not p then
-		abort("Insufficient or invalid parameters in function 'forward_game_time'!")
+		printf("Insufficient or invalid parameters in function 'forward_game_time'!")
 	end
 
 	local hours = tonumber(p[1])
@@ -2967,13 +2961,13 @@ function jup_b10_spawn_drunk_dead_items(actor, npc, p)
 			if target_obj_id ~= nil then
 				box = alife():object(target_obj_id)
 				if box == nil then
-					abort("There is no such object %s", p[1])
+					printf("There is no such object %s", p[1])
 				end
 				for i = 1,v do
 					alife():create(k,vector(),0,0,target_obj_id)
 				end
 			else
-				abort("object is nil %s", tostring(p[1]))
+				printf("object is nil %s", tostring(p[1]))
 			end
 		end
 	else
@@ -3007,16 +3001,16 @@ function pick_artefact_from_anomaly(actor, npc, p)
 
 		local npc_id = get_story_object_id(p[1])
 		if npc_id == nil then
-			abort("Couldn't relocate item to NULL in function 'pick_artefact_from_anomaly!'")
+			printf("Couldn't relocate item to NULL in function 'pick_artefact_from_anomaly!'")
 		end
 		npc = alife():object(npc_id)
 		if npc and (not IsStalker(npc) or not npc:alive()) then
-			abort("Couldn't relocate item to NULL (dead or not stalker) in function 'pick_artefact_from_anomaly!'")
+			printf("Couldn't relocate item to NULL (dead or not stalker) in function 'pick_artefact_from_anomaly!'")
 		end
 	end
 
 	if anomal_zone == nil then
-		abort("No such anomal zone in function 'pick_artefact_from_anomaly!'")
+		printf("No such anomal zone in function 'pick_artefact_from_anomaly!'")
 	end
 
 	if anomal_zone.spawned_count < 1 then
@@ -3057,7 +3051,7 @@ end
 function anomaly_turn_off (actor, npc, p)
 	local anomal_zone = db.anomaly_by_name[p[1]]
 	if anomal_zone == nil then
-		abort("No such anomal zone in function 'anomaly_turn_off!'")
+		printf("No such anomal zone in function 'anomaly_turn_off!'")
 	end
 	anomal_zone:turn_off()
 end
@@ -3065,7 +3059,7 @@ end
 function anomaly_turn_on (actor, npc, p)
 	local anomal_zone = db.anomaly_by_name[p[1]]
 	if anomal_zone == nil then
-		abort("No such anomal zone in function 'anomaly_turn_on!'")
+		printf("No such anomal zone in function 'anomaly_turn_on!'")
 	end
 	if p[2] then
 		anomal_zone:turn_on(true)
@@ -3171,7 +3165,7 @@ function jup_b221_play_main(actor, npc, p)
 	local theme_to_play = 0
 
 	if (p and p[1]) == nil then
-		abort("No such parameters in function 'jup_b221_play_main'")
+		printf("No such parameters in function 'jup_b221_play_main'")
 	end
 --Составляем таблицу инфопоршинов определяющих доступность той или иной темы, определяем префиксы темы, ответа и реакции, соответственно для долга или для свободы.
 	if tostring(p[1]) == "duty" then
@@ -3199,7 +3193,7 @@ function jup_b221_play_main(actor, npc, p)
 		reply_theme = "jup_b221_freedom_reply_"
 		info_need_reply = "jup_b221_freedom_reply"
 	else
-		abort("Wrong parameters in function 'jup_b221_play_main'")
+		printf("Wrong parameters in function 'jup_b221_play_main'")
 	end
 --Составляем таблицу достыпных тем(тлько номера тем).
 	for k,v in pairs(info_table) do
@@ -3218,7 +3212,7 @@ function jup_b221_play_main(actor, npc, p)
 		if theme_to_play ~= 0 then
 			play_sound(actor, npc, {main_theme .. tostring(theme_to_play)})
 		else
-			abort("No such theme_to_play in function 'jup_b221_play_main'")
+			printf("No such theme_to_play in function 'jup_b221_play_main'")
 		end
 	else
 		db.actor:give_info_portion(info_need_reply)
@@ -3226,7 +3220,7 @@ function jup_b221_play_main(actor, npc, p)
 		if theme_to_play ~= 0 then
 			play_sound(actor, npc, {reply_theme..tostring(theme_to_play)})
 		else
-			abort("No such theme_to_play in function 'jup_b221_play_main'")
+			printf("No such theme_to_play in function 'jup_b221_play_main'")
 		end
 		xr_logic.pstor_store(actor,"jup_b221_played_main_theme","0")
 	end
@@ -3338,7 +3332,7 @@ end
 --[[
 function set_tip_to_story(actor, npc, p)
 	if p == nil or p[2] == nil then
-		abort("Not enough parameters in 'set_tip_to_story' function!")
+		printf("Not enough parameters in 'set_tip_to_story' function!")
 	end
 
 	local obj = get_story_object(p[1])
@@ -3354,7 +3348,7 @@ end
 
 function clear_tip_from_story(actor, npc, p)
 	if p == nil or p[1] == nil then
-		abort("Not enough parameters in 'clear_tip_from_story' function!")
+		printf("Not enough parameters in 'clear_tip_from_story' function!")
 	end
 
 	local obj = get_story_object(p[1])
@@ -3502,7 +3496,7 @@ end
 
 function set_torch_state(actor, npc, p)
  	if p == nil or p[2] == nil then
-		abort("Not enough parameters in 'set_torch_state' function!")
+		printf("Not enough parameters in 'set_torch_state' function!")
 	end
 
 	local obj = get_story_object(p[1])
@@ -3577,16 +3571,16 @@ function create_cutscene_actor_with_weapon(actor, npc, p)
 	--' p[5] - принудительный слот - будет работать даже при disable_ui
 	local spawn_sect = p[1]
 	if spawn_sect == nil then
-		abort("Wrong spawn section for 'spawn_object' function %s. For object %s", tostring(spawn_sect), obj:name())
+		printf("Wrong spawn section for 'spawn_object' function %s. For object %s", tostring(spawn_sect), obj:name())
 	end
 
 	local path_name = p[2]
 	if path_name == nil then
-		abort("Wrong path_name for 'spawn_object' function %s. For object %s", tostring(path_name), obj:name())
+		printf("Wrong path_name for 'spawn_object' function %s. For object %s", tostring(path_name), obj:name())
 	end
 
 	if not level.patrol_path_exists(path_name) then
-		abort("Path %s doesnt exist. Function 'spawn_object' for object %s ", tostring(path_name), obj:name())
+		printf("Path %s doesnt exist. Function 'spawn_object' for object %s ", tostring(path_name), obj:name())
 	end
 	local ptr = patrol(path_name)
 	local index = p[3] or 0
@@ -3734,7 +3728,7 @@ end
 
 function set_monster_animation (actor, npc, p)
 	if not (p and p[1]) then
-		abort("Wrong parameters in function 'set_monster_animation'!!!")
+		printf("Wrong parameters in function 'set_monster_animation'!!!")
 	end
 	npc:set_override_animation (p[1])
 end
@@ -3765,7 +3759,7 @@ end
 function force_obj(actor, npc, p)
 	local obj = get_story_object(p[1])
 	if not obj then
-		abort("'force_obj' Target object does not exist")
+		printf("'force_obj' Target object does not exist")
 		return
 	end
 	if p[2] == nil then p[2] = 20 end
@@ -3812,7 +3806,7 @@ function pri_a28_check_zones()
 	end
 
 	if index == 0 then
-		abort("Found no distance or zones in func 'pri_a28_check_zones'")
+		printf("Found no distance or zones in func 'pri_a28_check_zones'")
 	end
 
 	if has_alife_info(info_tbl[index]) then

@@ -131,7 +131,7 @@ function action_patrol:can_shoot()
 			return false
 		end
 	end
-	abort("Camper: unrecognized shoot type [%s] for [%s]", tostring(self.a.shoot), self.object:name())
+	printf("Camper: unrecognized shoot type [%s] for [%s]", tostring(self.a.shoot), self.object:name())
 	return true
 end
 function action_patrol:execute()
@@ -588,7 +588,7 @@ function action_patrol:increment_waypoint_index()
 
 	if (self.target.sig) then
 		self.a.signals[self.target.sig] = true
-		--alun_utils.printf("npc = %s sig = %s",self.object:name(),self.target.sig)
+		--printf("npc = %s sig = %s",self.object:name(),self.target.sig)
 	end
 
 	self.a.wait_delay = nil
@@ -678,7 +678,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.path_look = utils.cfg_get_string(ini, section, "path_look", npc, true, gulag_name)
 
 	if st.path_walk and st.path_walk == st.path_look then
-		abort("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
+		printf("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
 	end
 
 	st.sniper = utils.cfg_get_bool(ini, section, "sniper", npc, false)
@@ -686,7 +686,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.shoot = utils.cfg_get_string(ini, section, "shoot", npc, false, "", "always")
 	st.sniper_anim = utils.cfg_get_string(ini, section, "sniper_anim", npc, false, "hide_na")
 	if st.sniper == true and st.no_retreat == true then
-		_G.abort("ERROR: NPC [%s] Section [%s]. No_retreat not available for SNIPER.", npc:name(), section)
+		_G.printf("ERROR: NPC [%s] Section [%s]. No_retreat not available for SNIPER.", npc:name(), section)
 	end
 
 	st.radius = utils.cfg_get_number(ini, section, "radius", npc, false, 20)

@@ -246,7 +246,7 @@ function animation:select_anim()
 			local state = self.anim_path.animations[states.target_state]
 
 			if not (state) then
-				alun_utils.printf("state_mgr_animation: Critical Error: No animation state for %s",states.target_state)
+				printf("state_mgr_animation: Critical Error: No animation state for %s",states.target_state)
 				return
 			end
 
@@ -317,7 +317,7 @@ function animation:anim_for_slot(slot, t)
 
 	if t[0] == nil then
 --		print_table(t)
---		abort("cant find animation for slot %s", tonumber(slot))
+--		printf("cant find animation for slot %s", tonumber(slot))
 	end
 	return t[slot]
 end
@@ -358,7 +358,7 @@ function animation:add_anim(anim, state)
 	--printf("[%s][%s] add_anim[%s] time[%s] no_rootmove[%s] %s", self.npc:name(), self.name, tostring(anim), time_global(), tostring(animation_props == nil or animation_props.moving ~= true), device():time_global())
 
 	--if (state_mgr.weapon_locked(npc)) then
-		--alun_utils.printf("state_mgr_animation: weapon_locked can't add animation")
+		--printf("state_mgr_animation: weapon_locked can't add animation")
 		--return
 	--end
 
@@ -375,7 +375,7 @@ function animation:add_anim(anim, state)
 		npc:add_animation(anim, true, true)
 	else
 		if self.mgr.animation_direction == nil then
-			abort("Animation direction missing")
+			printf("Animation direction missing")
 		end
 
 		-- —юда передаетс€ дирекшн (единичный вектор. нужно его перевести в вектор ротейшнов по кост€м)

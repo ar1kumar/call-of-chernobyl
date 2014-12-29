@@ -106,12 +106,12 @@ function gather_item(npc)
 
 	-- this should never happen
 	if not (st) then
-		alun_utils.printf("wtf no db.storage[%s].gather_items",id)
+		printf("wtf no db.storage[%s].gather_items",id)
 		return
 	end
 
 	local selected_id = st.selected_id
-	--alun_utils.printf("selected_id = %s",selected_id)
+	--printf("selected_id = %s",selected_id)
 
 	-- reset all scheme dependent variables
 	if (st.selected_id) then
@@ -131,7 +131,7 @@ function gather_item(npc)
 	local itm = selected_id and level.object_by_id(selected_id)
 	local loot_table = UseCorpseLootTable ~= true and LootTable or xr_corpse_detection.lootable_table
 	if (itm == nil or loot_table[itm:section()] == nil) then
-		alun_utils.printf("nooooo!  itm=%s lootable=%s",itm and itm:name(), itm and loot_table[itm:section()])
+		printf("nooooo!  itm=%s lootable=%s",itm and itm:name(), itm and loot_table[itm:section()])
 		return
 	end
 
@@ -167,7 +167,7 @@ end
 
 function eva_gather_itm:find_valid_item()
 	if (self.st.cstackprevent) then
-		alun_utils.printf("C Stack Overflow Prevention: warning xr_gather_items scheme making repeated calls without return; save now and reload!")
+		printf("C Stack Overflow Prevention: warning xr_gather_items scheme making repeated calls without return; save now and reload!")
 		return false
 	end
 	
@@ -319,7 +319,7 @@ function eva_gather_itm:find_valid_item()
 			self.st.nearest_pos = itm_pos
 			self.st.nearest_id = itm_id
 
-			--alun_utils.printf("item = %s id=%s",itm:section(),itm_id)
+			--printf("item = %s id=%s",itm:section(),itm_id)
 		end
 	end
 
@@ -333,21 +333,13 @@ function eva_gather_itm:evaluate()
 		return false
 	end
 
-	if not (self.mgr) then
-		self.mgr = npc:motivation_action_manager()
-	end
-
-	if not self.mgr:initialized() then
-		return false
-	end
-
 	if (npc:best_enemy()) then
 		return false
 	end
-
-	local cid = self.mgr:current_action_id()
-	if (cid == xr_actions_id.wounded_exist) then
-		return false
+	
+	local st = db.storage[npc:id()]
+	if (st and st.help_wounded and st.help_wounded.selected_id ~= nil) then 
+		return false 
 	end
 
 	if (xr_danger.has_danger(npc)) then
@@ -547,7 +539,7 @@ function add_to_binder(npc, ini, scheme, section, storage)
 		if (action) then
 			action:add_precondition( wp(evaid,false) )
 		else
-			alun_utils.printf("xr_gather_items: no action id p[%s]",i)
+			printf("xr_gather_items: no action id p[%s]",i)
 		end
 	end
 end

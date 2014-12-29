@@ -146,7 +146,7 @@ local function begin_kill_wounded(npc,vo,st)
 
 		if (db.storage[vo:id()].victim_surrender) then
 			st.timer = tg + math.random(SurrenderMinTriggerTimer,SurrenderMaxTriggerTimer)
-			--alun_utils.printf("%s--%s",vo:name(),vo:get_visual_name())
+			--printf("%s--%s",vo:name(),vo:get_visual_name())
 		else
 			st.timer = tg + math.random(MinTriggerTimer,MaxTriggerTimer)
 		end
@@ -181,7 +181,7 @@ function eva_kill_wounded:evaluate()
 
 	local st = self.st
 
-	--alun_utils.printf("stage = %s",st.stage)
+	--printf("stage = %s",st.stage)
 	if (st.stage == 0) then
 		local tg = time_global()
 

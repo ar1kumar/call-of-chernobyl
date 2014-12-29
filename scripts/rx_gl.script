@@ -75,7 +75,7 @@ end
 
 local function find_valid_target(npc,st)
 	if (st.overflowdetect) then
-		alun_utils.printf("C Stack Overflow Prevention: warning rx_gl scheme making repeated calls without return; save now and reload!")
+		printf("C Stack Overflow Prevention: warning rx_gl scheme making repeated calls without return; save now and reload!")
 		return false
 	end
 
@@ -432,7 +432,7 @@ function action_reload_gl:initialize()
 			actn:add_precondition(world_property(evid_gl_reload,false))
 		end
 	end
-	--alun_utils.printf("reload_gl[%s]:init",npc:character_name())
+	--printf("reload_gl[%s]:init",npc:character_name())
 end
 function action_reload_gl:execute()
 	action_base.execute(self)
@@ -863,5 +863,5 @@ function disable_scheme(npc,stype)
 end
 
 function printf(txt,...)
-	--alun_utils.printf(txt,...)
+	--printf(txt,...)
 end

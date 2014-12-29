@@ -130,7 +130,7 @@ function set_best_monster(obj)
 	else
 		local community = monster_classes[get_clsid(obj)]
 		if not(community) then
-			abort("Statistic ERROR: cannot find monster class for [%s] clsid [%s]", obj:name(), tostring(get_clsid(obj)))
+			printf("Statistic ERROR: cannot find monster class for [%s] clsid [%s]", obj:name(), tostring(get_clsid(obj)))
 			return
 		end
 		local s_obj = alife():object(obj:id())

@@ -5,6 +5,8 @@
 
 	Copyright (C) 2012 Alundaio
 	This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+	
+	TODO: Fix use camp
 --]]
 
 ---------------
@@ -20,6 +22,7 @@ local wp = world_property
 
 local keep_state_min_time = 2000
 
+--[[
 local assoc_tbl = 	{
 						idle = {		director = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"},
 										listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
@@ -40,10 +43,12 @@ local camp_states = {
 						["animpoint_sit_high"] = true,
 						["animpoint_stay_wall"] = true
 }
+--]]
 
 ------------------------------------------
 -- Localized Functions
 ------------------------------------------
+--[[
 local function can_eat_bread(npc)
 	local t = { "bread" }
 	for i=1,#t do
@@ -107,6 +112,7 @@ end
 local function can_weapon(npc)
 	return npc:best_weapon()
 end
+--]]
 
 local function angle_dir(ang)
 	return vector():setHP(ang.y,ang.x):normalize()
@@ -241,7 +247,7 @@ function action_beh:execute()
 
 	if (self.st.target == "waypoint") then
 		return self:beh_path()
-	elseif (self.st.target == "cover" or self.st.target == "task_target_anomaly") then 
+	elseif (self.st.target == "cover" or self.st.target == "cover_near_actor" or self.st.target == "task_target_anomaly" or self.st.target == "scan_area") then 
 		return self:beh_cover()
 	elseif (self.st.behavior == "beh_move") then
 		return self:beh_move()
@@ -315,7 +321,7 @@ function action_beh:set_desired_target()
 			t.object = be
 		end
 	elseif (target == "cover_near_actor") then
-		local vid = alun_utils.find_close_cover(self.object,db.actor:position(),db.actor:position()) or npc:level_vertex_id()
+		local vid = alun_utils.find_close_cover(self.object,db.actor:position(),db.actor:position()) or self.object:level_vertex_id()
 		if (vid) then 
 			t.level_vertex_id = vid
 			t.position = level.vertex_position(vid)
@@ -325,7 +331,7 @@ function action_beh:set_desired_target()
 			t.__keep_until = time_global() + 3000
 		end
 	elseif (target == "cover") then
-		local vid = alun_utils.find_close_cover(self.object,self.object:position(),db.actor:position()) or npc:level_vertex_id()
+		local vid = alun_utils.find_close_cover(self.object,self.object:position(),db.actor:position()) or self.object:level_vertex_id()
 		if (vid) then 
 			t.level_vertex_id = vid
 			t.position = level.vertex_position(vid)
@@ -337,36 +343,7 @@ function action_beh:set_desired_target()
 		if (name) then 
 			local anomaly = db.anomaly_by_name[name]
 			if (anomaly and anomaly.object) then
-			
-				local function create_scan_point(pos,dir)
-					local radius = 4
-					local vertex_id = 4294967295
-					local tmp_pos
-					while (vertex_id >= 4294967295) do
-						tmp_pos = vector():set(0,0,0)
-
-						tmp_pos.x = pos.x + dir.x * radius
-						tmp_pos.z = pos.z + dir.z * radius
-						tmp_pos.y = pos.y
-
-						vertex_id = level.vertex_id(tmp_pos)
-						if (vertex_id >= 4294967295) then
-							if (radius < 15) then
-								radius = radius + 1
-							else
-								break
-							end
-						end
-					end
-					if (vertex_id >= 4294967295) then 
-						return nil 
-					end
-					return vertex_id
-				end
-
-				local vid = create_scan_point(anomaly.object:position(),vector_rotate_y(anomaly.object:direction(),math.random(1,6)*60)) or alun_utils.find_random_cover(self.object,anomaly.object:position(),5,15)
-				vid = vid and not db.used_level_vertex_ids[vid] and vid or alun_utils.find_close_cover(self.object,self.object:position(),anomaly.object:position())
-				vid = vid and not db.used_level_vertex_ids[vid] and vid or self.object:level_vertex_id()
+				local vid = alun_utils.try_go_cover(self.object,anomaly.object:position())
 				if (vid) then
 					db.used_level_vertex_ids[vid] = self.object:id()
 					t.level_vertex_id = vid
@@ -379,8 +356,6 @@ function action_beh:set_desired_target()
 		end
 	elseif (target == "waypoint") then
 		t = self:get_current_waypoint()
-	elseif (target == "pathpoint") then 
-		t = self:get_current_waypoint(true)
 	elseif (target == "commander") then
 		local squad = get_object_squad(self.object)
 		if not(squad:commander_id() == self.object:id()) then
@@ -421,7 +396,15 @@ function action_beh:beh_cover()
 		utils.send_to_nearest_accessible_vertex(self.object,self.st.desired_target.level_vertex_id)
 		return
 	end
+	local t = time_global()
+	if (self.keep_state_until and t < self.keep_state_until) then 
+		return 
+	end 
+	self.keep_state_until = t + keep_state_min_time
 	local new_state = self.st.wait_animation or "hide"
+	if (new_state == "rand") then 
+		new_state = random_choice("binocular","idle","hide","caution")
+	end
 	state_mgr.set_state(self.object,new_state,nil,nil,{look_object = self.st.desired_target and self.st.desired_target.object or nil})
 end 
 
@@ -563,10 +546,10 @@ function action_beh:beh_path()
 		self.object:set_path_type(game_object.level_path)
 		self.object:set_desired_direction()
 		--self.object:set_dest_level_vertex_id(self.st.desired_target.level_vertex_id)
-		--alun_utils.printf("lvid = %s",self.st.desired_target.level_vertex_id)
-		self.st.desired_target.level_vertex_id = utils.send_to_nearest_accessible_vertex( self.object, self.st.desired_target.level_vertex_id, "axr_beh")
+		--printf("lvid = %s",self.st.desired_target.level_vertex_id)
+		self.st.assist_point = utils.send_to_nearest_accessible_vertex( self.object, self.st.desired_target.level_vertex_id, "axr_beh")
 		--self.object:set_desired_position(self.st.desired_target.position)
-		local pos = self.object:position()
+		local pos = utils.vector_copy_by_val(self.object:position())
 		pos = vector():set(pos.x,self.st.desired_target.position.y,pos.z)
 		self.dist_to_assist_pt = pos:distance_to(self.st.desired_target.position)
 		self:set_state()
@@ -604,7 +587,8 @@ function action_beh:beh_path()
 	local state = state_mgr.get_state(self.object)
 	local new_state = self.st.desired_target.delay_animation or self.st.delay_animation
 
-	if (self.st.use_camp and camp_states[new_state]) then
+	--if (self.st.use_camp and camp_states[new_state]) then
+	if (self.st.use_camp) then
 		--[[
 		self:fill_approved_actions(new_state)
 
@@ -635,7 +619,7 @@ function action_beh:beh_path()
 				local anim = found and t[math.random(#t)]
 				if (anim and anim ~= "") then
 					if (self.st.desired_target.animpoint) then
-						alun_utils.printf("camp_action = %s",anim)
+						printf("camp_action = %s",anim)
 						state_mgr.set_state(self.object, anim, nil, nil, nil, {animation_position = self.st.desired_target.animpoint, animation_direction = self.st.desired_target.animpoint_dir})
 					else
 						state_mgr.set_state(self.object, anim)
@@ -673,7 +657,13 @@ end
 
 function action_beh:get_current_waypoint(use_var)
 	local st = db.storage[self.object:id()]
-	local str = use_var and alun_utils.load_var(npc,"pathpoint"..tostring(self.st.path_index)) or alun_utils.read_from_ini(st.ini,st.active_section,"pt"..self.st.path_index,"string",nil)
+	local str
+	if (self.object:has_info("npcx_beh_patrol_mode")) then
+		str = alun_utils.load_var(self.object,"pathpoint"..self.st.path_index)
+	else
+		str = alun_utils.read_from_ini(st.ini,st.active_section,"pt"..self.st.path_index,"string",nil)
+	end
+
 	if not (str) then
 		return {}
 	end
@@ -760,15 +750,23 @@ end
 function action_beh:next_waypoint_index()
 	local st = db.storage[self.object:id()]
 	local inc = self.st.path_reverse and -1 or 1
-	local next_index = alun_utils.read_from_ini(st.ini,st.active_section,"pt"..self.st.path_index+inc,"string",nil)
-	return next_index
+	if (self.object:has_info("npcx_beh_patrol_mode")) then 
+		return alun_utils.load_var(self.object,"pathpoint"..self.st.path_index+inc)
+	end 
+	return alun_utils.read_from_ini(st.ini,st.active_section,"pt"..self.st.path_index+inc,"string",nil)
 end
 
 function action_beh:increment_waypoint_index()
 	local st = db.storage[self.object:id()]
 
 	local inc = self.st.path_reverse and -1 or 1
-	local next_index = alun_utils.read_from_ini(st.ini,st.active_section,"pt"..self.st.path_index+inc,"string",nil)
+	
+	local next_index
+	if (self.object:has_info("npcx_beh_patrol_mode")) then
+		next_index = alun_utils.load_var(self.object,"pathpoint"..self.st.path_index+inc)
+	else
+		next_index = alun_utils.read_from_ini(st.ini,st.active_section,"pt"..self.st.path_index+inc,"string",nil)
+	end
 
 	if (next_index) then
 		self.st.am_i_reached = nil

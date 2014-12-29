@@ -142,10 +142,10 @@ function setup_companion_logic(npc)
 
 	local sect = xr_logic.determine_section_to_activate(npc, ltx, "logic", db.actor)
 	if utils.get_scheme_by_section("logic") == "nil" then
-		abort("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
+		printf("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
 	end
 
-	--alun_utils.printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
+	--printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
 	xr_logic.activate_by_section(npc, ltx, sect, "", false)
 end 
 
@@ -160,7 +160,7 @@ function add_special_task_npc_to_actor_squad(npc)
 			unreg:unregister_npc(se_npc)
 		end
 	end
-
+	npc:inactualize_patrol_path()
 	npc:give_info_portion("npcx_is_companion")
 	axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
 	setup_companion_logic(npc)
@@ -346,7 +346,7 @@ end
 function companion_add_waypoints(npc)
 	local i = 1
 	local p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
-	while p == nil do 
+	while p do 
 		i = i + 1
 		p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
 	end

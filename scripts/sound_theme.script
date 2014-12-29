@@ -111,7 +111,7 @@ function npc_sound:init_npc(npc)
 	end
 
 	if self.npc[npc_id].max < 0 then
-		--abort("Couldnt find sounds %s with prefix %s", tostring(self.path), npc:sound_prefix())
+		--printf("Couldnt find sounds %s with prefix %s", tostring(self.path), npc:sound_prefix())
 		return
 	end
 
@@ -255,14 +255,14 @@ end
 function npc_sound:select_next_sound(npc_id)
 	local npc_data = self.npc[npc_id]
 	if not (npc_data) then
-		abort("sound_theme: npc_data is nil for select_next_sound [%s]",self.npc and self.npc:section())
+		printf("sound_theme: npc_data is nil for select_next_sound [%s]",self.npc and self.npc:section())
 		return 0
 	end
 
 	if self.shuffle == "rnd" then
 		if not (npc_data.max) then
 			local snd = self.sound_path[npc_id] and self.sound_path[npc_id][self.played_id + 1]
-			abort("sound_theme: max not set for snd=%s",snd)
+			printf("sound_theme: max not set for snd=%s",snd)
 			npc_data.max = 0
 		end
 
@@ -405,7 +405,7 @@ function actor_sound:__init(snd_ini, section)
 		end
 	end
 	if #self.sound == 0 then
-		abort("There are no sound collection with path: %s", self.path)
+		printf("There are no sound collection with path: %s", self.path)
 	end
 end
 function actor_sound:callback(npc_id)
@@ -597,7 +597,7 @@ function object_sound:__init(snd_ini, section)
 		end
 	end
 	if #self.sound == 0 then
-		abort("There are no sound collection with path: %s", self.path)
+		printf("There are no sound collection with path: %s", self.path)
 	end
 end
 function object_sound:callback(npc_id)
@@ -763,7 +763,7 @@ function looped_sound:__init(snd_ini, section)
 		self.sound = self.path
 	end
 	if self.sound == nil then
-		abort("There are no looped sound with path: %s", self.path)
+		printf("There are no looped sound with path: %s", self.path)
 	end
 end
 function looped_sound:is_playing ()
@@ -811,7 +811,7 @@ function load_sound()
 
 	--' Итерируемся по списку тем.
 	if not snd_ini:section_exist("list") then
-		abort("There is no section [list] in script_sound.ltx")
+		printf("There is no section [list] in script_sound.ltx")
 	end
 	local n = snd_ini:line_count("list")
 	local id, value = "",""

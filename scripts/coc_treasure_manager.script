@@ -197,7 +197,7 @@ function create_random_stash(no_spot,hint,bonus_items)
 		if (sec ~= "" and ini:section_exist(sec)) then
 			se_obj = sim:create(sec,se_box.position,0,0,id)
 			if (alun_utils.item_is_fa(se_obj)) then
-				--alun_utils.printf("coc_treasure_manager: item is fa")
+				--printf("coc_treasure_manager: item is fa")
 				data = stpk_utils.get_weapon_data(se_obj)
 
 				-- Create random addon flag for weapon
@@ -227,10 +227,10 @@ function create_random_stash(no_spot,hint,bonus_items)
 				data.condition = (math.random(70)+30)/100
 				stpk_utils.set_weapon_data(data,se_obj)
 
-				--alun_utils.printf("coc_treasure_manager: item is fa- end")
+				--printf("coc_treasure_manager: item is fa- end")
 			end
 		else
-			alun_utils.printf("coc_treasure_manager.script: invalid section %s",sec)
+			printf("coc_treasure_manager.script: invalid section %s",sec)
 		end
 	end
 

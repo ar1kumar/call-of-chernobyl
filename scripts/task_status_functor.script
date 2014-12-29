@@ -41,7 +41,8 @@ function check_smart_under_faction_control(task,task_id)
 					for i=1,#faction_list do
 						if (faction_list[i] == "monster" and sim_squad_scripted.is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
 							alun_utils.save_var(db.actor,task_id.."_target_id",squad.id)
-							--alun_utils.printf("task_id = %s squad_id = %s",task_id,squad.id)
+							squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+							--printf("task_id = %s squad_id = %s",task_id,squad.id)
 							return
 						end
 					end
@@ -65,7 +66,7 @@ end
 function check_if_killed_enough(task,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then
-		alun_utils.printf("task_status_function not set up properly! check_if_killed_enough needs an extra param for squad story id! task_id=%s",task_id)
+		printf("task_status_function not set up properly! check_if_killed_enough needs an extra param for squad story id! task_id=%s",task_id)
 		return 
 	end 
 	
@@ -96,7 +97,7 @@ end
 function check_if_looted_enough(task,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then
-		alun_utils.printf("task_status_function not set up properly! check_if_looted_enough needs an extra param for squad story id! task_id=%s",task_id)
+		printf("task_status_function not set up properly! check_if_looted_enough needs an extra param for squad story id! task_id=%s",task_id)
 		return 
 	end 
 	

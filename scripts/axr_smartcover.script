@@ -7,7 +7,7 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 --]]
 ----------------------------------------------------------------------------------------------------------------------
 function printf(txt,...)
-	alun_utils.printf(txt,...)
+	printf(txt,...)
 end
 
 local used_covers = {}
@@ -189,7 +189,7 @@ function act_axr_smartcover:execute()
 			st.lvid = get_rand_vertex(npc,bdo,6,20)
 			st.pos = level.vertex_position(st.lvid)
 
-			alun_utils.printf("bdo = %s pos = %s  lvid = %s",bdo and bdo.name and bdo:name(),alun_utils.vector_to_string(st.pos),st.lvid)
+			printf("bdo = %s pos = %s  lvid = %s",bdo and bdo.name and bdo:name(),alun_utils.vector_to_string(st.pos),st.lvid)
 			--[[
 			local cover
 			for i=2,4 do

@@ -263,7 +263,7 @@ function debug_ui:SendOutput(txt,...)
 	self.txt_console[#self.txt_console]:SetText(out)
 
 	if (self.console_relay) then
-		alun_utils.printf("Debug Console: %s",out)
+		printf("Debug Console: %s",out)
 	end
 end
 
@@ -433,7 +433,7 @@ function debug_ui:spawn_section(text)
 	end
 
 	local obj = alife():create(text,pos,lvid,gvid)
-	--alun_utils.printf("Spawned Object %s as ID: %s",obj:name(),obj.id)
+	--printf("Spawned Object %s as ID: %s",obj:name(),obj.id)
 	self:SendOutput("Object %s created as ID %s.",obj:name(),obj.id)
 	return true
 end
@@ -485,7 +485,7 @@ function debug_ui:FindNearest(txt)
 			self.txt_near:SetText(id)
 			self:SendOutput("%s with ID %s found with distance %s",near:name(),id,dist)
 		else
-			--alun_utils.printf("Could not find object matching name")
+			--printf("Could not find object matching name")
 			self.txt_near:SetText("Not Found")
 			self:SendOutput("Object with name not found.")
 		end

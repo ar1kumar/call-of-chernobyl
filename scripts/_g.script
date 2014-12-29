@@ -10,6 +10,21 @@ function callback_unregister(name,func)
 	axr_main.callback_unregister(name,func)
 end
 --------------------------------------------------------------------
+function memoize (f) --supports only first argument
+	local mem = {} -- memoizing table
+	setmetatable(mem, {__mode = "kv"}) -- make it weak
+	return function (x,...) -- new version of ’f’, with memoizing
+		local r = x and mem[x]
+		if r == nil then -- no previous result?
+			r = f(x,...) -- calls original function
+			if (x) then
+				mem[x] = r -- store result for reuse
+			end
+		end
+		return r
+	end
+end
+--------------------------------------------------------------------
 game.CTime.__size = 4 * 9 -- guess based on ctime.h tm; most likely wrong
 function game_CTime___persist(self)
 	local Y, M, D, h, m, s, ms = 0,0,0,0,0,0,0
@@ -62,12 +77,56 @@ amb_vol = 0
 b_discard_settings_shown = false
 ----------------------------------------------------------------------
 function printf(fmt,...)
-	if (dev_debug) then
-		--alun_utils.printf(fmt,...)
-		--get_console():execute("flush")
+	if not (fmt) then return end
+	local fmt = tostring(fmt)
+
+	if (select('#',...) >= 1) then
+		local i = 0
+		local p = {...}
+		local function sr(a)
+			i = i + 1
+			if (type(p[i]) == 'userdata') then
+				return 'userdata'
+			end
+			return tostring(p[i])
+		end
+		fmt = string.gsub(fmt,"%%s",sr)
 	end
+	
+	if (log1) then 
+		log1(fmt)
+	else 
+		get_console():execute("load ~#debug msg:"..fmt)
+	end	
 end
 
+function xr_log(fmt,...)
+	if not (fmt) then return end
+	local fmt = tostring(fmt)
+
+	if (select('#',...) >= 1) then
+		local i = 0
+		local p = {...}
+		local function sr(a)
+			i = i + 1
+			if (type(p[i]) == 'userdata') then
+				return 'userdata'
+			end
+			return tostring(p[i])
+		end
+		fmt = string.gsub(fmt,"%%s",sr)
+	end
+	
+	if (debug and type(debug.traceback) == 'function') then
+		fmt = fmt .. debug.traceback('\n', 2)
+	end
+	
+	if (log1) then 
+		log1(fmt)
+	else 
+		get_console():execute("load ~#debug msg:"..fmt)
+	end	
+end
 ----------------------------------------------------------------------
 function time_global()
 	return device():time_global()
@@ -207,15 +266,6 @@ function random_choice(...)
 	return arg[r]
 end
 
--- lmao don't use this; stupid GSC
-function if_then_else(cond, if_true, if_false)
-	if cond then
-		return if_true
-	end
-	return if_false
-end
-
-
 function set_current_time (hour, min, sec)
 	local current_time_factor = level.get_time_factor ()
 	printf ("Need time : %d:%d:%d", hour, min, sec)
@@ -310,7 +360,7 @@ end
 -- очистка таблицы.
 function clear_table (t)
 	while #t > 0 do
-		table.remove (t, #t)
+		t[#t] = nil
 	end
 end
 
@@ -319,7 +369,7 @@ function empty_table(t)
 		return {}
 	end
 	if (type(t) ~= "table") then
-		alun_utils.printf("_G.empty_table: trying to empty non-table %s",t)
+		printf("_G.empty_table: trying to empty non-table %s",t)
 		return
 	end
 	for k,v in pairs(t) do
@@ -348,32 +398,32 @@ function print_table(table, subs)
 		if type(v) == "table" then
 			print_table(v, sub.."["..k.."]----->")
 		elseif type(v) == "function" then
-			alun_utils.printf(sub.."%s = function",k)
+			printf(sub.."%s = function",k)
 		elseif type(v) == "userdata" then
 			if (v.x) then
-				alun_utils.printf(sub.."%s = %s",k,alun_utils.vector_to_string(v))
+				printf(sub.."%s = %s",k,alun_utils.vector_to_string(v))
 			else
-				alun_utils.printf(sub.."%s = userdata", k)
+				printf(sub.."%s = userdata", k)
 			end
 		elseif type(v) == "boolean" then
 					if v == true then
 							if(type(k)~="userdata") then
-									alun_utils.printf(sub.."%s = true",k)
+									printf(sub.."%s = true",k)
 							else
-									alun_utils.printf(sub.."userdata = true")
+									printf(sub.."userdata = true")
 							end
 					else
 							if(type(k)~="userdata") then
-									alun_utils.printf(sub.."%s = false", k)
+									printf(sub.."%s = false", k)
 							else
-									alun_utils.printf(sub.."userdata = false")
+									printf(sub.."userdata = false")
 							end
 					end
 		else
 			if v ~= nil then
-				alun_utils.printf(sub.."%s = %s", k,v)
+				printf(sub.."%s = %s", k,v)
 			else
-				alun_utils.printf(sub.."%s = nil", k,v)
+				printf(sub.."%s = nil", k,v)
 			end
 		end
 	end
@@ -410,28 +460,35 @@ local stalker_classes = {}
 local weapon_classes = {}
 local artefact_classes = {}
 
-function IsMonster(object, id)
+IsMonster = memoize(
+function(object, id)
 	id = id or get_clsid(object)
 	return id and monster_classes[id] == true
 end
-function IsStalker(object, id)
+)
+
+IsStalker = memoize(
+function (object, id)
 	id = id or get_clsid(object)
 	return id and stalker_classes[id] == true
-end
-function IsHelicopter(object, id)
+end)
+
+IsHelicopter = memoize(function (object, id)
 	id = id or get_clsid(object)
 	return id and (id == clsid.helicopter or id == clsid.car or id == clsid.script_heli) or false
-end
+end)
 
-function isWeapon(object, id)
+isWeapon = memoize(
+function (object, id)
 	id = id or get_clsid(object)
 	return id and weapon_classes[id] == true or false
-end
+end)
 
-function isArtefact(object, id)
+isArtefact = memoize(
+function (object, id)
 	id = id or get_clsid(object)
 	return id and artefact_classes[id] == true or false
-end
+end)
 
 
 -------------------------------------------------------------------------------------------
@@ -444,6 +501,9 @@ function get_object_community(obj)
 end
 
 function character_community (obj)
+	if not (obj) then 
+		return
+	end
 	if IsStalker(obj) then
 		return obj:character_community()
 	end
@@ -451,6 +511,9 @@ function character_community (obj)
 end
 
 function alife_character_community (obj)
+	if not (obj) then 
+		return
+	end
 	if IsStalker(obj, obj:clsid()) then
 		return obj:community()
 	end
@@ -561,7 +624,7 @@ end
 function start_game_callback()
 	aa = alife()
 
-	alun_utils.printf("start_game_callback")
+	printf("start_game_callback")
 	-- Alundaio
 	if (axr_main) then axr_main.on_game_start() end
 	-- End Alundaio
@@ -664,9 +727,9 @@ function start_game_callback()
 	sr_light.clean_up ()
 	pda.add_quick_slot_items_on_game_start()
 	
-	alun_utils.printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	collectgarbage("collect")
-	alun_utils.printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	--collectgarbage("collect")
+	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 --' Lсталость
@@ -799,14 +862,14 @@ function set_save_marker(p, mode, check, prefix)
 	if mode == "save" then
 		local dif = p:w_tell() - save_marker_result[prefix]
 		if dif >= 8000 then
-			alun_utils.printf("set_save_marker:%s: WARNING! may be this is problem save point dif=%s",prefix,dif)
+			printf("set_save_marker:%s: WARNING! may be this is problem save point dif=%s",prefix,dif)
 		end
 		p:w_u16(dif)
 	else
 		local c_dif = p:r_tell() - save_marker_result[prefix]
 		local dif = p:r_u16()
 		if dif ~= c_dif then
-			alun_utils.printf("set_save_marker:%s: INCORRECT LOAD dif=%s c_dif=%s", prefix, dif, c_dif)
+			printf("set_save_marker:%s: INCORRECT LOAD dif=%s c_dif=%s", prefix, dif, c_dif)
 		end
 	end
 	
@@ -841,19 +904,19 @@ function add_story_object(obj_id , story_obj_id)
 	story_objects.get_story_objects_registry():register(obj_id , story_obj_id)
 end
 
-function get_story_object(story_obj_id)
-	local obj_id = story_objects.get_story_objects_registry():get(story_obj_id)
+get_story_object = memoize(function (story_obj_id)
+	local obj_id = story_obj_id and story_objects.get_story_objects_registry():get(story_obj_id)
 	if obj_id == nil then return nil end
 	return (db.storage[obj_id] and db.storage[obj_id].object) or (level ~= nil and level.object_by_id(obj_id))
-end
+end)
 
-function get_object_story_id(obj_id)
-	return story_objects.get_story_objects_registry():get_story_id(obj_id)
-end
+get_object_story_id = memoize(function (obj_id)
+	return obj_id and story_objects.get_story_objects_registry():get_story_id(obj_id)
+end)
 
-function get_story_object_id(story_obj_id)
-	return story_objects.get_story_objects_registry():get(story_obj_id)
-end
+get_story_object_id = memoize(function (story_obj_id)
+	return story_obj_id and story_objects.get_story_objects_registry():get(story_obj_id)
+end)
 
 function unregister_story_object_by_id(obj_id)
 	story_objects.get_story_objects_registry():unregister_by_id(obj_id)
@@ -865,7 +928,7 @@ end
 
 -----------------------------------------------------------------------------------------------
 -- Получить сквад обьекта!!!!!
-function get_object_squad(object,caller)
+get_object_squad = memoize(function (object,caller)
 	if object == nil then return abort("You are trying to get squad_object from NIL object!!! %s",caller) end
 	local obj_id = type(object.id ) == "function" and object:id() or object.id
 	local sim = aa or alife()
@@ -874,12 +937,12 @@ function get_object_squad(object,caller)
 		return sim:object(se_obj.group_id)
 	end
 	return nil
-end
+end)
 
-function get_story_squad(story_id)
+get_story_squad = memoize(function (story_id)
 	local squad_id = get_story_object_id(story_id)
 	return squad_id and alife():object(squad_id)
-end
+end)
 
 --Проверка по временному интервалу.
 function in_time_interval(val1, val2)

@@ -179,13 +179,13 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.path_walk = utils.cfg_get_string(ini, section, "path_walk", npc, true,  gulag_name)
 
 	if not level.patrol_path_exists(st.path_walk) then
-		abort("there is no patrol path %s", st.path_walk)
+		printf("there is no patrol path %s", st.path_walk)
 	end
 
 	st.path_look = utils.cfg_get_string(ini, section, "path_look", npc, false, gulag_name)
 
 	if st.path_walk == st.path_look then
-		abort("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
+		printf("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
 	end
 
 	st.team      = utils.cfg_get_string(ini, section, "team",      npc, false, gulag_name)

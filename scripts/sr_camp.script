@@ -262,7 +262,7 @@ function CCampManager:get_director()
 	end
 	if(#directors<1) then
 		return false
-		--abort("There is no director for state [%s]. Camp [%s]!!!", self.active_state, self.object:name())
+		--printf("There is no director for state [%s]. Camp [%s]!!!", self.active_state, self.object:name())
 	elseif(#directors==1) then
 		self.director = directors[1]
 	else
@@ -282,7 +282,7 @@ end
 -- Возвращает текущее действие кемпа
 function CCampManager:get_camp_action(npc_id)
 	if(npc_id==nil) then
-		abort("Trying to use destroyed object!")
+		printf("Trying to use destroyed object!")
 	end
 	if(self.npc[npc_id]==nil) then
 		return
@@ -301,7 +301,7 @@ function CCampManager:register_npc(npc_id)
 		--printf("FIND NPC ROLE %s", npc_id)
 		local role = self:get_npc_role(npc_id, k)
 		if(role==npc_role.noone) then
-			abort("Wrong role for npc[%s] with id[%d] in camp [%s]!!!", npc:name(), npc_id, self.object:name())
+			printf("Wrong role for npc[%s] with id[%d] in camp [%s]!!!", npc:name(), npc_id, self.object:name())
 		end
 		self.npc[npc_id][k] = role
 	end
@@ -375,7 +375,7 @@ function start_guitar(npc)
 	local camp_id = db.storage[npc:id()].registred_camp
 	if camp_id == nil then
 		return	
-		--abort("trying to play guitar without camp [%s]",tostring(npc:name()))
+		--printf("trying to play guitar without camp [%s]",tostring(npc:name()))
 	end
 	local camp = bind_camp.camps[camp_id].camp
 
@@ -389,7 +389,7 @@ function start_harmonica(npc)
 	local camp_id = db.storage[npc:id()].registred_camp
 	if camp_id == nil then	
 		return
-		--abort("trying to play harmonica without camp")
+		--printf("trying to play harmonica without camp")
 	end
 	local camp = bind_camp.camps[camp_id].camp
 

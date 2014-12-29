@@ -127,11 +127,11 @@ end
 -- Возвращает true или false
 function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
 	if mandatory == nil then
-		abort("section '%s': wrong arguments order in call to cfg_get_bool", section)
+		printf("section '%s': wrong arguments order in call to cfg_get_bool", section)
 	end
 
 	if not (char_ini) then
-		--alun_utils.printf("cfg_get_bool: ini is nil! section=%s field=%s object=%s",section,field,object and object:name())
+		--printf("cfg_get_bool: ini is nil! section=%s field=%s object=%s",section,field,object and object:name())
 		return default_val 
 	end
 	
@@ -143,24 +143,24 @@ function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
 	if not mandatory then
 		if default_val then
 			if default_val ~= false and default_val ~= true then
-				abort("object '%s': section '%s': field '%s': default value is " ..
+				printf("object '%s': section '%s': field '%s': default value is " ..
 					"not boolean", object:name(), section, field)
 			end
 			return default_val
 		end
 		return false
 	end
-	abort("object '%s': attempt to read a non-existant boolean field '%s' in " ..
+	printf("object '%s': attempt to read a non-existant boolean field '%s' in " ..
 		"section '%s'", object:name(), field, section)
 end
 
 function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name, default_val)
 	if mandatory == nil then
-		abort("section '%s': wrong arguments order in call to cfg_get_string", section)
+		printf("section '%s': wrong arguments order in call to cfg_get_string", section)
 	end
 
 	if not (char_ini) then
-		--alun_utils.printf("cfg_get_string: ini is nil! section=%s field=%s object=%s",section,field,object and object:name())
+		--printf("cfg_get_string: ini is nil! section=%s field=%s object=%s",section,field,object and object:name())
 		return default_val 
 	end
 
@@ -177,16 +177,16 @@ function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name,
 	end
 	local err = "'Attempt to read a non-existant string field '" ..
 		field .. "' in section '" .. section .. "'";
-	--abort("%s", err)
+	--printf("%s", err)
 end
 
 function cfg_get_number(char_ini, section, field, object, mandatory, default_val)
 	if mandatory == nil then
-		abort("section '%s': wrong arguments order in call to cfg_get_number", section)
+		printf("section '%s': wrong arguments order in call to cfg_get_number", section)
 	end
 	
 	if not (char_ini) then
-		--alun_utils.printf("cfg_get_number: ini is nil! section=%s field=%s object=%s",section,field,object and object:name())
+		--printf("cfg_get_number: ini is nil! section=%s field=%s object=%s",section,field,object and object:name())
 		return default_val 
 	end
 
@@ -199,7 +199,7 @@ function cfg_get_number(char_ini, section, field, object, mandatory, default_val
 	end
 	-- local err = "object name '" .. object:name() .. "': attempt to read a non-existant numeric field '" ..
 	--	field .. "' in section '" .. section .. "'";
-	-- abort("%s", err)
+	-- printf("%s", err)
 end
 
 function mob_get_string(char_ini, section, field, override, object, mandatory, default_val)
@@ -356,14 +356,14 @@ function parse_waypoint_data(pathname, wpflags, wpname)
 			-- continue
 		else
 			if param == "" then
-				abort("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
+				printf("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
 			end
 
 			local t_pos = string.find(param, "=", 1, true)
 
 			if t_pos == nil then
 				printf("Path_param: %s", param)
-				abort("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
+				printf("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
 				return
 			end
 
@@ -371,7 +371,7 @@ function parse_waypoint_data(pathname, wpflags, wpname)
 			val = string.sub(param, t_pos + 1)
 
 			if not fld or fld == "" then
-				abort("path '%s': waypoint '%s': syntax error while parsing the param '%s': no field specified",
+				printf("path '%s': waypoint '%s': syntax error while parsing the param '%s': no field specified",
 					pathname, wpname, param)
 			end
 
@@ -404,7 +404,7 @@ function path_parse_waypoints(pathname)
 		--printf("_bp: %s", ptr:name(pt))
 		rslt[pt] = parse_waypoint_data(pathname, ptr:flags(pt), ptr:name(pt))
 		if not rslt[pt] then
-			abort("error while parsing point %d of path '%s'", pt, pathname)
+			printf("error while parsing point %d of path '%s'", pt, pathname)
 		end
 
 	end
@@ -423,7 +423,7 @@ function path_parse_waypoints_from_arglist(pathname, num_points, ...)
 	local cnt = ptr:count()
 
 	if cnt ~= num_points then
-		abort("path '%s' has %d points, but %d points were expected", pathname, cnt, num_points)
+		printf("path '%s' has %d points, but %d points were expected", pathname, cnt, num_points)
 	end
 
 	local rslt = {}
@@ -433,13 +433,13 @@ function path_parse_waypoints_from_arglist(pathname, num_points, ...)
 	for pt = 0, cnt-1 do
 		cur_arg = arg[pt + 1]
 		if not cur_arg then
-			abort("script error [1] while processing point %d of path '%s'", pt, pathname)
+			printf("script error [1] while processing point %d of path '%s'", pt, pathname)
 		end
 		fl = flags32()
 		fl:assign(cur_arg[1])
 		rslt[pt] = parse_waypoint_data(pathname, fl, cur_arg[2])
 		if not rslt[pt] then
-			abort("script error [2] while processing point %d of path '%s'", pt, pathname)
+			printf("script error [2] while processing point %d of path '%s'", pt, pathname)
 		end
 	end
 
@@ -575,7 +575,7 @@ function get_nearest_waypoint(obj, pathname, ptr, cnt)
 		end
 	end
 	if not pt_chosen then
-		abort("object '%s': path '%s': get_nearest_waypoint: unable to choose a nearest waypoint (path has no waypoints?)",
+		printf("object '%s': path '%s': get_nearest_waypoint: unable to choose a nearest waypoint (path has no waypoints?)",
 			obj:name(), pathname)
 	end
 	return pt_chosen
@@ -654,7 +654,7 @@ function send_to_nearest_accessible_vertex( npc, v_id, caller)
 
 	-- For debugging strange movement behavior
 	--if (xrs_debug_tools.NEAREST_STALKER and npc:id() == xrs_debug_tools.NEAREST_STALKER:id()) then
-		--alun_utils.printf("send nearest npc=%s  caller=%s  vid=%s",npc:name(),caller,v_id)
+		--printf("send nearest npc=%s  caller=%s  vid=%s",npc:name(),caller,v_id)
 	--end
 
 	npc:set_dest_level_vertex_id( v_id )

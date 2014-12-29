@@ -21,7 +21,7 @@ ini = nil
 
 function help_wounded(npc)
 	--state_mgr.set_state(npc,"guard")
-	--alun_utils.printf("%s Helping wounded.",npc:name())
+	--printf("%s Helping wounded.",npc:name())
 	local id = npc and npc:id()
 	local st = id and db.storage[id] and db.storage[id].help_wounded
 	if not (st) then
@@ -373,7 +373,7 @@ function add_to_binder(npc, char_ini, scheme, section, st)
 		if (action) then
 			action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
 		else
-			alun_utils.printf("xr_help_wounded: no action id p[%s]",i)
+			printf("xr_help_wounded: no action id p[%s]",i)
 		end
 	end
 end

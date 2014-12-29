@@ -53,7 +53,7 @@ function npc_on_save(npc,packet)
 		alun_utils.w_stpk(packet,"u16",id,"inventory_upgrades:"..sec..":RepairTime")
 		alun_utils.w_stpk(packet,"u16",t.rt,"inventory_upgrades:"..sec..":RepairTime")
 		alun_utils.w_stpk(packet,"CTime",t.gt,"inventory_upgrades:"..sec..":CurrentGameTime")
-		--alun_utils.printf("sec=%s id=%s c=%s",sec,id,c)
+		--printf("sec=%s id=%s c=%s",sec,id,c)
 	end
 end
 
@@ -76,7 +76,7 @@ function npc_on_load(npc,packet)
 		RepairItemList[sec][id] = {}
 		RepairItemList[sec][id].rt = packet:r_u16()
 		RepairItemList[sec][id].gt = utils.r_CTime(packet,"inventory_upgrades")
-		--alun_utils.printf("sec=%s id=%s",sec,id)
+		--printf("sec=%s id=%s",sec,id)
 	end
 end
 
@@ -103,7 +103,7 @@ function lend_item_for_repair(itm,mechanic_name,rt)
 			end
 		end
 
-		alun_utils.printf("mechanic name = %s [sec = %s, id = %s]  repair_time = %s",mechanic_name,itm:section(),itm:id(),rt)
+		printf("mechanic name = %s [sec = %s, id = %s]  repair_time = %s",mechanic_name,itm:section(),itm:id(),rt)
 		RepairItemList[mechanic_name][itm:id()] = {gt = game.get_game_time(), rt = rt}
 
 		local hud = get_hud()
@@ -114,7 +114,7 @@ end
 function has_repair_info(a,b)
 	if (check_items and not effect_funct) then
 		check_items = nil
-		--alun_utils.printf("check_items nil")
+		--printf("check_items nil")
 		for k in pairs (weapon_upgrades) do
 			weapon_upgrades[k] = nil
 		end
@@ -309,7 +309,7 @@ function precondition_functor_a( param1, section )
 	if (ret ~= 0 and not check_items) then
 		check_items = true
 		last_section = section
-		--alun_utils.printf("check_items true")
+		--printf("check_items true")
 	end
 
 	if (check_items) then
@@ -348,7 +348,7 @@ function precondition_functor_a( param1, section )
 
 	if (effect_funct) then
 		check_items = nil
-		--alun_utils.printf("check_items nil")
+		--printf("check_items nil")
 		for k in pairs (weapon_upgrades) do
 			weapon_upgrades[k] = nil
 		end
@@ -364,7 +364,7 @@ function effect_functor_a( param2, section, loading ) --( string, string, int )
 		db.actor:give_money(math.floor(money*-1*cur_price_percent))
 		effect_funct = true
 	end
-	--alun_utils.printf("param2 = %s, section = %s, loading = %s",param2,section,loading)
+	--printf("param2 = %s, section = %s, loading = %s",param2,section,loading)
 end
 
 function get_upgrade_cost(section)

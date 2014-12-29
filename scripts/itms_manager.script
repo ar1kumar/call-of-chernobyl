@@ -416,7 +416,7 @@ function squad_assign_new_target(squad)
 
 	local dist = db.actor:position():distance_to_sqr(squad.position)
 	if (dist < SleepBagRadius) then
-		--alun_utils.printf("actor is target")
+		--printf("actor is target")
 		return 0
 	end
 end
@@ -477,7 +477,7 @@ function loot_mutant(obj,clsid,t,npc)
 		return
 	end
 
-	--alun_utils.printf("loot_mutant: collecting section=%s",clsid_to_section[clsid])
+	--printf("loot_mutant: collecting section=%s",clsid_to_section[clsid])
 	local loot_table = alun_utils.collect_section(ini,clsid_to_section[clsid])
 
 	local loot,sec
@@ -491,7 +491,7 @@ function loot_mutant(obj,clsid,t,npc)
 			loot[2] = tonumber(loot[2])
 			for i=1,loot[2] do
 				if (math.random() <= tonumber(loot[3])) then
-					--alun_utils.printf("loot_mutant: section=%s",loot[1])
+					--printf("loot_mutant: section=%s",loot[1])
 					local se_obj = alife():create(loot[1],npc and npc:position() or db.actor:position(),0,0,npc and npc:id() or 0)
 					if (t) then
 						local item_section = loot[1]
@@ -500,7 +500,7 @@ function loot_mutant(obj,clsid,t,npc)
 						end
 						t[item_section].count = t[item_section].count and t[item_section].count + 1 or 1
 						t[item_section][t[item_section].count] = se_obj.id
-						--alun_utils.printf("loot_mutant")
+						--printf("loot_mutant")
 					end
 				end
 			end

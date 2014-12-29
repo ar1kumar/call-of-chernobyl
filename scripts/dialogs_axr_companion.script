@@ -18,7 +18,7 @@ function add_dialog(p_id,id,phrase_id,cond,act)
 		return
 	end
 
-	--alun_utils.printf("phrase_id = %s",phrase_id)
+	--printf("phrase_id = %s",phrase_id)
 
 	local phrase_script = phrase:GetPhraseScript()
 	if ( cond ) then
@@ -205,7 +205,7 @@ function squad_action_description_for_travelling(actor,npc)
 
 	local desc = travel_class.smart_to_stringtables[smart_name]
 	if desc == nil then
-		abort("wrong smart name [%s] in travel_manager.ltx", tostring(smart_name))
+		printf("wrong smart name [%s] in travel_manager.ltx", tostring(smart_name))
 	end
 	return desc
 end
@@ -386,10 +386,7 @@ end
 
 function companion_has_waypoint(actor,npc)
 	local npc = dialogs.who_is_npc(actor,npc)
-	local st = db.storage[npc:id()].beh
-	if ( st.pathpoint and #st.pathpoint > 1 ) then
-		return true
-	end
+	return alun_utils.load_var(npc,"pathpoint2") ~= nil
 end
 
 function companion_gather_items_enabled(actor,npc)

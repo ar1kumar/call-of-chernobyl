@@ -1187,7 +1187,7 @@ function make_zombied(p)
 	-- release stalker
 	sim:release(se_obj,true)
 
-	--alun_utils.printf("make zombied")
+	--printf("make zombied")
 
 	return true
 end
@@ -1232,7 +1232,7 @@ function CSurgeManager:turn_to_zombie(obj)
 		return
 	end
 	create_delayed_event(obj.id,"turn_to_zombie",math_random(1,10),make_zombied,obj.id)
-	--alun_utils.printf("turn_to_zombie")
+	--printf("turn_to_zombie")
 end
 
 function CSurgeManager:explode(obj)

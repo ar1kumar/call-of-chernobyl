@@ -40,10 +40,10 @@ function se_smart_cover:STATE_Read (packet, size)
 		if smart_cover_description ~= nil then
 			--printf("name %s descr %s", self:name(), tostring(smart_cover_description))
 			if smart_covers == nil then
-				abort("smartcovers is nil")
+				printf("smartcovers is nil")
 			end
 			if smart_covers.descriptions[smart_cover_description] == nil then
-				abort("smartcover [%s] has wrong description [%s]!!!", self:name(), tostring(smart_cover_description))
+				printf("smartcover [%s] has wrong description [%s]!!!", self:name(), tostring(smart_cover_description))
 			end
 			local loopholes = smart_covers.descriptions[smart_cover_description].loopholes
 			for k,v in pairs (loopholes) do

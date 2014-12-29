@@ -140,7 +140,7 @@ function generic_object_binder:extrapolate_callback()
 	if not level.patrol_path_exists(patrol_path) then
 		--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
 		return false
-		--abort("bind_monster:extrapolate_callback(). There is no patrol path [%s]", tostring(patrol_path))
+		--printf("bind_monster:extrapolate_callback(). There is no patrol path [%s]", tostring(patrol_path))
 	end
 	if patrol(patrol_path):flags(cur_pt):get() == 0 then
 		--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
@@ -257,7 +257,7 @@ function generic_object_binder:net_spawn(sobject)
 		
 		-- fix for 'Invalid vertex for object'
 		if not (sobject.m_level_vertex_id < 4294967295 and self.object:accessible(sobject.m_level_vertex_id)) then
-			alun_utils.printf("npc %s has invalid spawning vertex, correcting",sobject:name())
+			printf("npc %s has invalid spawning vertex, correcting",sobject:name())
 			local v_id = self.object:accessible_nearest(level.vertex_position(sobject.m_level_vertex_id), vector())
 			self.object:set_npc_position(level.vertex_position(v_id))
 		end

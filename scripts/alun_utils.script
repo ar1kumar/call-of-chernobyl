@@ -41,7 +41,7 @@ function jump_to_level(new_level,specific_gvid,specific_lvid,specific_pos)
 		end
 	end
 	
-	alun_utils.printf("jump_to_level: level=%s gvid=%s lvid=%s valid_gvid=%s",new_level,specific_gvid,specific_lvid,gg:valid_vertex_id(specific_gvid))
+	printf("jump_to_level: level=%s gvid=%s lvid=%s valid_gvid=%s",new_level,specific_gvid,specific_lvid,gg:valid_vertex_id(specific_gvid))
 	
 	if (specific_gvid and gg:valid_vertex_id(specific_gvid)) then
 		cvertex = gg:vertex(specific_gvid)
@@ -77,7 +77,7 @@ function release_object(p)
 
     if not (se_obj.marked_for_release) then
 		if (dev_debug) then
-			alun_utils.printf("safe released %s",se_obj:name())
+			printf("safe released %s",se_obj:name())
 		end
 	   sim:release(se_obj,true)
        se_obj.marked_for_release = true
@@ -800,7 +800,7 @@ end
 function debug_nearest(npc,msg,...)
 	local id = npc and npc.id and (type(npc.id) == "function" and npc:id() or npc.id)
 	if (id and xrs_debug_tools.NEAREST_STALKER and id == xrs_debug_tools.NEAREST_STALKER:id()) then
-		alun_utils.printf("nearest=%s |"..msg,npc:name(),...)
+		printf("nearest=%s |"..msg,npc:name(),...)
 	end
 end 
 
@@ -966,7 +966,7 @@ function create_squad(section,smart_name)
 	if not (sim) then return end
 	local smart = sim.smarts_by_names[smart_name]
 	if not (smart) then
-		alun_utils.printf("create_squad: no smart by name %s",smart_name)
+		printf("create_squad: no smart by name %s",smart_name)
 		return
 	end
 	local squad = sim:create_squad(smart,section)
@@ -1401,7 +1401,7 @@ function execute_queue()
 
 		if not (se_obj.online) then
 			-- execute function and switch online
-			--alun_utils.printf("offline execute 1")
+			--printf("offline execute 1")
 			exec_data[id].f(se_obj,exec_data[id].p)
 			exec_data[id] = nil
 			table.insert(remove_me,i)
@@ -1412,7 +1412,7 @@ function execute_queue()
 			else
 				se_obj:switch_online()
 			end
-			--alun_utils.printf("offline execute 2")
+			--printf("offline execute 2")
 		else
 			local obj = level.object_by_id(id)
 			if (IsStalker(se_obj)) then
@@ -1465,19 +1465,7 @@ end
 --**********************************************************************************************************************************
 --* memoize(function)		--> Memoizies a function with a weak table
 --**********************************************************************************************************************************
-function memoize (f)
-	local mem = {} -- memoizing table
-	setmetatable(mem, {__mode = "kv"}) -- make it weak
-	return function (x) -- new version of ’f’, with memoizing
-	local r = mem[x]
-		if r == nil then -- no previous result?
-			r = f(x) -- calls original function
-			mem[x] = r -- store result for reuse
-			end
-		return r
-	end
-end
-
+--moved to _g.script
 --local loadstring = memoize(loadstring)
 
 
@@ -1591,7 +1579,7 @@ end
 
 class "cfg_file"
 function cfg_file:__init(fname)
-	--alun_utils.printf("fname=%s",fname)
+	--printf("fname=%s",fname)
 	local cfg = io.open(fname,"a+")
 	cfg:close()
 	self.fname = fname
@@ -1862,12 +1850,12 @@ function XmlFindNodeWithPropertyValue(xml,node_name,prop_name,val)
 	while not deepest do
 		if (node and #node > 0) then 
 			for i=1,#node do 
-				--alun_utils.printf("%s",node[i]:name())
+				--printf("%s",node[i]:name())
 				if (node[i]:name() == node_name) then
 					p = node[i] and node[i]:properties()
 					if (p and #p > 0) then 
 						for ii=1,#p do
-							--alun_utils.printf("%s=%s",p[ii] and p[ii].name,p[ii] and p[ii].value)
+							--printf("%s=%s",p[ii] and p[ii].name,p[ii] and p[ii].value)
 							if (p[ii] and p[ii].name == prop_name and p[ii].value == val) then 
 								return node[i]
 							end
@@ -1893,7 +1881,7 @@ function XmlGetNodeValue(xml,node_name)
 	local node = xml:children()
 	if (node and #node > 0) then 
 		for i=1,#node do 
-			--alun_utils.printf("%s",node[i]:name())
+			--printf("%s",node[i]:name())
 			if (node[i]:name() == node_name) then
 				return node[i]:value()
 			end
@@ -1905,7 +1893,7 @@ function XmlGetNodePropertyValue(xml,node_name,prop_name)
 	local p
 	if (node and #node > 0) then 
 		for i=1,#node do 
-			--alun_utils.printf("%s",node[i]:name())
+			--printf("%s",node[i]:name())
 			if (node[i]:name() == node_name) then
 				p = node[i]:properties()
 				for j=1,#p do 
@@ -2148,13 +2136,20 @@ function find_random_cover(npc,pos,min_rad,max_rad)
 	return cover and valid_vertex(npc,cover:level_vertex_id())
 end
 
--- find nearest cover; optional, don't use lvids in stored in table
+local function validate(npc,vid)
+	if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
+		return db.used_level_vertex_ids[vid] == nil or db.used_level_vertex_ids[vid] == npc:id()
+	end 
+	return false
+end
+
+-- find nearest cover
 function find_close_cover(npc,base_position,pos,cover_dist)
 	local cover
 	cover_dist = not cover_dist and 5 or cover_dist
 	while not cover and cover_dist < 30 do
 		cover = npc:best_cover(base_position,pos,cover_dist,1,30)
-		if (cover) and (tbl and tbl[cover:level_vertex_id()]) then 
+		if (cover) and not (validate(npc,cover:level_vertex_id())) then 
 			cover = nil 
 		end
 		cover_dist = cover_dist + 2
@@ -2163,20 +2158,107 @@ function find_close_cover(npc,base_position,pos,cover_dist)
 	return cover and valid_vertex(npc,cover:level_vertex_id())
 end
 
-function find_cover_in_direction(npc,base_point,pos,dir,min_rad,max_rad)
+function find_cover_in_rand_direction(npc,base_point,pos)
 	local rand = math.random
-	local base_vertex_id = level.vertex_in_direction(base_point,dir,rand(min_rad,max_rad))
-	local base_position = level.vertex_position(base_vertex_id)
+	
+	local dir = npc:direction()
+	local rand_dir = rand(1,6)
+	local base_vertex_id, base_position, cover, cover_dist
+	for i=rand_dir,6 do
+		base_vertex_id = level.vertex_in_direction(base_point,dir,i*60)
+		base_position = level.vertex_position(base_vertex_id)
 
-	local cover
-	local cover_dist = rand(1,30)
-	while not cover and cover_dist > 0 do
-		cover = npc:best_cover(base_position,pos,cover_dist,1,150)
-		cover_dist = cover_dist - 1
+		cover = nil
+		cover_dist = rand(1,30)
+		while not cover and cover_dist > 0 do
+			cover = npc:best_cover(base_position,pos,cover_dist,1,30)
+			cover_dist = cover_dist - 1
+		end
+		
+		if (cover and valid_vertex(npc,cover:level_vertex_id())) then 
+			return valid_vertex(npc,cover:level_vertex_id())
+		end
 	end
 
-	return cover and valid_vertex(npc,cover:level_vertex_id()) or valid_vertex(npc,base_vertex_id)
+	return valid_vertex(npc,base_vertex_id)
 end
+
+function try_go_backward(npc,radius,old_vid)
+	--alun_utils.debug_nearest(npc,"try_go_backward")
+	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math.random(160,200))
+	local vid
+	local base_point = npc:level_vertex_id()
+	while (radius > 0) do
+		vid = level.vertex_in_direction(base_point,dir,radius)
+		if (validate(npc,vid)) then
+			return alun_utils.lmove(npc,vid,old_vid)
+		end
+		radius = radius - 2
+	end
+end 
+
+function try_go_aside_object(npc,friend,pos,old_vid)
+	if not (friend) then 
+		return 
+	end 
+	
+	local mypos = npc:position()
+	
+	if (mypos:distance_to_sqr(friend:position()) < 3) then 
+		return 
+	end
+
+	--alun_utils.debug_nearest(npc,"try_to_strafe")
+	local _dir = utils.vector_copy_by_val(mypos):sub(pos)
+	local dir = {}
+	dir[1] = vector_rotate_y(utils.vector_copy_by_val(_dir),-90)
+	dir[2] = vector_rotate_y(utils.vector_copy_by_val(_dir),90)
+	local vid
+	local radius = 12
+	local base_point = friend:level_vertex_id()
+	
+	for i=1,2 do
+		while (radius > 0) do
+			vid = level.vertex_in_direction(base_point,dir[i],radius)
+			if (validate(npc,vid)) then 
+				return alun_utils.lmove(npc,vid,old_vid)
+			end
+			radius = radius - 2
+		end
+	end
+end 
+
+function try_go_position(npc,pos,old_vid)
+	local vid = level.vertex_id(pos)
+	if (validate(npc,vid)) then 
+		return alun_utils.lmove(npc,vid,old_vid)
+	end 
+end 
+
+function try_go_cover(npc,pos,old_vid)
+	local vid = alun_utils.find_close_cover(npc,npc:position(),pos,8)
+	return validate(npc,vid) and alun_utils.lmove(npc,vid,old_vid)
+end 
+
+function try_to_strafe(npc,old_vid)
+	local _dir = npc:direction()
+	local dir = {}
+	dir[1] = vector_rotate_y(utils.vector_copy_by_val(_dir),-90)
+	dir[2] = vector_rotate_y(utils.vector_copy_by_val(_dir),90)
+	local vid
+	local radius = 10
+	local base_point = npc:level_vertex_id()
+	
+	for i=1,2 do
+		while (radius > 0) do
+			vid = level.vertex_in_direction(base_point,dir[i],radius)
+			if (validate(npc,vid)) then 
+				return lmove(npc,vid,old_vid)
+			end
+			radius = radius - 2
+		end
+	end
+end 
 
 function lmove(npc,vid,old_vid)
 	if (old_vid) then 

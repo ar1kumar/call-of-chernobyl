@@ -5,6 +5,7 @@ registered_smartcovers = {}
 
 function bind(obj)
 	obj:bind_object(smart_cover_binder(obj))
+	printf("bind %s",obj:name())
 end
 
 class "smart_cover_binder" (object_binder)
