@@ -748,7 +748,7 @@ function evaluator_check_danger:evaluate()
 	
 	if not (db.storage[id].danger_flag) then
 		db.storage[id].danger_flag_scripted = not be and script_danger[id] ~= nil and true
-		return db.storage[id].danger_flag_scripted
+		return db.storage[id].danger_flag_scripted or false
 	end
 
 	local bd_type = bd:type()

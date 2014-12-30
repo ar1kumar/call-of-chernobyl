@@ -63,7 +63,7 @@ function eva_state_mgr_in_smartcover:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_in_smartcover:evaluate()
-	return self.object:in_smart_cover()
+	return self.object:in_smart_cover() or false
 end
 
 

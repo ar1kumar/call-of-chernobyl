@@ -18,7 +18,7 @@ function evaluator_need_animpoint:__init(storage, name) super(nil, name)
 	self.st = storage
 end
 function evaluator_need_animpoint:evaluate()
-	return xr_logic.is_active(self.object, self.st)
+	return xr_logic.is_active(self.object, self.st) or false
 end
 
 class "evaluator_reach_animpoint" (property_evaluator)
@@ -30,7 +30,7 @@ function evaluator_reach_animpoint:evaluate()
 	if (xr_danger.has_danger(self.object)) then 
 		return false 
 	end
-	return self.st.animpoint:position_riched()
+	return self.st.animpoint:position_riched() == true
 end
 --------------------------------------------------------------------------------
 class "action_reach_animpoint" (action_base)

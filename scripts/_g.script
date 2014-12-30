@@ -885,8 +885,8 @@ function vec_to_str (vector)
 end
 -- выводит в лог стэк вызова функций.
 function callstack()
-	if debug ~= nil then
-		log(debug.traceback(2))
+	if (log1 and debug and type(debug.traceback) == 'function') then 
+		log1(debug.traceback('\n', 2))
 	end
 end
 -- меняет team:squad:group обьекта.

@@ -349,8 +349,12 @@ function eva_gather_itm:evaluate()
 	if (xr_conditions.surge_started() or xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.gather_items_enabled) == "false") then
 		return false
 	end
+	
+	if (self:find_valid_item()) then 
+		return true 
+	end
 
-	return self:find_valid_item() or false
+	return false
 end
 
 ------------------------------------------------------

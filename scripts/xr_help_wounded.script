@@ -209,7 +209,11 @@ function evaluator_wounded_exist:evaluate()
 		end
 	end
 
-	return self:find_valid_target() or false
+	if (self:find_valid_target()) then 
+		return true 
+	end 
+	
+	return false
 end
 
 ----------------------------------------------------------------------------------------------------------------------

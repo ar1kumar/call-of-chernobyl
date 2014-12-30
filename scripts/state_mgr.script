@@ -165,6 +165,8 @@ function evaluator_state_mgr_idle_alife:evaluate()
 	if not self.object:alive() then
 		return true
 	end
+	
+	callstack()
 
 	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
 	if not (self.st.mgr and self.st.mgr:initialized()) then
@@ -228,7 +230,7 @@ function evaluator_state_mgr_logic_active:__init(name, state_manager) super (nil
 	self.st = state_manager
 end
 function evaluator_state_mgr_logic_active:evaluate()
-	return db.storage[self.object:id()].active_section ~= nil
+	return db.storage[self.object:id()] and db.storage[self.object:id()].active_section ~= nil or false
 end
 
 --' Переход в idle
@@ -244,6 +246,7 @@ function act_state_mgr_to_idle:initialize()
 end
 
 function act_state_mgr_to_idle:execute()
+	callstack()
 	action_base.execute(self)
 	if (self.st.target_state ~= "idle") and (self.object:best_enemy() or self.object:best_danger()) then
 		self.object:clear_animations()
@@ -271,7 +274,7 @@ end
 
 function eva_state_mgr_end:evaluate()
 	--alun_utils.debug_write("",true)
-
+	callstack()
 	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
 	if not (self.st.mgr and self.st.mgr:initialized()) then
 		return false

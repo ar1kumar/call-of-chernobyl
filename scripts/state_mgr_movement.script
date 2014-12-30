@@ -194,7 +194,7 @@ function act_state_mgr_movement_walk_search:initialize()
 	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- WALK", tostring(self.object:movement_type()))
 	printf("SET_SIGHT!!!act_state_mgr_movement_walk_search:initialize()")
 	self.object:set_sight(state_mgr_direction.look_position_type(self.object, self.st), nil, 0)
-
+	callstack()
 end
 function act_state_mgr_movement_walk_search:execute()
 	action_base.execute(self)

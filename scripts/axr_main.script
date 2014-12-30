@@ -962,9 +962,7 @@ function npc_on_update(npc,st)
 	if (_nupdate) then
 		for i=1, #_nupdate do
 			_nupdate[i](npc,st)
-			--if (log1 and debug and type(debug.traceback) == 'function') then 
-				--log1(debug.traceback('\n', 2))
-			--end
+			callstack()
 		end
 	end
 

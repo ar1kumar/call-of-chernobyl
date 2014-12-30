@@ -41,7 +41,7 @@ function evaluator_need_job:__init(storage, name) super(nil, name)
   	self.st = storage
 end
 function evaluator_need_job:evaluate()
-  	return xr_logic.is_active(self.object, self.st)
+  	return xr_logic.is_active(self.object, self.st) or false
 end
 
 ----------------------------------------------------------------------------------------------------------------------

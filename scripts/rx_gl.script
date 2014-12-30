@@ -167,7 +167,9 @@ function evaluator_launch_grenade:evaluate()
 
 	if (self.st.check_time < tg) then
 		self.st.check_time = tg+gl_sets.check_prd+math.random(200)
-		return find_valid_target(npc,self.st)
+		if (find_valid_target(npc,self.st)) then
+			return true
+		end
 	end
 	return false
 end
@@ -368,7 +370,7 @@ function evaluator_reload_gl:evaluate()
 		self.evn = false
 		self.wait = time_global()+3000
 		printf("reload_gl[%s]:good act",npc:character_name())
-		return self.evn
+		return self.evn or false
 	end
 	local wpn = npc:active_item()
 	if not (wpn and wpn:id() == self.st.wpn_id) then
@@ -378,7 +380,7 @@ function evaluator_reload_gl:evaluate()
 		self.dif = nil
 	else
 		self.dif = true
-		return self.evn
+		return self.evn or false
 	end
 	if self.wait < time_global() and check_ammo(npc) then
 		local in_cover = alun_utils.npc_in_cover(npc)
@@ -396,7 +398,7 @@ function evaluator_reload_gl:evaluate()
 	end
 
 
-	return self.evn
+	return self.evn or false
 end
 
 function npc_on_hit_callback(npc,amount)
