@@ -453,6 +453,8 @@ function se_smart_terrain:load_jobs()
 					active_section = ltx:r_string(section, "active")
 
 					job_type = gulag_general.get_job_type(job)
+					job.alife_task = self.smart_alife_task
+					
 					if (job_type == "path_job" or job_type == "heli_path_job") then
 						path_field = "nil"
 						
@@ -479,8 +481,6 @@ function se_smart_terrain:load_jobs()
 								end
 							end
 							
-							job.alife_task = self.smart_alife_task
-							
 							if (level.patrol_path_exists(path_name)) then
 								if not (job_type == "heli_path_job") then
 									if (validate_patrol_path(path_name,gg)) then
@@ -498,10 +498,8 @@ function se_smart_terrain:load_jobs()
 						if not (smartcover) then
 							printf("There is an exclusive job with wrong smatrcover name [%s]  smartterrain [%s]", tostring(smartcover_name), self:name())
 						else 
-							job.alife_task = smartcover and CALifeSmartTerrainTask(smartcover.m_game_vertex_id, smartcover.m_level_vertex_id) or self.smart_alife_task
+							job.alife_task = CALifeSmartTerrainTask(smartcover.m_game_vertex_id, smartcover.m_level_vertex_id)
 						end
-					else
-						job.alife_task = self.smart_alife_task
 					end
 
 					if (job.alife_task) then -- if a single job is failed, ignore and fill rest of job table

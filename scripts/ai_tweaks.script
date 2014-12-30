@@ -233,7 +233,7 @@ function npc_on_item_take(npc,item)
 		if (weapon:weapon_is_scope() and alun_utils.get_addon_status(weapon,"sc") == 2) then
 			return -- already has sc attached
 		end
-		create_delayed_event(npc:id(),"attach_addon",2,attach_addon,se_wpn.id,item:id(),1)
+		create_delayed_event(npc:id(),"attach_addon",2,attach_addon,weapon:id(),item:id(),1)
 		return
 	end
 
@@ -245,7 +245,7 @@ function npc_on_item_take(npc,item)
 		if (weapon:weapon_is_grenadelauncher() and alun_utils.get_addon_status(weapon,"gl") == 2) then
 			return -- already has gl attached
 		end
-		create_delayed_event(npc:id(),"attach_addon",2,attach_addon,se_wpn.id,item:id(),2)
+		create_delayed_event(npc:id(),"attach_addon",2,attach_addon,weapon:id(),item:id(),2)
 		return
 	end
 
