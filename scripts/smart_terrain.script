@@ -1345,13 +1345,11 @@ function se_smart_terrain:on_reach_target(squad)
 	--alun_utils.debug_write(alun_utils.sr("%s:on_reach_target %s",self:name(),squad and squad:name()))
 	squad:set_location_types(self:name())
 	SIMBOARD:assign_squad_to_smart(squad, self.id)
-	--[[
 	for k in squad:squad_members() do
 		if db.offline_objects[k.id] ~= nil then
 			empty_table(db.offline_objects[k.id])
 		end
 	end
-	--]]
 end
 
 -- CALifeSmartTerrainTask

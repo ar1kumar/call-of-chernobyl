@@ -79,14 +79,12 @@ end
 -- Вызывается 1 раз в момент выбора меня как цели.
 function se_actor:on_reach_target(squad)
 	squad:set_location_types()
-	--[[
 	for k in squad:squad_members() do
 		if db.offline_objects[k.id] ~= nil then
 			empty_table(db.offline_objects[k.id])
 			--db.offline_objects[k.id] = {}
 		end
 	end
-	--]]
 	SIMBOARD:assign_squad_to_smart(squad, nil)
 end
 -- Возвращает CALifeSmartTerrainTask на меня, вызывается из smart_terrain:task()
