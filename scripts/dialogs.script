@@ -192,7 +192,7 @@ function npc_is_surrendered(a,b)
 	local npc = who_is_npc(a, b)
 	local st = db.storage[npc:id()]
 	local po = st and st.victim_surrender and st.victim_surrender ~= 65535 and level.object_by_id(st.victim_surrender)
-	--alun_utils.printf("npc_is_surrendered: surrendered to %s",st.victim_surrender)
+	--printf("npc_is_surrendered: surrendered to %s",st.victim_surrender)
 	if (po) then
 		return true
 	end
@@ -323,8 +323,8 @@ function surrender_victim_answers_2(a,b)
 		end
 	end
 
-	if (db.actor:character_reputation()+2 < 10000) then
-		db.actor:change_character_reputation(2)
+	if (db.actor:character_reputation()+5 <= 10000) then
+		db.actor:change_character_reputation(5)
 	end
 
 	npc:iterate_inventory(itr,npc)
@@ -370,7 +370,7 @@ function disable_talk_victim(first_speaker, second_speaker)
 end
 
 function punch(first_speaker, second_speaker)
-	--abort("KICK ASS !!!!")
+	--printf("KICK ASS !!!!")
 	--xr_punch.punch[first_speaker:id()] = second_speaker
 	db.storage[second_speaker:id()].punch.enabled = true
 end
@@ -436,7 +436,9 @@ function transfer_medkit(first_speaker, second_speaker)
 		npc:set_relation(game_object.friend,db.actor)
 	end
 
-	db.actor:change_character_reputation(10);
+	if (db.actor:character_reputation()+10 <= 10000) then
+		db.actor:change_character_reputation(10)
+	end
 end
 function transfer_bandage(first_speaker, second_speaker)
 	dialogs.relocate_item_section(second_speaker, "bandage", "out")
@@ -467,7 +469,7 @@ function relocate_item_section(victim, section, type, amount)
 				end
 			elseif type == "out" then
 				if victim == nil then
-					abort("Couldn't relocate item to NULL")
+					printf("Couldn't relocate item to NULL")
 				end
 				db.actor:transfer_item(db.actor:object(section), victim)
 			end
@@ -490,7 +492,7 @@ function relocate_money(victim, num, type)
 
 		elseif type == "out" then
 			if victim == nil then
-				abort("Couldn't relocate money to NULL")
+				printf("Couldn't relocate money to NULL")
 			end
 			db.actor:transfer_money(num, victim)
 			game_stats.money_quest_update(-num)
@@ -848,7 +850,7 @@ end
 function relocate_money_from_actor(first_speaker, second_speaker, num)
 	local victim = who_is_npc(first_speaker, second_speaker)
 	if victim == nil then
-		abort("Couldn't relocate money to NULL")
+		printf("Couldn't relocate money to NULL")
 	end
 	db.actor:transfer_money(num, victim)
 	game_stats.money_quest_update(-num)
@@ -898,7 +900,7 @@ function relocate_item_section_from_actor(first_speaker, second_speaker, section
 		i = amount
 		actor:iterate_inventory(transfer_object_item, nil)
 	elseif amount < 1 then
-		abort("Wrong parameters in function 'relocate_item_section_from_actor'!")
+		printf("Wrong parameters in function 'relocate_item_section_from_actor'!")
 	else
 		actor:transfer_item(actor:object(section), npc)
 	end

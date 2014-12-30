@@ -54,10 +54,10 @@ local function npc_on_item_take(npc,item)
 
 	buy_sell = alun_utils.str_explode(buy_sell,",")
 
-	--alun_utils.printf("buy_sell[2]=%s",buy_sell[2])
+	--printf("buy_sell[2]=%s",buy_sell[2])
 	if (st.trade_items[sec] >= tonumber(buy_sell[2])) then
 		st.has_items_to_sell = true
-		--alun_utils.printf("%s: wants to trade surplus items",npc:name())
+		--printf("%s: wants to trade surplus items",npc:name())
 	end
 end
 
@@ -78,12 +78,12 @@ function npc_trade_buy_sell(npc)
 	end
 
 	if not (st.has_items_to_sell) then
-		alun_utils.printf("st.has_items_to_sell = nil!")
+		printf("st.has_items_to_sell = nil!")
 		return
 	end
 
 	if not (st.trade_items) then
-		alun_utils.printf("no items to sell")
+		printf("no items to sell")
 		return
 	end
 
@@ -93,7 +93,7 @@ function npc_trade_buy_sell(npc)
 		npc_info.job.idle = time_global() + 6000
 	end
 
-	alun_utils.printf("trade_job_sell_items")
+	printf("trade_job_sell_items")
 
 	local sim = alife()
 
@@ -125,7 +125,7 @@ function npc_trade_buy_sell(npc)
 					buy_sell = alun_utils.str_explode(buy_sell,",")
 
 					sim:release(sim:object(itm:id()),true)
-					alun_utils.printf("trading %s",sec)
+					printf("trading %s",sec)
 
 					itm_base_cost = alun_utils.read_from_ini(nil,sec,"cost","float",30)
 					npc:money(itm_base_cost * (tonumber(buy_sell[4]) or 1))
@@ -166,7 +166,7 @@ function npc_trade_buy_sell(npc)
 		return
 	end
 
-	alun_utils.printf("trade_job_buy_items")
+	printf("trade_job_buy_items")
 
 	local valid_items = alun_utils.collect_section(ini,"buy_sell",true)
 	local item_list = {}
@@ -204,7 +204,7 @@ function npc_trade_buy_sell(npc)
 						if (money >= total_cost) then
 							sim:create(sec,npc:position(),0,0,npc:id())
 							npc:transfer_money(total_cost,seller)
-							alun_utils.printf("%s bought %s for %s",npc:name(),sec,total_cost)
+							printf("%s bought %s for %s",npc:name(),sec,total_cost)
 							money = money - total_cost
 						end
 					end
@@ -214,7 +214,7 @@ function npc_trade_buy_sell(npc)
 						if (money >= total_cost) then
 							sim:create(sec,npc:position(),0,0,npc:id())
 							npc:transfer_money(total_cost,seller)
-							alun_utils.printf("%s bought %s for %s",npc:name(),sec,total_cost)
+							printf("%s bought %s for %s",npc:name(),sec,total_cost)
 							money = money - total_cost
 						end
 					end

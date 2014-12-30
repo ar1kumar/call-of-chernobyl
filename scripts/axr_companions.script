@@ -6,6 +6,8 @@ by Alundaio
 	This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 -]]
 
+--TODO: Make it so patrol/waiting npcs do not follow actor to new levels. Maybe set their own squad id as target?
+
 ask_anyone_to_be_companion = false
 allow_story_squads = false
 max_actor_squad_size = 0
@@ -92,6 +94,18 @@ local function npc_on_net_spawn(npc,se_npc)
 	end
 end
 
+local function on_level_changing()
+	local squad
+	local sim = alife()
+	local se_actor = sim:actor()
+	for id,v in pairs(companion_squads) do 
+		squad = sim:object(id)
+		if (squad and companion_squad_can_teleport(squad)) then 
+			alun_utils.teleport_squad(squad,se_actor.m_game_vertex_id,se_actor.m_level_vertex_id,se_actor.position)
+		end
+	end
+end
+
 ---------------------------------
 -- Register Callbacks
 ---------------------------------
@@ -105,12 +119,21 @@ function on_game_start()
 	callback_register("squad_on_unregister",squad_on_unregister)
 	callback_register("squad_can_switch_offline",squad_can_switch_offline)
 	callback_register("npc_on_net_spawn",npc_on_net_spawn)
+	callback_register("on_level_changing",on_level_changing)
 
 	DisabledFactions = alun_utils.parse_list(ini,"main","disabled_factions",true)
 	ask_anyone_to_be_companion = alun_utils.read_from_ini(ini,"main","anyone_as_companion","bool",false)
 	allow_story_squads = alun_utils.read_from_ini(ini,"main","allow_story_squads","bool",false)
 	max_actor_squad_size = alun_utils.read_from_ini(ini,"main","max_actor_squad_size","float",3)
 end
+
+function companion_squad_can_teleport(squad)
+	local id = squad:commander_id()
+	if (id and alife():has_info(id,"npcx_beh_patrol_mode") or alife():has_info(id,"npcx_beh_wait")) then
+		return false
+	end
+	return true
+end 
 
 function get_companion_count()
 	local count = 0
@@ -142,10 +165,10 @@ function setup_companion_logic(npc)
 
 	local sect = xr_logic.determine_section_to_activate(npc, ltx, "logic", db.actor)
 	if utils.get_scheme_by_section("logic") == "nil" then
-		abort("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
+		printf("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
 	end
 
-	--alun_utils.printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
+	--printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
 	xr_logic.activate_by_section(npc, ltx, sect, "", false)
 end 
 
@@ -160,7 +183,7 @@ function add_special_task_npc_to_actor_squad(npc)
 			unreg:unregister_npc(se_npc)
 		end
 	end
-
+	npc:inactualize_patrol_path()
 	npc:give_info_portion("npcx_is_companion")
 	axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
 	setup_companion_logic(npc)
@@ -346,7 +369,7 @@ end
 function companion_add_waypoints(npc)
 	local i = 1
 	local p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
-	while p == nil do 
+	while p do 
 		i = i + 1
 		p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
 	end

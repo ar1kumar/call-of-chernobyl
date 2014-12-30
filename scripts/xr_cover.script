@@ -152,7 +152,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.sound_idle= utils.cfg_get_string(ini, section, "sound_idle",npc, false, "")
 
 	if st.smart == nil then
-		abort("There is no path_walk and smart in xr_cover.")
+		printf("There is no path_walk and smart in xr_cover.")
 	end
 
 	st.use_attack_direction = utils.cfg_get_bool(ini, section, "use_attack_direction", npc, false, true)

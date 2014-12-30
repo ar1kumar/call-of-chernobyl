@@ -165,10 +165,10 @@ function parse_ltx(actor,sections,ltx_data)
 				if not (on_info_sections) then
 					on_info_sections = {}
 				end
-				--alun_utils.printf("on_info sec = %s",sec)
+				--printf("on_info sec = %s",sec)
 				table.insert(on_info_sections,sec)
 			else
-				--alun_utils.printf("sec = %s",sec)
+				--printf("sec = %s",sec)
 				table.insert(sections,sec)
 			end
 		end
@@ -393,9 +393,9 @@ function interpret_spawn_data(sections)
 						se_obj.angle = alun_utils.string_to_vector(t.angle)
 					end
 
-					alun_utils.printf("after create %s [%s]",se_obj:name(),sec)
+					printf("after create %s [%s]",se_obj:name(),sec)
 				else
-					alun_utils.printf("dynamic_spawn.ltx: ERROR improper values for section %s [ section=%s | pos=%s | lvid=%s | gvid=%s ]",sec,section,t.position,lvid,gvid)
+					printf("dynamic_spawn.ltx: ERROR improper values for section %s [ section=%s | pos=%s | lvid=%s | gvid=%s ]",sec,section,t.position,lvid,gvid)
 				end
 			end
 		end
@@ -520,7 +520,7 @@ function dynamic.cse_alife_smart_cover(se_obj,t,sec)
 		for i=1,size,2 do
 			if (t.loopholes[i] and t.loopholes[i+1]) then
 				data.loopholes[t.loopholes[i]] = tonumber(t.loopholes[i+1])
-				--alun_utils.printf("data.loopholes[%s] = %s",t.loopholes[i],t.loopholes[i+1])
+				--printf("data.loopholes[%s] = %s",t.loopholes[i],t.loopholes[i+1])
 			end
 		end
 	else

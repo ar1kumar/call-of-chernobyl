@@ -39,13 +39,13 @@ end
 -- obj=game_object
 function get_npc_smart(obj)
 	if not (obj) then 
-		abort("get_npc_smart: obj is nil WHY GOD WHY!")
+		printf("get_npc_smart: obj is nil WHY GOD WHY!")
 		return	
 	end 
 	
 	local id = obj.id and (type(obj.id) == "function" and obj:id() or obj.id)
 	if not (id) then 
-		abort("get_npc_smart: invalid object")
+		printf("get_npc_smart: invalid object")
 		return 
 	end 
 	
@@ -184,12 +184,12 @@ function loadLtx(name)
 		dltx = ini_file("gulag\\"..name..".ltx")
 		if (dltx) then
 			dynamic_ltx[h] = dltx
-			alun_utils.printf("xr_gulag.loadLtx: gulag file found %s",alun_utils.fspath("$game_gulag$")..name..".ltx")
+			printf("xr_gulag.loadLtx: gulag file found %s",alun_utils.fspath("$game_gulag$")..name..".ltx")
 			return dltx,h
 		end
 	end
 
-	alun_utils.printf("loadLtx=%s  path=%s",name,alun_utils.fspath("$game_gulag$")..name..".ltx")
+	printf("loadLtx=%s  path=%s",name,alun_utils.fspath("$game_gulag$")..name..".ltx")
 	return nil, nil
 end
 

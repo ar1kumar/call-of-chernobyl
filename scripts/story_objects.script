@@ -8,7 +8,7 @@ end
 
 function story_objects_registry:register(obj_id , story_obj_id)
 	if (self.story_id[story_obj_id] and self.story_id[story_obj_id] ~= obj_id) then
-		alun_utils.printf("Multiple objects trying to use same story_id %s",story_obj_id)
+		printf("Multiple objects trying to use same story_id %s",story_obj_id)
 		return
 	end
 
@@ -88,10 +88,10 @@ function check_spawn_ini_for_story_id(se_obj)
 		local result, id, value
 		result, id, value	= spawn_ini:r_line("story_object",0,"","")
 		if id ~= "story_id" then
-			abort("There is no 'story_id' field in [story_object] section :object [%s]", se_obj:name())
+			printf("There is no 'story_id' field in [story_object] section :object [%s]", se_obj:name())
 		end
 		if value == "" then
-			abort("Field 'story_id' in [story_object] section got no value :object [%s]", se_obj:name())
+			printf("Field 'story_id' in [story_object] section got no value :object [%s]", se_obj:name())
 		end
 		sor:register(se_obj.id , value)
 		return

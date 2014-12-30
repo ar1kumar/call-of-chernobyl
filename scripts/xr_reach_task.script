@@ -81,7 +81,7 @@ function PatrolManager:add_npc(npc)
 
 	--' Проверка на то что в патруле не больше 7 сталкеров (иначе будет вылетать дальше)
 --	if self.npc_count == 7 then
---		abort("[XR_REACH_TASK] attempt to add more then 7 npc. [%s]", npc:name())
+--		printf("[XR_REACH_TASK] attempt to add more then 7 npc. [%s]", npc:name())
 --		return
 --	end
 	--' if this npc first in command then set him as commander
@@ -170,7 +170,7 @@ end
 --' Получить параметры действия NPC
 function PatrolManager:get_npc_command(npc)
 	if npc == nil then
-		abort("Invalid NPC on call PatrolManager:get_npc_command in PatrolManager[%s]", self.target_name)
+		printf("Invalid NPC on call PatrolManager:get_npc_command in PatrolManager[%s]", self.target_name)
 	end
 	--'закешируем айдишник непися
 	local npc_id = npc:id ()
@@ -179,16 +179,16 @@ function PatrolManager:get_npc_command(npc)
 	end
 	--'проверка непися на присутсвие в списке
 	if self.npc_list[npc:id ()] == nil then
-		 abort("NPC with name %s can't present in PatrolManager[%s]", npc:name (), self.target_name)
+		 printf("NPC with name %s can't present in PatrolManager[%s]", npc:name (), self.target_name)
 	end
 	--'проверка, чтобы командир не вздумал задавать глупых вопросов
 	if npc:id() == self.commander_id then
-		 abort("Patrol commander called function PatrolManager:get_npc_command in PatrolManager[%s]", self.target_name)
+		 printf("Patrol commander called function PatrolManager:get_npc_command in PatrolManager[%s]", self.target_name)
 	end
 	--'получим данные командира
 	local commander = level.object_by_id(self.npc_list[self.commander_id].soldier)
 	if commander == nil then
-		abort("commander is nil!!!")
+		printf("commander is nil!!!")
 	end
 	local dir = commander:direction()
 

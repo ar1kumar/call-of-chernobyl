@@ -21,8 +21,7 @@ end
 
 local good_acts = {
 					[xr_actions_id.smartcover_action] = true,
-					[xr_actions_id.smartcover_action+2] = true,
-					[xr_actions_id.wounded_exist] = true
+					[xr_actions_id.smartcover_action+2] = true
 					}
 					
 -----------------------------------------------------------------------------------------
@@ -52,6 +51,11 @@ function evaluator_radio_in_heli:evaluate()
 	end
 	
 	if (empty(db.heli)) then 
+		return false 
+	end
+	
+	local st = db.storage[npc:id()]
+	if (st and st.help_wounded and st.help_wounded.selected_id ~= nil) then 
 		return false 
 	end
 	
@@ -100,7 +104,7 @@ function evaluator_radio_in_heli:evaluate()
 
 	if (self.st.stage == 1) then 
 		local vid = alun_utils.find_close_cover(npc,npc:position(),be:position())
-		--alun_utils.printf("vid=%s",vid)
+		--printf("vid=%s",vid)
 		if (vid) then
 			self.st.vid = utils.send_to_nearest_accessible_vertex(npc,vid)
 			self.st.stage = 2

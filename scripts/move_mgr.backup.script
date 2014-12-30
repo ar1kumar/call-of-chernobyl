@@ -73,14 +73,14 @@ end
 class "move_mgr"
 function move_mgr:__init(npc)
 	if npc == nil then
-		abort("move_mgr:__init() - npc is nil, please update the script")
+		printf("move_mgr:__init() - npc is nil, please update the script")
 	end
 	self.object = npc
 end
 
 function move_mgr:initialize(npc)
 	if npc ~= nil then
-		abort("Wrong arguments passed to move_mgr:initialize(), please update the script")
+		printf("Wrong arguments passed to move_mgr:initialize(), please update the script")
 	end
 	--printf("move_mgr:initialize()")
 
@@ -101,7 +101,7 @@ function move_mgr:validate_paths()
 	local patrol_walk_count = self.patrol_walk:count()
 	if patrol_walk_count == 1 then
 		if self.path_walk_info[0].flags:get() == 0 then
-			abort("object '%s': path_walk '%s' has 1 waypoint, but has no flags",
+			printf("object '%s': path_walk '%s' has 1 waypoint, but has no flags",
 				self.object:name(), self.path_walk)
 		end
 	end
@@ -201,7 +201,7 @@ function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, te
 		self.path_walk = path_walk
 		self.patrol_walk = patrol(path_walk)
 		if not self.patrol_walk then
-			abort("object '%s': unable to find path_walk '%s' on the map",self.object:name(), path_walk)
+			printf("object '%s': unable to find path_walk '%s' on the map",self.object:name(), path_walk)
 			self:disable()
 			return
 		end
@@ -209,7 +209,7 @@ function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, te
 		local cnt = self.patrol_walk:count()
 		for i=0,cnt-1 do
 			if not (self.object:accessible(self.patrol_walk:level_vertex_id(i)) and self.patrol_walk:level_vertex_id(i) < 4294967295) then
-				abort("move_mgr:reset: %s: point %s is inaccessible to npc on patrol path %s",self.object:name(),i,path_walk)
+				printf("move_mgr:reset: %s: point %s is inaccessible to npc on patrol path %s",self.object:name(),i,path_walk)
 				self:disable()
 				return
 			end
@@ -217,12 +217,12 @@ function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, te
 
 		local gg = game_graph()
 		if (gg:vertex(self.object:game_vertex_id()):level_id() ~= gg:vertex(self.patrol_walk:game_vertex_id(0)):level_id()) then
-			abort("move_mgr:reset: %s: trying to use patrol path %s that exists on another level then object",self.object:name(),path_walk)
+			printf("move_mgr:reset: %s: trying to use patrol path %s that exists on another level then object",self.object:name(),path_walk)
 			self:disable()
 			return
 		end
 		if not path_walk_info then
-			abort("object '%s': path_walk ('%s') field was supplied, but path_walk_info field is nil",self.object:name(), path_walk)
+			printf("object '%s': path_walk ('%s') field was supplied, but path_walk_info field is nil",self.object:name(), path_walk)
 			self:disable()
 			return
 		end
@@ -230,12 +230,12 @@ function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, te
 
 		if path_look then
 			if not path_look_info then
-				abort("object '%s': path_look ('%s') field was supplied, but path_look_info field is nil",self.object:name(), path_look)
+				printf("object '%s': path_look ('%s') field was supplied, but path_look_info field is nil",self.object:name(), path_look)
 				return
 			end
 			self.patrol_look = patrol(path_look)
 			if not self.patrol_look then
-				abort("object '%s': unable to find path_look '%s' on the map",self.object:name(), path_look)
+				printf("object '%s': unable to find path_look '%s' on the map",self.object:name(), path_look)
 			end
 		else
 			self.patrol_look = nil
@@ -407,7 +407,7 @@ function move_mgr:update_movement_state()
 		local b = self.patrol_walk:point(self.current_point_index-1)
 		if (a and b) then
 			local angle = alun_utils.angle_diff(b,a)
-			--alun_utils.printf("angle=%s",angle)
+			--printf("angle=%s",angle)
 			if (angle >= 60) then
 				state_mgr.set_state(self.object,"climb")
 				self.__climb_enabled = true
@@ -462,7 +462,7 @@ function move_mgr:time_callback()
 		self:update_movement_state() -- идти дальше
 		local syn = self.path_look_info and self.path_look_info[self.last_look_index] and self.path_look_info[self.last_look_index]["syn"]
 		if syn then
-			abort("object '%s': path_walk '%s': syn flag used on non-terminal waypoint",
+			printf("object '%s': path_walk '%s': syn flag used on non-terminal waypoint",
 				self.object:name(), self.path_walk)
 		end
 	end
@@ -486,7 +486,7 @@ function move_mgr:turn_end_callback()
 	if syn then
 		self.syn_signal = self.path_look_info[self.last_look_index]["sig"]
 		if not self.syn_signal then
-			abort("object '%s': path_look '%s': syn flag uset without sig flag", self.object:name(), self.path_look)
+			printf("object '%s': path_look '%s': syn flag uset without sig flag", self.object:name(), self.path_look)
 		end
 
 		-- Отметить, что мы сами уже прибыли в точку синхронизации:
@@ -512,7 +512,7 @@ function move_mgr:turn_end_callback()
 
 	if self.retval_after_rotation then
 		if not self.move_cb_info then
-			abort("object '%s': path_look '%s': ret flag is set, but " ..
+			printf("object '%s': path_look '%s': ret flag is set, but " ..
 				"callback function wasn't registered in move_mgr:reset()",
 				self.object:name(), self.path_look)
 		end
@@ -527,7 +527,7 @@ function move_mgr:turn_end_callback()
 		state_mgr.set_state(self.object, self.cur_state_standing, nil, nil, nil)
 		--' 2) Вызываем callback
 		if not self.move_cb_info then
-			abort("object '%s': path_look '%s': ret flag is set, but " ..
+			printf("object '%s': path_look '%s': ret flag is set, but " ..
 				"callback function wasn't registered in move_mgr:reset()",
 				self.object:name(), self.path_look)
 		end
@@ -565,12 +565,12 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 		self.cur_state_moving = xr_logic.pick_section_from_condlist(db.actor, self.object, suggested_state_moving)
 		if tostring(self.cur_state_moving) == "true" then
 			--print_table(suggested_state_moving)
-			abort("!!!!!")
+			printf("!!!!!")
 		end
 	else
 		self.cur_state_moving = xr_logic.pick_section_from_condlist(db.actor, self.object, self.default_state_moving1)
 		if tostring(self.cur_state_moving) == "true" then
-			abort("!!!!!")
+			printf("!!!!!")
 		end
 	end
 
@@ -581,7 +581,7 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 		local retv_num = tonumber(retv)
 
 		if not self.move_cb_info then
-			abort("object '%s': path_walk '%s': ret flag is set, but " ..
+			printf("object '%s': path_walk '%s': ret flag is set, but " ..
 				"callback function wasn't registered in move_mgr:reset()",
 				self.object:name(), self.path_walk)
 		end
@@ -640,7 +640,7 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 
 						suggested_wait_time = SuggestedWaitTimes["sleep"] and SuggestedWaitTimes["sleep"] ~= "*" and tonumber(SuggestedWaitTimes["sleep"]) or 45000
 
-						--alun_utils.printf("%s set state to sleep with a %s wait time",self.object:name(),suggested_wait_time)
+						--printf("%s set state to sleep with a %s wait time",self.object:name(),suggested_wait_time)
 						if (SoundSets["sleep"]) then
 							local t = alun_utils.str_explode(SoundSets["sleep"],",")
 							if (t[2] and math.random() < tonumber(t[2])) then
@@ -669,7 +669,7 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 						self.play_sound_idle = time_global() + math.random(1000,tonumber(suggested_wait_time))
 					end
 				end
-				--alun_utils.printf("%s set state to %s with a %s wait time",self.object:name(),new_state,suggested_wait_time)
+				--printf("%s set state to %s with a %s wait time",self.object:name(),new_state,suggested_wait_time)
 			end
 		end
 
@@ -703,7 +703,7 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 		--' в нужную сторону - не будет паузы в несколько миллисекунд на поворот.
 		self:update()
 	else
-		abort("object '%s': path_walk '%s', index %d: cannot find corresponding point(s) on path_look '%s'",
+		printf("object '%s': path_walk '%s', index %d: cannot find corresponding point(s) on path_look '%s'",
 			self.object:name(), tostring(self.path_walk), tostring(index), tostring(self.path_look))
 	end
 end

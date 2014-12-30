@@ -35,7 +35,7 @@ function heli_move:reset_scheme( loading )
 
 	if (self.a.path_move) then 
 		if not level.patrol_path_exists(self.a.path_move) then
-			abort("Patrol path %s doesnt exist", self.a.path_move)
+			printf("Patrol path %s doesnt exist", self.a.path_move)
 			return
 		end
 		
@@ -55,7 +55,7 @@ function heli_move:reset_scheme( loading )
             self.heli_fly:set_look_point(self.patrol_look:point( 0 ))
             self:update_look_state()
 		    if not self.patrol_look then
-			    abort("object '%s': unable to find path_look '%s' on the map",self.object:name(), self.a.path_look)
+			    printf("object '%s': unable to find path_look '%s' on the map",self.object:name(), self.a.path_look)
 				return
 		    end
         end
@@ -200,7 +200,7 @@ function heli_move:iterate_nodes()
 		return 
 	end
 	
-	--alun_utils.printf("iterating nodes")
+	--printf("iterating nodes")
 	
 	if not (self.a.path_index) then 
 		self.a.path_index = 1 
@@ -208,18 +208,18 @@ function heli_move:iterate_nodes()
 	
 	if (self.object:position():distance_to_sqr(self.a.nodes[self.a.path_index].position) > 1.5) then
 		self.heliObject:SetDestPosition(self.a.nodes[self.a.path_index].position)
-		--alun_utils.printf("moving %s",self.a.path_index)
+		--printf("moving %s",self.a.path_index)
 		return
 	end
 	
 	if (self.a.nodes[self.a.path_index].delay and time_global() < self.a.nodes[self.a.path_index].delay) then
-		--alun_utils.printf("delay %s",self.a.path_index)
+		--printf("delay %s",self.a.path_index)
 		return 
 	end
 	
 	if (self.a.increment < 0 and self.a.path_index == 1 or self.a.increment > 0 and self.a.path_index == #self.a.nodes) then
 		local path_end = xr_logic.pick_section_from_condlist(db.actor, self.object, self.a.path_end)
-		--alun_utils.printf("path_end %s %s",self.a.path_index,path_end)
+		--printf("path_end %s %s",self.a.path_index,path_end)
 		if (path_end == "loop") then 
 			self.a.path_index = 1
 		elseif (path_end == "reverse") then
@@ -234,7 +234,7 @@ function heli_move:iterate_nodes()
 		if (self.a.nodes[self.a.path_index].signal) then
 			self.a.signals[self.a.nodes[self.a.path_index].signal] = true
 		end
-		--alun_utils.printf("increment %s",self.a.path_index)
+		--printf("increment %s",self.a.path_index)
 		return
 	end
 end 
@@ -390,7 +390,7 @@ function set_scheme( npc, ini, scheme, section, gulag_name)
 	local st = db.storage[npc:id()]
 	a.path_move         = utils.cfg_get_string( ini, section, "path_move", npc, true,  gulag_name)
 	if (a.path_move and not level.patrol_path_exists(a.path_move)) then
-		abort("Patrol path %s doesnt exist", a.path_move)
+		printf("Patrol path %s doesnt exist", a.path_move)
 		a.path_move = nil
 	end
 	a.path_look         = utils.cfg_get_string( ini, section, "path_look", npc, false, gulag_name)

@@ -13,7 +13,6 @@ function action_door:__init(obj, storage)
 	self.object = obj
 	self.st = storage
 	self.snd_obj = nil
-	
 	storage.door_action = self
 end
 function action_door:reset_scheme(loading)
@@ -64,9 +63,9 @@ end
 function action_door:update(delta)
 	--printf("_bp: action_door:update()", delta)
 	if not self.initialized then
-		abort("object '%s': door failed to initialize", self.object:name())
+		printf("object '%s': door failed to initialize", self.object:name())
 	end
-
+	
 	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
 		return
 	end
@@ -218,7 +217,7 @@ function action_door:close_door(disable_snd)
 	else
 		self.joint:set_max_force_and_velocity(200, 3, 0)
 	end
-	self.block = true -- Закрываем и блокируем	
+	--self.block = true -- Закрываем и блокируем	
 	self.soundless_block = disable_snd
 	
 	local ph_obj = self.object:get_physics_object()
@@ -254,7 +253,7 @@ function action_door:use_callback(door, actor)
             xr_sound.set_sound_play(self.object:id(), self.st.snd_open_start)
 		end
 	end
-
+	
 	if self:try_switch() then
 		return
 	end

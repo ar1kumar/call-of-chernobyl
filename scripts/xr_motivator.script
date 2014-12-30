@@ -78,13 +78,6 @@ function motivator_binder:net_spawn(sobject)
 	self.object:set_callback(callback.use_object, motivator_binder.use_callback, self)
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)
-
-	-- fix for 'Invalid vertex for object'
-	if not (sobject.m_level_vertex_id < 4294967295 and self.object:accessible(sobject.m_level_vertex_id)) then
-		alun_utils.printf("npc %s has invalid spawning vertex, correcting",sobject:name())
-		local v_id = self.object:accessible_nearest(level.vertex_position(sobject.m_level_vertex_id), vector())
-		self.object:set_npc_position(level.vertex_position(v_id))
-	end
 		
 	self.object.se_obj = sobject
 	db.add_obj(self.object)
@@ -93,6 +86,14 @@ function motivator_binder:net_spawn(sobject)
 		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body...")
 		release_body_manager.get_release_body_manager():moving_dead_body(self.object,true)
 		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body done")
+		
+		-- fix for 'Invalid vertex for object'
+		if not (sobject.m_level_vertex_id < 4294967295 and self.object:accessible(sobject.m_level_vertex_id)) then
+			printf("npc %s has invalid spawning vertex, correcting",sobject:name())
+			local v_id = self.object:accessible_nearest(level.vertex_position(sobject.m_level_vertex_id), vector())
+			self.object:set_npc_position(level.vertex_position(v_id))
+		end
+	
 		return true
 	end
 
@@ -257,7 +258,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	xr_wounded.hit_callback(obj:id())
 	
 	if (who and IsHelicopter(who)) then
-		--alun_utils.printf("hit by helicopter")
+		--printf("hit by helicopter")
 		local squad = get_object_squad(obj)
 		if (squad and not xr_combat_ignore.safe_zone_npcs[squad.id]) then 
 			for o in squad:squad_members() do 

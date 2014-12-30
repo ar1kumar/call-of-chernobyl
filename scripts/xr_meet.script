@@ -18,6 +18,8 @@ local function get_vertex(npc)
 	return npc:vertex_in_direction(npc:level_vertex_id(),dir,math.random(4,6))
 end
 
+local good_acts = { [xr_actions_id.animpoint_action + 1] = true
+}
 ---------------------------------------------------------------------------------------------------------------------
 --Evaluators
 ----------------------------------------------------------------------------------------------------------------------
@@ -44,7 +46,7 @@ function evaluator_contact:evaluate()
 		if (db.storage[self.object:id()].victim_surrender == db.actor:id()) then
 			return true
 		end
-
+		
 		if xr_wounded.is_wounded(self.object) then
 			return false
 		end
@@ -57,6 +59,17 @@ function evaluator_contact:evaluate()
 		if (state == "search_corpse" or state == "pickup_crouch") then
 			return false
 		end
+		
+		if (self.a.gtfo == true) then 
+			return true 
+		end 
+		
+		 if (self.object:has_info("npcx_is_companion") or not get_object_story_id(self.object:id())) then
+			if (db.actor:position():distance_to_sqr(self.object:position()) < 1.6) and not (good_acts[alun_utils.get_current_action_id(self.object)]) then
+				self.a.gtfo = true
+				return true
+			end
+		end 
 
 		local squad = self.object and get_object_squad(self.object)
 		local commander = squad and squad:commander_id() ~= self.object:id() and level.object_by_id(squad:commander_id())
@@ -93,10 +106,31 @@ function action_meet_wait:initialize()
 end
 function action_meet_wait:execute ()
 	action_base.execute(self)
-	if (self.a.commander_threat) then
-		local npc = self.object
+	local npc = self.object
+	-- Move npc out of the way if player bumps into him
+	if (self.a.gtfo) then 
+		if (self.a.stage == 0) then 
+			self.a.vertex_id = alun_utils.try_go_backward(npc,5,self.a.vertex_id)
+			if (self.a.vertex_id) then
+				npc:set_desired_direction()
+				state_mgr.set_state(npc,"patrol")
+				self.a.stage = 1
+				self.a.dtimer = time_global() + 4000
+			end
+		elseif (self.a.stage == 1) then
+			if (npc:level_vertex_id() == self.a.vertex_id or time_global() > self.a.dtimer) then
+				self.a.gtfo = nil
+				self.a.vertex_id = nil
+				self.a.stage = 0
+				return 
+			end 
+			utils.send_to_nearest_accessible_vertex(npc,self.a.vertex_id)
+		end
+		return
+	elseif (self.a.commander_threat) then
 		if (self.a.stage == 0) then
 			if (alun_utils.squad_in_los(npc,db.actor)) then
+				npc:set_desired_direction()
 				state_mgr.set_state(npc,"rush")
 				self.a.stage = 1
 				return
@@ -115,6 +149,7 @@ function action_meet_wait:execute ()
 			self.a.stage = 2
 			return
 		elseif (self.a.stage == 2) then
+			npc:set_desired_direction()
 			state_mgr.set_state(npc,"rush")
 			if (npc:level_vertex_id() == self.a.vertex_id) then
 				self.a.stage = 0
@@ -125,6 +160,7 @@ function action_meet_wait:execute ()
 			end
 			return
 		end
+		npc:set_desired_direction()
 		state_mgr.set_state(self.object, "threat_na", nil, nil, {look_object = db.actor})
 		return
 	end
@@ -133,6 +169,11 @@ end
 function action_meet_wait:finalize ()
 	action_base.finalize(self)
 	self.a.stage = 0
+	self.a.gtfo = nil
+	if (self.a.vertex_id) then 
+		db.used_level_vertex_ids[self.a.vertex_id] = nil
+		self.a.vertex_id = nil
+	end
 end
 
 

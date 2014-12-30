@@ -137,7 +137,7 @@ function action_wounded:execute()
 	if tostring(wound_manager_state) == "nil" then
 		print_table(self.a.hp_state)
 		print_table(self.a.hp_state_see)
-		abort("wrong wounded animation %s", self.object:name())
+		printf("wrong wounded animation %s", self.object:name())
 	end
 
 	if (db.storage[id].victim_surrender ~= 65535) then

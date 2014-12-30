@@ -39,7 +39,7 @@ function CTreasureManager:initialize()
 									self.secrets[id].items[item_section] = {}
 									local tbl = utils.parse_spawns(str)
 									if(#tbl==0) then
-											abort("There is no items count set for treasure [%s], item [%s]", id, item_section)
+											printf("There is no items count set for treasure [%s], item [%s]", id, item_section)
 									end
 					for i=1,#tbl do
 						local tbl = {count = tonumber(tbl[i].section), prob = tonumber(tbl[i].prob or 1)}
@@ -48,7 +48,7 @@ function CTreasureManager:initialize()
 				end
 			end
 		else
-			abort("There is no section [%s] in secrets.ltx", tostring(id))
+			printf("There is no section [%s] in secrets.ltx", tostring(id))
 		end
 	end
 end
@@ -72,10 +72,10 @@ function CTreasureManager:fill(se_obj, treasure_id)
 				end
 			end
 		else
-			abort("Attempt to register unknown item [%s] in secret [%s]", se_obj:section_name(), treasure_id)
+			printf("Attempt to register unknown item [%s] in secret [%s]", se_obj:section_name(), treasure_id)
 		end
 	else
-		abort("Attempt to register item [%s] in unexistent secret [%s]", se_obj:name(), treasure_id)
+		printf("Attempt to register item [%s] in unexistent secret [%s]", se_obj:name(), treasure_id)
 	end
 end
 
@@ -89,10 +89,10 @@ function CTreasureManager:register_item(se_obj)
 		local result, id, value
 		result, id, value	= spawn_ini:r_line("secret",0,"","")
 		if id ~= "name" then
-			abort("There is no 'name' field in [secret] section for object [%s]", se_obj:name())
+			printf("There is no 'name' field in [secret] section for object [%s]", se_obj:name())
 		end
 		if value == "" then
-			abort("Field 'name' in [secret] section got no value for object [%s]", se_obj:name())
+			printf("Field 'name' in [secret] section got no value for object [%s]", se_obj:name())
 		end
 		return self:fill(se_obj, value)
 	end
@@ -154,7 +154,7 @@ function CTreasureManager:spawn_treasure(treasure_id)
 		return
 	end
 	if not(self.secrets[treasure_id]) then
-		abort("There is no stored secret [%s]", tostring(treasure_id))
+		printf("There is no stored secret [%s]", tostring(treasure_id))
 	end
 	if(self.secrets[treasure_id].given) then
 		printf("Secret [%s] already given!", treasure_id)
@@ -196,7 +196,7 @@ function CTreasureManager:give_treasure(treasure_id, spawn)
 		return
 	end
 	if not(self.secrets[treasure_id]) then
-		abort("There is no stored secret [%s]", tostring(treasure_id))
+		printf("There is no stored secret [%s]", tostring(treasure_id))
 	end
 	if(self.secrets[treasure_id].given) then
 		printf("Secret [%s] already given!", treasure_id)

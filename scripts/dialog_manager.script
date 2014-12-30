@@ -7,7 +7,7 @@
 
 
 function printf(txt,...)
-alun_utils.printf(txt,...)
+printf(txt,...)
 end
 
 RandomVal = 0
@@ -46,7 +46,7 @@ function add_dialog(p_id,id,phrase_id,cond,act)
 		return
 	end
 
-	--alun_utils.printf("phrase_id = %s",phrase_id)
+	--printf("phrase_id = %s",phrase_id)
 
 	local phrase_script = phrase:GetPhraseScript()
 	if ( cond ) then
@@ -254,11 +254,11 @@ function init_start_dialogs(dialog, str)
 	-- test all conditions and display a failsafe dialog message
 	--[[
 	if (use_npc) then
-		--alun_utils.printf("dialog for %s",use_npc:name())
+		--printf("dialog for %s",use_npc:name())
 		local pass = false
 		local func
 		for i=1,#cond_list do
-			--alun_utils.printf("precondition = %s",cond_list[i])
+			--printf("precondition = %s",cond_list[i])
 			func = alun_utils.findfunction(cond_list[i],_G)
 			if (func and func(db.actor,use_npc) == true) then
 				pass = true
@@ -267,7 +267,7 @@ function init_start_dialogs(dialog, str)
 		end
 
 		if (pass == false) then
-			alun_utils.printf("%s has empty dialog, using failsafe message [str=%s community=%s]",use_npc:name(),str,character_community(use_npc))
+			printf("%s has empty dialog, using failsafe message [str=%s community=%s]",use_npc:name(),str,character_community(use_npc))
 			ph = nil
 		end
 	end
@@ -342,7 +342,7 @@ function precondition_no_more(npc, str, phrase_id)
 
 	local pr, id = get_highest_priority_phrase(phrase_table[str], priority_table[str], npc, phrase_id)
 	if(pr<0) or (id==0) then
-		alun_utils.printf("there is no avaliable "..str.." dialogs")
+		printf("there is no avaliable "..str.." dialogs")
 		return true
 	end
 
@@ -356,7 +356,7 @@ end
 -- Calculate phrase's preconditions
 function precondition(npc, PT_subtable, PRT_subtable, phrase_id,dialog_name)
 	if not (phrase_id) then
-		alun_utils.printf("dialog_manager: no pharse_id for dialog %s",dialog_name)
+		printf("dialog_manager: no pharse_id for dialog %s",dialog_name)
 	end
 
 	if not (PRT_subtable[npc:id()]) then

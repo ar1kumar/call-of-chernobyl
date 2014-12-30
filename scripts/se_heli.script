@@ -33,7 +33,7 @@ function se_heli:on_unregister()
 		table.remove(se_helicopters,remove_me)
 	end
 
-	--alun_utils.printf("unregister heli %s",self.respawn_point_id)
+	--printf("unregister heli %s",self.respawn_point_id)
 	if (self.respawn_point_id and self.respawn_point_prop_section) then
 		local smart = alife():object(self.respawn_point_id)
 		if smart == nil then
@@ -66,7 +66,7 @@ end
 
 function se_heli:STATE_Write(packet)
 	cse_alife_helicopter.STATE_Write(self,packet)
-	--alun_utils.printf("STATE_Write %s",self.respawn_point_id)
+	--printf("STATE_Write %s",self.respawn_point_id)
 	if (self.respawn_point_prop_section) then
 		packet:w_u16(self.assigned_target_id or 65535)
 		packet:w_u16(self.current_target_id or 65535)
@@ -78,7 +78,7 @@ end
 
 function se_heli:STATE_Read(packet,size)
 	cse_alife_helicopter.STATE_Read(self, packet, size)
-	--alun_utils.printf("size=%s elapsed=%s",size,packet:r_elapsed())
+	--printf("size=%s elapsed=%s",size,packet:r_elapsed())
 	if (packet:r_elapsed() > 0) then
 		self.assigned_target_id = packet:r_u16()
 		if (self.assigned_target_id == 65535) then 

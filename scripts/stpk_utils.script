@@ -593,7 +593,7 @@ function get_item_update_data(sobj)
 				if uppk:r_elapsed() >= 12 then
 					t.upd_ph_angular_vel = read_chunk(uppk, 3, "float")
 				else
-					abort("cse_alife_item::update_read => cannot read 'upd:ph_angular_vel'")
+					printf("cse_alife_item::update_read => cannot read 'upd:ph_angular_vel'")
 					return
 				end
 			end
@@ -601,7 +601,7 @@ function get_item_update_data(sobj)
 				if uppk:r_elapsed() >= 12 then
 					t.upd_ph_linear_vel = read_chunk(uppk, 3, "float")
 				else
-					abort("cse_alife_item::update_read => cannot read 'upd:ph_linear_vel'")
+					printf("cse_alife_item::update_read => cannot read 'upd:ph_linear_vel'")
 					return
 				end
 			end

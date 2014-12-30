@@ -9,7 +9,7 @@ local diff_game_2sec = 0
 
 
 function printf(txt,...)
-	alun_utils.printf(txt,...)
+	printf(txt,...)
 end
 
 
@@ -27,7 +27,7 @@ function WeatherManager:__init()
 	self.graphs={}
 	self.graphs_ini = ini_file("environment\\dynamic_weather_graphs.ltx")
 	if not self.graphs_ini then
-		abort("error when open weather_dynamic_graphs.ltx")
+		printf("error when open weather_dynamic_graphs.ltx")
 	end
 	self.dof_factor=1
 	self.period="good"
@@ -386,7 +386,7 @@ function WeatherManager:select_weather(now)
 		else
 			local period = level_name and self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_"..self.period)
 			if not (period) then
-				alun_utils.printf("level_weathers: opt_%s_peroid_%s does not exist in atmosfear_current_parameters",level_name,self.period)
+				printf("level_weathers: opt_%s_peroid_%s does not exist in atmosfear_current_parameters",level_name,self.period)
 				period = "clear"
 			end
 			weather = weather.."_"..period
@@ -486,7 +486,7 @@ function WeatherManager:set_state_as_string(ss)
 
 		local i,j,grname,curs,nexs=string.find(laststring,"([^=]+)=([^,]+),([^,]+)")
 		if not grname then
-			abort("WeatherManager:set_state_as_string: malformed state string. "..ss)
+			printf("WeatherManager:set_state_as_string: malformed state string. "..ss)
 		end
 		--local lvl_name=self:unpack_level(lvl)
 		local current_state=self:unpack_state(curs)

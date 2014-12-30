@@ -298,6 +298,7 @@ end
 	
 --]]
 function on_game_start()
+
 	-- CoP
 	if (xrs_dyn_music) then xrs_dyn_music.on_game_start() end 
 	
@@ -411,7 +412,7 @@ function on_game_load()
 			count = count + 1
 		end
 	end
-	alun_utils.printf("axr_main.on_game_load: There are %s object ids in use.",count)
+	printf("axr_main.on_game_load: There are %s object ids in use.",count)
 	--]]
 
 	-- clean up intercepts table if callbacks are unused
@@ -537,7 +538,7 @@ function actor_on_update(se_actor,delta)
 		db.storage[0].loud_gvid = nil
 		db.storage[0].loud_lvid = nil
 		--if (actor_sound_incr and actor_sound_incr < LOUD_SOUND_THRESHOLD) then
-			--alun_utils.printf("Actor is quiet")
+			--printf("Actor is quiet")
 		--end
 	end
 
@@ -573,7 +574,7 @@ function actor_on_update(se_actor,delta)
 				if (actor_sound_incr > LOUD_SOUND_THRESHOLD) then
 					actor_sound_incr = LOUD_SOUND_THRESHOLD
 					--if not (db.storage[0].loud) then
-						--alun_utils.printf("Actor is being loud")
+						--printf("Actor is being loud")
 					--end
 					db.storage[0].loud = tg + 50000		-- 50 seconds
 					db.storage[0].loud_gvid = db.actor:game_vertex_id()
@@ -762,12 +763,12 @@ function actor_on_save(binder,packet)
 		local actor_gv = sim and gg:vertex(sim:actor().m_game_vertex_id)
 		
 		if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
-			alun_utils.printf("actor changing level")
+			--printf("actor changing level")
 			if (REMOVE_ME_LC) then
 				local sim = alife()
 				local se_obj = sim:object(REMOVE_ME_LC)
 				if (se_obj) then
-					alun_utils.printf("removing temp level_changer %s",se_obj:name())
+					--printf("removing temp level_changer %s",se_obj:name())
 					sim:release(se_obj,true)
 				end
 			end
@@ -808,7 +809,7 @@ function actor_on_save(binder,packet)
 
 			local data = marshal.encode(m_data)
 			if (data) then
-				alun_utils.printf("axr_main: saving custom data %s",path)
+				printf("axr_main: saving custom data %s",path)
 				savegame:write(data)
 				savegame:close()
 			end
@@ -850,7 +851,7 @@ function actor_on_load(binder,packet)
 
 		m_data = marshal.decode(data) or m_data
 
-		alun_utils.printf("axr_main: loading custom data %s", path)
+		printf("axr_main: loading custom data %s", path)
 
 		if (intercepts.load_state) then
 			for i=1, #intercepts.load_state do
@@ -961,6 +962,9 @@ function npc_on_update(npc,st)
 	if (_nupdate) then
 		for i=1, #_nupdate do
 			_nupdate[i](npc,st)
+			--if (log1 and debug and type(debug.traceback) == 'function') then 
+				--log1(debug.traceback('\n', 2))
+			--end
 		end
 	end
 
@@ -1134,7 +1138,7 @@ end
 -- npc_on_death_callback(npc,who)
 -------------------
 function npc_on_death_callback(npc,who)
-	--alun_utils.printf("death_callback for %s killed by %s",npc:name(),who:name())
+	--printf("death_callback for %s killed by %s",npc:name(),who:name())
 	--alun_utils.debug_write("npc_on_death_callback")
 	if (intercepts.npc_on_death_callback) then
 		for i=1, #intercepts.npc_on_death_callback do
@@ -1492,9 +1496,9 @@ end
 -- on_save_game_load(fileName)		-- ui_load_dlg.script
 -------------------
 function on_save_game_load(fname)
-	alun_utils.printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	collectgarbage("collect")
-	alun_utils.printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	--collectgarbage("collect")
+	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 --------------------
@@ -1506,7 +1510,7 @@ function on_save_game_save(fname)
 	-- because the queue does not persist through saves we must force all queued actions to trigger
 	event_queue(true)
 
-	--alun_utils.printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
 	--collectgarbage("collect")
-	--alun_utils.printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end

@@ -10,7 +10,7 @@ local function npc_on_death_callback(npc,who)
 	local npc_id = npc:id()
 	local id = alun_utils.load_var(db.actor,"esc_m_trader_bounty_target_id")
 	if (id and npc_id == id) then
-		alun_utils.printf("esc_m_trader_bounty_target_id=%s tagged_by_actor=%s",npc_id,db.storage[id] and db.storage[id].tagged_by_actor)
+		printf("esc_m_trader_bounty_target_id=%s tagged_by_actor=%s",npc_id,db.storage[id] and db.storage[id].tagged_by_actor)
 		if (db.storage[npc_id] and db.storage[npc_id].tagged_by_actor == true) or (who and (who:id() == 0 or who:has_info("npcx_is_companion"))) then
 			task_manager.get_task_manager():set_task_completed("esc_m_trader_task_1")
 		end
@@ -78,7 +78,7 @@ function get_first_available_task(npc,skip)
 	
 	local count = 1
 	while (task_manager.task_ini:section_exist(task_id)) do
-		--alun_utils.printf("task_id=%s skipped=%s",task_id,skipped_tasks[task_id])
+		--printf("task_id=%s skipped=%s",task_id,skipped_tasks[task_id])
 		if (skipped_tasks[task_id] ~= true and task_info[task_id] == nil and xr_conditions.has_completed_task_prerequisites(nil,nil,{task_id})) then
 			if (skip) then 
 				skipped_tasks[task_id] = true

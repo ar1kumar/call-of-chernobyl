@@ -1,3 +1,4 @@
+--TODO: Rewrite this piece of shit
 
 --' Ключем является группировка персонажа. Значением является таблица, содержашая имена секций предметов.
 local item_by_community = {}
@@ -21,18 +22,18 @@ local death_ini = ini_file("misc\\death_generic.ltx")
 function init_drop_settings()
 	local community_list = { "stalker", "dolg", "freedom", "bandit", "army", "zombied", "ecolog", "killer", "monolith", "csky" }
 
-		for k,v in pairs(community_list) do
-				--' Необходимо заполнить таблицу
-				item_by_community[v] = {}
-				if death_ini:section_exist(v) then
-				local n = death_ini:line_count(v)
-				local id, value = "", ""
-				for i=0,n-1 do
-					result, id, value	= death_ini:r_line(v,i,"","")
-								item_by_community[v][id] = 100*tonumber(value)
-				end
-				end
+	for k,v in pairs(community_list) do
+		--' Необходимо заполнить таблицу
+		item_by_community[v] = {}
+		if death_ini:section_exist(v) then
+		local n = death_ini:line_count(v)
+		local id, value = "", ""
+		for i=0,n-1 do
+			result, id, value	= death_ini:r_line(v,i,"","")
+						item_by_community[v][id] = 100*tonumber(value)
 		end
+		end
+	end
 
 		--' Заполняем таблицу зависимостей
 	local n = death_ini:line_count("item_dependence")
@@ -53,7 +54,7 @@ function init_drop_settings()
 		level_name = "default"
 	end
 
-		local n = death_ini:line_count(level_name)
+	local n = death_ini:line_count(level_name)
 	local id, value = "", ""
 	for i=0,n-1 do
 		result, id, value	= death_ini:r_line(level_name,i,"","")
@@ -67,7 +68,7 @@ function init_drop_settings()
 		--' Нужно распарсить value в два значения
 		local t = parse_nums(value)
 		if t[1] == nil then
-			abort("Error on [death_ini] declaration. Section [%s], line [%s]", item_count_section, tostring(id))
+			printf("Error on [death_ini] declaration. Section [%s], line [%s]", item_count_section, tostring(id))
 		end
 		local min = t[1]
 		local max = t[2]
@@ -147,7 +148,7 @@ function drop_manager:create_release_item()
 		if check_item_dependence(self.npc, k) == true then
 			--' По каждому объекту необходимо получить количество
 			if count_by_level[k] == nil then
-				abort("Incorrect count settings in death_manager for object[%s]", k)
+				printf("Incorrect count settings in death_manager for object[%s]", k)
 			end
 			local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
 			--' Необходимо заспавнить нужное количество.

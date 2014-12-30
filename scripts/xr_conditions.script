@@ -7,6 +7,7 @@
 	This program is free software; you can redistribute and/or modify
 	it under the terms of the Open S.T.A.L.K.E.R. Mod License version 1.0.
 -]]
+-- TODO: Remove all unused COP story functions
 
 function check_yan_ecolog_semenov_task_1_stage_1_complete(actor,npc,p)
 	if (alun_utils.load_var(npc,"yan_ecolog_semenov_task_1_count",0) >= 8) then 
@@ -134,12 +135,12 @@ function has_completed_task_prerequisites(actor,npc,p)
 	for i=1,#prereq do
 		task = prereq[i]
 		if not (info[task]) then
-			--alun_utils.printf("no task %s",task)
+			--printf("no task %s",task)
 			return false 
 		end 
 		
 		if (info[task].status ~= "completed" and info[task].status ~= "fail") then
-			--alun_utils.printf("task %s not completed %s",task,info[task].status)
+			--printf("task %s not completed %s",task,info[task].status)
 			return false 
 		end	
 	end
@@ -251,7 +252,15 @@ end
 
 function is_enemy_actor_or_companion(enemy,npc)
 	local id = enemy:id()
-	return id == 0 and true or alife():has_info(id,"npcx_is_companion") or false
+	if (id == 0) then 
+		return true 
+	end 
+	if (alife():has_info(id,"npcx_is_companion")) then
+		if (npc:relation(db.actor) >= game_object.enemy) then 
+			return true 
+		end
+	end
+	return false
 end
 
 -- current enemy at a distance greater than or equal to the specified Distance
@@ -462,7 +471,7 @@ end
 function dist_to_actor_le(actor, npc, p)
 	local d = p[1]
 	if d == nil then
-		abort("Wrong parameter in 'dist_to_actor_le' function!!!")
+		printf("Wrong parameter in 'dist_to_actor_le' function!!!")
 	end
 	return d and npc:position():distance_to_sqr(actor:position()) <= tonumber(d)^2
 end
@@ -470,7 +479,7 @@ end
 function dist_to_actor_ge(actor, npc, p)
 	local d = p[1]
 	if d == nil then
-		abort("Wrong parameter in 'dist_to_actor_ge' function!!!")
+		printf("Wrong parameter in 'dist_to_actor_ge' function!!!")
 	end
 	return d and npc:position():distance_to_sqr(actor:position()) >= tonumber(d)^2
 end
@@ -616,7 +625,7 @@ function npc_community(actor, npc, p)
 	local npc_obj
 
 	if p[1] == nil then
-		abort("Wrong number of params in npc_community")
+		printf("Wrong number of params in npc_community")
 	end
 
 	if type(npc.id) ~= "function" then
@@ -636,7 +645,7 @@ end
 
 function npc_rank(actor, npc, p)
 	if p[1] == nil then
-		abort("Wrong number of params in npc_rank")
+		printf("Wrong number of params in npc_rank")
 	end
 
 	if ranks.get_obj_rank_name(npc) == p[1] then
@@ -647,7 +656,7 @@ end
 
 function npc_profile(actor, npc, p)
 	if p[1] == nil then
-		abort("Wrong number of params in npc_profile")
+		printf("Wrong number of params in npc_profile")
 	end
 	if npc:profile_name() == p[1] then
 		return true
@@ -945,7 +954,7 @@ function check_smart_alarm_status(actor, npc, p)
 	local status = alarm_statuses[p[2]]
 
 	if status == nil then
-		abort("Wrong status[%s] in 'check_smart_alarm_status'", tostring(p[2]))
+		printf("Wrong status[%s] in 'check_smart_alarm_status'", tostring(p[2]))
 	end
 
 	local smart = SIMBOARD:get_smart_by_name(smart_name)
@@ -953,7 +962,7 @@ function check_smart_alarm_status(actor, npc, p)
 	local smart_control = smart.base_on_actor_control
 
 	if smart_control == nil then
-		abort("Cannot calculate 'check_smart_alarm_status' for smart %s", tostring(smart_name))
+		printf("Cannot calculate 'check_smart_alarm_status' for smart %s", tostring(smart_name))
 	end
 
 	return smart_control:get_status() == status
@@ -1062,7 +1071,7 @@ end
 
 function is_squad_enemy_to_actor(actor, npc, p)
 	if not p then
-		abort("Not enough arguments in 'is_squad_enemy_to_actor' funciton!")
+		printf("Not enough arguments in 'is_squad_enemy_to_actor' funciton!")
 	end
 
 	for k,v in pairs(p) do
@@ -1090,14 +1099,12 @@ end
 function hit_by_actor(actor, npc)
 	local t = db.storage[npc:id()].hit
 	local hit_by_actor = (t ~= nil and t.who == actor:id())
-	printf("_bp: hit_by_actor: %s", if_then_else(hit_by_actor, "true", "false"))
 	return hit_by_actor
 end
 
 function killed_by_actor(actor, npc)
 	local t = db.storage[npc:id()].death
 	local killed_by_actor = t ~= nil and t.killer == actor:id()
-	printf("_bp: killed_by_actor: %s", if_then_else(killed_by_actor, "true", "false"))
 	return killed_by_actor
 end
 
@@ -1109,7 +1116,7 @@ end
 
 function actor_active_detector(actor, npc, p)
 	local detector_section = p and p[1]
-	if detector_section == nil then abort("Wrong parameters in function 'actor_active_detector'") end
+	if detector_section == nil then printf("Wrong parameters in function 'actor_active_detector'") end
 	local actor_detector = db.actor:active_detector()
 	return (actor_detector ~= nil) and actor_detector:section() == detector_section
 end
@@ -1237,7 +1244,7 @@ function squad_in_zone(actor, npc, p)
 	local story_id = p[1]
 	local zone_name = p[2]
 	if story_id == nil then
-		abort("Insufficient params in squad_in_zone function. story_id[%s], zone_name[%s]", tostring(story_id), tostring(zone_name))
+		printf("Insufficient params in squad_in_zone function. story_id[%s], zone_name[%s]", tostring(story_id), tostring(zone_name))
 	end
 	if zone_name == nil then
 		zone_name = npc:name()
@@ -1247,13 +1254,13 @@ function squad_in_zone(actor, npc, p)
 
 	local squad = get_story_squad(story_id)
 	if squad == nil then
-		--abort("There is no squad with id[%s]", tostring(squad_id))
+		--printf("There is no squad with id[%s]", tostring(squad_id))
 		return false
 	end
 
 	local zone = db.zone_by_name[zone_name]
 	if zone == nil then
-		--abort("There is no squad with id[%s]", tostring(zone_name))
+		--printf("There is no squad with id[%s]", tostring(zone_name))
 		return false
 	end
 
@@ -1272,12 +1279,12 @@ function squad_has_enemy(actor, npc, p)
 	local story_id = p[1]
 
 	if story_id == nil then
-		abort("Insufficient params in squad_has_enemy function. story_id [%s]", tostring(story_id))
+		printf("Insufficient params in squad_has_enemy function. story_id [%s]", tostring(story_id))
 	end
 
 	local squad = get_story_squad(story_id)
 	if squad == nil then
-		--abort("There is no squad with id[%s]", tostring(story_id))
+		--printf("There is no squad with id[%s]", tostring(story_id))
 		return false
 	end
 
@@ -1297,16 +1304,16 @@ function squad_in_zone_all(actor, npc, p)
 	local story_id = p[1]
 	local zone_name = p[2]
 	if story_id == nil or zone_name == nil then
-		abort("Insufficient params in squad_in_zone_all function. story_id[%s], zone_name[%s]", tostring(story_id), tostring(zone_name))
+		printf("Insufficient params in squad_in_zone_all function. story_id[%s], zone_name[%s]", tostring(story_id), tostring(zone_name))
 	end
 	local squad = get_story_squad(story_id)
 	if squad == nil then
-		--abort("There is no squad with id[%s]", tostring(story_id))
+		--printf("There is no squad with id[%s]", tostring(story_id))
 		return false
 	end
 	local zone = db.zone_by_name[zone_name]
 	if zone == nil then
-		--abort("There is no squad with id[%s]", tostring(zone_name))
+		--printf("There is no squad with id[%s]", tostring(zone_name))
 		return false
 	end
 	local se_obj
@@ -1349,7 +1356,7 @@ end
 --' Проверка в таргет кондлисте задания, соответствует ли имя сквада переданному
 function target_squad_name(actor, obj, p)
 	if p[1] == nil then
-		abort("Wrong parameters")
+		printf("Wrong parameters")
 	end
 	if not(obj) then
 		return false
@@ -1370,7 +1377,7 @@ end
 --' Проверка в таргет кондлисте задания, соответствует ли имя смарта переданному
 function target_smart_name(actor, smart, p)
 	if p[1] == nil then
-		abort("Wrong parameters")
+		printf("Wrong parameters")
 	end
 	--callstack()
 	return smart:name() == p[1]
@@ -1380,7 +1387,7 @@ end
 function squad_exist(actor, npc, p)
 	local story_id = p[1]
 	if story_id == nil then
-		abort("Wrong parameter story_id[%s] in squad_exist function", tostring(story_id))
+		printf("Wrong parameter story_id[%s] in squad_exist function", tostring(story_id))
 	end
 	local squad = get_story_squad(story_id)
 
@@ -1404,7 +1411,7 @@ end
 function squad_npc_count_ge(actor, npc, p)
 	local story_id = p[1]
 	if story_id == nil then
-		abort("Wrong parameter squad_id[%s] in 'squad_npc_count_ge' function", tostring(squad_id))
+		printf("Wrong parameter squad_id[%s] in 'squad_npc_count_ge' function", tostring(squad_id))
 	end
 	local squad = get_story_squad(story_id)
 
@@ -1429,19 +1436,19 @@ end
 
 function signal_rocket_flying(actor, npc, p)
 	if p==nil then
-		abort("Signal rocket name is not set!")
+		printf("Signal rocket name is not set!")
 	end
 	if db.signal_light[p[1]] then
 		return db.signal_light[p[1]]:is_flying()
 	else
-		abort("No such signal rocket: [%s] on level", tostring(p[1]))
+		printf("No such signal rocket: [%s] on level", tostring(p[1]))
 	end
 	return false
 end
 
 function quest_npc_enemy_actor(actor, npc, p)
 	if p[1] == nil then
-		abort("wrong story id")
+		printf("wrong story id")
 	else
 		local obj = get_story_object(p[1])
 		if obj and IsStalker(obj) then
@@ -1468,7 +1475,7 @@ end
 --[[
 function npc_stay_offline(actor, npc, p)
 	if p == nil then
-		abort("Wrong parameter!!!")
+		printf("Wrong parameter!!!")
 	end
 	if npc and db.actor then
 		if is_smart_in_combat(actor, npc, p) then
@@ -1533,7 +1540,7 @@ end
 --						2 - полностью видимый
 
 function check_bloodsucker_state(actor, npc, p)
-	if (p and p[1]) == nil then abort("Wrong parameters in function 'check_bloodsucker_state'!!!") end
+	if (p and p[1]) == nil then printf("Wrong parameters in function 'check_bloodsucker_state'!!!") end
 	local state = p[1]
 	if p[2] ~= nil then
 		state = p[2]
@@ -1773,7 +1780,7 @@ function jup_b221_who_will_start(actor, npc, p) -- доступные параметры: ability 
 		end
 	end
 	if (p and p[1]) == nil then
-		abort("No such parameters in function 'jup_b221_who_will_start'")
+		printf("No such parameters in function 'jup_b221_who_will_start'")
 	end
 	if tostring(p[1]) == "ability" then
 		return #reachable_theme ~= 0 -- если таблица пуста значит нет доступных тем и ненадо играть сцену
@@ -1781,7 +1788,7 @@ function jup_b221_who_will_start(actor, npc, p) -- доступные параметры: ability 
 ---------Выберем рандомам елемент составленой таблицы и проверим к какой груперовки он пренадлежит :)
 		return reachable_theme[math.random(1, #reachable_theme)] <= 6 -- если меньше 6-ти значит ДОЛГ если больше 6-ти значит СВОБОДА
 	else
-		abort("Wrong parameters in function 'jup_b221_who_will_start'")
+		printf("Wrong parameters in function 'jup_b221_who_will_start'")
 	end
 end
 
@@ -2384,7 +2391,7 @@ function obj_on_job(actor,npc,p)
 	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
 	local st = id and db.storage[id]
 	local obj = id and (st and st.object or level.object_by_id(id))
-	--alun_utils.printf("obj=%s",obj and obj:name())
+	--printf("obj=%s",obj and obj:name())
 	if not (p[3]) then
 		return obj and obj:alive() or false
 	end
@@ -2401,7 +2408,7 @@ function is_obj_on_job(actor,npc,p)
 	local id = smart and smart.npc_by_job_section[p[1]]
 	local st = id and db.storage[id]
 	local obj = id and (st and st.object or level.object_by_id(id))
-	--alun_utils.printf("obj=%s",obj and obj:name())
+	--printf("obj=%s",obj and obj:name())
 	if not (p[3]) then
 		return obj and obj:alive() or false
 	end

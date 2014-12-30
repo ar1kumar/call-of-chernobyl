@@ -27,7 +27,7 @@ function se_monster:switch_online()
     cse_alife_monster_base.switch_online(self)
 	-- This is a good way to debug if certain mutant is causing issues
 	--if (dev_debug) then
-		--alun_utils.printf("se_monster:switch_online() [%s]",self:name())
+		--printf("se_monster:switch_online() [%s]",self:name())
 		--get_console():execute("flush")
 	--end
 end
@@ -114,7 +114,7 @@ function se_monster:on_death(killer)
 		if squad == nil then
 			--printf("sim_board squads")
 			--print_table(SIMBOARD.squads)
-			abort("There is no squad with ID [%s]", self.group_id)
+			printf("There is no squad with ID [%s]", self.group_id)
 		end
 		squad:on_npc_death(self,killer)
 	end

@@ -47,7 +47,7 @@ function Crelease_body:__init()
 
 	local snd_ini = ini_file("misc\\death_generic.ltx")
 	if not snd_ini:section_exist("keep_items") then
-		abort("There is no section [keep_items] in death_generic.ltx")
+		printf("There is no section [keep_items] in death_generic.ltx")
 	end
 	local n = snd_ini:line_count("keep_items")
 	local value = ""
@@ -121,7 +121,7 @@ local function release_object(p)
 		return false
 	end
 
-	--alun_utils.printf("safe released %s",se_obj:name())
+	--printf("safe released %s",se_obj:name())
 	sim:release(se_obj,true)
 
 	return true
@@ -150,7 +150,7 @@ function Crelease_body:clear(all,dist,now)
 		se_obj = sim:object(id)
 		if (se_obj and not se_obj:alive()) and (IsStalker(se_obj) or IsMonster(se_obj)) then
 			if (all or pos:distance_to_sqr(se_obj.position) >= dist) then
-				--alun_utils.printf("release_body_manager:safe_remove_npc: releasing %s from the game",se_obj:name())
+				--printf("release_body_manager:safe_remove_npc: releasing %s from the game",se_obj:name())
 
 				if (now) then
 					sim:release(se_obj,true)

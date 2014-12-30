@@ -1626,6 +1626,9 @@ C++ class alife_simulator {
     function create(alife_simulator*, string, const vector&, number, number, number);
     function create(alife_simulator*, string, const vector&, number, number);
 
+	--Alundaio: START
+	function teleport_object(number,number,number,vector&); -- (id,game_vertex_id,level_vertex_id,position)
+	--Alundaio: END
 };
 
 C++ class CALifeSmartTerrainTask {
@@ -11893,6 +11896,9 @@ namespace  {
     function IsImportantSave();
     function GetFontLetterica25();
     function system_ini();
+	--Alundaio: START
+	function reload_system_ini();
+	--Alundaio: END
     function GetFontMedium();
     function alife();
     function flush();
@@ -11978,6 +11984,11 @@ namespace  {
         function start_weather_fx_from_time(string, number);
         function hide_indicators_safe();
         function debug_actor();
+		--Alundaio: START
+		function get_target_obj(); --returns target game_object at cursor
+		function get_target_dist(); -- returns distance of target at cursor 
+		function send(net_packet&,boolean bReliable = 0, boolean bSequential = 1, boolean bHighPriority = 0, boolean bSendImmediately = 0); -- update level packet
+		--Alundaio: END
     };
  
     namespace relation_registry {

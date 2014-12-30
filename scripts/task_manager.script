@@ -42,7 +42,7 @@ function CRandomTask:give_task(task_id)
 	printf("CRandomTask:give_task() task_id[%s]", tostring(task_id))
 
 	if not task_ini:section_exist(task_id) then
-		abort("There is no task [%s] in task ini_file or ini_file is not included!!!", task_id)
+		printf("There is no task [%s] in task ini_file or ini_file is not included!!!", task_id)
 	end
 	self.task_info[task_id] = task_objects.CGeneralTask(task_id)
 

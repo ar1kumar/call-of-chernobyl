@@ -419,7 +419,7 @@ function state_manager:__init(npc)
 end
 function state_manager:set_state(state_name, callback, timeout, target, extra)
 	if state_lib.states[state_name] == nil then
-		abort("ERROR: ILLEGAL SET STATE CALLED!!! %s for %s", tostring(state_name), self.npc:name())
+		printf("ERROR: ILLEGAL SET STATE CALLED!!! %s for %s", tostring(state_name), self.npc:name())
 		return
 	end
 
@@ -622,7 +622,7 @@ function bind_manager(object)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
 
 	action = manager:action(stalker_ids.action_anomaly_planner)
-	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
+	action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
 
 	action = manager:action(stalker_ids.action_danger_planner)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))

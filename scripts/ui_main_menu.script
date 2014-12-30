@@ -35,7 +35,7 @@ function main_menu:InitControls()
 
 	local _ver = xml:InitStatic		("static_version",self)
 	local mm						= _G.main_menu.get_main_menu()
-	_ver:TextControl():SetText		("ver. " .. mm:GetGSVer().." + Call of Chernobyl BETA (Dec-18-2014) by Team EPIC")
+	_ver:TextControl():SetText		("ver. " .. mm:GetGSVer().." + Call of Chernobyl BETA (Dec-29-2014) by Team EPIC")
 
     self.l_mgr = mm:GetLoginMngr()
     self.acc_mgr = mm:GetAccountMngr()
@@ -400,11 +400,18 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 					console:execute	("start server(" .. fname .. "/single/alife/load) client(localhost)")
 				else
 					console:execute	("load " .. fname)
-			end
+				end
 				if (axr_main) then axr_main.on_save_game_load(fname) end
-		end
+			end
 		elseif (dik == DIK_keys.DIK_Q) then
 			self:OnMessageQuitWin()
+		elseif (dik == DIK_keys.DIK_NUMPAD0) then 
+			if (reload_system_ini) then 
+				reload_system_ini()
+				alun_utils.printf("system_ini_reload = success!")
+			end
+			local var = alun_utils.read_from_ini(nil,"actor","crouch_coef")
+			alun_utils.printf("crouch_coef=%s",var)
 		end
 
 	end

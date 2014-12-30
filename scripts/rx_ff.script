@@ -175,87 +175,6 @@ function action_verso:initialize()
 	npc:set_desired_direction()
 end
 
-function action_verso:try_go_aside_friend(npc,pos)
-	
-	local friend = self.st.friend_id and db.storage[self.st.friend_id] and db.storage[self.st.friend_id].object 
-	if not (friend) then 
-		return 
-	end 
-	
-	local mypos = npc:position()
-	
-	if (mypos:distance_to_sqr(friend:position()) < 3) then 
-		return 
-	end
-
-	--alun_utils.debug_nearest(npc,"try_to_strafe")
-	local _dir = utils.vector_copy_by_val(mypos):sub(pos)
-	local dir = {}
-	dir[1] = vector_rotate_y(utils.vector_copy_by_val(_dir),-90)
-	dir[2] = vector_rotate_y(utils.vector_copy_by_val(_dir),90)
-	local vid
-	local radius = 12
-	local base_point = friend:level_vertex_id()
-	
-	for i=1,2 do
-		while (radius > 0) do
-			vid = level.vertex_in_direction(base_point,dir[i],radius)
-			if (validate(npc,vid)) then 
-				return alun_utils.lmove(npc,vid)
-			end
-			radius = radius - 2
-		end
-	end
-end 
-
-function action_verso:try_go_position(npc,pos)
-	local vid = level.vertex_id(pos)
-	if (validate(npc,vid)) then 
-		return alun_utils.lmove(npc,vid)
-	end 
-end 
-
-function action_verso:try_go_backward(npc)
-	--alun_utils.debug_nearest(npc,"try_go_backward")
-	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math_random(160,200))
-	local vid
-	local radius = 10
-	local base_point = npc:level_vertex_id()
-	while (radius > 0) do
-		vid = level.vertex_in_direction(base_point,dir,radius)
-		if (validate(npc,vid)) then
-			return alun_utils.lmove(npc,vid)
-		end
-		radius = radius - 2
-	end
-end 
-
-function action_verso:try_go_cover(npc,pos)
-	local vid = alun_utils.find_close_cover(npc,npc:position(),pos,8,db.used_level_vertex_ids)
-	return validate(npc,vid) and alun_utils.lmove(npc,vid)
-end 
-
-function action_verso:try_to_strafe(npc)
-	--alun_utils.debug_nearest(npc,"try_to_strafe")
-	local _dir = npc:direction()
-	local dir = {}
-	dir[1] = vector_rotate_y(utils.vector_copy_by_val(_dir),-90)
-	dir[2] = vector_rotate_y(utils.vector_copy_by_val(_dir),90)
-	local vid
-	local radius = 10
-	local base_point = npc:level_vertex_id()
-	
-	for i=1,2 do
-		while (radius > 0) do
-			vid = level.vertex_in_direction(base_point,dir[i],radius)
-			if (validate(npc,vid)) then 
-				return alun_utils.lmove(npc,vid)
-			end
-			radius = radius - 2
-		end
-	end
-end 
-
 function action_verso:execute()
 	action_base.execute(self)
 	
@@ -268,10 +187,12 @@ function action_verso:execute()
 	
 	npc:set_item(object.aim1,npc:active_item())
 	npc:set_sight(look.fire_point,alun_utils.safe_bone_pos(be))
+	npc:set_desired_direction()
 	
 	if not (self.st.vertex_id) then
 		local be_pos = be:position()
-		self.st.vertex_id = self:try_to_strafe(npc) or self:try_go_aside_friend(npc,be_pos) or self:try_go_position(npc,be_pos)
+		local friend = self.st.friend_id and db.storage[self.st.friend_id] and db.storage[self.st.friend_id].object 
+		self.st.vertex_id = alun_utils.try_to_strafe(npc) or alun_utils.try_go_aside_object(npc,friend,be_pos) or alun_utils.try_go_position(npc,be_pos)
 	end
 	
 	if (self.st.vertex_id == nil or self.st.vertex_id == npc:level_vertex_id()) then
@@ -283,11 +204,7 @@ function action_verso:execute()
 		return 
 	end
 
-	if (character_community(npc) == "monolith") then 
-		state_mgr.set_state(npc,"assault",nil,nil,{look_object = be})
-	else 
-		state_mgr.set_state(npc,"patrol",nil,nil,{look_object = be})
-	end
+	state_mgr.set_state(npc,"assault",nil,nil,{look_object = be})
 end
 
 function action_verso:finalize()
@@ -337,7 +254,7 @@ function add_to_binder(npc,ini,scheme,section,storage)
 		if (action) then
 			action:add_precondition(world_property(evid_dont_shoot,false))
 		else
-			alun_utils.printf("xr_corpse_detection: no action id p[%s]",i)
+			printf("xr_corpse_detection: no action id p[%s]",i)
 		end
 	end
 

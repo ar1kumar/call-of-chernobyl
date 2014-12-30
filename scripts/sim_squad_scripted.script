@@ -79,7 +79,7 @@ function sim_squad_scripted:set_squad_behaviour()
 	self.behaviour		= {}
 	local behaviour_section = utils.cfg_get_string(system_ini(), self:section_name(), "behaviour", self, false, "", self.player_id)
 	if not squad_behaviour_ini:section_exist(behaviour_section) then
-		abort("There is no section ["..behaviour_section.."] in 'misc\\squad_behaviours.ltx'")
+		printf("There is no section ["..behaviour_section.."] in 'misc\\squad_behaviours.ltx'")
 	end
 	local n = squad_behaviour_ini:line_count(behaviour_section)
 	local result, prop_name, prop_condlist
@@ -128,7 +128,7 @@ function sim_squad_scripted:update()
 		local se_actor = sim:actor()
 		local gg = game_graph()
 
-		--alun_utils.printf("m_game_vertex_id=%s actor.m_game_vertex_id=%s",self.m_game_vertex_id,se_actor.m_game_vertex_id)
+		--printf("m_game_vertex_id=%s actor.m_game_vertex_id=%s",self.m_game_vertex_id,se_actor.m_game_vertex_id)
 		if (se_actor and gg:valid_vertex_id(self.m_game_vertex_id) and gg:valid_vertex_id(se_actor.m_game_vertex_id)) then
 			local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
 			local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
@@ -144,7 +144,7 @@ function sim_squad_scripted:update()
 					end
 					simulation_objects.get_sim_obj_registry():unregister(self)
 					self.disabled = true
-					--alun_utils.printf("%s disabled",self:name())
+					--printf("%s disabled",self:name())
 					return
 				end
 			end
@@ -633,7 +633,7 @@ function sim_squad_scripted:create_npc(spawn_smart)
 			self:add_squad_member(random_spawn[random_id], base_spawn_position, base_lvi, base_gvi)
 		end
 	elseif #spawn_sections == 0 then
-		abort("You are trying to spawn an empty squad [%s]!!!", settings_id)
+		printf("You are trying to spawn an empty squad [%s]!!!", settings_id)
 	end
 
 
@@ -659,13 +659,16 @@ function sim_squad_scripted:set_squad_sympathy(sympathy)
 		end
 	end
 end
+
 local function set_relation(npc1, npc2, new_relation)
 	local goodwill = tonumber(new_relation) or new_relation == "enemy" and -1000 or new_relation == "friend" and 1000 or 0
+	-- IMPORTANT: Don't use 'relation =' for monster squad descriptions! They are not derived from CSE_ALifeTraderAbstract!
+	-- I could just add check IsStalker but needless overhead
 	if npc1 and npc2 then
-		alun_utils.printf("set_relation %s",npc1)
+		--printf("set_relation %s",npc1:name())
 		npc1:force_set_goodwill(goodwill, npc2.id)
 	else
-		abort("Npc not set in goodwill function!!!")
+		printf("Npc not set in goodwill function!!!")
 	end
 end
 function sim_squad_scripted:set_squad_relation(relation)
@@ -749,7 +752,7 @@ end
 function sim_squad_scripted:get_squad_community()
 	local squad_community = squad_community_by_behaviour[self.player_id]
 	if squad_community == nil then
-		abort("squad community is 'nil' for player_id [%s]", self.player_id)
+		printf("squad community is 'nil' for player_id [%s]", self.player_id)
 	end
 	return squad_community
 end
@@ -813,7 +816,7 @@ function sim_squad_scripted:STATE_Read(packet, size)
 	end
 
 	if (self.id == 22579) then 
-		alun_utils.printf("self.current_target_id=%s self.smart_id=%s",self.current_target_id,self.smart_id)
+		printf("self.current_target_id=%s self.smart_id=%s",self.current_target_id,self.smart_id)
 	end
 	self:init_squad_on_load()
 	set_save_marker(packet, "load", true, "sim_squad_scripted")
@@ -880,7 +883,7 @@ end
 function sim_squad_scripted:switch_online()
 	cse_alife_online_offline_group.switch_online(self)
 	--if (dev_debug) then
-		--alun_utils.printf("sim_squad_scripted:switch_online() [%s]",self:name())
+		--printf("sim_squad_scripted:switch_online() [%s]",self:name())
 		--get_console():execute("flush")
 	--end
 end

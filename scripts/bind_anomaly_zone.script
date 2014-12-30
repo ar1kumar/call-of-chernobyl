@@ -72,7 +72,7 @@ function anomaly_zone_binder:__init(obj) super(obj)
 		self.forces_table[section].y = utils.cfg_get_number(ini, section, "applying_force_y", nil, false, def_app_force_y)
 		arts = utils.cfg_get_string(ini, section, "artefacts", nil, false, "", def_arts)
 		if arts == nil then
-			abort("There is no field 'artefacts' in section [%s] in obj [%s]", section, obj:name())
+			printf("There is no field 'artefacts' in section [%s] in obj [%s]", section, obj:name())
 		end
 		self.artefacts_table[section] = parse_names(arts)
 
@@ -96,18 +96,18 @@ function anomaly_zone_binder:__init(obj) super(obj)
 
 		path = utils.cfg_get_string(ini, section, "artefact_ways", nil, false, "", def_ways)
 		if path == nil then
-			abort("There is no field 'artefact_ways' in section [%s] in obj [%s]", section, obj:name())
+			printf("There is no field 'artefact_ways' in section [%s] in obj [%s]", section, obj:name())
 		end
 		self.path_table[section] = parse_names(path)
 
 		if #self.path_table[section] < self.max_artefacts_table[section] then
-			--abort("Not enough ways for anomal zone [%s], in section [%s], must be at least [%s]", tostring(obj:name()), tostring(section), tostring(self.max_artefacts_table[section]))
+			--printf("Not enough ways for anomal zone [%s], in section [%s], must be at least [%s]", tostring(obj:name()), tostring(section), tostring(self.max_artefacts_table[section]))
 		end
 
 		if(self.custom_placement) then
 			field = utils.cfg_get_string(ini, section, "field_name", nil, false, "", def_field_name)
 			if field == nil then
-				--abort("There is no field 'field_name' in section [%s] in obj [%s]", section, obj:name())
+				--printf("There is no field 'field_name' in section [%s] in obj [%s]", section, obj:name())
 				self.fields_table[section] = {}
 			else
 				self.fields_table[section] = parse_names(field)--field
@@ -115,11 +115,11 @@ function anomaly_zone_binder:__init(obj) super(obj)
 
 			mines_section = utils.cfg_get_string(ini, section, "mines_section", nil, true, "", nil)
 			if mines_section == nil then
-				abort("There is no field 'mines_section' in section [%s] in obj [%s]", section, obj:name())
+				printf("There is no field 'mines_section' in section [%s] in obj [%s]", section, obj:name())
 			end
 
 			if ini:line_count(mines_section) == 0 then
-				--abort("There is no 'mines_names' in section [%s] in obj [%s]", mines_section, obj:name())
+				--printf("There is no 'mines_names' in section [%s] in obj [%s]", mines_section, obj:name())
 			end
 
 			self.mines_table[section] = {}
@@ -289,7 +289,7 @@ function anomaly_zone_binder:get_artefact_path()
 	end
 
 	if #temp_table < 1 then
-		--abort("No free way to spawn artefact in anomal zone [%s]", tostring(self.object:name()))
+		--printf("No free way to spawn artefact in anomal zone [%s]", tostring(self.object:name()))
 		return self.path_table[self.cur_layer][math.random(1, #self.path_table[self.cur_layer])]
 	end
 

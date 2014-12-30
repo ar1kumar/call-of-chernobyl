@@ -1,6 +1,6 @@
 --Copyright (C) 2014 Alundaio
 --This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
-
+--TODO: Fix heli aim targetting!
 
 -- disable it entirely
 local ENABLE = true
@@ -108,7 +108,7 @@ end
 local function find_valid_target(npc,st,bw)
 	--alun_utils.debug_write("axr_new_combat.find valid target")
 	if (st.overflowdetect) then
-		alun_utils.printf("C Stack Overflow Prevention: warning axr_new_combat scheme making repeated calls without return; save now and reload!")
+		printf("C Stack Overflow Prevention: warning axr_new_combat scheme making repeated calls without return; save now and reload!")
 		return false
 	end
 	
@@ -203,7 +203,7 @@ local function find_valid_target(npc,st,bw)
 			
 			-- Only target the closest target
 			if (dist < be_dist and xr_combat_ignore.is_enemy(npc,target) == true) then
-				--alun_utils.printf("closer target %s",target and target:name())
+				--printf("closer target %s",target and target:name())
 				st.target_id = target:id()
 				st.__keep_target_until = tg + 6000
 				return true
@@ -287,11 +287,11 @@ function evaluator_new_combat:evaluate()
 
 	local best_weapon = npc:best_weapon()
 	local clsid = best_weapon and best_weapon:clsid()
-	if (best_weapon) and (override or GLOBAL_OVERRIDE or not alun_utils.isRifle(nil,clsid)) then
+	if (best_weapon) and (override or GLOBAL_OVERRIDE or not (alun_utils.isRifle(nil,clsid) or alun_utils.isPistol(nil,clsid))) then
 		if (find_valid_target(npc,self.st) == true) then
 			--alun_utils.debug_write("after find valid target 1")
 			self.st.bw = best_weapon
-			--alun_utils.printf("has target %s",self.st.target_id and db.storage[self.st.target_id] and db.storage[self.st.target_id].object and db.storage[self.st.target_id].object:name())
+			--printf("has target %s",self.st.target_id and db.storage[self.st.target_id] and db.storage[self.st.target_id].object and db.storage[self.st.target_id].object:name())
 			return true		
 		end
 		--alun_utils.debug_write("after find valid target 2")
@@ -343,7 +343,8 @@ function action_new_combat:npc_see(enemy)
 			end
 		end
 	else 
-		return self.object:see(enemy) or time_global()-self.object:memory_time(enemy) <= 2000
+		--return self.object:see(enemy) or time_global()-self.object:memory_time(enemy) <= 2000
+		return time_global()-self.object:memory_time(enemy) <= 2000
 	end
 	
 	return false
@@ -406,8 +407,10 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 			--local vel = enemy:get_helicopter():GetCurrVelocity()
 			--vec = enemy:position()
 			--npc:set_sight(look.fire_point,vector():set(vec.x+vel,vec.y+vel+1,vec.z+vel))
-			npc:set_sight(look.fire_point,enemy:get_helicopter():GetCurrVelocityVec())
+			--npc:set_sight(look.fire_point,enemy:get_helicopter():GetCurrVelocityVec())
 			self:set_movement_type(npc,move.stand)
+			npc:set_sight(look.fire_point,ene_pos)
+			self.st.__keep_point_until = time_global() + 2000
 		elseif (not npc_see and not see) then
 			npc:set_sight(look.direction,npc:direction())
 		else	
@@ -1014,7 +1017,7 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 				if (dist <= 3) then
 					self:set_body_state(npc,move.standing)
 					self:set_movement_type(npc,move.walk)
-					return self:try_go_backward(npc) or self:try_to_strafe(npc,enemy,ene_pos,dist) or lmove_ns(npc,npc:level_vertex_id(),self.st)
+					return random_choice(self:try_go_backward(npc),self:try_to_strafe(npc,enemy,ene_pos,dist)) or lmove_ns(npc,npc:level_vertex_id(),self.st)
 				elseif (dist <= 49) then 
 					self:set_body_state(npc,move.crouch)
 					self:set_movement_type(npc,move.walk)
@@ -1023,7 +1026,7 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 				elseif (dist <= 400) then 
 					self:set_movement_type(npc,move.walk)
 					self:set_body_state(npc,move.standing)
-					return self:try_go_enemy_position(npc,enemy,ene_pos) or self:try_go_cover_forward(npc,ene_pos)
+					return random_choice(self:try_go_enemy_position(npc,enemy,ene_pos),self:try_go_cover_forward(npc,ene_pos)) or lmove_ns(npc,npc:level_vertex_id(),self.st)
 				end
 			end
 			self:set_body_state(npc,move.standing)
@@ -1041,7 +1044,7 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 			else
 				self:set_body_state(npc,move.crouch)
 				self:set_movement_type(npc,move.walk)
-				return self:try_go_cover(npc,enemy,ene_pos,dist) or self:try_go_enemy_position(npc,enemy,ene_pos) or lmove_ns(npc,npc:level_vertex_id(),self.st)
+				return random_choice(self:try_go_cover(npc,enemy,ene_pos,dist),self:try_go_enemy_position(npc,enemy,ene_pos)) or lmove_ns(npc,npc:level_vertex_id(),self.st)
 			end
 		end
 	end
@@ -1057,7 +1060,7 @@ function action_new_combat:execute()
 	local npc = self.object
 	local enemy = self.st.target_id and (db.storage[self.st.target_id] and db.storage[self.st.target_id].object or level.object_by_id(self.st.target_id))
 	
-	--alun_utils.printf("rush attack")
+	--printf("rush attack")
 	
 	if not (enemy and enemy:alive()) then
 		self.st.target_id = nil
@@ -1171,7 +1174,7 @@ function add_to_binder(npc,ini,scheme,section,storage)
 		if (action) then
 			action:add_precondition(world_property(evaid,false))
 		else
-			alun_utils.printf("axr_new_combat: no action id p[%s]",i)
+			printf("axr_new_combat: no action id p[%s]",i)
 		end
 	end
 end

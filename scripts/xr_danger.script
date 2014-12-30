@@ -365,8 +365,7 @@ local function script_action_danger_scripted(npc,st)
 	--]]
 
 	if (st.stage == 1) then
-		--local new_vid = npc:vertex_in_direction(npc:level_vertex_id(),dir,math_random(20,35))
-		local new_vid = alun_utils.find_random_cover(npc,bdo and bdo:position() or bdo_pos,10,math_random(20,50))
+		local new_vid = random_choice(alun_utils.try_to_strafe(npc),alun_utils.try_go_backward(npc,6),alun_utils.try_go_cover(npc,bdo and bdo:position() or bdo_pos or npc:position()))
 		
 		st.lvid = nil
 
@@ -537,11 +536,11 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 			game_relations.set_npcs_relation(npc, killer, -1000)
 		end
 
-		alun_utils.printf("xr_danger.script_action_danger_corpse: forced enemies %s and %s",npc:name(), killer:name())
+		printf("xr_danger.script_action_danger_corpse: forced enemies %s and %s",npc:name(), killer:name())
 		--]]
 	end
 
-	--alun_utils.printf("stage = %s",st.stage)
+	--printf("stage = %s",st.stage)
 	if (st.stage == 1) then
 		st.lvid = bdo:level_vertex_id()
 		st.lvid = utils.send_to_nearest_accessible_vertex(npc,st.lvid)
@@ -583,7 +582,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 
 		local dist_to_killer = dst and dst.killer_last_known_position and npc:position():distance_to_sqr(dst.killer_last_known_position) or 30
 
-		local new_vid = alun_utils.find_random_cover(npc,dst and dst.killer_last_known_position or bdo and bdo:position(),10,math_random(20,50))
+		local new_vid = random_choice(alun_utils.try_to_strafe(npc),alun_utils.try_go_backward(npc,6),alun_utils.try_go_cover(npc,dst and dst.killer_last_known_position or bdo and bdo:position() or npc:position()))
 
 		if (new_vid and (not st.lvid or new_vid ~= st.lvid))then
 			st.lvid = new_vid
@@ -630,7 +629,7 @@ local function script_action_danger_attacked(npc,st,bd,best_danger_object,depend
 	local bdo = dependent_object or best_danger_object
 	local tg = time_global()
 
-	--alun_utils.printf("stage = %s",st.stage)
+	--printf("stage = %s",st.stage)
 	if (st.stage == 1) then
 
 		if not (st.last_pos) then
@@ -640,7 +639,7 @@ local function script_action_danger_attacked(npc,st,bd,best_danger_object,depend
 		local dir = st.last_pos and utils.vector_copy_by_val(st.last_pos):sub(npc:position()) or utils.vector_copy_by_val(npc:direction())
 		local dist_to_bdo = st.last_pos and npc:position():distance_to_sqr(st.last_pos) or 30
 
-		local target_vertex_id = alun_utils.find_random_cover(npc,st.last_pos or npc:position(),5,35)
+		local target_vertex_id = random_choice(alun_utils.try_to_strafe(npc),alun_utils.try_go_backward(npc,6),alun_utils.try_go_cover(npc,st.last_pos or npc:position()))
 
 		if (target_vertex_id) then
 			st.lvid = utils.send_to_nearest_accessible_vertex(npc,target_vertex_id)
@@ -706,6 +705,11 @@ function action_danger:finalize()
 	if (self.a.last_state) then
 		state_mgr.set_state(self.object,self.a.last_state)
 	end
+	
+	for k,v in pairs(db.used_level_vertex_ids) do 
+		db.used_level_vertex_ids[k] = nil
+	end 
+	
 	self.a.__warning_shot_tmr = nil
 	utils.send_to_nearest_accessible_vertex(self.object,self.object:level_vertex_id())
 	action_base.finalize(self)
@@ -804,7 +808,7 @@ function add_to_binder(object, ini, scheme, section, storage)
 		if (action) then
 			action:add_precondition( wp(evaid,false) )
 		else
-			alun_utils.printf("xr_danger: no action id p[%s]",i)
+			printf("xr_danger: no action id p[%s]",i)
 		end
 	end
 end

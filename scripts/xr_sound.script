@@ -14,12 +14,12 @@ function set_sound_play(npc_id, sound, faction, point)
 		return
 	end
 	if sound_theme.theme[sound] == nil then
-		abort("set_sound_play. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
+		printf("set_sound_play. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
 		return
 	end
 	local snd_theme = sound_theme.theme[sound]
 	if snd_theme.class_id == "looped_sound" then
-		abort("You trying to play sound [%s] which type is looped", sound)
+		printf("You trying to play sound [%s] which type is looped", sound)
 	end
 		if sound_table[npc_id] == nil or snd_theme.play_always == true then
 		if sound_table[npc_id] ~= nil then
@@ -66,10 +66,10 @@ looped_sound = {}
 function play_sound_looped(npc_id, sound)
 	local snd_theme = sound_theme.theme[sound]
 	if snd_theme == nil then
-		abort("play_sound_looped. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
+		printf("play_sound_looped. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
 	end
 	if snd_theme.class_id ~= "looped_sound" then
-		abort("You trying to play sound [%s] which type is not looped", sound)
+		printf("You trying to play sound [%s] which type is not looped", sound)
 	end
 	if looped_sound[npc_id] ~= nil and looped_sound[npc_id][sound] ~= nil and looped_sound[npc_id][sound]:is_playing(npc_id) then
 		return
@@ -347,7 +347,7 @@ function play_sound(npc, themes, timeout)
 			snd_table[t].theme = v
 			get_sound(sound_theme.theme[v], snd_table[t], npc)
 		else
-			abort("ERROR: ILLEGAL PLAY SOUND!!! %s for %s", v, npc:name())
+			printf("ERROR: ILLEGAL PLAY SOUND!!! %s for %s", v, npc:name())
 		end
 		t = t + 1
 	end
@@ -492,11 +492,11 @@ function get_sound_object(theme, t_type)
 	if not (ph_snd_themes) then
 		ph_snd_themes = {}
 		ph_snd_themes[theme] = alun_utils.collect_section(ltx,theme)
-		--alun_utils.printf("collect theme=%s",theme)
+		--printf("collect theme=%s",theme)
 	end
 
 	if (not ph_snd_themes or not ph_snd_themes[theme]) then
-		--alun_utils.printf("no ph_snd_themes theme=%s",theme)
+		--printf("no ph_snd_themes theme=%s",theme)
 		return
 	end
 
@@ -521,7 +521,7 @@ function get_sound_object(theme, t_type)
 		return
 	end
 
-	--alun_utils.printf("tablesize = %s theme=%s",table_size,theme)
+	--printf("tablesize = %s theme=%s",table_size,theme)
 	if sound_object_by_theme[theme].last_id == nil then
 		if t_type == "random" then
 			if table_size >= 2 then
