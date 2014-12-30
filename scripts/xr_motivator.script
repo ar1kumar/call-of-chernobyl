@@ -128,7 +128,10 @@ function motivator_binder:net_spawn(sobject)
 		local smart = alife():object(sobject.m_smart_terrain_id)
 		if (smart and not smart.disabled) then
 			if not (smart.arriving_npc[id]) then
-				if (smart.npc_info[id]) then 
+				if (smart.npc_info[id]) then
+					if not (smart.npc_info[id].job) then
+						smart:select_npc_job(smart.npc_info[id],true)
+					end
 					if (smart.npc_info[id].job) then
 						local smart_task = smart.npc_info[id].job.alife_task
 						force_set_position = smart_task and smart_task:position() or nil
@@ -142,14 +145,7 @@ function motivator_binder:net_spawn(sobject)
 	end
 
 	if (force_set_position) then 
-		if (self.object:accessible(force_set_position)) then
-			self.object:set_npc_position(force_set_position)
-		else 
-			local vid = self.object:accessible_nearest(force_set_position,vector())
-			if (vid) then 
-				self.object:set_npc_position(level.vertex_position(vid))
-			end
-		end
+		self.object:set_npc_position(force_set_position)
 	end
 	
 	smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_stalker, self.loaded)
