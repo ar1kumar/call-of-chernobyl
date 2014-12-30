@@ -1,6 +1,6 @@
 --Copyright (C) 2014 Alundaio
 --This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
-
+--TODO: Fix heli aim targetting!
 
 -- disable it entirely
 local ENABLE = true
@@ -287,7 +287,7 @@ function evaluator_new_combat:evaluate()
 
 	local best_weapon = npc:best_weapon()
 	local clsid = best_weapon and best_weapon:clsid()
-	if (best_weapon) and (override or GLOBAL_OVERRIDE or not alun_utils.isRifle(nil,clsid)) then
+	if (best_weapon) and (override or GLOBAL_OVERRIDE or not (alun_utils.isRifle(nil,clsid) or alun_utils.isPistol(nil,clsid))) then
 		if (find_valid_target(npc,self.st) == true) then
 			--alun_utils.debug_write("after find valid target 1")
 			self.st.bw = best_weapon
@@ -343,7 +343,8 @@ function action_new_combat:npc_see(enemy)
 			end
 		end
 	else 
-		return self.object:see(enemy) or time_global()-self.object:memory_time(enemy) <= 2000
+		--return self.object:see(enemy) or time_global()-self.object:memory_time(enemy) <= 2000
+		return time_global()-self.object:memory_time(enemy) <= 2000
 	end
 	
 	return false
@@ -406,8 +407,10 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 			--local vel = enemy:get_helicopter():GetCurrVelocity()
 			--vec = enemy:position()
 			--npc:set_sight(look.fire_point,vector():set(vec.x+vel,vec.y+vel+1,vec.z+vel))
-			npc:set_sight(look.fire_point,enemy:get_helicopter():GetCurrVelocityVec())
+			--npc:set_sight(look.fire_point,enemy:get_helicopter():GetCurrVelocityVec())
 			self:set_movement_type(npc,move.stand)
+			npc:set_sight(look.fire_point,ene_pos)
+			self.st.__keep_point_until = time_global() + 2000
 		elseif (not npc_see and not see) then
 			npc:set_sight(look.direction,npc:direction())
 		else	

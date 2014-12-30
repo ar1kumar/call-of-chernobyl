@@ -66,16 +66,6 @@ function action_door:update(delta)
 		printf("object '%s': door failed to initialize", self.object:name())
 	end
 	
-	-- clear recent openers
-	if (self.initiator) then
-		local tg = time_global()
-		if (self._last_update and tg < self._last_update) then
-			return
-		end
-		self._last_update = tg + 500
-		self.initiator = nil
-	end
-
 	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
 		return
 	end
@@ -227,7 +217,7 @@ function action_door:close_door(disable_snd)
 	else
 		self.joint:set_max_force_and_velocity(200, 3, 0)
 	end
-	self.block = true -- Закрываем и блокируем	
+	--self.block = true -- Закрываем и блокируем	
 	self.soundless_block = disable_snd
 	
 	local ph_obj = self.object:get_physics_object()
@@ -257,27 +247,13 @@ function action_door:try_switch()
 end
 
 function action_door:use_callback(door, actor)
-	alun_utils.printf("door=%s actor=%s",door and door:name(),actor and actor:name())
+	--alun_utils.printf("door=%s actor=%s",door and door:name(),actor and actor:name())
 	if self.st.locked then
 		if self.st.snd_open_start then
             xr_sound.set_sound_play(self.object:id(), self.st.snd_open_start)
 		end
 	end
 	
-	local id = actor and actor:id()
-	
-	if (id and id ~= 0) then 
-		if (self.initiator and db.storage[id] and db.storage[id].meet) then
-			-- Too many NPC trying to open the damn door, tell him to GTFO
-			db.storage[id].meet.gtfo = true
-			return
-		end
-
-		if not (self.initiator) then 
-			self.initiator = id
-		end
-	end
-
 	if self:try_switch() then
 		return
 	end

@@ -18,6 +18,8 @@ local function get_vertex(npc)
 	return npc:vertex_in_direction(npc:level_vertex_id(),dir,math.random(4,6))
 end
 
+local good_acts = { [xr_actions_id.animpoint_action + 1] = true
+}
 ---------------------------------------------------------------------------------------------------------------------
 --Evaluators
 ----------------------------------------------------------------------------------------------------------------------
@@ -58,9 +60,15 @@ function evaluator_contact:evaluate()
 			return false
 		end
 		
-		if (self.a.gtfo == true) or (self.object:has_info("npcx_is_companion") and db.actor:position():distance_to_sqr(self.object:position()) < 1.6) then
-			self.a.gtfo = true
-			return true
+		if (self.a.gtfo == true) then 
+			return true 
+		end 
+		
+		 if (self.object:has_info("npcx_is_companion") or not get_object_story_id(self.object:id())) then
+			if (db.actor:position():distance_to_sqr(self.object:position()) < 1.6) and not (good_acts[alun_utils.get_current_action_id(self.object)]) then
+				self.a.gtfo = true
+				return true
+			end
 		end 
 
 		local squad = self.object and get_object_squad(self.object)
@@ -107,9 +115,10 @@ function action_meet_wait:execute ()
 				npc:set_desired_direction()
 				state_mgr.set_state(npc,"patrol")
 				self.a.stage = 1
+				self.a.dtimer = time_global() + 4000
 			end
 		elseif (self.a.stage == 1) then
-			if (npc:level_vertex_id() == self.a.vertex_id) then
+			if (npc:level_vertex_id() == self.a.vertex_id or time_global() > self.a.dtimer) then
 				self.a.gtfo = nil
 				self.a.vertex_id = nil
 				self.a.stage = 0

@@ -86,6 +86,18 @@ function release_object(p)
 	return true
 end
 
+function teleport_squad(squad,gvid,lvid,pos)
+	if not (alife().teleport_object) then 
+		return 
+	end 
+	
+	local sim = alife()
+	sim:teleport_object(squad.id,gvid,lvid,pos)
+	for k in squad:squad_members() do
+		sim:teleport_object(k.id,gvid,lvid,pos)
+	end
+end
+
 -- Prints a formated lua table to print_table.txt for debugging purposes
 function print_table(tbl,header)
 	local txt = tostring(header) .. "\n{\n\n"
@@ -827,6 +839,8 @@ end
 
 local debug_file
 function debug_write(output,trace)
+	if true then return end
+	
 	if not (dev_debug) then
 		return
 	end

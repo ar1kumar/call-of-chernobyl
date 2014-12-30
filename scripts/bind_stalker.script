@@ -192,7 +192,7 @@ end
 function actor_binder:update(delta)
 	object_binder.update(self, delta)
 	--alun_utils.debug_write("actor update START")
-	printf("actor update start")
+	--printf("actor update start")
 	if not (db.actor:alive()) then
 		return
 	end
@@ -263,7 +263,7 @@ function actor_binder:update(delta)
 	end
 
 	-- AtmosFear
-	printf("actor update before psi_storm_manager")
+	--printf("actor update before psi_storm_manager")
 	if(self.psi_storm_manager) then
 		if(self.f_psi_storm_manager_loaded ~= true) then
 			self.psi_storm_manager:initialize()
@@ -271,15 +271,15 @@ function actor_binder:update(delta)
 		end
 		self.psi_storm_manager:update()
 	end
-	printf("actor update after psi_storm_manager before fallout_manager")
+	--printf("actor update after psi_storm_manager before fallout_manager")
 	if(self.fallout_manager) then
 		self.fallout_manager:update()
 	end
-	printf("actor update before atmosfear update")
+	--printf("actor update before atmosfear update")
 	if(self.atmosfear) then
 		self.atmosfear:update()
 	end
-	printf("actor update after atmosfear update")
+	--printf("actor update after atmosfear update")
 	if not db.actor:has_info("atmosfear_default_console_settings_loaded") then
 		self.atmosfear:loadDefaultConsoleSettings()
 		db.actor:give_info_portion("atmosfear_default_console_settings_loaded")
@@ -290,18 +290,18 @@ function actor_binder:update(delta)
 	simulation_objects.get_sim_obj_registry():update_avaliability(alife():actor())
 
 	-- alundaio
-	printf("actor update before axr_main")
+	--printf("actor update before axr_main")
 	axr_main.actor_on_update(self,delta)
-	printf("actor update after axr_main and before xrs_debug_tools")
+	--printf("actor update after axr_main and before xrs_debug_tools")
 	if (xrs_debug_tools) then xrs_debug_tools.on_actor_update(self,delta) end
-	printf("actor update after xrs_debug_tools")
+	--printf("actor update after xrs_debug_tools")
 	-- alundaio
 	
 	
 	
 	local tg = time_global()
 	if (self.last_update and tg < self.last_update) then
-		printf("actor update end")
+		--printf("actor update end")
 		return
 	end
 	self.last_update = tg + 3000
@@ -309,7 +309,7 @@ function actor_binder:update(delta)
 	pda.fill_sleep_zones()
 	treasure_manager.get_treasure_manager():update()
 	
-	printf("actor update end")
+	--printf("actor update end")
 	--alun_utils.debug_write("actor update END")
 end
 ----------------------------------------------------------------------------------------------------------------------

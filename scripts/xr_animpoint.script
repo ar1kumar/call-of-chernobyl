@@ -319,6 +319,9 @@ function animpoint:get_action()
 end
 
 function animpoint:update()
+	if not (self.position) then
+		return
+	end
 	local tmp_actions = {}
 	local descr = self.st.description
 

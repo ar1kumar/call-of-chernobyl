@@ -772,7 +772,7 @@ function npc_on_update(npc,st)
 				end
 				if not have_shell then
 					local shell = shells[math.random(#shells)]
-					printf("npc_update[%s]:spawn %s",npc:name(),shell)
+					--printf("npc_update[%s]:spawn %s",npc:name(),shell)
 					alife():create(shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 				end
 			end

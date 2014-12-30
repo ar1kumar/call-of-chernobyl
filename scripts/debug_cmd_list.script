@@ -104,6 +104,15 @@ function cmd.echo(me,txt,owner,p)
 	return txt
 end
 
+-- reload_system_ini
+function cmd.reload_system_ini(me,text,owner,p)
+	if (reload_system_ini) then 
+		reload_system_ini()
+		return "reload_system_ini:= success"
+	end
+	return "reload_system_ini:= failure, engine does not have this function!"
+end
+
 -- Community
 function cmd.community(me,txt,owner,p)
 	local wrd = first_word(me,txt,owner,"<community>")
@@ -515,7 +524,35 @@ function cmd.squad(me,txt,owner,p)
 	local wrd = first_word(me,txt,owner,"{assign}")
 	if not (wrd) then return end
 
-	if (string.find(wrd,"assign")) then
+	if (string.find(wrd,"teleport")) then 
+		local id,squad,a_id,target
+		if (string.find(txt,"id:")) then
+			for s in string.gmatch(txt,"id:(%d+)") do
+				id = tonumber(s)
+			end
+
+			squad = alife():object(id)
+			if not (squad) then
+				return "squad:= improper id used. id:%s",id
+			end
+		end
+		
+		if (string.find(txt,"target:")) then
+			for s in string.gmatch(txt,"target:(%d+)") do
+				a_id = tonumber(s)
+			end
+
+			target = alife():object(a_id)
+			if not (target) then
+				return "squad:= target by id %s does not exist.",a_id
+			end
+		end
+
+		if (squad and target) then
+			alun_utils.teleport_squad(squad,target.m_game_vertex_id,target.m_level_vertex_id,target.position)
+			return "squad := %s teleported to %s.",squad:name(),target:name()
+		end
+	elseif (string.find(wrd,"assign")) then
 		local id,squad,a_id,target
 		if (string.find(txt,"id:")) then
 			for s in string.gmatch(txt,"id:(%d+)") do
@@ -569,7 +606,7 @@ function cmd.teleport(me,txt,owner,p)
 	local wrd = first_word(me,txt,owner,"who:<id> [ to:<id> | pos:<x,y,z> | $code$ | cam ]")
 	if not (wrd) then return end
 
-	local who,to_pos
+	local who,to_pos,to_obj
 
 	if (string.find(txt,"who:")) then
 		local who_id
@@ -589,12 +626,12 @@ function cmd.teleport(me,txt,owner,p)
 			id = tonumber(s)
 		end
 
-		local obj = alife():object(id)
-		if not (obj) then
+		to_obj = alife():object(id)
+		if not (to_obj) then
 			return "teleport := Wrong arugment given or object doesn't exist. id:%s",id
 		end
 
-		to_pos = obj.position
+		to_pos = to_obj.position
 	else
 		local pos = p[1]
 
@@ -615,21 +652,37 @@ function cmd.teleport(me,txt,owner,p)
 
 		to_pos = pos
 	end
-
-	if (who and to_pos) then
-		if (db.actor:id() == who.id) then
+	
+	if (who and to_obj) then 
+		if (who.id == 0) then 
 			db.actor:set_actor_position(to_pos)
-		else
-			local object = level.object_by_id(who.id)
-			if not (object) then 
-				who.position = to_pos
-			else
-				object:set_npc_position(to_pos)
+			local pos = string.format("%0.3f, %0.3f, %0.3f",to_pos.x,to_pos.y,to_pos.z)
+			return "teleport:= %s teleported to pos:%s",who:name(),pos
+		end
+		local object = level.object_by_id(who.id)
+		if (object) then
+			object:set_npc_position(to_pos)
+			local pos = string.format("%0.3f, %0.3f, %0.3f",to_pos.x,to_pos.y,to_pos.z)
+			return "teleport:= %s teleported to pos:%s",who:name(),pos
+		end
+		if (to_obj.id == 0) then 
+			local squad = who:clsid() == clsid.online_offline_group_s and who or get_object_squad(who)
+			local sim = alife()
+			local se_actor = sim:actor()
+			if (squad and sim.teleport_object) then
+				sim.teleport_object(squad.id,se_actor.m_game_vertex_id,se_actor.m_level_vertex_id,se_actor.position)
+				local se_obj
+				for k in squad:squad_members() do
+					se_obj = k.object or k.id and sim:object(k.id)
+					if (se_obj) then
+						sim.teleport_object(se_obj.id,se_actor.m_game_vertex_id,se_actor.m_level_vertex_id,se_actor.position)
+					end
+				end
+				return "teleport:= %s teleported to %s",who:name(),se_actor:name()
 			end
 		end
-		local pos = string.format("%0.3f, %0.3f, %0.3f",to_pos.x,to_pos.y,to_pos.z)
-		return "teleport:= %s teleported to pos:%s",who:name(),pos
-	end
+		return
+	end 
 end
 
 -- Wound

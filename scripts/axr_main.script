@@ -298,6 +298,7 @@ end
 	
 --]]
 function on_game_start()
+
 	-- CoP
 	if (xrs_dyn_music) then xrs_dyn_music.on_game_start() end 
 	
@@ -421,17 +422,6 @@ function on_game_load()
 			intercepts[i] = nil
 		end
 	end
-	
-	--[[
-	local sim = alife()
-	local se_obj
-	for i=1,65534 do
-		se_obj = sim:object(i)
-		if (se_obj and se_obj:clsid() == clsid.zombie_s) then
-			sim:release(se_obj,true)
-		end
-	end
-	--]]
 end
 
 -------------------
@@ -773,12 +763,12 @@ function actor_on_save(binder,packet)
 		local actor_gv = sim and gg:vertex(sim:actor().m_game_vertex_id)
 		
 		if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
-			printf("actor changing level")
+			--printf("actor changing level")
 			if (REMOVE_ME_LC) then
 				local sim = alife()
 				local se_obj = sim:object(REMOVE_ME_LC)
 				if (se_obj) then
-					printf("removing temp level_changer %s",se_obj:name())
+					--printf("removing temp level_changer %s",se_obj:name())
 					sim:release(se_obj,true)
 				end
 			end
@@ -972,9 +962,9 @@ function npc_on_update(npc,st)
 	if (_nupdate) then
 		for i=1, #_nupdate do
 			_nupdate[i](npc,st)
-			if (log1 and debug and type(debug.traceback) == 'function') then 
-				log1(debug.traceback('\n', 2))
-			end
+			--if (log1 and debug and type(debug.traceback) == 'function') then 
+				--log1(debug.traceback('\n', 2))
+			--end
 		end
 	end
 
