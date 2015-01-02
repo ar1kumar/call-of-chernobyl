@@ -166,8 +166,6 @@ function loadLtx(name)
 		return dltx, h
 	end
 
-	alun_utils.fsgame_append("$game_gulag$",[[$game_gulag$         	= true|  false| $game_config$|        gulag\]])
-
 	local l = gulag_general.load_ltx(name)
 	if l ~= nil then
 		dltx = create_ini_file(l)
@@ -180,7 +178,7 @@ function loadLtx(name)
 	   if f~=nil then io.close(f) return true else return false end
 	end
 
-	if (file_exists(alun_utils.fspath("$game_gulag$")..name..".ltx")) then
+	if (file_exists(alun_utils.fspath("$game_config$").."gulag\\"..gname..".ltx")) then
 		dltx = ini_file("gulag\\"..name..".ltx")
 		if (dltx) then
 			dynamic_ltx[h] = dltx

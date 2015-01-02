@@ -22,7 +22,7 @@ function generic_object_binder:reinit()
 	--alun_utils.debug_write(self.object:name().."re_init() Start")
 	object_binder.reinit(self)
 
-	db.storage[self.object:id()] = empty_table(db.storage[self.object:id()])
+	db.storage[self.object:id()] = db.storage[self.object:id()] or {}
 	self.st = db.storage[self.object:id()]
 
 	if (self.object:alive()) then

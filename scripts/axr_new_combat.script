@@ -1,5 +1,8 @@
---Copyright (C) 2014 Alundaio
---This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+--[[
+	scheme_type: generic
+	author: Alundaio
+--]]
+
 --TODO: Fix heli aim targetting!
 
 -- disable it entirely
@@ -76,14 +79,6 @@ local function lmove_ns(npc,vid,st)
 	
 	npc:set_dest_level_vertex_id(vid)
 	return vid
-end
-
-local function set_generic_scheme(npc, ini, stype)
-	local st = xr_logic.assign_storage_and_bind(npc,ini,"new_combat","new_combat")
-end
-
-local function npc_add_precondition(action)
-	action:add_precondition(world_property(evaid,false))
 end
 
 local good_acts = {
@@ -227,19 +222,6 @@ local function check_overrides(npc)
 	local script_combat_type = st and st.combat_type and xr_logic.pick_section_from_condlist(db.actor, npc, st.combat_type.condlist)
 	return script_combat_type and script_combat_type == "new_combat" or false
 end 
-
---------------------------------------------------------------------------------------
---												ON_GAME_START
---------------------------------------------------------------------------------------					
-function on_game_start()
-	if not (ENABLE) then 
-		return 
-	end 
-	
-	load_scheme("axr_new_combat","new_combat",0)
-	callback_register("set_generic_scheme",set_generic_scheme)
-	callback_register("npc_add_precondition",npc_add_precondition)
-end
 
 --------------------------------------------------------------------------------------
 --												EVALUATOR NEW COMBAT
@@ -390,6 +372,8 @@ function action_new_combat:set_fire_type(dist)
 end
 
 function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
+	self.is_firing = false 
+	
 	--alun_utils.debug_write(alun_utils.sr("action_new_combat:set_item"))
 	local is_heli = IsHelicopter(enemy,self.st.cls)
 	local bw = self:find_suitable_weapon(npc,enemy)
@@ -435,6 +419,7 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 				self:set_movement_type(npc,move.stand)
 			end
 			npc:set_item(object.fire1,bw,self.st.__fire_type or 1,self.st.__fire_queue or 1500)
+			self.is_firing = true
 		else
 			npc:set_item(object.aim1,bw)
 		end
@@ -829,6 +814,13 @@ function action_new_combat:heli_combat_execute(npc,enemy,ene_pos,see,dist)
 		db.used_level_vertex_ids[self.st.vid] = nil
 	end
 	
+	if (self.is_firing) then 
+		self:set_body_state(npc,move.standing)
+		self:set_movement_type(npc,move.walk)
+		lmove_ns(npc,npc:level_vertex_id(),self.st)
+		return
+	end
+	
 	new_vid = self:try_go_cover_reload(npc,ene_pos)
 	if (new_vid == nil) then
 		if (dist <= 64) then
@@ -894,6 +886,13 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 			return
 		end
 		db.used_level_vertex_ids[self.st.vid] = nil
+	end
+	
+	if (self.is_firing) then 
+		self:set_body_state(npc,move.standing)
+		self:set_movement_type(npc,move.walk)
+		lmove_ns(npc,npc:level_vertex_id(),self.st)
+		return
 	end
 	
 	--alun_utils.debug_write(alun_utils.sr("action_new_combat:high_level_ai_execute"))
@@ -1131,44 +1130,54 @@ function action_new_combat:finalize()
 	self.st.bw = nil
 end
 
-function add_to_binder(npc,ini,scheme,section,storage)
-	local manager = npc:motivation_action_manager()
+--------------------------------------------------------------------
+--------------------------------- BINDER ---------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"new_combat",section,temp)
+end
 
-	-- Evaluators
+function add_to_binder(npc,ini,scheme,section,storage,temp)
+	local manager = npc:motivation_action_manager()
+	
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
-	else
-		manager:add_evaluator(evaid,evaluator_new_combat(npc,"eva_new_combat",storage))
+		temp.needs_configured = false
+		return 
 	end
 
-	local action = action_new_combat(npc,"act_new_combat",storage)
-	xr_logic.subscribe_action_for_events(npc, storage, action)
+	manager:add_evaluator(evaid,evaluator_new_combat(npc,"eva_new_combat",storage))
 	
-	action:add_precondition(world_property(stalker_ids.property_alive,true))
-	action:add_precondition(world_property(stalker_ids.property_danger, false))
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-	action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
-	--action:add_precondition(world_property(xr_evaluators_id.state_mgr + 1,true))
-	action:add_precondition(world_property(evaid,true))
-	action:add_effect(world_property(evaid,false))
+	temp.action = action_new_combat(npc,"act_new_combat",storage)
+	
+	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action:add_precondition(world_property(stalker_ids.property_danger, false))
+	temp.action:add_precondition(world_property(evaid,true))
+	
+	temp.action:add_effect(world_property(evaid,false))
+	
+	manager:add_action(actid,temp.action)
+	
+	xr_logic.subscribe_action_for_events(npc, storage, temp.action)
+end
 
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
+
+	if (rx_ff) then 
+		temp.action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+	end
 	if (rx_gl) then
-		action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
+		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
 	end
 	if (xrs_facer) then
-		action:add_precondition(world_property(xrs_facer.evid_facer,false))
-	end
-	if (rx_ff) then 
-		action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
 	end
 
-	manager:add_action(actid,action)
-
-	local p = {
-				stalker_ids.action_combat_planner,
-				xr_actions_id.state_mgr + 2,
-				xr_actions_id.alife
-	}
+	local manager = npc:motivation_action_manager()
+	local action
+	local p = {stalker_ids.action_combat_planner,xr_actions_id.state_mgr + 2,xr_actions_id.alife}
+	
 	for i=1,#p do
 		action = manager:action(p[i])
 		if (action) then
@@ -1177,11 +1186,15 @@ function add_to_binder(npc,ini,scheme,section,storage)
 			printf("axr_new_combat: no action id p[%s]",i)
 		end
 	end
-end
+end 
 
-function disable_scheme(npc, stype)
-	local st = db.storage[npc:id()]["new_combat"]
+function disable_generic_scheme(npc,scheme,stype)
+	local st = db.storage[npc:id()][scheme]
 	if st then
 		st.enabled = false
 	end
+end
+
+function npc_add_precondition(action)
+	action:add_precondition(world_property(evaid,false))
 end

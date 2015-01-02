@@ -98,10 +98,10 @@ local intercepts = {
 
 	-- xr_logic.script
 	on_pstor_load_all			= {},
-	set_generic_scheme			= {},
-	scheme_reset				= {},
-	scheme_disable				= {},
-	scheme_deactivate			= {},
+	--set_generic_scheme			= {},
+	--scheme_reset				= {},
+	--scheme_disable				= {},
+	--scheme_deactivate			= {},
 
 	-- bind_stalker.script
 	on_game_load				= {},
@@ -235,6 +235,7 @@ local function remove_squad(p)
 		return true
 	end
 	
+	printf("DEBUG: removing squad %s from the game",squad:name())
 	SIMBOARD:assign_squad_to_smart(squad, nil)
 	squad:remove_squad()
 	return true
@@ -252,12 +253,18 @@ local function remove_non_story_squads(p)
 					[task_functor.get_squad_id_by_task_var("zat_b7_bandit_boss_sultan_bounty_target_id",true) or 65535] = true
 					}
 	
+	local sim = alife()
+	local actor_l = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
+	local squad_l
 	for id,squad in pairs(board.squads) do
 		if (squad and squad.m_game_vertex_id and not exclude[id] and sor:get_story_id(id) == nil) then
 			-- simulation_objects.sim_dist_to(se_actor,squad) > 2000
-			if (gg:vertex(db.actor:game_vertex_id()):level_id() ~= gg:vertex(squad.m_game_vertex_id):level_id()) then
-				create_delayed_event(squad.id,"remove_squad",math.random(1,220),remove_squad,squad.id)
-				p[1] = p[1] - 1
+			squad_l = sim:level_name(gg:vertex(squad.m_game_vertex_id):level_id())
+			if (actor_l ~= squad_l) then
+				if not (string.find(simulation_objects.config:GetValue(actor_l,"target_maps",0,""),squad_l)) then
+					create_delayed_event(squad.id,"remove_squad",math.random(1,220),remove_squad,squad.id)
+					p[1] = p[1] - 1
+				end
 			end
 		end
 
@@ -299,6 +306,9 @@ end
 --]]
 function on_game_start()
 
+	modules.on_game_start()
+	
+	if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
 	-- CoP
 	if (xrs_dyn_music) then xrs_dyn_music.on_game_start() end 
 	
@@ -315,26 +325,11 @@ function on_game_start()
 	if (axr_task_manager) then axr_task_manager.on_game_start() end
 
 	-- AI Tweaks
-	if (xr_danger and xr_danger.on_game_start) then xr_danger.on_game_start() end
-	if (xr_gather_items and xr_gather_items.on_game_start) then xr_gather_items.on_game_start() end
-	if (xr_corpse_detection.on_game_start) then xr_corpse_detection.on_game_start() end
-	if (xr_combat_ignore and xr_combat_ignore.on_game_start) then xr_combat_ignore.on_game_start() end
 	if (ai_tweaks) then ai_tweaks.on_game_start() end
+	if (axr_companions) then axr_companions.on_game_start() end
 	--if (xr_visual) then xr_visual.on_game_start() end
 	if (xr_eat_medkit) then xr_eat_medkit.on_game_start() end
 	if (axr_trade_manager) then axr_trade_manager.on_game_start() end
-
-	-- SCHEMES
-	if (axr_beh) then axr_beh.on_game_start() end
-	if (axr_companions) then axr_companions.on_game_start() end
-	if (xrs_facer) then xrs_facer.on_game_start() end
-	if (xrs_kill_wounded) then xrs_kill_wounded.on_game_start() end
-	if (rx_gl) then rx_gl.on_game_start() end
-	if (rx_ff) then rx_ff.on_game_start() end
-	if (xr_campfire_point) then xr_campfire_point.on_game_start() end
-	if (axr_turn_on_campfire) then axr_turn_on_campfire.on_game_start() end
-	if (axr_new_combat) then axr_new_combat.on_game_start() end
-	if (axr_radio_in_heli) then axr_radio_in_heli.on_game_start() end
 end
 
 -------------------
@@ -391,10 +386,16 @@ function on_game_load()
 	local sor = story_objects.get_story_objects_registry()
 	local board = SIMBOARD
 	local gg = game_graph()
+	local squad_lid
+	local sim = alife()
+	local actor_l = sim:level_name(gg:vertex(db.actor:game_vertex_id()):level_id())
 	for id,squad in pairs(board.squads) do
 		if (squad and squad.m_game_vertex_id and sor:get_story_id(id) == nil) then
-			if (gg:vertex(db.actor:game_vertex_id()):level_id() ~= gg:vertex(squad.m_game_vertex_id):level_id()) then
-				count = count + 1
+			squad_l = sim:level_name(gg:vertex(squad.m_game_vertex_id):level_id())
+			if (actor_l ~= squad_l) then
+				if not (string.find(simulation_objects.config:GetValue(actor_l,"target_maps",0,""),squad_l)) then
+					count = count + 1
+				end
 			end
 		end
 	end
@@ -962,7 +963,7 @@ function npc_on_update(npc,st)
 	if (_nupdate) then
 		for i=1, #_nupdate do
 			_nupdate[i](npc,st)
-			callstack()
+			--callstack()
 		end
 	end
 
@@ -1419,12 +1420,12 @@ function main_menu_on_quit(menu)
 end
 
 ------------------
--- main_menu_on_keyboard(dik,keyboard_action,self)
+-- main_menu_on_keyboard(dik,keyboard_action,self,level_present)
 ------------------
-function main_menu_on_keyboard(dik,keyboard_action,menu)
+function main_menu_on_keyboard(dik,keyboard_action,menu,level_present)
 	if (intercepts.main_menu_on_keyboard) then
 		for i=1, #intercepts.main_menu_on_keyboard do
-			intercepts.main_menu_on_keyboard[i](dik,keyboard_action,menu)
+			intercepts.main_menu_on_keyboard[i](dik,keyboard_action,menu,level_present)
 		end
 	end
 end

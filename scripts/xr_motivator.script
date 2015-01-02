@@ -36,10 +36,11 @@ end
 
 function motivator_binder:reinit()
 	--alun_utils.debug_write(self.object:name()..":motivator_reinit() start")
+	printf("motivator_binder:reinit() %s",self.object:name())
 	object_binder.reinit(self)
 
 	local id = self.object:id()
-	db.storage[id] = empty_table(db.storage[id])
+	db.storage[id] = db.storage[id] or {}
 	db.storage[id].followers = db.storage[id].followers or {}
 
 	self.st = db.storage[id]

@@ -1,9 +1,7 @@
----- Rulix aka Bak --- 8.5.2009
--- создано на базе схемы метания гранат от   xStream  (xrs_grenade.script)
---modified by Alundaio
 --[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
+	scheme_type: generic
+	author: Rulix
+	modified_by: Alundaio
 --]]
 ---------------------------------
 evid_gl_fire = 18801
@@ -18,16 +16,10 @@ local good_acts = {[xr_actions_id.smartcover_action] = true,[xr_actions_id.smart
 local bad_acts = {xr_actions_id.stohe_meet_base+1}
 local Enable
 
-
-local function set_generic_scheme(npc, ini, stype)
-	local st = xr_logic.assign_storage_and_bind(npc,ini,"gl","gl")
-end
-
 function on_game_start()
 	local gl_ini = ini_file("ai_tweaks\\rx_gl.ltx")
 	Enable = alun_utils.read_from_ini(gl_ini,"main","enabled","bool",false)
 	if not (Enable) then return end
-	load_scheme("rx_gl","gl",0)
 
 	callback_register("on_game_load",on_game_load)
 	callback_register("actor_on_update",actor_on_update)
@@ -35,8 +27,6 @@ function on_game_start()
 	callback_register("npc_on_update",npc_on_update)
 	callback_register("npc_on_hit_callback",npc_on_hit_callback)
 	callback_register("npc_on_death_callback",npc_on_death_callback)
-	callback_register("set_generic_scheme",set_generic_scheme)
-	--callback_register("scheme_disable",disable_scheme)
 
 	gl_sets = {forbiddens = {weapons = {},factions = {},npcs = {}},
 				weapons = {},
@@ -811,59 +801,76 @@ function get_atn_vel(obj)
 	return vel
 end
 
-function add_to_binder(npc,ini,scheme,section,storage)
-	if not (Enable) then
-		return
-	end
+---------------------------------------------------------
+---------------------- binder ---------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"gl",section,temp)
+end
+
+function add_to_binder(npc,ini,scheme,section,storage,temp)
 	local manager = npc:motivation_action_manager()
+
 	if (gl_sets.forbiddens.factions[npc:character_community()] or gl_sets.forbiddens.npcs[npc:name()]) then
 		manager:add_evaluator(evid_gl_fire,property_evaluator_const(false))
 		manager:add_evaluator(evid_gl_reload,property_evaluator_const(false))
-		return
+		temp.needs_configured = false
+		return 
 	end
+	
+	temp.action = {}
+
 	manager:add_evaluator(evid_gl_fire,evaluator_launch_grenade(npc,"eva_launch_grenade",storage))
 	manager:add_evaluator(evid_gl_reload,evaluator_reload_gl(npc,"eva_reload_gl",storage))
-	local action = action_launch_grenade(npc,"act_launch_grenade",storage)
-	action:add_precondition(world_property(stalker_ids.property_alive,true))
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-	if xrs_facer then
-		action:add_precondition(world_property(xrs_facer.evid_facer,false))
-	end
-
-	action:add_precondition(world_property(evid_gl_fire,true))
-	action:add_effect(world_property(evid_gl_fire,false))
-	manager:add_action(actid_gl_fire,action)
-	action = action_reload_gl(npc,"act_reload_gl",storage)
-	action:add_precondition(world_property(stalker_ids.property_alive,true))
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-
-	if xrs_facer then
-		action:add_precondition(world_property(xrs_facer.evid_facer,false))
-	end
-	if rx_ff then
-		action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
-	end
-	if rx_knife then
-		action:add_precondition(world_property(rx_knife.evid_knife_attack,false))
-	end
-
-	action:add_precondition(world_property(evid_gl_reload,true))
-	action:add_effect(world_property(evid_gl_reload,false))
-	manager:add_action(actid_gl_reload,action)
-	for i,id in ipairs({xr_actions_id.alife,stalker_ids.action_combat_planner,stalker_ids.action_danger_planner}) do
-		action = manager:action(id)
-		action:add_precondition(world_property(evid_gl_fire,false))
-		action:add_precondition(world_property(evid_gl_reload,false))
-	end
+	
+	temp.action[actid_gl_fire] = action_launch_grenade(npc,"act_launch_grenade",storage)
+	temp.action[actid_gl_reload] = action_reload_gl(npc,"act_reload_gl",storage)
+	
+	temp.action[evid_gl_fire]:add_precondition(world_property(evid_gl_fire,true))
+	temp.action[evid_gl_fire]:add_effect(world_property(evid_gl_fire,false))
+	manager:add_action(actid_gl_fire,temp.action[actid_gl_fire])
+	
+	temp.action[evid_gl_reload]:add_precondition(world_property(evid_gl_reload,true))
+	temp.action[evid_gl_reload]:add_effect(world_property(evid_gl_reload,false))
+	manager:add_action(actid_gl_reload,temp.action[actid_gl_reload])
 end
 
-function disable_scheme(npc,stype)
-	local st = db.storage[npc:id()]["gl"]
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	if xrs_facer then
+		temp.action[evid_gl_fire]:add_precondition(world_property(xrs_facer.evid_facer,false))
+	end
+
+	temp.action[evid_gl_fire]:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action[evid_gl_fire]:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+
+	temp.action[evid_gl_reload]:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action[evid_gl_reload]:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+	
+	if xrs_facer then
+		temp.action[evid_gl_reload]:add_precondition(world_property(xrs_facer.evid_facer,false))
+	end
+	if rx_ff then
+		temp.action[evid_gl_reload]:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+	end
+	if rx_knife then
+		temp.action[evid_gl_reload]:add_precondition(world_property(rx_knife.evid_knife_attack,false))
+	end
+
+	local manager = npc:motivation_action_manager()
+	local action
+	local p = {xr_actions_id.alife,stalker_ids.action_combat_planner,stalker_ids.action_danger_planner}
+	
+	for i=1,#p do
+		action = manager:action(p[i])
+		if (action) then
+			action:add_precondition(world_property(evid_gl_fire,false))
+			action:add_precondition(world_property(evid_gl_reload,false))
+		end
+	end
+end 
+
+function disable_generic_scheme(npc,scheme,stype)
+	local st = db.storage[npc:id()][scheme]
 	if st then
 		st.enabled = false
 	end
-end
-
-function printf(txt,...)
-	--printf(txt,...)
 end

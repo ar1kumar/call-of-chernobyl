@@ -33,12 +33,15 @@ function mob_death:death_callback(victim, who)
 end
 
 ---------------------------------------------------------------------------------------------------------------------
-function add_to_binder(npc, ini, scheme, section, storage)
- 	local action = mob_death(npc, storage)
- 	xr_logic.subscribe_action_for_events(npc, storage, action)
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local death_section = utils.cfg_get_string(ini, section, "on_death", npc, false, "")
+	if (death_section) then
+		local st = xr_logic.assign_storage_and_bind(npc,ini,"mob_death",death_section,temp)
+		st.logic = xr_logic.cfg_get_switch_conditions(ini, death_section, npc)
+	end
 end
 
-function set_scheme(npc, ini, scheme, section, gulag_name)
-	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
-	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+function add_to_binder(npc,ini,scheme,section,st,temp)
+ 	st.action = mob_death(npc,st)
+ 	xr_logic.subscribe_action_for_events(npc,st,st.action)
 end

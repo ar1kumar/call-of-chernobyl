@@ -214,6 +214,12 @@ function vector_rotate_y (v, angle)
 end
 
 ----------------------------------------------------------------------------------------------------------------------
+function set_scheme(object, ini, scheme, section)
+	local st = xr_logic.assign_storage_and_bind(object, ini, scheme, section)
+	st.logic				= xr_logic.cfg_get_switch_conditions(ini, section, npc)
+	st.behavior = beh_walk_simple
+end
+
 function add_to_binder(npc, ini, scheme, section, storage)
 	--printf("_bp: add_to_binder (companion)")
 	local operators    = {}
@@ -243,10 +249,4 @@ function add_to_binder(npc, ini, scheme, section, storage)
 
 	new_action = manager:action(xr_actions_id.alife)
 	new_action:add_precondition(world_property(properties["need_companion"], false))
-end
-
-function set_scheme(object, ini, scheme, section)
-	local st = xr_logic.assign_storage_and_bind(object, ini, scheme, section)
-	st.logic				= xr_logic.cfg_get_switch_conditions(ini, section, npc)
-	st.behavior = beh_walk_simple
 end

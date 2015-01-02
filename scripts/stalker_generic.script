@@ -215,13 +215,13 @@ end
 function reset_invulnerability(npc, ini, section)
 	local invulnerability = is_need_invulnerability(npc)
 
-	printf("RESET INVULNERABILITY. npc[%s] = [%s]", npc:name(), tostring(invulnerability))
+	--printf("RESET INVULNERABILITY. npc[%s] = [%s]", npc:name(), tostring(invulnerability))
 	if npc:invulnerable() ~= invulnerability then
 		npc:invulnerable(invulnerability)
 	end
 end
 function disable_invulnerability(npc)
-	printf("DISABLE INVULNERABILITY. npc[%s] = [false]", npc:name())
+	--printf("DISABLE INVULNERABILITY. npc[%s] = [false]", npc:name())
 	npc:invulnerable(false)
 end
 
@@ -229,7 +229,7 @@ function update_invulnerability(npc)
 	local invulnerability = is_need_invulnerability(npc)
 
 	if npc:invulnerable() ~= invulnerability then
-		printf("UPDATE INVULNERABILITY. npc[%s] = [%s]", npc:name(), tostring(invulnerability))
+		--printf("UPDATE INVULNERABILITY. npc[%s] = [%s]", npc:name(), tostring(invulnerability))
 		npc:invulnerable(invulnerability)
 	end
 end

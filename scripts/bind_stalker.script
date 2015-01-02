@@ -64,7 +64,6 @@ function actor_binder:net_spawn(data)
 
 	-- alundaio
 	axr_main.on_game_load()
-	if (xrs_debug_tools) then xrs_debug_tools.on_game_load() end
 	-- end alundaio
 
 	return true
@@ -292,12 +291,7 @@ function actor_binder:update(delta)
 	-- alundaio
 	--printf("actor update before axr_main")
 	axr_main.actor_on_update(self,delta)
-	--printf("actor update after axr_main and before xrs_debug_tools")
-	if (xrs_debug_tools) then xrs_debug_tools.on_actor_update(self,delta) end
-	--printf("actor update after xrs_debug_tools")
 	-- alundaio
-	
-	
 	
 	local tg = time_global()
 	if (self.last_update and tg < self.last_update) then

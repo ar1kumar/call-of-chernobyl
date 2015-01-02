@@ -1,11 +1,8 @@
----- Rulix aka Bak --- 29.7.2009
--- modified by Alundaio
---Copyright (C) 2014 Alundaio
-
-function printf(s,...)
-	--ai_tweaks.printf("ff:"..s,...)
---	get_console():execute("flush")
-end
+--[[
+	scheme_type: generic
+	author: Rulix
+	modified_by: Alundaio
+--]]
 
 --------------------------------------
 evid_dont_shoot = 18803
@@ -42,25 +39,11 @@ local function get_vertex(npc,dir,st)
 	end
 end
 
-local function set_generic_scheme(npc, ini, stype)
-	local st = xr_logic.assign_storage_and_bind(npc,ini,"rx_ff","rx_ff")
-end
-
-local function npc_add_precondition(action)
-	action:add_precondition(world_property(evid_dont_shoot,false))
-end
-
 local good_acts = {
 					[xr_actions_id.smartcover_action] = true,
 					[xr_actions_id.smartcover_action+2] = true,
 					[xr_actions_id.wounded_exist] = true
 					}
-function on_game_start()
-	load_scheme("rx_ff","rx_ff",0)
-	callback_register("set_generic_scheme",set_generic_scheme)
-	callback_register("npc_add_precondition",npc_add_precondition)
-end
-
 
 class "evaluator_dont_shoot" (property_evaluator)
 function evaluator_dont_shoot:__init(npc,name,storage) super (nil, name)
@@ -214,35 +197,49 @@ function action_verso:finalize()
 		self.st.vertex_id = nil
 	end
 end
+------------------------------------------------------------------
+----------------- binder 
 
-function add_to_binder(npc,ini,scheme,section,storage)
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"rx_ff",section,temp)
+end
+
+function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 
 	-- Evaluators
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evid_dont_shoot,property_evaluator_const(false))
-	else
-		manager:add_evaluator(evid_dont_shoot,evaluator_dont_shoot(npc,"eva_dont_shoot",storage))
+		temp.needs_configured = false
+		return
 	end
 
-	local action = action_verso(npc,"act_dont_shoot",storage)
-	action:add_precondition(world_property(stalker_ids.property_alive,true))
-	action:add_precondition(world_property(stalker_ids.property_enemy,true))
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-	action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
-	--action:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
-	action:add_precondition(world_property(evid_dont_shoot,true))
-	action:add_effect(world_property(evid_dont_shoot,false))
+	manager:add_evaluator(evid_dont_shoot,evaluator_dont_shoot(npc,"eva_dont_shoot",st))
+
+	temp.action = action_verso(npc,"act_dont_shoot",st)
+	
+	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action:add_precondition(world_property(stalker_ids.property_enemy,true))
+	temp.action:add_precondition(world_property(evid_dont_shoot,true))
+	temp.action:add_effect(world_property(evid_dont_shoot,false))	
+	
+	manager:add_action(actid_dont_shoot,temp.action)
+end
+
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
+	--temp.action:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
 
 	if rx_gl then
-		action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
+		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
 	end
 	if xrs_facer then
-		action:add_precondition(world_property(xrs_facer.evid_facer,false))
+		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
 	end
 
-	manager:add_action(actid_dont_shoot,action)
-
+	local manager = npc:motivation_action_manager()
+	local action
 	local p = {
 				stalker_ids.action_combat_planner,
 				--xr_actions_id.state_mgr + 1,
@@ -257,15 +254,15 @@ function add_to_binder(npc,ini,scheme,section,storage)
 			printf("xr_corpse_detection: no action id p[%s]",i)
 		end
 	end
+end 
 
---	action = manager:action(xr_actions_id.alife)
---	action:add_precondition(world_property(evid_dont_shoot,false))
-
-end
-
-function disable_scheme(npc, stype)
+function disable_generic_scheme(npc,scheme,stype)
 	local st = db.storage[npc:id()]["rx_ff"]
 	if st then
 		st.enabled = false
 	end
+end
+
+function npc_add_precondition(action)
+	action:add_precondition(world_property(evid_dont_shoot,false))
 end

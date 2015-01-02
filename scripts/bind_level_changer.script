@@ -43,7 +43,7 @@ function lchanger_binder:net_spawn(sobject)
     db.add_obj(obj)
 
     self.st.s_obj = alife():object(obj:id())
-    obj:enable_level_changer(self.st.s_obj.enabled)
+    --obj:enable_level_changer(self.st.s_obj.enabled or true)
     obj:set_level_changer_invitation(self.st.s_obj.hint)
     return true
 end

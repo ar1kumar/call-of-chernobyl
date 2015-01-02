@@ -1,8 +1,8 @@
 ----------------------------------------------------------------------------------------------------------------------
--- Alundaio (original: Stohe)
 --[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+	scheme_type: generic
+	author: Stohe
+	modified_by: Alundaio
 --]]
 ----------------------------------------------------------------------------------------------------------------------
 
@@ -325,41 +325,42 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 -- BINDER
 ----------------------------------------------------------------------------------------------------------------------
-function add_to_binder(npc, char_ini, scheme, section, st)
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"help_wounded",section,temp)
+end
+
+function add_to_binder(npc,char_ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 
-	-- Evaluators
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(xr_evaluators_id.wounded_exist,property_evaluator_const(false))
-	else
-		manager:add_evaluator(xr_evaluators_id.wounded_exist, evaluator_wounded_exist("wounded_exist", st))
-	end
-
+		temp.needs_configured = false
+		return 
+	end 
+	
 	local wp = world_property
+	
+	manager:add_evaluator(xr_evaluators_id.wounded_exist, evaluator_wounded_exist("wounded_exist", st))
 
-	-- Actions
-	local action = action_help_wounded (npc:name(),"action_help_wounded", st)
-	action:add_precondition( wp(stalker_ids.property_alive, true) )
-	action:add_precondition( wp(xr_evaluators_id.wounded_exist, true) )
-	action:add_precondition( wp(stalker_ids.property_anomaly,false) )
-	action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base, false) )
+	temp.action = action_help_wounded (npc:name(),"action_help_wounded", st)
+	temp.action:add_precondition(wp(stalker_ids.property_alive, true))
+	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
+	
+	temp.action:add_effect(wp(xr_evaluators_id.wounded_exist, false))
+	
+	manager:add_action(xr_actions_id.wounded_exist, temp.action)
+end
 
-
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	local wp = world_property
+	
+	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base, false))
+	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist, true))
+	
+	local manager = npc:motivation_action_manager()
+	local action
+	
 	local vis = npc:get_visual_name()
-	if not (HelpInCombat or HelpInCombatVisuals[vis]) then
-		action:add_precondition( wp(stalker_ids.property_enemy,	false) )
-		action:add_precondition( wp(stalker_ids.property_danger,false) )
-		--action:add_precondition( wp(xr_danger.evaid,false) )
-	end
-
-	action:add_effect( wp(xr_evaluators_id.wounded_exist, false) )
-	--action:add_effect( wp(xr_evaluators_id.state_mgr + 4,false) )
-
-	manager:add_action(xr_actions_id.wounded_exist, action)
-
-	--action = manager:action(stalker_ids.action_danger_planner)
-	--action:add_precondition( wp(properties["wounded_exist"],false) )
-
 	if (HelpInCombat or HelpInCombatVisuals[vis]) then
 		action = manager:action(stalker_ids.action_combat_planner)
 		action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
@@ -380,15 +381,9 @@ function add_to_binder(npc, char_ini, scheme, section, st)
 			printf("xr_help_wounded: no action id p[%s]",i)
 		end
 	end
-end
+end 
 
-function set_help_wounded(npc, ini, scheme, section)
-	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
-end
-
-
-function reset_help_wounded(npc, scheme, st, section)
-	local t = db.storage[npc:id()]
+function reset_generic_scheme(npc,scheme,section,stype,t)
 	if not (t) then
 		return
 	end

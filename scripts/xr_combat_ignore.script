@@ -1,11 +1,8 @@
 --[[
-	xr_combat_ignore.script
-	Alundaio (Original: Stohe? GSC)
-
-	Copyright (C) 2014 Alundaio
-	This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+	scheme_type: generic
+	author: Stohe
+	modified_by: Alundaio
 --]]
-
 
 fighting_with_actor_npcs = {}
 safe_zone_npcs = {}
@@ -359,23 +356,26 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
-function add_to_binder( npc, ini, scheme, section, storage )
-	local new_action = this.action_process_enemy( npc, storage )
-	storage.action = new_action
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"combat_ignore",section,temp)
 end
 
-function set_combat_ignore_checker( npc, ini, scheme)
-	local st = xr_logic.assign_storage_and_bind( npc, ini, scheme )
+function add_to_binder(npc,ini,scheme,section,st,temp)
+	st.action = action_process_enemy(npc,st)
 end
 
-function reset_combat_ignore_checker(npc, scheme, st, section)
+function reset_generic_scheme(npc,scheme,section,stype,st)
 	local storage = st.combat_ignore
-	npc:set_enemy_callback( storage.action.enemy_callback, storage.action )
-	xr_logic.subscribe_action_for_events( npc, storage, storage.action )
+	if not (storage) then 
+		printf("xr_combat_ignore: reset_generic_scheme storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
+		return
+	end
+	npc:set_enemy_callback(storage.action.enemy_callback,storage.action)
+	xr_logic.subscribe_action_for_events(npc, storage, storage.action)
 	storage.enabled = true
 end
 
-function disable_scheme( npc, scheme )
+function disable_generic_scheme(npc,scheme,stype)
 	npc:set_enemy_callback()
 
 	local st = db.storage[npc:id()][scheme]

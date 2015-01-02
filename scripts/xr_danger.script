@@ -1,7 +1,8 @@
-----------------------------------------------------------------------------------------------------------------------
--- xr_danger
--- re-written by Alundaio
-----------------------------------------------------------------------------------------------------------------------
+--[[
+	scheme_type: generic
+	author: Alundaio
+	modified_by: 
+--]]
 
 --------------------
 evaid = 188113
@@ -762,70 +763,6 @@ function evaluator_check_danger:evaluate()
 
 	return true
 end
-----------------------------------------------------------------------------------------------------------------------
--- BINDER
-----------------------------------------------------------------------------------------------------------------------
-function add_to_binder(object, ini, scheme, section, storage)
-	local manager = object:motivation_action_manager()
-	local danger_action = manager:action(stalker_ids.action_danger_planner)
-	local danger_action_planner = cast_planner(danger_action)
-
-	manager:remove_evaluator(stalker_ids.property_danger)
-	manager:add_evaluator(stalker_ids.property_danger, this.evaluator_danger("danger", storage, object))
-	manager:add_evaluator(evaid, this.evaluator_check_danger("script_danger",storage,object) )
-
-	danger_action_planner:remove_evaluator(stalker_ids.property_danger)
-	danger_action_planner:add_evaluator(stalker_ids.property_danger, this.evaluator_danger("danger", storage, object))
-
-	local wp = world_property
-
-	danger_action:add_precondition( wp(evaid, false) )
-
-	local action = action_danger("danger", storage)
-	action:add_precondition( wp(stalker_ids.property_alive, true) )
-	--action:add_precondition( wp(stalker_ids.property_danger, true) )
-	--action:add_precondition( wp(xr_evaluators_id.state_mgr + 1,true) )
-
-	action:add_precondition( wp(stalker_ids.property_enemy, false) )
-	action:add_precondition( wp(stalker_ids.property_anomaly, false) )
-	action:add_precondition( wp(evaid, true) )
-
-	action:add_effect( wp(evaid,false) )
-	action:add_effect( wp(stalker_ids.property_danger, false) )
-
-	manager:add_action(actid,action)
-
-	--action = manager:action(stalker_ids.action_combat_planner)
-	--action:add_precondition( wp(evaid, false) )
-
-	local p = {
-				xr_actions_id.alife,
-				xr_actions_id.state_mgr + 1,
-				xr_actions_id.state_mgr + 2
-	}
-	for i=1,#p do
-		action = manager:action(p[i])
-		if (action) then
-			action:add_precondition( wp(evaid,false) )
-		else
-			printf("xr_danger: no action id p[%s]",i)
-		end
-	end
-end
-
-function set_danger(npc, ini, scheme, section)
-	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
-	db.storage[npc:id()].danger_flag = false
-	db.storage[npc:id()].danger_flag_scripted = nil
-end
-
-function reset_danger(npc, scheme, st, section)
-	local danger_section
-	if scheme ~= nil and scheme ~= "nil" then
-		danger_section = utils.cfg_get_string(st.ini, section, "danger", npc, false, "")
-	end
-end
-
 class "position_node"
 function position_node:__init(amt)
 	self.node = {}
@@ -865,3 +802,71 @@ function position_node:select_best_vertex_id(object,dir,lvid,min_dist,max_dist,f
 	end
 	return close and self.node[close]
 end
+
+----------------------------------------------------------------------------------------------------------------------
+-- BINDER
+----------------------------------------------------------------------------------------------------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"danger","danger",temp)
+	db.storage[npc:id()].danger_flag = false
+	db.storage[npc:id()].danger_flag_scripted = nil
+end
+
+function add_to_binder(npc,ini,scheme,section,storage,temp)
+	local manager = npc:motivation_action_manager()
+
+	manager:remove_evaluator(stalker_ids.property_danger)
+	manager:add_evaluator(stalker_ids.property_danger,evaluator_danger("danger", storage, npc))
+	manager:add_evaluator(evaid,evaluator_check_danger("script_danger",storage,npc))
+
+	local danger_action = manager:action(stalker_ids.action_danger_planner)
+	local danger_action_planner = cast_planner(danger_action)
+	
+	danger_action_planner:remove_evaluator(stalker_ids.property_danger)
+	danger_action_planner:add_evaluator(stalker_ids.property_danger,evaluator_danger("danger", storage, npc))
+
+	local wp = world_property
+
+	danger_action:add_precondition( wp(evaid, false) )
+	
+	temp.action = action_danger("danger", storage)
+	
+	temp.action:add_precondition( wp(evaid, true) )
+	temp.action:add_effect( wp(evaid,false) )
+	temp.action:add_effect( wp(stalker_ids.property_danger, false) )
+	
+	manager:add_action(actid,temp.action)
+end
+
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	local wp = world_property
+	
+	temp.action:add_precondition( wp(stalker_ids.property_alive, true) )
+	temp.action:add_precondition( wp(stalker_ids.property_enemy, false) )
+	temp.action:add_precondition( wp(stalker_ids.property_anomaly, false) )
+
+	local manager = npc:motivation_action_manager()
+	local action
+	local p = {
+				xr_actions_id.alife,
+				xr_actions_id.state_mgr + 1,
+				xr_actions_id.state_mgr + 2
+	}
+	
+	for i=1,#p do
+		action = manager:action(p[i])
+		if (action) then
+			action:add_precondition( wp(evaid,false) )
+		else
+			printf("xr_danger: no action id p[%s]",i)
+		end
+	end
+end 
+
+function reset_generic_scheme(npc,scheme,section,stype,st)
+	local danger_section
+	if scheme ~= nil and scheme ~= "nil" then
+		danger_section = utils.cfg_get_string(st.ini, section, "danger", npc, false, "")
+	end
+end
+

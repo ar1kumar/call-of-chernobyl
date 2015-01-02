@@ -1,19 +1,13 @@
----- Rulix aka Bak --- 22.6.2009
--- Modified by Alundaio 2011
 --[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
+	scheme_type: generic
+	author: Rulix
+	modified_by: Alundaio
 --]]
 
 
 -- Set to true if you want punches to make actor drop active item
 local enable_drop_item = true
 
-
-
-function printf(s, ...)
-	--printf(s,...)
-end
 
 --------------------
 evid_facer = 18815
@@ -24,10 +18,6 @@ actid_steal_up_facer = 18816
 
 local function read_from_ini(ini,sec,val,typ,def)
 	return alun_utils.read_from_ini(ini,sec,val,typ,def)
-end
-
-local function set_generic_scheme(npc, ini, stype)
-	local st = xr_logic.assign_storage_and_bind(npc,ini,"facer","facer")
 end
 
 local hit_sound = [[material\dead-body\collide\hithard06hl]]
@@ -44,11 +34,7 @@ function on_game_start()
 		state_mgr.combat_action_ids[actid_steal_up_facer] = true
 	end
 
-	load_scheme("xrs_facer","facer",0)
-	callback_register("set_generic_scheme",set_generic_scheme)
-	--callback_register("scheme_disable",disable_scheme)
 	callback_register("npc_on_hit_callback",hit_callback)
-	callback_register("npc_add_precondition",npc_add_precondition)
 
 	facer_sets =	{
 						forbiddens = { factions = {} },
@@ -438,54 +424,80 @@ function get_anim(npc) -- не буду связываться со ст манагер
 	return a1,a2
 end
 
-function add_to_binder(npc,ini,scheme,section,storage)
-	local manager = npc:motivation_action_manager()
+-----------------------------------------------------------------
+---------------------- binder -----------------------------------
 
-	if (not Enabled) or (facer_sets.forbiddens.factions and facer_sets.forbiddens.factions[npc:character_community()]) or (facer_sets.ranks and not facer_sets.ranks[ranks.get_obj_rank_name(npc)]) then
-		manager:add_evaluator(evid_facer,property_evaluator_const(false))
-		manager:add_evaluator(evid_steal_up_facer,property_evaluator_const(false))
-		return
-	end
-
-	manager:add_evaluator(evid_facer,evaluator_facer(npc,"eva_facer",storage))
-	manager:add_evaluator(evid_steal_up_facer,evaluator_steal_up(npc,"eva_steal_up_facer",storage))
-	local action = action_facer(npc,"act_facer",storage)
-	action:add_precondition(world_property(stalker_ids.property_alive,true))
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-	action:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
-	if axr_knife then
-		action:add_precondition(world_property(axr_knife.evid_knife,false))
-	end
-	if xrs_grenade and xrs_grenade.evid_aaa_grenade then
-		action:add_precondition(world_property(xrs_grenade.evid_aaa_grenade,false))
-	end
-	action:add_precondition(world_property(evid_facer,true))
-	action:add_effect(world_property(evid_facer,false))
-	manager:add_action(actid_facer,action)
-	action = action_steal_up(npc,"act_steal_up_facer",storage)
-	action:add_precondition(world_property(stalker_ids.property_alive,true))
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-	action:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
-	if axr_knife then
-		action:add_precondition(world_property(axr_knife.evid_knife,false))
-	end
-	action:add_precondition(world_property(evid_facer,false))
-	action:add_precondition(world_property(evid_steal_up_facer,true))
-	action:add_effect(world_property(evid_steal_up_facer,false))
-	manager:add_action(actid_steal_up_facer,action)
-	for i,id in ipairs({xr_actions_id.alife,stalker_ids.action_combat_planner,stalker_ids.action_danger_planner,xr_actions_id.stohe_meet_base+1}) do
-		action = manager:action(id)
-		action:add_precondition(world_property(evid_facer,false))
-		action:add_precondition(world_property(evid_steal_up_facer,false))
-	end
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"facer",section,temp)
 end
 
-function disable_scheme(npc,stype)
-	local st = db.storage[npc:id()]["facer"]
+function add_to_binder(npc,ini,scheme,section,storage,temp)
+	local manager = npc:motivation_action_manager()
+
+	if (facer_sets.forbiddens.factions and facer_sets.forbiddens.factions[npc:character_community()]) or (facer_sets.ranks and not facer_sets.ranks[ranks.get_obj_rank_name(npc)]) then
+		manager:add_evaluator(evid_facer,property_evaluator_const(false))
+		manager:add_evaluator(evid_steal_up_facer,property_evaluator_const(false))
+		temp.needs_configured = false
+		return 
+	end 
+	
+	temp.action = {}
+	
+	manager:add_evaluator(evid_facer,evaluator_facer(npc,"eva_facer",storage))
+	manager:add_evaluator(evid_steal_up_facer,evaluator_steal_up(npc,"eva_steal_up_facer",storage))
+
+	temp.action[actid_facer] = action_facer(npc,"act_facer",storage)
+	temp.action[actid_steal_up_facer] = action_steal_up(npc,"act_steal_up_facer",storage)
+	
+	temp.action[actid_facer]:add_precondition(world_property(evid_facer,true))
+	temp.action[actid_facer]:add_effect(world_property(evid_facer,false))
+	manager:add_action(actid_facer,temp.action[actid_facer])
+	
+	temp.action[actid_steal_up_facer]:add_precondition(world_property(evid_facer,false))
+	temp.action[actid_steal_up_facer]:add_precondition(world_property(evid_steal_up_facer,true))
+	temp.action[actid_steal_up_facer]:add_effect(world_property(evid_steal_up_facer,false))
+	manager:add_action(actid_steal_up_facer,temp.action[actid_steal_up_facer])
+end
+
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	temp.action[actid_facer]:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action[actid_facer]:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action[actid_facer]:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
+	if axr_knife then
+		temp.action[actid_facer]:add_precondition(world_property(axr_knife.evid_knife,false))
+	end
+	if xrs_grenade and xrs_grenade.evid_aaa_grenade then
+		temp.action[actid_facer]:add_precondition(world_property(xrs_grenade.evid_aaa_grenade,false))
+	end
+	
+	temp.action[actid_steal_up_facer]:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action[actid_steal_up_facer]:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action[actid_steal_up_facer]:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
+	if axr_knife then
+		temp.action[actid_steal_up_facer]:add_precondition(world_property(axr_knife.evid_knife,false))
+	end
+	
+	local manager = npc:motivation_action_manager()
+	local action
+	local p = {xr_actions_id.alife,stalker_ids.action_combat_planner,stalker_ids.action_danger_planner,xr_actions_id.stohe_meet_base+1}
+	
+	for i=1,#p do
+		action = manager:action(p[i])
+		if (action) then
+			action:add_precondition(world_property(evid_facer,false))
+			action:add_precondition(world_property(evid_steal_up_facer,false))
+		end
+	end
+end 
+
+--[[
+function disable_generic_scheme(npc,scheme,stype)
+	local st = db.storage[npc:id()][scheme]
 	if st then
 		st.enabled = false
 	end
 end
+--]]
 
 function npc_add_precondition(action)
 	action:add_precondition(world_property(evid_facer,false))

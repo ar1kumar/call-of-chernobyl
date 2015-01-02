@@ -8,12 +8,31 @@ Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 --]]
 
+---------------------------------------------------------------------------------------------------------
+-- HOW TO CREATE YOUR OWN HUD TOOL
+--[[ Steps:
+
+1. Add tool name to the toggle rotation for either top hud or left hud. ( ie. { "my_hud" } )
+2. create a show() function with hud name as prefix_ ( ie. local function my_hud_show() )
+3. use the add_msg() class function to add text to your new hud. ( ie. hud:add_msg("Variable",value) )
+4. call display() class function.	( ie. hud:display() )
+5. Optionally set header display ( ie. hud:set_header("-[My Hud Info]-") )
+
+--]]
+---------------------------------------------------------------------------------------------------------
+
+local toggle_hud_list = 	{
+							["top"]  = { "squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
+							["left"] = { "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
+							["right"] = { "planner_hud", "gulag_info_hud", "position_hud", "heli_hud", "wounded_hud","corpse_hud"}
+							}
+--------------------------------------------------------------------------------------------------
+
+
 -- used for debugging
 NEAREST_STALKER = nil
 
-local show_game_graph = false
 local developer_debug = true
-local spawn_all_items_on_actor = false
 local position_file = ""
 
 local keybinds
@@ -23,11 +42,8 @@ local Enable
 local hud_display_top
 local hud_display_left
 local hud_display_right
-function on_game_load()
-	local ini = ini_file("debug\\xrs_debug_tools.ltx")
-	Enable = alun_utils.read_from_ini(ini,"plugin","enable","bool",false,"xrs_debug_tools")
-	if not (Enable) then ini=nil return end
 
+local function on_game_load()
 	actor_info = {}
 	keybinds = {}
 
@@ -123,7 +139,6 @@ function on_game_load()
 	local developer_debug = alun_utils.read_from_ini(ini,"plugin","developer_debug","bool",false)
 	local debug_gulag = alun_utils.read_from_ini(ini,"plugin","debug_gulag","bool",false)
 	show_game_graph = alun_utils.read_from_ini(ini,"plugin","show_game_graph","bool",false)
-	spawn_all_items_on_actor = alun_utils.read_from_ini(ini,"plugin","spawn_all_items_on_actor","bool",false)
 	position_file = alun_utils.read_from_ini(ini,"plugin","file_save_position_info","string","positional_info.txt")
 
 	keybinds = 	{
@@ -146,31 +161,6 @@ function on_game_load()
 	hud_display_top = hud_tool("cs_debug")
 	hud_display_left = hud_tool("cop_debug")
 	hud_display_right = hud_tool("cop2_debug")
-
-	--[[
-	debug_game_graph_loaded = xr_logic.pstor_retrieve(db.actor,"debug_game_graph_loaded",nil)
-	if (show_game_graph and not debug_game_graph_loaded) then
-		local gg = game_graph()
-		for gvid=0,933 do
-			if gg:valid_vertex_id(gvid) then
-				local vertex = gg:vertex(gvid)
-
-				local level_name = alife():level_name(vertex:level_id())
-
-				local lvid = vertex:level_vertex_id()
-
-				local pos = vertex:level_point()
-
-				if (not debug_game_graph_loaded) then
-					local obj = alife():create("medkit", pos, lvid, gvid)
-					level.map_add_object_spot_ser(obj.id, "alife_combat", level_name.." Gvid:"..gvid)
-				end
-			end
-		end
-
-		xr_logic.pstor_store(db.actor,"debug_game_graph_loaded",true)
-	end
-	--]]
 end
 
 ------------------------------------------------------------------------
@@ -212,36 +202,16 @@ function hud_tool:clear()
 	end
 end
 
----------------------------------------------------------------------------------------------------------
--- HOW TO CREATE YOUR OWN HUD TOOL
---[[ Steps:
-
-1. Add tool name to the toggle rotation for either top hud or left hud. ( ie. { "my_hud" } )
-2. create a show() function with hud name as prefix_ ( ie. local function my_hud_show() )
-3. use the add_msg() class function to add text to your new hud. ( ie. hud:add_msg("Variable",value) )
-4. call display() class function.	( ie. hud:display() )
-5. Optionally set header display ( ie. hud:set_header("-[My Hud Info]-") )
-
---]]
----------------------------------------------------------------------------------------------------------
-
-local toggle_hud_list = 	{
-							["top"]  = { "squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
-							["left"] = { "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
-							["right"] = { "planner_hud", "gulag_info_hud", "position_hud", "heli_hud", "wounded_hud","corpse_hud"}
-							}
---------------------------------------------------------------------------------------------------
-
-
 -- Callback main_menu_on_keyboard
 local toggle_left_key = 1
 local toggle_top_key = 1
 local toggle_right_key = 1
 local debug_ui
-function main_menu_on_keyboard(dik,keyboard_action,main_menu)
-	if not (Enable) then
-		return
-	end
+local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present)
+	if not (level_present) then 
+		return 
+	end 
+	
 	if keyboard_action ~= ui_events.WINDOW_KEY_RELEASED then return end
 	if (keybinds["print_position"] and dik == DIK_keys["DIK_"..keybinds["print_position"]]) then
 		if (db.actor) then
@@ -326,15 +296,10 @@ end
 -- ACTOR UPDATE
 local dtimer = 0
 LastCameraPos = nil
-function on_actor_update()
+local function actor_on_update()
 	if not (Enable) then
 		return
 	end
-
-	--local cross = alun_utils.in_crosshair()
-	--if (cross) then
-	--	printf("in cross_hair %s",cross:name())
-	--end
 	
 	if (STEP) then
 		collectgarbage("step",STEP)
@@ -386,6 +351,25 @@ function on_actor_update()
 	_G["xrs_debug_tools"][left_hud.."_show"](hud_display_left)
 	_G["xrs_debug_tools"][right_hud.."_show"](hud_display_right)
 end
+
+local function actor_on_hit_callback(binder,npc,amount,local_direction,who,bone_index)
+	if (debug_god) then
+		db.actor.health = 1
+	end
+end
+------------------------------------------------------------------------------------
+--										GAME START
+function on_game_start()
+
+	local ini = ini_file("debug\\xrs_debug_tools.ltx")
+	Enable = alun_utils.read_from_ini(ini,"plugin","enable","bool",false,"xrs_debug_tools")
+	if not (Enable) then ini=nil return end
+
+	callback_register("on_game_load",on_game_load)
+	callback_register("actor_on_update",actor_on_update)
+	callback_register("main_menu_on_keyboard",main_menu_on_keyboard)
+	callback_register("actor_on_hit_callback",actor_on_hit_callback)
+end 
 
 -- NPC target for hud display ( nil = off )
 local DEBUG_NPC

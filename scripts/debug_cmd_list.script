@@ -361,6 +361,7 @@ function cmd.waypoint(me,txt,owner,p)
 	local sim = alife()
 	local actor_level = wrd == "checklevel" and sim:level_name(game_graph():vertex(sim:actor().m_game_vertex_id):level_id())
 
+	local checked = false
 	local gg = game_graph()
 	for i=1,65534 do
 		smart = sim:object(i)
@@ -372,6 +373,7 @@ function cmd.waypoint(me,txt,owner,p)
 					name = job == "sleep" and gname.."_"..job.."_"..i or gname.."_"..job.."_"..i.."_walk"
 					ptr = patrol(name)
 					if (ptr) then
+						checked = true
 						cnt = ptr:count()
 						for n=0,cnt-1 do
 						
@@ -393,7 +395,10 @@ function cmd.waypoint(me,txt,owner,p)
 		end
 	end
 
-	return "waypoint: successfully checked all gulag job paths."
+	if (checked) then
+		return "waypoint: successfully checked all gulag job paths."
+	end 
+	return "waypoint: failed, no checking done."
 end
 
 
@@ -899,6 +904,25 @@ function cmd.offset(me,txt,owner,p)
 	end
 
 end
+
+function cmd.object(me,txt,owner,p)
+	local wrd = first_word(me,txt,owner,"{count}")
+	if not (wrd) then return end
+	
+	if (wrd == "count") then
+		local count = 0
+		local a = alife()
+		local se_obj
+		for i=1, 65534 do 
+			se_obj = a:object(i)
+			if (se_obj) then 
+				count = count + 1
+			end
+		end
+		return "object:= there are %s ids in use.",count
+	end
+	return "object:= try object count <number>"
+end 
 
 function get_position_offset(npc,o)
 	local sec = o and type(o.section) == "function" and o:section()

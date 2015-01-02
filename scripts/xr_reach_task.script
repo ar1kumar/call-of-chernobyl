@@ -1,11 +1,7 @@
---[[----------------------------------------------------------------------------------------------------------
-Схема, ведущяя сталкера к месту его работы под smart terrain.
-Приводит сталкера к месту работы единожды. Дальше сталкер ходит под обычными схемами.
-Чугай Александр (chugai)
-
-script modified by Alundaio
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+--[[
+	scheme_type: generic
+	author: Chugai
+	modified_by: Alundaio
 --]]
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -491,16 +487,16 @@ end
 
 --------------------------------------------------------------------------------------------------------------
 
-function set_reach_task( npc, ini, scheme)
-	local st = xr_logic.assign_storage_and_bind( npc, ini, scheme )
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"reach_task",section,temp)
 end
 
-function add_to_binder(npc, ini, scheme, section, storage)
+function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 	local alife_action = manager:action(stalker_ids.action_alife_planner)
 	local alife_action_planner = cast_planner(alife_action)
-	local new_action = 	alife_action_planner:action(stalker_ids.action_smart_terrain_task)
-	xr_logic.subscribe_action_for_events(npc, storage, new_action)
+	st.action =	alife_action_planner:action(stalker_ids.action_smart_terrain_task)
+	xr_logic.subscribe_action_for_events(npc,st,st.action)
 end
 
 function add_reach_task_action(npc)

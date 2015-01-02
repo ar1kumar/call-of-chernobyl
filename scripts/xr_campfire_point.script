@@ -1,8 +1,10 @@
-------------------------------------------------------------------------------------
---    xr_campfire_point
--- Auto-generated point_jobs around smart_terrain bound campfires for gulag_general
--- by Alundaio
-------------------------------------------------------------------------------------
+--[[
+	scheme_type: active_section
+	author: Alundaio
+	modified_by: 
+	
+	Auto-generated point_jobs around smart_terrain bound campfires for gulag_general
+--]]
 
 -- TODO: Fix use_camp. It spams animations. use_camp manually set = false in add_to_binder.
 -- Need to make it independent of sr_camp.script so that it doesn't require space_restrictors
@@ -21,11 +23,6 @@ local assoc_tbl = 	{
 						guitar = {director = {"play_guitar"}, listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}},
 						story = {director = {"sit"}, listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}},
 					}
-
-function on_game_start()
-	load_scheme("xr_campfire_point","campfire_point",0)
-	--callback_register("scheme_set",set_scheme)
-end
 
 -----------------------------Private-----------------
 local function get_rand_vertex(npc,vo,minD,maxD)
@@ -213,37 +210,8 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
-function add_to_binder(npc, ini, scheme, section, storage)
-	local wp = world_property
-	local manager = npc:motivation_action_manager()
-
-	-- evaluators
-	manager:add_evaluator(evaid, this.evaluator_need_job(storage, "need_cover"))
-
-	local new_action = this.action_point_campfire(npc, "action_point_campfire", storage)
-	new_action:add_precondition( wp(stalker_ids.property_alive,true) )
-	new_action:add_precondition( wp(stalker_ids.property_danger,false) )
-	--new_action:add_precondition( wp(xr_danger.evaid,false) )
-	new_action:add_precondition( wp(stalker_ids.property_enemy,false) )
-	new_action:add_precondition( wp(stalker_ids.property_anomaly,false) )
-	new_action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base,false) )
-	new_action:add_precondition( wp(evaid,true) )
-
-	new_action:add_effect( wp(evaid,false) )
-	new_action:add_effect ( wp(xr_evaluators_id.state_mgr + 4, false) )
-	manager:add_action(actid, new_action)
-
-	xr_logic.subscribe_action_for_events(npc, storage, new_action)
-
-	-- actions
-	new_action = manager:action(xr_actions_id.alife)
-	new_action:add_precondition( wp(evaid, false) )
-	new_action = manager:action(xr_actions_id.state_mgr + 2)
-	new_action:add_precondition( wp(evaid, false) )
-end
-
-function set_scheme(npc, ini, scheme, section, gulag_name, stype)
-	local st = xr_logic.assign_storage_and_bind(npc, ini, "campfire_point", section)
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, "campfire_point", section,temp)
 	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
 	st.sound_idle= utils.cfg_get_string(ini, section, "sound_idle",npc, false, "")
@@ -253,4 +221,33 @@ function set_scheme(npc, ini, scheme, section, gulag_name, stype)
 
 	local use_camp = xr_logic.parse_condlist(npc, "use_camp", "use_camp", utils.cfg_get_string(ini, section, "use_camp", npc, false, "", "false"))
 	st.use_camp = xr_logic.pick_section_from_condlist(db.actor, npc, use_camp) == "true"
+end
+
+function add_to_binder(npc,ini,scheme,section,storage)
+	local wp = world_property
+	local manager = npc:motivation_action_manager()
+
+	manager:add_evaluator(evaid,evaluator_need_job(storage, "need_cover"))
+	
+	temp.action = action_point_campfire(npc, "action_point_campfire", storage)
+	temp.action:add_precondition( wp(evaid,true) )
+	temp.action:add_effect( wp(evaid,false) )
+	temp.action:add_effect( wp(xr_evaluators_id.state_mgr + 4, false) )
+	
+	manager:add_action(actid,temp.action)
+	
+	xr_logic.subscribe_action_for_events(npc, storage, temp.action)
+	
+	temp.action:add_precondition( wp(stalker_ids.property_alive,true) )
+	temp.action:add_precondition( wp(stalker_ids.property_danger,false) )
+
+	temp.action:add_precondition( wp(stalker_ids.property_enemy,false) )
+	temp.action:add_precondition( wp(stalker_ids.property_anomaly,false) )
+	temp.action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base,false) )
+
+	local action
+	action = manager:action(xr_actions_id.alife)
+	action:add_precondition( wp(evaid, false) )
+	action = manager:action(xr_actions_id.state_mgr + 2)
+	action:add_precondition( wp(evaid, false) )
 end

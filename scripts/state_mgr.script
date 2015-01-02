@@ -166,7 +166,7 @@ function evaluator_state_mgr_idle_alife:evaluate()
 		return true
 	end
 	
-	callstack()
+	--callstack()
 
 	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
 	if not (self.st.mgr and self.st.mgr:initialized()) then
@@ -246,7 +246,7 @@ function act_state_mgr_to_idle:initialize()
 end
 
 function act_state_mgr_to_idle:execute()
-	callstack()
+	--callstack()
 	action_base.execute(self)
 	if (self.st.target_state ~= "idle") and (self.object:best_enemy() or self.object:best_danger()) then
 		self.object:clear_animations()
@@ -274,7 +274,7 @@ end
 
 function eva_state_mgr_end:evaluate()
 	--alun_utils.debug_write("",true)
-	callstack()
+	--callstack()
 	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
 	if not (self.st.mgr and self.st.mgr:initialized()) then
 		return false

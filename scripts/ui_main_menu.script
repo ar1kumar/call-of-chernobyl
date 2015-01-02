@@ -373,8 +373,7 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	local console = get_console()
 	-- Alundaio
 	if (level.present()) then
-		if (axr_main) then axr_main.main_menu_on_keyboard(dik,keyboard_action,self) end
-		if (xrs_debug_tools) then xrs_debug_tools.main_menu_on_keyboard(dik,keyboard_action,self) end
+		if (axr_main) then axr_main.main_menu_on_keyboard(dik,keyboard_action,self,level.present()) end
 	end
 	-- alundaio
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
