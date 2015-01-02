@@ -563,7 +563,7 @@ function actor_on_update(se_actor,delta)
 			-- comment block this routine if need to optimize
 			local se_obj = alife():object(wpn:id())
 			local data = se_obj and stpk_utils.get_weapon_data(se_obj)
-			if (data.weapon_state == 5) then
+			if (data and data.weapon_state == 5) then
 
 				if (alun_utils.addon_attached(wpn,"sl",data.addon_flags)) then
 					actor_sound_incr = actor_sound_incr and actor_sound_incr + 1 or 1
@@ -1004,7 +1004,7 @@ function npc_on_update(npc,st)
 			local sobj = alife():object(wpn:id())
 			local data = stpk_utils.get_weapon_data(sobj)
 
-			if (st.weapon_state ~= data.weapon_state) then
+			if (data and st.weapon_state ~= data.weapon_state) then
 				npc_on_weapon_state_change(npc,wpn,st,data.weapon_state)
 				st.weapon_state = data.weapon_state
 			end
