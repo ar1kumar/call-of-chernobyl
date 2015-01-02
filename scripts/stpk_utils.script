@@ -8,9 +8,10 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 local stpk = net_packet()
 local uppk = net_packet()
 
-
-
 function get_abstract_data(stpk)
+	if (stpk:r_eof()) then 
+		return
+	end
     if (stpk:w_tell() <= 2) then
         return
     end
@@ -73,11 +74,15 @@ end
 
 function get_squad_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_alife_online_offline_group_properties_packet(t,stpk)
@@ -90,18 +95,23 @@ function set_squad_data(t,sobj)
 		stpk_utils.fill_cse_alife_object_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_online_offline_group_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end 
 
 function get_weapon_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -118,18 +128,23 @@ function set_weapon_data(t,sobj)
 		stpk_utils.fill_cse_alife_item_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_item_weapon_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
 
 function get_item_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -144,7 +159,8 @@ function set_item_data(t,sobj)
 		stpk_utils.fill_cse_visual_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_item_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
@@ -152,11 +168,15 @@ end
 
 function get_inv_box_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -171,18 +191,23 @@ function set_inv_box_data(t,sobj)
 		stpk_utils.fill_cse_visual_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_inventory_box_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
 
 function get_item_document_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -199,18 +224,23 @@ function set_item_document_data(t,sobj)
 		stpk_utils.fill_cse_alife_item_properties_packet(t,stpk)
 		stpk:w_stringZ(t.info_portion)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
 
 function get_item_pda_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -231,19 +261,21 @@ function set_item_pda_data(t,sobj)
 		stpk:w_stringZ(t.specific_character)
 		stpk:w_stringZ(t.info_portion)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
 
 function get_actor_data(sobj)
-	if not (sobj) then return {} end
+	if not (sobj) then return end
 	stpk:w_begin(0)
-	uppk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	sobj:UPDATE_Write(uppk)
-	stpk:r_seek(2)
-	uppk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -258,7 +290,6 @@ end
 function set_actor_data(t,sobj)
 	if sobj then
 		stpk:w_begin(0)
-		uppk:w_begin(0)
 		stpk_utils.fill_cse_alife_object_properties_packet(t,stpk)
 		stpk_utils.fill_cse_visual_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_creature_abstract_properties_packet(t,stpk)
@@ -267,21 +298,21 @@ function set_actor_data(t,sobj)
 		stpk_utils.fill_cse_alife_creature_actor_properties_packet(t,stpk)
 		stpk_utils.fill_se_actor_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
-		uppk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
-		sobj:UPDATE_Read(uppk)
 	end
 end 
 
 function get_stalker_data(sobj)
-	if not (sobj) then return {} end
+	if not (sobj) then return end
 	stpk:w_begin(0)
-	uppk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	sobj:UPDATE_Write(uppk)
-	stpk:r_seek(2)
-	uppk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_trader_abstract_properties_packet(t,stpk)
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -297,7 +328,6 @@ end
 function set_stalker_data(t,sobj)
 	if sobj then
 		stpk:w_begin(0)
-		uppk:w_begin(0)
 		stpk_utils.fill_cse_alife_trader_abstract_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_object_properties_packet(t,stpk)
 		stpk_utils.fill_cse_visual_properties_packet(t,stpk)
@@ -307,21 +337,24 @@ function set_stalker_data(t,sobj)
 		stpk_utils.fill_cse_ph_skeleton_properties_packet(t,stpk)
 		stpk_utils.fill_se_stalker_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
-		uppk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
-		sobj:UPDATE_Read(uppk)
 	end
 end
 
 
 function get_smart_cover_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_shape_properties_packet(t,stpk)
@@ -338,7 +371,8 @@ function set_smart_cover_data(t,sobj)
 		stpk_utils.fill_cse_smart_cover_properties_packet(t,stpk)
 		stpk_utils.fill_se_smart_cover_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
@@ -357,11 +391,15 @@ end
 
 function get_climable_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_shape_properties_packet(t,stpk)
@@ -376,18 +414,23 @@ function set_climable_data(t,sobj)
 		stpk_utils.fill_cse_shape_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_object_climable_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
 
 function get_heli_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -406,7 +449,8 @@ function set_heli_data(t,sobj)
 		stpk_utils.fill_cse_ph_skeleton_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_helicopter_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
@@ -416,23 +460,29 @@ function spawn_heli()
 	local pos = db.actor:position()
 	local se_obj = alife():create("helicopter",vector():set(pos.x,pos.y,pos.z),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 	local data = get_heli_data(se_obj)
-	data.visual_name = [[dynamics\vehicles\mi2\veh_mi2_01]]
-	data.motion_name = [[helicopter\aaa.anm]]
-	data.startup_animation = "idle"
-	data.skeleton_name = "idle"
-	data.engine_sound = [[vehicles\helicopter\helicopter]]
-	data.custom_data = "[logic]\n cfg = scripts\\heli.ltx"
-	set_heli_data(data,se_obj)
+	if (data) then
+		data.visual_name = [[dynamics\vehicles\mi2\veh_mi2_01]]
+		data.motion_name = [[helicopter\aaa.anm]]
+		data.startup_animation = "idle"
+		data.skeleton_name = "idle"
+		data.engine_sound = [[vehicles\helicopter\helicopter]]
+		data.custom_data = "[logic]\n cfg = scripts\\heli.ltx"
+		set_heli_data(data,se_obj)
+	end
 	return se_obj
 end
 
 function get_lamp_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -449,18 +499,23 @@ function set_lamp_data(t,sobj)
 		stpk_utils.fill_cse_ph_skeleton_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_object_hanging_lamp_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
 
 function get_physic_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
@@ -477,18 +532,23 @@ function set_physic_data(t,sobj)
 		stpk_utils.fill_cse_ph_skeleton_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_object_physic_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
 
 function get_space_restrictor_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_shape_properties_packet(t,stpk)
@@ -503,7 +563,8 @@ function set_space_restrictor_data(t,sobj)
 		stpk_utils.fill_cse_shape_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_space_restrictor_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
@@ -511,11 +572,15 @@ end
 
 function get_anom_zone_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_shape_properties_packet(t,stpk)
@@ -536,7 +601,8 @@ function set_anom_zone_data(t,sobj)
 		stpk_utils.fill_cse_alife_anomalous_zone_properties_packet(t,stpk)
 		stpk_utils.fill_se_zone_anom_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
@@ -545,11 +611,15 @@ end
 
 function get_level_changer_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	stpk:r_seek(2)
+	if (stpk:r_eof()) then 
+		return
+	end
+   	stpk:r_begin()
+	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_shape_properties_packet(t,stpk)
@@ -568,7 +638,8 @@ function set_level_changer_data(t,sobj)
 		stpk_utils.fill_cse_alife_level_changer_properties_packet(t,stpk)
 		stpk_utils.fill_se_level_changer_properties_packet(t,stpk)
 		local size = stpk:w_tell()
-		stpk:r_seek(2)
+		stpk:r_begin()
+		
 		sobj:STATE_Read(stpk,size)
 	end
 end
@@ -576,10 +647,13 @@ end
 
 function get_item_update_data(sobj)
 	if not sobj then
-		return {}
+		return
 	end
 	uppk:w_begin(0)
 	sobj:UPDATE_Write(uppk)
+	if (uppk:r_eof()) then 
+		return
+	end
 	uppk:r_seek(2)
 	local t = {}
 	if data_left(uppk) then

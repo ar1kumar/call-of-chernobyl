@@ -65,6 +65,7 @@ stypes = {} -- типv схем
 -- 	filename - имя файла, в котором реализована схема, без расширения
 -- 	scheme - имя схем
 function load_scheme(filename, scheme, stype)
+	assert(_G[filename],filename.." is nil!")
 	schemes[scheme] = filename
 	stypes[scheme] = stype
 end

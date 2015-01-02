@@ -1523,13 +1523,14 @@ function se_smart_terrain:try_respawn()
 					local visual = utils.cfg_get_string(system_ini(),heli,"visual",se_heli,false)
 					-- required to spawn by script
 					local data = stpk_utils.get_heli_data(se_heli)
-					data.visual_name = visual and visual ~="" and visual or [[dynamics\vehicles\mi2\veh_mi2_01]]
-					data.motion_name = [[helicopter\aaa.anm]]
-					data.startup_animation = "idle"
-					data.skeleton_name = "idle"
-					data.engine_sound = [[vehicles\helicopter\helicopter]]
-					stpk_utils.set_heli_data(data,se_heli)
-					
+					if (data) then
+						data.visual_name = visual and visual ~="" and visual or [[dynamics\vehicles\mi2\veh_mi2_01]]
+						data.motion_name = [[helicopter\aaa.anm]]
+						data.startup_animation = "idle"
+						data.skeleton_name = "idle"
+						data.engine_sound = [[vehicles\helicopter\helicopter]]
+						stpk_utils.set_heli_data(data,se_heli)
+					end
 					self:register_npc(se_heli)
 					
 					se_heli.respawn_point_id = self.id

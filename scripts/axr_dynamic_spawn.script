@@ -504,6 +504,9 @@ function dynamic.cse_alife_smart_cover(se_obj,t,sec)
 	se_obj.loopholes[t.description] = 1
 
 	local data = stpk_utils.get_smart_cover_data(se_obj)
+	if not (data) then 
+		return 
+	end
 
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
@@ -546,6 +549,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_level_changer(se_obj,t)
 	local data = stpk_utils.get_level_changer_data(se_obj)
+	if not (data) then 
+		return 
+	end
 
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
@@ -595,7 +601,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_space_restrictor(se_obj,t,sec)
 	local data = stpk_utils.get_space_restrictor_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -627,7 +635,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_anomalous_zone(se_obj,t,sec)
 	local data = stpk_utils.get_anom_zone_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -669,7 +679,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_object_hanging_lamp_properties(se_obj,t)
 	local data = stpk_utils.get_lamp_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -700,7 +712,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_item(se_obj,t)
 	local data = stpk_utils.get_item_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -718,7 +732,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_item_document(se_obj,t)
 	local data = stpk_utils.get_item_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -738,7 +754,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_item_pda(se_obj,t)
 	local data = stpk_utils.get_item_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -760,7 +778,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_item_weapon(se_obj,t)
 	local data = stpk_utils.get_weapon_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -784,7 +804,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_helicopter(se_obj,t)
 	local data = stpk_utils.get_heli_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -804,7 +826,9 @@ end
 -------------------------------------------
 function dynamic.cse_alife_stalker(se_obj,t)
 	local data = stpk_utils.get_stalker_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.money = t.money and tonumber(t.money)
 	data.specific_character = t.specific_character or data.specific_character
 	data.trader_flags = t.trader_flags and tonumber(t.trader_flags) or data.trader_flags
@@ -828,7 +852,9 @@ end
 ---------------------------------------------
 function dynamic.cse_alife_inventory_box(se_obj,t)
 	local data = stpk_utils.get_inv_box_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -847,7 +873,9 @@ end
 --------------------------------------------
 function dynamic.cse_alife_object_climable(se_obj,t)
 	local data = stpk_utils.get_climable_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
@@ -879,7 +907,9 @@ end
 --------------------------------------------
 function dynamic.cse_alife_object_physic(se_obj,t)
 	local data = stpk_utils.get_physic_data(se_obj)
-
+	if not (data) then 
+		return 
+	end
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 

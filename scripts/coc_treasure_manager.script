@@ -199,34 +199,34 @@ function create_random_stash(no_spot,hint,bonus_items)
 			if (alun_utils.item_is_fa(se_obj)) then
 				--printf("coc_treasure_manager: item is fa")
 				data = stpk_utils.get_weapon_data(se_obj)
+				if (data) then
+					-- Create random addon flag for weapon
+					flag = 0
+					if (alun_utils.read_from_ini(nil,sec,"scope_status","float",nil)) then
+						flag = flag + 1
+					end
 
-				-- Create random addon flag for weapon
-				flag = 0
-				if (alun_utils.read_from_ini(nil,sec,"scope_status","float",nil)) then
-					flag = flag + 1
+					if (alun_utils.read_from_ini(nil,sec,"grenade_launcher_status","float",nil)) then
+						flag = flag + 2
+					end
+
+					if (alun_utils.read_from_ini(nil,sec,"silencer_status","float",nil)) then
+						flag = flag + 4
+					end
+
+					flag = math.random(0,flag)
+
+					-- Create random ammo type
+					ammos = alun_utils.parse_list(system_ini(),sec,"ammo_class")
+					ct = ammos and #ammos
+					ammo_type = ammos and ct and math.random(0,ct-1) or 0
+					ammo_section = ammo_type and ammos[ammo_type+1]
+
+					data.addon_flags = flag
+					data.ammo_type = ammo_type
+					data.condition = (math.random(70)+30)/100
+					stpk_utils.set_weapon_data(data,se_obj)
 				end
-
-				if (alun_utils.read_from_ini(nil,sec,"grenade_launcher_status","float",nil)) then
-					flag = flag + 2
-				end
-
-				if (alun_utils.read_from_ini(nil,sec,"silencer_status","float",nil)) then
-					flag = flag + 4
-				end
-
-				flag = math.random(0,flag)
-
-				-- Create random ammo type
-				ammos = alun_utils.parse_list(system_ini(),sec,"ammo_class")
-				ct = ammos and #ammos
-				ammo_type = ammos and ct and math.random(0,ct-1) or 0
-				ammo_section = ammo_type and ammos[ammo_type+1]
-
-				data.addon_flags = flag
-				data.ammo_type = ammo_type
-				data.condition = (math.random(70)+30)/100
-				stpk_utils.set_weapon_data(data,se_obj)
-
 				--printf("coc_treasure_manager: item is fa- end")
 			end
 		else

@@ -137,6 +137,8 @@ function fail_task_dec_goodwill(actor,npc,p)
 	end
 end
 
+-- param1 - amount of goodwill to increase
+-- param2+ - community
 function complete_task_inc_goodwill(actor,npc,p)
 	local amt = tonumber(p[1]) or 10
 	for i=2,#p do 
@@ -204,6 +206,37 @@ function setup_task_target_anomaly(actor,npc,p)
 	alun_utils.save_var(db.actor,"task_target_anomaly",target_name)
 end
 
+function setup_artefact_fetch_task(actor,npc,p)
+	local arts = {
+	"af_cristall",
+	"af_fireball",
+	"af_dummy_glassbeads",
+	"af_eye",
+	"af_fire",
+	"af_medusa",
+	"af_cristall_flower",
+	"af_night_star",
+	"af_vyvert",
+	"af_gravi",
+	"af_gold_fish",
+	"af_blood",
+	"af_mincer_meat",
+	"af_soul",
+	"af_fuzz_kolobok",
+	"af_baloon",
+	"af_glass",
+	"af_electra_sparkler",
+	"af_electra_flash",
+	"af_electra_moonlight",
+	"af_dummy_battery",
+	"af_dummy_dummy",
+	"af_ice"
+	}
+	
+	local artefact = arts[math.random(#arts)]
+	
+	alun_utils.save_var(db.actor,"artefact_fetch",artefact)
+end 
 
 function force_talk(actor,npc,p)
 	local allow_break = p[1] and p[1] == "true" or false
@@ -3972,9 +4005,10 @@ function update_visual(p)
 	end
 
 	local data = stpk_utils.get_stalker_data(se_npc)
-	data.visual_name = p[2]
-	stpk_utils.set_stalker_data(data,se_npc)
-
+	if (data) then
+		data.visual_name = p[2]
+		stpk_utils.set_stalker_data(data,se_npc)
+	end
 	return true
 end
 

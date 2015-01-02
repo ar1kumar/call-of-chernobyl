@@ -361,6 +361,7 @@ function cmd.waypoint(me,txt,owner,p)
 	local sim = alife()
 	local actor_level = wrd == "checklevel" and sim:level_name(game_graph():vertex(sim:actor().m_game_vertex_id):level_id())
 
+	local gg = game_graph()
 	for i=1,65534 do
 		smart = sim:object(i)
 		if (smart and smart:clsid() == clsid.smart_terrain) and (wrd == "checkall" or actor_level) then
@@ -373,6 +374,12 @@ function cmd.waypoint(me,txt,owner,p)
 					if (ptr) then
 						cnt = ptr:count()
 						for n=0,cnt-1 do
+						
+							if not (gg:valid_vertex_id(ptr:game_vertex_id(n))) then
+								owner:SendOutput("path %s p%s:%s does not have valid game_vertex_id",name,n,ptr:name(n))
+								printf("path %s p%s:%s does not have valid game_vertex_id",name,n,ptr:name(n))
+							end
+			
 							if not ( (wrd == "checklevel" and alun_utils.accessible(npc,ptr:level_vertex_id(n))) or (ptr:level_vertex_id(n) < 4294967295) ) then
 								owner:SendOutput("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
 								printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
@@ -1275,22 +1282,23 @@ function cmd.level(me,txt,owner,p)
 			local pos = vertex:level_point()
 
 			data = stpk_utils.get_level_changer_data(se_obj)
+			if (data) then
+				data.dest_game_vertex_id = gvid
+				data.dest_level_vertex_id = lvid
+				data.dest_position = pos
+				data.dest_direction = vector():set(0,0,0)
+				data.dest_level_name = level
+				data.silent_mode = 1
+				
+				data.shapes[1] = {}
+				data.shapes[1].shtype = 0
+				data.shapes[1].offset = vector():set(0,0,0)
+				data.shapes[1].radius = 5
+				
+				data.hint = "level_changer_invitation"
 
-			data.dest_game_vertex_id = gvid
-			data.dest_level_vertex_id = lvid
-			data.dest_position = pos
-			data.dest_direction = vector():set(0,0,0)
-			data.dest_level_name = level
-			data.silent_mode = 1
-			
-			data.shapes[1] = {}
-			data.shapes[1].shtype = 0
-			data.shapes[1].offset = vector():set(0,0,0)
-			data.shapes[1].radius = 5
-			
-			data.hint = "level_changer_invitation"
-
-			stpk_utils.set_level_changer_data(data,se_obj)
+				stpk_utils.set_level_changer_data(data,se_obj)
+			end
 		end
 	end 
 	

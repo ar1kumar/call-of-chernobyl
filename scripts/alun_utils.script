@@ -19,25 +19,26 @@ function jump_to_level(new_level,specific_gvid,specific_lvid,specific_pos)
 				axr_main.REMOVE_ME_LC = se_obj.id
 			end 
 			data = stpk_utils.get_level_changer_data(se_obj)
-			
-			data.dest_game_vertex_id = gvid
-			data.dest_level_vertex_id = specific_lvid or vertex:level_vertex_id()
-			data.dest_position = specific_pos or specific_lvid and level.vertex_position(specific_lvid) or vertex:level_point()
-			data.dest_direction = vector():set(0,0,0)
-			data.dest_level_name = new_level
-			
-			data.silent_mode = 1
-			
-			data.shapes[1] = {}
-			data.shapes[1].shtype = 1
-			data.shapes[1].v1 = vector():set(3,0,0)
-			data.shapes[1].v2 = vector():set(0,2,0)
-			data.shapes[1].v3 = vector():set(0,0,3)
-			data.shapes[1].offset = vector():set(0,0,0)
+			if (data) then
+				data.dest_game_vertex_id = gvid
+				data.dest_level_vertex_id = specific_lvid or vertex:level_vertex_id()
+				data.dest_position = specific_pos or specific_lvid and level.vertex_position(specific_lvid) or vertex:level_point()
+				data.dest_direction = vector():set(0,0,0)
+				data.dest_level_name = new_level
+				
+				data.silent_mode = 1
+				
+				data.shapes[1] = {}
+				data.shapes[1].shtype = 1
+				data.shapes[1].v1 = vector():set(3,0,0)
+				data.shapes[1].v2 = vector():set(0,2,0)
+				data.shapes[1].v3 = vector():set(0,0,3)
+				data.shapes[1].offset = vector():set(0,0,0)
 
-			data.restrictor_type = 3
+				data.restrictor_type = 3
 
-			stpk_utils.set_level_changer_data(data,se_obj)
+				stpk_utils.set_level_changer_data(data,se_obj)
+			end
 		end
 	end
 	

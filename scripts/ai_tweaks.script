@@ -143,11 +143,13 @@ function npc_on_weapon_no_ammo(npc,wpn,st)
 	local sec = wpn:section()
 	local se_wpn = alife():object(wpn:id())
 	local data = stpk_utils.get_weapon_data(se_wpn)
-	local ammos = alun_utils.parse_list(ini,sec,"ammo_class")
+	if (data) then
+		local ammos = alun_utils.parse_list(ini,sec,"ammo_class")
 
-	local box = data.ammo_type+1 == 1 and npc:object(ammos[1]) or npc:object(ammos[2])
-	if (box) then
-		alife():release( alife():object(box:id()), true)
+		local box = data.ammo_type+1 == 1 and npc:object(ammos[1]) or npc:object(ammos[2])
+		if (box) then
+			alife():release( alife():object(box:id()), true)
+		end
 	end
 end
 
@@ -317,8 +319,10 @@ function npc_on_weapon_unstrapped(npc,weapon)
 		local function update_addon_flag(se_wpn,p)
 			if (se_wpn) then
 				local data = stpk_utils.get_weapon_data(se_wpn)
-				data.addon_flags = flag
-				stpk_utils.set_weapon_data(data,se_wpn)
+				if (data) then
+					data.addon_flags = flag
+					stpk_utils.set_weapon_data(data,se_wpn)
+				end
 			end
 		end
 		alun_utils.switch_offline_execute(se_wpn.id,update_addon_flag,flag)

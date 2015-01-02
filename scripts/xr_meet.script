@@ -64,7 +64,7 @@ function evaluator_contact:evaluate()
 			return true 
 		end 
 		
-		 if (self.object:has_info("npcx_is_companion") or not get_object_story_id(self.object:id())) then
+		 if (self.object:has_info("npcx_is_companion")) then --or not get_object_story_id(self.object:id())) then
 			if (db.actor:position():distance_to_sqr(self.object:position()) < 1.6) and not (good_acts[alun_utils.get_current_action_id(self.object)]) then
 				self.a.gtfo = true
 				return true
@@ -415,7 +415,11 @@ function Cmeet_manager:update()
 		end
 	end
 
+	if (self.a.gtfo) then 
+		self.npc:allow_break_talk_dialog(false)
+	else
 		self.npc:allow_break_talk_dialog(self.allow_break)
+	end
 --[[
 	if is_talking then
 		db.actor:allow_break_talk_dialog(self.allow_break)
