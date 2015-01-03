@@ -3,7 +3,7 @@ def_restr = jup_a6_sr_noweap
 safe_restr = jup_a6_sr_light
 smart_control = smart_control
 squad_id = 4
-max_population = {+jup_b207_attack_started} 4, 3
+max_population = 6
 respawn_params = respawn@jup_a6   
 arrive_dist = 65
 
@@ -12,12 +12,12 @@ spawn_stalker@advanced
 spawn_stalker@master
 
 [spawn_stalker@advanced]
-spawn_squads = stalker_sim_squad_advanced, ecolog_sim_squad_advanced
-spawn_num = 1
+spawn_squads = stalker_sim_squad_advanced, ecolog_sim_squad_advanced, freedom_sim_squad_advanced
+spawn_num = 2
 
 [spawn_stalker@master]
-spawn_squads = ecolog_sim_squad_veteran, stalker_sim_squad_veteran
-spawn_num = 1
+spawn_squads = stalker_sim_squad_veteran, freedom_sim_squad_veteran
+spawn_num = 2
 
 [smart_control]
 noweap_zone = jup_a6_sr_noweap
@@ -31,8 +31,41 @@ jup_b10_stalker_drunk = jupiter\jup_b10_stalker_drunk.ltx
 stalker_medik = jupiter\jup_b202_stalker_medic.ltx
 stalker_barmen = jupiter\jup_b202_stalker_barmen.ltx
 jup_b220_trapper = jupiter\jup_b220_trapper.ltx
+
 jup_a6_freedom_leader = jupiter\jup_a6_freedom_leader.ltx
-jup_a6_duty_leader = jupiter\jup_a6_duty_leader.ltx
+jup_a6_important_npc_1 = jupiter\jup_a6_duty_leader.ltx
+
+jup_a6_animp_01 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_02 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_03 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_04 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_09 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_10 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_11 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_15 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_16 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_17 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_18 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_91 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_92 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_93 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_05 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_06 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_07 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_08 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_12 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_13 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_14 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_19 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_20 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_21 = jupiter\jup_a6_logic.ltx
+
+jup_a6_duty_guarder			= jupiter\jup_a6_logic.ltx
+jup_a6_duty_guard			= jupiter\jup_a6_logic.ltx
+jup_a6_freedom_guarder		= jupiter\jup_a6_logic.ltx
+jup_a6_animp_freedom_guard	= jupiter\jup_a6_logic.ltx
+
+;----unused
 jup_b19_freedom_yar = jupiter\jup_b19_freedom_yar.ltx
 jup_a12_stalker_assaulter = jupiter\jup_a12_stalker_assaulter.ltx
 jup_a12_stalker_diplomat = jupiter\jup_a12_stalker_diplomat.ltx
@@ -53,35 +86,3 @@ jup_b25_listener_02 = jupiter\jup_b25_freedom_flint.ltx
 jup_b221_freedom_01 = jupiter\jup_b221_freedom.ltx
 jup_b221_freedom_02 = jupiter\jup_b221_freedom.ltx
 jup_b221_freedom_03 = jupiter\jup_b221_freedom.ltx
-
-;duty
-jup_a6_animp_01 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_02 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_03 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_04 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_09 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_10 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_11 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_15 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_16 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_17 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_18 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_91 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_92 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_93 = jupiter\jup_a6_logic.ltx
-;freedom
-jup_a6_animp_05 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_06 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_07 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_08 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_12 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_13 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_14 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_19 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_20 = jupiter\jup_a6_logic.ltx
-jup_a6_animp_21 = jupiter\jup_a6_logic.ltx
-
-jup_a6_duty_guarder			= jupiter\jup_a6_logic.ltx
-jup_a6_duty_guard			= jupiter\jup_a6_logic.ltx
-jup_a6_freedom_guarder		= jupiter\jup_a6_logic.ltx
-jup_a6_animp_freedom_guard	= jupiter\jup_a6_logic.ltx

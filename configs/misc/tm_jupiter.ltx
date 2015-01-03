@@ -14,6 +14,17 @@ on_complete = %=remove_special_task_squad(ecolog_companion_task_2)%
 on_fail = %=fail_task_dec_goodwill(5:ecolog:csky)%
 condlist_0 = {!squad_exist(ecolog_companion_task_2)} fail
 
+[jup_b6_scientist_tech_task_2]
+icon = ui_inGame2_Artefakti_na_zakaz
+prior = 5
+storyline = false
+title = jup_b6_scientist_tech_task_2_name
+descr = jup_b6_scientist_tech_task_2_text
+job_descr = jup_b6_scientist_tech_task_2_about
+repeat_timeout = 86400
+on_complete = %=complete_task_inc_goodwill(10:ecolog:csky)%
+on_fail = %=fail_task_dec_goodwill(5:ecolog:csky)%
+
 [jup_b220_trapper_task_1]
 icon = ui_inGame2_Nochnaya_ohota
 prior = 2

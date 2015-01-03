@@ -17,7 +17,7 @@ on_info2 = {=dist_to_actor_ge(75)} %-zat_b3_mech_greetings%, {=see_actor =dist_t
 on_info3 = {=dist_to_actor_ge(20)} %+zat_b3_tech_waked_up +zat_b3_tech_drinked_out%
 on_game_timer = 100 | %+zat_b3_tech_waked_up +zat_b3_tech_drinked_out% 
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
-combat_ignore_keep_when_attacked = {!is_enemy_actor_or_companion} true, false
+combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
@@ -53,7 +53,7 @@ on_game_timer = 37 | {-zat_b3_tech_take_dose +zat_b3_tech_out} %=play_sound(zat_
 on_game_timer2 = 42 | {+zat_b3_tech_out} animpoint@sleep %-zat_b3_tech_drinking -zat_b3_tech_take_dose -zat_b3_tech_waked_up%, animpoint@base %-zat_b3_tech_drinking -zat_b3_tech_take_dose%
 meet = no_meet
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
-combat_ignore_keep_when_attacked = {!is_enemy_actor_or_companion} true, false
+combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
@@ -69,7 +69,7 @@ on_info = {-zat_b3_tech_out} animpoint@base  %-zat_a2_mech_sleep_sound%
 on_info2 = {=dist_to_actor_ge(20)} %-zat_b3_mech_sleeping%, {=see_actor =dist_to_actor_le(4) -zat_b3_mech_sleeping +zat_a2_mech_sleep_sound} %=play_sound(zat_b3_tech_sleep_) +zat_b3_mech_sleeping%
 meet = meet@sleep
 out_restr = bar_visitors_surge_hide_a5
-combat_ignore_cond = true
+combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true
 gather_items_enabled = false
