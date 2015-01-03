@@ -538,7 +538,6 @@ function state_manager:update()
 	--alun_utils.debug_write(alun_utils.sr("goap_action = %s current_action = %s",gid,(id and xrs_debug_tools.actions_by_stalker_ids[id] or id)))
 	-- END DEBUG PLANNER
 	
-	--[[
 	local lid
 	local id = self.planner:current_action_id()
 
@@ -549,7 +548,6 @@ function state_manager:update()
 		lid = id
 		id = self.planner:current_action_id()
 	end
-	--]]
 end
 
 function set_state(npc, state_name, callback, timeout, target, extra)

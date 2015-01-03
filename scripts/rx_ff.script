@@ -124,7 +124,7 @@ function evaluator_dont_shoot:evaluate()
 		return set_flag(npc,false)
 	end 
 
-	if good_acts[npc:motivation_action_manager():current_action_id()] then
+	if good_acts[alun_utils.get_current_action_id(npc)] then
 		return set_flag(npc,false)
 	end
 	

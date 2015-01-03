@@ -467,6 +467,10 @@ function evaluator_gather_items:__init(name, storage, npc) super (nil, name)
 	self.st = storage
 end
 function evaluator_gather_items:evaluate()
+	if true then 
+		return false 
+	end 
+	
 	local enabled = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.gather_items_enabled)
 	if (enabled ~= "true") then
 		return false
@@ -492,7 +496,8 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	local wp = world_property
 	
 	manager:remove_evaluator(stalker_ids.property_items)
-	manager:add_evaluator(stalker_ids.property_items, property_evaluator_const(false))
+	manager:add_evaluator(stalker_ids.property_items,evaluator_gather_items("gather_items",st,npc))
+	--manager:add_evaluator(stalker_ids.property_items, property_evaluator_const(false))
 	
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))

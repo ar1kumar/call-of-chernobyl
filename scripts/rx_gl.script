@@ -136,7 +136,7 @@ function evaluator_launch_grenade:evaluate()
 	--alun_utils.debug_write("eva_launch_grenade")
 	local npc = self.object
 	local tg = time_global()
-	if good_acts[npc:motivation_action_manager():current_action_id()] then
+	if good_acts[alun_utils.get_current_action_id(npc)] then
 		self.st.launch = nil
 		self.st.check_time = tg+gl_sets.check_prd
 		return false
@@ -356,7 +356,7 @@ function evaluator_reload_gl:evaluate()
 	if self.st.charged then
 		return false
 	end
-	if good_acts[npc:motivation_action_manager():current_action_id()] then
+	if good_acts[alun_utils.get_current_action_id(npc)] then
 		self.evn = false
 		self.wait = time_global()+3000
 		printf("reload_gl[%s]:good act",npc:character_name())

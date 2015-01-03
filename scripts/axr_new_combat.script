@@ -236,7 +236,7 @@ end
 function evaluator_new_combat:evaluate()
 	--alun_utils.debug_write("eva_new_combat")
 	local npc = self.object
-	if good_acts[npc:motivation_action_manager():current_action_id()] then
+	if good_acts[alun_utils.get_current_action_id(npc)] then
 		return false
 	end
 	
