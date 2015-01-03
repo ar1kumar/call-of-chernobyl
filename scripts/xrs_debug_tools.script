@@ -43,126 +43,6 @@ local hud_display_top
 local hud_display_left
 local hud_display_right
 
-local function on_game_load()
-	actor_info = {}
-	keybinds = {}
-
-	actions_by_stalker_ids = {}
-	for k,v in pairs(_G.xr_actions_id) do
-		actions_by_stalker_ids[v] = k
-	end
-	actions_by_stalker_ids[4294967295] = "undefined"
-	actions_by_stalker_ids[7] = "action_accomplish_task"
-	actions_by_stalker_ids[16] = "action_aim_enemy"
-	actions_by_stalker_ids[88] = "action_alife_planner"
-	actions_by_stalker_ids[90] = "action_anomaly_planner"
-	actions_by_stalker_ids[89] = "action_combat_planner"
-	actions_by_stalker_ids[9] = "action_communicate_with_customer"
-	actions_by_stalker_ids[36] = "action_critically_wounded"
-	actions_by_stalker_ids[73] = "action_danger_by_sound_planner"
-	actions_by_stalker_ids[85] = "action_danger_grenade_look_around"
-	actions_by_stalker_ids[72] = "action_danger_grenade_planner"
-	actions_by_stalker_ids[86] = "action_danger_grenade_search"
-	actions_by_stalker_ids[82] = "action_danger_grenade_take_cover"
-	actions_by_stalker_ids[84] = "action_danger_grenade_take_cover_after_explosion"
-	actions_by_stalker_ids[83] = "action_danger_grenade_wait_for_explosion"
-	actions_by_stalker_ids[80] = "action_danger_in_direction_detour"
-	actions_by_stalker_ids[79] = "action_danger_in_direction_hold_position"
-	actions_by_stalker_ids[78] = "action_danger_in_direction_look_out"
-	actions_by_stalker_ids[71] = "action_danger_in_direction_planner"
-	actions_by_stalker_ids[81] = "action_danger_in_direction_search"
-	actions_by_stalker_ids[77] = "action_danger_in_direction_take_cover"
-	actions_by_stalker_ids[91] = "action_danger_planner"
-	actions_by_stalker_ids[75] = "action_danger_unknown_look_around"
-	actions_by_stalker_ids[70] = "action_danger_unknown_planner"
-	actions_by_stalker_ids[76] = "action_danger_unknown_search"
-	actions_by_stalker_ids[74] = "action_danger_unknown_take_cover"
-	actions_by_stalker_ids[0] = "action_dead"
-	actions_by_stalker_ids[87] = "action_death_planner"
-	actions_by_stalker_ids[25] = "action_detour_enemy"
-	actions_by_stalker_ids[1] = "action_dying"
-	actions_by_stalker_ids[15] = "action_find_ammo"
-	actions_by_stalker_ids[13] = "action_find_item_to_kill"
-	actions_by_stalker_ids[2] = "action_gather_items"
-	actions_by_stalker_ids[24] = "action_get_distance"
-	actions_by_stalker_ids[12] = "action_get_item_to_kill"
-	actions_by_stalker_ids[17] = "action_get_ready_to_kill"
-	actions_by_stalker_ids[23] = "action_hold_position"
-	actions_by_stalker_ids[19] = "action_kill_enemy"
-	actions_by_stalker_ids[29] = "action_kill_enemy_if_not_visible"
-	actions_by_stalker_ids[37] = "action_kill_if_enemy_critically_wounded"
-	actions_by_stalker_ids[35] = "action_kill_if_player_on_the_path"
-	actions_by_stalker_ids[33] = "action_kill_wounded_enemy"
-	actions_by_stalker_ids[22] = "action_look_out"
-	actions_by_stalker_ids[14] = "action_make_item_killing"
-	actions_by_stalker_ids[3] = "action_no_alife"
-	actions_by_stalker_ids[34] = "action_post_combat_wait"
-	actions_by_stalker_ids[32] = "action_prepare_wounded_enemy"
-	actions_by_stalker_ids[8] = "action_reach_customer_location"
-	actions_by_stalker_ids[6] = "action_reach_task_location"
-	actions_by_stalker_ids[30] = "action_reach_wounded_enemy"
-	actions_by_stalker_ids[20] = "action_retreat_from_enemy"
-	actions_by_stalker_ids[92] = "action_script"
-	actions_by_stalker_ids[26] = "action_search_enemy"
-	actions_by_stalker_ids[4] = "action_smart_terrain_task"
-	actions_by_stalker_ids[5] = "action_solve_zone_puzzle"
-	actions_by_stalker_ids[28] = "action_sudden_attack"
-	actions_by_stalker_ids[21] = "action_take_cover"
-	actions_by_stalker_ids[95] = "script_combat_planner"
-	actions_by_stalker_ids[96] = "reach_task_location"
-	actions_by_stalker_ids[142] = "corpse_exist"
-	actions_by_stalker_ids[147] = "wounded_exist"
-	actions_by_stalker_ids[192] = "state_mgr"
-	actions_by_stalker_ids[193] = "state_mgr_to_idle_combat"
-	actions_by_stalker_ids[194] = "state_mgr_to_idle_alife"
-	actions_by_stalker_ids[195] = "state_mgr_to_idle_items"
-	actions_by_stalker_ids[307] = "smartcover_action"
-	actions_by_stalker_ids[343] = "meet_contact"
-	actions_by_stalker_ids[3865] = "action_walker"
-	actions_by_stalker_ids[453] = "action_animpoint"
-	actions_by_stalker_ids[454] = "action_reach_animpoint"
-	actions_by_stalker_ids[xr_actions_id.stohe_camper_base + 1] = "camper_patrol"
-	--alundaio schemes
-	actions_by_stalker_ids[17000] = "xr_campfire_point"
-	actions_by_stalker_ids[18803] = "rx_ff"
-	actions_by_stalker_ids[18801] = "rx_gl"
-	actions_by_stalker_ids[18815] = "xrs_facer"
-	actions_by_stalker_ids[188111] = "beh"
-	actions_by_stalker_ids[188112] = "kill_wounded"
-	actions_by_stalker_ids[188113] = "script_danger"
-	actions_by_stalker_ids[188114] = "axr_turn_on_campfire"
-	actions_by_stalker_ids[188115] = "axr_new_combat"
-	actions_by_stalker_ids[188116] = "axr_radio_in_heli"
-	actions_by_stalker_ids[90005] = "gather_items"
-
-	local sect = "plugin"
-	local developer_debug = alun_utils.read_from_ini(ini,"plugin","developer_debug","bool",false)
-	local debug_gulag = alun_utils.read_from_ini(ini,"plugin","debug_gulag","bool",false)
-	show_game_graph = alun_utils.read_from_ini(ini,"plugin","show_game_graph","bool",false)
-	position_file = alun_utils.read_from_ini(ini,"plugin","file_save_position_info","string","positional_info.txt")
-
-	keybinds = 	{
-					["debug_ui"] = alun_utils.read_from_ini(ini,"plugin","keybind_debug_ui","string","S"),
-					["debug_ui_nearest_stalker"] = alun_utils.read_from_ini(ini,"plugin","keybind_debug_ui_nearest_stalker","string","F1"),
-					["debug_ui_spawn_position"] = alun_utils.read_from_ini(ini,"plugin","keybind_debug_ui_spawn_position","string","F2"),
-					["print_position"] = alun_utils.read_from_ini(ini,"plugin","keybind_print_position","string","P"),
-					["toggle_top_hud"] = alun_utils.read_from_ini(ini,"plugin","keybind_toggle_top_hud","string","F1"),
-					["toggle_left_hud"] = alun_utils.read_from_ini(ini,"plugin","keybind_toggle_left_hud","string","F2"),
-					["toggle_right_hud"] = alun_utils.read_from_ini(ini,"plugin","keybind_toggle_right_hud","string","F3")
-				}
-
-	if (developer_debug) then
-		_G.dev_debug = true
-		--_G.log = alun_utils.printf
-		--_G.sim_debug = true
-	end
-
-	-- HUD DISPLAYS
-	hud_display_top = hud_tool("cs_debug")
-	hud_display_left = hud_tool("cop_debug")
-	hud_display_right = hud_tool("cop2_debug")
-end
-
 ------------------------------------------------------------------------
 -- Class to create hud tools
 class "hud_tool"
@@ -357,10 +237,105 @@ local function actor_on_hit_callback(binder,npc,amount,local_direction,who,bone_
 		db.actor.health = 1
 	end
 end
+
+local function on_game_load()
+	actions_by_stalker_ids = {}
+	for k,v in pairs(_G.xr_actions_id) do
+		actions_by_stalker_ids[v] = k
+	end
+	actions_by_stalker_ids[4294967295] = "undefined"
+	actions_by_stalker_ids[7] = "action_accomplish_task"
+	actions_by_stalker_ids[16] = "action_aim_enemy"
+	actions_by_stalker_ids[88] = "action_alife_planner"
+	actions_by_stalker_ids[90] = "action_anomaly_planner"
+	actions_by_stalker_ids[89] = "action_combat_planner"
+	actions_by_stalker_ids[9] = "action_communicate_with_customer"
+	actions_by_stalker_ids[36] = "action_critically_wounded"
+	actions_by_stalker_ids[73] = "action_danger_by_sound_planner"
+	actions_by_stalker_ids[85] = "action_danger_grenade_look_around"
+	actions_by_stalker_ids[72] = "action_danger_grenade_planner"
+	actions_by_stalker_ids[86] = "action_danger_grenade_search"
+	actions_by_stalker_ids[82] = "action_danger_grenade_take_cover"
+	actions_by_stalker_ids[84] = "action_danger_grenade_take_cover_after_explosion"
+	actions_by_stalker_ids[83] = "action_danger_grenade_wait_for_explosion"
+	actions_by_stalker_ids[80] = "action_danger_in_direction_detour"
+	actions_by_stalker_ids[79] = "action_danger_in_direction_hold_position"
+	actions_by_stalker_ids[78] = "action_danger_in_direction_look_out"
+	actions_by_stalker_ids[71] = "action_danger_in_direction_planner"
+	actions_by_stalker_ids[81] = "action_danger_in_direction_search"
+	actions_by_stalker_ids[77] = "action_danger_in_direction_take_cover"
+	actions_by_stalker_ids[91] = "action_danger_planner"
+	actions_by_stalker_ids[75] = "action_danger_unknown_look_around"
+	actions_by_stalker_ids[70] = "action_danger_unknown_planner"
+	actions_by_stalker_ids[76] = "action_danger_unknown_search"
+	actions_by_stalker_ids[74] = "action_danger_unknown_take_cover"
+	actions_by_stalker_ids[0] = "action_dead"
+	actions_by_stalker_ids[87] = "action_death_planner"
+	actions_by_stalker_ids[25] = "action_detour_enemy"
+	actions_by_stalker_ids[1] = "action_dying"
+	actions_by_stalker_ids[15] = "action_find_ammo"
+	actions_by_stalker_ids[13] = "action_find_item_to_kill"
+	actions_by_stalker_ids[2] = "action_gather_items"
+	actions_by_stalker_ids[24] = "action_get_distance"
+	actions_by_stalker_ids[12] = "action_get_item_to_kill"
+	actions_by_stalker_ids[17] = "action_get_ready_to_kill"
+	actions_by_stalker_ids[23] = "action_hold_position"
+	actions_by_stalker_ids[19] = "action_kill_enemy"
+	actions_by_stalker_ids[29] = "action_kill_enemy_if_not_visible"
+	actions_by_stalker_ids[37] = "action_kill_if_enemy_critically_wounded"
+	actions_by_stalker_ids[35] = "action_kill_if_player_on_the_path"
+	actions_by_stalker_ids[33] = "action_kill_wounded_enemy"
+	actions_by_stalker_ids[22] = "action_look_out"
+	actions_by_stalker_ids[14] = "action_make_item_killing"
+	actions_by_stalker_ids[3] = "action_no_alife"
+	actions_by_stalker_ids[34] = "action_post_combat_wait"
+	actions_by_stalker_ids[32] = "action_prepare_wounded_enemy"
+	actions_by_stalker_ids[8] = "action_reach_customer_location"
+	actions_by_stalker_ids[6] = "action_reach_task_location"
+	actions_by_stalker_ids[30] = "action_reach_wounded_enemy"
+	actions_by_stalker_ids[20] = "action_retreat_from_enemy"
+	actions_by_stalker_ids[92] = "action_script"
+	actions_by_stalker_ids[26] = "action_search_enemy"
+	actions_by_stalker_ids[4] = "action_smart_terrain_task"
+	actions_by_stalker_ids[5] = "action_solve_zone_puzzle"
+	actions_by_stalker_ids[28] = "action_sudden_attack"
+	actions_by_stalker_ids[21] = "action_take_cover"
+	actions_by_stalker_ids[95] = "script_combat_planner"
+	actions_by_stalker_ids[96] = "reach_task_location"
+	actions_by_stalker_ids[142] = "corpse_exist"
+	actions_by_stalker_ids[147] = "wounded_exist"
+	actions_by_stalker_ids[192] = "state_mgr"
+	actions_by_stalker_ids[193] = "state_mgr_to_idle_combat"
+	actions_by_stalker_ids[194] = "state_mgr_to_idle_alife"
+	actions_by_stalker_ids[195] = "state_mgr_to_idle_items"
+	actions_by_stalker_ids[307] = "smartcover_action"
+	actions_by_stalker_ids[343] = "meet_contact"
+	actions_by_stalker_ids[3865] = "action_walker"
+	actions_by_stalker_ids[453] = "action_animpoint"
+	actions_by_stalker_ids[454] = "action_reach_animpoint"
+	actions_by_stalker_ids[xr_actions_id.stohe_camper_base + 1] = "camper_patrol"
+	--alundaio schemes
+	actions_by_stalker_ids[17000] = "xr_campfire_point"
+	actions_by_stalker_ids[18803] = "rx_ff"
+	actions_by_stalker_ids[18801] = "rx_gl"
+	actions_by_stalker_ids[18815] = "xrs_facer"
+	actions_by_stalker_ids[188111] = "beh"
+	actions_by_stalker_ids[188112] = "kill_wounded"
+	actions_by_stalker_ids[188113] = "script_danger"
+	actions_by_stalker_ids[188114] = "axr_turn_on_campfire"
+	actions_by_stalker_ids[188115] = "axr_new_combat"
+	actions_by_stalker_ids[188116] = "axr_radio_in_heli"
+	actions_by_stalker_ids[90005] = "gather_items"
+	
+	-- HUD DISPLAYS
+	hud_display_top = hud_tool("cs_debug")
+	hud_display_left = hud_tool("cop_debug")
+	hud_display_right = hud_tool("cop2_debug")
+end 
+
 ------------------------------------------------------------------------------------
 --										GAME START
 function on_game_start()
-
 	local ini = ini_file("debug\\xrs_debug_tools.ltx")
 	Enable = alun_utils.read_from_ini(ini,"plugin","enable","bool",false,"xrs_debug_tools")
 	if not (Enable) then ini=nil return end
@@ -369,6 +344,27 @@ function on_game_start()
 	callback_register("actor_on_update",actor_on_update)
 	callback_register("main_menu_on_keyboard",main_menu_on_keyboard)
 	callback_register("actor_on_hit_callback",actor_on_hit_callback)
+	
+	actor_info = {}
+
+	local sect = "plugin"
+	local developer_debug = alun_utils.read_from_ini(ini,"plugin","developer_debug","bool",false)
+	local debug_gulag = alun_utils.read_from_ini(ini,"plugin","debug_gulag","bool",false)
+	position_file = alun_utils.read_from_ini(ini,"plugin","file_save_position_info","string","positional_info.txt")
+
+	keybinds = 	{
+					["debug_ui"] = alun_utils.read_from_ini(ini,"plugin","keybind_debug_ui","string","S"),
+					["debug_ui_nearest_stalker"] = alun_utils.read_from_ini(ini,"plugin","keybind_debug_ui_nearest_stalker","string","F1"),
+					["debug_ui_spawn_position"] = alun_utils.read_from_ini(ini,"plugin","keybind_debug_ui_spawn_position","string","F2"),
+					["print_position"] = alun_utils.read_from_ini(ini,"plugin","keybind_print_position","string","P"),
+					["toggle_top_hud"] = alun_utils.read_from_ini(ini,"plugin","keybind_toggle_top_hud","string","F1"),
+					["toggle_left_hud"] = alun_utils.read_from_ini(ini,"plugin","keybind_toggle_left_hud","string","F2"),
+					["toggle_right_hud"] = alun_utils.read_from_ini(ini,"plugin","keybind_toggle_right_hud","string","F3")
+				}
+
+	if (developer_debug) then
+		_G.dev_debug = true
+	end
 end 
 
 -- NPC target for hud display ( nil = off )
