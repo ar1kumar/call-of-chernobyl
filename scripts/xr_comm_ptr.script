@@ -304,7 +304,7 @@ function action_escape:initialize ()
     self.object:set_patrol_path           (self.a.escape_path, patrol.nearest, patrol.continue, true)
     self.object:set_movement_type         (move.run)
     self.object:set_mental_state          (anim.danger)
-	  printf("SET_SIGHT!!!action_escape:initialize")
+	--printf("SET_SIGHT!!!action_escape:initialize")
     self.object:set_sight                 (look.path_dir, nil, 0)
 
     self.object:set_callback (self, "move_callback", game_object.movement)
