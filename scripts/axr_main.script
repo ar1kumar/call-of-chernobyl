@@ -9,7 +9,10 @@ TODO: Split up some features into their own scripts, such as event queue, sound_
 also consider moving MAX_SQUADS to sim_squad_scripted.script
 --]]
 
-local alife, game_graph, pairs, marshal, level = alife, game_graph, pairs, _G.marshal, level
+require("lua_extensions")
+marshal = require "marshal"
+
+local alife, game_graph, pairs, level = alife, game_graph, pairs, level
 local last_save
 
 -------------------------------------------------------------------------------------------------
@@ -17,7 +20,7 @@ local last_save
 -- marshal library can encode tables, functions, strings and numbers to easily allow persistent data storage to file
 -- This is used for db.storage[id].pstor and coc_treasure_manager.script if enabled
 
-USE_MARSHAL = false -- marshal ~= nil
+USE_MARSHAL = marshal ~= nil
 m_data = {}
 -------------------------------------------------------------------------------------------------
 
@@ -790,6 +793,8 @@ function actor_on_save(binder,packet)
 		local savegame = io.open(path,"wb+")
 		if (savegame) then
 			packet:w_stringZ(path)
+			
+			
 
 			if (intercepts.save_state) then
 				for i=1, #intercepts.save_state do

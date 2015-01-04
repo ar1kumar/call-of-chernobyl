@@ -888,13 +888,6 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 		db.used_level_vertex_ids[self.st.vid] = nil
 	end
 	
-	if (self.is_firing) then 
-		self:set_body_state(npc,move.standing)
-		self:set_movement_type(npc,move.walk)
-		lmove_ns(npc,npc:level_vertex_id(),self.st)
-		return
-	end
-	
 	--alun_utils.debug_write(alun_utils.sr("action_new_combat:high_level_ai_execute"))
 	local new_vid = self:try_to_panic(npc,enemy,ene_pos,dist)
 	if (new_vid) then
@@ -916,6 +909,14 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 	if (new_vid == nil) then
 		local bw = self:find_suitable_weapon(npc,enemy)
 		if (alun_utils.isSniper(bw) or alun_utils.isLauncher(bw)) then 
+				
+			if (self.is_firing) then 
+				self:set_body_state(npc,move.standing)
+				self:set_movement_type(npc,move.walk)
+				lmove_ns(npc,npc:level_vertex_id(),self.st)
+				return
+			end
+			
 			if (dist <= 2500) then 
 				self:set_body_state(npc,move.standing)
 				self:set_movement_type(npc,move.run)

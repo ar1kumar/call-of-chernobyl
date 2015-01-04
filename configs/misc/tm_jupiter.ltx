@@ -21,8 +21,13 @@ storyline = false
 title = jup_b6_scientist_tech_task_2_name
 descr = jup_b6_scientist_tech_task_2_text
 job_descr = jup_b6_scientist_tech_task_2_about
+fetch_text = jup_b6_scientist_tech_task_2_fetch_about
+fetch_func = %=setup_artefact_fetch_task(jup_b6_scientist_tech_task_2_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+task_complete_descr = jup_b6_scientist_tech_task_2_fetch_finish
 repeat_timeout = 86400
-on_complete = %=complete_task_inc_goodwill(10:ecolog:csky)%
+on_complete = %=complete_task_inc_goodwill(10:ecolog:csky) =remove_fetch_item(jup_b6_scientist_tech_task_2_fetch)%
 on_fail = %=fail_task_dec_goodwill(5:ecolog:csky)%
 
 [jup_b220_trapper_task_1]

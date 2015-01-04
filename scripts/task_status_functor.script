@@ -63,6 +63,15 @@ function check_smart_under_faction_control(task,task_id)
 	return "complete"	
 end
 
+function actor_has_fetch_item(task,task_id)
+	local section = db.actor and alun_utils.load_var(db.actor,task_id.."_fetch")
+	if (section and db.actor:object(section) ~= nil) then 
+		task.stage = 1
+	else 
+		task.stage = 0 
+	end 
+end
+
 function check_if_killed_enough(task,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then

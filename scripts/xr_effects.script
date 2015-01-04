@@ -234,9 +234,17 @@ function setup_artefact_fetch_task(actor,npc,p)
 	}
 	
 	local artefact = arts[math.random(#arts)]
-	
-	alun_utils.save_var(db.actor,"artefact_fetch",artefact)
+	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,artefact,"inv_name","string"))
+	alun_utils.save_var(db.actor,p[1],artefact)
 end 
+
+function remove_fetch_item(actor,npc,p)
+	local section = alun_utils.load_var(db.actor,p[1])
+	if (section and db.actor:object(section)) then
+		remove_item(actor, npc, {section})
+		news_manager.relocate_item(db.actor, "out", section, 1)
+	end
+end
 
 function force_talk(actor,npc,p)
 	local allow_break = p[1] and p[1] == "true" or false

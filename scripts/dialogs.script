@@ -4,28 +4,50 @@ function npc_has_ordered_task_to_give(a,b)
 	return axr_task_manager and axr_task_manager.get_first_available_task(npc) ~= nil or false
 end
 
+function actor_has_finished_ordered_task(a,b)
+	local npc = who_is_npc(a, b)
+	return axr_task_manager and axr_task_manager.get_first_finished_task(npc) ~= nil or false
+end
+
 function text_npc_has_ordered_task_to_give(a,b)
 	local npc = who_is_npc(a, b)
 	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)
 	return game.translate_string(task_section and axr_task_manager.get_task_job_description(task_section) or "st_no_available_task")
 end 
 
+function text_fetch_task(a,b)
+	local npc = who_is_npc(a, b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_finished_task(npc)
+	
+	axr_task_manager.trigger_fetch_func()
+
+	local text = game.translate_string(task_section and axr_task_manager.get_fetch_task_description(task_section) or "st_about_fetch_task_default")
+	
+	return string.format(text,_FETCH_TEXT)
+end
+
+function text_task_finish(a,b)
+	local npc = who_is_npc(a, b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_finished_task(npc)
+	return game.translate_string(task_section and axr_task_manager.get_task_complete_text(task_section) or "st_default_task_finished")
+end
+
 function task_is_fetch_task(a,b)
+	local npc = who_is_npc(a, b)
 	local task_id = axr_task_manager.get_first_available_task(npc)
 	if not (task_id) then 
 		return false 
 	end 
-	
-	local ttype = alun_utils.read_from_ini(task_manager.task_ini,task_id,"task_type","string")
-	if (ttype == "artefact_fetch_task") then 
-		return true
-	end
-	
-	return false
+	return alun_utils.read_from_ini(task_manager.task_ini,task_id,"fetch_text","string") ~= nil
 end
 
 function not_task_is_fetch_task(a,b)
 	return not task_is_fetch_task(a,b)
+end
+
+function npc_set_finished_task_complete(a,b)
+	local npc = who_is_npc(a, b)
+	axr_task_manager.set_finished_task_complete(npc)
 end
 
 function npc_give_first_available_task(a,b)

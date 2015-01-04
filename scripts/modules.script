@@ -147,7 +147,7 @@ function enable_generic_schemes(npc,ini,section,stype)
 	for scheme,v in pairs(_G.schemes_by_stype[stype]) do
 		filename = _G.schemes[scheme]
 		if (filename and _G[filename] and _G[filename].setup_generic_scheme) then
-			printf("DEBUG: setup_generic_scheme npc=%s scheme=%s",npc and npc:name(),scheme)
+			--printf("DEBUG: setup_generic_scheme npc=%s scheme=%s",npc and npc:name(),scheme)
 			temp[scheme] = empty_table(temp[scheme])
 			_G[filename].setup_generic_scheme(npc,ini,scheme,section,stype,temp[scheme])
 		end
@@ -158,7 +158,7 @@ function enable_generic_schemes(npc,ini,section,stype)
 		if (temp[scheme] and temp[scheme].needs_configured) then
 			filename = _G.schemes[scheme]
 			if (filename and _G[filename] and _G[filename].configure_actions) then
-				printf("DEBUG: configure_actions npc=%s scheme=%s",npc and npc:name(),scheme)
+				--printf("DEBUG: configure_actions npc=%s scheme=%s",npc and npc:name(),scheme)
 				
 				if not (db.storage[id][scheme]) then 
 					printf("ERROR: storage for db.storage[%s][%s] not setup!",id,scheme)
@@ -188,7 +188,7 @@ end
 function reset_generic_schemes(npc,scheme,section)
 	local st = db.storage[npc:id()]
 	if not (st) then 
-		printf("DEBUG: reset_generic_schemes: ERROR storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
+		printf("ERROR: reset_generic_schemes: storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
 		return
 	end 
 	
@@ -202,7 +202,7 @@ function reset_generic_schemes(npc,scheme,section)
 	for scheme,v in pairs(_G.schemes_by_stype[st.stype]) do
 		filename = _G.schemes[scheme]
 		if (filename and _G[filename] and st[scheme] and _G[filename].reset_generic_scheme) then
-			printf("DEBUG: reset_generic_schemes npc=%s scheme=%s  storage_exists=%s",npc and npc:name(),scheme,st[scheme])
+			--printf("DEBUG: reset_generic_schemes npc=%s scheme=%s  storage_exists=%s",npc and npc:name(),scheme,st[scheme])
 			_G[filename].reset_generic_scheme(npc,scheme,section,st.stype,st)
 		end
 	end
@@ -243,7 +243,7 @@ end
 function disable_generic_schemes(npc, stype)
 	local st = db.storage[npc:id()]
 	if not (st) then 
-		printf("DEBUG: disable_generic_schemes : ERROR storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
+		printf("ERROR: disable_generic_schemes : storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
 		return
 	end 
 	
@@ -251,7 +251,7 @@ function disable_generic_schemes(npc, stype)
 	for scheme,v in pairs(_G.schemes_by_stype[stype]) do
 		filename = _G.schemes[scheme]
 		if (filename and _G[filename] and st[scheme] and _G[filename].disable_generic_scheme) then
-			printf("DEBUG: disable_generic_scheme npc=%s scheme=%s",npc and npc:name(),scheme)
+			--printf("DEBUG: disable_generic_scheme npc=%s scheme=%s",npc and npc:name(),scheme)
 			_G[filename].disable_generic_scheme(npc,scheme,stype)
 		end
 	end

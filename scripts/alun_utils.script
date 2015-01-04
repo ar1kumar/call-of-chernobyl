@@ -1173,7 +1173,7 @@ function npc_in_cover(npc)
 		for o in npc:memory_visible_objects() do
 			local obj = o:object()
 			local id = obj:id()
-			if obj and obj:alive() and npc:relation(obj) == game_object.enemy and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and not xr_wounded.is_wounded(obj) then
+			if obj and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
 --				rx_ai.printf("npc_in_cover[%s]:add enemy[%s]",npc:character_name(),obj:name())
 				table.insert(enemies,obj)
 				tt[id] = true
@@ -1183,7 +1183,7 @@ function npc_in_cover(npc)
 			local obj = o:object()
 			local id = obj:id()
 			if not tt[id] then
-				if obj and obj:alive() and npc:relation(obj) == game_object.enemy and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and not xr_wounded.is_wounded(obj) then
+				if obj and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
 --					rx_ai.printf("npc_in_cover[%s]:add enemy[%s]",npc:character_name(),obj:name())
 					table.insert(enemies,obj)
 				end
@@ -2084,11 +2084,17 @@ function get_fsgame()
 	for k,v in pairs(root) do
 		t = str_explode(v,"|")
 		dir = t[3]
-		fsgame[k] = t[4] or ""
+
+		if not (string.find(dir,"%$")) then
+			fsgame[k] = (dir or "") .. (t[4] or "")
+		else
+			fsgame[k] = t[4] or ""
+		end
+
 		repeat
 			t = root[dir] and str_explode(root[dir],"|")
 			dir = t and t[3]
-			fsgame[k] = (t and t[4] or "") .. fsgame[k]
+			fsgame[k] = (fsgame[dir] or dir or "") .. (t and t[4] or "") .. fsgame[k]
 		until (dir == nil)
 	end
 	return fsgame

@@ -467,35 +467,42 @@ local stalker_classes = {}
 local weapon_classes = {}
 local artefact_classes = {}
 
-IsMonster = memoize(
-function(object, id)
+function IsMonster(object, id)
+	if (object and object.is_monster) then 
+		return object:is_monster()
+	end
 	id = id or get_clsid(object)
 	return id and monster_classes[id] == true
 end
-)
 
-IsStalker = memoize(
-function (object, id)
+function IsStalker(object, id)
+	if (object and object.is_stalker) then 
+		return object:is_stalker()
+	end
 	id = id or get_clsid(object)
 	return id and stalker_classes[id] == true
-end)
+end
 
-IsHelicopter = memoize(function (object, id)
+function IsHelicopter(object, id)
 	id = id or get_clsid(object)
 	return id and (id == clsid.helicopter or id == clsid.car or id == clsid.script_heli) or false
-end)
+end
 
-isWeapon = memoize(
-function (object, id)
+function isWeapon(object, id)
+	if (object and object.is_weapon) then 
+		return object:is_weapon()
+	end
 	id = id or get_clsid(object)
 	return id and weapon_classes[id] == true or false
-end)
+end
 
-isArtefact = memoize(
-function (object, id)
+function isArtefact(object, id)
+	if (object and object.is_artefact) then 
+		return object:is_artefact()
+	end
 	id = id or get_clsid(object)
 	return id and artefact_classes[id] == true or false
-end)
+end
 
 
 -------------------------------------------------------------------------------------------

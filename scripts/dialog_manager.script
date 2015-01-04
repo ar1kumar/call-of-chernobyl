@@ -110,12 +110,17 @@ function dm_init_dynamic_task_dialog(dialog)
 				add_dialog(base_id+1,base_id+2,"st_ordered_task_accept","dialogs.npc_has_ordered_task_to_give","dialogs.npc_give_first_available_task") 			-- Actor
 					add_dialog(base_id+2,base_id+3,"st_accepted_task","dialogs.not_task_is_fetch_task")																		-- NPC
 						add_dialog(base_id+3,base_id+11112,"dm_universal_actor_exit_thanks",nil,"dialogs.npc_clear_skipped_tasks")									-- Actor
-					add_dialog(base_id+2,base_id+4,"st_accepted_task","dialogs.task_is_fetch_task")																			-- NPC
+					add_script_dialog(base_id+2,base_id+4,"dialogs.text_fetch_task","dialogs.task_is_fetch_task")																			-- NPC
 						add_dialog(base_id+4,base_id+11113,"dm_universal_actor_exit_thanks",nil,"dialogs.npc_clear_skipped_tasks")										-- Actor
 				add_dialog(base_id+1,base_id+22222,"st_ordered_task_next","dialogs.npc_has_ordered_task_to_give","dialogs.npc_skip_first_ordered_task")				-- Actor
 				add_dialog(base_id+1,base_id+11111,"dm_universal_actor_exit",nil,"dialogs.npc_clear_skipped_tasks") 													-- Actor
 		base_id = base_id+10
 	end
+	
+	-- finished task dialog
+	add_dialog("",base_id,"st_ordered_task_query_finished","dialogs.actor_has_finished_ordered_task")								-- Actor
+		add_script_dialog(base_id,base_id+1,"dialogs.text_task_finish",nil,"dialogs.npc_set_finished_task_complete")		-- NPC
+			add_dialog(base_id+1,base_id+11111,"dm_universal_actor_exit") 													-- Actor				
 end
 
 -----------------------------------------------------
