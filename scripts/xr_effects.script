@@ -246,6 +246,15 @@ function remove_fetch_item(actor,npc,p)
 	end
 end
 
+function setup_fetch_descr(actor,npc,p)
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	if not (task_info[p[1]]) then 
+		return 
+	end
+	task_info[p[1]].current_title = alun_utils.load_var(db.actor,p[1].."_fetch","")
+end
+
 function force_talk(actor,npc,p)
 	local allow_break = p[1] and p[1] == "true" or false
 	db.actor:run_talk_dialog(npc, allow_break)

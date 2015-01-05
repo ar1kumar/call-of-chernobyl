@@ -87,7 +87,6 @@ function CGeneralTask:__init(id)
 	self.on_complete = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "on_complete", nil, false, "", ""))
 	self.on_fail = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "on_fail", nil, false, "", ""))
 	self.on_reversed = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "on_reversed", nil, false, "", ""))
-	self.fetch_func = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "fetch_func", nil, false, "", ""))
 	
 	--' Награды за квест
 	self.reward_money = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "reward_money", nil, false, "", ""))

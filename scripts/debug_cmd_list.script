@@ -340,6 +340,77 @@ local function parse_waypoint(pathname, wpflags, wpname, owner)
 	return rslt
 end
 
+function cmd.attach(me,txt,owner,p)
+	local wpn = db.actor:active_item()
+	if (wpn) then
+		local firearm = alun_utils.item_is_fa(wpn)
+		if (firearm) then
+			if (wpn.weapon_addon_attach) then
+				local addons = {
+					"wpn_addon_scope",
+					"wpn_addon_scope_x2.7",
+					"wpn_addon_scope_detector",
+					"wpn_addon_scope_night",
+					"wpn_addon_scope_susat",
+					"wpn_addon_scope_susat_x1.6",
+					"wpn_addon_scope_susat_custom",
+					"wpn_addon_scope_susat_dusk",
+					"wpn_addon_scope_susat_night",
+					"wpn_addon_silencer",
+					"wpn_addon_grenade_launcher",
+					"wpn_addon_grenade_launcher_m203"
+					}
+				local addon
+				local attached = false
+				for k,v in pairs(addons) do
+					addon = db.actor:object(k)
+					if (addon) then 
+						wpn:weapon_addon_attach(addon)
+						attached = true
+					end
+				end 
+				
+				if (attached) then 
+					return "attach:= addon attached"
+				end 
+				return "attach:= no addons attached"
+			else 
+				return "attach:= weapon does not have weapon_addon_attach method"
+			end
+		end 
+	end
+	return "attach:= addon was not attached for active weapon"
+end 
+
+function cmd.detach(me,txt,owner,p)
+	local wpn = db.actor:active_item()
+	if (wpn) then
+		local firearm = alun_utils.item_is_fa(wpn)
+		if (firearm and wpn.weapon_addon_detach) then
+			local addons = {
+				"wpn_addon_scope",
+				"wpn_addon_scope_x2.7",
+				"wpn_addon_scope_detector",
+				"wpn_addon_scope_night",
+				"wpn_addon_scope_susat",
+				"wpn_addon_scope_susat_x1.6",
+				"wpn_addon_scope_susat_custom",
+				"wpn_addon_scope_susat_dusk",
+				"wpn_addon_scope_susat_night",
+				"wpn_addon_silencer",
+				"wpn_addon_grenade_launcher",
+				"wpn_addon_grenade_launcher_m203"
+				}
+			local addon
+			for k,v in pairs(addons) do
+				wpn:weapon_addon_detach(k)
+			end 
+
+			return "detach:= check item"
+		end 
+	end
+	return "detach:= addon was not detached from active weapon"
+end 
 
 function cmd.waypoint(me,txt,owner,p)
 	local wrd = first_word(me,txt,owner,"[checkall | checklevel]")

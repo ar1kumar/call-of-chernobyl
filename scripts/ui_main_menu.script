@@ -14,7 +14,7 @@ function main_menu:__init() super()
     self:InitCallBacks()
     --xr_s.on_main_menu_on()     						 --' Distemper 03.2008 --
 	-- Alundaio
-	if (axr_main) then axr_main.main_menu_on_init(self)	end
+	if (axr_main and axr_main.main_menu_on_init) then axr_main.main_menu_on_init(self)	end
 	-- End Alundaio
 end
 

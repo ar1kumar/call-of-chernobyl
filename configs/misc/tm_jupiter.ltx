@@ -15,16 +15,19 @@ on_fail = %=fail_task_dec_goodwill(5:ecolog:csky)%
 condlist_0 = {!squad_exist(ecolog_companion_task_2)} fail
 
 [jup_b6_scientist_tech_task_2]
-icon = ui_inGame2_Artefakti_na_zakaz
+icon = ui_inGame2_Kontrakt_s_uchenimi
 prior = 5
 storyline = false
 title = jup_b6_scientist_tech_task_2_name
+title_functor = general_fetch_task
 descr = jup_b6_scientist_tech_task_2_text
+descr_functor = general_fetch_task
 job_descr = jup_b6_scientist_tech_task_2_about
-fetch_text = jup_b6_scientist_tech_task_2_fetch_about
+fetch_descr = jup_b6_scientist_tech_task_2_fetch_about
 fetch_func = %=setup_artefact_fetch_task(jup_b6_scientist_tech_task_2_fetch)%
 stage_complete = 1
 status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
 task_complete_descr = jup_b6_scientist_tech_task_2_fetch_finish
 repeat_timeout = 86400
 on_complete = %=complete_task_inc_goodwill(10:ecolog:csky) =remove_fetch_item(jup_b6_scientist_tech_task_2_fetch)%

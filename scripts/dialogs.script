@@ -17,13 +17,13 @@ end
 
 function text_fetch_task(a,b)
 	local npc = who_is_npc(a, b)
-	local task_section = axr_task_manager and axr_task_manager.get_first_finished_task(npc)
+	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)
 	
-	axr_task_manager.trigger_fetch_func()
+	axr_task_manager.trigger_fetch_func(task_section)
 
 	local text = game.translate_string(task_section and axr_task_manager.get_fetch_task_description(task_section) or "st_about_fetch_task_default")
 	
-	return string.format(text,_FETCH_TEXT)
+	return string.format(text,_FETCH_TEXT or "") or ""
 end
 
 function text_task_finish(a,b)
@@ -38,7 +38,7 @@ function task_is_fetch_task(a,b)
 	if not (task_id) then 
 		return false 
 	end 
-	return alun_utils.read_from_ini(task_manager.task_ini,task_id,"fetch_text","string") ~= nil
+	return axr_task_manager.get_fetch_task_description(task_id) ~= nil
 end
 
 function not_task_is_fetch_task(a,b)

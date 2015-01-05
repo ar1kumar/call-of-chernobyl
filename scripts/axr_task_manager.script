@@ -92,7 +92,7 @@ function get_first_available_task(npc,skip)
 	end
 end
 
-function get_first_finished_task(npc,skip)
+function get_first_finished_task(npc)
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
 	
@@ -101,14 +101,9 @@ function get_first_finished_task(npc,skip)
 	
 	local count = 1
 	while (task_manager.task_ini:section_exist(task_id)) do
-		--printf("task_id=%s skipped=%s",task_id,skipped_tasks[task_id])
-		if (skipped_tasks[task_id] ~= true and task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","number")) then
-			if (skip) then 
-				skipped_tasks[task_id] = true
-				return
-			else
-				return task_id
-			end
+		printf("get_first_finished_task task_id=%s",task_id)
+		if (task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","float")) then
+			return task_id
 		end
 		count = count + 1
 		task_id = sec..tostring(count)
@@ -125,10 +120,10 @@ function set_finished_task_complete(npc)
 end
 
 function trigger_fetch_func(task_id)
-	local tm = task_manager.get_task_manager()
-	local task_info = tm.task_info
-	if (task_info[task_id] and task_info[task_id].fetch_func) then
-		xr_logic.pick_section_from_condlist(db.actor, db.actor, task_info[task_id].fetch_func)
+	printf("triiger_fetch_func %s",task_id)
+	local fetch_func = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_manager.task_ini, task_id, "fetch_func", nil, false, "", ""))
+	if (fetch_func) then 
+		xr_logic.pick_section_from_condlist(db.actor,db.actor,fetch_func)
 	end
 end 
 

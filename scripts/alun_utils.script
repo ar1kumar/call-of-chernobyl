@@ -99,6 +99,10 @@ function teleport_squad(squad,gvid,lvid,pos)
 	end
 end
 
+function get_inv_name(section)
+	return game.translate_string(read_from_ini(nil,section,"inv_name","string",""))
+end 
+
 -- Prints a formated lua table to print_table.txt for debugging purposes
 function print_table(tbl,header)
 	local txt = tostring(header) .. "\n{\n\n"
@@ -188,6 +192,9 @@ function read_from_ini(ini,section,line,var_type,default,caller)
 	if not (ini) then
 		ini = system_ini()
 	end
+	if not (section) then 
+		printf("ERROR: alun_utils.read_from_ini trying to read nil section!")
+	end
 
 	if (section and line and ini:section_exist(section) and ini:line_exist(section,line)) then
 		if (var_type == "bool") then
@@ -199,9 +206,8 @@ function read_from_ini(ini,section,line,var_type,default,caller)
 		else
 			return ini:r_string_wq(section,line)
 		end
-	else
-		return default
 	end
+	return default
 end
 
 function trim(s)
@@ -2614,3 +2620,52 @@ function vec_intersects_line(a,b,c)
 		end
 	end
 end 
+
+--/----------------------------------------------------------------------------
+--/ Sandbox ( http://www.amk-team.ru/forum/index.php?showtopic=6458#entry258260 )
+--/----------------------------------------------------------------------------
+function sandbox(file_name, function_name, ...)
+  local status, result = pcall(sandbox_exec, file_name, function_name, ...)
+  if status == false then
+		elog("(%s:sandbox) call failed, result = [%s]", self_name, result)
+		return
+  else
+    return result
+  end
+end
+
+--/ execute script in sandbox
+function sandbox_exec(file_name, function_name, ...)
+  if file_name then
+		if not _G[file_name] then dlog("script %s is not found", file_name) return end -- script does not exist
+		-- dlog("full script name = %s", getFS():update_path('$game_scripts$', '')..file_name..'.script')
+    local result = assert(loadfile(getFS():update_path('$game_scripts$', '')..file_name..'.script'))
+    if type(result) == "function" then
+      if function_name then
+        result()
+        local f = loadstring("return "..function_name)
+        f(...)
+      else
+        result()
+      end
+    else
+			elog("(%s:sandbox) exec failed. function is not available: result = [%s]", self_name, type(result))
+      return
+    end
+  else
+    local file_path = getFS():update_path('$game_scripts', default_sandbox_file..'.script')
+    local result = assert(loadfile(file_path))
+    if type(result) == "function" then
+      if function_name then
+        result()
+        local f = loadstring("return "..function_name)
+        f(...)
+      else
+        result()
+      end
+    else
+      elog("(%s:sandbox) exec failed. function is not available: result = [%s]", self_name, type(result))
+      return
+    end
+  end
+end

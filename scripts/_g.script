@@ -489,9 +489,9 @@ function IsHelicopter(object, id)
 end
 
 function isWeapon(object, id)
-	if (object and object.is_weapon) then 
-		return object:is_weapon()
-	end
+	--if (object and object.is_weapon) then 
+		--return object:is_weapon()
+	--end
 	id = id or get_clsid(object)
 	return id and weapon_classes[id] == true or false
 end
@@ -557,7 +557,7 @@ function id_by_sid( sid )
 	return nil
 end
 
-package.path = [[gamedata\scripts\?.script;gamedata\scripts\lib\?.lua]]
+--package.path = [[gamedata\scripts\?.script;gamedata\scripts\lib\?.lua]]
 -- do
 -- 	local status, result = pcall(require, 'StackTracePlus')
 -- 	if status then
@@ -917,6 +917,12 @@ end
 function add_story_object(obj_id , story_obj_id)
 	story_objects.get_story_objects_registry():register(obj_id , story_obj_id)
 end
+
+get_story_se_object = memoize(function (story_obj_id)
+	local obj_id = story_obj_id and story_objects.get_story_objects_registry():get(story_obj_id)
+	if obj_id == nil then return nil end
+	return alife():object(obj_id)
+end)
 
 get_story_object = memoize(function (story_obj_id)
 	local obj_id = story_obj_id and story_objects.get_story_objects_registry():get(story_obj_id)
