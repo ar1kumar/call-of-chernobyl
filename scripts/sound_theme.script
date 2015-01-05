@@ -4,7 +4,6 @@
 --'--------------------------------------------------------------------------------------------------------------------
 nstl = 64
 theme = {}
-
 local sounds_base = stalker_ids.sound_script + 10000
 
 function id()
@@ -34,7 +33,7 @@ function npc_sound:__init(snd_ini, section)
 	-- Время задержки начала отыгрывания звука
 	self.delay_sound = utils.cfg_get_number(snd_ini, section, "delay_sound", self.npc, false, 0)
 	--' Интервал проигрывания звука
-	local interval = parse_names(utils.cfg_get_string(snd_ini, section, "idle", nil, false, "", "3,5,100"))
+	local interval = parse_names(utils.cfg_get_string(snd_ini, section, "idle", nil, false, "", "3,5,100"))	
 	self.min_idle = tonumber(interval[1])
 	self.max_idle = tonumber(interval[2])
 	self.rnd = tonumber(interval[3])
@@ -109,11 +108,10 @@ function npc_sound:init_npc(npc)
 			num = num + 1
 		end
 	end
-
 	if self.npc[npc_id].max < 0 then
-		--printf("Couldnt find sounds %s with prefix %s", tostring(self.path), npc:sound_prefix())
-		return
+		abort("Couldnt find sounds %s with prefix %s", tostring(self.path), npc:sound_prefix())
 	end
+
 
 	if self.prefix == false then
 		npc:sound_prefix(character_prefix)
@@ -209,8 +207,9 @@ function npc_sound:play(npc_id, faction, point, msg)
 	--printf("playing sound "..self.played_id)
 	if npc ~= nil then
 		-- play_sound (u32 internal_type, u32 max_start_time, u32 min_start_time, u32 max_stop_time, u32 min_stop_time, u32 id)
-		--alun_utils.debug_write(alun_utils.sr("%s:play_sound(%s,%s,%s,%s,%s,%s)",npc:name(),npc_data.id,self.delay_sound+0.06,self.delay_sound+0.05,1,0,self.played_id))
+		print("TEST: BEFORE PLAY SOUND")
 		npc:play_sound(npc_data.id, self.delay_sound+0.06, self.delay_sound+0.05, 1, 0, self.played_id)
+		print("TEST: AFTER PLAY SOUND")
 	end
 	local table_id = self.played_id + 1
 	local snd = self.sound_path[npc_id][table_id]
@@ -254,24 +253,13 @@ function npc_sound:play(npc_id, faction, point, msg)
 end
 function npc_sound:select_next_sound(npc_id)
 	local npc_data = self.npc[npc_id]
-	if not (npc_data) then
-		printf("sound_theme: npc_data is nil for select_next_sound [%s]",self.npc and self.npc:section())
-		return 0
-	end
-
 	if self.shuffle == "rnd" then
-		if not (npc_data.max) then
-			local snd = self.sound_path[npc_id] and self.sound_path[npc_id][self.played_id + 1]
-			printf("sound_theme: max not set for snd=%s",snd)
-			npc_data.max = 0
-		end
-
-		if (npc_data.max == 0) then
+		if npc_data.max == 0 then
 			return 0
 		end
 
-		if (self.played_id) then
-			local played_id = npc_data.max == 1 and 1 or math.random(0,npc_data.max - 1)
+		if self.played_id ~= nil then
+			local played_id = math.random(0,npc_data.max - 1)
 			if played_id >= self.played_id then
 				return played_id + 1
 			end
@@ -405,7 +393,7 @@ function actor_sound:__init(snd_ini, section)
 		end
 	end
 	if #self.sound == 0 then
-		printf("There are no sound collection with path: %s", self.path)
+		abort("There are no sound collection with path: %s", self.path)
 	end
 end
 function actor_sound:callback(npc_id)
@@ -467,8 +455,8 @@ function actor_sound:play(npc, faction, point, msg)
 	self.snd_obj.volume = 0.8
 	self.snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
 	self.snd_obj.volume = 0.8
---[[
 	local snd_st, num_copy = string.gsub(snd, "\\", "_")
+--[[
 	if game.translate_string(snd_st) ~= snd_st then
 		local hud_demo = get_hud()
 		--printf("uraaaa!!!")
@@ -477,7 +465,7 @@ function actor_sound:play(npc, faction, point, msg)
 			hud_demo:AddCustomStatic("cs_subtitles_actor", true)
 			self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_actor")
 		end
-		self.custom_static_demo:wnd():TextControl():SetTextST(snd_st)
+		self.custom_static_demo:wnd():SetTextST(snd_st)
 	end
 ]]
 	self.can_play_sound = false
@@ -597,7 +585,7 @@ function object_sound:__init(snd_ini, section)
 		end
 	end
 	if #self.sound == 0 then
-		printf("There are no sound collection with path: %s", self.path)
+		abort("There are no sound collection with path: %s", self.path)
 	end
 end
 function object_sound:callback(npc_id)
@@ -660,8 +648,8 @@ function object_sound:play(obj_id, faction, point, msg)
 	end
 	self.snd_obj = sound_object(snd)
 	self.snd_obj:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
---[[
 	local snd_st, num_copy = string.gsub(snd, "\\", "_")
+--[[
 	if game.translate_string(snd_st) ~= snd_st then
 		local hud_demo = get_hud()
 --		printf("uraaaa!!!")
@@ -670,7 +658,7 @@ function object_sound:play(obj_id, faction, point, msg)
 			hud_demo:AddCustomStatic("cs_subtitles_object", true)
 			self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_object")
 		end
-		self.custom_static_demo:wnd():TextControl():SetTextST(snd_st)
+		self.custom_static_demo:wnd():SetTextST(snd_st)
 	end
 ]]
 	self.can_play_sound = false
@@ -763,7 +751,7 @@ function looped_sound:__init(snd_ini, section)
 		self.sound = self.path
 	end
 	if self.sound == nil then
-		printf("There are no looped sound with path: %s", self.path)
+		abort("There are no looped sound with path: %s", self.path)
 	end
 end
 function looped_sound:is_playing ()
@@ -811,7 +799,7 @@ function load_sound()
 
 	--' Итерируемся по списку тем.
 	if not snd_ini:section_exist("list") then
-		printf("There is no section [list] in script_sound.ltx")
+		abort("There is no section [list] in script_sound.ltx")
 	end
 	local n = snd_ini:line_count("list")
 	local id, value = "",""
