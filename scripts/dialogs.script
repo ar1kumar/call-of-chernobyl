@@ -9,6 +9,10 @@ function actor_has_finished_ordered_task(a,b)
 	return axr_task_manager and axr_task_manager.get_first_finished_task(npc) ~= nil or false
 end
 
+function actor_has_not_finished_ordered_task(a,b)
+	return not actor_has_finished_ordered_task(a,b)
+end
+
 function text_npc_has_ordered_task_to_give(a,b)
 	local npc = who_is_npc(a, b)
 	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)

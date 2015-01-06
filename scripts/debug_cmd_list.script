@@ -1520,6 +1520,10 @@ function cmd.game_graph(me,txt,owner,p)
 			end
 		end
 		
+		if (#issues == 0) then 
+			return "game_graph:= no issues found"
+		end
+		
 		local sz = owner.console_size
 		local page_count = math.ceil(#issues/sz)
 
@@ -1529,6 +1533,7 @@ function cmd.game_graph(me,txt,owner,p)
 
 		owner:SendOutput("game_graph:= list of objects with invalid game_vertex_ids [%s of %s]",page,page_count)
 		owner:SendOutputList(issues,(page*sz)-sz,sz-1)
+		return
 	end
 	return "game_graph:= type game_graph help for list of commands"
 end

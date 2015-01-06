@@ -193,7 +193,7 @@ function read_from_ini(ini,section,line,var_type,default,caller)
 		ini = system_ini()
 	end
 	if not (section) then 
-		printf("ERROR: alun_utils.read_from_ini trying to read nil section!")
+		printf("ERROR: alun_utils.read_from_ini trying to read nil section! line=%s var_type=%s default=%s caller=%s",line,var_type,default,caller)
 	end
 
 	if (section and line and ini:section_exist(section) and ini:line_exist(section,line)) then

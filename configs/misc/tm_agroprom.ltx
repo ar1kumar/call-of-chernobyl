@@ -1,0 +1,35 @@
+[agr_smart_terrain_1_6_army_mechanic_stalker_task_1]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = agr_smart_terrain_1_6_army_mechanic_stalker_task_1_name
+title_functor = general_fetch_task
+descr = agr_smart_terrain_1_6_army_mechanic_stalker_task_1_text
+descr_functor = general_fetch_task
+job_descr = agr_smart_terrain_1_6_army_mechanic_stalker_task_1_about
+fetch_descr = agr_smart_terrain_1_6_army_mechanic_stalker_task_1_fetch_about
+fetch_func = %=setup_generic_fetch_task(agr_smart_terrain_1_6_army_mechanic_stalker_task_1_fetch:itm_gunsmith_toolkit)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = agr_smart_terrain_1_6_army_mechanic_stalker_task_1_fetch_finish
+on_complete = %+agr_smart_terrain_1_6_army_mechanic_stalker_upgrade_tier_1 =complete_task_inc_goodwill(5:army) =reward_money(1000) =remove_fetch_item(agr_smart_terrain_1_6_army_mechanic_stalker_task_1_fetch) =inc_task_stage(agr_smart_terrain_1_6_army_mechanic_stalker_task_1)%
+precondition = {-agr_smart_terrain_1_6_army_mechanic_stalker_upgrade_tier_1} true, false
+
+[agr_smart_terrain_1_6_army_mechanic_stalker_task_2]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = agr_smart_terrain_1_6_army_mechanic_stalker_task_2_name
+title_functor = general_fetch_task
+descr = agr_smart_terrain_1_6_army_mechanic_stalker_task_2_text
+descr_functor = general_fetch_task
+job_descr = agr_smart_terrain_1_6_army_mechanic_stalker_task_2_about
+fetch_descr = agr_smart_terrain_1_6_army_mechanic_stalker_task_2_fetch_about
+fetch_func = %=setup_generic_fetch_task(agr_smart_terrain_1_6_army_mechanic_stalker_task_2_fetch:itm_gunsmith_toolkit_tier_2)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = agr_smart_terrain_1_6_army_mechanic_stalker_task_2_fetch_finish
+on_complete = %+agr_smart_terrain_1_6_army_mechanic_stalker_upgrade_tier_2 =complete_task_inc_goodwill(5:army) =reward_money(1000) =remove_fetch_item(agr_smart_terrain_1_6_army_mechanic_stalker_task_2_fetch) =inc_task_stage(agr_smart_terrain_1_6_army_mechanic_stalker_task_2)%
+precondition = {+agr_smart_terrain_1_6_army_mechanic_stalker_upgrade_tier_1 -agr_smart_terrain_1_6_army_mechanic_stalker_upgrade_tier_2} true, false

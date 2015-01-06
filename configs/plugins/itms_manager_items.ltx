@@ -156,7 +156,7 @@ inv_name			= st_itm_gunsmith_toolkit
 inv_name_short		= st_itm_gunsmith_toolkit
 can_trade			= true
 quest_item      	= false
-cost				= 200
+cost				= 800
 inv_weight			= 3.65
 visual				= dynamics\devices\dev_instrument_1\dev_instrument_1.ogf
 inv_grid_width		= 2
@@ -166,8 +166,8 @@ inv_grid_y			= 25
 
 repair_min_condition 	= 0.05		;Min required condition to use
 repair_max_condition 	= 0.65		;Max required condition to use
-repair_add_condition 	= 0.20		;Amount of condition added to repaired item
-repair_part_bonus	 	= 0.15		;Amount bonus to add_condition if parts are used
+repair_add_condition 	= 0.15		;Amount of condition added to repaired item
+repair_part_bonus	 	= 0.10		;Amount bonus to add_condition if parts are used
 repair_use_parts	 	= true		;Allows the use of lesser conditioned weapons to be used for parts to add overall bonus to repair
 repair_type			 	= weapon	;weapon or outfit
 repair_refuse			=           ;Add sections separated by commas that cannot be repaired by this item
@@ -175,6 +175,20 @@ repair_only				=           ;Add sections separated by commas that exclude all se
 repair_parts_include    = 			;Add sections of items to include to be considered repair parts
 repair_parts_exclude	=			;Add sections of items to exclude from being considered repair parts
 repair_use_actor_effects= false     ;Uses actor_effects script. Setup a *_dummy section for the item in actor_effects_data.script
+
+
+[itm_gunsmith_toolkit_tier_2]:itm_gunsmith_toolkit
+description				= st_itm_gunsmith_toolkit_tier_2_descr
+inv_name				= st_itm_gunsmith_toolkit_tier_2
+inv_name_short			= st_itm_gunsmith_toolkit_tier_2
+cost 					= 2500
+repair_min_condition 	= 0.05		;Min required condition to use
+repair_max_condition 	= 0.80		;Max required condition to use
+repair_add_condition 	= 0.20		;Amount of condition added to repaired item
+repair_part_bonus	 	= 0.20		;Amount bonus to add_condition if parts are used
+repair_use_parts	 	= true		;Allows the use of lesser conditioned weapons to be used for parts to add overall bonus to repair
+
+
 
 [test_flashlight]:detector_simple
 visual				= dynamics\equipments\trade\torch.ogf

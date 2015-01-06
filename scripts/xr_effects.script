@@ -94,6 +94,20 @@ function add_task_companion(actor,npc,p)
 	end
 end
 
+function inc_task_stage(actor,npc,p)
+	local task = p[1] and task_manager.get_task_manager().task_info[p[1]]
+	if (task and task.stage) then
+		task.stage = task.stage + 1
+	end
+end 
+
+function dec_task_stage(actor,npc,p)
+	local task = p[1] and task_manager.get_task_manager().task_info[p[1]]
+	if (task and task.stage) then
+		task.stage = task.stage - 1
+	end
+end
+
 --param 1 var to store bounty id
 --param 2+ factions that can be targetted; can be list
 function on_init_bounty_hunt(actor,npc,p)
@@ -150,7 +164,10 @@ function complete_task_inc_goodwill(actor,npc,p)
 end
 
 function reward_money(actor,npc,p)
-	dialogs.relocate_money(db.actor,tonumber(p[1] or 0),"in")
+	dialogs.relocate_money(db.actor,tonumber(p[1] or 500),"in")
+end
+function reward_random_money(actor,npc,p)
+	dialogs.relocate_money(db.actor,math.random(tonumber(p[1] or 500),tonumber(p[2] or 1000)),"in")
 end
 
 function remove_special_task_squad(actor,npc,p)
@@ -192,6 +209,7 @@ function setup_companion_task(actor,npc,p)
 	create_delayed_event(0,"add_special_task_squad",5,add_special_task_squad,squad.id)
 end
 
+-- setup for special escort to anomaly task
 function setup_task_target_anomaly(actor,npc,p)
 	local targets = {}
 	for k,v in pairs(db.anomaly_by_name) do 
@@ -206,6 +224,31 @@ function setup_task_target_anomaly(actor,npc,p)
 	alun_utils.save_var(db.actor,"task_target_anomaly",target_name)
 end
 
+-- param1 - variable name 
+-- param2 - section
+function setup_generic_fetch_task(actor,npc,p)
+	if (p[1] and p[2]) then 
+		alun_utils.save_var(db.actor,p[1],p[2])
+		dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,p[2],"inv_name","string"))
+	end
+end
+
+function setup_mutant_fetch_task(actor,npc,p)
+	local parts = { 
+	"mutant_part_controller_glass",
+	"mutant_part_controller_hand",
+	"mutant_part_burer_hand",
+	"mutant_part_pseudogigant_eye",
+	"mutant_part_pseudogigant_hand",
+	"mutant_part_chimera_claw",
+	"mutant_part_chimera_kogot"
+	}
+	local part = parts[math.random(#parts)]
+	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,part,"inv_name","string"))
+	alun_utils.save_var(db.actor,p[1],artefact)
+end 
+
+-- param1 - variable name
 function setup_artefact_fetch_task(actor,npc,p)
 	local arts = {
 	"af_cristall",
@@ -242,7 +285,7 @@ function remove_fetch_item(actor,npc,p)
 	local section = alun_utils.load_var(db.actor,p[1])
 	if (section and db.actor:object(section)) then
 		remove_item(actor, npc, {section})
-		news_manager.relocate_item(db.actor, "out", section, 1)
+		--news_manager.relocate_item(db.actor, "out", section, 1)
 	end
 end
 
