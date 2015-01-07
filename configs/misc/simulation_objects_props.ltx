@@ -15,6 +15,7 @@ army 			= 0
 monolith		= 0
 stalker 		= 0
 csky			= 0
+zombied			= 0
 zoo_monster				= 0
 monster					= 0
 monster_predatory_day 	= 0
@@ -30,9 +31,12 @@ heli_monolith 	= 0
 [default_resource]:default
 resource 	= 1
 territory	= 1
+ecolog		= 1
+stalker 	= 1 
+csky		= 1
 
 [default_base]:default
-base 		= 2
+base 		= 5
 
 [default_lair]:default
 lair		= 1
@@ -45,10 +49,12 @@ all			= 1
 
 [default_squad]:default
 squad 		= 1
+all 		= 1
 
 [actor]:default
 actor		= 1
-sim_avail = true
+sim_avail 	= true
+all 		= 1
 
 ;----------- << MARSH >> ------------
 ;unique starting base
@@ -2496,8 +2502,9 @@ freedom 	= 1
 sim_avail	= true
 surge		= 1
 
-[jup_b19]:default_territory
+[jup_b19]:default_base
 sim_avail 	= true
+zombied 	= 1
 
 [jup_b200]:default_base
 sim_avail	= true
@@ -2631,7 +2638,7 @@ sim_avail =  true
 sim_avail =  true
 
 [jup_sim_12]:default_lair
-sim_avail =  {+jup_b9_heli_1_searched}true, false
+sim_avail =  true
 
 [jup_sim_13]:default_lair
 sim_avail =  true
@@ -2653,7 +2660,7 @@ resource 	= 2
 sim_avail =  true
 
 [jup_sim_19]:default_lair
-sim_avail =  false
+sim_avail =  true
 
 [jup_sim_20]:default_lair
 sim_avail =  true
@@ -2664,10 +2671,10 @@ sim_avail =  true
 ; --------------------------------------------------------------------------
 
 [pri_a15]:default_territory
-sim_avail = {+pri_a15_cutscene_end} true, false
+sim_avail = true
 
 [pri_a16]:default_base
-sim_avail = {+pri_a28_actor_in_zone_stay} true, false
+sim_avail = true
 stalker		= 1 
 bandit		= 1 
 csky		= 1 
@@ -2676,24 +2683,24 @@ freedom 	= 1
 army		= 1
 
 [pri_a17]:default_territory
-sim_avail = {+pri_a17_actor_has_gauss_rifle} true, false
+sim_avail = true
 
 [pri_a18_smart_terrain]:default_territory
-sim_avail = {+pri_a18_reinf_go_base} true, false
+sim_avail = true 
 surge = 1
 
 [pri_a21_smart_terrain]:default_territory
-sim_avail = {-pri_a21_sentry_task_done +zat_a23_actor_has_gauss_rifle_documentation +pri_a20_talk_with_colonel_complete} false, true
+sim_avail = true
 surge = 1
 
 [pri_a22_smart_terrain]:default_territory
-sim_avail = {+pri_a22_scene_done} true, {-pri_a22_scene_done +pri_a18_found_antenna +pri_a21_sentry_task_done +pri_a19_lab_x8_investigated} false, true
+sim_avail = true
 
 [pri_a25_smart_terrain]:default_territory
-sim_avail = {+pri_a25_rfi_source_eliminated} true, false
+sim_avail = true
 
 [pri_b301]:default_resource
-sim_avail = {+pri_b301_zulus_dead} true, {+pri_b301_save_zulus_complete} true, false
+sim_avail = true
 surge = 1
 
 [pri_b302]:default_resource
@@ -2704,22 +2711,22 @@ sim_avail = {+pri_b303_door_is_open} true, false
 surge = 1
 
 [pri_b304]:default_territory
-sim_avail = {+pri_b304_actor_take_toolkit} true, false
+sim_avail = true
 surge = 1
 
 [pri_b306]:default_resource
-sim_avail = {+pri_b306_task_end} true, false
+sim_avail = true
 surge = 1
 
 [pri_b307]:default_resource
 sim_avail = true
 
 [pri_b35_mercs]:default_territory
-sim_avail = {-pri_b35_task_end +pri_b35_task_running} false, true
+sim_avail = true
 surge = 1
 
 [pri_b36_smart_terrain]:default_territory
-sim_avail = {+pri_b36_master_dead} true, false
+sim_avail = true
 surge 		= 1
 stalker 	= 1
 dolg		= 1 
@@ -2764,35 +2771,35 @@ sim_avail = true
 sim_avail = true
 
 [pri_b35_military]:default_territory
-sim_avail = {-pri_b35_task_end +pri_b35_task_running} false, true
+sim_avail = true
 surge = 1
 
 [pri_b305_dogs]:default_territory
 sim_avail = false
 
 [pri_b304_monsters_smart_terrain]:default_territory
-sim_avail = {+zat_b103_toolkit_2_second} true, false
+sim_avail = true
 
 [pri_a20]:default_territory
-sim_avail = false
+sim_avail = true
 
 [pri_a28_heli]:default_territory
-sim_avail = false
+sim_avail = true
 
 [pri_a28_base]:default_territory
-sim_avail = false
+sim_avail = true
 
 [pri_a28_shop]:default_territory
-sim_avail = false
+sim_avail = true
 
 [pri_a28_arch]:default_territory
-sim_avail = false
+sim_avail = true
 
 [pri_a28_school]:default_territory
-sim_avail = false
+sim_avail = true
 
 [pri_a28_evac]:default_territory
-sim_avail = false
+sim_avail = true
 
 ;underpass
 [lx8_smart_terrain]:default_territory
