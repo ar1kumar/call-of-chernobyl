@@ -56,7 +56,7 @@ function on_game_load()
 		if sobj then
 			local sec = sobj:section_name()
 			if string.find(sec,"gl_test_shell") or string.find(sec,"gl_fake_missile") then
-				printf("net_spawn:remove %s",sec)
+				--printf("net_spawn:remove %s",sec)
 				temp.rem[a] = true
 			end
 		end
@@ -577,7 +577,7 @@ function check_weapon(wpn)
 						printf("not found gl sections for shell [%s]",s)
 					end
 				end
-				printf("read_wpn_params[%s]:vel=[%s],launcher=[%s],prtcl=[%s],sshoot=[%s],sreload=[%s],sswitch=[%s],",sec,vel,launcher,particles,sound_shoot,sound_reload,sound_switch)
+				--printf("read_wpn_params[%s]:vel=[%s],launcher=[%s],prtcl=[%s],sshoot=[%s],sreload=[%s],sswitch=[%s],",sec,vel,launcher,particles,sound_shoot,sound_reload,sound_switch)
 				gl_sets.weapons[sec] = {shells = shells,vel = vel,prtcl = particles,sshoot = sound_shoot,sreload = sound_reload,sswitch = sound_switch}
 			end
 			if #gl_sets.weapons[sec].shells == 0 then
@@ -609,31 +609,31 @@ end
 function check_victims(npc,pos,radius,pre)
 	local nid = npc:id()
 	if not radius then
-		printf("check_victims[%s]:not radius",npc:character_name())
+	--printf("check_victims[%s]:not radius",npc:character_name())
 		radius = 1
 	end
 	if npc:position():distance_to(pos) < radius+1.5 then
-		printf("check_victims[%s]:near npc",npc:character_name())
+		--printf("check_victims[%s]:near npc",npc:character_name())
 		return false
 	end
 --	printf("check victims for [%s]",nid)
 	local enemy = false
 	for k,v in pairs(db.storage) do
 		local obj = level.object_by_id(k)
-		if k ~= nid and obj and obj:alive() then
+		if (k ~= nid and obj) and (k == 0 or (IsStalker(obj) or IsMonster(obj)) and obj:alive())then
 			if obj:position():distance_to(pos) < radius+1 then
 				if npc:relation(obj) >= game_object.enemy then
-					printf("check_victims[%s]:enemy = true[%s]",npc:character_name(),obj:name())
+					--printf("check_victims[%s]:enemy = true[%s]",npc:character_name(),obj:name())
 					enemy = true
 				else
-					printf("check_victims[%s]:friend = true[%s]",npc:character_name(),obj:name())
+					--printf("check_victims[%s]:friend = true[%s]",npc:character_name(),obj:name())
 					return false
 				end
 			end
 		end
 	end
 	if pre then
-		printf("check_victims[%s]:return enemy[%s]",npc:character_name(),tostring(enemy))
+		--printf("check_victims[%s]:return enemy[%s]",npc:character_name(),tostring(enemy))
 		return enemy
 	else
 		return true
@@ -646,7 +646,7 @@ function spawn_shell(npc)
 		local cnt = #gl_sets.weapons[wpn:section()].shells
 		if cnt ~= 0 then
 			local shell = gl_sets.weapons[wpn:section()].shells[math.random(cnt)]
-			printf("create shell %s",shell)
+			--printf("create shell %s",shell)
 			alife():create(shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 		end
 	end
@@ -659,7 +659,7 @@ function actor_on_update()
 		if sobj then
 			local obj = level.object_by_id(k)
 			if obj and obj:parent() then
-				printf("obj:parent()!")
+				--printf("obj:parent()!")
 			elseif obj then
 				if v.launch then
 					launch(obj,v.target,v.type)
@@ -670,39 +670,39 @@ function actor_on_update()
 					end
 					temp.fms[k].launch = nil
 					temp.fms[k].type = nil
-					printf("launch!")
+					--printf("launch!")
 				end
 				local vel = get_atn_vel(obj)
 				if v.explode then
 				elseif v.time < tg then
 					temp.rem[k] = true
 					temp.fms[k] = nil
-					printf("release")
+					--printf("release")
 				elseif v.cnt > 6 or v.vel > 20 then
-					printf("test:vel=[%s],v.vel=[%s]",vel,v.vel)
+					--printf("test:vel=[%s],v.vel=[%s]",vel,v.vel)
 					local pos = obj:position()
 					if vel < v.vel*0.92 or vel > v.vel*1.11 then
-						printf("trigger")
+						--printf("trigger")
 						if v.test then
 --							level.map_remove_object_spot(k,"red_location")
 							temp.fms[k].pos = pos
 							temp.fms[k].explode = true
 							temp.rem[k] = true
-							printf("test:explode!:dist=[%s]",pos:distance_to(v.target))
+							--printf("test:explode!:dist=[%s]",pos:distance_to(v.target))
 						else
 --							level.map_remove_object_spot(k,"grenade_location")
 							if check_victims(v.npc,pos,v.radius) then
-								printf("explode!:dist=[%s]",pos:distance_to(v.target))
+								--printf("explode!:dist=[%s]",pos:distance_to(v.target))
 								obj:explode(0)
 							else
-								printf("release!:dist=[%s]",pos:distance_to(v.target))
+								--printf("release!:dist=[%s]",pos:distance_to(v.target))
 								temp.rem[k] = true
 								spawn_shell(v.npc)
 							end
 							temp.fms[k] = nil
 						end
 					else
---						printf("else")
+--						--printf("else")
 						temp.fms[k].vel = vel
 						temp.fms[k].cnt = v.cnt + 1
 --						obj:set_desired_direction(utils.vector_copy_by_val(v.target):sub(pos))
@@ -712,20 +712,20 @@ function actor_on_update()
 					temp.fms[k].cnt = v.cnt + 1
 				end
 			else
-				printf("not obj!")
+				--printf("not obj!")
 				temp.rem[k] = true
 				temp.fms[k] = nil
 			end
 		elseif not v.explode then
-			printf("not sobj! %s",k)
+			--printf("not sobj! %s",k)
 			temp.fms[k] = nil
 		end
 	end
 	for id,v in pairs(temp.rem) do
 		local se = alife():object(id)
 		if se or (se == false and se.parent_id and se.parent_id ~= 65535) then
-			printf("parent_id %s",tostring(se.parent_id))
-			printf("release %s",id)
+			--printf("parent_id %s",tostring(se.parent_id))
+			--printf("release %s",id)
 			alife():release(se)
 		end
 	end
@@ -776,7 +776,7 @@ function npc_on_death_callback(npc)
 	local function remove_fms(q,item)
 		local sec = item:section()
 		if string.find(sec,"gl_test_shell") or string.find(sec,"gl_fake_missile") then
-			printf("death:remove %s",item:name())
+			--printf("death:remove %s",item:name())
 			temp.rem[item:id()] = true
 		end
 	end
@@ -786,7 +786,7 @@ end
 function actor_on_item_take(obj)
 	local sec = obj:section()
 	if string.find(sec,"gl_test_shell") or string.find(sec,"gl_fake_missile") then
-		printf("fake_pickup:remove %s",obj:name())
+		--printf("fake_pickup:remove %s",obj:name())
 		temp.rem[obj:id()] = true
 	end
 end

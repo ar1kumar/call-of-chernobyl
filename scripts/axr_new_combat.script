@@ -1090,7 +1090,7 @@ function action_new_combat:execute()
 	local tg = time_global()
 	local ene_pos = is_heli and enemy:position() or npc:memory_position(enemy) or enemy:position()
 	local dist = is_heli and heli_alife.distance_2d_sqr(npc:position(),enemy:position()) or ene_pos:distance_to_sqr(npc:position())
-	local mem_time = is_heli and tg or enemy:memory_time(npc)
+	local mem_time = is_heli and tg or ((IsStalker(enemy) or IsMonster(enemy)) and enemy:memory_time(npc))
 	local see = is_heli and enemy:get_helicopter():isVisible(npc) or enemy:see(npc) or mem_time and tg - mem_time <= 7000
 
 	if (is_heli) then 
