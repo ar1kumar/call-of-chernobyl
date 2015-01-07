@@ -1063,7 +1063,7 @@ function get_vertex(npc,dist)
 	else
 		ang = math.random(300,310)
 	end
-	local dir = vector_rotate_y(npc:direction(),ang)
+	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),ang)
 	return npc:vertex_in_direction(npc:level_vertex_id(),dir,dist)
 end
 

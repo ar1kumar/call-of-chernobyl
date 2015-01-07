@@ -196,7 +196,9 @@ function action_launch_grenade:initialize()
 	npc:set_item(object.idle,wpn)
 	self.lvid = npc:level_vertex_id()
 	self.bodystate = npc:body_state()
-	self.target_point = self.st.target:position()
+	
+	local vid = alun_utils.get_vertex(self.st.target,math.random(3,5))
+	self.target_point = vid and level.vertex_position(vid) or self.st.target:position()
 	self.direction = utils.vector_copy_by_val(self.target_point):sub(npc:position()):add(vector():set(0,1,0))
 	self.test_end = time_global()+5000
 	if rx_wmgr then

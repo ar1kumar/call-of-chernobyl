@@ -477,7 +477,7 @@ end
 
 function IsStalker(object, id)
 	if (object and object.is_stalker) then 
-		return object:is_stalker()
+		return object:is_stalker() or object:is_actor()
 	end
 	id = id or get_clsid(object)
 	return id and stalker_classes[id] == true
