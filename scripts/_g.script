@@ -952,7 +952,7 @@ function get_object_squad(object,caller)
 	if object == nil then return abort("You are trying to get squad_object from NIL object!!! %s",caller) end
 	local obj_id = type(object.id ) == "function" and object:id() or object.id
 	local sim = aa or alife()
-	local se_obj = object.se_obj or sim:object(obj_id)
+	local se_obj = sim:object(obj_id)
 	if se_obj and se_obj.group_id ~= 65535 then
 		return sim:object(se_obj.group_id)
 	end

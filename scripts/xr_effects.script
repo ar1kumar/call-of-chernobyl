@@ -245,7 +245,7 @@ function setup_mutant_fetch_task(actor,npc,p)
 	}
 	local part = parts[math.random(#parts)]
 	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,part,"inv_name","string"))
-	alun_utils.save_var(db.actor,p[1],artefact)
+	alun_utils.save_var(db.actor,p[1],part)
 end 
 
 -- param1 - variable name

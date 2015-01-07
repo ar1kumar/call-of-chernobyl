@@ -80,7 +80,6 @@ function motivator_binder:net_spawn(sobject)
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)
 		
-	self.object.se_obj = sobject
 	db.add_obj(self.object)
 	if not self.object:alive() then
 		self.object:death_sound_enabled(false)

@@ -15,9 +15,7 @@ function jump_to_level(new_level,specific_gvid,specific_lvid,specific_pos)
 	local function create_lc(gvid,vertex)
 		local se_obj = sim:create("level_changer",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 		if (se_obj) then
-			if (axr_main) then 
-				axr_main.REMOVE_ME_LC = se_obj.id
-			end 
+			axr_main.REMOVE_ME_LC = se_obj.id
 			data = stpk_utils.get_level_changer_data(se_obj)
 			if (data) then
 				data.dest_game_vertex_id = gvid
@@ -88,11 +86,11 @@ function release_object(p)
 end
 
 function teleport_squad(squad,gvid,lvid,pos)
-	if not (alife().teleport_object) then 
+	local sim = alife()
+	if not (sim.teleport_object) then 
 		return 
 	end 
-	
-	local sim = alife()
+
 	sim:teleport_object(squad.id,gvid,lvid,pos)
 	for k in squad:squad_members() do
 		sim:teleport_object(k.id,gvid,lvid,pos)
