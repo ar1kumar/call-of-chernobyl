@@ -81,10 +81,15 @@ local function eval_weapon(mgr,npc)
 		return true
 	end
 
-	if not isWeapon(npc:best_weapon()) then
+	local bestweapon = npc:best_weapon()
+	if not (bestweapon) then 
+		return true 
+	end
+	
+	if not IsWeapon(bestweapon) then
 		return true
 	end
-	local bestweapon = npc:best_weapon()
+	
 	local activeitem = npc:active_item()
 
 	if (weapon == "strapped" and
@@ -356,7 +361,7 @@ function act_state_mgr_end:weapon_update()
 	end
 
 	local wpn = self.object:best_weapon()
-	if (not wpn or not isWeapon(wpn)) then
+	if (not wpn or not IsWeapon(wpn)) then
 		return
 	end
 

@@ -337,9 +337,12 @@ function is_object_online(obj_id)
 	return level.object_by_id(obj_id) ~= nil
 end
 
-function get_clsid(npc)
-	if npc == nil then return nil end
-	return npc.clsid and type(npc.clsid) == "function" and npc:clsid()
+function get_clsid(obj)
+	if not (obj) then 
+		printf("ERROR: get_clsid - obj is nil!")
+		callstack()
+	end
+	return obj.clsid and obj:clsid()
 end
 
 --Tvчисляет yaw в радианах
@@ -488,7 +491,7 @@ function IsHelicopter(object, id)
 	return id and (id == clsid.helicopter or id == clsid.car or id == clsid.script_heli) or false
 end
 
-function isWeapon(object, id)
+function IsWeapon(object, id)
 	--if (object and object.is_weapon) then 
 		--return object:is_weapon()
 	--end
@@ -496,7 +499,7 @@ function isWeapon(object, id)
 	return id and weapon_classes[id] == true or false
 end
 
-function isArtefact(object, id)
+function IsArtefact(object, id)
 	if (object and object.is_artefact) then 
 		return object:is_artefact()
 	end

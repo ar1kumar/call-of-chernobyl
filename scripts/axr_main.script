@@ -672,7 +672,7 @@ end
 -- actor_on_item_take(item)
 -------------------
 function actor_on_item_take(binder,item)
-	if isArtefact(item) then
+	if IsArtefact(item) then
 		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
 		if anomal_zone ~= nil then
 			anomal_zone:on_artefact_take(item)

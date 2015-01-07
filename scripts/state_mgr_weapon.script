@@ -13,10 +13,15 @@ function eva_state_mgr_weapon:evaluate()
 		return true
 	end
 
-	if not isWeapon(self.object:best_weapon()) then
+	local bestweapon = self.object:best_weapon()
+	if not (bestweapon) then 
+		return true 
+	end
+	
+	if not IsWeapon(bestweapon) then
 		return true
 	end
-	local bestweapon = self.object:best_weapon()
+	
 	local activeitem = self.object:active_item()
 
 	if (weapon == "strapped" and
@@ -93,7 +98,7 @@ end
 function eva_state_mgr_weapon_strapped_now:evaluate()
 	local best_weapon = self.object:best_weapon()
 
-	if not isWeapon(best_weapon) then
+	if not IsWeapon(best_weapon) then
 		return true
 	end
 

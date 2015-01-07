@@ -467,7 +467,7 @@ function wpn_info_get(npc)
 	local rslt = {}
 
 	local active_item = npc:active_item()
-	local has_weapon = active_item and isWeapon(active_item)
+	local has_weapon = active_item and IsWeapon(active_item)
 	if has_weapon then
 		rslt["id"] = active_item:id()
 		rslt["ammo"] = active_item:get_ammo_in_magazine()
