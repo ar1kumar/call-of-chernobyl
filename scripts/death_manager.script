@@ -189,8 +189,8 @@ function keep_item(npc, item)
 		return
 	end
 	--printf("item name [%s]", item:name())
-	local clsid = item:clsid()
-	if IsWeapon(item,clsid) and not(clsid==clsid.wpn_grenade_rgd5_s or clsid==clsid.wpn_grenade_f1_s) then
+	local cls = item:clsid()
+	if IsWeapon(item,cls) and not(cls==clsid.wpn_grenade_rgd5_s or cls==clsid.wpn_grenade_f1_s) then
 		set_weapon_drop_condition(item)
 		return
 	end
