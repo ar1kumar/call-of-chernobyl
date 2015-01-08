@@ -340,7 +340,9 @@ function heli_combat:initialize()
 	self.flyby_states_for_one_pass  = 2
 
 	--self.object:set_fastcall( self.fastcall, self )
-
+	
+	self.heliObject:TurnEngineSound(true)
+	
 	self.initialized = true
 	self.flyby_initialized  = false
 	self.round_initialized  = false
@@ -449,57 +451,40 @@ end
 function heli_combat:update_combat_type( see_enemy )
 	local ct = self.combat_type
 
---	printf( "flyby_states_for_one_pass=%d", self.flyby_states_for_one_pass )
-
-	if self.combat_type == combat_type_flyby then
-		if self.flyby_states_for_one_pass <= 0 then
+	if (ct == combat_type_flyby) then 
+		if (self.flyby_states_for_one_pass <= 0) then 
 			if self.attack_before_retreat then
-				ct = combat_type_retreat
+				self:set_combat_type(combat_type_retreat)
 			else
-				ct = combat_type_round
+				self:set_combat_type(combat_type_round)
 			end
 		end
-
-	elseif self.combat_type == combat_type_round then
-		if see_enemy then
-			if distance_2d( self.object:position(), self.enemy:position() ) > self.flyby_attack_dist + 70 --and
---			   not self.flyby_pass_finished
-			then
-				ct = combat_type_flyby
-			end
-		else
-			ct = combat_type_search
-		end
-
-		if bind_heli.get_heli_health( self.heliObject, self.st ) < self.flame_start_health then
-			self.attack_before_retreat = true
-
-			self.heliObject.m_use_rocket_on_attack = true
-
-			ct = combat_type_flyby
-		end
-
-	elseif self.combat_type == combat_type_search then
-		if see_enemy then
-			if distance_2d( self.object:position(), self.enemy:position() ) > self.flyby_attack_dist then
-				ct = combat_type_flyby
-			else
-				ct = combat_type_round
-			end
-		end
-
-		if bind_heli.get_heli_health( self.heliObject, self.st ) < self.flame_start_health then
-			self.attack_before_retreat = true
-
-			self.heliObject.m_use_rocket_on_attack = true
-
-			ct = combat_type_flyby
-		end
+		return
 	end
 
---	printf( "combat_type = %s", tostring( self.combat_type ) )
-	self:set_combat_type( ct )
---	printf( "combat_type = %s", tostring( self.combat_type ) )
+	if (bind_heli.get_heli_health( self.heliObject, self.st ) < self.flame_start_health) then
+		self.attack_before_retreat = true
+		self.heliObject.m_use_rocket_on_attack = true
+		self:set_combat_type(combat_type_flyby)
+		return
+	end
+		
+	if (ct == combat_type_round) then
+		if (see_enemy) then 
+			if (distance_2d(self.object:position(),self.enemy:position()) > self.flyby_attack_dist + 70) then 
+				self:set_combat_type(combat_type_flyby)
+			end
+		else 
+			self:set_combat_type(combat_type_search)
+		end
+		return
+	end
+	
+	if (ct == combat_type_search) then 
+		if (see_enemy and distance_2d(self.object:position(),self.enemy:position()) > self.flyby_attack_dist) then 
+			self:set_combat_type(combat_type_round)
+		end
+	end 
 end
 
 -- нужно ли игнорировать врага

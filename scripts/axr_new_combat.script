@@ -332,7 +332,7 @@ function action_new_combat:npc_see(enemy)
 	return false
 end 
 
-function action_new_combat:set_fire_type(dist)
+function action_new_combat:set_fire_type(enemy,dist)
 	--alun_utils.debug_write("action_new_combat:set_fire_type")
 	local can_set = true
 	local tg = time_global()
@@ -381,7 +381,7 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 	local npc_see = self:npc_see(enemy)
 	local vec
 
-	self:set_fire_type(dist)
+	self:set_fire_type(enemy,dist)
 	
 	local sight_type = npc:sight_params()
 	sight_type = sight_type and sight_type.m_sight_type or 0
@@ -429,7 +429,7 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 	end
 end
 
-function action_new_combat:try_go_cover_reload(npc,ene_pos)
+function action_new_combat:try_go_cover_reload(npc,enemy,ene_pos)
 	--alun_utils.debug_write(alun_utils.sr("action_new_combat:try_go_cover_reload"))
 	local bw = self:find_suitable_weapon(npc,enemy)
 	
@@ -760,7 +760,7 @@ function action_new_combat:low_level_ai_execute(npc,enemy,ene_pos,see,dist)
 	npc:set_mental_state(anim.danger)
 	npc:set_movement_type(move.walk)
 
-	new_vid = self:try_go_cover_reload(npc,ene_pos)
+	new_vid = self:try_go_cover_reload(npc,enemy,ene_pos)
 	if (new_vid == nil) then
 		if (dist <= 400) then 
 			self:set_body_state(npc,move.standing)
@@ -819,7 +819,7 @@ function action_new_combat:heli_combat_execute(npc,enemy,ene_pos,see,dist)
 		return
 	end
 	
-	new_vid = self:try_go_cover_reload(npc,ene_pos)
+	new_vid = self:try_go_cover_reload(npc,enemy,ene_pos)
 	if (new_vid == nil) then
 		if (dist <= 64) then
 			self:set_body_state(npc,move.standing)
@@ -902,7 +902,7 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 	npc:set_movement_type(move.walk)
 	
 	new_vid = self:try_to_facer(npc,enemy,ene_pos,dist)
-	new_vid = new_vid or self:try_go_cover_reload(npc,ene_pos)
+	new_vid = new_vid or self:try_go_cover_reload(npc,enemy,ene_pos)
 	
 	if (new_vid == nil) then
 		local bw = self:find_suitable_weapon(npc,enemy)
