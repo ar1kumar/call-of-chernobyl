@@ -895,10 +895,15 @@ function planner_hud_show(hud)
 						return true
 					end
 
-					if not IsWeapon(npc:best_weapon()) then
+					local bestweapon = npc:best_weapon()
+					if not (bestweapon) then 
+						return 
+					end
+					
+					if not IsWeapon(bestweapon) then
 						return true
 					end
-					local bestweapon = npc:best_weapon()
+					
 					local activeitem = npc:active_item()
 
 					if (weapon == "strapped" and

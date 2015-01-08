@@ -341,8 +341,9 @@ function get_clsid(obj)
 	if not (obj) then 
 		printf("ERROR: get_clsid - obj is nil!")
 		callstack()
+		return
 	end
-	return obj.clsid and obj:clsid()
+	return obj.clsid and obj:clsid() or nil
 end
 
 --Tvчисляет yaw в радианах
