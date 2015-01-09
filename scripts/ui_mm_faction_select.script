@@ -69,8 +69,8 @@ local function on_game_load()
 			
 			db.actor:set_character_community("actor_"..faction, 0, 0)
 			
-			local _xml = alun_utils.XmlParser():loadFile(alun_utils.fspath("$game_config$").."gameplay\\character_desc_general.xml")
-			_xml = alun_utils.XmlFindNodeWithPropertyValue(_xml,"specific_character","id","actor_"..faction)
+			local _xml = alun_utils.XmlParser:loadFile(alun_utils.fspath("$game_config$").."gameplay\\character_desc_general.xml")
+			_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
 			if (_xml) then
 				local supplies = alun_utils.XmlGetNodeValue(_xml,"supplies")
 				if (supplies) then 
@@ -88,10 +88,10 @@ local function on_game_load()
 					end
 				end
 				
-				local money_max = alun_utils.XmlGetNodePropertyValue(_xml,"money","max")
+				local money_max = alun_utils.XmlGetNodeAttribute(_xml,"money","max")
 				if (money_max) then
 					money_max = tonumber(money_max)
-					if (money_max > 0) then
+					if (money_max > 1) then
 						set_money = money_max-1
 					end
 				end
@@ -197,11 +197,11 @@ function faction_ui:OnFactionSelect(faction)
 	local gs = game.translate_string
 	local desc = gs("st_faction_"..faction.."_desc") .. "\\n \\n \\n"
 	
-	local _xml = alun_utils.XmlParser():loadFile(alun_utils.fspath("$game_config$").."gameplay\\character_desc_general.xml")
-	_xml = alun_utils.XmlFindNodeWithPropertyValue(_xml,"specific_character","id","actor_"..faction)
+	local _xml = alun_utils.XmlParser:loadFile(alun_utils.fspath("$game_config$").."gameplay\\character_desc_general.xml")
+	_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
 	if (_xml) then
 	
-		local money_max = alun_utils.XmlGetNodePropertyValue(_xml,"money","max")
+		local money_max = alun_utils.XmlGetNodeAttribute(_xml,"money","max")
 		if (money_max) then
 			desc = desc .. "%c[0,245,245,220]Money: %c[0,188,210,238]".. money_max .. " RU\\n \\n"
 		end

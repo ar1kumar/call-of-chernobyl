@@ -65,8 +65,13 @@ end
 
 function actor_has_fetch_item(task,task_id)
 	local section = db.actor and alun_utils.load_var(db.actor,task_id.."_fetch")
-	if (section and db.actor:object(section) ~= nil) then 
-		task.stage = 1
+	local item = section and db.actor:object(section)
+	if (item ~= nil) then 
+		if (task_id == "esc_2_12_stalker_nimble_task_1" and item:condition() >= 1) then 
+			task.stage = 1
+		else 
+			task.stage = 1
+		end 
 	else 
 		task.stage = 0 
 	end 

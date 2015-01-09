@@ -1723,61 +1723,7 @@ end
 --------------------------------
 -- XML parser 
 --------------------------------
-
-class "XmlNode"
-function XmlNode:__init(name)
-	self.___value = nil
-	self.___name = name
-	self.___children = {}
-	self.___props = {}
-	self.___root = {}
-end
-function XmlNode:raw() return self.___root end
-function XmlNode:child(name) return self.___root[name] end
-function XmlNode:value() return self.___value end
-function XmlNode:setValue(val) self.___value = val end
-function XmlNode:name() return self.___name end
-function XmlNode:setName(name) self.___name = name end
-function XmlNode:children() return self.___children end
-function XmlNode:numChildren() return #self.___children end
-function XmlNode:addChild(child)
-	if (child == nil or type(child.name) ~= "function") then 
-		return 
-	end 
-	
-	if (self.___root[child:name()]) then 
-		if (type(self.___root[child:name()].name) == "function") then 
-			local tempTable = {}
-			table.insert(tempTable, self.___root[child:name()])
-			self.___root[child:name()] = tempTable
-		end
-		table.insert(self.___root[child:name()], child)
-	else
-		self.___root[child:name()] = child
-	end
-
-	table.insert(self.___children, child)
-end
-function XmlNode:properties() return self.___props end
-function XmlNode:numProperties() return #self.___props end
-function XmlNode:addProperty(name, value)
-	local lName = "@" .. name
-	if self.___root[lName] ~= nil then
-		if type(self.___root[lName]) == "string" then
-			local tempTable = {}
-			table.insert(tempTable, self.___root[lName])
-			self.___root[lName] = tempTable
-		end
-		table.insert(self.___root[lName], value)
-	else
-		self.___root[lName] = value
-	end
-	table.insert(self.___props, { name = name, value = value })
-end
-
-class "XmlParser"
-function XmlParser:__init()
-end
+XmlParser = {}
 function XmlParser:ToXmlString(value)
 	value = string.gsub(value, "&", "&amp;"); -- '&' -> "&amp;"
 	value = string.gsub(value, "<", "&lt;"); -- '<' -> "&lt;"
@@ -1805,94 +1751,83 @@ function XmlParser:FromXmlString(value)
 	value = string.gsub(value, "&amp;", "&");
 	return value;
 end
-function XmlParser:ParseArgs(node, s)
+function XmlParser:ParseArgs(s)
+	local arg = {}
 	string.gsub(s, "(%w+)=([\"'])(.-)%2", function(w, _, a)
-		node:addProperty(w, self:FromXmlString(a))
+		arg[w] = self:FromXmlString(a);
 	end)
+	return arg
 end
-function XmlParser:ParseXmlText(xmlText)
+function XmlParser:ParseXmlText(xmlText,path)
 	local stack = {}
-	local top = XmlNode()
+	local top = {Name=nil,Value=nil,Attributes={},ChildNodes={}}
 	table.insert(stack, top)
-	local ni, c, label, xarg, empty
+	local ni,c,label,xarg, empty
 	local i, j = 1, 1
 	while true do
-		ni, j, c, label, xarg, empty = string.find(xmlText, "<(%/?)([%w_:]+)(.-)(%/?)>", i)
+		ni,j,c,label,xarg, empty = string.find(xmlText, "<(%/?)([%w_:]+)(.-)(%/?)>", i)
 		if not ni then break end
-		local text = string.sub(xmlText, i, ni - 1);
+		local text = string.sub(xmlText, i, ni-1);
 		if not string.find(text, "^%s*$") then
-			local lVal = (top:value() or "") .. self:FromXmlString(text)
-			stack[#stack]:setValue(lVal)
+			top.Value=(top.Value or "")..self:FromXmlString(text);
 		end
-		if empty == "/" then -- empty element tag
-			local lNode = XmlNode(label)
-			self:ParseArgs(lNode, xarg)
-			top:addChild(lNode)
-		elseif c == "" then -- start tag
-			local lNode = XmlNode(label)
-			self:ParseArgs(lNode, xarg)
-			table.insert(stack, lNode)
-	top = lNode
-		else -- end tag
-			local toclose = table.remove(stack) -- remove top
-
+		if empty == "/" then  -- empty element tag
+			table.insert(top.ChildNodes, {Name=label,Value=nil,Attributes=self:ParseArgs(xarg),ChildNodes={}})
+		elseif c == "" then   -- start tag
+			top = {Name=label, Value=nil, Attributes=self:ParseArgs(xarg), ChildNodes={}}
+			table.insert(stack, top)   -- new level
+		else  -- end tag
+			local toclose = table.remove(stack)  -- remove top
 			top = stack[#stack]
 			if #stack < 1 then
-				error("XmlParser: nothing to close with " .. label)
+				printf("XmlParser: nothing to close with "..label)
 			end
-			if toclose:name() ~= label then
-				error("XmlParser: trying to close " .. toclose.name .. " with " .. label)
+			if toclose.Name ~= label then
+				printf("XmlParser: trying to close "..toclose.Name.." with "..label)
 			end
-			top:addChild(toclose)
+			table.insert(top.ChildNodes, toclose)
 		end
-		i = j + 1
+		i = j+1
 	end
 	local text = string.sub(xmlText, i);
-	if #stack > 1 then
-		error("XmlParser: unclosed " .. stack[#stack]:name())
+	if not string.find(text, "^%s*$") then
+		stack[#stack].Value=(stack[#stack].Value or "")..self:FromXmlString(text);
 	end
-	return top
+	if #stack > 1 then
+		printf("XmlParser: unclosed "..stack[stack.n].Name)
+	end
+	return stack[1].ChildNodes[1];
 end
 function XmlParser:loadFile(path)
 	local hFile, err = io.open(path, "r");
-
 	if hFile and not err then
 		local xmlText = hFile:read("*a"); -- read file content
 		io.close(hFile);
 		return self:ParseXmlText(xmlText), nil;
 	else
-		print(err)
+		printf(err)
 		return nil
 	end
 end
 
 ---- utils 
-function XmlFindNodeWithPropertyValue(xml,node_name,prop_name,val)
-	local node = xml:children()
+function XmlFindNodeWithAttribute(n,node_name,prop_name,val)
+	local node = n.ChildNodes
 	local deepest,p,c
 	local stack = {}
 	while not deepest do
-		if (node and #node > 0) then 
-			for i=1,#node do 
-				--printf("%s",node[i]:name())
-				if (node[i]:name() == node_name) then
-					p = node[i] and node[i]:properties()
-					if (p and #p > 0) then 
-						for ii=1,#p do
-							--printf("%s=%s",p[ii] and p[ii].name,p[ii] and p[ii].value)
-							if (p[ii] and p[ii].name == prop_name and p[ii].value == val) then 
-								return node[i]
-							end
-						end
-					end
+		if (node and #node > 0) then
+			for i=1,#node do
+				if (node[i].Name == node_name and node[i].Attributes[prop_name] == val) then
+					return node[i]
 				end
-				c = node[i]:children()
+				c = node[i].ChildNodes
 				if (c and #c > 0) then
-					table.insert(stack,node[i]:children())
+					table.insert(stack,node[i].ChildNodes)
 				end
 			end
 		end
-	
+
 		if (#stack > 0) then
 			node = stack[#stack]
 			stack[#stack] = nil
@@ -1901,30 +1836,29 @@ function XmlFindNodeWithPropertyValue(xml,node_name,prop_name,val)
 		end
 	end
 end
-function XmlGetNodeValue(xml,node_name)
-	local node = xml:children()
-	if (node and #node > 0) then 
-		for i=1,#node do 
-			--printf("%s",node[i]:name())
-			if (node[i]:name() == node_name) then
-				return node[i]:value()
+function XmlFindNextNodeByName(n,node_name)
+	if (n.ChildNodes and #n.ChildNodes > 0) then
+		for k,v in pairs(n.ChildNodes) do
+			if (v.Name == node_name) then
+				return n.ChildNodes[k]
 			end
 		end
 	end
 end
-function XmlGetNodePropertyValue(xml,node_name,prop_name)
-	local node = xml:children()
-	local p
-	if (node and #node > 0) then 
-		for i=1,#node do 
-			--printf("%s",node[i]:name())
-			if (node[i]:name() == node_name) then
-				p = node[i]:properties()
-				for j=1,#p do 
-					if (p[j] and p[j].name == prop_name) then 
-						return p[j].value
-					end
-				end
+function XmlGetNodeValue(n,node_name)
+	if (n.ChildNodes and #n.ChildNodes > 0) then
+		for k,v in pairs(n.ChildNodes) do
+			if (v.Name == node_name) then
+				return n.ChildNodes[k].Value
+			end
+		end
+	end
+end
+function XmlGetNodeAttribute(n,node_name,attribute)
+	if (n.ChildNodes and #n.ChildNodes > 0) then
+		for k,v in pairs(n.ChildNodes) do
+			if (v.Name == node_name) then
+				return n.ChildNodes[k].Attributes[attribute]
 			end
 		end
 	end

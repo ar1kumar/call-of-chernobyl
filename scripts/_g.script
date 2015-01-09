@@ -338,12 +338,17 @@ function is_object_online(obj_id)
 end
 
 function get_clsid(obj)
-	if not (obj) then 
-		printf("ERROR: get_clsid - obj is nil!")
+	if not (obj) then
 		callstack()
+		printf("ERROR: get_clsid - obj is nil!")
 		return
 	end
-	return obj.clsid and obj:clsid() or nil
+	if not (obj.clsid) then
+		callstack()
+		printf("ERROR: no clsid method for %s",obj:name())
+		return
+	end
+	return obj:clsid()
 end
 
 --Tvчисляет yaw в радианах

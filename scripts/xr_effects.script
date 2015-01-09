@@ -166,6 +166,20 @@ end
 function reward_money(actor,npc,p)
 	dialogs.relocate_money(db.actor,tonumber(p[1] or 500),"in")
 end
+
+function reward_item_cost_mult_and_remove(actor,npc,p)
+	local sec = alun_utils.load_var(db.actor,p[1])
+	if not (sec) then 
+		return 
+	end 
+	local item = db.actor:object(sec)
+	if not (item) then 
+		return 
+	end 
+	dialogs.relocate_money(db.actor,(tonumber(p[2]) or 1)*item:cost(),"in")
+	remove_item(actor, npc, {sec})
+end 
+
 function reward_random_money(actor,npc,p)
 	dialogs.relocate_money(db.actor,math.random(tonumber(p[1] or 500),tonumber(p[2] or 1000)),"in")
 end
@@ -279,6 +293,36 @@ function setup_artefact_fetch_task(actor,npc,p)
 	local artefact = arts[math.random(#arts)]
 	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,artefact,"inv_name","string"))
 	alun_utils.save_var(db.actor,p[1],artefact)
+end 
+
+function setup_weapon_fetch_task(actor,npc,p)
+	local itm = {
+			"wpn_bm16",
+			"wpn_toz34",
+			"wpn_wincheaster1300",
+			"wpn_spas12",
+			"wpn_protecta",
+			"wpn_ak74u",
+			"wpn_mp5",
+			"wpn_ak74",
+			"wpn_abakan",
+			"wpn_l85",
+			"wpn_lr300",
+			"wpn_sig550",
+			"wpn_groza",
+			"wpn_val",
+			"wpn_vintorez",
+			"wpn_svu",
+			"wpn_svd",
+			"wpn_rg-6",
+			"wpn_rpg7",
+			"wpn_g36",
+			"wpn_fn2000",
+			"wpn_pkm"
+	}
+	local wpn = itm[math.random(#itm)]
+	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,wpn,"inv_name","string"))
+	alun_utils.save_var(db.actor,p[1],wpn)
 end 
 
 function remove_fetch_item(actor,npc,p)
@@ -2747,7 +2791,11 @@ end
 
 --Функция отнятия предмета у игрока
 function remove_item(actor, npc, p)
-	if (p and p[1]) == nil then printf("Wrong parameters in function 'remove_item'!!!") end
+	if (p and p[1]) == nil then
+		printf("Wrong parameters in function 'remove_item'!!!") 
+		return 
+	end
+	
 	local item = p[1]
 
 	local obj = db.actor:object(item)

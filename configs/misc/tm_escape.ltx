@@ -8,6 +8,26 @@ target = {-esc_2_12_order_ready_task} nil, esc_2_12_stalker_nimble
 condlist_0 = {-esc_2_12_order_in_process -esc_2_12_order_refused} complete
 condlist_1 = {-esc_2_12_order_in_process +esc_2_12_order_refused} reversed
 
+[esc_2_12_stalker_nimble_task_1]
+icon = ui_inGame2_Osobiy_zakaz
+prior = 2
+storyline = false
+title = esc_2_12_stalker_nimble_task_1_name
+title_functor = general_fetch_task
+descr = esc_2_12_stalker_nimble_task_1_text
+descr_functor = general_fetch_task
+job_descr = esc_2_12_stalker_nimble_task_1_about
+fetch_descr = esc_2_12_stalker_nimble_task_1_fetch_about
+fetch_func = %=setup_weapon_fetch_task(esc_2_12_stalker_nimble_task_1_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = esc_2_12_stalker_nimble_task_1_fetch_finish
+repeat_timeout = 86400
+on_complete = %=complete_task_inc_goodwill(10:stalker) =reward_item_cost_mult_and_remove(esc_2_12_stalker_nimble_task_1_fetch:1.25) =inc_task_stage(esc_2_12_stalker_nimble_task_1)%
+on_fail = %=fail_task_dec_goodwill(5:stalker)%
+
+
 [esc_m_trader_task_1]
 icon = ui_inGame2_Odin_vistrel
 prior = 2

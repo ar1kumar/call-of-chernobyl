@@ -104,6 +104,79 @@ function cmd.echo(me,txt,owner,p)
 	return txt
 end
 
+function cmd.char_desc(me,txt,owner,p)
+	local wrd = first_word(me,txt,owner,"[checkall]")
+	if not (wrd) then return end
+	if not (wrd == "checkall") then return "char_desc:= try char_desc checkall" end
+	
+	local f = {	"character_desc_agroprom",
+				"character_desc_bar",
+				"character_desc_darkvalley",
+				"character_desc_deadcity",
+				"character_desc_escape",
+				"character_desc_general",
+				"character_desc_jupiter",
+				"character_desc_katacomb",
+				"character_desc_marsh",
+				"character_desc_military",
+				"character_desc_pripyat",
+				"character_desc_red_forest",
+				"character_desc_simulation",
+				"character_desc_underpass",
+				"character_desc_yantar",
+				"character_desc_zaton"
+			}
+			
+	local tags = {			["name"] = false,
+							["icon"] = false,
+							["map_icon"] = false,
+							["bio"] = false,
+							["class"] = false,
+							["community"] = false,
+							["terrain_sect"] = false,
+							["money"] = false,
+							["rank"] = false,
+							["reputation"] = false,
+							["visual"] = false,
+							["snd_config"] = false,
+							["supplies"] = false,
+							["actor_dialog"] = false
+	}
+	
+	local xml,node,id,char_node,p
+	for i=1,#f do 
+		xml = alun_utils.XmlParser:loadFile(alun_utils.fspath("$game_config$").."gameplay\\"..f[i]..".xml")
+		if (xml) then
+			for index,node in pairs(xml.ChildNodes) do
+				if (type(node) == "table") then
+
+					-- Check if all specific_character nodes for mandatory child nodes
+					for k,child in pairs(node.ChildNodes) do
+						if (type(child) == "table") then
+							if (tags[child.Name] == false) then 
+								tags[child.Name] = true
+							end
+						end
+					end	
+
+					-- Validate that all nodes by tag names exist
+					for k,v in pairs(tags) do 
+						if (v == false) then 
+							owner:SendOutput("char_desc:= specific character id=%s missing a mandatory node by name %s",node.Attributes.id,k)
+						end
+						-- reset for next loop
+						tags[k] = false
+					end
+					
+				end
+			end
+		else
+			owner:SendOutput("char_desc:= no xml by name %s",f[i])
+		end 
+	end
+	return "char_desc:= scanning complete"
+end 
+
 -- reload_system_ini
 function cmd.reload_system_ini(me,text,owner,p)
 	if (reload_system_ini) then 
