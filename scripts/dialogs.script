@@ -2,7 +2,7 @@
 last_task_id = nil
 function npc_has_ordered_task_to_give(a,b)
 	local npc = who_is_npc(a, b)
-	last_task_id = axr_task_manager and axr_task_manager.get_first_available_task(npc)
+	--return axr_task_manager and axr_task_manager.get_first_available_task(npc) ~= nil or false
 	return last_task_id ~= nil or false
 end
 
@@ -18,6 +18,7 @@ end
 function text_npc_has_ordered_task_to_give(a,b)
 	local npc = who_is_npc(a, b)
 	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)
+	last_task_id = task_section
 	return game.translate_string(task_section and axr_task_manager.get_task_job_description(task_section) or "st_no_available_task")
 end 
 
