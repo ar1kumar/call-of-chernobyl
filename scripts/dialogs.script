@@ -54,7 +54,7 @@ end
 
 function task_is_fetch_task(a,b)
 	local npc = who_is_npc(a, b)
-	local task_id = axr_task_manager.get_first_available_task(npc)
+	local task_id = last_task_id --axr_task_manager.get_first_available_task(npc)
 	if not (task_id) then 
 		return false 
 	end 

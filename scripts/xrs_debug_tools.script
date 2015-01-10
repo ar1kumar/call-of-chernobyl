@@ -504,7 +504,7 @@ function heli_hud_show(hud)
 		local st
 		for id,st in pairs(db.storage) do
 			mon = st.object or level.object_by_id(id)
-			if (mon and mon:alive() and IsHelicopter(mon)) then
+			if (mon and IsHelicopter(mon)) then
 				pos = npc == "cam" and device().cam_pos or mon:position()
 				dist = pos:distance_to_sqr(mon:position())
 				if not (nearest_dist) then
@@ -598,7 +598,7 @@ function monster_hud_show(hud)
 		local st
 		for id,st in pairs(db.storage) do
 			mon = st.object or level.object_by_id(id)
-			if (mon and mon:alive() and IsMonster(mon)) then
+			if (mon and IsMonster(mon) and mon:alive()) then
 				pos = npc == "cam" and device().cam_pos or mon:position()
 				dist = pos:distance_to_sqr(mon:position())
 				if not (nearest_dist) then
@@ -635,13 +635,18 @@ function monster_hud_show(hud)
 		hud:add_msg("Ini",st.ini_filename)
 		local be = near:best_enemy()
 		hud:add_msg("Best Enemy",be and be:name())
+		
+		if (st.overrides and st.overrides.combat_ignore and be) then
+			hud:add_msg("CombatIgnoreCond",xr_logic.pick_section_from_condlist(be, near, st.overrides.combat_ignore.condlist))
+		end
+		
+		be = near:get_enemy()
+		hud:add_msg("Enemy",be and be:name())
+		
 		if (st.overrides and st.overrides.combat_ignore and be) then
 			hud:add_msg("CombatIgnoreCond",xr_logic.pick_section_from_condlist(be, near, st.overrides.combat_ignore.condlist))
 		end
 
-		hud:add_msg("BodyState",near:body_state())
-		hud:add_msg("MentalState",near:mental_state())
-		
 		local smart = sobj.m_smart_terrain_id and sobj.m_smart_terrain_id ~= 65535 and alife():object(sobj.m_smart_terrain_id)
 		local npc_info = smart and smart.npc_info[near:id()]
 		if (npc_info) then 

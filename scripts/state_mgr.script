@@ -386,7 +386,7 @@ function act_state_mgr_end:weapon_update()
 		local o = self.st.look_object and level.object_by_id(self.st.look_object)
 		local pos = o and o:alive() and self.object:see(o) and o:position() or self.st.look_position
 		if (pos) then
-			if not (npc:active_item()) then 
+			if not (self.object:active_item()) then 
 				return 
 			end
 			if (t == "sniper_fire") then
