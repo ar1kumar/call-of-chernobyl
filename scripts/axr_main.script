@@ -963,12 +963,13 @@ end
 -- npc_on_update(npc,st)
 -------------------
 function npc_on_update(npc,st)
-	--alun_utils.debug_write("npc_on_update")
+	--alun_utils.debug_write("npc_on_update %s",npc:name())
 	local _nupdate = intercepts.npc_on_update
 	if (_nupdate) then
 		for i=1, #_nupdate do
+			--alun_utils.debug_write("npc_on_update %s BEFORE iterate",npc:name())
 			_nupdate[i](npc,st)
-			--callstack()
+			--alun_utils.debug_write("npc_on_update %s AFTER iterate",npc:name())
 		end
 	end
 

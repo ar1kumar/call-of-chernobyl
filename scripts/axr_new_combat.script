@@ -177,7 +177,7 @@ local function find_valid_target(npc,st,bw)
 	
 	local target = id and (db.storage[id] and db.storage[id].object or level.object_by_id(id))
 
-	if (IsHelicopter(target)) then 
+	if (target and IsHelicopter(target)) then 
 		if not (current_target) then 
 			local dist = heli_alife.distance_2d_sqr(npc:position(),target:position())
 			if (dist < 40000) then 
@@ -377,6 +377,9 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 	--alun_utils.debug_write(alun_utils.sr("action_new_combat:set_item"))
 	local is_heli = IsHelicopter(enemy,self.st.cls)
 	local bw = self:find_suitable_weapon(npc,enemy)
+	if not (bw) then 
+		return 
+	end 
 	local tg = time_global()
 	local npc_see = self:npc_see(enemy)
 	local vec
@@ -419,8 +422,10 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 			if (is_heli) then 
 				self:set_movement_type(npc,move.stand)
 			end
-			npc:set_item(object.fire1,bw,self.st.__fire_type or 1,self.st.__fire_queue or 1500)
-			self.is_firing = true
+			if (npc:active_item()) then
+				npc:set_item(object.fire1,bw,self.st.__fire_type or 1,self.st.__fire_queue or 1500)
+				self.is_firing = true
+			end
 		else
 			npc:set_item(object.aim1,bw)
 		end

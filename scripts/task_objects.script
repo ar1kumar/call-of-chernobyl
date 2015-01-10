@@ -186,7 +186,7 @@ function CGeneralTask:check_task(tm)
 		return
 	end
 
-	self.check_time = global_time + 1000 + math.random()
+	self.check_time = global_time + 1000 + math.random() + (self.prior*100)
 
 	local t_tile = task_functor[self.title_functor](self.id, "title", self.title)
 	if self.current_title ~= t_tile then

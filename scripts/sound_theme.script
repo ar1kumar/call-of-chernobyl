@@ -17,6 +17,7 @@ end
 --'--------------------------------------------------------------------------------------------------------------------
 class "npc_sound"
 function npc_sound:__init(snd_ini, section)
+	--alun_utils.debug_write("npc_sound:__init %s",section)
 	self.class_id = "npc_sound"
 		--' Параметры вычитывания звука
 	self.prefix = utils.cfg_get_bool(snd_ini, section, "npc_prefix", nil, false, false)
@@ -77,10 +78,8 @@ function npc_sound:is_playing(npc_id)
 	return obj:active_sound_count() ~= 0 or (self.pda_snd_obj and self.pda_snd_obj:playing())
 end
 function npc_sound:init_npc(npc)
-	--printf("Init %s snd NPC %s", self.section, npc:name())
+	--alun_utils.debug_write("npc_sound:init_npc %s",npc and npc:name())
 	local npc_id = npc:id()
-
-	self.npc[npc_id] = {}
 	self.sound_path[npc_id] = {}
 
 	local character_prefix
@@ -89,16 +88,17 @@ function npc_sound:init_npc(npc)
 		npc:sound_prefix("characters_voice\\")
 	end
 
-	self.npc[npc_id].id = id()
-	if self.is_combat_sound then
-		self.npc[npc_id].max = npc:add_combat_sound(self.path, nstl, snd_type.talk, 2, 1, self.npc[npc_id].id,"bip01_head") - 1
-	else
-		self.npc[npc_id].max = npc:add_sound(self.path, nstl, snd_type.talk, 2, 1, self.npc[npc_id].id) - 1
-	end
 	local f = getFS()
 	if f:exist("$game_sounds$",npc:sound_prefix()..self.path..".ogg") ~= nil then
+		self.npc[npc_id] = {}
+		self.npc[npc_id].id = id()
+	
 		self.sound_path[npc_id][1] = npc:sound_prefix()..self.path
---		printf("adding sound ["..npc:sound_prefix()..self.path.."]")
+		if self.is_combat_sound then
+			self.npc[npc_id].max = npc:add_combat_sound(self.path, nstl, snd_type.talk, 2, 1, self.npc[npc_id].id,"bip01_head") - 1
+		else
+			self.npc[npc_id].max = npc:add_sound(self.path, nstl, snd_type.talk, 2, 1, self.npc[npc_id].id) - 1
+		end
 	else
 		local num = 1
 		while f:exist("$game_sounds$",npc:sound_prefix()..self.path..num..".ogg") do
@@ -106,10 +106,25 @@ function npc_sound:init_npc(npc)
 			self.sound_path[npc_id][num] = npc:sound_prefix()..self.path..num
 			num = num + 1
 		end
+		if (num > 1) then 
+			self.npc[npc_id] = {}
+			self.npc[npc_id].id = id()
+	
+			if self.is_combat_sound then
+				self.npc[npc_id].max = npc:add_combat_sound(self.path, nstl, snd_type.talk, 2, 1, self.npc[npc_id].id,"bip01_head") - 1
+			else
+				self.npc[npc_id].max = npc:add_sound(self.path, nstl, snd_type.talk, 2, 1, self.npc[npc_id].id) - 1
+			end
+		end
 	end
 	
-	if self.npc[npc_id].max < 0 then
+	if not (self.npc[npc_id]) then 
+		return 
+	end 
+	
+	if self.npc[npc_id].max == nil or self.npc[npc_id].max < 0 then
 		abort("Couldnt find sounds %s with prefix %s", tostring(self.path), npc:sound_prefix())
+		return
 	end
 
 	if self.prefix == false then
@@ -161,6 +176,7 @@ function npc_sound:callback(npc_id)
 	end
 end
 function npc_sound:play(npc_id, faction, point, msg)
+	--alun_utils.debug_write("npc_sound:play npc_id=%s faction=%s msg=%s",npc_id,faction,msg)
 	local npc = db.storage[npc_id] and db.storage[npc_id].object
 
 	if npc == nil then
@@ -252,6 +268,10 @@ function npc_sound:play(npc_id, faction, point, msg)
 end
 function npc_sound:select_next_sound(npc_id)
 	local npc_data = self.npc[npc_id]
+	if not (npc_data and npc_data.max) then 
+		return 0 
+	end 
+	
 	if self.shuffle == "rnd" then
 		if npc_data.max == 0 then
 			return 0
@@ -302,7 +322,9 @@ function npc_sound:stop(obj_id)
 	end
 end
 function npc_sound:save(thread)
+	--alun_utils.debug_write("npc_sound:save BEFORE")
 	if self.dont_save then
+		--alun_utils.debug_write("npc_sound:save AFTER 1")
 		return
 	end
 --	set_save_marker(thread, "save", false, "npc_sound")
@@ -311,10 +333,13 @@ function npc_sound:save(thread)
 	if self.group_snd then
 		thread:w_bool(self.can_play_group_sound)
 	end
+	--alun_utils.debug_write("npc_sound:save AFTER 2")
 --	set_save_marker(thread, "save", true, "npc_sound")
 end
 function npc_sound:load(thread)
+	--alun_utils.debug_write("npc_sound:load BEFORE")
 	if self.dont_save then
+		--alun_utils.debug_write("npc_sound:load AFTER 1")
 		return
 	end
 --	set_save_marker(thread, "load", false, "npc_sound")
@@ -328,26 +353,33 @@ function npc_sound:load(thread)
 	if self.group_snd then
 		self.can_play_group_sound = thread:r_bool()
 	end
+	--alun_utils.debug_write("npc_sound:load AFTER 2")
 --	set_save_marker(thread, "load", true, "npc_sound")
 end
 function npc_sound:save_npc(thread, npc_id)
+	--alun_utils.debug_write("npc_sound:save_npc BEFORE")
 	if self.dont_save then
+		--alun_utils.debug_write("npc_sound:save_npc AFTER 1")
 		return
 	end
 --	set_save_marker(thread, "save", false, "npc_sound_save_npc")
 	if not self.group_snd then
 		thread:w_bool(self.can_play_sound[npc_id] == true)
 	end
+	--alun_utils.debug_write("npc_sound:save_npc AFTER 2")
 --	set_save_marker(thread, "save", true, "npc_sound_save_npc")
 end
 function npc_sound:load_npc(thread, npc_id)
+	--alun_utils.debug_write("npc_sound:load_npc BEFORE")
 	if self.dont_save then
+		--alun_utils.debug_write("npc_sound:load_npc AFTER 1")
 		return
 	end
 --	set_save_marker(thread, "load", false, "npc_sound_save_npc")
 	if not self.group_snd then
 		self.can_play_sound[npc_id] = thread:r_bool()
 	end
+	--alun_utils.debug_write("npc_sound:load_npc AFTER 2")
 --	set_save_marker(thread, "load", true, "npc_sound_save_npc")
 end
 --'--------------------------------------------------------------------------------------------------------------------

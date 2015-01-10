@@ -387,7 +387,7 @@ function CSurgeManager:update()
 		prev_sec = diff_sec
 		local level_name = level.name()
 		if(level_name == "l11_hospital" or self.atmosfear.valid_levels[level_name] ~= true or self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==0) then
-			printf("Surge stopped because of level!")
+			--printf("Surge stopped because of level!")
 			self:end_surge()
 			return
 		end
@@ -1369,7 +1369,7 @@ function CSurgeManager:kill_all_unhided_after_actor_death()
 					end
 					if(release) then
 						local fate = self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_blowout_fate",0,"killonwave")
-						printf("Releasing npc [%s] from squad [%s] after actors death because of surge!",obj:name(), squad:name())
+						--printf("Releasing npc [%s] from squad [%s] after actors death because of surge!",obj:name(), squad:name())
 						if fate=="turntozombie" then
 							self:turn_to_zombie(obj)
 						elseif fate=="explode" then

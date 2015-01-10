@@ -360,6 +360,8 @@ end
 
 function motivator_binder:update(delta)
 	object_binder.update(self, delta)
+	
+	--alun_utils.debug_write("motivator_bind:update %s START",self.object and self.object:name())
 
 	local object = self.object
 	local id = object:id()
@@ -373,6 +375,7 @@ function motivator_binder:update(delta)
 		end
 		self.first_update = true
 		object:set_tip_text_default()
+		--alun_utils.debug_write("motivator_bind:update %s END 1",self.object and self.object:name())
 		return
 	end 
 	
@@ -395,6 +398,7 @@ function motivator_binder:update(delta)
 	-- create a 200 milisecond delay
 	local tg = time_global()
 	if (self.last_update and tg < self.last_update) then
+		--alun_utils.debug_write("motivator_bind:update %s END 2",self.object and self.object:name())
 		return
 	end
 	self.last_update = tg + math.random(200,350)
@@ -444,10 +448,14 @@ function motivator_binder:update(delta)
 	elseif (st_combat) then
 		xr_combat.set_combat_type(object, db.actor, st_combat)
 	end
+	
+	--alun_utils.debug_write("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name())
 
 	-- Start [Alundaio]
 	if (axr_main) then axr_main.npc_on_update(object,db.storage[id]) end
 	-- End [Alundaio]
+	
+	--alun_utils.debug_write("motivator_bind:update %s END AFTER AXR_MAIN",self.object and self.object:name())
 end
 
 function motivator_binder:reload(section)

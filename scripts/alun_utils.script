@@ -844,16 +844,15 @@ end
 
 local debug_file
 function debug_write(output,trace)
-	if true then return end
-	
-	if not (dev_debug) then
-		return
-	end
-
 	if (trace and debug and type(debug.traceback) == 'function') then
 		output = output .. debug.traceback('\n', 2)
 	end
 
+	if (log1) then 
+		log1(output)
+		return
+	end 
+	
 	if (last_ouput == output) then
 		return
 	end
@@ -868,7 +867,6 @@ function debug_write(output,trace)
 		debug_file:write(output.."\n")
 		debug_file:close()
 	end
-	--printf(output)
 end
 
 function str_format(str,...)
@@ -1063,8 +1061,11 @@ function get_vertex(npc,dist)
 	else
 		ang = math.random(300,310)
 	end
-	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),ang)
-	return npc:vertex_in_direction(npc:level_vertex_id(),dir,dist)
+	
+	if (accessible(npc,npc:level_vertex_id())) then
+		local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),ang)
+		return npc:vertex_in_direction(npc:level_vertex_id(),dir,dist)
+	end
 end
 
 

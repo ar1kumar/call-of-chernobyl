@@ -162,7 +162,9 @@ function action_facer:initialize()
 	npc:set_desired_direction()
 	npc:set_movement_type(move.stand)
 	npc:set_body_state(move.standing)
-	npc:set_item(object.aim1,wpn)
+	if (wpn) then
+		npc:set_item(object.aim1,wpn)
+	end
 	self.rank = ranks.get_obj_rank_name(npc)
 end
 

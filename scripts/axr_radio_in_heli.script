@@ -42,7 +42,8 @@ function evaluator_radio_in_heli:evaluate()
 		return false 
 	end
 	
-	if (good_acts[npc:motivation_action_manager():current_action_id()])then
+	local mgr = npc:motivation_action_manager()
+	if (mgr and mgr:initialized() and good_acts[mgr:current_action_id()])then
 		return false
 	end
 	

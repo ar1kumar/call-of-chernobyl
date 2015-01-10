@@ -814,7 +814,7 @@ function planner_hud_show(hud)
 
 			local combat_action = manager:action(stalker_ids.action_combat_planner)
 			local combat_action_planner = cast_planner(combat_action)
-			actid = combat_action_planner:current_action_id()
+			actid = combat_action_planner and combat_action_planner:initialized() and combat_action_planner:current_action_id()
 			if (actid and actid < 4294967295) then
 				name = actions_by_stalker_ids[actid] or "unknown"
 				hud:add_msg("Combat Act",name)
@@ -823,7 +823,7 @@ function planner_hud_show(hud)
 
 			local danger_action = manager:action(stalker_ids.action_danger_planner)
 			local danger_action_planner = cast_planner(danger_action)
-			actid = danger_action_planner:current_action_id()
+			actid = danger_action_planner and danger_action_planner:initialized() and danger_action_planner:current_action_id()
 			if (actid and actid < 4294967295) then
 				name = actions_by_stalker_ids[actid] or "unknown"
 				hud:add_msg("Danger Act",name)
@@ -832,7 +832,7 @@ function planner_hud_show(hud)
 
 			local alife_action = manager:action(stalker_ids.action_alife_planner)
 			local alife_action_planner = cast_planner(alife_action)
-			actid = alife_action_planner:current_action_id()
+			actid = alife_action_planner and alife_action_planner:initialized() and alife_action_planner:current_action_id()
 			if (actid and actid < 4294967295) then
 				name = actions_by_stalker_ids[actid] or "unknown"
 				hud:add_msg("Alife Act",name)
@@ -935,7 +935,7 @@ function planner_hud_show(hud)
 						return false
 					end
 
-					return (npc:is_body_turning() and (mgr.target_state == "zat_b20_noah_jump" or mgr.mgr:current_action_id() == xr_actions_id.animpoint_action + 1)) or false
+					return npc:is_body_turning() --(npc:is_body_turning() and (mgr.target_state == "zat_b20_noah_jump" or mgr.mgr:current_action_id() == xr_actions_id.animpoint_action + 1)) or false
 				end 
 				
 				local sm = st.state_mgr

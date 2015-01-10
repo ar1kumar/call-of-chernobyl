@@ -236,6 +236,10 @@ end
 
 function relocate_item(actor, type, item, amount)
 	if db.actor == nil then return false end
+	if not (item and system_ini():section_exist(item)) then 
+		printf("ERROR: relocate_item - section %s does not exist",item)
+		return false
+	end
 	--' Играем дефолтный звук
 	if not amount then
 		amount = 1

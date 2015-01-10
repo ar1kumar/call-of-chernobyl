@@ -374,7 +374,7 @@ function act_state_mgr_end:weapon_update()
 	if (not wpn or not IsWeapon(wpn)) then
 		return
 	end
-
+	
 	local t = state_lib.states[self.st.target_state].weapon
 
 	if (t == "unstrapped") then
@@ -386,6 +386,9 @@ function act_state_mgr_end:weapon_update()
 		local o = self.st.look_object and level.object_by_id(self.st.look_object)
 		local pos = o and o:alive() and self.object:see(o) and o:position() or self.st.look_position
 		if (pos) then
+			if not (npc:active_item()) then 
+				return 
+			end
 			if (t == "sniper_fire") then
 				local aim = self.object:position():distance_to(pos)*aim_ratio or min_ratio
 				self.object:set_item(object.fire1, wpn, 1, aim <= min_ratio and min_ratio or aim)

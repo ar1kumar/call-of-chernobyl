@@ -173,6 +173,11 @@ end
 function action_launch_grenade:initialize()
 	action_base.initialize(self)
 	local npc,wpn = self.object,self.object:active_item()
+	if not (wpn) then 
+		self:cancel(1500)
+		return 
+	end 
+	
 	if check_weapon(wpn) then
 		local shell = {}
 		for k,v in pairs(gl_sets.weapons[wpn:section()].shells) do
