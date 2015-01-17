@@ -402,8 +402,8 @@ function action_mgun:fast_update()
 				self.target_fire_pt = target:position()
 				self.target_fire_pt.z = self.target_fire_pt.z + (math.random(-1,1)/100)
 				self.target_fire_pt.x = self.target_fire_pt.x + (math.random(-1,1)/100)
-				if target:id() ~= db.actor:id() then
-					if target:target_body_state() == move.crouch then
+				if (target:id() ~= db.actor:id()) then
+					if (IsMonster(target) or target:target_body_state() == move.crouch) then
 						self.target_fire_pt.y = self.target_fire_pt.y + 0.5 + (math.random(-1,1)/100)
 					else
 						self.target_fire_pt.y = self.target_fire_pt.y + 0.1

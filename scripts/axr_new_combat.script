@@ -11,7 +11,7 @@ local ENABLE = true
 -- all ranks will use script and at highest level of AI
 local IGNORE_RANK = false
 
--- all npcs will use this combat behavior
+-- all npcs will always use this combat behavior
 local GLOBAL_OVERRIDE = false
 
 --------------------------------------
@@ -269,7 +269,7 @@ function evaluator_new_combat:evaluate()
 
 	local best_weapon = npc:best_weapon()
 	local clsid = best_weapon and best_weapon:clsid()
-	if (best_weapon) and (override or GLOBAL_OVERRIDE or not (alun_utils.isRifle(nil,clsid) or alun_utils.isPistol(nil,clsid))) then
+	if (best_weapon) and (override or GLOBAL_OVERRIDE or not (alun_utils.isRifle(nil,clsid))) then
 		if (find_valid_target(npc,self.st) == true) then
 			--alun_utils.debug_write("after find valid target 1")
 			self.st.bw = best_weapon
@@ -325,8 +325,7 @@ function action_new_combat:npc_see(enemy)
 			end
 		end
 	else 
-		return self.object:see(enemy) or time_global()-self.object:memory_time(enemy) <= 2000
-		--return time_global()-self.object:memory_time(enemy) <= 2000
+		return self.object:see(enemy) and time_global()-self.object:memory_time(enemy) <= 500
 	end
 	
 	return false
@@ -986,17 +985,26 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 		elseif (alun_utils.isShotgun(bw)) then
 			--alun_utils.debug_nearest(npc,"isShotgun DIST=%s enemy=%s is_stalker=%s",dist,enemy and enemy:name(),IsStalker(enemy))
 			if (IsStalker(enemy)) then
-				if (dist <= 3) then
+				if (dist <= 10) then
 					self:set_body_state(npc,move.crouch)
 					self:set_movement_type(npc,move.walk)
 					self.st.__keep_point_until = time_global() + 5000
 					return self:try_to_strafe(npc,enemy,ene_pos,dist) or lmove_ns(npc,npc:level_vertex_id(),self.st)
-				elseif (dist <= 49) then
+				elseif (dist <= 900) then
 					if (see) then
 						self:set_body_state(npc,move.standing)
 						self:set_movement_type(npc,move.walk)
 					else 
 						self:set_body_state(npc,move.crouch)
+						self:set_movement_type(npc,move.run)
+					end
+					return self:try_to_strafe_behind_enemy(npc,enemy,ene_pos,dist) or self:try_go_cover(npc,enemy,ene_pos,dist) or lmove_ns(npc,npc:level_vertex_id(),self.st)
+				elseif (dist <= 1200) then 
+					if (see) then
+						self:set_body_state(npc,move.standing)
+						self:set_movement_type(npc,move.walk)
+					else 
+						self:set_body_state(npc,move.standing)
 						self:set_movement_type(npc,move.run)
 					end
 					return self:try_to_strafe_behind_enemy(npc,enemy,ene_pos,dist) or self:try_go_cover(npc,enemy,ene_pos,dist) or lmove_ns(npc,npc:level_vertex_id(),self.st)
@@ -1007,17 +1015,17 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 					if (dist <= 400) then 
 						self:set_body_state(npc,move.standing)
 						self:set_movement_type(npc,move.run)
-						return self:try_go_cover_backward(npc,ene_pos) or self:try_go_cover(npc,enemy,ene_pos,dist)
+						return random_choice(self:try_go_cover_backward(npc,ene_pos),self:try_go_cover(npc,enemy,ene_pos,dist)) or self:try_to_strafe(npc,enemy,ene_pos,dist)
 					elseif (dist <= 900) then
 						self:set_body_state(npc,move.standing)
 						self:set_movement_type(npc,move.walk)
-						return self:try_go_cover_backward(npc,ene_pos) or self:try_go_cover(npc,enemy,ene_pos,dist)
+						return random_choice(self:try_go_cover_backward(npc,ene_pos),self:try_go_cover(npc,enemy,ene_pos,dist)) or self:try_to_strafe(npc,enemy,ene_pos,dist)
 					end
 					self:set_movement_type(npc,move.walk)
 					self:set_body_state(npc,move.standing)
 					return self:try_go_enemy_position(npc,enemy,ene_pos)		
 				end 
-				if (dist <= 3) then
+				if (dist <= 6) then
 					self:set_body_state(npc,move.standing)
 					self:set_movement_type(npc,move.walk)
 					return random_choice(self:try_go_backward(npc),self:try_to_strafe(npc,enemy,ene_pos,dist)) or lmove_ns(npc,npc:level_vertex_id(),self.st)
@@ -1036,18 +1044,35 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 			self:set_movement_type(npc,move.run)
 			return self:try_go_enemy_position(npc,enemy,ene_pos) or self:try_go_cover_forward(npc,ene_pos)
 		else
-			if (dist <= 400) then 
+			if (self.is_firing) then 
+				self:set_body_state(npc,move.standing)
+				self:set_movement_type(npc,move.walk)
+				lmove_ns(npc,npc:level_vertex_id(),self.st)
+				return
+			end
+			if (dist <= 900) then 
+				if (see) then
+					self:set_body_state(npc,move.standing)
+					self:set_movement_type(npc,move.walk)
+				else 
+					self:set_body_state(npc,move.crouch)
+					self:set_movement_type(npc,move.run)
+				end
+				return self:try_go_cover(npc,enemy,ene_pos,dist)
+			elseif (dist <= 3600) then
+				if (see) then
+					self:set_body_state(npc,move.standing)
+					self:set_movement_type(npc,move.walk)
+				else 
+					self:set_body_state(npc,move.standing)
+					self:set_movement_type(npc,move.run)
+				end
+				local npc_see = npc:see(enemy)
+				return npc_see and self:try_go_cover(npc,enemy,ene_pos,dist) or self:try_go_enemy_position(npc,enemy,ene_pos) or self:try_go_cover_forward(npc,ene_pos)
+			else
 				self:set_body_state(npc,move.standing)
 				self:set_movement_type(npc,move.run)
-				return self:try_go_cover_backward(npc,ene_pos) or self:try_go_cover(npc,enemy,ene_pos,dist)
-			elseif (dist <= 900) then 
-				self:set_body_state(npc,move.standing)
-				self:set_movement_type(npc,move.walk)
-				return self:try_go_cover_backward(npc,ene_pos) or self:try_go_cover(npc,enemy,ene_pos,dist)
-			else
-				self:set_body_state(npc,move.crouch)
-				self:set_movement_type(npc,move.walk)
-				return random_choice(self:try_go_cover(npc,enemy,ene_pos,dist),self:try_go_enemy_position(npc,enemy,ene_pos)) or lmove_ns(npc,npc:level_vertex_id(),self.st)
+				return self:try_go_cover_forward(npc,ene_pos) or lmove_ns(npc,npc:level_vertex_id(),self.st)
 			end
 		end
 	end
@@ -1063,17 +1088,22 @@ function action_new_combat:execute()
 	local npc = self.object
 	local enemy = self.st.target_id and (db.storage[self.st.target_id] and db.storage[self.st.target_id].object or level.object_by_id(self.st.target_id))
 	
-	--printf("rush attack")
-	
-	if not (enemy and enemy:alive()) then
+	if not (enemy) then
 		self.st.target_id = nil
-		--alun_utils.debug_write(alun_utils.sr("action_new_combat:execute end"))
+		return 
+	end
+	
+	local is_heli = IsHelicopter(enemy,self.st.cls)
+	
+	if (is_heli ~= true and not enemy:alive()) then
+		self.st.target_id = nil
 		return
 	end
 	
-	self.st.cls = enemy:clsid()
+	self.st.cls = get_clsid(enemy)
 	
 	if (self.st.last_id == nil or self.st.last_id ~= self.st.target_id) then 
+		--[[
 		local sm = db.storage[npc:id()].state_mgr
 		if (sm and sm.target_state ~= "assault") then
 			npc:clear_animations()
@@ -1081,6 +1111,7 @@ function action_new_combat:execute()
 			sm.animation:set_state(nil, true)
 			sm.animation:set_control()
 		end
+		--]]
 		self.st.last_id = self.st.target_id
 	end 
 	
@@ -1089,12 +1120,12 @@ function action_new_combat:execute()
 		npc:set_path_type(game_object.level_path)
 	end
 	
-	local is_heli = IsHelicopter(enemy,self.st.cls)
+	
 	local tg = time_global()
 	local ene_pos = is_heli and enemy:position() or npc:memory_position(enemy) or enemy:position()
 	local dist = is_heli and heli_alife.distance_2d_sqr(npc:position(),enemy:position()) or ene_pos:distance_to_sqr(npc:position())
 	local mem_time = is_heli and tg or enemy:id() ~= 0 and enemy:memory_time(npc)
-	local see = is_heli and enemy:get_helicopter():isVisible(npc) or enemy:see(npc) or mem_time and tg - mem_time <= 7000
+	local see = is_heli and enemy:get_helicopter():isVisible(npc) or mem_time and tg - mem_time <= 1000
 
 	if (is_heli) then 
 		self:heli_combat_execute(npc,enemy,ene_pos,see,dist)
@@ -1114,9 +1145,11 @@ function action_new_combat:execute()
 end
 
 function action_new_combat:hit_callback(obj, amount, local_direction, who, bone_index)
-	if (amount > 0 and who and obj:relation(who) >= game_object.enemy) then 
-		self.st.__keep_target_until = tg + 7000
-		self.st.target_id = who:id()	
+	if (amount > 0 and who) then 
+		if (IsMonster(who)) or (IsStalker(who) and obj:relation(who) >= game_object.enemy) then 
+			self.st.__keep_target_until = tg + 7000
+			self.st.target_id = who:id()
+		end
 	end
 end
 
@@ -1129,8 +1162,10 @@ function action_new_combat:finalize()
 	self.st.__panic_sound = nil
 	self.st.__keep_target_until = nil
 	db.storage[self.object:id()].panicked = nil
-	self.object:set_sight(look.fire_point,nil,0)
-	self.object:set_item(object.idle,self.st.bw or self.object:best_weapon())
+	if (self.object:active_item()) then
+		self.object:set_sight(look.fire_point,nil,0)
+		self.object:set_item(object.idle,self.object:best_weapon())
+	end
 	self.st.bw = nil
 end
 

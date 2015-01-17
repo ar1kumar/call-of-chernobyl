@@ -456,7 +456,12 @@ function heli_combat:update_combat_type( see_enemy )
 			if self.attack_before_retreat then
 				self:set_combat_type(combat_type_retreat)
 			else
-				self:set_combat_type(combat_type_round)
+				local tg = time_global()
+				self.__keep_type_until = not self.__keep_type_until and tg + 10000 or self.__keep_type_until
+				if (self.__keep_type_until and tg > self.__keep_type_until) then
+					self.__keep_type_until = nil
+					self:set_combat_type(combat_type_round)
+				end
 			end
 		end
 		return
@@ -474,8 +479,13 @@ function heli_combat:update_combat_type( see_enemy )
 			if (distance_2d(self.object:position(),self.enemy:position()) > self.flyby_attack_dist + 70) then 
 				self:set_combat_type(combat_type_flyby)
 			end
-		else 
-			self:set_combat_type(combat_type_search)
+		else
+			local tg = time_global()
+			self.__keep_type_until = not self.__keep_type_until and tg + 10000 or self.__keep_type_until
+			if (self.__keep_type_until and tg > self.__keep_type_until) then
+				self.__keep_type_until = nil
+				self:set_combat_type(combat_type_search)
+			end
 		end
 		return
 	end
@@ -540,9 +550,6 @@ function heli_combat:update()
 	end
 
 	self:update_combat_type( see_enemy )
-	
-	-- FIXME
---	self.heliObject:GetSpeedInDestPoint(0)
 
 	if self.combat_type == combat_type_search then
 		self:search_update( see_enemy )

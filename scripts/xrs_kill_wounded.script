@@ -126,23 +126,6 @@ local function get_rand_vertex(npc,vo)
 	return vo:vertex_in_direction(vo:level_vertex_id(),dir,math.random(MinDistance,MaxDistance))
 end
 
-local function begin_kill_wounded(npc,vo,st)
-	if not (st.timer) then
-		local tg = time_global()
-
-		if (math.random() < KillWoundedSoundChance) then
-			xr_sound.set_sound_play(npc:id(),"kill_wounded")
-		end
-
-		if (db.storage[vo:id()].victim_surrender) then
-			st.timer = tg + math.random(SurrenderMinTriggerTimer,SurrenderMaxTriggerTimer)
-			--printf("%s--%s",vo:name(),vo:get_visual_name())
-		else
-			st.timer = tg + math.random(MinTriggerTimer,MaxTriggerTimer)
-		end
-	end
-end
-
 local function is_wounded(npc)
 	return xr_wounded.is_wounded(npc)
 end
@@ -165,10 +148,6 @@ function eva_kill_wounded:evaluate()
 		return false
 	end
 
-	if (xr_help_wounded.is_under_help_wounded(npc)) then
-		return false
-	end
-
 	local st = self.st
 
 	--printf("stage = %s",st.stage)
@@ -187,7 +166,7 @@ function eva_kill_wounded:evaluate()
 		st.delta = tg+math.random(2000,3000)
 
 		local vo = npc:best_enemy()
-		if (vo and vo:alive() and IsStalker(vo) and is_wounded(vo)) then
+		if (vo and IsStalker(vo) and vo:alive() and is_wounded(vo)) then
 			st.current_id = vo:id()
 
 			st.vertex_id = get_rand_vertex(npc,vo) or vo:level_vertex_id()
@@ -280,7 +259,27 @@ function act_kill_wounded:initialize()
 	action_base.initialize(self)
 end
 
-local function execute_kill_wounded(npc,st)
+function act_kill_wounded:begin_kill_wounded(vo)
+	if not (self.st.timer) then
+		local tg = time_global()
+
+		if (math.random() < KillWoundedSoundChance) then
+			xr_sound.set_sound_play(self.object:id(),"kill_wounded")
+		end
+
+		if (db.storage[vo:id()].victim_surrender) then
+			self.st.timer = tg + math.random(SurrenderMinTriggerTimer,SurrenderMaxTriggerTimer)
+			--printf("%s--%s",vo:name(),vo:get_visual_name())
+		else
+			self.st.timer = tg + math.random(MinTriggerTimer,MaxTriggerTimer)
+		end
+	end
+end
+
+function act_kill_wounded:execute()
+	action_base.execute(self)
+	local npc = self.object 
+	local st = self.st
 	local vo = npc:best_enemy()
 	if (not vo) or (not vo:alive()) or (not is_wounded(vo)) then
 		st.stage = 0
@@ -322,18 +321,13 @@ local function execute_kill_wounded(npc,st)
 	if (st.stop_short and dist <= math.random(MinDistance,MaxDistance)) then
 		st.vertex_id = utils.send_to_nearest_accessible_vertex(npc,npc:level_vertex_id(),"kill_wounded")
 		npc:set_movement_type(move.stand)
-		begin_kill_wounded(npc,vo,st)
+		self:begin_kill_wounded(vo)
 		return
 	end
 
 	if (dist < 1.5 or npc:level_vertex_id() == st.vertex_id) then
-		begin_kill_wounded(npc,vo,st)
+		self:begin_kill_wounded(vo)
 	end
-end
-
-function act_kill_wounded:execute()
-	action_base.execute(self)
-	execute_kill_wounded(self.object,self.st)
 end
 
 function act_kill_wounded:finalize()

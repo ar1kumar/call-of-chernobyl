@@ -19,7 +19,7 @@ end
 
 function animpoint_predicate_bread(id)
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc and not db.storage[id].need_sleep and npc:object("bread")) then
+	if (npc and not db.storage[id].need_sleep) then
 		return true
 	end
 	return false
@@ -27,7 +27,7 @@ end
 
 function animpoint_predicate_kolbasa(id)
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc and not db.storage[id].need_sleep and npc:object("kolbasa")) then
+	if (npc and not db.storage[id].need_sleep) then
 		return true
 	end
 	return false
@@ -35,7 +35,7 @@ end
 
 function animpoint_predicate_vodka(id)
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc and not db.storage[id].need_sleep and npc:object("vodka")) then
+	if (npc and not db.storage[id].need_sleep) then
 		return true
 	end
 	return false
@@ -43,7 +43,7 @@ end
 
 function animpoint_predicate_energy(id)
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc and not db.storage[id].need_sleep and npc:object("energy")) then
+	if (npc and not db.storage[id].need_sleep) then
 		return true
 	end
 	return false
@@ -54,7 +54,7 @@ function animpoint_predicate_guitar(id, camp)
 		return false 
 	end 
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc and not db.storage[id].need_sleep and npc:object("guitar_a")) then
+	if (npc and not db.storage[id].need_sleep) then
 		return true
 	end
 	return false
@@ -65,24 +65,13 @@ function animpoint_predicate_harmonica(id, camp)
 		return false 
 	end 
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc and not db.storage[id].need_sleep and npc:object("harmonica_a")) then
+	if (npc and not db.storage[id].need_sleep) then
 		return true
 	end
 	return false
 end
 
 function animpoint_predicate_weapon(id)
-	local npc = db.storage[id] and db.storage[id].object
-	if (npc and not db.storage[id].need_sleep) then
-		local smart = xr_gulag.get_npc_smart(npc)
-		if (smart) then
-			for i=1,#smart_table do
-				if (smart:name() == smart_table[i]) then
-					return false
-				end
-			end
-		end
-	end
 	return true
 end
 
@@ -106,6 +95,7 @@ function animpoint_predicate_need_sleep(id, camp)
 end
 
 function animpoint_predicate_roast(id,camp)
+if true then return true end -- debug
 	local npc = db.storage[id] and db.storage[id].object
 	if (npc) then
 		local smart = xr_gulag.get_npc_smart(npc)

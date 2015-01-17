@@ -1480,12 +1480,11 @@ function se_smart_terrain:try_respawn()
 		
 	local curr_time = game.get_game_time()
 	
-	if not (self.is_on_actor_level) then
-		if not (self.last_respawn_update) then 
-			self.last_respawn_update = curr_time
-			return
-		end 
-	end
+	-- first spawn after game load
+	if (self.last_respawn_update == nil and math.random() < 0.3) then 
+		self.last_respawn_update = curr_time
+		return
+	end 
 	
 	if self.last_respawn_update == nil or curr_time:diffSec(self.last_respawn_update) > self.respawn_idle then
 		self.last_respawn_update = curr_time

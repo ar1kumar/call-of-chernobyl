@@ -132,7 +132,7 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.use_object, axr_main.actor_on_item_use, self)
 	self.object:set_callback(callback.hit, axr_main.actor_on_hit_callback, self)
 	if (callback.key_press) then
-		self.object:set_callback(callback.key_press, axr_main.key_press, self)
+		self.object:set_callback(callback.key_press, axr_main.on_keypress, self)
 	end
 end
 
@@ -208,7 +208,22 @@ function actor_binder:update(delta)
 		self.object:activate_slot(3)
 		self.bCheckStart = false
 	end
-
+	
+	--[[ Prevents actor from falling below map
+	local vid = db.actor:level_vertex_id()
+	last_valid_vertex_id = vid < 4294967295 and vid
+	
+	if not (level_min_y) then 
+		level_min_y = level.get_bounding_volume().min.y
+	end
+	
+	if (db.actor:position().y < level_min_y) then 
+		if (last_valid_vertex_id) then
+			db.actor:set_actor_position(level.vertex_position(last_valid_vertex_id))
+		end
+	end
+	--]]
+	
 	self.task_manager:update()
 
 	-- DEBUG slowdown

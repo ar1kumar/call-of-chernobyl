@@ -91,7 +91,6 @@ function generic_object_binder:update(delta)
 
 	if self.st.active_section ~= nil then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
-		return
 	end
 	
 	if self.squad and self.squad.current_action and self.squad.current_action == 0 then
@@ -116,7 +115,6 @@ function generic_object_binder:update(delta)
 				action(self.object, move(move.walk_with_leader, target_pos),cond(cond.move_end))
 			end
 		end
-		return
 	end
 end
 
