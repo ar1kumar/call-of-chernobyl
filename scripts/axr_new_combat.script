@@ -4,6 +4,7 @@
 --]]
 
 --TODO: Fix heli aim targetting!
+--TODO: Kind of obsolete. Would be better to make separate scheme for heli combat
 
 -- disable it entirely
 local ENABLE = true
@@ -268,8 +269,8 @@ function evaluator_new_combat:evaluate()
 	end 
 
 	local best_weapon = npc:best_weapon()
-	local clsid = best_weapon and best_weapon:clsid()
-	if (best_weapon) and (override or GLOBAL_OVERRIDE or not (alun_utils.isRifle(nil,clsid))) then
+	local cls = best_weapon and best_weapon:clsid()
+	if (best_weapon) and (override or GLOBAL_OVERRIDE or not (alun_utils.isRifle(nil,cls) or alun_utils.isPistol(nil,cls) or alun_utils.isShotgun(nil,cls))) then
 		if (find_valid_target(npc,self.st) == true) then
 			--alun_utils.debug_write("after find valid target 1")
 			self.st.bw = best_weapon
@@ -336,7 +337,7 @@ function action_new_combat:set_fire_type(enemy,dist)
 	local can_set = true
 	local tg = time_global()
 	
-	self.st.__keep_fire_type_until = not self.st.__keep_fire_type_until and tg+3000 or self.st.__keep_fire_type_until
+	self.st.__keep_fire_type_until = not self.st.__keep_fire_type_until and tg+5000 or self.st.__keep_fire_type_until
 	if (self.st.__keep_fire_type_until and tg < self.st.__keep_fire_type_until) then
 		can_set = false
 	end
@@ -407,10 +408,12 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 		if (npc_see) then 
 			vec = alun_utils.safe_bone_pos(enemy,"bip01_spine")
 			npc:set_sight(look.fire_point,vec)
-		elseif (not npc_see and not see) then
-			npc:set_sight(look.direction,npc:direction())
-		else	
-			vec = ene_pos
+		else
+			if (math.abs(npc:position().y - ene_pos.y) > 3.0) then
+				vec = vector():set(ene_pos.x,npc:position().y+1,ene_pos.z)
+			else
+				vec = ene_pos
+			end
 			npc:set_sight(look.fire_point,vec)
 		end
 	end
@@ -459,7 +462,7 @@ function action_new_combat:try_go_cover(npc,enemy,ene_pos,dist)
 	
 	local vid = alun_utils.find_close_cover(npc,npc:position(),ene_pos,8,db.used_level_vertex_ids)
 	if (validate(npc,vid) and level.vertex_position(vid):distance_to_sqr(npc:position()) < dist) then
-		self.st.__keep_point_until = time_global() + 4000
+		self.st.__keep_point_until = time_global() + 6000
 		return lmove(npc,vid,self.st)
 	end
 end
@@ -474,7 +477,7 @@ function action_new_combat:try_to_facer(npc,enemy,ene_pos,dist)
 		if (dist <= 3) then
 			-- close enough already
 			return lmove_ns(npc,npc:level_vertex_id(),self.st)
-		elseif (dist <= 40) then
+		elseif (dist <= 30) then
 			local vid = level.vertex_id(ene_pos)
 			vid = vid and vid < 4294967295 and npc:accessible(vid) and vid
 			if (vid and vid ~= npc:level_vertex_id()) then
@@ -553,7 +556,7 @@ function action_new_combat:try_go_backward(npc)
 	while (radius > 0) do
 		vid = level.vertex_in_direction(base_point,dir,radius)
 		if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then
-			self.st.__keep_point_until = time_global() + 3000
+			self.st.__keep_point_until = time_global() + 10000
 			return lmove_ns(npc,vid,self.st)
 		end
 		radius = radius - 1
@@ -594,7 +597,7 @@ function action_new_combat:try_go_cover_forward(npc,ene_pos)
 	vid = cover and cover:level_vertex_id() or vid
 
 	if (validate(npc,vid)) then 
-		self.st.__keep_point_until = time_global() + 3000
+		self.st.__keep_point_until = time_global() + 10000
 		return lmove(npc,vid,self.st)
 	end 
 end
@@ -633,7 +636,7 @@ function action_new_combat:try_go_cover_backward(npc,ene_pos)
 	vid = cover and cover:level_vertex_id() or vid
 
 	if (validate(npc,vid)) then 
-		self.st.__keep_point_until = time_global() + 3000
+		self.st.__keep_point_until = time_global() + 10000
 		return lmove(npc,vid,self.st)
 	end 
 end

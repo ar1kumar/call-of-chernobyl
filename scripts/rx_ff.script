@@ -171,7 +171,13 @@ function action_verso:execute()
 	local wpn = npc:active_item()
 	if (wpn) then
 		npc:set_item(object.aim1,wpn)
-		npc:set_sight(look.fire_point,alun_utils.safe_bone_pos(be))
+		local pos = alun_utils.safe_bone_pos(be)
+		if not (npc:see(be)) then 
+			if (math.abs(npc:position().y - be:position().y) > 3.0) then 
+				pos = vector():set(be:position().x,npc:position().y+1,be:position().z)
+			end
+		end
+		npc:set_sight(look.fire_point,pos)
 	end
 	npc:set_desired_direction()
 	

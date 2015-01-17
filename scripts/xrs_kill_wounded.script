@@ -293,6 +293,17 @@ function act_kill_wounded:execute()
 			npc:set_item(object.fire1,st.weapon,1,1)
 			local look_pos = vo:bone_position("bip01_neck")
 			npc:set_sight(look.fire_point,look_pos)
+			st.hangtime = tg + 2000
+		end
+		if (st.hangtime and tg > st.hangtime) then
+			local h = hit()
+			h.type = hit.fire_wound
+			h.power = 1
+			h.impulse = 0.0
+			h.direction = vector():set(0,0,1)
+			h.draftsman = npc
+			vo:hit(h)
+			return
 		end
 		return
 	end
