@@ -249,6 +249,9 @@ function act_axr_smartcover:execute()
 		npc:set_movement_type(move.run)
 
 		if not (st.weapon) then st.weapon = npc:best_weapon() end
+		if not (st.weapon) then 
+			return 
+		end
 
 		npc:set_item(object.aim1,st.weapon)
 

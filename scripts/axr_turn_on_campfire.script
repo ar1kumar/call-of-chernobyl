@@ -1,5 +1,9 @@
 -- Scheme for Stalkers with gulag jobs to turn on their smart's campfires
--- by Alundaio
+--[[
+	scheme_type: generic
+	author: Alundaio
+	modified_by:
+--]]
 
 --------------------
 evaid = 188114
@@ -10,14 +14,6 @@ actid = 188114
 -- 						PRIVATE
 -------------------------------------------------------------
 already_selected = {}
-
-local function npc_add_precondition(action)
-	action:add_precondition(world_property(evaid,false))
-end
-
-local function set_generic_scheme(npc,ini)
-	local st = xr_logic.assign_storage_and_bind(npc,ini,"turn_on_campfire","turn_on_campfire")
-end
 
 local function eval_reset(st)
 	if (st.selected_id) then
@@ -34,21 +30,13 @@ local function eval_reset(st)
 	return false
 end
 
-local function reset_scheme(npc,scheme,section,st)
-	if (st.turn_on_campfire) then
-		st.turn_on_campfire.allow = xr_logic.parse_condlist(npc, section, "turn_on_campfire",utils.cfg_get_string(st.ini, section, "turn_on_campfire", npc, false,"","false"))
-		eval_reset(st.turn_on_campfire)
-	end
-end
+
 
 -------------------------------------------------------------
 -- 						ON GAME START
 -------------------------------------------------------------
 function on_game_start()
 	load_scheme("axr_turn_on_campfire","turn_on_campfire",0)
-	callback_register("set_generic_scheme",set_generic_scheme)
-	callback_register("scheme_reset",reset_scheme)
-	callback_register("npc_add_precondition",npc_add_precondition)
 end
 
 -------------------------------------------------------------
@@ -241,37 +229,48 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 -- 													BINDER
 ----------------------------------------------------------------------------------------------------------------------
-function add_to_binder(npc, char_ini, scheme, section, st)
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"turn_on_campfire",section,temp)
+end
+
+function add_to_binder(npc,char_ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
-	else
-		manager:add_evaluator(evaid, eva_turn_on_campfire(npc,"eval_turn_on_campfire", st))
-	end
+		temp.needs_configured = false
+		return 
+	end 
+	
+	manager:add_evaluator(evaid, eva_turn_on_campfire(npc,"eval_turn_on_campfire", st))
 
 	local wp = world_property
 	
-	-- Actions
-	local action = act_turn_on_campfire(npc,"action_turn_on_campfire", st)
-	action:add_precondition( wp(evaid, true) )
-	action:add_precondition( wp(stalker_ids.property_alive,true) )
-	action:add_precondition( wp(stalker_ids.property_enemy,	false) )
-	action:add_precondition( wp(stalker_ids.property_danger,false) )
-	action:add_precondition( wp(stalker_ids.property_anomaly,false) )
+	temp.action = act_turn_on_campfire(npc,"action_turn_on_campfire", st)
+	temp.action:add_precondition(wp(evaid, true))
+	temp.action:add_precondition(wp(stalker_ids.property_alive,true))
+	temp.action:add_precondition(wp(stalker_ids.property_enemy,false))
+	temp.action:add_precondition(wp(stalker_ids.property_danger,false))
+	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
 
-	action:add_precondition( wp(xr_gather_items.evaid, false))
-	action:add_precondition( wp(stalker_ids.property_items, false) )
-	action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
-	action:add_precondition( wp(xr_evaluators_id.corpse_exist,false) )
-	action:add_precondition( wp(xr_evaluators_id.stohe_meet_base + 1, false) )
-	action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base, false) )
-	action:add_precondition( wp(xr_evaluators_id.abuse_base, false) )
-	--action:add_precondition( wp(xr_evaluators_id.state_mgr + 1,false) )
+	temp.action:add_effect(wp(evaid, false))
+	manager:add_action(actid,temp.action)
+end
 
-	action:add_effect( wp(evaid, false) )
-	manager:add_action(actid, action)
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	local wp = world_property
+	
+	temp.action:add_precondition(wp(xr_gather_items.evaid, false))
+	temp.action:add_precondition(wp(stalker_ids.property_items, false))
+	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.corpse_exist,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1, false))
+	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base, false))
+	temp.action:add_precondition(wp(xr_evaluators_id.abuse_base, false))
+	--temp.action:add_precondition( wp(xr_evaluators_id.state_mgr + 1,false) )
 
+	local manager = npc:motivation_action_manager()	
+	local action 
 	local p = {
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife
@@ -284,6 +283,17 @@ function add_to_binder(npc, char_ini, scheme, section, st)
 			printf("xr_corpse_detection: no action id p[%s]",i)
 		end
 	end
+end 
+
+function reset_generic_scheme(npc,scheme,section,stype,st)
+	if (st.turn_on_campfire) then
+		st.turn_on_campfire.allow = xr_logic.parse_condlist(npc, section, "turn_on_campfire",utils.cfg_get_string(st.ini, section, "turn_on_campfire", npc, false,"","false"))
+		eval_reset(st.turn_on_campfire)
+	end
+end
+
+function npc_add_precondition(action)
+	action:add_precondition(world_property(evaid,false))
 end
 
 function is_under_turn_on_campfire(npc)

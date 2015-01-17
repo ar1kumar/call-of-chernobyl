@@ -1,10 +1,6 @@
 --[[
-	axr_beh.script
-	Behavior Manager
-	Alundaio
-
-	Copyright (C) 2012 Alundaio
-	This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+	scheme_type: active_section
+	author: Alundaio
 	
 	TODO: Fix use camp
 --]]
@@ -17,7 +13,6 @@ beh_actid = 188111
 -----------------------------
 local level = level
 local alife = alife
-local wp = world_property
 -----------------------------
 
 local keep_state_min_time = 2000
@@ -167,36 +162,6 @@ local function init_custom_data(npc, ini, section, st, scheme)
 
 	st.use_camp  		= utils.cfg_get_bool(ini, section, "use_camp",npc, false, false)
 	st.sound_idle		= xr_logic.parse_condlist(npc, section, "sound_idle", 	utils.cfg_get_string(ini, section, "sound_idle", npc, false, "", "nil"))
-end
-
-local function add_common_precondition(action)
-	--action:add_precondition(world_property(beh_evid, false))
-end
-
----------------------------------------
--- Register Callbacks
----------------------------------------
-function on_game_start()
-	load_scheme("axr_beh","beh",0)
-end
-
-function set_scheme(npc, ini, scheme, section, gulag_name, stype)
-	local st = xr_logic.assign_storage_and_bind(npc,ini,"beh",section)
-	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
-	init_custom_data(npc, ini, section, st, "beh")
-end
-
-function reset_scheme(npc,scheme,section,st)
-	if (st.beh) then
-		init_custom_data(npc, st.ini, section, st.beh, scheme)
-	end
-end
-
-function disable_scheme(npc,stype)
-	local st = db.storage[npc:id()]["beh"]
-	if st then
-		st.enabled = false
-	end
 end
 
 function am_i_reached(npc,index)
@@ -831,18 +796,32 @@ end
 --
 -------------------------- Scheme Handlers ------------------------------------------------------------
 
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"beh",section)
+	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+	init_custom_data(npc, ini, section, st, "beh")
+end
+
 function add_to_binder(npc, ini, scheme, section, storage)
 	local manager = npc:motivation_action_manager()
-	-- evaluators
-	manager:add_evaluator(beh_evid, this.evaluator_beh(storage, "evaluator_beh"))
-
-	local action = this.action_beh(npc, "action_beh", storage)
+	local wp = world_property
+	
+	local evaluator = evaluator_beh(storage, "evaluator_beh")
+	local action = action_beh(npc, "action_beh", storage)
+	
+	manager:add_evaluator(beh_evid,evaluator)
+	
 	action:add_precondition( wp(beh_evid, true) )
-
+	action:add_effect( wp(beh_evid, false) )
+	action:add_effect( wp(xr_evaluators_id.state_mgr + 4, false) )	
+	
+	manager:add_action(beh_actid,action)
+	
+	xr_logic.subscribe_action_for_events(npc, storage, action)
+	
 	action:add_precondition( wp(stalker_ids.property_alive,true) )
 	action:add_precondition( wp(stalker_ids.property_enemy,false) )
 	action:add_precondition( wp(stalker_ids.property_danger,false) )
-	--action:add_precondition( wp(xr_danger.evaid,false) )
 	action:add_precondition( wp(stalker_ids.property_anomaly,false) )
 
 	action:add_precondition( wp(xr_evaluators_id.corpse_exist, false) )
@@ -853,15 +832,18 @@ function add_to_binder(npc, ini, scheme, section, storage)
 	action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base + 0, false) )
 	action:add_precondition( wp(xr_evaluators_id.abuse_base, false) )
 
-	action:add_effect( wp(beh_evid, false) )
-	action:add_effect( wp(xr_evaluators_id.state_mgr + 4, false) )
-	manager:add_action(beh_actid, action)
-
-	xr_logic.subscribe_action_for_events(npc, storage, action)
-
 	action = manager:action(xr_actions_id.alife)
 	action:add_precondition( wp(beh_evid, false) )
 
 	action = manager:action(xr_actions_id.state_mgr + 2)
 	action:add_precondition( wp(beh_evid, false) )
 end
+
+--[[
+function reset_scheme(loading, npc)
+	local st = db.storage[npc:id()]
+	if (st.beh) then
+		init_custom_data(npc, st.ini, section, st.beh, scheme)
+	end
+end
+--]]

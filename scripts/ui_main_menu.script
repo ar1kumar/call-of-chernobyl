@@ -14,7 +14,7 @@ function main_menu:__init() super()
     self:InitCallBacks()
     --xr_s.on_main_menu_on()     						 --' Distemper 03.2008 --
 	-- Alundaio
-	if (axr_main) then axr_main.main_menu_on_init(self)	end
+	if (axr_main and axr_main.main_menu_on_init) then axr_main.main_menu_on_init(self)	end
 	-- End Alundaio
 end
 
@@ -35,7 +35,7 @@ function main_menu:InitControls()
 
 	local _ver = xml:InitStatic		("static_version",self)
 	local mm						= _G.main_menu.get_main_menu()
-	_ver:TextControl():SetText		("ver. " .. mm:GetGSVer().." + Call of Chernobyl BETA (Dec-29-2014) by Team EPIC")
+	_ver:TextControl():SetText		("ver. " .. mm:GetGSVer().." + Call of Chernobyl BETA (Jan-6-2014) by TeamEPIC")
 
     self.l_mgr = mm:GetLoginMngr()
     self.acc_mgr = mm:GetAccountMngr()
@@ -373,8 +373,7 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	local console = get_console()
 	-- Alundaio
 	if (level.present()) then
-		if (axr_main) then axr_main.main_menu_on_keyboard(dik,keyboard_action,self) end
-		if (xrs_debug_tools) then xrs_debug_tools.main_menu_on_keyboard(dik,keyboard_action,self) end
+		if (axr_main) then axr_main.main_menu_on_keyboard(dik,keyboard_action,self,level.present()) end
 	end
 	-- alundaio
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then

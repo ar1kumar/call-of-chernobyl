@@ -1,3 +1,9 @@
+--[[
+	scheme_type: active_section
+	author: ???
+	modified_by: Alundaio
+--]]
+
 local function angle_to_direction(oangle)
 	local yaw = oangle.y
 	local pitch = oangle.x
@@ -18,7 +24,7 @@ function evaluator_need_animpoint:__init(storage, name) super(nil, name)
 	self.st = storage
 end
 function evaluator_need_animpoint:evaluate()
-	return xr_logic.is_active(self.object, self.st)
+	return xr_logic.is_active(self.object, self.st) or false
 end
 
 class "evaluator_reach_animpoint" (property_evaluator)
@@ -30,7 +36,7 @@ function evaluator_reach_animpoint:evaluate()
 	if (xr_danger.has_danger(self.object)) then 
 		return false 
 	end
-	return self.st.animpoint:position_riched()
+	return self.st.animpoint:position_riched() == true
 end
 --------------------------------------------------------------------------------
 class "action_reach_animpoint" (action_base)
@@ -486,7 +492,7 @@ end
 
 
 function set_scheme(npc, ini, scheme, section, gulag_name)
-	printf("DEBUG: %s set_scheme: scheme='%s', section='%s'", npc:name(), scheme, section)
+	--printf("DEBUG: %s set_scheme: scheme='%s', section='%s'", npc:name(), scheme, section)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic	  		= xr_logic.cfg_get_switch_conditions(ini, section, npc)
 	st.cover_name		= utils.cfg_get_string(ini, section, "cover_name", npc, false, "", "$script_id$_cover")

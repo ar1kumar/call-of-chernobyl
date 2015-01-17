@@ -1,14 +1,81 @@
 -- Dynamic Ordered Task dialog 
+last_task_id = nil
 function npc_has_ordered_task_to_give(a,b)
 	local npc = who_is_npc(a, b)
-	return axr_task_manager and axr_task_manager.get_first_available_task(npc) ~= nil or false
+	--return axr_task_manager and axr_task_manager.get_first_available_task(npc) ~= nil or false
+	return last_task_id ~= nil or false
+end
+
+function actor_has_finished_ordered_task(a,b)
+	local npc = who_is_npc(a, b)
+	return axr_task_manager and axr_task_manager.get_first_finished_task(npc) ~= nil or false
+end
+
+function actor_has_not_finished_ordered_task(a,b)
+	return not actor_has_finished_ordered_task(a,b)
 end
 
 function text_npc_has_ordered_task_to_give(a,b)
 	local npc = who_is_npc(a, b)
 	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)
+	last_task_id = task_section
 	return game.translate_string(task_section and axr_task_manager.get_task_job_description(task_section) or "st_no_available_task")
 end 
+
+function text_fetch_task(a,b)
+	local npc = who_is_npc(a, b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)
+
+	if (last_task_id) then
+		while last_task_id and task_section ~= nil and task_section ~= last_task_id do 
+			task_section = axr_task_manager.get_first_available_task(npc,true)
+		end
+	else 
+		last_task_id = task_section
+	end
+	
+	if not (task_section) then 
+		last_task_id = nil
+		return game.translate_string("st_nevermind")
+	end
+	
+	axr_task_manager.trigger_fetch_func(task_section)
+
+	local text = game.translate_string(task_section and axr_task_manager.get_fetch_task_description(task_section) or "st_about_fetch_task_default")
+	
+	return string.format(text,_FETCH_TEXT or "") or ""
+end
+
+function text_task_finish(a,b)
+	local npc = who_is_npc(a, b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_finished_task(npc)
+	return game.translate_string(task_section and axr_task_manager.get_task_complete_text(task_section) or "st_default_task_finished")
+end
+
+function task_is_fetch_task(a,b)
+	local npc = who_is_npc(a, b)
+	local task_id = last_task_id --axr_task_manager.get_first_available_task(npc)
+	if not (task_id) then 
+		return false 
+	end 
+	return axr_task_manager.get_fetch_task_description(task_id) ~= nil
+end
+
+function not_task_is_fetch_task(a,b)
+	return not task_is_fetch_task(a,b)
+end
+
+function npc_set_finished_task_complete(a,b)
+	local npc = who_is_npc(a, b)
+	axr_task_manager.set_finished_task_complete(npc)
+end
+
+function npc_give_last_task_id(a,b)
+	if (last_task_id) then
+		task_manager.get_task_manager():give_task(last_task_id)
+		last_task_id = nil
+	end
+end
 
 function npc_give_first_available_task(a,b)
 	if (axr_task_manager) then

@@ -8,12 +8,31 @@ Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 --]]
 
+---------------------------------------------------------------------------------------------------------
+-- HOW TO CREATE YOUR OWN HUD TOOL
+--[[ Steps:
+
+1. Add tool name to the toggle rotation for either top hud or left hud. ( ie. { "my_hud" } )
+2. create a show() function with hud name as prefix_ ( ie. local function my_hud_show() )
+3. use the add_msg() class function to add text to your new hud. ( ie. hud:add_msg("Variable",value) )
+4. call display() class function.	( ie. hud:display() )
+5. Optionally set header display ( ie. hud:set_header("-[My Hud Info]-") )
+
+--]]
+---------------------------------------------------------------------------------------------------------
+
+local toggle_hud_list = 	{
+							["top"]  = { "squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
+							["left"] = { "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
+							["right"] = { "planner_hud", "gulag_info_hud", "position_hud", "heli_hud", "wounded_hud","corpse_hud"}
+							}
+--------------------------------------------------------------------------------------------------
+
+
 -- used for debugging
 NEAREST_STALKER = nil
 
-local show_game_graph = false
 local developer_debug = true
-local spawn_all_items_on_actor = false
 local position_file = ""
 
 local keybinds
@@ -23,14 +42,203 @@ local Enable
 local hud_display_top
 local hud_display_left
 local hud_display_right
-function on_game_load()
-	local ini = ini_file("debug\\xrs_debug_tools.ltx")
-	Enable = alun_utils.read_from_ini(ini,"plugin","enable","bool",false,"xrs_debug_tools")
-	if not (Enable) then ini=nil return end
 
-	actor_info = {}
-	keybinds = {}
+------------------------------------------------------------------------
+-- Class to create hud tools
+class "hud_tool"
+function hud_tool:__init(custom_static)
+	get_hud():AddCustomStatic(custom_static,true)
+	self.custom_static = custom_static
+	self.header = ""
+	self.msg = ""
+end
 
+function hud_tool:add_msg(text,value,...)
+	self.msg = self.msg..str_format(text..": %s\\n",value)
+end
+
+function hud_tool:set_header(header)
+	self.header = header
+end
+
+function hud_tool:display(disable)
+	if (disable) then 
+		return 
+	end 
+	
+	local hud = get_hud()
+	local cus = hud:GetCustomStatic(self.custom_static)
+	if (cus) then
+		cus:wnd():TextControl():SetText(self.msg)
+		self.msg = self.header and self.header .."\\n" or ""
+	end
+end
+
+function hud_tool:clear()
+	local hud = get_hud()
+	local cus = hud:GetCustomStatic(self.custom_static)
+	if (cus) then
+		cus:wnd():TextControl():SetText("")
+	end
+end
+
+-- Callback main_menu_on_keyboard
+local toggle_left_key = 1
+local toggle_top_key = 1
+local toggle_right_key = 1
+local debug_ui
+local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present)
+	if not (level_present) then 
+		return 
+	end 
+	
+	if keyboard_action ~= ui_events.WINDOW_KEY_RELEASED then return end
+	if (keybinds["print_position"] and dik == DIK_keys["DIK_"..keybinds["print_position"]]) then
+		if (db.actor) then
+			local lvid, gvid = db.actor:level_vertex_id(), db.actor:game_vertex_id()
+			local pos = db.actor:position()
+			local dir = device().cam_dir
+			local pos2 = level.vertex_position(lvid)
+			local valid = pos2:distance_to(pos) <= 0.7
+			local function write_file(text,...)
+				if not text then return end
+				local debug_file = io.open(position_file,"a+")
+
+				if ( debug_file == nil ) then
+					debug_mode = false
+					return
+				end
+
+				local i = 0
+				local p = {...}
+				local function sr(a)
+					i = i + 1
+					return tostring(p[i])
+				end
+				local output = string.gsub(text,"%%s",sr)
+
+				debug_file:write(output.."\n")
+
+				debug_file:close()
+
+				get_console():execute("load ~#I#:"..output)
+			end
+			write_file("position 		= %s,%s,%s",pos.x,pos.y,pos.z)
+			write_file("level_vertex_id = %s",lvid)
+			write_file("game_vertex_id 	= %s",gvid)
+			write_file("direction 		= %s,%s,%s",dir.x,dir.y,dir.z)
+			write_file("direction HP 	= %s,%s",dir:getH(),dir:getP())
+			write_file("valid 			= %s",valid)
+			write_file("","")
+		end
+	elseif (keybinds["toggle_top_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_top_hud"]]) then
+		if ( toggle_top_key < #toggle_hud_list["top"]) then
+			toggle_top_key = toggle_top_key + 1
+		else
+			toggle_top_key = 1
+		end
+			printf("TOP HUD = %s",toggle_hud_list["top"][toggle_top_key])
+	elseif keybinds["toggle_left_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_left_hud"]] then
+		if ( toggle_left_key < #toggle_hud_list["left"]) then
+			toggle_left_key = toggle_left_key + 1
+		else
+			toggle_left_key = 1
+		end
+		printf("LEFT HUD = %s",toggle_hud_list["left"][toggle_left_key])
+	elseif keybinds["toggle_right_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_right_hud"]] then
+		if ( toggle_right_key < #toggle_hud_list["right"]) then
+			toggle_right_key = toggle_right_key + 1
+		else
+			toggle_right_key = 1
+		end
+		printf("right HUD = %s",toggle_hud_list["right"][toggle_right_key])
+	elseif keybinds["debug_ui"] and dik == DIK_keys["DIK_"..keybinds["debug_ui"]] then
+		if not (debug_ui) then
+			debug_ui = ui_debug_main and ui_debug_main.debug_ui(main_menu,keybinds)
+		end
+
+		if (debug_ui) then
+			debug_ui:ShowDialog(true)
+			main_menu:HideDialog()
+			main_menu:Show(false)
+		end
+	end
+end
+
+local draw_debug_hud = true
+function set_draw_debug_hud(val)
+	hud_display_top:clear()
+	hud_display_left:clear()
+	hud_display_right:clear()
+	draw_debug_hud = val
+end
+
+-- ACTOR UPDATE
+local dtimer = 0
+LastCameraPos = nil
+local function actor_on_update()
+	if not (Enable) then
+		return
+	end
+	
+	if (STEP) then
+		collectgarbage("step",STEP)
+	end
+
+	if (debug_god) then
+		db.actor.health = 1
+		db.actor.bleeding = 1
+		db.actor.psy_health = 1
+		db.actor.radiation = -1
+		db.actor.power = 1
+	end
+
+	if (crow_fun) then
+		local crow = level.object_by_id(crow_fun)
+		db.actor:set_actor_position(crow:position())
+	end
+
+	local cam_pos = device().cam_pos
+	if (cam_pos and db.actor:position():distance_to_sqr(cam_pos) > 5) then
+		LastCameraPos = cam_pos
+	end
+
+	local tg = time_global()
+	if (tg < dtimer) then
+		return
+	end
+
+	dtimer = tg + 250
+
+	NEAREST_STALKER = alun_utils.get_nearest_stalker("cam",500)
+
+	--local disable_draw = alun_utils.load_var(db.actor,"disable_debug_draw",nil)
+	local disable_draw = axr_main and axr_main.config and axr_main.config:GetValue("debug","enable_hud",1,false) == false
+	if (disable_draw) then
+		hud_display_top:clear()
+		hud_display_left:clear()
+		hud_display_right:clear()
+		return
+	end
+
+	local top_hud = toggle_hud_list["top"][toggle_top_key]
+	local left_hud = toggle_hud_list["left"][toggle_left_key]
+	local right_hud = toggle_hud_list["right"][toggle_right_key]
+
+	if not(top_hud) or not(left_hud) then return end
+
+	_G["xrs_debug_tools"][top_hud.."_show"](hud_display_top)
+	_G["xrs_debug_tools"][left_hud.."_show"](hud_display_left)
+	_G["xrs_debug_tools"][right_hud.."_show"](hud_display_right)
+end
+
+local function actor_on_hit_callback(binder,npc,amount,local_direction,who,bone_index)
+	if (debug_god) then
+		db.actor.health = 1
+	end
+end
+
+local function on_game_load()
 	actions_by_stalker_ids = {}
 	for k,v in pairs(_G.xr_actions_id) do
 		actions_by_stalker_ids[v] = k
@@ -118,12 +326,30 @@ function on_game_load()
 	actions_by_stalker_ids[188115] = "axr_new_combat"
 	actions_by_stalker_ids[188116] = "axr_radio_in_heli"
 	actions_by_stalker_ids[90005] = "gather_items"
+	
+	-- HUD DISPLAYS
+	hud_display_top = hud_tool("cs_debug")
+	hud_display_left = hud_tool("cop_debug")
+	hud_display_right = hud_tool("cop2_debug")
+end 
+
+------------------------------------------------------------------------------------
+--										GAME START
+function on_game_start()
+	local ini = ini_file("debug\\xrs_debug_tools.ltx")
+	Enable = alun_utils.read_from_ini(ini,"plugin","enable","bool",false,"xrs_debug_tools")
+	if not (Enable) then ini=nil return end
+
+	callback_register("on_game_load",on_game_load)
+	callback_register("actor_on_update",actor_on_update)
+	callback_register("main_menu_on_keyboard",main_menu_on_keyboard)
+	callback_register("actor_on_hit_callback",actor_on_hit_callback)
+	
+	actor_info = {}
 
 	local sect = "plugin"
 	local developer_debug = alun_utils.read_from_ini(ini,"plugin","developer_debug","bool",false)
 	local debug_gulag = alun_utils.read_from_ini(ini,"plugin","debug_gulag","bool",false)
-	show_game_graph = alun_utils.read_from_ini(ini,"plugin","show_game_graph","bool",false)
-	spawn_all_items_on_actor = alun_utils.read_from_ini(ini,"plugin","spawn_all_items_on_actor","bool",false)
 	position_file = alun_utils.read_from_ini(ini,"plugin","file_save_position_info","string","positional_info.txt")
 
 	keybinds = 	{
@@ -138,254 +364,8 @@ function on_game_load()
 
 	if (developer_debug) then
 		_G.dev_debug = true
-		--_G.log = alun_utils.printf
-		--_G.sim_debug = true
 	end
-
-	-- HUD DISPLAYS
-	hud_display_top = hud_tool("cs_debug")
-	hud_display_left = hud_tool("cop_debug")
-	hud_display_right = hud_tool("cop2_debug")
-
-	--[[
-	debug_game_graph_loaded = xr_logic.pstor_retrieve(db.actor,"debug_game_graph_loaded",nil)
-	if (show_game_graph and not debug_game_graph_loaded) then
-		local gg = game_graph()
-		for gvid=0,933 do
-			if gg:valid_vertex_id(gvid) then
-				local vertex = gg:vertex(gvid)
-
-				local level_name = alife():level_name(vertex:level_id())
-
-				local lvid = vertex:level_vertex_id()
-
-				local pos = vertex:level_point()
-
-				if (not debug_game_graph_loaded) then
-					local obj = alife():create("medkit", pos, lvid, gvid)
-					level.map_add_object_spot_ser(obj.id, "alife_combat", level_name.." Gvid:"..gvid)
-				end
-			end
-		end
-
-		xr_logic.pstor_store(db.actor,"debug_game_graph_loaded",true)
-	end
-	--]]
-end
-
-------------------------------------------------------------------------
--- Class to create hud tools
-class "hud_tool"
-function hud_tool:__init(custom_static)
-	get_hud():AddCustomStatic(custom_static,true)
-	self.custom_static = custom_static
-	self.header = ""
-	self.msg = ""
-end
-
-function hud_tool:add_msg(text,value,...)
-	self.msg = self.msg..str_format(text..": %s\\n",value)
-end
-
-function hud_tool:set_header(header)
-	self.header = header
-end
-
-function hud_tool:display(disable)
-	if (disable) then 
-		return 
-	end 
-	
-	local hud = get_hud()
-	local cus = hud:GetCustomStatic(self.custom_static)
-	if (cus) then
-		cus:wnd():TextControl():SetText(self.msg)
-		self.msg = self.header and self.header .."\\n" or ""
-	end
-end
-
-function hud_tool:clear()
-	local hud = get_hud()
-	local cus = hud:GetCustomStatic(self.custom_static)
-	if (cus) then
-		cus:wnd():TextControl():SetText("")
-	end
-end
-
----------------------------------------------------------------------------------------------------------
--- HOW TO CREATE YOUR OWN HUD TOOL
---[[ Steps:
-
-1. Add tool name to the toggle rotation for either top hud or left hud. ( ie. { "my_hud" } )
-2. create a show() function with hud name as prefix_ ( ie. local function my_hud_show() )
-3. use the add_msg() class function to add text to your new hud. ( ie. hud:add_msg("Variable",value) )
-4. call display() class function.	( ie. hud:display() )
-5. Optionally set header display ( ie. hud:set_header("-[My Hud Info]-") )
-
---]]
----------------------------------------------------------------------------------------------------------
-
-local toggle_hud_list = 	{
-							["top"]  = { "squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
-							["left"] = { "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
-							["right"] = { "planner_hud", "gulag_info_hud", "position_hud", "heli_hud", "wounded_hud","corpse_hud"}
-							}
---------------------------------------------------------------------------------------------------
-
-
--- Callback main_menu_on_keyboard
-local toggle_left_key = 1
-local toggle_top_key = 1
-local toggle_right_key = 1
-local debug_ui
-function main_menu_on_keyboard(dik,keyboard_action,main_menu)
-	if not (Enable) then
-		return
-	end
-	if keyboard_action ~= ui_events.WINDOW_KEY_RELEASED then return end
-	if (keybinds["print_position"] and dik == DIK_keys["DIK_"..keybinds["print_position"]]) then
-		if (db.actor) then
-			local lvid, gvid = db.actor:level_vertex_id(), db.actor:game_vertex_id()
-			local pos = db.actor:position()
-			local dir = device().cam_dir
-			local pos2 = level.vertex_position(lvid)
-			local valid = pos2:distance_to(pos) <= 0.7
-			local function write_file(text,...)
-				if not text then return end
-				local debug_file = io.open(position_file,"a+")
-
-				if ( debug_file == nil ) then
-					debug_mode = false
-					return
-				end
-
-				local i = 0
-				local p = {...}
-				local function sr(a)
-					i = i + 1
-					return tostring(p[i])
-				end
-				local output = string.gsub(text,"%%s",sr)
-
-				debug_file:write(output.."\n")
-
-				debug_file:close()
-
-				get_console():execute("load ~#I#:"..output)
-			end
-			write_file("position 		= %s,%s,%s",pos.x,pos.y,pos.z)
-			write_file("level_vertex_id = %s",lvid)
-			write_file("game_vertex_id 	= %s",gvid)
-			write_file("direction 		= %s,%s,%s",dir.x,dir.y,dir.z)
-			write_file("direction HP 	= %s,%s",dir:getH(),dir:getP())
-			write_file("valid 			= %s",valid)
-			write_file("","")
-		end
-	elseif (keybinds["toggle_top_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_top_hud"]]) then
-		if ( toggle_top_key < #toggle_hud_list["top"]) then
-			toggle_top_key = toggle_top_key + 1
-		else
-			toggle_top_key = 1
-		end
-			printf("TOP HUD = %s",toggle_hud_list["top"][toggle_top_key])
-	elseif keybinds["toggle_left_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_left_hud"]] then
-		if ( toggle_left_key < #toggle_hud_list["left"]) then
-			toggle_left_key = toggle_left_key + 1
-		else
-			toggle_left_key = 1
-		end
-		printf("LEFT HUD = %s",toggle_hud_list["left"][toggle_left_key])
-	elseif keybinds["toggle_right_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_right_hud"]] then
-		if ( toggle_right_key < #toggle_hud_list["right"]) then
-			toggle_right_key = toggle_right_key + 1
-		else
-			toggle_right_key = 1
-		end
-		printf("right HUD = %s",toggle_hud_list["right"][toggle_right_key])
-	elseif keybinds["debug_ui"] and dik == DIK_keys["DIK_"..keybinds["debug_ui"]] then
-		if not (debug_ui) then
-			debug_ui = ui_debug_main and ui_debug_main.debug_ui(main_menu,keybinds)
-		end
-
-		if (debug_ui) then
-			debug_ui:ShowDialog(true)
-			main_menu:HideDialog()
-			main_menu:Show(false)
-		end
-	end
-end
-
-local draw_debug_hud = true
-function set_draw_debug_hud(val)
-	hud_display_top:clear()
-	hud_display_left:clear()
-	hud_display_right:clear()
-	draw_debug_hud = val
-end
-
--- ACTOR UPDATE
-local dtimer = 0
-LastCameraPos = nil
-function on_actor_update()
-	if not (Enable) then
-		return
-	end
-
-	--local cross = alun_utils.in_crosshair()
-	--if (cross) then
-	--	printf("in cross_hair %s",cross:name())
-	--end
-	
-	if (STEP) then
-		collectgarbage("step",STEP)
-	end
-
-	if (debug_god) then
-		db.actor.health = 1
-		db.actor.bleeding = 1
-		db.actor.psy_health = 1
-		db.actor.radiation = -1
-		db.actor.power = 1
-	end
-
-	if (crow_fun) then
-		local crow = level.object_by_id(crow_fun)
-		db.actor:set_actor_position(crow:position())
-	end
-
-	local cam_pos = device().cam_pos
-	if (cam_pos and db.actor:position():distance_to_sqr(cam_pos) > 5) then
-		LastCameraPos = cam_pos
-	end
-
-	local tg = time_global()
-	if (tg < dtimer) then
-		return
-	end
-
-	dtimer = tg + 250
-
-	NEAREST_STALKER = alun_utils.get_nearest_stalker("cam",500)
-
-	--local disable_draw = alun_utils.load_var(db.actor,"disable_debug_draw",nil)
-	local disable_draw = axr_main and axr_main.config and axr_main.config:GetValue("debug","enable_hud",1,false) == false
-	if (disable_draw) then
-		hud_display_top:clear()
-		hud_display_left:clear()
-		hud_display_right:clear()
-		return
-	end
-
-	local top_hud = toggle_hud_list["top"][toggle_top_key]
-	local left_hud = toggle_hud_list["left"][toggle_left_key]
-	local right_hud = toggle_hud_list["right"][toggle_right_key]
-
-	if not(top_hud) or not(left_hud) then return end
-
-	_G["xrs_debug_tools"][top_hud.."_show"](hud_display_top)
-	_G["xrs_debug_tools"][left_hud.."_show"](hud_display_left)
-	_G["xrs_debug_tools"][right_hud.."_show"](hud_display_right)
-end
+end 
 
 -- NPC target for hud display ( nil = off )
 local DEBUG_NPC
@@ -524,7 +504,7 @@ function heli_hud_show(hud)
 		local st
 		for id,st in pairs(db.storage) do
 			mon = st.object or level.object_by_id(id)
-			if (mon and mon:alive() and IsHelicopter(mon)) then
+			if (mon and IsHelicopter(mon)) then
 				pos = npc == "cam" and device().cam_pos or mon:position()
 				dist = pos:distance_to_sqr(mon:position())
 				if not (nearest_dist) then
@@ -618,7 +598,7 @@ function monster_hud_show(hud)
 		local st
 		for id,st in pairs(db.storage) do
 			mon = st.object or level.object_by_id(id)
-			if (mon and mon:alive() and IsMonster(mon)) then
+			if (mon and IsMonster(mon) and mon:alive()) then
 				pos = npc == "cam" and device().cam_pos or mon:position()
 				dist = pos:distance_to_sqr(mon:position())
 				if not (nearest_dist) then
@@ -655,13 +635,18 @@ function monster_hud_show(hud)
 		hud:add_msg("Ini",st.ini_filename)
 		local be = near:best_enemy()
 		hud:add_msg("Best Enemy",be and be:name())
+		
+		if (st.overrides and st.overrides.combat_ignore and be) then
+			hud:add_msg("CombatIgnoreCond",xr_logic.pick_section_from_condlist(be, near, st.overrides.combat_ignore.condlist))
+		end
+		
+		be = near:get_enemy()
+		hud:add_msg("Enemy",be and be:name())
+		
 		if (st.overrides and st.overrides.combat_ignore and be) then
 			hud:add_msg("CombatIgnoreCond",xr_logic.pick_section_from_condlist(be, near, st.overrides.combat_ignore.condlist))
 		end
 
-		hud:add_msg("BodyState",near:body_state())
-		hud:add_msg("MentalState",near:mental_state())
-		
 		local smart = sobj.m_smart_terrain_id and sobj.m_smart_terrain_id ~= 65535 and alife():object(sobj.m_smart_terrain_id)
 		local npc_info = smart and smart.npc_info[near:id()]
 		if (npc_info) then 
@@ -834,7 +819,7 @@ function planner_hud_show(hud)
 
 			local combat_action = manager:action(stalker_ids.action_combat_planner)
 			local combat_action_planner = cast_planner(combat_action)
-			actid = combat_action_planner:current_action_id()
+			actid = combat_action_planner and combat_action_planner:initialized() and combat_action_planner:current_action_id()
 			if (actid and actid < 4294967295) then
 				name = actions_by_stalker_ids[actid] or "unknown"
 				hud:add_msg("Combat Act",name)
@@ -843,7 +828,7 @@ function planner_hud_show(hud)
 
 			local danger_action = manager:action(stalker_ids.action_danger_planner)
 			local danger_action_planner = cast_planner(danger_action)
-			actid = danger_action_planner:current_action_id()
+			actid = danger_action_planner and danger_action_planner:initialized() and danger_action_planner:current_action_id()
 			if (actid and actid < 4294967295) then
 				name = actions_by_stalker_ids[actid] or "unknown"
 				hud:add_msg("Danger Act",name)
@@ -852,7 +837,7 @@ function planner_hud_show(hud)
 
 			local alife_action = manager:action(stalker_ids.action_alife_planner)
 			local alife_action_planner = cast_planner(alife_action)
-			actid = alife_action_planner:current_action_id()
+			actid = alife_action_planner and alife_action_planner:initialized() and alife_action_planner:current_action_id()
 			if (actid and actid < 4294967295) then
 				name = actions_by_stalker_ids[actid] or "unknown"
 				hud:add_msg("Alife Act",name)
@@ -915,10 +900,15 @@ function planner_hud_show(hud)
 						return true
 					end
 
-					if not isWeapon(npc:best_weapon()) then
+					local bestweapon = npc:best_weapon()
+					if not (bestweapon) then 
+						return 
+					end
+					
+					if not IsWeapon(bestweapon) then
 						return true
 					end
-					local bestweapon = npc:best_weapon()
+					
 					local activeitem = npc:active_item()
 
 					if (weapon == "strapped" and
@@ -950,7 +940,7 @@ function planner_hud_show(hud)
 						return false
 					end
 
-					return (npc:is_body_turning() and (mgr.target_state == "zat_b20_noah_jump" or mgr.mgr:current_action_id() == xr_actions_id.animpoint_action + 1)) or false
+					return npc:is_body_turning() --(npc:is_body_turning() and (mgr.target_state == "zat_b20_noah_jump" or mgr.mgr:current_action_id() == xr_actions_id.animpoint_action + 1)) or false
 				end 
 				
 				local sm = st.state_mgr

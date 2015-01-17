@@ -61,7 +61,7 @@ meet_on_talking = false
 
 [logic@duty_guard1]
 active = walker@duty_guard1_reach
-suitable = {=npc_community(dolg) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=npc_community(dolg) !surge_started} true
 
 [walker@duty_guard1_reach]
 path_walk = guard_1_walk
@@ -89,7 +89,7 @@ use_camp = false
 
 [logic@duty_guard2]
 active = walker@duty_guard2
-suitable = {=npc_community(dolg) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=npc_community(dolg) !surge_started} true
 
 [walker@duty_guard2]
 path_walk = guard_2_walk
@@ -111,7 +111,7 @@ meet = no_meet
 
 [logic@duty_guard3]
 active = walker@duty_guard3
-suitable = {=npc_community(dolg) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=npc_community(dolg) !surge_started} true
 
 [walker@duty_guard3]
 path_walk = guard_3_walk
@@ -119,9 +119,9 @@ path_look = guard_3_look
 def_state_standing = wait_na
 meet = meet@bar_zastava
 ;out_restr = bar_zastava_online_restrictor
-gather_items_enabled = true
-help_wounded_enabled = true
-corpse_detection_enabled = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
 use_camp = false
 on_info = {=npc_in_zone(bar_zastava_restrictor)} walker@duty_guarder3
 
@@ -139,7 +139,7 @@ use_camp = false
 
 [logic@duty_guard4]
 active = walker@duty_guard4
-suitable = {=check_npc_name(bar_duty_security_squad_leader) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=check_npc_name(bar_duty_security_squad_leader) !surge_started} true
 prior = 120
 
 [walker@duty_guard4]
@@ -159,7 +159,7 @@ meet = no_meet
 
 [logic@duty_guard5]
 active = walker@duty_guard5_reach
-suitable = {=npc_community(dolg) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=npc_community(dolg) !surge_started} true
 
 [walker@duty_guard5_reach]
 path_walk = guard_5_walk
@@ -187,7 +187,7 @@ use_camp = false
 
 [logic@duty_guard6]
 active = walker@duty_guard6
-suitable = {=npc_community(dolg) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=npc_community(dolg) !surge_started} true
 
 [walker@duty_guard6]
 path_walk = guard_6_walk
@@ -206,7 +206,7 @@ meet = no_meet
 
 [logic@duty_guard7]
 active = walker@duty_guard7
-suitable = {=npc_community(dolg) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=npc_community(dolg) !surge_started} true
 
 [walker@duty_guard7]
 path_walk = guard_7_walk
@@ -228,7 +228,7 @@ meet = no_meet
 
 [logic@duty_guard8]
 active = walker@duty_guard8
-suitable = {=npc_community(dolg) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=npc_community(dolg) !surge_started} true
 
 [walker@duty_guard8]
 path_walk = guard_8_walk
@@ -251,7 +251,7 @@ meet = no_meet
 
 [logic@duty_guard9]
 active = walker@duty_guard9
-suitable = {=npc_community(dolg) =npc_in_zone(bar_zastava_restrictor) !surge_started} true
+suitable = {=npc_community(dolg) !surge_started} true
 
 [walker@duty_guard9]
 path_walk = guard_9_walk

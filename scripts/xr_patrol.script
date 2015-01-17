@@ -523,7 +523,7 @@ end
 
 -- включение патруля
 function set_scheme(npc, ini, scheme, section, gulag_name)
-		printf ("XR_PATROL CALLED 'SET_SCHEME' FOR NPC %s", npc:name ())
+		printf ("XR_PATROL CALLED 'set_scheme' FOR NPC %s", npc:name ())
 	local st = xr_logic.assign_storage_and_bind (npc, ini, scheme, section)
 
 	st.logic = xr_logic.cfg_get_switch_conditions (ini, section, npc)

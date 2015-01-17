@@ -10,7 +10,7 @@ local function npc_on_death_callback(npc,who)
 	local npc_id = npc:id()
 	local id = alun_utils.load_var(db.actor,"esc_m_trader_bounty_target_id")
 	if (id and npc_id == id) then
-		printf("esc_m_trader_bounty_target_id=%s tagged_by_actor=%s",npc_id,db.storage[id] and db.storage[id].tagged_by_actor)
+		--printf("esc_m_trader_bounty_target_id=%s tagged_by_actor=%s",npc_id,db.storage[id] and db.storage[id].tagged_by_actor)
 		if (db.storage[npc_id] and db.storage[npc_id].tagged_by_actor == true) or (who and (who:id() == 0 or who:has_info("npcx_is_companion"))) then
 			task_manager.get_task_manager():set_task_completed("esc_m_trader_task_1")
 		end
@@ -68,7 +68,7 @@ end
 ------------------------------------------------------------------------------
 -- automated ordered tasks
 -- tasks must be named <section>_task_<number>
--- m_trader (ie. Sidrovich) use npc:name() instead
+-- m_trader (ie. Sidorovich) use npc:name() instead
 function get_first_available_task(npc,skip)
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
@@ -91,6 +91,41 @@ function get_first_available_task(npc,skip)
 		task_id = sec..tostring(count)
 	end
 end
+
+function get_first_finished_task(npc)
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	
+	local sec = npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	local task_id = sec.."1"
+	
+	local count = 1
+	while (task_manager.task_ini:section_exist(task_id)) do
+	--	printf("get_first_finished_task task_id=%s",task_id)
+		if (task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","float")) then
+			return task_id
+		end
+		count = count + 1
+		task_id = sec..tostring(count)
+	end
+end
+
+function set_finished_task_complete(npc)
+	local task_id = get_first_finished_task(npc)
+	if not (task_id) then 
+		return 
+	end 
+
+	task_manager.get_task_manager():set_task_completed(task_id)
+end
+
+function trigger_fetch_func(task_id)
+	--printf("triiger_fetch_func %s",task_id)
+	local fetch_func = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_manager.task_ini, task_id, "fetch_func", nil, false, "", ""))
+	if (fetch_func) then 
+		xr_logic.pick_section_from_condlist(db.actor,db.actor,fetch_func)
+	end
+end 
 
 function get_random_available_task(npc)
 	local tm = task_manager.get_task_manager()
@@ -117,6 +152,23 @@ end
 function get_task_job_description(task)
 	return alun_utils.read_from_ini(task_manager.task_ini,task,"job_descr","string")
 end 
+
+function get_fetch_task_description(task)
+	return alun_utils.read_from_ini(task_manager.task_ini,task,"fetch_descr","string")
+end 
+
+function get_task_complete_text(task)
+	return alun_utils.read_from_ini(task_manager.task_ini,task,"task_complete_descr","string")
+end
+
+function is_task_on_complete_stage(task)
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	if not (task_info[task_id]) then 
+		return false 
+	end 
+	return task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task,"stage_complete","number")
+end
 
 function npc_has_task_to_give(npc)
 	return get_first_available_task(npc) ~= nil

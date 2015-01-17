@@ -276,6 +276,10 @@ function sim_squad_scripted:specific_update(script_target_id)
 	end
 	
 	self.assigned_target_id = script_target_id
+		
+	if (self.smart_id ~= self.assigned_target_id and se_target:clsid() == clsid.smart_terrain) then 
+		self:assign_smart(se_target,self.smart_id)
+	end
 	
 	if (self.current_action) then
 		-- If current action is not finished, then return
@@ -328,6 +332,10 @@ function sim_squad_scripted:generic_update()
 		if (se_target and se_target:target_precondition(self,true)) then
 			-- If current action is not finished, then return
 			
+			if (self.smart_id ~= self.assigned_target_id and se_target:clsid() == clsid.smart_terrain) then 
+				self:assign_smart(se_target,self.smart_id)
+			end
+	
 			if (self.current_action == 0) then
 				if (se_target:am_i_reached(self)) then
 					se_target:on_after_reach(self)
@@ -1042,7 +1050,6 @@ end
 
 function sim_squad_scripted:on_reach_target(squad)
 	squad:set_location_types()
-	-- Why is this done?
  	for k in squad:squad_members() do
 		if db.offline_objects[k.id] ~= nil then
 			db.offline_objects[k.id] = db.offline_objects[k.id] and empty_table(db.offline_objects[k.id])

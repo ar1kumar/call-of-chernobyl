@@ -165,12 +165,12 @@ function create_random_stash(no_spot,hint,bonus_items)
 	loot[9] = {"itm_pda_uncommon","wpn_wincheaster1300","wpn_toz34","wpn_desert_eagle","wpn_beretta","wpn_walther","wpn_sig220","wpn_colt1911","detector_scientific","wpn_addon_grenade_launcher","wpn_addon_grenade_launcher_m203","ammo_11.43x23_fmj","ammo_11.43x23_hydro","ammo_5.45x39_ap","ammo_5.45x39_fmj","ammo_9x39_ap","ammo_5.56x45_ss190","ammo_5.56x45_ap","ammo_7.62x54_7h1","ammo_9x18_fmj","ammo_9x18_pmm","ammo_9x19_pbp","ammo_9x19_fmj","ammo_og-7b","itm_gunsmith_toolkit"}
 
 	-- rare
-	loot[10] = {"wpn_bm16","wpn_addon_scope_susat_night","af_blood","af_glass","af_gold_fish","novice_outfit","itm_pda_rare","ammo_9x18_pmm","ammo_5.56x45_ap"}
-	loot[11] = {"wpn_addon_scope_susat_dusk","wpn_sig550","wpn_protecta","stalker_outfit","helm_respirator","helm_hardhat","helm_protective","itm_pda_rare","ammo_11.43x23_hydro","ammo_9x18_pmm","ammo_5.56x45_ap"}
-	loot[12] = {"wpn_spas12","wpn_ak74u","wpn_mp5","wpn_ak74","wpn_abakan","wpn_l85","wpn_lr300","wpn_groza","wpn_val","wpn_vintorez","helm_tactic","helm_battle","itm_pda_rare","ammo_11.43x23_hydro","ammo_5.56x45_ap"}
+	loot[10] = {"wpn_bm16","wpn_addon_scope_susat_night","af_blood","af_glass","af_gold_fish","novice_outfit","itm_pda_rare","ammo_9x18_pmm","ammo_5.56x45_ap","itm_gunsmith_toolkit_tier_2"}
+	loot[11] = {"wpn_addon_scope_susat_dusk","wpn_sig550","wpn_protecta","stalker_outfit","helm_respirator","helm_hardhat","helm_protective","itm_pda_rare","ammo_11.43x23_hydro","ammo_9x18_pmm","ammo_5.56x45_ap","itm_gunsmith_toolkit_tier_2"}
+	loot[12] = {"wpn_spas12","wpn_ak74u","wpn_mp5","wpn_ak74","wpn_abakan","wpn_l85","wpn_lr300","wpn_groza","wpn_val","wpn_vintorez","helm_tactic","helm_battle","itm_pda_rare","ammo_11.43x23_hydro","ammo_5.56x45_ap","itm_gunsmith_toolkit_tier_2"}
 
 	-- extremely rare
-	loot[13] = {"wpn_svu","wpn_svd","wpn_g36","wpn_fn2000","wpn_pkm","stalker_outfit","svoboda_light_outfit","wpn_sig550_luckygun","af_compass","itm_pda_rare"}
+	loot[13] = {"wpn_svu","wpn_svd","wpn_g36","wpn_fn2000","helm_m40","wpn_pkm","stalker_outfit","svoboda_novice_outfit","ecolog_guard_outfit","banditmerc_outfit","dolg_novice_outfit","cs_novice_outfit","ecolog_outfit_green","svoboda_light_outfit","wpn_sig550_luckygun","af_compass","itm_pda_rare"}
 	loot[14] = {"wpn_rg-6","wpn_rpg7","specops_outfit","military_outfit","scientific_outfit","svoboda_heavy_outfit","cs_heavy_outfit","dolg_outfit","itm_pda_rare"}
 	loot[15] = {"ammo_gauss","exo_outfit","dolg_heavy_outfit","itm_pda_rare"}
 
@@ -199,34 +199,34 @@ function create_random_stash(no_spot,hint,bonus_items)
 			if (alun_utils.item_is_fa(se_obj)) then
 				--printf("coc_treasure_manager: item is fa")
 				data = stpk_utils.get_weapon_data(se_obj)
+				if (data) then
+					-- Create random addon flag for weapon
+					flag = 0
+					if (alun_utils.read_from_ini(nil,sec,"scope_status","float",nil)) then
+						flag = flag + 1
+					end
 
-				-- Create random addon flag for weapon
-				flag = 0
-				if (alun_utils.read_from_ini(nil,sec,"scope_status","float",nil)) then
-					flag = flag + 1
+					if (alun_utils.read_from_ini(nil,sec,"grenade_launcher_status","float",nil)) then
+						flag = flag + 2
+					end
+
+					if (alun_utils.read_from_ini(nil,sec,"silencer_status","float",nil)) then
+						flag = flag + 4
+					end
+
+					flag = math.random(0,flag)
+
+					-- Create random ammo type
+					ammos = alun_utils.parse_list(system_ini(),sec,"ammo_class")
+					ct = ammos and #ammos
+					ammo_type = ammos and ct and math.random(0,ct-1) or 0
+					ammo_section = ammo_type and ammos[ammo_type+1]
+
+					data.addon_flags = flag
+					data.ammo_type = ammo_type
+					data.condition = (math.random(70)+30)/100
+					stpk_utils.set_weapon_data(data,se_obj)
 				end
-
-				if (alun_utils.read_from_ini(nil,sec,"grenade_launcher_status","float",nil)) then
-					flag = flag + 2
-				end
-
-				if (alun_utils.read_from_ini(nil,sec,"silencer_status","float",nil)) then
-					flag = flag + 4
-				end
-
-				flag = math.random(0,flag)
-
-				-- Create random ammo type
-				ammos = alun_utils.parse_list(system_ini(),sec,"ammo_class")
-				ct = ammos and #ammos
-				ammo_type = ammos and ct and math.random(0,ct-1) or 0
-				ammo_section = ammo_type and ammos[ammo_type+1]
-
-				data.addon_flags = flag
-				data.ammo_type = ammo_type
-				data.condition = (math.random(70)+30)/100
-				stpk_utils.set_weapon_data(data,se_obj)
-
 				--printf("coc_treasure_manager: item is fa- end")
 			end
 		else

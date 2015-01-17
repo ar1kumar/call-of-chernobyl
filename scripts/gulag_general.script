@@ -881,6 +881,10 @@ def_state_campering_fire = %s_fire
 				job_ltx = job_ltx.."path_look = sniper_"..i.."_look\n"
 			end
 
+			if (xr_gulag.job_in_restrictor(smart,gname.."_sniper_"..i.."_restr",name)) then 
+				job_ltx = job_ltx.."out_restr = " .. gname.."_sniper_"..i.."_restr"
+			end 
+			
 			if (smart.safe_restr and xr_gulag.job_in_restrictor(smart, smart.safe_restr, name)) then
 				job_ltx = job_ltx .. "invulnerable = {=npc_in_zone("..smart.safe_restr..")} true\n"
 			end
@@ -942,6 +946,10 @@ def_state_campering_fire = %s_fire
 				job_ltx = job_ltx .. "invulnerable = {=npc_in_zone("..smart.safe_restr..")} true\n"
 			end
 
+			if (xr_gulag.job_in_restrictor(smart,gname.."_camper_"..i.."_restr",name)) then 
+				job_ltx = job_ltx.."out_restr = " .. gname.."_camper_"..i.."_restr"
+			end 
+			
 			if (smart.def_restr) then
 				--job_ltx = job_ltx .."out_restr = "..smart.def_restr..","..combat_restrictor.get_job_restrictor(name).."\n"
 			end
@@ -1316,8 +1324,8 @@ function load_job(smart)
 	local gname = smart:name()
 
 	-- Use a gulag if it already exists, saves tons of memory and cuts loading time down drastically
-	if (file_exists(alun_utils.fspath("$game_gulag$")..gname..".ltx")) then
-		generate_ltx = false
+	if (file_exists(alun_utils.fspath("$game_config$").."gulag\\"..gname..".ltx")) then
+		--generate_ltx = false
 		--printf("Not generating dynamic ltx")
 	end
 

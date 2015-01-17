@@ -1,11 +1,8 @@
-----------------------------------------------------------------------------------------------------------------------
--- xr_corpse_detection
--- Alundaio (original: Stohe)
 --[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+	scheme_type: generic
+	author: Stohe
+	modified_by: Alundaio
 --]]
-----------------------------------------------------------------------------------------------------------------------
 
 --------------------
 local alife = alife
@@ -123,21 +120,6 @@ local function on_pstor_load_all(obj)
 	end
 end
 
-local function scheme_deactivate(npc,scheme,st)
-	if (scheme ~= "corpse_detection") then
-		return
-	end
-
-	if (st.selected_corpse_id) then
-		if (db.storage[st.selected_corpse_id]) then
-			db.storage[st.selected_corpse_id].corpse_already_selected = nil
-		end
-		st.selected_corpse_id = nil
-	end
-	st.vertex_id = nil
-	st.vertex_position = nil
-end
-
 -----------------------------------
 -- Register Callbacks
 -----------------------------------
@@ -147,7 +129,6 @@ function on_game_start()
 	callback_register("npc_on_death_callback",on_death_callback)
 	callback_register("monster_on_death_callback",monster_on_death_callback)
 	callback_register("on_pstor_load_all",on_pstor_load_all)
-	callback_register("scheme_deactivate",scheme_deactivate)
 end
 
 function get_all_from_corpse(npc)
@@ -256,7 +237,7 @@ end
 function evaluator_corpse:find_valid_target()
 	if (self.a.cstackprevent) then
 		printf("C Stack Overflow Prevention: warning xr_corpse_detection scheme making repeated calls without return; save now and reload!")
-		return
+		return false
 	end
 
 	if (self.a.selected_corpse_id) then 
@@ -341,7 +322,7 @@ function evaluator_corpse:find_valid_target()
 		local can_loot_mutants = not is_stalker and (self.a.analse_mode == "true" or self.a.enabled == "true" and MonsterLootCommunities[character_community(npc)])
 
 		if (self.a.enabled == "true" and is_stalker or can_loot_mutants) then
-			local corpse_pos = corpse_npc:bone_position("bip01_spine")
+			local corpse_pos = alun_utils.safe_bone_pos(corpse_npc,"bip01_spine")
 			local dist = npc:position():distance_to_sqr(corpse_pos)
 
 			if (self.a.nearest_corpse_dist == nil or dist <= self.a.nearest_corpse_dist) then
@@ -404,7 +385,11 @@ function evaluator_corpse:evaluate()
 		return false
 	end
 	
-	return self:find_valid_target()
+	if (self:find_valid_target()) then
+		return true 
+	end 
+	
+	return false
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -458,7 +443,7 @@ local function execute_search_corpse(npc,self)
 		end
 
 		local corpse = db.storage[self.a.selected_corpse_id] and db.storage[self.a.selected_corpse_id].object or level.object_by_id(self.a.selected_corpse_id)
-		look_pos = corpse and corpse:bone_position("bip01_spine") or self.a.vertex_position
+		look_pos = corpse and alun_utils.safe_bone_pos(corpse,"bip01_spine") or self.a.vertex_position
 
 		state_mgr.set_state(npc,"search_corpse",nil,nil,{look_position = look_pos})
 	else
@@ -507,34 +492,46 @@ end
 ---------------------------------------------------------------------------------------------------------------------
 -- BINDER
 ----------------------------------------------------------------------------------------------------------------------
-function add_to_binder(npc, char_ini, scheme, section, st)
+
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"corpse_detection",section,temp)
+end
+
+function add_to_binder(npc,char_ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(xr_evaluators_id.corpse_exist,property_evaluator_const(false))
-	else
-		manager:add_evaluator (xr_evaluators_id.corpse_exist, evaluator_corpse("corpse_exist", st))
+		temp.needs_configured = false 
+		return
 	end
 
-	-- Actions
-	local action = action_search_corpse (npc:name(),"action_search_corpse", st)
-	action:add_precondition(wp(xr_evaluators_id.corpse_exist, true))
-	action:add_precondition( wp(stalker_ids.property_alive,true) )
-	action:add_precondition( wp(stalker_ids.property_enemy,	false) )
-	action:add_precondition( wp(stalker_ids.property_danger,false) )
-	action:add_precondition( wp(stalker_ids.property_anomaly,false) )
+	manager:add_evaluator(xr_evaluators_id.corpse_exist, evaluator_corpse("corpse_exist", st))
 
-	action:add_precondition( wp(xr_gather_items.evaid, false))
-	action:add_precondition( wp(stalker_ids.property_items, false) )
-	action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
-	action:add_precondition( wp(xr_evaluators_id.stohe_meet_base + 1, false) )
-	action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base, false) )
-	action:add_precondition( wp(xr_evaluators_id.abuse_base, false) )
-	--action:add_precondition( wp(xr_evaluators_id.state_mgr + 1,false) )
+	temp.action = action_search_corpse(npc:name(),"action_search_corpse", st)
+		
+	temp.action:add_precondition(wp(stalker_ids.property_alive,true))
+	temp.action:add_precondition(wp(stalker_ids.property_enemy,false))
+	temp.action:add_precondition(wp(stalker_ids.property_danger,false))
+	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.corpse_exist, true))
+	
+	temp.action:add_effect(wp(xr_evaluators_id.corpse_exist, false))
+	
+	manager:add_action(xr_actions_id.corpse_exist,temp.action)
+end
 
-	action:add_effect(wp(xr_evaluators_id.corpse_exist, false))
-	manager:add_action(xr_actions_id.corpse_exist, action)
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	temp.action:add_precondition(wp(xr_gather_items.evaid,false))
+	temp.action:add_precondition(wp(stalker_ids.property_items,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.abuse_base, false))
+	--temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,false))
 
+	local manager = npc:motivation_action_manager()
+	local action
 	local p = {
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife
@@ -544,18 +541,19 @@ function add_to_binder(npc, char_ini, scheme, section, st)
 		if (action) then
 			action:add_precondition( wp(xr_evaluators_id.corpse_exist,false) )
 		else
-			printf("xr_corpse_detection: no action id p[%s]",i)
+			printf("ERROR: xr_corpse_detection: no action id p[%s]",i)
 		end
 	end
-
 end
 
-function set_corpse_detection(npc, ini, scheme, section)
-	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
-end
-
-
-function reset_corpse_detection(npc, scheme, st, section)
+function reset_generic_scheme(npc,scheme,section,stype,st)
+	if not (st) then
+		printf("ERROR: xr_corpse_detection: reset_generic_scheme storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
+		return 
+	end
+	
+	--printf("TEST: scheme=%s st[scheme]=%s",scheme,st[scheme] ~= nil)
+	
 	if (st.corpse_detection.selected_corpse_id) then
 		if (db.storage[st.corpse_detection.selected_corpse_id]) then
 			db.storage[st.corpse_detection.selected_corpse_id].corpse_already_selected = nil

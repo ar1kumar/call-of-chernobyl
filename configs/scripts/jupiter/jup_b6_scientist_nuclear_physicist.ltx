@@ -13,7 +13,7 @@ def_state_moving = walk_noweap
 on_info = {+jup_b1_complete_end -jup_b6_ask !talking} %+jup_b6_ask%
 on_info2 = {!npc_in_zone(jup_b41_sr_light)} %=teleport_npc(jup_b41_nuc_walk)%
 meet = meet@default
-combat_ignore_cond = true
+combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 out_restr = jup_b41_sr_light

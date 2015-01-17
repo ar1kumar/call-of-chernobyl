@@ -1109,9 +1109,11 @@ function killed_by_actor(actor, npc)
 end
 
 function actor_has_weapon (actor, npc)
-	local obj = actor:active_item ()
-	if obj == nil or isWeapon (obj) == false then return false end
-	return true
+	local obj = actor:active_item()
+	if (obj and IsWeapon(obj)) then 
+		return true 
+	end
+	return false
 end
 
 function actor_active_detector(actor, npc, p)
@@ -1267,7 +1269,7 @@ function squad_in_zone(actor, npc, p)
 	local se_obj
 	local sim = alife()
 	for k in squad:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		se_obj = k.id and sim:object(k.id)
 		if (se_obj and zone:inside(se_obj.position)) then
 			return true
 		end
@@ -1522,8 +1524,15 @@ function active_item(actor, npc, p)
 end
 
 function actor_nomove_nowpn()
-	if (not isWeapon(db.actor:active_item())) or db.actor:is_talking() then
-		return true
+	local itm = db.actor:active_item()
+	if not (itm) then 
+		return true 
+	end
+	if not (IsWeapon(itm)) then 
+		return true 
+	end 
+	if (db.actor:is_talking()) then 
+		return true 
 	end
 	return false
 end

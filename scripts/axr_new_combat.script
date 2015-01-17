@@ -1,5 +1,8 @@
---Copyright (C) 2014 Alundaio
---This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+--[[
+	scheme_type: generic
+	author: Alundaio
+--]]
+
 --TODO: Fix heli aim targetting!
 
 -- disable it entirely
@@ -76,14 +79,6 @@ local function lmove_ns(npc,vid,st)
 	
 	npc:set_dest_level_vertex_id(vid)
 	return vid
-end
-
-local function set_generic_scheme(npc, ini, stype)
-	local st = xr_logic.assign_storage_and_bind(npc,ini,"new_combat","new_combat")
-end
-
-local function npc_add_precondition(action)
-	action:add_precondition(world_property(evaid,false))
 end
 
 local good_acts = {
@@ -182,7 +177,7 @@ local function find_valid_target(npc,st,bw)
 	
 	local target = id and (db.storage[id] and db.storage[id].object or level.object_by_id(id))
 
-	if (IsHelicopter(target)) then 
+	if (target and IsHelicopter(target)) then 
 		if not (current_target) then 
 			local dist = heli_alife.distance_2d_sqr(npc:position(),target:position())
 			if (dist < 40000) then 
@@ -229,19 +224,6 @@ local function check_overrides(npc)
 end 
 
 --------------------------------------------------------------------------------------
---												ON_GAME_START
---------------------------------------------------------------------------------------					
-function on_game_start()
-	if not (ENABLE) then 
-		return 
-	end 
-	
-	load_scheme("axr_new_combat","new_combat",0)
-	callback_register("set_generic_scheme",set_generic_scheme)
-	callback_register("npc_add_precondition",npc_add_precondition)
-end
-
---------------------------------------------------------------------------------------
 --												EVALUATOR NEW COMBAT
 --------------------------------------------------------------------------------------
 
@@ -254,7 +236,7 @@ end
 function evaluator_new_combat:evaluate()
 	--alun_utils.debug_write("eva_new_combat")
 	local npc = self.object
-	if good_acts[npc:motivation_action_manager():current_action_id()] then
+	if good_acts[alun_utils.get_current_action_id(npc)] then
 		return false
 	end
 	
@@ -343,14 +325,14 @@ function action_new_combat:npc_see(enemy)
 			end
 		end
 	else 
-		--return self.object:see(enemy) or time_global()-self.object:memory_time(enemy) <= 2000
-		return time_global()-self.object:memory_time(enemy) <= 2000
+		return self.object:see(enemy) or time_global()-self.object:memory_time(enemy) <= 2000
+		--return time_global()-self.object:memory_time(enemy) <= 2000
 	end
 	
 	return false
 end 
 
-function action_new_combat:set_fire_type(dist)
+function action_new_combat:set_fire_type(enemy,dist)
 	--alun_utils.debug_write("action_new_combat:set_fire_type")
 	local can_set = true
 	local tg = time_global()
@@ -369,7 +351,7 @@ function action_new_combat:set_fire_type(dist)
 	if (alun_utils.isShotgun(bw)) then 
 		self.st.__fire_type = (self.st.__fire_type == nil or can_set) and math_random(1,2) or self.st.__fire_type
 		self.st.__fire_range = 1600
-		self.st.__fire_queue = (aim <= 500 and 500 or aim >= 7500 and 7500 or aim) + math_random(100,500)
+		self.st.__fire_queue = (aim <= 500 and 500 or aim >= 7500 and 7500 or aim) + math_random(100,800)
 	elseif (alun_utils.isSniper(bw)) then 
 		self.st.__fire_type = 1
 		self.st.__fire_range = 250000
@@ -390,14 +372,19 @@ function action_new_combat:set_fire_type(dist)
 end
 
 function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
+	self.is_firing = false 
+	
 	--alun_utils.debug_write(alun_utils.sr("action_new_combat:set_item"))
 	local is_heli = IsHelicopter(enemy,self.st.cls)
 	local bw = self:find_suitable_weapon(npc,enemy)
+	if not (bw) then 
+		return 
+	end 
 	local tg = time_global()
 	local npc_see = self:npc_see(enemy)
 	local vec
 
-	self:set_fire_type(dist)
+	self:set_fire_type(enemy,dist)
 	
 	local sight_type = npc:sight_params()
 	sight_type = sight_type and sight_type.m_sight_type or 0
@@ -429,12 +416,16 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 		end
 	end
 	
-	if (sight_type == 3 or sight_type == 4) then
+	--alun_utils.debug_nearest(npc,"sight_type=%s",sight_type)
+	if (sight_type == 3 or sight_type == 4) or (alun_utils.isShotgun(bw)) then
 		if (npc_see) then
 			if (is_heli) then 
 				self:set_movement_type(npc,move.stand)
 			end
-			npc:set_item(object.fire1,bw,self.st.__fire_type or 1,self.st.__fire_queue or 1500)
+			if (npc:active_item()) then
+				npc:set_item(object.fire1,bw,self.st.__fire_type or 1,self.st.__fire_queue or 1500)
+				self.is_firing = true
+			end
 		else
 			npc:set_item(object.aim1,bw)
 		end
@@ -443,7 +434,7 @@ function action_new_combat:set_item(npc,enemy,ene_pos,see,dist)
 	end
 end
 
-function action_new_combat:try_go_cover_reload(npc,ene_pos)
+function action_new_combat:try_go_cover_reload(npc,enemy,ene_pos)
 	--alun_utils.debug_write(alun_utils.sr("action_new_combat:try_go_cover_reload"))
 	local bw = self:find_suitable_weapon(npc,enemy)
 	
@@ -455,7 +446,7 @@ function action_new_combat:try_go_cover_reload(npc,ene_pos)
 	if (bw:get_ammo_in_magazine() == 0) then
 		local vid = alun_utils.find_close_cover(npc,npc:position(),ene_pos,8,db.used_level_vertex_ids)
 		if (validate(npc,vid)) then
-			self.st.__keep_point_until = time_global() + 4000
+			self.st.__keep_point_until = time_global() + 8000
 			return lmove(npc,vid,self.st)
 		end
 	end
@@ -496,10 +487,7 @@ function action_new_combat:try_to_facer(npc,enemy,ene_pos,dist)
 	if (IsStalker(enemy,self.st.cls)) then
 		local f = db.storage[npc:id()] and db.storage[npc:id()].facer
 		if (xrs_facer) and (not (f and f.abtime and f.abtime > time_global())) then 
-			if (dist <= 3) then
-				-- close enough already
-				return lmove_ns(npc,npc:level_vertex_id(),self.st)
-			elseif (dist <= 40) then
+			if (dist <= 30) then
 				local vid = level.vertex_id(ene_pos)
 				vid = vid and vid < 4294967295 and npc:accessible(vid) and vid
 				if (vid and vid ~= npc:level_vertex_id()) then
@@ -777,7 +765,7 @@ function action_new_combat:low_level_ai_execute(npc,enemy,ene_pos,see,dist)
 	npc:set_mental_state(anim.danger)
 	npc:set_movement_type(move.walk)
 
-	new_vid = self:try_go_cover_reload(npc,ene_pos)
+	new_vid = self:try_go_cover_reload(npc,enemy,ene_pos)
 	if (new_vid == nil) then
 		if (dist <= 400) then 
 			self:set_body_state(npc,move.standing)
@@ -829,7 +817,14 @@ function action_new_combat:heli_combat_execute(npc,enemy,ene_pos,see,dist)
 		db.used_level_vertex_ids[self.st.vid] = nil
 	end
 	
-	new_vid = self:try_go_cover_reload(npc,ene_pos)
+	if (self.is_firing) then 
+		self:set_body_state(npc,move.standing)
+		self:set_movement_type(npc,move.walk)
+		lmove_ns(npc,npc:level_vertex_id(),self.st)
+		return
+	end
+	
+	new_vid = self:try_go_cover_reload(npc,enemy,ene_pos)
 	if (new_vid == nil) then
 		if (dist <= 64) then
 			self:set_body_state(npc,move.standing)
@@ -912,11 +907,19 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 	npc:set_movement_type(move.walk)
 	
 	new_vid = self:try_to_facer(npc,enemy,ene_pos,dist)
-	new_vid = new_vid or self:try_go_cover_reload(npc,ene_pos)
+	new_vid = new_vid or self:try_go_cover_reload(npc,enemy,ene_pos)
 	
 	if (new_vid == nil) then
 		local bw = self:find_suitable_weapon(npc,enemy)
 		if (alun_utils.isSniper(bw) or alun_utils.isLauncher(bw)) then 
+				
+			if (self.is_firing) then 
+				self:set_body_state(npc,move.standing)
+				self:set_movement_type(npc,move.walk)
+				lmove_ns(npc,npc:level_vertex_id(),self.st)
+				return
+			end
+			
 			if (dist <= 2500) then 
 				self:set_body_state(npc,move.standing)
 				self:set_movement_type(npc,move.run)
@@ -981,7 +984,7 @@ function action_new_combat:high_level_ai_execute(npc,enemy,ene_pos,see,dist)
 			end
 			return
 		elseif (alun_utils.isShotgun(bw)) then
-			--alun_utils.debug_nearest(npc,"isShotgun")
+			--alun_utils.debug_nearest(npc,"isShotgun DIST=%s enemy=%s is_stalker=%s",dist,enemy and enemy:name(),IsStalker(enemy))
 			if (IsStalker(enemy)) then
 				if (dist <= 3) then
 					self:set_body_state(npc,move.crouch)
@@ -1090,7 +1093,7 @@ function action_new_combat:execute()
 	local tg = time_global()
 	local ene_pos = is_heli and enemy:position() or npc:memory_position(enemy) or enemy:position()
 	local dist = is_heli and heli_alife.distance_2d_sqr(npc:position(),enemy:position()) or ene_pos:distance_to_sqr(npc:position())
-	local mem_time = is_heli and tg or enemy:memory_time(npc)
+	local mem_time = is_heli and tg or enemy:id() ~= 0 and enemy:memory_time(npc)
 	local see = is_heli and enemy:get_helicopter():isVisible(npc) or enemy:see(npc) or mem_time and tg - mem_time <= 7000
 
 	if (is_heli) then 
@@ -1131,44 +1134,54 @@ function action_new_combat:finalize()
 	self.st.bw = nil
 end
 
-function add_to_binder(npc,ini,scheme,section,storage)
-	local manager = npc:motivation_action_manager()
+--------------------------------------------------------------------
+--------------------------------- BINDER ---------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"new_combat",section,temp)
+end
 
-	-- Evaluators
+function add_to_binder(npc,ini,scheme,section,storage,temp)
+	local manager = npc:motivation_action_manager()
+	
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
-	else
-		manager:add_evaluator(evaid,evaluator_new_combat(npc,"eva_new_combat",storage))
+		temp.needs_configured = false
+		return 
 	end
 
-	local action = action_new_combat(npc,"act_new_combat",storage)
-	xr_logic.subscribe_action_for_events(npc, storage, action)
+	manager:add_evaluator(evaid,evaluator_new_combat(npc,"eva_new_combat",storage))
 	
-	action:add_precondition(world_property(stalker_ids.property_alive,true))
-	action:add_precondition(world_property(stalker_ids.property_danger, false))
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-	action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
-	--action:add_precondition(world_property(xr_evaluators_id.state_mgr + 1,true))
-	action:add_precondition(world_property(evaid,true))
-	action:add_effect(world_property(evaid,false))
+	temp.action = action_new_combat(npc,"act_new_combat",storage)
+	
+	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action:add_precondition(world_property(stalker_ids.property_danger, false))
+	temp.action:add_precondition(world_property(evaid,true))
+	
+	temp.action:add_effect(world_property(evaid,false))
+	
+	manager:add_action(actid,temp.action)
+	
+	xr_logic.subscribe_action_for_events(npc, storage, temp.action)
+end
 
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
+
+	if (rx_ff) then 
+		temp.action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+	end
 	if (rx_gl) then
-		action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
+		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
 	end
 	if (xrs_facer) then
-		action:add_precondition(world_property(xrs_facer.evid_facer,false))
-	end
-	if (rx_ff) then 
-		action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
 	end
 
-	manager:add_action(actid,action)
-
-	local p = {
-				stalker_ids.action_combat_planner,
-				xr_actions_id.state_mgr + 2,
-				xr_actions_id.alife
-	}
+	local manager = npc:motivation_action_manager()
+	local action
+	local p = {stalker_ids.action_combat_planner,xr_actions_id.state_mgr + 2,xr_actions_id.alife}
+	
 	for i=1,#p do
 		action = manager:action(p[i])
 		if (action) then
@@ -1177,11 +1190,15 @@ function add_to_binder(npc,ini,scheme,section,storage)
 			printf("axr_new_combat: no action id p[%s]",i)
 		end
 	end
-end
+end 
 
-function disable_scheme(npc, stype)
-	local st = db.storage[npc:id()]["new_combat"]
+function disable_generic_scheme(npc,scheme,stype)
+	local st = db.storage[npc:id()][scheme]
 	if st then
 		st.enabled = false
 	end
+end
+
+function npc_add_precondition(action)
+	action:add_precondition(world_property(evaid,false))
 end

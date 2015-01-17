@@ -160,6 +160,10 @@ end
 
 --' Функция вызывается для каждого предмета, если вернет false то предмет удалится.
 function keep_item(npc, item)
+	if not (item) then 
+		return 
+	end 
+	
 	local section = item:section()
 
 	local ini = npc:spawn_ini()
@@ -173,7 +177,7 @@ function keep_item(npc, item)
 		return
 	end
 
-	if isArtefact(item) then
+	if IsArtefact(item) then
 		return
 	end
 --	printf("keep_item:item ["..item:name().."] npc_name ["..npc:name().."]")
@@ -185,7 +189,8 @@ function keep_item(npc, item)
 		return
 	end
 	--printf("item name [%s]", item:name())
-	if isWeapon(item) and not(get_clsid(item)==clsid.wpn_grenade_rgd5_s or get_clsid(item)==clsid.wpn_grenade_f1_s) then
+	local cls = item:clsid()
+	if IsWeapon(item,cls) and not(cls==clsid.wpn_grenade_rgd5_s or cls==clsid.wpn_grenade_f1_s) then
 		set_weapon_drop_condition(item)
 		return
 	end

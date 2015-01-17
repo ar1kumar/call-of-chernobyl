@@ -1,8 +1,10 @@
 ----------------------------------------------------------------------------------------------------------------------
---	Схема встречи двух сталкеров
---	автор: Диденко Руслан (Stohe)
+--[[
+	scheme_type: generic
+	author: Stohe
+	modified_by: Alundaio
+--]]
 --	TODO:
--- Modified by: Alundaio
 ----------------------------------------------------------------------------------------------------------------------
 
 local function get_vertex(npc)
@@ -64,7 +66,7 @@ function evaluator_contact:evaluate()
 			return true 
 		end 
 		
-		 if (self.object:has_info("npcx_is_companion") or not get_object_story_id(self.object:id())) then
+		 if (self.object:has_info("npcx_is_companion")) then --or not get_object_story_id(self.object:id())) then
 			if (db.actor:position():distance_to_sqr(self.object:position()) < 1.6) and not (good_acts[alun_utils.get_current_action_id(self.object)]) then
 				self.a.gtfo = true
 				return true
@@ -83,9 +85,8 @@ function evaluator_contact:evaluate()
 		end
 
 		return self.a.meet_manager.current_distance ~= nil
-	else
-		return false
 	end
+	return false
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -416,7 +417,11 @@ function Cmeet_manager:update()
 		end
 	end
 
+	if (self.a.gtfo) then 
+		self.npc:allow_break_talk_dialog(false)
+	else
 		self.npc:allow_break_talk_dialog(self.allow_break)
+	end
 --[[
 	if is_talking then
 		db.actor:allow_break_talk_dialog(self.allow_break)
@@ -470,8 +475,6 @@ function notify_on_use(victim, who)
 		return
 	end
 
-
-
 	local snd = xr_logic.pick_section_from_condlist(db.actor, victim, st.snd_on_use) or "nil"
 	if (snd ~= "nil") then
 		xr_sound.set_sound_play(victim:id(), snd)
@@ -489,60 +492,63 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
-function add_to_binder(object, char_ini, scheme, section, st)
-	local manager = object:motivation_action_manager()
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local meet_section = utils.cfg_get_string (ini, section, "meet", npc, false, "")
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"meet",meet_section,temp)
+end
 
-	-- Evaluators
-	manager:add_evaluator (xr_evaluators_id.stohe_meet_base + 1, 		evaluator_contact("meet_contact", st))
-
+function add_to_binder(npc,char_ini,scheme,section,st,temp)
+	local manager = npc:motivation_action_manager()
 	local wp = world_property
-	-- Actions
-	local action = action_meet_wait (object:name(),"action_process_meet", st, char_ini)
-	action:add_precondition( wp(stalker_ids.property_alive, true))
-	action:add_precondition( wp(stalker_ids.property_enemy,	false))
-	action:add_precondition( wp(stalker_ids.property_danger,false))
-	action:add_precondition( wp(stalker_ids.property_anomaly,false))
+	
+	manager:add_evaluator(xr_evaluators_id.stohe_meet_base + 1, evaluator_contact("meet_contact", st))
 
-	--action:add_precondition( wp(stalker_ids.property_items,	false))
-	--action:add_precondition( wp(xr_evaluators_id.wounded_exist,false))
-	--action:add_precondition( wp(xr_evaluators_id.corpse_exist,	false))
+	temp.action = action_meet_wait(npc:name(),"action_process_meet", st, char_ini)
+	
+	temp.action:add_precondition(wp(stalker_ids.property_alive,true))
+	temp.action:add_precondition(wp(stalker_ids.property_enemy,false))
+	temp.action:add_precondition(wp(stalker_ids.property_danger,false))
+	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1,true))
+	
+	temp.action:add_effect(wp(xr_evaluators_id.stohe_meet_base + 1,false))
+	manager:add_action(xr_actions_id.stohe_meet_base + 1, temp.action)
+	
+	st.meet_manager = Cmeet_manager(npc,st)
+	xr_logic.subscribe_action_for_events(npc,st,st.meet_manager)
+end
 
-	action:add_precondition( wp(xr_evaluators_id.stohe_meet_base + 1, 		true))
-	action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base, 		false))
-	action:add_precondition( wp(xr_evaluators_id.abuse_base,		false))
-	action:add_effect( wp(xr_evaluators_id.stohe_meet_base + 1, 			false))
-	manager:add_action(xr_actions_id.stohe_meet_base + 1, action)
-
-	action = manager:action(xr_actions_id.alife)
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	local wp = world_property
+	
+	local manager = npc:motivation_action_manager()
+	local action = manager:action(xr_actions_id.alife)
 	action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1,		false))
 
 	action = manager:action(xr_actions_id.state_mgr + 2)
 	action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1,		false))
+	
+	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.abuse_base,false))
+end 
 
-	st.meet_manager = Cmeet_manager(object, st)
+function reset_generic_scheme(npc,scheme,section,stype,st)
+	if (st.meet) then
+		local meet_section
 
-	xr_logic.subscribe_action_for_events(object, st, st.meet_manager)
-end
+		if scheme == nil or scheme == "nil" then
+			meet_section = utils.cfg_get_string(st.ini, st.section_logic, "meet", npc, false, "") or "nil"
+		else
+			meet_section = utils.cfg_get_string(st.ini, section, "meet", npc, false, "") or "nil"
+		end
 
-
-
-------------
--- Вызывается только в начале на чтении логики, создает экшены, эвалуаторы и производит
--- первичную настройку.
-function set_meet(npc, ini, scheme, section)
-	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
-end
--- Вызывается на переключении на новую секцию. Производит вычитывание настроек из текущей секции.
-function reset_meet(npc, scheme, st, section)
-	local meet_section
-
-	if scheme == nil or scheme == "nil" then
-		meet_section = utils.cfg_get_string(st.ini, st.section_logic, "meet", npc, false, "") or "nil"
-	else
-		meet_section = utils.cfg_get_string(st.ini, section, "meet", npc, false, "") or "nil"
+		init_meet(npc, st.ini, meet_section, st.meet, scheme)
 	end
+end
 
-	init_meet(npc, st.ini, meet_section, st.meet, scheme)
+function disable_generic_scheme(npc,scheme,stype)
+	db.storage[npc:id()].actor_dialogs = nil
+	db.storage[npc:id()].actor_disable = nil
 end
 
 
@@ -664,11 +670,6 @@ function init_meet(npc, ini, section, st, scheme)
 	--print_table(st.far_distance)
 	-- флажок, что функция хотя бы раз вызывалась
 	st.meet_set = true
-end
-
-function disable_scheme(npc, scheme)
-	db.storage[npc:id()].actor_dialogs = nil
-	db.storage[npc:id()].actor_disable = nil
 end
 
 --- Находится ли чувак в данный момент в состоянии мита

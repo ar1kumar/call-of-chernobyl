@@ -143,6 +143,11 @@ end
 function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, team, suggested_state, move_cb_info, no_validation, continue, use_default_sound)
 	--printf("move_mgr:reset() [%s]", self.object:name())
 
+	if not (path_walk_info) then 
+		printf("ERROR: no path_walk_info  npc=%s path_walk=%s",npc and npc:name(),path_walk)
+		self.__disable = true
+	end 
+	
 	if (self.__disable) then
 		return
 	end

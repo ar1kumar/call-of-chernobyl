@@ -225,124 +225,14 @@ end
 -- ВНОСЯ ИЗМЕНЕНИЯ В ЭТУ ФУНКЦИЮ, НЕ ЗАБЫВАЙТЕ ДОБАВЛЯТЬ СООТВЕТСТВУЮЩИЕ СТРОКИ И В enable_generic_schemes
 ------------------------------------------------------------------------------------------------------------
 function disable_generic_schemes(npc, stype)
-	if stype == modules.stype_stalker then
-		xr_combat.disable_scheme(npc, "combat")
-		-- alundaio
-		--if (axr_main) then axr_main.scheme_disable(npc,stype) end
-		-- end alundaio
-
-		xr_hit.disable_scheme(npc, "hit")
-		xr_meet.disable_scheme(npc, "actor_dialogs")
-		--'xr_heli_hunter.disable_scheme(npc, "heli_hunter")
-		xr_combat_ignore.disable_scheme(npc, "combat_ignore")
-		stalker_generic.disable_invulnerability(npc)
-	elseif stype == modules.stype_mobile then
-		mob_combat.disable_scheme(npc, "mob_combat")
-		xr_combat_ignore.disable_scheme(npc, "combat_ignore")
-		stalker_generic.disable_invulnerability(npc)
-    elseif stype == modules.stype_trader then
-		mob_trade.disable_scheme(npc, "mob_trade")
-	elseif stype == modules.stype_item then
-		ph_on_hit.disable_scheme(npc, "ph_on_hit")
-	elseif stype == modules.stype_heli then
-		xr_hit.disable_scheme(npc, "hit")
-	end
+	modules.disable_generic_schemes(npc,stype)
 end
 
 ------------------------------------------------------------------------------------------------------------
 -- ВНОСЯ ИЗМЕНЕНИЯ В ЭТУ ФУНКЦИЮ, НЕ ЗАБЫВАЙТЕ ДОБАВЛЯТЬ СООТВЕТСТВУЮЩИЕ СТРОКИ И В disable_generic_schemes
 ------------------------------------------------------------------------------------------------------------
- function enable_generic_schemes(ini, npc, stype, section)
-	if stype == modules.stype_stalker then
-		--xr_reactions.set_reactions(npc, ini, "reactions", section)
-		xr_danger.set_danger(npc, ini, "danger", "danger")
-		xr_gather_items.set_gather_items(npc, ini, "gather_items", "gather_items")
-
-		local combat_section = utils.cfg_get_string(ini, section, "on_combat", npc, false, "")
-		xr_combat.set_combat_checker(npc, ini, "combat", combat_section)
-
-		stalker_generic.reset_invulnerability(npc, ini, section)
-
-		local info_section = utils.cfg_get_string(ini, section, "info", npc, false, "")
-		if info_section then
-			stalker_generic.set_npc_info(npc, ini, "info", info_section)
-		end
-
-		local hit_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
-		if hit_section then
-			xr_hit.set_hit_checker(npc, ini, "hit", hit_section)
-		end
-
-		local actor_dialogs_section = utils.cfg_get_string (ini, section, "actor_dialogs", npc, false, "")
-		if actor_dialogs_section then
-			xr_meet.set_actor_dialogs(npc, ini, "actor_dialogs", actor_dialogs_section)
-		end
-
-		local wounded_section = utils.cfg_get_string (ini, section, "wounded", npc, false, "")
-		xr_wounded.set_wounded (npc, ini, "wounded", wounded_section)
-
-		xr_abuse.set_abuse(npc, ini, "abuse", section)
-
-		xr_help_wounded.set_help_wounded (npc, ini, "help_wounded")
-
-		xr_corpse_detection.set_corpse_detection (npc, ini, "corpse_detection")
-
-
-		local meet_section = utils.cfg_get_string (ini, section, "meet", npc, false, "")
-		xr_meet.set_meet (npc, ini, "meet", meet_section)
-
-
-
-		local death_section = utils.cfg_get_string (ini, section, "on_death", npc, false, "")
-		xr_death.set_death (npc, ini, "death", death_section)
-
-		--'local heli_hunter_section = utils.cfg_get_string(ini, section, "heli_hunter", npc, false, "")
-		--'xr_heli_hunter.set_scheme(npc, ini, "heli_hunter", heli_hunter_section)
-
-		xr_combat_ignore.set_combat_ignore_checker(npc, ini, "combat_ignore")
-		xr_reach_task.set_reach_task(npc, ini, "reach_task")
-
-		-- Alun
-		if (axr_main) then axr_main.set_generic_scheme(npc, ini, stype) end
-		-- Alun end
-	elseif stype == modules.stype_mobile then
-		local combat_section = utils.cfg_get_string(ini, section, "on_combat", npc, false, "")
-		if combat_section then
-			mob_combat.set_scheme(npc, ini, "mob_combat", combat_section)
-		end
-
-		local death_section = utils.cfg_get_string(ini, section, "on_death", npc, false, "")
-		if death_section then
-			mob_death.set_scheme(npc, ini, "mob_death", death_section)
-		end
-
-		stalker_generic.reset_invulnerability(npc, ini, section)
-
-		local hit_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
-		if hit_section then
-			xr_hit.set_hit_checker(npc, ini, "hit", hit_section)
-		end
-
-		xr_combat_ignore.set_combat_ignore_checker(npc, ini, "combat_ignore")
-
-    elseif stype == modules.stype_trader then
-		local trade_section = utils.cfg_get_string(ini, section, "on_trade", npc, false, "")
-		if trade_section then
-			mob_trade.set_scheme(npc, ini, "mob_trade", trade_section)
-		end
-	elseif stype == modules.stype_item then
-		local hit_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
-		--printf("HIT SECTION [%s]", tostring(hit_section))
-		if hit_section then
-			ph_on_hit.set_scheme(npc, ini, "ph_on_hit", hit_section)
-		end
-
-	elseif stype == modules.stype_heli then
-		local hit_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
-		if hit_section then
-			xr_hit.set_hit_checker(npc, ini, "hit", hit_section)
-		end
-	end
+function enable_generic_schemes(ini, npc, stype, section)
+	modules.enable_generic_schemes(npc,ini,section,stype)
 end
 
 -- Существует два способа вызова функции: с передаванием секции или без нее
@@ -350,12 +240,15 @@ end
 -- Если section не передана, то она берется из работы переданного гулага.
 function activate_by_section(npc, ini, section, gulag_name, loading)
 	--printf("LOGIC[%s]: Object '%s': activate_by_section: looking for section '%s'", tostring(time_global()), npc:name(), section)
-	if not (ini) then 
+	if not (ini) then
+		callstack()
+		printf("activate_by_section: INI is nil! npc=%s section=%s",npc and npc:name(),section)
 		return 
 	end 
 	
 	if loading == nil then
-		printf("xr_logic: activate_by_section: loading field is nil, true or false expected")
+		callstack()
+		printf("ERROR: xr_logic: activate_by_section: loading field is nil, true or false expected")
 	end
 
 	local npc_id = npc:id()
@@ -377,7 +270,7 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 	if section == nil then
 		local current_gulag = xr_gulag.get_npc_smart(npc)
 		if current_gulag == nil then
-			printf("xr_logic: activate_by_section: section is NIL and NPC not in gulag.")
+			printf("ERROR: xr_logic: activate_by_section: section is NIL and NPC not in gulag.")
 		end
 		local t = current_gulag:getJob(npc_id)
 		section = t.section
@@ -403,11 +296,11 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 	-- _G[] даст указатель на неймспейс (таблицу) этого модуля
 	local filename = schemes[scheme]
 	if filename == nil then
-		printf("xr_logic: scheme '%s' is not registered in modules.script", scheme)
+		printf("ERROR: xr_logic: scheme '%s' is not registered in modules.script", scheme)
 	end
 	--printf("_bp: calling module('%s')", filename)
 	if (not _G[filename] or not _G[filename].set_scheme) then
-		printf("xr_logic: can't call %s.set_scheme() - a nil value", filename)
+		printf("ERROR: xr_logic: can't call %s.set_scheme() - a nil value", filename)
 		return
 	end
 
@@ -436,99 +329,43 @@ end
 	]] --
 
 function reset_generic_schemes_on_scheme_switch(npc, scheme, section)
-	--printf("_bp: reset_generic_schemes_on_scheme_switch: npc:name()='%s'", npc:name())
-	local st = db.storage[npc:id()]
-
-	st.exit_from_smartcover_initialized = nil
-
-	if not st.stype then
-		return
-	end
-
-	if st.stype == modules.stype_stalker then
-		--xr_reactions.reset_reactions(npc, scheme, st, section)
-		xr_meet.reset_meet(npc, scheme, st, section)
-		xr_help_wounded.reset_help_wounded(npc, scheme, st, section)
-		xr_corpse_detection.reset_corpse_detection(npc, scheme, st, section)
-		xr_abuse.reset_abuse(npc, scheme, st, section)
-		xr_wounded.reset_wounded(npc, scheme, st, section)
-		xr_death.reset_death(npc, scheme, st, section)
-		xr_danger.reset_danger(npc, scheme, st, section)
-		xr_gather_items.reset_gather_items(npc, scheme, st, section)
-		xr_combat_ignore.reset_combat_ignore_checker(npc, scheme, st, section)
-
-		stalker_generic.reset_threshold(npc, scheme, st, section)
-		stalker_generic.reset_show_spot(npc, scheme, st, section)
---		stalker_generic.set_level_spot(npc, scheme, st, section)
-		stalker_generic.reset_invulnerability(npc, st.ini, section)
-		stalker_generic.reset_group(npc, st.ini, section)
-		stalker_generic.take_items_enabled(npc, scheme, st, section)
-		stalker_generic.can_select_weapon(npc, scheme, st, section)
-		restrictor_manager.get_restrictor_manager(npc):reset_restrictions(st, section)
-		xr_hear.reset_hear_callback(st, section)
-
-		-- alundaio
-		if (axr_main) then axr_main.scheme_reset(npc,scheme,section,st) end
-		-- End Alundaio
-	elseif st.stype == modules.stype_mobile then
-		--printf("_bp: disabling talk")
-		--npc:disable_talk() -- теперь делается в dialog_manager_reset
-		mob_release(npc)
-		if get_clsid(npc) == clsid.bloodsucker_s then
-			if scheme == "nil" then
-				npc:set_manual_invisibility(false)
-			else
-				npc:set_manual_invisibility(true)
-				-- Видимый или нет определяет схема, которая возьмет его под контроль:
-				--npc:set_invisible(false)
-			end
-		end
-		xr_combat_ignore.reset_combat_ignore_checker(npc, scheme, st, section)
-		stalker_generic.reset_invulnerability(npc, st.ini, section)
-		restrictor_manager.get_restrictor_manager(npc):reset_restrictions(st, section)
-		xr_hear.reset_hear_callback(st, section)
-        elseif st.stype == modules.stype_trader then
-		stalker_generic.reset_show_spot(npc, scheme, st, section)
-	elseif st.stype == modules.stype_item then
-		npc:set_callback(callback.use_object, nil)
-		npc:set_nonscript_usable(true)
-		if get_clsid(npc) == clsid.car then
-			-- Другие объекты под скрипт не берутся, поэтому для них не надо сбрасывать
-			npc:destroy_car()
-			mob_release(npc)
-		end
-	end
+	modules.reset_generic_schemes(npc,scheme,section)
 end
 
-function assign_storage_and_bind(npc, ini, scheme, section)
-	local npc_id = npc:id()
-	local st
+function assign_storage_and_bind(npc,ini,scheme,section,temp)
+	local id = npc:id()
+	
+	if not (db.storage[id][scheme]) then
+		db.storage[id][scheme] = {}
+		db.storage[id][scheme].npc = npc
 
-	if not db.storage[npc_id][scheme] then
-		db.storage[npc_id][scheme] = {}
-		st = db.storage[npc_id][scheme]
-
-		st["npc"] = npc
-
-		-- Схема стартует впервые - прибиндить
-		--printf("DEBUG: assign_storage_and_bind: bind scheme: '%s'", scheme)
 		if not (_G[schemes[scheme]] and _G[schemes[scheme]].add_to_binder) then 
-			printf("no scheme found in schemes table or scheme has no add_to_binder function! scheme = %s",scheme)
+			callstack()
+			printf("ERROR: no scheme found in schemes table or scheme has no add_to_binder function! scheme = %s",scheme)
 		end
-		_G[schemes[scheme]].add_to_binder(npc, ini, scheme, section, st)
-	else
-		st = db.storage[npc_id][scheme]
+		
+		if (temp) then 
+			temp.needs_configured = true
+		end
+		
+		--printf("DEBUG: add_to_binder npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
+		_G[schemes[scheme]].add_to_binder(npc, ini, scheme, section, db.storage[id][scheme], temp)
 	end
 
-	st["scheme"] = scheme
-	st["section"] = section
-	st["ini"] = ini
+	db.storage[id][scheme].scheme = scheme
+	db.storage[id][scheme].section = section
+	db.storage[id][scheme].ini = ini
 
-	return st
+	return db.storage[id][scheme]
 end
 
 function subscribe_action_for_events(npc, storage, new_action)
-	--printf("DEBUG: registering new action for reset event (npc:name() = '%s')", npc:name())
+	--printf("DEBUG: registering new action for reset event scheme=%s npc=%s",scheme, npc and npc:name())
+	
+	if not (storage) then 
+		callstack()
+		printf("ERROR: subscribe_action_for_events storage is nil!")
+	end
 
 	if not storage.actions then
 		storage.actions = {}
@@ -749,8 +586,9 @@ function switch_to_section(npc, ini, section)
 	--printf("[%s] switch to section [%s] %s", npc:name(), tostring(section), device():time_global())
 
 	if active_section then
-		issue_event(npc, db.storage[npc_id][db.storage[npc_id].active_scheme], "deactivate", npc)
-		if (axr_main) then axr_main.scheme_deactivate(npc,db.storage[npc_id].active_scheme,db.storage[npc_id][db.storage[npc_id].active_scheme]) end
+		local st = db.storage[npc_id][db.storage[npc_id].active_scheme]
+		issue_event(npc, st, "deactivate", npc, st)
+		--if (axr_main) then axr_main.scheme_deactivate(npc,db.storage[npc_id].active_scheme,db.storage[npc_id][db.storage[npc_id].active_scheme]) end
 	end
 	db.storage[npc_id].exit_from_smartcover_initialized = nil
 	db.storage[npc_id].active_section = nil

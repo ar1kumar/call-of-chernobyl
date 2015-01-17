@@ -144,7 +144,7 @@ function act_state_mgr_movement_stand_search:initialize()
 	action_base.initialize(self)
 	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- stand", tostring(self.object:movement_type()))
 	self.object:set_movement_type(move.stand)
-	printf("SET_SIGHT!!!act_state_mgr_movement_stand_search:initialize()")
+	--printf("SET_SIGHT!!!act_state_mgr_movement_stand_search:initialize()")
 	self.object:set_sight(state_mgr_direction.look_position_type(self.object, self.st), nil, 0)
 
 end
@@ -192,9 +192,9 @@ function act_state_mgr_movement_walk_search:initialize()
 --	printf("ENABLING MOVEMENT !!!!!")
 	--'self.object:movement_enabled(true)
 	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- WALK", tostring(self.object:movement_type()))
-	printf("SET_SIGHT!!!act_state_mgr_movement_walk_search:initialize()")
+	--printf("SET_SIGHT!!!act_state_mgr_movement_walk_search:initialize()")
 	self.object:set_sight(state_mgr_direction.look_position_type(self.object, self.st), nil, 0)
-
+	--callstack()
 end
 function act_state_mgr_movement_walk_search:execute()
 	action_base.execute(self)
@@ -241,7 +241,7 @@ function act_state_mgr_movement_run_search:initialize()
 --	printf("ENABLING MOVEMENT !!!!!")
 	--'self.object:movement_enabled(true)
 	--printf("MOVEMENT TYPE IS --- %s setting MOVEMENT TYPE --- RUN", tostring(self.object:movement_type()))
-	printf("SET_SIGHT!!!act_state_mgr_movement_run_search:initialize()")
+	--printf("SET_SIGHT!!!act_state_mgr_movement_run_search:initialize()")
 	self.object:set_sight(state_mgr_direction.look_position_type(self.object, self.st), nil, 0)
 
 end

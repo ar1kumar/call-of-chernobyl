@@ -40,7 +40,7 @@ local function arrived_to_smart(obj, smart)
 	local cls = obj and obj.clsid and obj:clsid()
 	if not (cls) then 
 		return false 
-	end 
+	end
 	
 	local gg = game_graph()
 	local obj_gv, obj_pos = gg:vertex(obj.m_game_vertex_id), obj.position
@@ -55,6 +55,9 @@ local function arrived_to_smart(obj, smart)
 	end 
 
 	local squad = obj.group_id and SIMBOARD.squads[obj.group_id]
+	
+	local script_target = squad and squad:get_script_target() and alife():object(squad:get_script_target())
+	--alun_utils.debug_nearest(obj,"squad=%s script_id=%s smart_id=%s",squad and squad:name(),script_target and script_target:name(),smart:name())
 	if (squad) then
 		if (squad.m_game_vertex_id == smart.m_game_vertex_id) then 
 			return true 
@@ -453,6 +456,8 @@ function se_smart_terrain:load_jobs()
 					active_section = ltx:r_string(section, "active")
 
 					job_type = gulag_general.get_job_type(job)
+					job.alife_task = self.smart_alife_task
+					
 					if (job_type == "path_job" or job_type == "heli_path_job") then
 						path_field = "nil"
 						
@@ -479,8 +484,6 @@ function se_smart_terrain:load_jobs()
 								end
 							end
 							
-							job.alife_task = self.smart_alife_task
-							
 							if (level.patrol_path_exists(path_name)) then
 								if not (job_type == "heli_path_job") then
 									if (validate_patrol_path(path_name,gg)) then
@@ -498,10 +501,8 @@ function se_smart_terrain:load_jobs()
 						if not (smartcover) then
 							printf("There is an exclusive job with wrong smatrcover name [%s]  smartterrain [%s]", tostring(smartcover_name), self:name())
 						else 
-							job.alife_task = smartcover and CALifeSmartTerrainTask(smartcover.m_game_vertex_id, smartcover.m_level_vertex_id) or self.smart_alife_task
+							job.alife_task = CALifeSmartTerrainTask(smartcover.m_game_vertex_id, smartcover.m_level_vertex_id)
 						end
-					else
-						job.alife_task = self.smart_alife_task
 					end
 
 					if (job.alife_task) then -- if a single job is failed, ignore and fill rest of job table
@@ -571,7 +572,7 @@ function se_smart_terrain:update_jobs()
 	end
 end
 
-function se_smart_terrain:select_npc_job(npc_info)
+function se_smart_terrain:select_npc_job(npc_info,now)
 	if (self.disabled) then
 		return
 	end
@@ -607,7 +608,7 @@ function se_smart_terrain:select_npc_job(npc_info)
 				local itr_job
 				local npc_id
 				local step = 1
-				while (new_job == nil and step <= (st and STEP_SIZE or STEP_SIZE_OFFLINE)) do
+				while (new_job == nil and step <= (now and #jobs or st and STEP_SIZE or STEP_SIZE_OFFLINE)) do
 					step = step + 1
 
 					if (npc_info.current_index > #jobs) then
@@ -1328,7 +1329,7 @@ function se_smart_terrain:am_i_reached(squad)
 		return squad.position:distance_to_sqr(self.position) <= 625
 	end
 
-	return squad.always_arrived or squad.position:distance_to_sqr(self.position) <= self.arrive_dist^2
+	return squad.always_arrived == true or squad.position:distance_to_sqr(self.position) <= self.arrive_dist^2
 end
 
 function se_smart_terrain:on_after_reach(squad)
@@ -1452,7 +1453,7 @@ function se_smart_terrain:try_respawn()
 	end
 	--alun_utils.debug_write(alun_utils.sr("%s:try_respawn",self:name()))
 	
-	if (self.is_on_actor_level) then
+	if (self.is_on_actor_level and not has_alife_info("actor_is_sleeping")) then
 		local sim = alife()
 		local se_actor = sim:actor()
 		local dist_to_actor = se_actor.position:distance_to_sqr(self.position)
@@ -1478,6 +1479,14 @@ function se_smart_terrain:try_respawn()
 	--]]
 		
 	local curr_time = game.get_game_time()
+	
+	if not (self.is_on_actor_level) then
+		if not (self.last_respawn_update) then 
+			self.last_respawn_update = curr_time
+			return
+		end 
+	end
+	
 	if self.last_respawn_update == nil or curr_time:diffSec(self.last_respawn_update) > self.respawn_idle then
 		self.last_respawn_update = curr_time
 		
@@ -1525,17 +1534,20 @@ function se_smart_terrain:try_respawn()
 					local visual = utils.cfg_get_string(system_ini(),heli,"visual",se_heli,false)
 					-- required to spawn by script
 					local data = stpk_utils.get_heli_data(se_heli)
-					data.visual_name = visual and visual ~="" and visual or [[dynamics\vehicles\mi2\veh_mi2_01]]
-					data.motion_name = [[helicopter\aaa.anm]]
-					data.startup_animation = "idle"
-					data.skeleton_name = "idle"
-					data.engine_sound = [[vehicles\helicopter\helicopter]]
-					stpk_utils.set_heli_data(data,se_heli)
-					
-					self:register_npc(se_heli)
-					
-					se_heli.respawn_point_id = self.id
-					se_heli.respawn_point_prop_section = sect_to_spawn
+					if (data) then
+						data.visual_name = visual and visual ~="" and visual or [[dynamics\vehicles\mi2\veh_mi2_01]]
+						data.motion_name = [[helicopter\aaa.anm]]
+						data.startup_animation = "idle"
+						data.skeleton_name = "idle"
+						data.engine_sound = [[vehicles\helicopter\helicopter]]
+						stpk_utils.set_heli_data(data,se_heli)
+						
+						self:register_npc(se_heli)
+						se_heli.respawn_point_id = self.id
+						se_heli.respawn_point_prop_section = sect_to_spawn
+					else
+						alife():release(se_heli,true)
+					end
 				else
 					return
 				end

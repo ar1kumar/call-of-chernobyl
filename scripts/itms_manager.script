@@ -432,18 +432,19 @@ function is_ammo_for_wpn(sec)
 
 			se_wpn = sim:object(wpn:id())
 			data = stpk_utils.get_weapon_data(se_wpn)
-
-			if (sec == ammos[data.ammo_type+1]) then
-				return true
+			if (data) then
+				if (sec == ammos[data.ammo_type+1]) then
+					return true
+				end
+				--Adjusted Yasti
+				if (sec == ammos[data.ammo_type+2]) then
+					return true
+				end
+				if (sec == ammos[data.ammo_type+3]) then
+					return true
+				end
+				--End Yasti
 			end
-			--Adjusted Yasti
-			if (sec == ammos[data.ammo_type+2]) then
-				return true
-			end
-			if (sec == ammos[data.ammo_type+3]) then
-				return true
-			end
-			--End Yasti
 		end
 	end
 	return false

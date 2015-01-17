@@ -94,6 +94,20 @@ function add_task_companion(actor,npc,p)
 	end
 end
 
+function inc_task_stage(actor,npc,p)
+	local task = p[1] and task_manager.get_task_manager().task_info[p[1]]
+	if (task and task.stage) then
+		task.stage = task.stage + 1
+	end
+end 
+
+function dec_task_stage(actor,npc,p)
+	local task = p[1] and task_manager.get_task_manager().task_info[p[1]]
+	if (task and task.stage) then
+		task.stage = task.stage - 1
+	end
+end
+
 --param 1 var to store bounty id
 --param 2+ factions that can be targetted; can be list
 function on_init_bounty_hunt(actor,npc,p)
@@ -137,6 +151,8 @@ function fail_task_dec_goodwill(actor,npc,p)
 	end
 end
 
+-- param1 - amount of goodwill to increase
+-- param2+ - community
 function complete_task_inc_goodwill(actor,npc,p)
 	local amt = tonumber(p[1]) or 10
 	for i=2,#p do 
@@ -148,7 +164,24 @@ function complete_task_inc_goodwill(actor,npc,p)
 end
 
 function reward_money(actor,npc,p)
-	dialogs.relocate_money(db.actor,tonumber(p[1] or 0),"in")
+	dialogs.relocate_money(db.actor,tonumber(p[1] or 500),"in")
+end
+
+function reward_item_cost_mult_and_remove(actor,npc,p)
+	local sec = alun_utils.load_var(db.actor,p[1])
+	if not (sec) then 
+		return 
+	end 
+	local item = db.actor:object(sec)
+	if not (item) then 
+		return 
+	end 
+	dialogs.relocate_money(db.actor,(tonumber(p[2]) or 1)*item:cost(),"in")
+	remove_item(actor, npc, {sec,p[3]})
+end 
+
+function reward_random_money(actor,npc,p)
+	dialogs.relocate_money(db.actor,math.random(tonumber(p[1] or 500),tonumber(p[2] or 1000)),"in")
 end
 
 function remove_special_task_squad(actor,npc,p)
@@ -190,6 +223,7 @@ function setup_companion_task(actor,npc,p)
 	create_delayed_event(0,"add_special_task_squad",5,add_special_task_squad,squad.id)
 end
 
+-- setup for special escort to anomaly task
 function setup_task_target_anomaly(actor,npc,p)
 	local targets = {}
 	for k,v in pairs(db.anomaly_by_name) do 
@@ -204,6 +238,109 @@ function setup_task_target_anomaly(actor,npc,p)
 	alun_utils.save_var(db.actor,"task_target_anomaly",target_name)
 end
 
+-- param1 - variable name 
+-- param2+ - sections
+function setup_generic_fetch_task(actor,npc,p)
+	if (p[1] and p[2] and p[3]) then 
+		local sec = #p > 3 and p[math.random(3,#p)] or p[3]
+		if (sec and system_ini():section_exist(sec)) then
+			alun_utils.save_var(db.actor,p[1],sec)
+			local count = tonumber(p[2]) or 1
+			if (count > 1) then 
+				alun_utils.save_var(db.actor,p[1].."_count",count)
+			end
+			dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,sec,"inv_name","string"))
+		else
+			printf("ERROR: xr_effects:setup_generic_fetch_task - invalid section %s",sec)
+		end
+	end
+end
+--{=setup_generic_fetch_task(var_name:mutant_part_controller_glass:mutant_part_controller_hand:mutant_part_burer_hand:mutant_part_pseudogigant_eye:mutant_part_pseudogigant_hand:mutant_part_chimera_claw:mutant_part_chimera_kogot)}
+
+function setup_rare_mutant_fetch_task(actor,npc,p)
+	local parts = { 
+	"mutant_part_controller_glass",
+	"mutant_part_controller_hand",
+	"mutant_part_burer_hand",
+	"mutant_part_pseudogigant_eye",
+	"mutant_part_pseudogigant_hand",
+	"mutant_part_chimera_claw",
+	"mutant_part_chimera_kogot"
+	}
+	local part = parts[math.random(#parts)]
+	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,part,"inv_name","string"))
+	alun_utils.save_var(db.actor,p[1],part)
+end 
+
+-- param1 - variable name
+function setup_artefact_fetch_task(actor,npc,p)
+	local arts = {
+	"af_cristall",
+	"af_fireball",
+	"af_dummy_glassbeads",
+	"af_eye",
+	"af_fire",
+	"af_medusa",
+	"af_cristall_flower",
+	"af_night_star",
+	"af_vyvert",
+	"af_gravi",
+	"af_gold_fish",
+	"af_blood",
+	"af_mincer_meat",
+	"af_soul",
+	"af_fuzz_kolobok",
+	"af_baloon",
+	"af_glass",
+	"af_electra_sparkler",
+	"af_electra_flash",
+	"af_electra_moonlight",
+	"af_dummy_battery",
+	"af_dummy_dummy",
+	"af_ice"
+	}
+	
+	local artefact = arts[math.random(#arts)]
+	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,artefact,"inv_name","string"))
+	alun_utils.save_var(db.actor,p[1],artefact)
+end 
+
+function setup_weapon_fetch_task(actor,npc,p)
+	local itm = {
+			"wpn_bm16",
+			"wpn_toz34",
+			"wpn_wincheaster1300",
+			"wpn_spas12",
+			"wpn_protecta",
+			"wpn_ak74u",
+			"wpn_mp5",
+			"wpn_ak74",
+			"wpn_abakan",
+			"wpn_l85",
+			"wpn_lr300",
+			"wpn_sig550",
+			"wpn_groza",
+			"wpn_val",
+			"wpn_vintorez",
+			"wpn_svu",
+			"wpn_svd",
+			"wpn_rg-6",
+			"wpn_rpg7",
+			"wpn_g36",
+			"wpn_fn2000",
+			"wpn_pkm"
+	}
+	local wpn = itm[math.random(#itm)]
+	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,wpn,"inv_name","string"))
+	alun_utils.save_var(db.actor,p[1],wpn)
+end 
+
+function remove_fetch_item(actor,npc,p)
+	local section = alun_utils.load_var(db.actor,p[1])
+	if (section and db.actor:object(section)) then
+		remove_item(actor, npc, {section,p[2]})
+	end
+end
 
 function force_talk(actor,npc,p)
 	local allow_break = p[1] and p[1] == "true" or false
@@ -2654,16 +2791,29 @@ end
 
 --Функция отнятия предмета у игрока
 function remove_item(actor, npc, p)
-	if (p and p[1]) == nil then printf("Wrong parameters in function 'remove_item'!!!") end
-	local item = p[1]
-
-	local obj = db.actor:object(item)
-	if obj ~= nil then
-		alife():release(alife():object(obj:id()), true)
-	else
-		printf("Actor has no such item!")
+	local sec = p[1]
+	if not (sec) then
+		printf("Wrong parameters in function 'remove_item'!!!") 
+		return 
 	end
-	news_manager.relocate_item(db.actor, "out", item)
+	local amt = p[2] and tonumber(p[2]) or 1
+	local removed = 0
+	local sim = alife()
+	local se_item
+	local function release_actor_item(temp, item)
+		if (item:section() == sec and amt > 0) then
+			se_item = sim:object(item:id())
+			if (se_item) then
+				sim:release(se_item,true)
+				amt = amt - 1
+				removed = removed + 1
+			end
+		end
+	end
+	db.actor:iterate_inventory(release_actor_item,nil)
+	if (removed > 0) then
+		news_manager.relocate_item(db.actor,"out",sec,removed)
+	end
 end
 
 -- Сюжетное сохранение в важных местах
@@ -2684,40 +2834,6 @@ function scenario_autosave(actor, npc, p)
 		get_console():execute("save "..save_param)
 	end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function zat_b29_create_random_infop(actor, npc, p)
 	if p[2] == nil then
@@ -3972,9 +4088,10 @@ function update_visual(p)
 	end
 
 	local data = stpk_utils.get_stalker_data(se_npc)
-	data.visual_name = p[2]
-	stpk_utils.set_stalker_data(data,se_npc)
-
+	if (data) then
+		data.visual_name = p[2]
+		stpk_utils.set_stalker_data(data,se_npc)
+	end
 	return true
 end
 

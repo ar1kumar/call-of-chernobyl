@@ -1,7 +1,7 @@
--- modified by Alundaio (original: ??? GSC)
 --[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
+	scheme_type: generic
+	author: Alundaio
+	modified_by: 
 --]]
 
 --------------------
@@ -12,7 +12,6 @@ actid = 90005
 --------------------
 local level = level
 local alife = alife
-local wp = world_property
 --------------------
 
 local Items
@@ -49,27 +48,10 @@ local function get_best_detector(npc)
 	end
 end
 
-local function npc_add_precondition(action)
-	action:add_precondition(world_property(evaid,false))
-end
-
 local function get_rand_vertex(npc,vo)
 	local dir = npc:position():sub(vo:position())
 	dir = vector_rotate_y(dir,math.random(5,45))
 	return vo:vertex_in_direction(vo:level_vertex_id(),dir,1)
-end
-
-local function scheme_deactivate(npc,scheme,st)
-	if (scheme ~= "gather_items") then
-		return
-	end
-
-	if (st.selected_id and Items[st.selected_id]) then
-		Items[st.selected_id] = nil
-	end
-	st.selected_id = nil
-	st.vid = nil
-	st.vid_pos = nil
 end
 
 ---------------------------------------
@@ -93,10 +75,8 @@ function on_game_start()
 		LootTable = alun_utils.collect_section(ini,"lootable",true)
 	end
 
-	callback_register("npc_add_precondition",npc_add_precondition)
 	callback_register("npc_on_item_take",npc_on_item_take)
 	callback_register("actor_on_item_take",actor_on_item_take)
-	callback_register("scheme_deactivate",scheme_deactivate)
 end
 
 
@@ -138,7 +118,7 @@ function gather_item(npc)
 	local itm_id = itm:id()
 	local se_itm = alife():object(selected_id)
 
-	if (isArtefact(itm)) then
+	if (IsArtefact(itm)) then
 		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[itm_id]
 		if (anomal_zone) then
 			anomal_zone:on_artefact_take(itm)
@@ -287,7 +267,7 @@ function eva_gather_itm:find_valid_item()
 		--end
 	--end
 
-	if (isArtefact(itm)) then
+	if (IsArtefact(itm)) then
 		if not (ArtifactDectection) then
 			return false
 		end
@@ -349,8 +329,12 @@ function eva_gather_itm:evaluate()
 	if (xr_conditions.surge_started() or xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.gather_items_enabled) == "false") then
 		return false
 	end
+	
+	if (self:find_valid_item()) then 
+		return true 
+	end
 
-	return self:find_valid_item() or false
+	return false
 end
 
 ------------------------------------------------------
@@ -388,7 +372,7 @@ local function execute_gather_item(npc,self)
 	local itm = level.object_by_id(self.st.selected_id)
 	local dist = npc:position():distance_to(self.st.vid_pos)
 
-	if (isArtefact(itm)) then
+	if (IsArtefact(itm)) then
 		local tg = time_global()
 
 		if not (self.st.artifact_timer) then
@@ -483,6 +467,10 @@ function evaluator_gather_items:__init(name, storage, npc) super (nil, name)
 	self.st = storage
 end
 function evaluator_gather_items:evaluate()
+	if true then 
+		return false 
+	end 
+	
 	local enabled = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.gather_items_enabled)
 	if (enabled ~= "true") then
 		return false
@@ -499,37 +487,48 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 -- BINDER
 ----------------------------------------------------------------------------------------------------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc, ini,"gather_items","gather_items",temp)
+end
 
-function add_to_binder(npc, ini, scheme, section, storage)
+function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
-
-	manager:remove_evaluator(stalker_ids.property_items)
-	manager:add_evaluator(stalker_ids.property_items, property_evaluator_const(false))
+	local wp = world_property
 	
-	local st = storage
-
+	manager:remove_evaluator(stalker_ids.property_items)
+	manager:add_evaluator(stalker_ids.property_items,evaluator_gather_items("gather_items",st,npc))
+	--manager:add_evaluator(stalker_ids.property_items, property_evaluator_const(false))
+	
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
-	else
-		manager:add_evaluator(evaid,eva_gather_itm("eva_gather_itm",st,npc))
+		temp.needs_configured = false
+		return
 	end
+
+	manager:add_evaluator(evaid,eva_gather_itm("eva_gather_itm",st,npc))
 	
-	-- Actions
-	local action = this.act_gather_itm("act_gather_itm",st)
-	action:add_precondition( wp(evaid, true) )
-	action:add_precondition( wp(stalker_ids.property_alive,true) )
-	action:add_precondition( wp(stalker_ids.property_enemy,	false) )
-	action:add_precondition( wp(stalker_ids.property_danger,false) )
-	action:add_precondition( wp(stalker_ids.property_anomaly,false) )
+	temp.action = act_gather_itm("act_gather_itm",st)
 
-	action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
-	action:add_precondition( wp(xr_evaluators_id.stohe_meet_base + 1, false) )
-	action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base, false) )
-	action:add_precondition( wp(xr_evaluators_id.abuse_base, false) )
+	temp.action:add_precondition(wp(stalker_ids.property_alive,true))
+	temp.action:add_precondition(wp(stalker_ids.property_enemy,	false))
+	temp.action:add_precondition(wp(stalker_ids.property_danger,false))
+	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
+	temp.action:add_precondition(wp(evaid,true))
+	
+	temp.action:add_effect(wp(evaid, false))
+	manager:add_action(actid, temp.action)
+end
 
-	action:add_effect( wp(evaid, false) )
-	manager:add_action(actid, action)
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	local wp = world_property
 
+	temp.action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
+	temp.action:add_precondition( wp(xr_evaluators_id.stohe_meet_base + 1, false) )
+	temp.action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base, false) )
+	temp.action:add_precondition( wp(xr_evaluators_id.abuse_base, false) )
+
+	local manager = npc:motivation_action_manager()
+	local action	
 	local p = {
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife
@@ -541,14 +540,15 @@ function add_to_binder(npc, ini, scheme, section, storage)
 		else
 			printf("xr_gather_items: no action id p[%s]",i)
 		end
-	end
-end
+	end	
+end 
 
-function set_gather_items(npc, ini, scheme, section)
-	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
-end
-
-function reset_gather_items(npc, scheme, st, section)
+function reset_generic_scheme(npc,scheme,section,stype,st)
+	if not (st.gather_items) then
+		printf("st.gather_items is nil! %s",npc and npc:name())
+		return 
+	end 
+	
 	if (st.gather_items.selected_id and Items[st.gather_items.selected_id]) then
 		Items[st.gather_items.selected_id] = nil
 	end
@@ -559,6 +559,10 @@ function reset_gather_items(npc, scheme, st, section)
 
 	st.gather_items.gather_items_enabled = xr_logic.parse_condlist(npc, section, "gather_items_enabled",utils.cfg_get_string(st.ini, section, "gather_items_enabled", npc, false,"","true"))
 	st.gather_items.gather_artefact_items_enabled = xr_logic.parse_condlist(npc, section, "gather_artefact_items_enabled",utils.cfg_get_string(st.ini, section, "gather_artefact_items_enabled", npc, false,"","true"))
+end
+
+function npc_add_precondition(action)
+	action:add_precondition(world_property(evaid,false))
 end
 
 function is_under_gather_items(npc)

@@ -61,9 +61,51 @@ end
 ---------------------------------------------------------
 -- TASK FUNCTORS
 ---------------------------------------------------------
+
+function general_fetch_task(task_id,field,p)
+	if (field == "title") then 
+		local tm = task_manager.get_task_manager()
+		local task_info = tm.task_info
+		if (task_info[task_id] and task_info[task_id].title) then
+			local fetch = alun_utils.get_inv_name(alun_utils.load_var(db.actor,task_id.."_fetch",""))
+			local count = alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
+			if (count > 1) then 
+				return alun_utils.sr((game.translate_string(task_info[task_id].title) or ""),fetch .. " x" .. tostring(count))
+			end
+			return alun_utils.sr(game.translate_string(task_info[task_id].title) or "",fetch)
+		end 
+		return ""
+	elseif (field == "descr") then 
+		local tm = task_manager.get_task_manager()
+		local task_info = tm.task_info
+		if (task_info[task_id] and task_info[task_id].descr) then
+			if (task_info[task_id].stage == 1) then
+				return game.translate_string("st_return_for_reward")
+			end
+			local fetch = alun_utils.get_inv_name(alun_utils.load_var(db.actor,task_id.."_fetch",""))
+			local count = alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
+			if (count > 1) then 
+				return alun_utils.sr((game.translate_string(task_info[task_id].descr) or ""),fetch .. " x" .. tostring(count))
+			end
+			return alun_utils.sr(game.translate_string(task_info[task_id].descr) or "",fetch)
+		end 
+		return ""
+	elseif (field == "target") then 
+		local tm = task_manager.get_task_manager()
+		local task_info = tm.task_info
+		if (task_info[task_id] and task_info[task_id].stage == 1) then
+			local story_id = string.sub(task_id,1,string.find(task_id,"_task")-1)
+			local se_obj = get_story_se_object(story_id)
+			if (se_obj) then
+				return se_obj.id
+			end
+		end
+	end
+end 
+
 -- Yantar
 function yan_ecolog_semenov_task_target(task_id,field,p)
-	if (id == "yan_ecolog_semenov_task_1") then
+	if (task_id == "yan_ecolog_semenov_task_1") then
 		local npc = get_story_object("yan_ecolog_semenov")
 		if (npc) then
 			if (xr_conditions.check_yan_ecolog_semenov_task_1_stage_1_complete(nil,npc)) then
@@ -86,17 +128,17 @@ function mar_base_stalker_barmen_task_target(task_id,field,p)
 		return 
 	end
 	
-	if (id == "mar_base_stalker_barmen_task_1") then
+	if (task_id == "mar_base_stalker_barmen_task_1") then
 		return under_faction_control_target_id(task_id)
-	elseif (id == "mar_base_stalker_barmen_task_2") then 
+	elseif (task_id == "mar_base_stalker_barmen_task_2") then 
 		return under_faction_control_target_id(task_id)
 	end
 end
 
 function mar_base_owl_stalker_trader_task_target(task_id,field,p)
 	if (task_id == "mar_base_owl_stalker_trader_task_1") then 
-		local npc = get_story_object("esc_2_12_stalker_nimble")
-		return npc and npc:id() or nil
+		local se_npc = get_story_se_object("esc_2_12_stalker_nimble")
+		return se_npc and se_npc.id or nil
 	elseif (task_id == "mar_base_owl_stalker_trader_task_2") then
 		for id,obj in pairs(db.heli) do 
 			if (obj and obj.id) then 
@@ -166,7 +208,7 @@ function jup_b220_trapper_task_target(task_id,field,p)
 		return 
 	end
 	if (task_id == "jup_b220_trapper_task_1") then 
-		return under_faction_control_target_id(id)
+		return under_faction_control_target_id(task_id)
 	end
 end
 function jup_b6_scientist_tech_task_target(task_id,field,p)
@@ -188,7 +230,7 @@ function jup_b6_scientist_tech_task_target(task_id,field,p)
 			end
 		end	
 	end
-end 
+end
 
 -- Zaton
 function zat_b7_bandit_boss_sultan_task_target(task_id,field,p)
