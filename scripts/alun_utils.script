@@ -15,9 +15,7 @@ function jump_to_level(new_level,specific_gvid,specific_lvid,specific_pos)
 	local function create_lc(gvid,vertex)
 		local se_obj = sim:create("level_changer",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 		if (se_obj) then
-			if (axr_main) then 
-				axr_main.REMOVE_ME_LC = se_obj.id
-			end 
+			axr_main.REMOVE_ME_LC = se_obj.id
 			data = stpk_utils.get_level_changer_data(se_obj)
 			if (data) then
 				data.dest_game_vertex_id = gvid
@@ -88,16 +86,20 @@ function release_object(p)
 end
 
 function teleport_squad(squad,gvid,lvid,pos)
-	if not (alife().teleport_object) then 
+	local sim = alife()
+	if not (sim.teleport_object) then 
 		return 
 	end 
-	
-	local sim = alife()
+
 	sim:teleport_object(squad.id,gvid,lvid,pos)
 	for k in squad:squad_members() do
 		sim:teleport_object(k.id,gvid,lvid,pos)
 	end
 end
+
+function get_inv_name(section)
+	return game.translate_string(read_from_ini(nil,section,"inv_name","string",""))
+end 
 
 -- Prints a formated lua table to print_table.txt for debugging purposes
 function print_table(tbl,header)
@@ -188,6 +190,9 @@ function read_from_ini(ini,section,line,var_type,default,caller)
 	if not (ini) then
 		ini = system_ini()
 	end
+	if not (section) then 
+		printf("ERROR: alun_utils.read_from_ini trying to read nil section! line=%s var_type=%s default=%s caller=%s",line,var_type,default,caller)
+	end
 
 	if (section and line and ini:section_exist(section) and ini:line_exist(section,line)) then
 		if (var_type == "bool") then
@@ -199,9 +204,8 @@ function read_from_ini(ini,section,line,var_type,default,caller)
 		else
 			return ini:r_string_wq(section,line)
 		end
-	else
-		return default
 	end
+	return default
 end
 
 function trim(s)
@@ -840,16 +844,15 @@ end
 
 local debug_file
 function debug_write(output,trace)
-	if true then return end
-	
-	if not (dev_debug) then
-		return
-	end
-
 	if (trace and debug and type(debug.traceback) == 'function') then
 		output = output .. debug.traceback('\n', 2)
 	end
 
+	if (log1) then 
+		log1(output)
+		return
+	end 
+	
 	if (last_ouput == output) then
 		return
 	end
@@ -864,7 +867,6 @@ function debug_write(output,trace)
 		debug_file:write(output.."\n")
 		debug_file:close()
 	end
-	--printf(output)
 end
 
 function str_format(str,...)
@@ -1024,9 +1026,14 @@ function collect_section(ini,section,keytable)
 	if not (ini) then
 		return
 	end
+	
+	if not (section) then 
+		callstack()
+		printf("ERROR: collect_section - section does not exist!")
+	end
 
 	local _t = {}
-	if ini:section_exist(section) then
+	if (section and ini:section_exist(section)) then
 		local n = ini:line_count(section)
 		if n > 0 then
 			for i = 0,n-1 do
@@ -1054,8 +1061,11 @@ function get_vertex(npc,dist)
 	else
 		ang = math.random(300,310)
 	end
-	local dir = vector_rotate_y(npc:direction(),ang)
-	return npc:vertex_in_direction(npc:level_vertex_id(),dir,dist)
+	
+	if (accessible(npc,npc:level_vertex_id())) then
+		local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),ang)
+		return npc:vertex_in_direction(npc:level_vertex_id(),dir,dist)
+	end
 end
 
 
@@ -1107,7 +1117,7 @@ function in_crosshair()
 	local active_slot = db.actor:active_slot()
 	if active_slot == 2 or active_slot == 3	then
 		local active_item = db.actor:active_item()
-		if active_item and isWeapon( active_item ) then
+		if active_item and IsWeapon( active_item ) then
 			for id,st in pairs(db.storage) do
 				npc = st.object
 				if (npc and (IsStalker(npc) or IsMonster(npc)) and npc:alive()) then
@@ -1173,7 +1183,7 @@ function npc_in_cover(npc)
 		for o in npc:memory_visible_objects() do
 			local obj = o:object()
 			local id = obj:id()
-			if obj and obj:alive() and npc:relation(obj) == game_object.enemy and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and not xr_wounded.is_wounded(obj) then
+			if obj and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
 --				rx_ai.printf("npc_in_cover[%s]:add enemy[%s]",npc:character_name(),obj:name())
 				table.insert(enemies,obj)
 				tt[id] = true
@@ -1183,7 +1193,7 @@ function npc_in_cover(npc)
 			local obj = o:object()
 			local id = obj:id()
 			if not tt[id] then
-				if obj and obj:alive() and npc:relation(obj) == game_object.enemy and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and not xr_wounded.is_wounded(obj) then
+				if obj and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
 --					rx_ai.printf("npc_in_cover[%s]:add enemy[%s]",npc:character_name(),obj:name())
 					table.insert(enemies,obj)
 				end
@@ -1714,61 +1724,7 @@ end
 --------------------------------
 -- XML parser 
 --------------------------------
-
-class "XmlNode"
-function XmlNode:__init(name)
-	self.___value = nil
-	self.___name = name
-	self.___children = {}
-	self.___props = {}
-	self.___root = {}
-end
-function XmlNode:raw() return self.___root end
-function XmlNode:child(name) return self.___root[name] end
-function XmlNode:value() return self.___value end
-function XmlNode:setValue(val) self.___value = val end
-function XmlNode:name() return self.___name end
-function XmlNode:setName(name) self.___name = name end
-function XmlNode:children() return self.___children end
-function XmlNode:numChildren() return #self.___children end
-function XmlNode:addChild(child)
-	if (child == nil or type(child.name) ~= "function") then 
-		return 
-	end 
-	
-	if (self.___root[child:name()]) then 
-		if (type(self.___root[child:name()].name) == "function") then 
-			local tempTable = {}
-			table.insert(tempTable, self.___root[child:name()])
-			self.___root[child:name()] = tempTable
-		end
-		table.insert(self.___root[child:name()], child)
-	else
-		self.___root[child:name()] = child
-	end
-
-	table.insert(self.___children, child)
-end
-function XmlNode:properties() return self.___props end
-function XmlNode:numProperties() return #self.___props end
-function XmlNode:addProperty(name, value)
-	local lName = "@" .. name
-	if self.___root[lName] ~= nil then
-		if type(self.___root[lName]) == "string" then
-			local tempTable = {}
-			table.insert(tempTable, self.___root[lName])
-			self.___root[lName] = tempTable
-		end
-		table.insert(self.___root[lName], value)
-	else
-		self.___root[lName] = value
-	end
-	table.insert(self.___props, { name = name, value = value })
-end
-
-class "XmlParser"
-function XmlParser:__init()
-end
+XmlParser = {}
 function XmlParser:ToXmlString(value)
 	value = string.gsub(value, "&", "&amp;"); -- '&' -> "&amp;"
 	value = string.gsub(value, "<", "&lt;"); -- '<' -> "&lt;"
@@ -1796,94 +1752,83 @@ function XmlParser:FromXmlString(value)
 	value = string.gsub(value, "&amp;", "&");
 	return value;
 end
-function XmlParser:ParseArgs(node, s)
+function XmlParser:ParseArgs(s)
+	local arg = {}
 	string.gsub(s, "(%w+)=([\"'])(.-)%2", function(w, _, a)
-		node:addProperty(w, self:FromXmlString(a))
+		arg[w] = self:FromXmlString(a);
 	end)
+	return arg
 end
-function XmlParser:ParseXmlText(xmlText)
+function XmlParser:ParseXmlText(xmlText,path)
 	local stack = {}
-	local top = XmlNode()
+	local top = {Name=nil,Value=nil,Attributes={},ChildNodes={}}
 	table.insert(stack, top)
-	local ni, c, label, xarg, empty
+	local ni,c,label,xarg, empty
 	local i, j = 1, 1
 	while true do
-		ni, j, c, label, xarg, empty = string.find(xmlText, "<(%/?)([%w_:]+)(.-)(%/?)>", i)
+		ni,j,c,label,xarg, empty = string.find(xmlText, "<(%/?)([%w_:]+)(.-)(%/?)>", i)
 		if not ni then break end
-		local text = string.sub(xmlText, i, ni - 1);
+		local text = string.sub(xmlText, i, ni-1);
 		if not string.find(text, "^%s*$") then
-			local lVal = (top:value() or "") .. self:FromXmlString(text)
-			stack[#stack]:setValue(lVal)
+			top.Value=(top.Value or "")..self:FromXmlString(text);
 		end
-		if empty == "/" then -- empty element tag
-			local lNode = XmlNode(label)
-			self:ParseArgs(lNode, xarg)
-			top:addChild(lNode)
-		elseif c == "" then -- start tag
-			local lNode = XmlNode(label)
-			self:ParseArgs(lNode, xarg)
-			table.insert(stack, lNode)
-	top = lNode
-		else -- end tag
-			local toclose = table.remove(stack) -- remove top
-
+		if empty == "/" then  -- empty element tag
+			table.insert(top.ChildNodes, {Name=label,Value=nil,Attributes=self:ParseArgs(xarg),ChildNodes={}})
+		elseif c == "" then   -- start tag
+			top = {Name=label, Value=nil, Attributes=self:ParseArgs(xarg), ChildNodes={}}
+			table.insert(stack, top)   -- new level
+		else  -- end tag
+			local toclose = table.remove(stack)  -- remove top
 			top = stack[#stack]
 			if #stack < 1 then
-				error("XmlParser: nothing to close with " .. label)
+				printf("XmlParser: nothing to close with "..label)
 			end
-			if toclose:name() ~= label then
-				error("XmlParser: trying to close " .. toclose.name .. " with " .. label)
+			if toclose.Name ~= label then
+				printf("XmlParser: trying to close "..toclose.Name.." with "..label)
 			end
-			top:addChild(toclose)
+			table.insert(top.ChildNodes, toclose)
 		end
-		i = j + 1
+		i = j+1
 	end
 	local text = string.sub(xmlText, i);
-	if #stack > 1 then
-		error("XmlParser: unclosed " .. stack[#stack]:name())
+	if not string.find(text, "^%s*$") then
+		stack[#stack].Value=(stack[#stack].Value or "")..self:FromXmlString(text);
 	end
-	return top
+	if #stack > 1 then
+		printf("XmlParser: unclosed "..stack[stack.n].Name)
+	end
+	return stack[1].ChildNodes[1];
 end
 function XmlParser:loadFile(path)
 	local hFile, err = io.open(path, "r");
-
 	if hFile and not err then
 		local xmlText = hFile:read("*a"); -- read file content
 		io.close(hFile);
 		return self:ParseXmlText(xmlText), nil;
 	else
-		print(err)
+		printf(err)
 		return nil
 	end
 end
 
 ---- utils 
-function XmlFindNodeWithPropertyValue(xml,node_name,prop_name,val)
-	local node = xml:children()
+function XmlFindNodeWithAttribute(n,node_name,prop_name,val)
+	local node = n.ChildNodes
 	local deepest,p,c
 	local stack = {}
 	while not deepest do
-		if (node and #node > 0) then 
-			for i=1,#node do 
-				--printf("%s",node[i]:name())
-				if (node[i]:name() == node_name) then
-					p = node[i] and node[i]:properties()
-					if (p and #p > 0) then 
-						for ii=1,#p do
-							--printf("%s=%s",p[ii] and p[ii].name,p[ii] and p[ii].value)
-							if (p[ii] and p[ii].name == prop_name and p[ii].value == val) then 
-								return node[i]
-							end
-						end
-					end
+		if (node and #node > 0) then
+			for i=1,#node do
+				if (node[i].Name == node_name and node[i].Attributes[prop_name] == val) then
+					return node[i]
 				end
-				c = node[i]:children()
+				c = node[i].ChildNodes
 				if (c and #c > 0) then
-					table.insert(stack,node[i]:children())
+					table.insert(stack,node[i].ChildNodes)
 				end
 			end
 		end
-	
+
 		if (#stack > 0) then
 			node = stack[#stack]
 			stack[#stack] = nil
@@ -1892,30 +1837,29 @@ function XmlFindNodeWithPropertyValue(xml,node_name,prop_name,val)
 		end
 	end
 end
-function XmlGetNodeValue(xml,node_name)
-	local node = xml:children()
-	if (node and #node > 0) then 
-		for i=1,#node do 
-			--printf("%s",node[i]:name())
-			if (node[i]:name() == node_name) then
-				return node[i]:value()
+function XmlFindNextNodeByName(n,node_name)
+	if (n.ChildNodes and #n.ChildNodes > 0) then
+		for k,v in pairs(n.ChildNodes) do
+			if (v.Name == node_name) then
+				return n.ChildNodes[k]
 			end
 		end
 	end
 end
-function XmlGetNodePropertyValue(xml,node_name,prop_name)
-	local node = xml:children()
-	local p
-	if (node and #node > 0) then 
-		for i=1,#node do 
-			--printf("%s",node[i]:name())
-			if (node[i]:name() == node_name) then
-				p = node[i]:properties()
-				for j=1,#p do 
-					if (p[j] and p[j].name == prop_name) then 
-						return p[j].value
-					end
-				end
+function XmlGetNodeValue(n,node_name)
+	if (n.ChildNodes and #n.ChildNodes > 0) then
+		for k,v in pairs(n.ChildNodes) do
+			if (v.Name == node_name) then
+				return n.ChildNodes[k].Value
+			end
+		end
+	end
+end
+function XmlGetNodeAttribute(n,node_name,attribute)
+	if (n.ChildNodes and #n.ChildNodes > 0) then
+		for k,v in pairs(n.ChildNodes) do
+			if (v.Name == node_name) then
+				return n.ChildNodes[k].Attributes[attribute]
 			end
 		end
 	end
@@ -2084,11 +2028,17 @@ function get_fsgame()
 	for k,v in pairs(root) do
 		t = str_explode(v,"|")
 		dir = t[3]
-		fsgame[k] = t[4] or ""
+
+		if not (string.find(dir,"%$")) then
+			fsgame[k] = (dir or "") .. (t[4] or "")
+		else
+			fsgame[k] = t[4] or ""
+		end
+
 		repeat
 			t = root[dir] and str_explode(root[dir],"|")
 			dir = t and t[3]
-			fsgame[k] = (t and t[4] or "") .. fsgame[k]
+			fsgame[k] = (fsgame[dir] or dir or "") .. (t and t[4] or "") .. fsgame[k]
 		until (dir == nil)
 	end
 	return fsgame
@@ -2608,3 +2558,52 @@ function vec_intersects_line(a,b,c)
 		end
 	end
 end 
+
+--/----------------------------------------------------------------------------
+--/ Sandbox ( http://www.amk-team.ru/forum/index.php?showtopic=6458#entry258260 )
+--/----------------------------------------------------------------------------
+function sandbox(file_name, function_name, ...)
+  local status, result = pcall(sandbox_exec, file_name, function_name, ...)
+  if status == false then
+		elog("(%s:sandbox) call failed, result = [%s]", self_name, result)
+		return
+  else
+    return result
+  end
+end
+
+--/ execute script in sandbox
+function sandbox_exec(file_name, function_name, ...)
+  if file_name then
+		if not _G[file_name] then dlog("script %s is not found", file_name) return end -- script does not exist
+		-- dlog("full script name = %s", getFS():update_path('$game_scripts$', '')..file_name..'.script')
+    local result = assert(loadfile(getFS():update_path('$game_scripts$', '')..file_name..'.script'))
+    if type(result) == "function" then
+      if function_name then
+        result()
+        local f = loadstring("return "..function_name)
+        f(...)
+      else
+        result()
+      end
+    else
+			elog("(%s:sandbox) exec failed. function is not available: result = [%s]", self_name, type(result))
+      return
+    end
+  else
+    local file_path = getFS():update_path('$game_scripts', default_sandbox_file..'.script')
+    local result = assert(loadfile(file_path))
+    if type(result) == "function" then
+      if function_name then
+        result()
+        local f = loadstring("return "..function_name)
+        f(...)
+      else
+        result()
+      end
+    else
+      elog("(%s:sandbox) exec failed. function is not available: result = [%s]", self_name, type(result))
+      return
+    end
+  end
+end

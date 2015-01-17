@@ -83,7 +83,7 @@ local function npc_on_update(npc,st)
 		end
 
 		local active_item = db.actor:active_item()
-		if (not active_item or not isWeapon(active_item)) then
+		if (not active_item or not IsWeapon(active_item)) then
 			return
 		end
 
@@ -232,12 +232,17 @@ function eva_kill_wounded:evaluate()
 			end
 
 			if not (st.weapon) then st.weapon = best_weapon(npc) or npc:best_weapon() end
-
+			
 			npc:set_item(object.idle,st.weapon)
 			st.stage = 1
 			return true
 		end
 	elseif (st.stage == 1) then
+		if not (npc:active_item()) then
+			st.stage = 0 
+			return false
+		end 
+		
 		npc:set_item(object.aim1,st.weapon)
 
 		local vo = npc:best_enemy()
@@ -285,9 +290,11 @@ local function execute_kill_wounded(npc,st)
 	local tg = time_global()
 
 	if (st.timer and tg > st.timer) then
-		npc:set_item(object.fire1,st.weapon,1,1)
-		local look_pos = vo:bone_position("bip01_neck")
-		npc:set_sight(look.fire_point,look_pos)
+		if (npc:active_item()) then
+			npc:set_item(object.fire1,st.weapon,1,1)
+			local look_pos = vo:bone_position("bip01_neck")
+			npc:set_sight(look.fire_point,look_pos)
+		end
 		return
 	end
 

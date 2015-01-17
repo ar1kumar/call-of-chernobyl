@@ -81,10 +81,17 @@ local function eval_weapon(mgr,npc)
 		return true
 	end
 
-	if not isWeapon(npc:best_weapon()) then
+	--printf("npc=%s",npc:name())
+	
+	local bestweapon = npc:best_weapon()
+	if not (bestweapon) then 
+		return true 
+	end
+	
+	if not IsWeapon(bestweapon) then
 		return true
 	end
-	local bestweapon = npc:best_weapon()
+	
 	local activeitem = npc:active_item()
 
 	if (weapon == "strapped" and
@@ -274,6 +281,10 @@ end
 
 function eva_state_mgr_end:evaluate()
 	--alun_utils.debug_write("",true)
+	if not (self.object) then 
+		callstack()
+		return false
+	end
 	--callstack()
 	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
 	if not (self.st.mgr and self.st.mgr:initialized()) then
@@ -297,6 +308,10 @@ function eva_state_mgr_locked:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_locked:evaluate()
+	if not (self.object) then 
+		callstack()
+		return false
+	end
 	-- Alundaio's note:
 	-- BUG* NPCs can be stuck in corners of AI map after danger or combat because is_body_turning continously returns true, so I removed it
 	-- Another bug is that if you disable the body turning here, animpoint animations can mess up and end up having npcs face wrong way.
@@ -311,7 +326,7 @@ function eva_state_mgr_locked:evaluate()
 		return false
 	end
 
-	return (self.object:is_body_turning() and (self.st.target_state == "zat_b20_noah_jump" or self.st.mgr:current_action_id() == xr_actions_id.animpoint_action + 1)) or false
+	return self.object:is_body_turning() --(self.object:is_body_turning() and (self.st.target_state == "zat_b20_noah_jump" or self.st.mgr:current_action_id() == xr_actions_id.animpoint_action + 1)) or false
 end
 
 class "eva_state_mgr_locked_external" (property_evaluator)
@@ -356,10 +371,10 @@ function act_state_mgr_end:weapon_update()
 	end
 
 	local wpn = self.object:best_weapon()
-	if (not wpn or not isWeapon(wpn)) then
+	if (not wpn or not IsWeapon(wpn)) then
 		return
 	end
-
+	
 	local t = state_lib.states[self.st.target_state].weapon
 
 	if (t == "unstrapped") then
@@ -371,6 +386,9 @@ function act_state_mgr_end:weapon_update()
 		local o = self.st.look_object and level.object_by_id(self.st.look_object)
 		local pos = o and o:alive() and self.object:see(o) and o:position() or self.st.look_position
 		if (pos) then
+			if not (self.object:active_item()) then 
+				return 
+			end
 			if (t == "sniper_fire") then
 				local aim = self.object:position():distance_to(pos)*aim_ratio or min_ratio
 				self.object:set_item(object.fire1, wpn, 1, aim <= min_ratio and min_ratio or aim)
@@ -504,13 +522,14 @@ function state_manager:update()
 		end
 	end
 
-	--alun_utils.debug_write("\n-----STATE MANAGER UPDATE----",true)
+	--printf("state_manager:update() %s",self.npc:name())
 	self.planner:update()
-		
+	
+	--alun_utils.debug_write("\n-----STATE MANAGER UPDATE----",true)
 	if not (self.planner:initialized()) then
 		return
 	end
-
+	
 	--- DEBUG PLANNER
 	--[[
 	local manager = self.npc:motivation_action_manager()

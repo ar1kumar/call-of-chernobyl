@@ -27,18 +27,20 @@ local function on_fighting_actor(npc)
 		end
 	end
 	
-	for id,squad in pairs(companion_squads) do 
-		xr_combat_ignore.safe_zone_npcs[id] = nil
-		if (squad and squad.commander_id) then
-			for k in squad:squad_members() do
-				local member = db.storage[k.id] and db.storage[k.id].object
-				if (member and member:alive()) then
-					member:set_relation(game_object.enemy,npc)
-					npc:set_relation(game_object.enemy,member)
+	if (IsStalker(npc)) then
+		for id,squad in pairs(companion_squads) do 
+			xr_combat_ignore.safe_zone_npcs[id] = nil
+			if (squad and squad.commander_id) then
+				for k in squad:squad_members() do
+					local member = db.storage[k.id] and db.storage[k.id].object
+					if (member and member:alive()) then
+						member:set_relation(game_object.enemy,npc)
+						npc:set_relation(game_object.enemy,member)
+					end
 				end
 			end
 		end
-	end 
+	end
 end
 
 local function squad_on_npc_death(squad,se_npc)

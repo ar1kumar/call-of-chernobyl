@@ -52,6 +52,7 @@ class "CGeneralTask"
 function CGeneralTask:__init(id)
 	local task_ini 		= task_manager.task_ini
 	self.id				= id
+	self.stage			= 0
 
 	self.title			= utils.cfg_get_string(task_ini, id, "title", nil, false, "", "TITLE_DOESNT_EXIST")
 	self.title_functor	= utils.cfg_get_string(task_ini, id, "title_functor", nil, false, "", "condlist")
@@ -86,7 +87,7 @@ function CGeneralTask:__init(id)
 	self.on_complete = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "on_complete", nil, false, "", ""))
 	self.on_fail = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "on_fail", nil, false, "", ""))
 	self.on_reversed = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "on_reversed", nil, false, "", ""))
-
+	
 	--' Награды за квест
 	self.reward_money = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "reward_money", nil, false, "", ""))
 	self.reward_item = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "reward_item", nil, false, "", ""))
@@ -185,7 +186,7 @@ function CGeneralTask:check_task(tm)
 		return
 	end
 
-	self.check_time = global_time + 1000 + math.random()
+	self.check_time = global_time + 1000 + math.random() + (self.prior*100)
 
 	local t_tile = task_functor[self.title_functor](self.id, "title", self.title)
 	if self.current_title ~= t_tile then
@@ -369,6 +370,7 @@ function CGeneralTask:save(packet)
 	alun_utils.w_stpk(packet,"stringZ",self.current_title,"CGeneralTask:current title")
 	alun_utils.w_stpk(packet,"stringZ",self.current_descr,"CGeneralTask:current descr")
 	alun_utils.w_stpk(packet,"stringZ",tostring(self.current_target),"CGeneralTask:current target")
+	alun_utils.w_stpk(packet,"u8",self.stage,"CGeneralTask:current stage")
 	--set_save_marker(packet, "save", true, "CGeneralTask")
 end
 -- Load quest
@@ -385,6 +387,7 @@ function CGeneralTask:load(packet)
 	self.current_title = packet:r_stringZ()
 	self.current_descr = packet:r_stringZ()
 	self.current_target = packet:r_stringZ()
+	self.stage = packet:r_u8()
 	if self.current_target == "nil" then
 		self.current_target = nil
 	else

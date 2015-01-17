@@ -32,7 +32,6 @@ load_scheme("xr_combat",						"combat",			stype_stalker)
 load_scheme("xr_death",							"death",			stype_stalker)
 load_scheme("xr_hit",							"hit",				stype_stalker,stype_mobile,stype_heli)
 load_scheme("xr_wounded",						"wounded",			stype_stalker)
-load_scheme("xr_meet",							"actor_dialogs",	stype_stalker)
 load_scheme("xr_combat_ignore",					"combat_ignore",	stype_stalker,stype_mobile)
 load_scheme("xr_combat_zombied",				"combat_zombied",	stype_stalker)
 load_scheme("xr_patrol",						"patrol",			stype_stalker)
@@ -67,7 +66,6 @@ load_scheme("ph_button",						"ph_button",		stype_item)
 load_scheme("ph_code",							"ph_code",			stype_item)
 load_scheme("ph_death",							"ph_on_death",		stype_item)
 load_scheme("ph_minigun",						"ph_minigun",		stype_item)
---load_scheme("ph_target",						"ph_target",		stype_item)
 load_scheme("ph_oscillate",						"ph_oscillate",		stype_item)
 load_scheme("ph_sound",       "ph_sound",    stype_item)
 ----------------------------------------------------------------------
@@ -86,13 +84,8 @@ load_scheme("sr_psy_antenna",					"sr_psy_antenna",	stype_restrictor)
 load_scheme("sr_postprocess",					"sr_postprocess",	stype_restrictor)
 load_scheme("sr_particle",						"sr_particle",		stype_restrictor)
 load_scheme("sr_cutscene",						"sr_cutscene",		stype_restrictor)
---load_scheme("sr_bloodsucker",					"sr_bloodsucker",	stype_restrictor)
 load_scheme("sr_monster",						"sr_monster",		stype_restrictor)
---load_scheme("sr_robbery",						"sr_robbery",		stype_restrictor)
---load_scheme("sr_survival",						"sr_survival",	stype_restrictor)
 load_scheme("sr_crow_spawner",					"sr_crow_spawner",	stype_restrictor)
---load_scheme("sr_shooting",						"sr_shooting",	stype_restrictor)
---load_scheme("sr_recoveritem",					"sr_recoveritem",	stype_restrictor)
 load_scheme("sr_silence",						"sr_silence",		stype_restrictor)
 load_scheme("sr_deimos",						"sr_deimos",		stype_restrictor)
 
@@ -147,7 +140,7 @@ function enable_generic_schemes(npc,ini,section,stype)
 	for scheme,v in pairs(_G.schemes_by_stype[stype]) do
 		filename = _G.schemes[scheme]
 		if (filename and _G[filename] and _G[filename].setup_generic_scheme) then
-			printf("DEBUG: setup_generic_scheme npc=%s scheme=%s",npc and npc:name(),scheme)
+			--printf("DEBUG: setup_generic_scheme npc=%s scheme=%s",npc and npc:name(),scheme)
 			temp[scheme] = empty_table(temp[scheme])
 			_G[filename].setup_generic_scheme(npc,ini,scheme,section,stype,temp[scheme])
 		end
@@ -158,7 +151,7 @@ function enable_generic_schemes(npc,ini,section,stype)
 		if (temp[scheme] and temp[scheme].needs_configured) then
 			filename = _G.schemes[scheme]
 			if (filename and _G[filename] and _G[filename].configure_actions) then
-				printf("DEBUG: configure_actions npc=%s scheme=%s",npc and npc:name(),scheme)
+				--printf("DEBUG: configure_actions npc=%s scheme=%s",npc and npc:name(),scheme)
 				
 				if not (db.storage[id][scheme]) then 
 					printf("ERROR: storage for db.storage[%s][%s] not setup!",id,scheme)
@@ -188,7 +181,7 @@ end
 function reset_generic_schemes(npc,scheme,section)
 	local st = db.storage[npc:id()]
 	if not (st) then 
-		printf("DEBUG: reset_generic_schemes: ERROR storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
+		printf("ERROR: reset_generic_schemes: storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
 		return
 	end 
 	
@@ -202,7 +195,7 @@ function reset_generic_schemes(npc,scheme,section)
 	for scheme,v in pairs(_G.schemes_by_stype[st.stype]) do
 		filename = _G.schemes[scheme]
 		if (filename and _G[filename] and st[scheme] and _G[filename].reset_generic_scheme) then
-			printf("DEBUG: reset_generic_schemes npc=%s scheme=%s  storage_exists=%s",npc and npc:name(),scheme,st[scheme])
+			--printf("DEBUG: reset_generic_schemes npc=%s scheme=%s  storage_exists=%s",npc and npc:name(),scheme,st[scheme])
 			_G[filename].reset_generic_scheme(npc,scheme,section,st.stype,st)
 		end
 	end
@@ -243,7 +236,7 @@ end
 function disable_generic_schemes(npc, stype)
 	local st = db.storage[npc:id()]
 	if not (st) then 
-		printf("DEBUG: disable_generic_schemes : ERROR storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
+		printf("ERROR: disable_generic_schemes : storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
 		return
 	end 
 	
@@ -251,7 +244,7 @@ function disable_generic_schemes(npc, stype)
 	for scheme,v in pairs(_G.schemes_by_stype[stype]) do
 		filename = _G.schemes[scheme]
 		if (filename and _G[filename] and st[scheme] and _G[filename].disable_generic_scheme) then
-			printf("DEBUG: disable_generic_scheme npc=%s scheme=%s",npc and npc:name(),scheme)
+			--printf("DEBUG: disable_generic_scheme npc=%s scheme=%s",npc and npc:name(),scheme)
 			_G[filename].disable_generic_scheme(npc,scheme,stype)
 		end
 	end

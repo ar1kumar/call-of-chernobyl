@@ -9,15 +9,18 @@ TODO: Split up some features into their own scripts, such as event queue, sound_
 also consider moving MAX_SQUADS to sim_squad_scripted.script
 --]]
 
-local alife, game_graph, pairs, marshal, level = alife, game_graph, pairs, _G.marshal, level
+require("lua_extensions")
+marshal = require "marshal"
+
+local alife, game_graph, pairs, level = alife, game_graph, pairs, level
 local last_save
 
 -------------------------------------------------------------------------------------------------
--- Use Xetrill's lua.jit dll and marshal library for saving persistent data (like xr_logic pstor)
+-- Use marshal library for saving persistent data (like xr_logic pstor)
 -- marshal library can encode tables, functions, strings and numbers to easily allow persistent data storage to file
 -- This is used for db.storage[id].pstor and coc_treasure_manager.script if enabled
 
-USE_MARSHAL = false -- marshal ~= nil
+USE_MARSHAL = false --marshal ~= nil
 m_data = {}
 -------------------------------------------------------------------------------------------------
 
@@ -669,7 +672,7 @@ end
 -- actor_on_item_take(item)
 -------------------
 function actor_on_item_take(binder,item)
-	if isArtefact(item) then
+	if IsArtefact(item) then
 		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
 		if anomal_zone ~= nil then
 			anomal_zone:on_artefact_take(item)
@@ -790,6 +793,8 @@ function actor_on_save(binder,packet)
 		local savegame = io.open(path,"wb+")
 		if (savegame) then
 			packet:w_stringZ(path)
+			
+			
 
 			if (intercepts.save_state) then
 				for i=1, #intercepts.save_state do
@@ -958,12 +963,13 @@ end
 -- npc_on_update(npc,st)
 -------------------
 function npc_on_update(npc,st)
-	--alun_utils.debug_write("npc_on_update")
+	--alun_utils.debug_write("npc_on_update %s",npc:name())
 	local _nupdate = intercepts.npc_on_update
 	if (_nupdate) then
 		for i=1, #_nupdate do
+			--alun_utils.debug_write("npc_on_update %s BEFORE iterate",npc:name())
 			_nupdate[i](npc,st)
-			--callstack()
+			--alun_utils.debug_write("npc_on_update %s AFTER iterate",npc:name())
 		end
 	end
 
@@ -1495,9 +1501,9 @@ end
 -- on_save_game_load(fileName)		-- ui_load_dlg.script
 -------------------
 function on_save_game_load(fname)
-	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	--collectgarbage("collect")
-	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	collectgarbage("collect")
+	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 --------------------

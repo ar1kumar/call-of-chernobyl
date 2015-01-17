@@ -337,9 +337,18 @@ function is_object_online(obj_id)
 	return level.object_by_id(obj_id) ~= nil
 end
 
-function get_clsid(npc)
-	if npc == nil then return nil end
-	return npc.clsid and type(npc.clsid) == "function" and npc:clsid()
+function get_clsid(obj)
+	if not (obj) then
+		callstack()
+		printf("ERROR: get_clsid - obj is nil!")
+		return
+	end
+	if not (obj.clsid) then
+		callstack()
+		printf("ERROR: no clsid method for %s",obj:name())
+		return
+	end
+	return obj:clsid()
 end
 
 --Tvчисляет yaw в радианах
@@ -467,35 +476,42 @@ local stalker_classes = {}
 local weapon_classes = {}
 local artefact_classes = {}
 
-IsMonster = memoize(
-function(object, id)
+function IsMonster(object, id)
+	if (object and object.is_monster) then 
+		return object:is_monster()
+	end
 	id = id or get_clsid(object)
 	return id and monster_classes[id] == true
 end
-)
 
-IsStalker = memoize(
-function (object, id)
+function IsStalker(object, id)
+	if (object and object.is_stalker) then 
+		return object:is_stalker() or object:is_actor()
+	end
 	id = id or get_clsid(object)
 	return id and stalker_classes[id] == true
-end)
+end
 
-IsHelicopter = memoize(function (object, id)
+function IsHelicopter(object, id)
 	id = id or get_clsid(object)
 	return id and (id == clsid.helicopter or id == clsid.car or id == clsid.script_heli) or false
-end)
+end
 
-isWeapon = memoize(
-function (object, id)
+function IsWeapon(object, id)
+	--if (object and object.is_weapon) then 
+		--return object:is_weapon()
+	--end
 	id = id or get_clsid(object)
 	return id and weapon_classes[id] == true or false
-end)
+end
 
-isArtefact = memoize(
-function (object, id)
+function IsArtefact(object, id)
+	if (object and object.is_artefact) then 
+		return object:is_artefact()
+	end
 	id = id or get_clsid(object)
 	return id and artefact_classes[id] == true or false
-end)
+end
 
 
 -------------------------------------------------------------------------------------------
@@ -550,7 +566,7 @@ function id_by_sid( sid )
 	return nil
 end
 
-package.path = [[gamedata\scripts\?.script;gamedata\scripts\lib\?.lua]]
+--package.path = [[gamedata\scripts\?.script;gamedata\scripts\lib\?.lua]]
 -- do
 -- 	local status, result = pcall(require, 'StackTracePlus')
 -- 	if status then
@@ -911,19 +927,25 @@ function add_story_object(obj_id , story_obj_id)
 	story_objects.get_story_objects_registry():register(obj_id , story_obj_id)
 end
 
-get_story_object = memoize(function (story_obj_id)
+function get_story_se_object(story_obj_id)
+	local obj_id = story_obj_id and story_objects.get_story_objects_registry():get(story_obj_id)
+	if obj_id == nil then return nil end
+	return alife():object(obj_id)
+end
+
+function get_story_object(story_obj_id)
 	local obj_id = story_obj_id and story_objects.get_story_objects_registry():get(story_obj_id)
 	if obj_id == nil then return nil end
 	return (db.storage[obj_id] and db.storage[obj_id].object) or (level ~= nil and level.object_by_id(obj_id))
-end)
+end
 
-get_object_story_id = memoize(function (obj_id)
+function get_object_story_id(obj_id)
 	return obj_id and story_objects.get_story_objects_registry():get_story_id(obj_id)
-end)
+end
 
-get_story_object_id = memoize(function (story_obj_id)
+function get_story_object_id(story_obj_id)
 	return story_obj_id and story_objects.get_story_objects_registry():get(story_obj_id)
-end)
+end
 
 function unregister_story_object_by_id(obj_id)
 	story_objects.get_story_objects_registry():unregister_by_id(obj_id)
@@ -935,21 +957,21 @@ end
 
 -----------------------------------------------------------------------------------------------
 -- Получить сквад обьекта!!!!!
-get_object_squad = memoize(function (object,caller)
+function get_object_squad(object,caller)
 	if object == nil then return abort("You are trying to get squad_object from NIL object!!! %s",caller) end
 	local obj_id = type(object.id ) == "function" and object:id() or object.id
 	local sim = aa or alife()
-	local se_obj = object.se_obj or sim:object(obj_id)
+	local se_obj = sim:object(obj_id)
 	if se_obj and se_obj.group_id ~= 65535 then
 		return sim:object(se_obj.group_id)
 	end
 	return nil
-end)
+end
 
-get_story_squad = memoize(function (story_id)
+function get_story_squad(story_id)
 	local squad_id = get_story_object_id(story_id)
 	return squad_id and alife():object(squad_id)
-end)
+end
 
 --Проверка по временному интервалу.
 function in_time_interval(val1, val2)

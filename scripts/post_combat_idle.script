@@ -37,16 +37,17 @@ function evaluator_combat_enemy:evaluate()
 		-- Fix freeze after combat or continual corpse shooting after combat
 		-- Why? Because action_sudden_attack seems to be default action when no other combat action is active
 		-- Sometimes post combat idle action doesn't execute after some actions. I don't know why. I tried removing all the preconditions (except property_enemy) to no avail.
-		self.manager = not self.manager and npc.motivation_action_manager and npc:motivation_action_manager() or self.manager
-		self.mgr = not self.mgr and npc:motivation_action_manager()
-		if (self.mgr) then 
-			local combat_action = self.mgr:action(stalker_ids.action_combat_planner)
+		local mgr = npc:motivation_action_manager()
+		if (mgr and mgr:initialized()) then 
+			local combat_action = mgr:action(stalker_ids.action_combat_planner)
 			local combat_action_planner = cast_planner(combat_action)
-			local cid = combat_action_planner:current_action_id()
-			if (cid == nil or cid == stalker_ids.action_sudden_attack) then
-				self.st.timer = 0
-				return false
-			end 	
+			if (combat_action_planner and combat_action_planner:initialized()) then
+				local cid = combat_action_planner:current_action_id()
+				if (cid == nil or cid == stalker_ids.action_sudden_attack) then
+					self.st.timer = 0
+					return false
+				end 
+			end
 		end
 		return true
 	end 
@@ -68,7 +69,10 @@ end
 function action_post_combat_wait:initialize()
 	action_base.initialize(self)
 
-	self.object:set_item(object.idle, self.object:best_weapon())
+	local bw = self.object:best_weapon()
+	if (bw) then
+		self.object:set_item(object.idle, bw)
+	end
 	self.object:set_mental_state(anim.danger)
 	self.object:set_body_state(move.crouch)
 	self.object:set_movement_type(move.stand)
@@ -93,7 +97,10 @@ function action_post_combat_wait:execute()
 		return 
 	end
 	
-	self.object:set_item(object.idle, self.object:best_weapon())
+	local bw = self.object:best_weapon()
+	if (bw) then
+		self.object:set_item(object.idle, bw)
+	end
 	
 	if (npc:path_type() ~= game_object.level_path) then 
 		npc:set_path_type(game_object.level_path)

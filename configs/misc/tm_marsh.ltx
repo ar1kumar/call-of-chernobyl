@@ -38,7 +38,7 @@ condlist_0 = {!squad_exist(ecolog_companion_task_1)} fail
 
 [mar_base_stalker_barmen_task_1]
 icon = ui_inGame2_Nochnaya_ohota
-prior = 2
+prior = 10
 storyline = false
 title = mar_base_stalker_barmen_task_1_name
 descr = mar_base_stalker_barmen_task_1_text
@@ -54,7 +54,7 @@ on_fail = %=pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base
 
 [mar_base_stalker_barmen_task_2]
 icon = ui_inGame2_Odin_vistrel
-prior = 2
+prior = 10
 storyline = false 
 title = mar_base_stalker_barmen_task_2_name
 descr = mar_base_stalker_barmen_task_2_text
@@ -67,3 +67,57 @@ on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_2_id:b
 precondition = {-mar_base_stalker_barmen_task_2_complete =all_avail_smart_stayed_squad_count_ge_by_faction(1:7200:false:bandit)} true, false
 on_complete = %+mar_base_stalker_barmen_task_2_complete =pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
 on_fail = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
+
+[mar_base_stalker_barmen_task_3]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 40
+storyline = false
+title = mar_base_stalker_barmen_task_3_name
+title_functor = general_fetch_task
+descr = mar_base_stalker_barmen_task_3_text
+descr_functor = general_fetch_task
+job_descr = mar_base_stalker_barmen_task_3_about
+fetch_descr = mar_base_stalker_barmen_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_barmen_task_3_fetch:15:mutant_part_boar_chop:mutant_part_dog_meat:mutant_part_flesh_meat:mutant_part_psevdodog_meat:mutant_part_tushkano_meat)%
+stage_complete = 1
+repeat_timeout = 86400
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = mar_base_stalker_barmen_task_3_fetch_finish
+on_complete = %=complete_task_inc_goodwill(5:csky) =reward_item_cost_mult_and_remove(mar_base_stalker_barmen_task_3_fetch:15:15) =inc_task_stage(mar_base_stalker_barmen_task_3)%
+
+[mar_base_stalker_tech_task_1]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = mar_base_stalker_tech_task_1_name
+title_functor = general_fetch_task
+descr = mar_base_stalker_tech_task_1_text
+descr_functor = general_fetch_task
+job_descr = mar_base_stalker_tech_task_1_about
+fetch_descr = mar_base_stalker_tech_task_1_fetch_about
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_1_fetch:1:itm_gunsmith_toolkit)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = mar_base_stalker_tech_task_1_fetch_finish
+on_complete = %+mar_base_stalker_tech_upgrade_tier_1 =complete_task_inc_goodwill(5:csky) =reward_money(1000) =remove_fetch_item(mar_base_stalker_tech_task_1_fetch) =inc_task_stage(mar_base_stalker_tech_task_1)%
+precondition = {-mar_base_stalker_tech_upgrade_tier_1} true, false
+
+[mar_base_stalker_tech_task_2]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = mar_base_stalker_tech_task_2_name
+title_functor = general_fetch_task
+descr = mar_base_stalker_tech_task_2_text
+descr_functor = general_fetch_task
+job_descr = mar_base_stalker_tech_task_2_about
+fetch_descr = mar_base_stalker_tech_task_2_fetch_about
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_2_fetch:1:itm_gunsmith_toolkit_tier_2)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = mar_base_stalker_tech_task_2_fetch_finish
+on_complete = %+mar_base_stalker_tech_upgrade_tier_2 =complete_task_inc_goodwill(5:csky) =reward_money(1000) =remove_fetch_item(mar_base_stalker_tech_task_2_fetch) =inc_task_stage(mar_base_stalker_tech_task_2)%
+precondition = {+mar_base_stalker_tech_upgrade_tier_1 -mar_base_stalker_tech_upgrade_tier_2} true, false

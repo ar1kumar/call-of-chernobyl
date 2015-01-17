@@ -12,3 +12,20 @@ on_complete = %=remove_task_companion(yan_ecolog_semenov_squad)%
 on_fail = %=remove_task_companion(yan_ecolog_semenov_squad) -yan_ecolog_semenov_task_1_complete -yan_ecolog_semenov_task_1_complete_force_dialog%
 condlist_0 = {!squad_exist(yan_ecolog_semenov_squad)} fail
 
+[yan_stalker_sakharov_task_1]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 10
+storyline = false
+title = yan_stalker_sakharov_task_1_name
+title_functor = general_fetch_task
+descr = yan_stalker_sakharov_task_1_text
+descr_functor = general_fetch_task
+job_descr = yan_stalker_sakharov_task_1_about
+fetch_descr = yan_stalker_sakharov_task_1_fetch_about
+fetch_func = %=setup_rare_mutant_fetch_task(yan_stalker_sakharov_task_1_fetch)%
+stage_complete = 1
+repeat_timeout = 86400
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = yan_stalker_sakharov_task_1_fetch_finish
+on_complete = %=complete_task_inc_goodwill(5:ecolog) =reward_random_money(2000:3500) =remove_fetch_item(yan_stalker_sakharov_task_1_fetch) =inc_task_stage(yan_stalker_sakharov_task_1)%

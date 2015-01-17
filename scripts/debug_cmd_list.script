@@ -104,6 +104,79 @@ function cmd.echo(me,txt,owner,p)
 	return txt
 end
 
+function cmd.char_desc(me,txt,owner,p)
+	local wrd = first_word(me,txt,owner,"[checkall]")
+	if not (wrd) then return end
+	if not (wrd == "checkall") then return "char_desc:= try char_desc checkall" end
+	
+	local f = {	"character_desc_agroprom",
+				"character_desc_bar",
+				"character_desc_darkvalley",
+				"character_desc_deadcity",
+				"character_desc_escape",
+				"character_desc_general",
+				"character_desc_jupiter",
+				"character_desc_katacomb",
+				"character_desc_marsh",
+				"character_desc_military",
+				"character_desc_pripyat",
+				"character_desc_red_forest",
+				"character_desc_simulation",
+				"character_desc_underpass",
+				"character_desc_yantar",
+				"character_desc_zaton"
+			}
+			
+	local tags = {			["name"] = false,
+							["icon"] = false,
+							["map_icon"] = false,
+							--["bio"] = false,
+							["class"] = false,
+							["community"] = false,
+							["terrain_sect"] = false,
+							["money"] = false,
+							["rank"] = false,
+							["reputation"] = false,
+							["visual"] = false,
+							--["snd_config"] = false,
+							["supplies"] = false,
+							--["actor_dialog"] = false
+	}
+	
+	local xml,node,id,char_node,p
+	for i=1,#f do 
+		xml = alun_utils.XmlParser:loadFile(alun_utils.fspath("$game_config$").."gameplay\\"..f[i]..".xml")
+		if (xml) then
+			for index,node in pairs(xml.ChildNodes) do
+				if (type(node) == "table") then
+
+					-- Check if all specific_character nodes for mandatory child nodes
+					for k,child in pairs(node.ChildNodes) do
+						if (type(child) == "table") then
+							if (tags[child.Name] == false) then 
+								tags[child.Name] = true
+							end
+						end
+					end	
+
+					-- Validate that all nodes by tag names exist
+					for k,v in pairs(tags) do 
+						if (v == false) then 
+							owner:SendOutput("char_desc:= specific character id=%s missing a mandatory node by name %s",node.Attributes.id,k)
+						end
+						-- reset for next loop
+						tags[k] = false
+					end
+					
+				end
+			end
+		else
+			owner:SendOutput("char_desc:= no xml by name %s",f[i])
+		end 
+	end
+	return "char_desc:= scanning complete"
+end 
+
 -- reload_system_ini
 function cmd.reload_system_ini(me,text,owner,p)
 	if (reload_system_ini) then 
@@ -340,6 +413,77 @@ local function parse_waypoint(pathname, wpflags, wpname, owner)
 	return rslt
 end
 
+function cmd.attach(me,txt,owner,p)
+	local wpn = db.actor:active_item()
+	if (wpn) then
+		local firearm = alun_utils.item_is_fa(wpn)
+		if (firearm) then
+			if (wpn.weapon_addon_attach) then
+				local addons = {
+					"wpn_addon_scope",
+					"wpn_addon_scope_x2.7",
+					"wpn_addon_scope_detector",
+					"wpn_addon_scope_night",
+					"wpn_addon_scope_susat",
+					"wpn_addon_scope_susat_x1.6",
+					"wpn_addon_scope_susat_custom",
+					"wpn_addon_scope_susat_dusk",
+					"wpn_addon_scope_susat_night",
+					"wpn_addon_silencer",
+					"wpn_addon_grenade_launcher",
+					"wpn_addon_grenade_launcher_m203"
+					}
+				local addon
+				local attached = false
+				for k,v in pairs(addons) do
+					addon = db.actor:object(k)
+					if (addon) then 
+						wpn:weapon_addon_attach(addon)
+						attached = true
+					end
+				end 
+				
+				if (attached) then 
+					return "attach:= addon attached"
+				end 
+				return "attach:= no addons attached"
+			else 
+				return "attach:= weapon does not have weapon_addon_attach method"
+			end
+		end 
+	end
+	return "attach:= addon was not attached for active weapon"
+end 
+
+function cmd.detach(me,txt,owner,p)
+	local wpn = db.actor:active_item()
+	if (wpn) then
+		local firearm = alun_utils.item_is_fa(wpn)
+		if (firearm and wpn.weapon_addon_detach) then
+			local addons = {
+				"wpn_addon_scope",
+				"wpn_addon_scope_x2.7",
+				"wpn_addon_scope_detector",
+				"wpn_addon_scope_night",
+				"wpn_addon_scope_susat",
+				"wpn_addon_scope_susat_x1.6",
+				"wpn_addon_scope_susat_custom",
+				"wpn_addon_scope_susat_dusk",
+				"wpn_addon_scope_susat_night",
+				"wpn_addon_silencer",
+				"wpn_addon_grenade_launcher",
+				"wpn_addon_grenade_launcher_m203"
+				}
+			local addon
+			for k,v in pairs(addons) do
+				wpn:weapon_addon_detach(k)
+			end 
+
+			return "detach:= check item"
+		end 
+	end
+	return "detach:= addon was not detached from active weapon"
+end 
 
 function cmd.waypoint(me,txt,owner,p)
 	local wrd = first_word(me,txt,owner,"[checkall | checklevel]")
@@ -381,11 +525,19 @@ function cmd.waypoint(me,txt,owner,p)
 								owner:SendOutput("path %s p%s:%s does not have valid game_vertex_id",name,n,ptr:name(n))
 								printf("path %s p%s:%s does not have valid game_vertex_id",name,n,ptr:name(n))
 							end
-			
-							if not ( (wrd == "checklevel" and alun_utils.accessible(npc,ptr:level_vertex_id(n))) or (ptr:level_vertex_id(n) < 4294967295) ) then
-								owner:SendOutput("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
-								printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+							
+							if (actor_level) then 
+								if (alun_utils.accessible(npc,ptr:level_vertex_id(n))) then 
+									owner:SendOutput("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+									printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+								end
+							else 
+								if (ptr:level_vertex_id(n) >= 4294967295) then 
+									owner:SendOutput("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+									printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+								end
 							end
+			
 							parse_waypoint(name,ptr:flags(n),ptr:name(n),owner)
 						end
 					end
@@ -1366,7 +1518,7 @@ end
 
 -- game_graph
 function cmd.game_graph(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[show | near]")
+	local wrd = first_word(me,txt,owner,"[show | near | checkall]")
 	if not (wrd) then return end
 
 	if (wrd == "show") then
@@ -1420,6 +1572,41 @@ function cmd.game_graph(me,txt,owner,p)
 			gvid = gvid + 1
 		end
 		return "game_graph:= nearest gvid = " .. near_gvid .. " [dist = " .. near_dist .. "] There are "..lgvid.." in "..level.name().." and "..gvid.." total."
+	elseif (wrd == "checkall") then
+		wrd = ""
+		local _strt, _end = string.find(txt,"%d+")
+		if (_strt and _end) then
+			wrd = string.sub(txt,_strt, _end)
+			wrd = string.lower(wrd)
+		end
+		local page = wrd ~= "" and tonumber(wrd) or 1
+		
+		local issues = {}
+		local gg = game_graph()
+		local vertex
+		local sim = alife()
+		local se_obj
+		for i=1,65534 do
+			se_obj = sim:object(i)
+			if (se_obj) and not (gg:valid_vertex_id(se_obj.m_game_vertex_id)) then
+				issues[#issues+1] = se_obj:name()
+			end
+		end
+		
+		if (#issues == 0) then 
+			return "game_graph:= no issues found"
+		end
+		
+		local sz = owner.console_size
+		local page_count = math.ceil(#issues/sz)
+
+		if (page > page_count) then
+			return "game_graph:= Invalid page"
+		end
+
+		owner:SendOutput("game_graph:= list of objects with invalid game_vertex_ids [%s of %s]",page,page_count)
+		owner:SendOutputList(issues,(page*sz)-sz,sz-1)
+		return
 	end
 	return "game_graph:= type game_graph help for list of commands"
 end

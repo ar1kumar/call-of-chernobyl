@@ -229,23 +229,22 @@ function add_to_binder(npc,ini,scheme,section,storage)
 
 	manager:add_evaluator(evaid,evaluator_need_job(storage, "need_cover"))
 	
-	temp.action = action_point_campfire(npc, "action_point_campfire", storage)
-	temp.action:add_precondition( wp(evaid,true) )
-	temp.action:add_effect( wp(evaid,false) )
-	temp.action:add_effect( wp(xr_evaluators_id.state_mgr + 4, false) )
+	local action = action_point_campfire(npc, "action_point_campfire", storage)
+	action:add_precondition( wp(evaid,true) )
+	action:add_effect( wp(evaid,false) )
+	action:add_effect( wp(xr_evaluators_id.state_mgr + 4, false) )
 	
-	manager:add_action(actid,temp.action)
+	manager:add_action(actid,action)
 	
-	xr_logic.subscribe_action_for_events(npc, storage, temp.action)
+	xr_logic.subscribe_action_for_events(npc, storage, action)
 	
-	temp.action:add_precondition( wp(stalker_ids.property_alive,true) )
-	temp.action:add_precondition( wp(stalker_ids.property_danger,false) )
+	action:add_precondition( wp(stalker_ids.property_alive,true) )
+	action:add_precondition( wp(stalker_ids.property_danger,false) )
 
-	temp.action:add_precondition( wp(stalker_ids.property_enemy,false) )
-	temp.action:add_precondition( wp(stalker_ids.property_anomaly,false) )
-	temp.action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base,false) )
+	action:add_precondition( wp(stalker_ids.property_enemy,false) )
+	action:add_precondition( wp(stalker_ids.property_anomaly,false) )
+	action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base,false) )
 
-	local action
 	action = manager:action(xr_actions_id.alife)
 	action:add_precondition( wp(evaid, false) )
 	action = manager:action(xr_actions_id.state_mgr + 2)

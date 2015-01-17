@@ -107,16 +107,27 @@ function dm_init_dynamic_task_dialog(dialog)
 	for i=1,10 do
 		add_dialog("",base_id,"st_ordered_task_query")																												-- Actor
 			add_script_dialog(base_id,base_id+1,"dialogs.text_npc_has_ordered_task_to_give")																				-- NPC
-				add_dialog(base_id+1,base_id+2,"st_ordered_task_accept","dialogs.npc_has_ordered_task_to_give","dialogs.npc_give_first_available_task") 			-- Actor
-					add_dialog(base_id+2,base_id+3,"st_accepted_task","dialogs.not_task_is_fetch_task")																		-- NPC
-						add_dialog(base_id+3,base_id+11112,"dm_universal_actor_exit_thanks",nil,"dialogs.npc_clear_skipped_tasks")									-- Actor
-					add_dialog(base_id+2,base_id+4,"st_accepted_task","dialogs.task_is_fetch_task")																			-- NPC
-						add_dialog(base_id+4,base_id+11113,"dm_universal_actor_exit_thanks",nil,"dialogs.npc_clear_skipped_tasks")										-- Actor
-				add_dialog(base_id+1,base_id+22222,"st_ordered_task_next","dialogs.npc_has_ordered_task_to_give","dialogs.npc_skip_first_ordered_task")				-- Actor
-				add_dialog(base_id+1,base_id+11111,"dm_universal_actor_exit",nil,"dialogs.npc_clear_skipped_tasks") 													-- Actor
+				add_dialog(base_id+1,base_id+2,"st_ordered_task_accept",{"dialogs.not_task_is_fetch_task","dialogs.npc_has_ordered_task_to_give"},"dialogs.npc_give_last_task_id") 			-- Actor
+					add_dialog(base_id+2,base_id+3,"st_accepted_task")																							-- NPC
+						add_dialog(base_id+3,base_id+4,"dm_universal_actor_exit_thanks",nil,"dialogs.npc_clear_skipped_tasks")									-- Actor
+				add_dialog(base_id+1,base_id+5,"st_ordered_task_accept",{"dialogs.task_is_fetch_task","dialogs.npc_has_ordered_task_to_give"}) 					-- Actor					
+					add_script_dialog(base_id+5,base_id+6,"dialogs.text_fetch_task",nil,"dialogs.npc_give_last_task_id")								-- NPC
+						add_dialog(base_id+6,base_id+7,"dm_universal_actor_exit_thanks",nil,"dialogs.npc_clear_skipped_tasks")										-- Actor
+				add_dialog(base_id+1,base_id+10,"st_ordered_task_next","dialogs.npc_has_ordered_task_to_give","dialogs.npc_skip_first_ordered_task")				-- Actor
+				add_dialog(base_id+1,base_id+8,"dm_universal_actor_exit",nil,"dialogs.npc_clear_skipped_tasks") 													-- Actor
 		base_id = base_id+10
 	end
 end
+
+function dm_init_dynamic_task_completed_dialog(dialog)
+	saved_dialog = dialog
+	-- finished task dialog
+	add_dialog("",0,"st_ordered_task_query_finished")														-- Actor
+		add_script_dialog(0,1,"dialogs.text_task_finish","dialogs.actor_has_finished_ordered_task","dialogs.npc_set_finished_task_complete")		-- NPC
+			add_dialog(1,2,"dm_universal_actor_exit_thanks") 																						-- Actor	
+		--add_dialog(0,3,"st_ordered_task_not_given_task","dialogs.actor_has_not_finished_ordered_task")												-- NPC
+		--	add_dialog(1,2,"dm_universal_actor_exit") 																								-- Actor
+end 
 
 -----------------------------------------------------
 -- Dynamic Broker Dialog

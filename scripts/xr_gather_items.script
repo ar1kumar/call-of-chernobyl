@@ -118,7 +118,7 @@ function gather_item(npc)
 	local itm_id = itm:id()
 	local se_itm = alife():object(selected_id)
 
-	if (isArtefact(itm)) then
+	if (IsArtefact(itm)) then
 		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[itm_id]
 		if (anomal_zone) then
 			anomal_zone:on_artefact_take(itm)
@@ -267,7 +267,7 @@ function eva_gather_itm:find_valid_item()
 		--end
 	--end
 
-	if (isArtefact(itm)) then
+	if (IsArtefact(itm)) then
 		if not (ArtifactDectection) then
 			return false
 		end
@@ -372,7 +372,7 @@ local function execute_gather_item(npc,self)
 	local itm = level.object_by_id(self.st.selected_id)
 	local dist = npc:position():distance_to(self.st.vid_pos)
 
-	if (isArtefact(itm)) then
+	if (IsArtefact(itm)) then
 		local tg = time_global()
 
 		if not (self.st.artifact_timer) then

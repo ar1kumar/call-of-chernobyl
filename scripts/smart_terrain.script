@@ -40,7 +40,7 @@ local function arrived_to_smart(obj, smart)
 	local cls = obj and obj.clsid and obj:clsid()
 	if not (cls) then 
 		return false 
-	end 
+	end
 	
 	local gg = game_graph()
 	local obj_gv, obj_pos = gg:vertex(obj.m_game_vertex_id), obj.position
@@ -55,6 +55,9 @@ local function arrived_to_smart(obj, smart)
 	end 
 
 	local squad = obj.group_id and SIMBOARD.squads[obj.group_id]
+	
+	local script_target = squad and squad:get_script_target() and alife():object(squad:get_script_target())
+	--alun_utils.debug_nearest(obj,"squad=%s script_id=%s smart_id=%s",squad and squad:name(),script_target and script_target:name(),smart:name())
 	if (squad) then
 		if (squad.m_game_vertex_id == smart.m_game_vertex_id) then 
 			return true 

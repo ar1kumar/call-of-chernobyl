@@ -494,7 +494,7 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
 	local meet_section = utils.cfg_get_string (ini, section, "meet", npc, false, "")
-	local st = xr_logic.assign_storage_and_bind(npc,ini,scheme,meet_section,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"meet",meet_section,temp)
 end
 
 function add_to_binder(npc,char_ini,scheme,section,st,temp)
@@ -521,8 +521,15 @@ end
 function configure_actions(npc,ini,scheme,section,stype,temp)
 	local wp = world_property
 	
-	--temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base,false))
-	--temp.action:add_precondition(wp(xr_evaluators_id.abuse_base,false))
+	local manager = npc:motivation_action_manager()
+	local action = manager:action(xr_actions_id.alife)
+	action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1,		false))
+
+	action = manager:action(xr_actions_id.state_mgr + 2)
+	action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1,		false))
+	
+	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action:add_precondition(wp(xr_evaluators_id.abuse_base,false))
 end 
 
 function reset_generic_scheme(npc,scheme,section,stype,st)

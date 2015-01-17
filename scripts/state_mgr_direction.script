@@ -131,8 +131,8 @@ function act_state_mgr_direction_turn:turn()
 		end
 		dir:normalize()
 		if utils.vector_cmp(dir, vector():set(0,0,0)) then
-			--callstack()
-			--printf("Before normalize direction [%s]", vec_to_str(vector():sub(self.st.look_position, self.object:position())))
+			callstack()
+			printf("Before normalize direction [%s]", vec_to_str(vector():sub(self.st.look_position, self.object:position())))
 			--printf("You are trying to set wrong direction %s (look_pos = [%s] npc_pos = [%s])!!!", vec_to_str(dir), vec_to_str(self.st.look_position), vec_to_str(self.object:position()))
 			-- Затычка, если дирекшн плохой, то ставим текущий и меняем позицию куда смотреть(для эвалуатора)
 			self.st.look_position = vector():set(self.object:position().x + self.object:direction().x,self.object:position().y + self.object:direction().y,self.object:position().z + self.object:direction().z)
