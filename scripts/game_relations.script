@@ -203,6 +203,9 @@ function get_squad_goodwill_to_actor_by_id(squad_id)
 		--printf(" squad_relation %s", tostring(squad.relationship))
 		return squad.relationship
 	else
+		if (is_squad_monster[squad.player_id]) then 
+			return "enemy"
+		end
 		local goodwill = "neutral"
 		if(relation_registry.community_relation(squad:get_squad_community(), alife():actor():community())>=FRIENDS) then
 			goodwill = "friend"
@@ -224,6 +227,9 @@ function get_squad_goodwill_to_actor(squad_name)
 		--printf(" squad_relation %s", tostring(squad.relationship))
 		return squad.relationship
 	else
+		if (is_squad_monster[squad.player_id]) then 
+			return "enemy"
+		end
 		local goodwill = "neutral"
 		if(relation_registry.community_relation(squad:get_squad_community(), alife():actor():community())>=FRIENDS) then
 			goodwill = "friend"
@@ -292,6 +298,11 @@ function get_squad_relation_to_actor_by_id(squad_id)
 	if(squad==nil) then
 		printf("No such squad %s in board", tostring(squad_id))
 	end
+	
+	if (is_squad_monster[squad.player_id]) then 
+		return "enemy"
+	end
+	
     local goodwill = 0
     local npc_count = 0
 	local object

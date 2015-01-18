@@ -297,6 +297,9 @@ function marked_by_zone_functor()
 	if has_alife_info("actor_marked_by_zone_3_times") then
 		return true
 	end
+	if (character_community(db.actor) == "actor_monolith") then 
+		return true 
+	end
 	local counter_name = "actor_marked_by_zone_cnt"
 	local cnt_value = xr_logic.pstor_retrieve(db.actor, counter_name, 0)
 	if cnt_value > 2 then
@@ -304,7 +307,6 @@ function marked_by_zone_functor()
 		news_manager.send_tip(db.actor, "st_ach_marked_by_zone", nil, "marked_by_zone", nil, nil)
 		return true
 	end
-
 	return false
 end
 

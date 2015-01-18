@@ -114,7 +114,7 @@ end
 
 -- Мой прекондишн.
 function se_actor:target_precondition(squad)
-	return sim_board.general_actor_precondition(squad,self,200,sim_squad_scripted.is_squad_monster[squad.player_id]) or false
+	return sim_board.general_actor_precondition(squad,self,200,is_squad_monster[squad.player_id]) or false
 end
 
 -- Посчитать мой приоритет для отряда.

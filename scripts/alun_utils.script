@@ -563,7 +563,7 @@ function get_nearest_stalker(npc)
 	for i=1, #db.OnlineStalkers do
 		st = db.storage[db.OnlineStalkers[i]]
 		stalker = st and st.object or level.object_by_id(db.OnlineStalkers[i])
-		if (stalker and stalker:alive()) then
+		if (stalker and IsStalker(stalker) and stalker:alive()) then
 			
 			dist = pos:distance_to_sqr(stalker:position())
 			if not (nearest_dist) then
