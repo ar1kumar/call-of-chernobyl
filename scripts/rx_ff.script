@@ -240,13 +240,13 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
 	--temp.action:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
 
-	if rx_gl then
+	if (_G.schemes["gl"]) then
 		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
 	end
-	if xrs_facer then
+	if (_G.schemes["facer"]) then
 		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
 	end
-
+	
 	local manager = npc:motivation_action_manager()
 	local action
 	local p = {
