@@ -123,6 +123,7 @@ function PsyAntenna:generate_phantoms()
 				local ang    = self.phantom_fov * math.random() - self.phantom_fov * 0.5
 				local dir    = vector_rotate_y( db.actor:direction(), ang )
 
+				printf("spawning phantom")
 				phantom_manager.spawn_phantom( db.actor:position():add( dir:mul(radius) ) )
 			end
 		end
