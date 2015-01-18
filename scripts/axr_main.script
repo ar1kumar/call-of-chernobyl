@@ -308,6 +308,8 @@ function on_game_start()
 
 	modules.on_game_start()
 	
+	phantom_manager.on_game_start()
+	
 	if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
 	-- CoP
 	if (xrs_dyn_music) then xrs_dyn_music.on_game_start() end 
@@ -1370,13 +1372,13 @@ function monster_on_death_callback(obj,who)
 end
 
 -------------------
--- monster_on_net_spawn(obj)
+-- monster_on_net_spawn(obj,se_obj)
 -------------------
-function monster_on_net_spawn(obj)
+function monster_on_net_spawn(obj,se_obj)
 	--alun_utils.debug_write("monster_on_net_spawn")
 	if (intercepts.monster_on_net_spawn) then
 		for i=1, #intercepts.monster_on_net_spawn do
-			intercepts.monster_on_net_spawn[i](obj)
+			intercepts.monster_on_net_spawn[i](obj,se_obj)
 		end
 	end
 end

@@ -1,3 +1,88 @@
+-----------
+-- modified by Alundaio
+
+phantom_registry = {}
+
+-----------------------------
+-- DynamicPhantom
+-----------------------------
+class "DynamicPhantom" (object_binder)
+function DynamicPhantom:__init(obj) super(obj)
+	phantom_registry[obj:section()] = phantom_registry[obj:section()] and phantom_registry[obj:section()] + 1 or 1
+end
+function DynamicPhantom:net_destroy()
+	phantom_registry[self.object:section()] = phantom_registry[self.object:section()] and phantom_registry[self.object:section()] - 1 or 0
+end
+
+function bind_phantom(obj)
+	obj:bind_object(DynamicPhantom(obj))
+end 
+
+--------------------------------------------------------------------------------------
+
+function spawn_dynamic_phantom(sec,pos,lvid)
+	if (level.spawn_item) then
+		level.spawn_item(sec,pos,lvid,65535,false)
+	end
+end
+
+function dynamic_phantom_count(sec)
+	return phantom_registry[sec] or 0
+end
+
+----------------------------------------------------------------------------------------
+function respawn(p)
+	local id = p[1]
+	local npc = level.object_by_id(id)
+	if not(npc and npc:alive()) then 
+		return true 
+	end
+	
+	spawn_dynamic_phantom(p[2],npc:position(),npc:level_vertex_id())
+	
+	return true
+end 
+
+function try_respawn(p)
+	local id = p[1]
+	local npc = level.object_by_id(id)
+	if not(npc and npc:alive()) then 
+		return true 
+	end
+	
+	if (db.actor:position():distance_to_sqr(npc:position()) > 900) then 
+		return false 
+	end
+	
+	-- TODO: add xr_combat_ignore is enemy check
+
+	local sec = alun_utils.read_from_ini(nil,npc:section(),"spawn_phantom","string")
+
+	if (dynamic_phantom_count(sec) >= 6) then 
+		return false
+	end
+	
+	create_delayed_event(id,"dynamic_phantom_respawn",30,respawn,id,sec)
+	
+	return false
+end 
+
+function monster_on_net_spawn(npc)
+	local phantom_section = alun_utils.read_from_ini(nil,npc:section(),"spawn_phantom","string")
+	if not (phantom_section) then
+		return 
+	end
+	create_delayed_event(npc:id(),"dynamic_phantom_try_respawn",5,try_respawn,npc:id())
+end
+
+function on_game_start()
+	if (level.spawn_item) then
+		callback_register("monster_on_net_spawn",monster_on_net_spawn)
+	end
+end 
+
+---------------------------------------------------------------------------
+-- LEGACY
 class "PhantomManager"
 function PhantomManager:__init()
 	self.phantom_count		= 0;
@@ -31,3 +116,5 @@ end
 function phantom_count		()
 	return g_PhantomManager.phantom_count;
 end
+
+
