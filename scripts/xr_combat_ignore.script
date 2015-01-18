@@ -137,8 +137,9 @@ function is_enemy(obj,enemy,no_memory)
 	if (obj_is_stalker) then
 	
 		-- no item to kill with
-		if not (obj:active_item()) then 
-			return false 
+		if not (obj:active_item()) then
+			printf("xr_combat_ignore.script - %s does not have active item",obj and obj:name())
+			--return false -- hack (sometimes game will crash on game load because npc will try to fire weapon when he doesn't have active item; this seems to fix it)
 		end 
 		
 		if (no_memory ~= true) then

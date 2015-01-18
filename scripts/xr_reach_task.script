@@ -291,7 +291,7 @@ end
 function evaluator_reached_task_location:evaluate()
 	local squad = get_object_squad(self.object)
 	if squad and squad.current_action and squad.current_action == 0 then
-		local squad_target = alife():object(squad.assigned_target_id)
+		local squad_target = squad.assigned_target_id and alife():object(squad.assigned_target_id)
 		if squad_target == nil then
 			return false
 		end

@@ -27,7 +27,7 @@ m_data = {}
 REMOVE_ME_LC			= nil 			-- Used by custom jump level command in xrs_debug_tools and faction select
 ------------------------------
 LOUD_SOUND_THRESHOLD 	= 35			-- Used for actor targetting by sim_board.script
-MAX_SQUADS 				= 256			-- Non-storied Squads above this count will randomly be removed on game load
+MAX_SQUADS 				= 400			-- Non-storied Squads above this count will randomly be removed on game load
 ------------------------------
 
 config = alun_utils.cfg_file(alun_utils.fspath("$game_data$").."axr_options.ini")
@@ -101,12 +101,9 @@ local intercepts = {
 
 	-- xr_logic.script
 	on_pstor_load_all			= {},
-	--set_generic_scheme			= {},
-	--scheme_reset				= {},
-	--scheme_disable				= {},
-	--scheme_deactivate			= {},
 
 	-- bind_stalker.script
+	on_keypress					= {},
 	on_game_load				= {},
 	on_game_end					= {},
 	actor_on_update				= {},
@@ -320,6 +317,7 @@ function on_game_start()
 	if (ui_mm_faction_select) then ui_mm_faction_select.on_game_start() end
 
 	-- Alundaio Extensions
+	if (actor_robbery) then actor_robbery.on_game_start() end
 	if (xrs_rnd_npc_loadout) then xrs_rnd_npc_loadout.on_game_start() end
 	--if (axr_dynamic_spawn) then axr_dynamic_spawn.on_game_start() end
 	if (itms_manager) then itms_manager.on_game_start() end
@@ -1518,4 +1516,15 @@ function on_save_game_save(fname)
 	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
 	--collectgarbage("collect")
 	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+end
+
+-------------------
+-- on_keypress
+-------------------
+function on_keypress(key)
+	if (intercepts.on_keypress) then 
+		for i=1,#intercepts.on_keypress do 
+			intercepts.on_keypress[i](key)
+		end
+	end
 end

@@ -983,11 +983,12 @@ function position_hud_show(hud)
 
 	local dir = device().cam_dir
 	local pos2 = level.vertex_position(lvid)
-	local valid = pos2:distance_to(pos) <= 0.7
+	local valid = lvid < 4294967295 and pos2:distance_to(pos) <= 0.7
 
 	local se_actor = not cam and alife():object(db.actor:id())
 
 	hud:set_header("-[Actor Info]-")
+	hud:add_msg("Precache Frame",device().precache_frame)
 	hud:add_msg("Lvid",lvid)
 	hud:add_msg("Gvid",gvid)
 	hud:add_msg("Pos",string.format("%0.4f, %0.4f, %0.4f", pos.x, pos.y, pos.z))

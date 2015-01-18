@@ -42,9 +42,9 @@ function lchanger_binder:net_spawn(sobject)
 	local obj = self.object
     db.add_obj(obj)
 
-    self.st.s_obj = alife():object(obj:id())
+    local se_obj = alife():object(obj:id())
     --obj:enable_level_changer(self.st.s_obj.enabled or true)
-    obj:set_level_changer_invitation(self.st.s_obj.hint)
+    obj:set_level_changer_invitation(se_obj.hint)
     return true
 end
 -- Net destroy

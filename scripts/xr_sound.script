@@ -66,16 +66,18 @@ looped_sound = {}
 function play_sound_looped(npc_id, sound)
 	local snd_theme = sound_theme.theme[sound]
 	if snd_theme == nil then
-		printf("play_sound_looped. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
+		printf("ERROR: play_sound_looped. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
+		return
 	end
 	if snd_theme.class_id ~= "looped_sound" then
-		printf("You trying to play sound [%s] which type is not looped", sound)
+		printf("ERROR: You trying to play sound [%s] which type is not looped", sound)
+		return
 	end
 	if looped_sound[npc_id] ~= nil and looped_sound[npc_id][sound] ~= nil and looped_sound[npc_id][sound]:is_playing(npc_id) then
 		return
 	end
 	if snd_theme:play(npc_id) then
-			printf("PLAY2. looped theme[%s] object[%s]", tostring(sound), npc_id)
+			--printf("PLAY2. looped theme[%s] object[%s]", tostring(sound), npc_id)
 			if looped_sound[npc_id] == nil then
 			looped_sound[npc_id] = {}
 		end
@@ -86,7 +88,7 @@ function stop_sound_looped(npc_id, sound)
 	if sound then
 		if type(looped_sound[npc_id][sound]) ~= "string" then
 					if looped_sound[npc_id][sound] and looped_sound[npc_id][sound]:is_playing(npc_id) then
-							printf("looped sound ["..tostring(sound).."] stop for obj [%s]",npc_id)
+							--printf("looped sound ["..tostring(sound).."] stop for obj [%s]",npc_id)
 							looped_sound[npc_id][sound]:stop()
 							looped_sound[npc_id][sound] = nil
 					end
@@ -95,7 +97,7 @@ function stop_sound_looped(npc_id, sound)
 		if looped_sound[npc_id] then
 					for k,v in pairs(looped_sound[npc_id]) do
 							if v and type(v) ~= "string" and v:is_playing(npc_id) then
-									printf("looped sound ["..tostring(k).."] stop for obj [%s]",npc_id)
+									--printf("looped sound ["..tostring(k).."] stop for obj [%s]",npc_id)
 									v:stop()
 							end
 					end
@@ -107,7 +109,7 @@ end
 function set_volume_sound_looped(npc_id, sound, level)
 	if looped_sound[npc_id] then
 		if looped_sound[npc_id][sound] and looped_sound[npc_id][sound]:is_playing(npc_id) then
-			printf("looped sound ["..tostring(sound).."] for obj ["..npc_id.."] set volume "..level)
+			--printf("looped sound ["..tostring(sound).."] for obj ["..npc_id.."] set volume "..level)
 			looped_sound[npc_id][sound]:set_volume(level)
 		end
 	end
@@ -425,7 +427,7 @@ function get_last_IDS(npc, theme)
 	if sound_theme.theme[theme] ~= nil then
 		get_sound(sound_theme.theme[theme], snd_table, npc)
 	end
-	printf("LAST INTO ID for [%s] = [%s], max [%s]", theme, last_table[snd_table.into_id], snd_table.into_max)
+	--printf("LAST INTO ID for [%s] = [%s], max [%s]", theme, last_table[snd_table.into_id], snd_table.into_max)
 	return last_table[snd_table.into_id], snd_table.into_max
 end
 
@@ -441,7 +443,7 @@ end
 --' Actor sound player
 local actor_sound = {}
 function set_actor_sound(sound)
-	printf("*ACTOR SND* try to change SND to [%s]", tostring(sound))
+	--printf("*ACTOR SND* try to change SND to [%s]", tostring(sound))
 	if actor_sound.theme ~= sound then
 		--' Туточки надобно распарсить имена тем в их id
 		if sound == nil then sound = "" end
@@ -551,7 +553,7 @@ function get_sound_object(theme, t_type)
 		end
 	end
 
-	printf("SOUND_OBJECT: selected id [%s] for theme [%s], type [%s], size [%s]", tostring(play_id), tostring(theme), tostring(type), table_size)
+	--printf("SOUND_OBJECT: selected id [%s] for theme [%s], type [%s], size [%s]", tostring(play_id), tostring(theme), tostring(type), table_size)
 
 	if play_id == -1 then
 		return
