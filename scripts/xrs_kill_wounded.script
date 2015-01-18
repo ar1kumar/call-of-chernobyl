@@ -390,7 +390,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
 	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base,false))
 
-	if (rx_ff) then
+	if (_G.schemes["rx_ff"]) then
 		temp.action:add_precondition(wp(rx_ff.evid_dont_shoot,false))
 	end
 	

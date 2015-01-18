@@ -900,17 +900,6 @@ end
 --*										MAP LOCATION											*
 --***********************************************************************************************
 
-is_squad_monster =
-{
-	["monster_predatory_day"] 	= true,
-	["monster_predatory_night"] = true,
-	["monster_vegetarian"] 		= true,
-	["monster_zombied_day"] 	= true,
-	["monster_zombied_night"] 	= true,
-	["monster_special"] 		= true,
-	["monster"]					= true
-}
-
 function sim_squad_scripted:refresh()
 	if(self:commander_id()==nil) then
 		self:hide()
@@ -918,7 +907,6 @@ function sim_squad_scripted:refresh()
 	end
 	self:show()
 end
-
 
 function sim_squad_scripted:hide()
 	if(self.current_spot_id==nil) or (self.spot_section==nil) then

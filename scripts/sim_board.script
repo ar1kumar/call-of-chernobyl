@@ -33,7 +33,7 @@ end
 function general_squad_precondition(squad,target)
 	-- duty and freedom target eachother
 	if (squad.player_id == "dolg") then 
-		if (target.player_id == "freedom" or sim_squad_scripted.is_squad_monster[target.player_id]) then 
+		if (target.player_id == "freedom" or is_squad_monster[target.player_id]) then 
 			return in_time_interval(8,19)
 		end
 	elseif (squad.player_id == "freedom") then 
@@ -43,7 +43,7 @@ function general_squad_precondition(squad,target)
 	end
 	
 	-- if target squad is not monster
-	if (sim_squad_scripted.is_squad_monster[target.player_id] ~= true) then 
+	if (is_squad_monster[target.player_id] ~= true) then 
 		if (squad.player_id == "monster_predatory_day") then 
 			return in_time_interval(6,19)
 		elseif (squad.player_id == "monster_predatory_night") then 

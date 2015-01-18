@@ -123,6 +123,7 @@ function PsyAntenna:generate_phantoms()
 				local ang    = self.phantom_fov * math.random() - self.phantom_fov * 0.5
 				local dir    = vector_rotate_y( db.actor:direction(), ang )
 
+				printf("spawning phantom")
 				phantom_manager.spawn_phantom( db.actor:position():add( dir:mul(radius) ) )
 			end
 		end
@@ -160,7 +161,7 @@ end
 function PsyAntenna:update(dt)
 	self.eff_time					= self.eff_time + dt
 
-	function update_intensity(intensity_base, intensity)
+	local function update_intensity(intensity_base, intensity)
 		local di = self.intensity_inertion * dt * 0.01
 		local ii = intensity_base
 		if math.abs(intensity_base - intensity) >= di then
