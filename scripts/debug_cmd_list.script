@@ -53,6 +53,61 @@ function first_word(caller,txt,owner,msg)
 	return wrd,rest
 end
 
+-- cmd.antifreeze
+function antifreeze_switch(p)
+	local sim = alife()
+	local se_obj = sim:object(p[1])
+	if not (se_obj) then 
+		return true 
+	end 
+	if (se_obj.online) then
+		se_obj:switch_offline()
+	else 
+		se_obj:switch_online()
+	end
+	return true
+end 
+function cmd.antifreeze(me,txt,owner,p)
+	local wrd = first_word(me,txt,owner,"<time>")
+	
+	wrd = tonumber(wrd) or 5 
+	
+	if not (smart_terrain.nearest_to_actor_smart.id) then 
+		return "antifreeze:= no nearest smart"
+	end 
+	
+	local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
+	if not (smart) then 
+		return "antifreeze:= smart by id " .. smart_terrain.nearest_to_actor_smart.id .. "does not exist."
+	end 
+	
+	local squad = SIMBOARD:create_squad(smart,"stalker_sim_squad_novice")
+	if not (squad) then 
+		return "antifreeze:= failed to create squad "
+	end 
+	
+	squad.scripted_target = "actor"
+	
+	local function tele_to_actor(p)
+		local sim = alife()
+		local se_obj = sim:object(p[1])
+		if not (se_obj) then 
+			return true 
+		end 
+		alun_utils.teleport_squad(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+		return true
+	end  
+	
+	local function repeater(p)
+		create_delayed_event(squad.id,"antifreeze",wrd,antifreeze_switch,p[1])
+		return false
+	end
+	
+	create_delayed_event(squad.id,"teleport",5,tele_to_actor,squad.id)
+	create_delayed_event(squad.id,"repeater",10,repeater,squad.id)
+	return "antifreeze:= created squad and teleported to your position!"
+end 
+
 -- HELP
 function cmd.help(me,txt,owner,p)
 	local wrd = ""

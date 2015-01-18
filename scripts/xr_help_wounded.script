@@ -156,7 +156,15 @@ function evaluator_wounded_exist:find_valid_target()
 	
 	local vo = id and db.storage[id] and db.storage[id].object
 	
-	if (vo == nil or vo:alive() ~= true or not xr_wounded.is_wounded(vo) or db.storage[id].wounded_already_selected) then 
+	if not (vo) then 
+		return false 
+	end 
+	
+	if not (IsStalker(vo)) then 
+		return false 
+	end 
+	
+	if (vo:alive() ~= true or not xr_wounded.is_wounded(vo) or db.storage[id].wounded_already_selected) then 
 		return false 
 	end
 	

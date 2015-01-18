@@ -103,7 +103,7 @@ function evaluator_dont_shoot:check_all_in_los()
 		id = db.OnlineStalkers[i]
 		local friend = id  and id ~= sid and db.storage[id] and db.storage[id].object
 
-		if (self:check_in_los(friend,be,be_pos) == true) then 
+		if (friend and IsStalker(friend) and self:check_in_los(friend,be,be_pos) == true) then 
 			self.st.friend_id = id
 			return true 
 		end
@@ -240,13 +240,13 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
 	--temp.action:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
 
-	if rx_gl then
+	if (_G.schemes["gl"]) then
 		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
 	end
-	if xrs_facer then
+	if (_G.schemes["facer"]) then
 		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
 	end
-
+	
 	local manager = npc:motivation_action_manager()
 	local action
 	local p = {
