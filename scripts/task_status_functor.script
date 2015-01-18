@@ -55,10 +55,12 @@ function check_smart_under_faction_control(task,task_id)
 		return "fail"
 	end
 
+	--[[
 	local last_target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
 	if (last_target_id and axr_task_manager.actor_tagged_squad_by_id[last_target_id] ~= true) then
 		return "fail"
 	end
+	--]]
 	
 	return "complete"	
 end

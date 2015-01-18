@@ -1020,6 +1020,7 @@ function CSurgeManager:kill_obj_at_pos(pos)
 	local board = SIMBOARD
 	local se_actor = alife():actor()
 	local immuned_to_surge_squads = {
+					["monolith"] = true,
 					["monster_predatory_day"] 	= true,
 					["monster_predatory_night"] = true,
 					["monster_vegetarian"] 		= true,
@@ -1075,6 +1076,7 @@ end
 function CSurgeManager:get_objects_to_kill()
 	local board = SIMBOARD
 	local immuned_to_surge_squads = {
+					["monolith"] = true,
 					["monster_predatory_day"] 	= true,
 					["monster_predatory_night"] = true,
 					["monster_vegetarian"] 		= true,
@@ -1261,6 +1263,7 @@ function CSurgeManager:kill_all_unhided()
 	local board = SIMBOARD
 	local zombie_count = 0
 	local immuned_to_surge_squads = {
+						["monolith"] = true,
 						["monster_predatory_day"] 	= true,
 						["monster_predatory_night"] = true,
 						["monster_vegetarian"] 		= true,
@@ -1344,6 +1347,7 @@ end
 function CSurgeManager:kill_all_unhided_after_actor_death()
 	local board = SIMBOARD
 	local immuned_to_surge_squads = {
+						["monolith"] = true,
 						["monster_predatory_day"] 	= true,
 						["monster_predatory_night"] = true,
 						["monster_vegetarian"] 		= true,

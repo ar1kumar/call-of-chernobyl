@@ -98,40 +98,13 @@ function printf(fmt,...)
 		fmt = string.gsub(fmt,"%%s",sr)
 	end
 	
-	if (log1) then 
-		log1(fmt)
+	if (log) then 
+		log(fmt)
 	else 
 		get_console():execute("load ~#debug msg:"..fmt)
 	end	
 end
 
-function xr_log(fmt,...)
-	if not (fmt) then return end
-	local fmt = tostring(fmt)
-
-	if (select('#',...) >= 1) then
-		local i = 0
-		local p = {...}
-		local function sr(a)
-			i = i + 1
-			if (type(p[i]) == 'userdata') then
-				return 'userdata'
-			end
-			return tostring(p[i])
-		end
-		fmt = string.gsub(fmt,"%%s",sr)
-	end
-	
-	if (debug and type(debug.traceback) == 'function') then
-		fmt = fmt .. debug.traceback('\n', 2)
-	end
-	
-	if (log1) then 
-		log1(fmt)
-	else 
-		get_console():execute("load ~#debug msg:"..fmt)
-	end	
-end
 ----------------------------------------------------------------------
 function time_global()
 	return device():time_global()
@@ -906,8 +879,8 @@ function vec_to_str (vector)
 end
 -- выводит в лог стэк вызова функций.
 function callstack()
-	if (log1 and debug and type(debug.traceback) == 'function') then 
-		log1(debug.traceback('\n', 2))
+	if (log and debug and type(debug.traceback) == 'function') then 
+		log(debug.traceback('\n', 2))
 	end
 end
 -- меняет team:squad:group обьекта.
