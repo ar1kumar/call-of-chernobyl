@@ -6,6 +6,12 @@
 -- Author:      Serhiy Vynnychenko (narrator@gsc-game.kiev.ua)
 -- Version:     0.9
 
+
+
+local SKIP_FACTION_SELECTION = false -- TRUE to disable faction selection menu and start normally
+
+
+
 class "main_menu" (CUIScriptWnd)
 function main_menu:__init() super()
 	self.mbox_mode = 0
@@ -172,6 +178,10 @@ end
 
 local faction_ui
 function main_menu:ShowFactionUI()
+	if (SKIP_FACTION_SELECTION) then 
+		self:StartGame() 
+		return 
+	end
 	if not (faction_ui) then
 		faction_ui = ui_mm_faction_select and ui_mm_faction_select.faction_ui(self)
 	end
