@@ -182,7 +182,7 @@ local function is_danger(npc,best_danger,script)
 	end
 
 	if (bd_type == danger_object.entity_corpse) then
-		if (best_danger_object and character_community(best_danger_object) == character_community(npc)) then
+		if (best_danger_object and IsStalker(best_danger_object) and character_community(best_danger_object) == character_community(npc)) then
 			local corpse_st = db.storage[best_danger_object:id()]
 			if not (corpse_st and corpse_st.death_time and corpse_st.death_by_id) then
 				return false
@@ -198,6 +198,7 @@ local function is_danger(npc,best_danger,script)
 			end
 			return danger_in_radius(npc,best_danger,bd_type)
 		end
+		return false
 	end
 
 	--if (db.storage[npc:id()].active_scheme == "camper") then
@@ -523,7 +524,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 	local dst = db.storage[bdo:id()]
 	local killer = dependent_object or dst and dst.death_by_id and (db.storage[dst.death_by_id] and db.storage[dst.death_by_id].object or level.object_by_id(dst.death_by_id))
 
-	if (st.stage >= 3 and killer and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
+	--if (st.stage >= 3 and killer and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
 		--[[
 		local squad = get_object_squad(npc)
 		if (squad) then
@@ -539,7 +540,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 
 		printf("xr_danger.script_action_danger_corpse: forced enemies %s and %s",npc:name(), killer:name())
 		--]]
-	end
+	--end
 
 	--printf("stage = %s",st.stage)
 	if (st.stage == 1) then
