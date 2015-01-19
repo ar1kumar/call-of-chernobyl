@@ -136,6 +136,17 @@ function main_menu:OnButton_quit_clicked()
 	self.message_box:ShowDialog(true)
 end
 
+function main_menu:OnButton_disconnect_clicked()
+	self.message_box:InitMessageBox("message_box_quit_game")
+
+	if (level.game_id() ~= 1) then
+		self.message_box:SetText("ui_mm_disconnect_message")	-- MultiPlayer
+	else
+		self.message_box:SetText("ui_mm_quit_game_message")		-- SinglePlayer
+	end
+	self.message_box:ShowDialog(true)
+end
+
 function main_menu:OnMessageQuitGame()
 	local console = get_console()
 	console:execute("disconnect")

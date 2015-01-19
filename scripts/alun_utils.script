@@ -5,6 +5,26 @@
 
 -- TODO: replace read_from_ini with type specific functions to remove code smell
 
+function change_level(pos,lvid,gvid,angle)
+--[[
+		NET_Packet	p;
+		p.w_begin	(M_CHANGE_LEVEL); -- M_CHANGE_LEVEL == 13
+		p.w			(&m_game_vertex_id,sizeof(m_game_vertex_id));
+		p.w			(&m_level_vertex_id,sizeof(m_level_vertex_id));
+		p.w_vec3	(m_position);
+		p.w_vec3	(m_angles);
+		Level().Send(p,net_flags(TRUE));
+--]]
+	if not (level.send) then return end
+	local p = net_packet()
+	p:w_begin(13)
+	p:w_u16(gvid)
+	p:w_u32(lvid)
+	p:w_vec3(pos)
+	p:w_vec3(angle)
+	level.send(p,true)
+end 
+
 function jump_to_level(new_level,specific_gvid,specific_lvid,specific_pos)
 	local level_name = level.name()
 	if (level_name == new_level) then 
