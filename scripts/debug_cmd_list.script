@@ -833,7 +833,7 @@ function cmd.teleport(me,txt,owner,p)
 			who_id = tonumber(s)
 		end
 
-		who = alife():object(who_id)
+		who = who_id and alife():object(who_id)
 		if not (who) then
 			return "teleport := Wrong argument given or object doesn't exist. who:<%s>",who_id
 		end
@@ -845,7 +845,7 @@ function cmd.teleport(me,txt,owner,p)
 			id = tonumber(s)
 		end
 
-		to_obj = alife():object(id)
+		to_obj = id and alife():object(id)
 		if not (to_obj) then
 			return "teleport := Wrong arugment given or object doesn't exist. id:%s",id
 		end
@@ -872,36 +872,39 @@ function cmd.teleport(me,txt,owner,p)
 		to_pos = pos
 	end
 	
-	if (who and to_obj) then 
+	
+	if (who and to_pos) then
+		local success = false
 		if (who.id == 0) then 
 			db.actor:set_actor_position(to_pos)
-			local pos = string.format("%0.3f, %0.3f, %0.3f",to_pos.x,to_pos.y,to_pos.z)
-			return "teleport:= %s teleported to pos:%s",who:name(),pos
-		end
-		local object = level.object_by_id(who.id)
-		if (object) then
-			object:set_npc_position(to_pos)
-			local pos = string.format("%0.3f, %0.3f, %0.3f",to_pos.x,to_pos.y,to_pos.z)
-			return "teleport:= %s teleported to pos:%s",who:name(),pos
-		end
-		if (to_obj.id == 0) then 
-			local squad = who:clsid() == clsid.online_offline_group_s and who or get_object_squad(who)
-			local sim = alife()
-			local se_actor = sim:actor()
-			if (squad and sim.teleport_object) then
-				sim.teleport_object(squad.id,se_actor.m_game_vertex_id,se_actor.m_level_vertex_id,se_actor.position)
-				local se_obj
-				for k in squad:squad_members() do
-					se_obj = k.object or k.id and sim:object(k.id)
-					if (se_obj) then
-						sim.teleport_object(se_obj.id,se_actor.m_game_vertex_id,se_actor.m_level_vertex_id,se_actor.position)
-					end
+			success = true
+		elseif (to_obj) then
+			local squad
+			if (IsStalker(who) or IsMonster(who)) then 
+				local object = level.object_by_id(who.id)
+				if (object) then
+					object:set_npc_position(to_pos)
+					success = true
+				else 
+					squad = get_object_squad(who)
 				end
-				return "teleport:= %s teleported to %s",who:name(),se_actor:name()
+			elseif (who:clsid() == clsid.online_offline_group_s) then 
+				squad = who
+			end 
+			
+			if (squad and alife().teleport_object) then 
+				alun_utils.teleport_squad(who,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+				success = true
 			end
 		end
-		return
-	end 
+		
+		if (success) then 
+			local pos = string.format("%0.3f, %0.3f, %0.3f",to_pos.x,to_pos.y,to_pos.z)
+			return "teleport:= %s teleported to pos:%s",who:name(),pos
+		end
+	end
+	
+	return "teleport:= failed to teleport %s",who and who:name()
 end
 
 -- Wound

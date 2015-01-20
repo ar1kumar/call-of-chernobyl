@@ -37,6 +37,7 @@ function action_walker_activity:__init (npc, action_name, storage) super(nil, ac
 end
 function action_walker_activity:initialize()
 	action_base.initialize(self)
+	--alun_utils.debug_write(alun_utils.sr("action_walker_activity:initialize %s",self.object:name()))
 	self.object:set_desired_position()
 	self.object:set_desired_direction()
 	self:reset_scheme(nil, self.object)
@@ -58,6 +59,8 @@ end
 function action_walker_activity:execute()
 	action_base.execute(self)
 
+	--alun_utils.debug_write(alun_utils.sr("action_walker_activity:execute %s",self.object:name()))
+	
 	self.move_mgr:update()
 
 	-- Определяем, в каком мы кемпе.

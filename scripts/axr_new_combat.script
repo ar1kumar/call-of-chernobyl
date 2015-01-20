@@ -300,13 +300,6 @@ end
 function action_new_combat:initialize()
 	action_base.initialize(self)
 	local npc = self.object
-	local sm = db.storage[npc:id()].state_mgr
-	if (sm and sm.target_state ~= "assault") then
-		npc:clear_animations()
-		sm:set_state("assault",nil,nil,nil, {fast_set = true})
-		sm.animation:set_state(nil, true)
-		sm.animation:set_control()
-	end	
 	npc:set_desired_position()
 	npc:set_desired_direction()
 end

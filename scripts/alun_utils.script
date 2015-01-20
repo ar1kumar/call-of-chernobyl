@@ -866,29 +866,14 @@ end
 
 local debug_file
 function debug_write(output,trace)
-	if (trace and debug and type(debug.traceback) == 'function') then
-		output = output .. debug.traceback('\n', 2)
-	end
+	--if (trace and debug and type(debug.traceback) == 'function') then
+		--output = output .. debug.traceback('\n', 2)
+	--end
 
-	if (log1) then 
-		log1(output)
+	if (log) then 
+		log(output)
 		return
 	end 
-	
-	if (last_ouput == output) then
-		return
-	end
-	last_ouput = output
-
-	if not (debug_file) then
-		debug_file = io.open("axr_debug_log.txt","w+")
-		debug_file:write(output.."\n")
-		debug_file:close()
-	else
-		debug_file = io.open("axr_debug_log.txt","a+")
-		debug_file:write(output.."\n")
-		debug_file:close()
-	end
 end
 
 function str_format(str,...)

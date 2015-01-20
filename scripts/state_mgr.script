@@ -254,6 +254,7 @@ end
 
 function act_state_mgr_to_idle:execute()
 	--callstack()
+	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_to_idle:execute %s",self.object:name()))
 	action_base.execute(self)
 	if (self.st.target_state ~= "idle") and (self.object:best_enemy() or self.object:best_danger()) then
 		self.object:clear_animations()
@@ -357,6 +358,7 @@ function act_state_mgr_end:execute()
 	self:weapon_update()
 end
 function act_state_mgr_end:weapon_update()
+	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_end:weapon_update %s",self.object:name()))
 	if self.st.callback and self.st.callback.timeout then
 		if self.st.callback.begin == nil then
 			self.st.callback.begin = time_global()
@@ -522,10 +524,12 @@ function state_manager:update()
 		end
 	end
 
+	--alun_utils.debug_write("\n-----STATE MANAGER UPDATE----",true)
+	
 	--printf("state_manager:update() %s",self.npc:name())
 	self.planner:update()
 	
-	--alun_utils.debug_write("\n-----STATE MANAGER UPDATE----",true)
+	
 	if not (self.planner:initialized()) then
 		return
 	end

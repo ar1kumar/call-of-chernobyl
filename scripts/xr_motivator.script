@@ -51,7 +51,7 @@ function motivator_binder:reinit()
 end
 ----------------------------------------------------------------------------------------------------------------------
 function motivator_binder:net_spawn(sobject)
-	--alun_utils.debug_write("\n----"..sobject:name()..":net_spawn()----",true)
+	--alun_utils.debug_write(alun_utils.sr("\n----%s:net_spawn()---%s visual=%s",self.object:name(),self.object:character_name(),self.object:get_visual_name()),true)
 	if not object_binder.net_spawn(self, sobject) then
 		return false
 	end
@@ -129,6 +129,7 @@ function motivator_binder:net_spawn(sobject)
 						smart:select_npc_job(smart.npc_info[id],true)
 					end
 					if (smart.npc_info[id].job) then
+						--alun_utils.debug_write(alun_utils.sr("xr_movtivator: npc=%s job=%s",self.object:name(),smart.npc_info[id].job.section))
 						local smart_task = smart.npc_info[id].job.alife_task
 						force_set_position = smart_task and smart_task:position() or nil
 					end
@@ -359,7 +360,7 @@ end
 function motivator_binder:update(delta)
 	object_binder.update(self, delta)
 	
-	--alun_utils.debug_write("motivator_bind:update %s START",self.object and self.object:name())
+	--alun_utils.debug_write(alun_utils.sr("motivator_bind:update %s START",self.object and self.object:name()))
 
 	local object = self.object
 	local id = object:id()

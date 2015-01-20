@@ -10,8 +10,8 @@ function PsyAntenna:__init				()
 -- ----------------------------------------------------------------------------------------
 -- phantom gen
 -- ----------------------------------------------------------------------------------------
-	self.phantom_max 					= 8 --10	-- max phantoms
-	self.phantom_spawn_probability		= 0	-- spawn probability (0..1)
+	self.phantom_max 					= 4 --10	-- max phantoms
+	self.phantom_spawn_probability		= 0.1	-- spawn probability (0..1)
 	self.phantom_spawn_radius			= 30.0	-- average radius 30.0m +-15m
 	self.phantom_spawn_height			= 2.5 --3	-- average height from actor pos +-1.5m
 	self.phantom_fov					= 45   -- ширина сектора перед глазами актёра, в котором могут рождаться фантомы
@@ -123,7 +123,7 @@ function PsyAntenna:generate_phantoms()
 				local ang    = self.phantom_fov * math.random() - self.phantom_fov * 0.5
 				local dir    = vector_rotate_y( db.actor:direction(), ang )
 
-				printf("spawning phantom")
+				printf("spawn_phantom")
 				phantom_manager.spawn_phantom( db.actor:position():add( dir:mul(radius) ) )
 			end
 		end
@@ -196,7 +196,7 @@ function PsyAntenna:update(dt)
 	self:update_psy_hit(dt)
 end
 function PsyAntenna:save(p)
-	printf("Psy Antenna SAVE")
+	--printf("Psy Antenna SAVE")
 	set_save_marker(p, "save", false, "psy_antenna_obj")
 	p:w_float(self.hit_intensity)
 	p:w_float(self.sound_intensity)
@@ -217,7 +217,7 @@ function PsyAntenna:save(p)
 	set_save_marker(p, "save", true, "psy_antenna_obj")
 end
 function PsyAntenna:load(p)
-	printf("Psy Antenna LOAD")
+	--printf("Psy Antenna LOAD")
 	set_save_marker(p, "load", false, "psy_antenna_obj")
 	self.hit_intensity  = p:r_float()
 	self.sound_intensity  = p:r_float()
@@ -304,6 +304,7 @@ end
 function action_psy_antenna:zone_enter()
 --'	printf("[psy_antenna] zone_enter")
 	self.state = state_inside
+	psy_antenna.global_state = state_inside
 
 	--включаем фейковый индикатор хита.
 	get_hud():enable_fake_indicators(true)
@@ -335,7 +336,8 @@ end
 function action_psy_antenna:zone_leave()
 --'		printf("[psy_antenna] zone_leave. hit_intensity=%s", tostring(psy_antenna.hit_intensity))
 	self.state = state_outside
-
+	psy_antenna.global_state = state_outside
+	
 	--выключаем фейковый индикатор хита.
 	get_hud():enable_fake_indicators(false)
 
@@ -395,6 +397,7 @@ function add_to_binder(npc, ini, scheme, section, storage)
 	if not psy_antenna then
 		psy_antenna = PsyAntenna()
 		psy_antenna:construct()
+		psy_antenna.global_state = state_void
 	end
 
 	local new_action = action_psy_antenna(npc, storage)
@@ -419,5 +422,4 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.no_mumble 	= utils.cfg_get_bool(ini, section, "no_mumble", npc, false, false)
 	st.hit_type	 	= utils.cfg_get_string(ini, section, "hit_type", npc, false, "", "wound")
 	st.hit_freq 	= utils.cfg_get_number(ini, section, "hit_freq", npc, false, 5000)
-
 end

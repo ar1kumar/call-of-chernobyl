@@ -90,8 +90,8 @@ local function squad_on_update(squad)
 end
 
 local function npc_on_net_spawn(npc,se_npc)
-	--alun_utils.debug_write(alun_utils.sr("action_new_combat:execute end"))
 	if (npc and npc:has_info("npcx_is_companion")) then
+		--alun_utils.debug_write(alun_utils.sr("axr_companions:npc_on_net_spawn:setup_companion_logic"))
 		setup_companion_logic(npc)
 	end
 end

@@ -22,6 +22,7 @@ end
 
 function spawn_dynamic_phantom(sec,pos,lvid)
 	if (level.spawn_item) then
+		printf("spawn_dynamic_phantom")
 		level.spawn_item(sec,pos,lvid,65535,false)
 	end
 end
@@ -50,15 +51,17 @@ function try_respawn(p)
 		return true 
 	end
 	
+	if not (xr_combat_ignore.fighting_with_actor_npcs[npc:id()]) then 
+		return false 
+	end
+	
 	if (db.actor:position():distance_to_sqr(npc:position()) > 900) then 
 		return false 
 	end
 	
-	-- TODO: add xr_combat_ignore is enemy check
-
 	local sec = alun_utils.read_from_ini(nil,npc:section(),"spawn_phantom","string")
 
-	if (dynamic_phantom_count(sec) >= 6) then 
+	if (dynamic_phantom_count(sec) >= 4) then 
 		return false
 	end
 	
@@ -72,6 +75,10 @@ function monster_on_net_spawn(npc)
 	if not (phantom_section) then
 		return 
 	end
+	local can_spawn = sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state == 1 or alun_utils.read_from_ini(nil,npc:section(),"can_spawn_phantom","bool")
+	if not (can_spawn) then 
+		return
+	end 
 	create_delayed_event(npc:id(),"dynamic_phantom_try_respawn",5,try_respawn,npc:id())
 end
 

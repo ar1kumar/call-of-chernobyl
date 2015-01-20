@@ -49,6 +49,8 @@ function action_reach_animpoint:initialize()
 end
 function action_reach_animpoint:execute()
 	action_base.execute(self)
+	
+	--alun_utils.debug_write("action_reach_animpoint:execute")
 
 	if not (self.st.animpoint.position_vertex) then
 		return
@@ -85,6 +87,8 @@ function action_animpoint:initialize()
 end
 function action_animpoint:execute()
 	action_base.execute(self)
+	
+	--alun_utils.debug_write("action_animpoint:execute")
 
 	if not(self.st.animpoint.started) then
 		self.st.animpoint:start() -- zatychka
@@ -159,6 +163,8 @@ end
 --' Рассчитывает позицию, куда идти
 function animpoint:calculate_position()
 	--printf("CALCULATE POSITION")
+	
+	--alun_utils.debug_write("animpoint:calculate_position")
 
 	local smartcover = se_smart_cover.registered_smartcovers[self.st.cover_name]
 	if smartcover == nil then
