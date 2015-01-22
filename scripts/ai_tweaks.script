@@ -165,10 +165,10 @@ local function attach_addon(p)
 			end
 		end
 
-		parent:switch_offline()
+		alun_utils.switch_offline(parent.id)
 		return false
 	elseif (se_wpn.online) then
-		se_wpn:switch_offline()
+		alun_utils.switch_offline(se_wpn.id)
 		return false
 	end
 
@@ -186,12 +186,6 @@ local function attach_addon(p)
 	local se_addon = p[2] and sim:object(p[2])
 	if (se_addon) then
 		sim:release(se_addon,true)
-	end
-
-	if (parent and not parent.online) then
-		parent:switch_online()
-	elseif not (se_wpn.online) then
-		se_wpn:switch_online()
 	end
 
 	return true

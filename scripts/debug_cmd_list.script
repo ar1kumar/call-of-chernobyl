@@ -68,44 +68,62 @@ function antifreeze_switch(p)
 	return true
 end 
 function cmd.antifreeze(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"<time>")
-	
-	wrd = tonumber(wrd) or 5 
-	
-	if not (smart_terrain.nearest_to_actor_smart.id) then 
-		return "antifreeze:= no nearest smart"
-	end 
-	
-	local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
-	if not (smart) then 
-		return "antifreeze:= smart by id " .. smart_terrain.nearest_to_actor_smart.id .. "does not exist."
-	end 
-	
-	local squad = SIMBOARD:create_squad(smart,"stalker_sim_squad_novice")
-	if not (squad) then 
-		return "antifreeze:= failed to create squad "
-	end 
-	
-	squad.scripted_target = "actor"
+	local wrd = first_word(me,txt,owner,"[npc [<time>]] (ex.1: antifreeze 5 | ex.2: antifreeze npc 5)")
 	
 	local function tele_to_actor(p)
 		local sim = alife()
 		local se_obj = sim:object(p[1])
 		if not (se_obj) then 
 			return true 
-		end 
-		alun_utils.teleport_squad(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+		end
+		if (se_obj:clsid() == clsid.online_offline_group_s) then
+			alun_utils.teleport_squad(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+		elseif (IsStalker(se_obj) or IsMonster(se_obj)) then 
+			if (alife().teleport_object) then 
+				alife():teleport_object(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+			end
+		end
 		return true
 	end  
 	
 	local function repeater(p)
-		create_delayed_event(squad.id,"antifreeze",wrd,antifreeze_switch,p[1])
+		create_delayed_event(p[1],"antifreeze",wrd,antifreeze_switch,p[1])
 		return false
 	end
 	
-	create_delayed_event(squad.id,"teleport",5,tele_to_actor,squad.id)
-	create_delayed_event(squad.id,"repeater",10,repeater,squad.id)
-	return "antifreeze:= created squad and teleported to your position!"
+	if (wrd == "npc") then 
+		local _strt, _end = string.find(txt,"%d+")
+		if (_strt and _end) then
+			wrd = string.sub(txt,_strt, _end)
+			wrd = string.lower(wrd)
+		end
+
+		wrd = wrd ~= "" and tonumber(wrd) or 5
+
+		se_obj = alife():create("sim_default_stalker_0", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+	else 
+		wrd = tonumber(wrd) or 5 
+		
+		if not (smart_terrain.nearest_to_actor_smart.id) then 
+			return "antifreeze:= no nearest smart"
+		end 
+		
+		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
+		if not (smart) then 
+			return "antifreeze:= smart by id " .. smart_terrain.nearest_to_actor_smart.id .. "does not exist."
+		end 
+		
+		local se_obj = SIMBOARD:create_squad(smart,"stalker_sim_squad_novice")
+		if not (se_obj) then 
+			return "antifreeze:= failed to create squad "
+		end 
+		
+		se_obj.scripted_target = "actor"
+		
+		create_delayed_event(se_obj.id,"teleport",5,tele_to_actor,se_obj.id)
+	end
+	create_delayed_event(se_obj.id,"repeater",10,repeater,se_obj.id)
+	return "antifreeze:= created object and teleported to your position!"
 end 
 
 -- HELP
@@ -926,14 +944,7 @@ function cmd.wound(me,txt,owner,p)
 	end
 
 	if (vo) then
-		local h = hit()
-		h.power = vo.health - 0.05
-		h.direction = vo:direction()
-		h.bone = "bip01_spine"
-		h.draftsman = vo
-		h.impulse = 0
-		h.type = hit.wound
-		vo:hit(h)
+		vo.health = 0.05
 		return "wound:= %s has been hit for %s.",vo:name(),h.power
 	end
 end
