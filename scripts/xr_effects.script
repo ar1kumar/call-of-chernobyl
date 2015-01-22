@@ -4072,7 +4072,7 @@ end
 function switch_offline(actor,npc,p)
 	local se_obj = npc and alife():object(npc:id())
 	if (se_obj) then 
-		se_obj:switch_offline()
+		alun_utils.switch_offline(se_obj.id)
 	end
 end
 
@@ -4084,7 +4084,7 @@ function update_visual(p)
 	end
 
 	if (se_npc.online) then
-		se_npc:switch_offline()
+		alun_utils.switch_offline(se_npc.id)
 		return false
 	end
 

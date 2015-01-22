@@ -1167,7 +1167,7 @@ function make_zombied(p)
 
 	-- wait for it to switch offline
 	if (se_obj.online) then
-		se_obj:switch_offline()
+		alun_utils.switch_offline(se_obj.id)
 		return false
 	end
 
@@ -1203,7 +1203,7 @@ function make_explode(p)
 
 	-- wait for it to switch offline
 	if (se_obj.online) then
-		se_obj:switch_offline()
+		alun_utils.switch_offline(se_obj.id)
 		return false
 	end
 

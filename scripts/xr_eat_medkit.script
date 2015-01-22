@@ -38,16 +38,15 @@ function npc_update(npc,st)
 		return
 	end
 
+	if not  (npc:alive()) then 
+		return 
+	end 
+	
 	if not (st.eat_medkit) then
 		st.eat_medkit = eat_medkit(npc,st)
 	else
-		if not (npc:alive()) then
-			st.eat_medkit:finalize()
-			return
-		end
-
 		local comm = npc:character_community()
-		if (comm == "trader" or comm == "zombied" or npc:clsid() == clsid.script_trader or npc:clsid() == clsid.trader) then
+		if (comm == "trader" or comm == "zombied") then
 			return
 		end
 
@@ -65,10 +64,6 @@ function eat_medkit:__init(object,storage)
 	self.st = storage
 	self.npc = object
 	self.rank = ranks.get_obj_rank_name(object)
-end
-
-function eat_medkit:finalize()
-	-- Finalize stuff
 end
 
 function eat_medkit:update()

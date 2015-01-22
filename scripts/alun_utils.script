@@ -1414,6 +1414,7 @@ function get_timer(userobj)
 	return nil
 end
 
+--[[
 local exec_queue = {}
 local exec_data = {}
 local remove_me = {}
@@ -1450,30 +1451,15 @@ function execute_queue()
 			if (IsStalker(se_obj)) then
 				if (obj) then
 					if (not db.actor:see(obj) or (alun_utils.angle_diff(db.actor:direction(), db.actor:position():sub(obj:position()))<90 and obj:position():distance_to(db.actor:position()) > 2.5) or obj:position():distance_to(db.actor:position())>100) then
-						se_obj:switch_offline()
+						alun_utils.switch_offline(se_obj.id)
 					end
 				end
 			else
-				--[[
-				local parent = se_obj.parent_id ~= 65535 and alife():object(se_obj.parent_id)
-				if (parent and not exec_data[parent.id]) then
-					if (IsStalker(parent)) then
-						local obj = level.object_by_id(parent.id)
-						if (not db.actor:see(obj) or (alun_utils.angle_diff(db.actor:direction(), db.actor:position():sub(obj:position()))<90 and obj:position():distance_to(db.actor:position()) > 2.5) or obj:position():distance_to(db.actor:position())>100) then
-							parent:switch_offline()
-						end
-					else
-						parent:switch_offline()
-					end
-				else
-					se_obj:switch_offline()
-				end
-				--]]
 				local parent = se_obj.parent_id ~= 65535 and alife():object(se_obj.parent_id)
 				if (parent and not exec_data[se_obj.parent_id]) then
-					parent:switch_offline()
+					alun_utils.switch_offline(parent.id)
 				else
-					se_obj:switch_offline()
+					alun_utils.switch_offline(se_obj.id)
 				end
 			end
 		end
@@ -1493,12 +1479,7 @@ function switch_offline_execute(id,func,...)
 		table.insert(exec_queue,id)
 	end
 end
-
---**********************************************************************************************************************************
---* memoize(function)		--> Memoizies a function with a weak table
---**********************************************************************************************************************************
---moved to _g.script
---local loadstring = memoize(loadstring)
+--]]
 
 
 ---------------------------------------- Path Nodes

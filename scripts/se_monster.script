@@ -89,7 +89,7 @@ function se_monster:on_register()
 	if smart_obj == nil then
 		return
 	end
-	alife():object(smart_obj.id):register_npc(self)
+	smart_obj:register_npc(self)
 	--alun_utils.debug_write("se_monster:on_register "..self:name().." END")
 end
 --------------------
