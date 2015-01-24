@@ -61,6 +61,10 @@ local function on_game_load()
 				task_manager.get_task_manager():give_task("esc_m_trader_task_1")
 			end
 			
+			if (faction ~= "monolith") then 
+				task_manager.get_task_manager():give_task("turn_off_brain_scorcher")
+			end
+			
 			local data = stpk_utils.get_actor_data(se_actor)
 			if (data) then
 				data.specific_character = "actor_"..faction
