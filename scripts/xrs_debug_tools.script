@@ -333,6 +333,16 @@ local function on_game_load()
 	hud_display_right = hud_tool("cop2_debug")
 end 
 
+local function on_keypress(key)
+	if (key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_demo_record",0,"")]) then 
+		get_console():execute("demo_record t")
+	elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_teleport_cam",0,"")]) then 
+		if (LastCameraPos) then
+			db.actor:set_actor_position(LastCameraPos)
+		end
+	end
+end 
+
 ------------------------------------------------------------------------------------
 --										GAME START
 function on_game_start()
@@ -340,10 +350,25 @@ function on_game_start()
 	Enable = alun_utils.read_from_ini(ini,"plugin","enable","bool",false,"xrs_debug_tools")
 	if not (Enable) then ini=nil return end
 
+	local need_save
+	if not (axr_main.config:KeyExist("global_keybinds","debug_demo_record")) then
+		axr_main.config:SetValue("global_keybinds","debug_demo_record","DIK_NUMPAD1")
+		need_save = true
+	end
+	if not (axr_main.config:KeyExist("global_keybinds","debug_teleport_cam")) then
+		axr_main.config:SetValue("global_keybinds","debug_teleport_cam","DIK_NUMPAD2")
+		need_save = true
+	end
+	
+	if (need_save) then
+		axr_main.config:Save()
+	end
+	
 	callback_register("on_game_load",on_game_load)
 	callback_register("actor_on_update",actor_on_update)
 	callback_register("main_menu_on_keyboard",main_menu_on_keyboard)
 	callback_register("actor_on_hit_callback",actor_on_hit_callback)
+	callback_register("on_keypress",on_keypress)
 	
 	actor_info = {}
 

@@ -57,7 +57,7 @@ local function set_flag(npc,val)
 end 
 
 function evaluator_dont_shoot:check_in_los(friend,be,be_pos)
-	if (friend and friend:alive() and self.object:relation(friend) < 2) then
+	if (friend and friend:alive() and self.object:relation(friend) < 2 and self.object:see(friend)) then
 		local pos = self.object:bone_position("bip01_l_finger02") --self.object:bone_position("bip01_spine")
 		local friend_pos = alun_utils.safe_bone_pos(friend,"bip01_spine")
 		
@@ -154,8 +154,8 @@ end
 function action_verso:initialize()
 	action_base.initialize(self)
 	local npc = self.object
-	npc:set_desired_position()
-	npc:set_desired_direction()
+	--npc:set_desired_position()
+	--npc:set_desired_direction()
 end
 
 function action_verso:execute()
@@ -167,19 +167,17 @@ function action_verso:execute()
 	if not (be) then 
 		return 
 	end 
-	
-	local wpn = npc:active_item()
-	if (wpn) then
-		npc:set_item(object.aim1,wpn)
-		local pos = alun_utils.safe_bone_pos(be)
-		if not (npc:see(be)) then 
-			if (math.abs(npc:position().y - be:position().y) > 3.0) then 
-				pos = vector():set(be:position().x,npc:position().y+1,be:position().z)
-			end
+
+	local pos
+	if not (npc:see(be)) then
+		local friend = self.st.friend_id and db.storage[self.st.friend_id] and db.storage[self.st.friend_id].object 
+		pos = friend and alun_utils.safe_bone_pos(friend) or be and alun_utils.safe_bone_pos(be)
+		if (math.abs(npc:position().y - pos.y) > 3.0) then 
+			pos = vector():set(pos.x,npc:position().y+1,pos.z)
 		end
-		npc:set_sight(look.fire_point,pos)
+	else 
+		pos = alun_utils.safe_bone_pos(be)
 	end
-	npc:set_desired_direction()
 	
 	if not (self.st.vertex_id) then
 		local be_pos = be:position()
@@ -192,11 +190,11 @@ function action_verso:execute()
 			db.used_level_vertex_ids[self.st.vertex_id] = nil
 			self.st.vertex_id = nil
 		end
-		state_mgr.set_state(npc,"threat_na",nil,nil,{look_object = be})
+		state_mgr.set_state(npc,"threat_na",nil,nil,{look_position = pos})
 		return 
 	end
 
-	state_mgr.set_state(npc,"assault",nil,nil,{look_object = be})
+	state_mgr.set_state(npc,"assault",nil,nil,{look_position = pos})
 end
 
 function action_verso:finalize()

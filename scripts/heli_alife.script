@@ -172,7 +172,11 @@ end
 function update(heli,se_heli,heliObject)
 	if not (db.actor) then 
 		return 
-	end 
+	end
+	
+	if not (heliObject) then 
+		return 
+	end
 	
 	-- Check if in combat
 	local st = db.storage[se_heli.id]

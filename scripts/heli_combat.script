@@ -538,6 +538,7 @@ function heli_combat:update()
 	
 	self:update_custom_data_settings()
 
+	printf("enemy = %s",self.enemy:name())
 	local see_enemy = self.heliObject:isVisible(self.enemy)
 	if (see_enemy) then
 		local tg = time_global()
@@ -619,15 +620,17 @@ end
 function heli_combat:round_update_shooting( see_enemy )
 	if see_enemy then
 		if self.round_begin_shoot_time then
-			--if self.round_begin_shoot_time < time_global() then
-				--self.heliObject:SetEnemy( self.enemy )
-			--end
+			if (self.last_use_mgun_on_attack and self.round_begin_shoot_time < time_global()) then
+				self.heliObject.m_use_mgun_on_attack = self.last_use_mgun_on_attack
+			end
 		else
 			self.round_begin_shoot_time = time_global() + round_shoot_delay
 		end
 	else
-		--self.heliObject:ClearEnemy()
-
+		if (self.heliObject.m_use_mgun_on_attack) then
+			self.last_use_mgun_on_attack = true
+			self.heliObject.m_use_mgun_on_attack = false
+		end
 		self.round_begin_shoot_time = nil
 	end
 end
@@ -664,7 +667,7 @@ function heli_combat:round_update_flight( see_enemy )
 		end
 
 		if distance_2d( self.center_pos, self.enemy_last_seen_pos ) > 10 then
-			printf( "heli_combat: enemy has changed his position" )
+			--printf( "heli_combat: enemy has changed his position" )
 
 			self:round_setup_flight( self.flight_direction )
 		end

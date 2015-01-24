@@ -12,14 +12,6 @@ function command_get_count()
 	return count
 end
 
-function command_get_count()
-	local count = 0
-	for k,v in pairs(cmd) do
-		count = count + 1
-	end
-	return count
-end
-
 function command_exists(name)
 	return cmd[name] ~= nil
 end
@@ -29,29 +21,67 @@ function command_give(name,...)
 end
 
 
-function trim(s)
+local function trim(s)
 	return string.gsub(s, "^%s*(.-)%s*$", "%1")
 end
 
-function first_word(caller,txt,owner,msg)
-	local wrd = ""
-	local rest = ""
+local function first_word(txt)
 	local _strt, _end = string.find(txt,".%S+")
 	if (_strt and _end) then
-		wrd = string.sub(txt,_strt, _end)
-		wrd = trim(string.lower(wrd))
-		rest = trim(string.sub(txt,_end+1))
-	else
+		return trim(string.lower(string.sub(txt,_strt, _end))),trim(string.sub(txt,_end+1))
+	end
+	return "",""
+end 
+
+function check_and_set_help(caller,txt,owner,msg)
+	local wrd,rest = first_word(txt)
+	
+	if (wrd == "") then 
 		owner:SendOutput("For usage type %s help",caller)
 		return
-	end
-
+	end 
+	
 	if (string.find(wrd,"help")) then
 		owner:SendOutput("%s %s",caller,msg)
 		return
 	end
 	return wrd,rest
 end
+
+-- cmd.inventory_owner
+function cmd.inventory_owner(me,txt,owner,p)
+	local wrd,rest = check_and_set_help(me,txt,owner,"[removeall]")
+	if (wrd == "removeall") then 
+		wrd = first_word(rest)
+		if (wrd == "help") then 
+			return "inventory_owner:= try 'inventory_owner removeall id:<number>'"
+		end 
+		
+		local id
+		for s in string.gmatch(txt,"id:(%d+)") do
+			id = tonumber(s)
+		end
+		if not (id) then
+			return "inventory_owner:= type 'inventory_owner removeall help'"
+		end
+		
+		local se_obj
+		local sim = alife()
+		local count = 0
+		for i=1,65534 do 
+			se_obj = sim:object(i)
+			if (se_obj and se_obj.parent_id == id) then 
+				sim:release(se_obj,true)
+				count = count + 1
+			end
+		end
+		if (count > 0) then 
+			return "inventory_owner:= removed %s children from inventory_owner",count
+		end
+		return "inventory_owner:= failed to remove any children from inventory_owner"
+	end
+	return "inventory_owner:= type 'inventory_owner help' for a list of subcommands"
+end 
 
 -- cmd.antifreeze
 function antifreeze_switch(p)
@@ -60,15 +90,15 @@ function antifreeze_switch(p)
 	if not (se_obj) then 
 		return true 
 	end 
-	if (se_obj.online) then
+	if (se_obj.online and se_obj:can_switch_offline() and level.object_by_id(se_obj.id)) then
 		alun_utils.switch_offline(se_obj.id)
-	else 
+	else
 		alun_utils.switch_online(se_obj.id)
 	end
 	return true
 end 
 function cmd.antifreeze(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[npc [<time>]] (ex.1: antifreeze 5 | ex.2: antifreeze npc 5)")
+	local wrd = check_and_set_help(me,txt,owner,"[npc [<time>]] (ex.1: antifreeze 5 | ex.2: antifreeze npc 5)")
 	
 	local function tele_to_actor(p)
 		local sim = alife()
@@ -133,14 +163,7 @@ end
 
 -- HELP
 function cmd.help(me,txt,owner,p)
-	local wrd = ""
-	local _strt, _end = string.find(txt,"%d+")
-	if (_strt and _end) then
-		wrd = string.sub(txt,_strt, _end)
-		wrd = string.lower(wrd)
-	end
-
-	local page = wrd ~= "" and tonumber(wrd) or 1
+	local page = tonumber(first_word(txt)) or 1
 	local sz = owner.console_size
 
 	if not (sz) or (sz == 0) then return "help := error" end
@@ -177,13 +200,11 @@ end
 
 -- ECHO
 function cmd.echo(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"<message>")
-	if not (wrd) then return end
 	return txt
 end
 
 function cmd.char_desc(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[checkall]")
+	local wrd = check_and_set_help(me,txt,owner,"[checkall]")
 	if not (wrd) then return end
 	if not (wrd == "checkall") then return "char_desc:= try char_desc checkall" end
 	
@@ -266,7 +287,7 @@ end
 
 -- Community
 function cmd.community(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"<community>")
+	local wrd = check_and_set_help(me,txt,owner,"<community>")
 	if not (wrd) then return end
 	
 	local comm_list = alun_utils.get_communities_list()
@@ -292,7 +313,7 @@ spawn s:wpn_pm pos:244,355,123 lvid:11344 gvid:12  -- Spawns pistol at exact loc
 
 --]]
 function cmd.spawn(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"s:<section> id:<number> amt:<number> [ pos:<x,y,z> lvid:<x,y,z> gvid:<x,y,z> ]")
+	local wrd = check_and_set_help(me,txt,owner,"s:<section> id:<number> amt:<number> [ pos:<x,y,z> lvid:<x,y,z> gvid:<x,y,z> ]")
 	if not (wrd) then return end
 
 	if (wrd == "reset") then
@@ -397,7 +418,7 @@ end
 
 -- collectgarbage
 function cmd.collectgarbage(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[full|count|step]")
+	local wrd = check_and_set_help(me,txt,owner,"[full|count|step]")
 	if not (wrd) then return end
 
 	if (wrd == "full") then
@@ -564,7 +585,7 @@ function cmd.detach(me,txt,owner,p)
 end 
 
 function cmd.waypoint(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[checkall | checklevel]")
+	local wrd = check_and_set_help(me,txt,owner,"[checkall | checklevel]")
 	if not (wrd) then return end
 
 	if not (wrd == "checkall" or wrd == "checklevel") then
@@ -635,7 +656,7 @@ end
 
 -- SURGE
 function cmd.surge(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[start|stop]")
+	local wrd = check_and_set_help(me,txt,owner,"[start|stop]")
 	if not (wrd) then return end
 
 	local sm = surge_manager.get_surge_manager()
@@ -654,7 +675,7 @@ end
 
 -- PsiStorm
 function cmd.psi_storm(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[start|stop]")
+	local wrd = check_and_set_help(me,txt,owner,"[start|stop]")
 	if not (wrd) then return end
 
 	local sm = psi_storm_manager and psi_storm_manager.get_psi_storm_manager()
@@ -674,7 +695,7 @@ end
 
 -- Fallout
 function cmd.fallout(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[start|stop]")
+	local wrd = check_and_set_help(me,txt,owner,"[start|stop]")
 	if not (wrd) then return end
 
 	local sm = fallout_manager and fallout_manager.get_fallout_manager()
@@ -694,7 +715,7 @@ end
 
 -- Find
 function cmd.find(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"<name>")
+	local wrd = check_and_set_help(me,txt,owner,"<name>")
 	if not (wrd) then return end
 
 	if (p[1]) then
@@ -706,7 +727,7 @@ end
 
 -- Execute
 function cmd.execute(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"<string>")
+	local wrd = check_and_set_help(me,txt,owner,"<string>")
 	if not (wrd) then return end
 
 	local loadstring = alun_utils.memoize(loadstring)
@@ -721,7 +742,7 @@ end
 -- Alife
 
 function cmd.alife(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"{switch}")
+	local wrd = check_and_set_help(me,txt,owner,"{switch}")
 	if not (wrd) then return end
 
 	if (string.find(wrd,"switch")) then
@@ -751,7 +772,7 @@ end
 
 -- Clear
 function cmd.clear(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"(Clears console)")
+	local wrd = check_and_set_help(me,txt,owner,"(Clears console)")
 	if (string.find(txt,"help")) then
 		return
 	end
@@ -763,7 +784,7 @@ end
 
 -- Squad
 function cmd.squad(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"{assign}")
+	local wrd = check_and_set_help(me,txt,owner,"{assign}")
 	if not (wrd) then return end
 
 	if (string.find(wrd,"teleport")) then 
@@ -829,7 +850,7 @@ end
 
 -- Console
 function cmd.console(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"{relay}")
+	local wrd = check_and_set_help(me,txt,owner,"{relay}")
 	if not (wrd) then return end
 
 	if (string.find(wrd,"relay")) then
@@ -845,7 +866,7 @@ end
 
 -- Teleport
 function cmd.teleport(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"who:<id> [ to:<id> | pos:<x,y,z> | $code$ | cam ]")
+	local wrd = check_and_set_help(me,txt,owner,"who:<id> [ to:<id> | pos:<x,y,z> | $code$ | cam ]")
 	if not (wrd) then return end
 
 	local who,to_pos,to_obj
@@ -932,7 +953,7 @@ end
 
 -- Wound
 function cmd.wound(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"id:<number>")
+	local wrd = check_and_set_help(me,txt,owner,"id:<number>")
 	if not (wrd) then return end
 
 	local id
@@ -961,7 +982,7 @@ end
 
 -- Var
 function cmd.var(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"<name> $code$")
+	local wrd = check_and_set_help(me,txt,owner,"<name> $code$")
 	if not (wrd) then return end
 
 	if (wrd == "clear") then
@@ -1042,7 +1063,7 @@ end
 
 -- Vector
 function cmd.vector(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"{add|sub}")
+	local wrd = check_and_set_help(me,txt,owner,"{add|sub}")
 	if not (wrd) then return end
 
 	if (wrd == "add") then
@@ -1093,7 +1114,7 @@ end
 
 -- Offset
 function cmd.offset(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"{get}")
+	local wrd = check_and_set_help(me,txt,owner,"{get}")
 	if not (wrd) then return end
 
 	if (wrd == "get") then
@@ -1132,7 +1153,7 @@ function cmd.offset(me,txt,owner,p)
 end
 
 function cmd.object(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"{count}")
+	local wrd = check_and_set_help(me,txt,owner,"{count}")
 	if not (wrd) then return end
 	
 	if (wrd == "count") then
@@ -1181,7 +1202,7 @@ end
 
 -- Hud
 function cmd.hud(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[on|off]")
+	local wrd = check_and_set_help(me,txt,owner,"[on|off]")
 	if not (wrd) then return end
 
 	if (wrd == "on") then
@@ -1199,7 +1220,7 @@ end
 
 -- God
 function cmd.god(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[on|off]")
+	local wrd = check_and_set_help(me,txt,owner,"[on|off]")
 	if not (wrd) then return end
 
 	if (wrd == "on") then
@@ -1219,7 +1240,7 @@ end
 
 -- Invisible
 function cmd.invisible(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[on|off]")
+	local wrd = check_and_set_help(me,txt,owner,"[on|off]")
 	if not (wrd) then return end
 
 	if (wrd == "on") then
@@ -1236,7 +1257,7 @@ function cmd.invisible(me,txt,owner,p)
 end
 
 function cmd.crow(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[on|off]")
+	local wrd = check_and_set_help(me,txt,owner,"[on|off]")
 	if not (wrd) then return end
 
 	if (wrd == "on") then
@@ -1255,7 +1276,7 @@ end
 
 local heli_id
 function cmd.heli(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[spawn|move]")
+	local wrd = check_and_set_help(me,txt,owner,"[spawn|move]")
 	if not (wrd) then return end
 
 	if (wrd == "spawn") then
@@ -1304,7 +1325,7 @@ end
 -- weather
 local weather_list
 function cmd.weather(me,txt,owner,p)
-	local wrd,rest = first_word(me,txt,owner,"[list <page> | <weather_name> ]")
+	local wrd,rest = check_and_set_help(me,txt,owner,"[list <page> | <weather_name> ]")
 	if not (wrd) then return end
 
 	if (wrd == "list") then
@@ -1359,7 +1380,7 @@ end
 
 -- time
 function cmd.time(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[day,hour,minute]")
+	local wrd = check_and_set_help(me,txt,owner,"[day,hour,minute]")
 	if not (wrd) then return end
 
 	local t = alun_utils.str_explode(txt,",")
@@ -1371,7 +1392,7 @@ end
 
 -- money
 function cmd.money(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"<amount>")
+	local wrd = check_and_set_help(me,txt,owner,"<amount>")
 	if not (wrd) then return end
 	local amt = tonumber(wrd) or 1000
 	db.actor:give_money(amt)
@@ -1380,7 +1401,7 @@ end
 
 -- luabind (not working)
 function cmd.luabind(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[list | info]")
+	local wrd = check_and_set_help(me,txt,owner,"[list | info]")
 	if not (wrd) then return end
 	
 	if (wrd == "list") then
@@ -1469,7 +1490,7 @@ end
 
 -- level
 function cmd.level(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"<name> | [list]")
+	local wrd = check_and_set_help(me,txt,owner,"<name> | [list]")
 	if not (wrd) then return end
 
 	if (wrd == "list") then
@@ -1580,7 +1601,7 @@ end
 
 -- dev_debug
 function cmd.dev_debug(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[on | off]")
+	local wrd = check_and_set_help(me,txt,owner,"[on | off]")
 	if not (wrd) then return end
 	if (wrd == "on") then
 		_G.dev_debug = true
@@ -1592,7 +1613,7 @@ end
 
 -- game_graph
 function cmd.game_graph(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[show | near | checkall]")
+	local wrd = check_and_set_help(me,txt,owner,"[show | near | checkall]")
 	if not (wrd) then return end
 
 	if (wrd == "show") then
@@ -1687,7 +1708,7 @@ end
 
 -- item
 function cmd.item(me,txt,owner,p)
-	local wrd = first_word(me,txt,owner,"[list <page> ]")
+	local wrd = check_and_set_help(me,txt,owner,"[list <page> ]")
 	if not (wrd) then return end
 
 	if (wrd == "list") then
@@ -1741,7 +1762,7 @@ end
 
 -- info
 function cmd.info(me,txt,owner,p)
-	local wrd,rest = first_word(me,txt,owner,"[list <page> | give | take | pas_b400 ]")
+	local wrd,rest = check_and_set_help(me,txt,owner,"[list <page> | give | take | pas_b400 ]")
 	if not (wrd) then return end
 
 	if (wrd == "give") then

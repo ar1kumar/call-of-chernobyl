@@ -9,8 +9,8 @@ TODO: Split up some features into their own scripts, such as event queue, sound_
 also consider moving MAX_SQUADS to sim_squad_scripted.script
 --]]
 
-require("lua_extensions")
-marshal = require "marshal"
+--require("lua_extensions")
+--marshal = require "marshal"
 
 local alife, game_graph, pairs, level = alife, game_graph, pairs, level
 local last_save
@@ -319,7 +319,7 @@ function on_game_start()
 	if (ui_mm_faction_select) then ui_mm_faction_select.on_game_start() end
 
 	-- Alundaio Extensions
-	if (actor_robbery) then actor_robbery.on_game_start() end
+	if (actor_command_actions) then actor_command_actions.on_game_start() end
 	if (xrs_rnd_npc_loadout) then xrs_rnd_npc_loadout.on_game_start() end
 	--if (axr_dynamic_spawn) then axr_dynamic_spawn.on_game_start() end
 	if (itms_manager) then itms_manager.on_game_start() end
@@ -1523,7 +1523,7 @@ end
 -------------------
 -- on_keypress
 -------------------
-function on_keypress(key)
+function on_keypress(binder,key)
 	if (intercepts.on_keypress) then 
 		for i=1,#intercepts.on_keypress do 
 			intercepts.on_keypress[i](key)

@@ -68,7 +68,10 @@ function debug_ui:InitControls()
 	self.console = xml:InitStatic("console",self)
 	self.console_input = xml:InitEditBox("console:input",self)
 	self:Register(self.console_input,"console_input")
-
+	
+	--self.scroll_v = xml:InitScrollView("console:scroll_v", self.dialog)
+	--self.scroll_v:AddWindow(self.console, true)
+	
 	local offset = vector2()
 	offset.x = 10
 	offset.y = 10
@@ -404,6 +407,8 @@ function debug_ui:OnKeyboard(dik, keyboard_action)
 		local keybinds = self.binds or {}
 		if dik == DIK_keys.DIK_ESCAPE then
 			self:OnQuit()
+		elseif (keybinds["keybind_teleport_to_cam"] and dik == DIK_keys["DIK_"..keybinds["keybind_teleport_to_cam"]]) then 
+			self:OnBtnTeleport()
 		elseif (keybinds["debug_ui_nearest_stalker"] and dik == DIK_keys["DIK_"..keybinds["debug_ui_nearest_stalker"]]) then
 			self:FindNearest("clsid.script_stalker")
 		elseif (keybinds["debug_ui_spawn_position"] and dik == DIK_keys["DIK_"..keybinds["debug_ui_spawn_position"]]) then

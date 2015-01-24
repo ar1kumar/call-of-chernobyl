@@ -760,23 +760,8 @@ function safe_bone_pos(npc,bone)
 		printf("safe_bone_pos: npc is nil!")
 		return
     end
-
-	if (npc:id() == 0) then 
-		return device().cam_pos
-	end 
 	
 	local pos
-
-	--[[
-	local cls = npc:clsid()
-	if (cls == clsid.burer_s) then
-		pos = utils.vector_copy_by_val(npc:position())
-		pos.y = pos.y + 1
-	elseif cls == clsid.gigant_s then
-		pos = npc:bone_position("bip01_spine")
-	else
-	--]]
-
 	if (IsStalker(npc)) then
 		pos = npc:bone_position(bone or "bip01_spine")
 	end
