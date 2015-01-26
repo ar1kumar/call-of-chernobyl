@@ -90,9 +90,9 @@ function antifreeze_switch(p)
 	if not (se_obj) then 
 		return true 
 	end 
-	if (se_obj.online and se_obj:can_switch_offline() and level.object_by_id(se_obj.id)) then
+	if (se_obj:can_switch_offline()) then
 		alun_utils.switch_offline(se_obj.id)
-	else
+	elseif (se_obj:can_switch_online()) then
 		alun_utils.switch_online(se_obj.id)
 	end
 	return true
@@ -163,7 +163,8 @@ end
 
 -- HELP
 function cmd.help(me,txt,owner,p)
-	local page = tonumber(first_word(txt)) or 1
+	local wrd,rest = first_word(txt)
+	local page = wrd and wrd ~= "" and tonumber(wrd) or 1
 	local sz = owner.console_size
 
 	if not (sz) or (sz == 0) then return "help := error" end
