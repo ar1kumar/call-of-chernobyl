@@ -1,0 +1,21 @@
+[logic]
+;active = ph_sound
+active = sr_idle@on
+
+;[ph_sound]
+;snd = x16_hum_2
+;looped = true
+;on_info = {+yan_labx16_switcher_1_off} ph_idle@2
+
+;[ph_idle@2]
+;snd = x16_switch_1
+;looped = false
+;on_signal = sound_end | nil
+
+[sr_idle@on]
+on_info = {-yan_labx16_switcher_1_off} %=play_sound_looped(x16_hum_2)%
+on_info2 = {+yan_labx16_switcher_1_off} sr_idle@off %=play_sound(x16_switch_1)%
+
+[sr_idle@off]
+on_game_timer = 5 | %=stop_sound_looped%
+on_game_timer2 = 100 | nil

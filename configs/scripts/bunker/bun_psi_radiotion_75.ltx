@@ -1,0 +1,20 @@
+[logic]
+active = sr_psy_antenna@no_helmet
+
+[sr_psy_antenna@no_helmet]
+eff_intensity = 75
+hit_intensity = 100
+on_info = {=actor_has_item(good_psy_helmet)} sr_psy_antenna@good_psy_helmet, {=actor_has_item(bad_psy_helmet)} sr_psy_antenna@bad_psy_helmet
+on_info2 = {+bar_deactivate_radar_done} nil
+
+[sr_psy_antenna@bad_psy_helmet]
+eff_intensity = 40
+hit_intensity = 0
+on_info = {=actor_has_item(good_psy_helmet)} sr_psy_antenna@good_psy_helmet, {=actor_has_item(bad_psy_helmet)}, sr_psy_antenna@no_helmet
+on_info2 = {+bar_deactivate_radar_done} nil
+
+[sr_psy_antenna@good_psy_helmet]
+eff_intensity = 25
+hit_intensity = 0
+on_info = {=actor_has_item(good_psy_helmet)}, {=actor_has_item(bad_psy_helmet)} sr_psy_antenna@bad_psy_helmet, sr_psy_antenna@no_helmet
+on_info2 = {+bar_deactivate_radar_done} nil

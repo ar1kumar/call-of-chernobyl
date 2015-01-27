@@ -96,17 +96,24 @@ brain_scorcher_rumble
 radar_drone
 radar_thunder
 
-[brain_scorcher_rumble]
-type = 3d
-path = ambient\earthquake
+x16_psy_loop
+x16_engine1_run
+x16_engine1_stop
+x16_engine2_run
+x16_engine2_stop
+x16_hum_2
+x16_switch_1
+system_message_1
+system_message_2
+system_message_3
+system_message_4
 
-[radar_drone]
-type = looped
-path = ambient\radar_1
-
-[radar_thunder]
-type = looped
-path = ambient\radar_2
+[mar_intro_getting_up]
+type = actor
+actor_stereo = false
+path = device\bed_getup_1
+shuffle = seq
+idle = 1,1,100
 
 [yan_stalker_sakharov_greeting]
 type = npc
@@ -120,12 +127,64 @@ path = scenario\yantar\yan_sakharov_meet_bye_
 shuffle = rnd
 idle = 1,1,100
 
-[mar_intro_getting_up]
+[brain_scorcher_rumble]
+type = 3d
+path = ambient\earthquake
+
+[radar_drone]
+type = looped
+path = ambient\radar_1
+
+[radar_thunder]
+type = looped
+path = ambient\radar_2
+
+[x16_psy_loop]
 type = actor
-actor_stereo = false
-path = device\bed_getup_1
-shuffle = seq
-idle = 1,1,100
+actor_stereo = true
+path = ambient\x16\x16_psy
+shuffle = loop
+idle = 0,0,100
+
+[x16_engine1_run]
+type = looped
+path = ambient\x16\x16_engine1_run
+
+[x16_engine1_stop]
+type = 3d
+path = ambient\x16\x16_engine1_stop
+
+[x16_engine2_run]
+type = looped
+path = ambient\x16\x16_engine2_run
+
+[x16_engine2_stop]
+type = 3d
+path = ambient\x16\x16_engine2_stop
+
+[x16_hum_2]
+type = looped
+path = ambient\x16\x16_hum_2
+
+[x16_switch_1]
+type = 3d
+path = ambient\x16\switch_1
+
+[system_message_1]
+type = 3d
+path = characters_voice\scenario\yantar\system_message_1
+
+[system_message_2]
+type = 3d
+path = characters_voice\scenario\yantar\system_message_2
+
+[system_message_3]
+type = 3d
+path = characters_voice\scenario\yantar\system_message_3
+
+[system_message_4]
+type = 3d
+path = characters_voice\scenario\yantar\system_message_4
 
 [surge_earthquake_sound_looped]
 type = looped
@@ -174,6 +233,7 @@ path = ambient\blowout\blowout_particle_wave
 [fallout_acid_rain]
 type = looped
 path = anomaly\acid_rain
+
 [state]
 type = npc
 npc_prefix = true

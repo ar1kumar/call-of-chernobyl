@@ -4142,3 +4142,36 @@ function trade_job_give_id(actor,npc,p)
 
 	npc_info.job.seller_id = npc:id()
 end
+
+--X16 machine switch off
+function yan_gluk (actor, npc)
+		
+	local sound_obj_l		= xr_sound.get_safe_sound_object( [[affects\psy_blackout_l]] )
+    local sound_obj_r		= xr_sound.get_safe_sound_object( [[affects\psy_blackout_r]] )
+        
+	sound_obj_l:play_no_feedback(actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
+	sound_obj_r:play_no_feedback(actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
+	level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
+
+end
+
+function play_snd_from_obj(actor, npc, p)
+	if p[1] and p[2] then
+		local snd_obj = xr_sound.get_safe_sound_object(p[2])
+		local obj     = level_object_by_sid(p[1])
+        if obj ~= nil then
+           printf("can't find object with story id %s", tostring(p[1]))
+        
+--		snd_obj:play_at_pos(obj, obj:position(), sound_object.s3d)
+		snd_obj:play_no_feedback(obj, sound_object.s3d, 0, obj:position(), 1.0)
+		end
+	end
+end
+
+function play_snd(actor, npc, p)
+	if p[1] then
+		local snd_obj = xr_sound.get_safe_sound_object(p[1])
+		--snd_obj:play(actor, p[2] or 0, sound_object.s2d)
+		snd_obj:play_no_feedback(actor, sound_object.s2d, p[2] or 0, vector(), 1.0)
+	end
+end
