@@ -71,13 +71,6 @@ function options_dialog:InitControls()
 
 	self.b_restart_system_shown	= false
 	self.timer					= nil
-
-	self.cap_download			= xml:InitStatic		("download_static",self)
-	self.text_download			= xml:InitStatic		("download_text",self)
-	self.download_progress		= xml:InitProgressBar	("progress_download", self)
-	self.btn_cancel_download	= xml:Init3tButton		("btn_cancel_download", self)
-	self:Register				(self.btn_cancel_download, "btn_cancel_download")
-
 end
 
 function options_dialog:SetCurrentValues()
@@ -145,7 +138,6 @@ function options_dialog:InitCallBacks()
 	self:AddCallback("btn_keyb_default",	ui_events.BUTTON_CLICKED,	self.OnBtnKeybDefault,		self)
 	--self:AddCallback("btn_check_updates",	ui_events.BUTTON_CLICKED,	self.OnBtnCheckUpdates,		self)
 	self:AddCallback("combo_renderer",		ui_events.LIST_ITEM_SELECT,	self.UpdateDependControls,	self)
-	self:AddCallback("btn_cancel_download",	ui_events.BUTTON_CLICKED,	self.OnBtn_CancelDownload,	self)
 	self:AddCallback("tab_ao_opt",			ui_events.TAB_CHANGED,		self.OnAOOptionChange,		self)
 
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_YES_CLICKED, self.OnApplyChanges, self)
@@ -298,23 +290,7 @@ function options_dialog:Update()
 	CUIScriptWnd.Update(self)
 
 	local mm = main_menu.get_main_menu()
-	local sss = mm:GetPatchProgress()
 
-	if sss:GetInProgress() then
-		self.text_download:Show					(true)
-		self.cap_download:Show					(true)
-		self.download_progress:Show				(true)
-		local _progr							= sss:GetProgress()
-		self.download_progress:SetProgressPos	(_progr)
-		local str								= string.format("%.0f%%(%s)",_progr,sss:GetFlieName())
-		self.text_download:TextControl():SetText				(str)
-		self.btn_cancel_download:Show			(true)
-	else
-		self.text_download:Show					(false)
-		self.cap_download:Show					(false)
-		self.download_progress:Show				(false)
-		self.btn_cancel_download:Show			(false)
-	end
 	if(_G.b_discard_settings_shown) then
 		local tg = math.floor(time_global_async()/1000)
 		if(self.timer==nil) then
@@ -326,11 +302,6 @@ function options_dialog:Update()
 			self:OnDiscardChanges()
 		end
 	end
-end
-
-function options_dialog:OnBtn_CancelDownload()
-	local mm = main_menu.get_main_menu()
-	mm:CancelDownload()
 end
 
 function options_dialog:OnApplyChanges()

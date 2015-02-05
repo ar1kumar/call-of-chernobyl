@@ -73,7 +73,7 @@ function check_light(stalker)
     local torch = stalker:object("device_torch")
 
 	-- Stalker dead or sleep animstate; release torch
-	if (not stalker:alive() or state_mgr.get_state(stalker) == "sleep") then
+	if (not stalker:alive() or state_mgr.get_state(stalker) == "sleep" or state_mgr.get_state(stalker) == "play_guitar") then
 		if (torch) then
 			if (torch:attachable_item_enabled()) then
 				torch:enable_attachable_item(false)

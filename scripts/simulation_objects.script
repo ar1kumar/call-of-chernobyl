@@ -20,6 +20,10 @@ function simulation_objects_registry:register(obj)
 end
 
 function simulation_objects_registry:update_avaliability(obj)
+	if (obj:clsid() == clsid.online_offline_group_s) then 
+		return
+	end 
+	
 	if (obj:sim_available() and xr_logic.pick_section_from_condlist(db.actor or alife():actor(), obj, obj.sim_avail) == "true") then
 		self.objects[obj.id] = obj
 	else

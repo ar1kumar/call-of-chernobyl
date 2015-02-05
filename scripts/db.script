@@ -30,11 +30,11 @@ spawned_vertex_by_id= {}
 
 
 
-function add_enemy( obj )
+function add_enemy(obj)
 	table.insert(heli_enemies,obj:id())
 end
 
-function delete_enemy( obj )
+function delete_enemy(obj)
 	local id = obj:id()
 	local remove_me
 	for i=1,#heli_enemies do 
@@ -47,7 +47,7 @@ function delete_enemy( obj )
 end
 
 function add_obj( obj )
-	printf("adding object %s",obj:name())
+	--printf("adding object %s",obj:name())
 	storage[obj:id()].object = obj
 	if (obj:clsid() == clsid.script_stalker) then 
 		add_stalker(obj)

@@ -102,6 +102,10 @@ end
 local function try_to_reach_target(heli,se_heli,heliObject,se_target)
 	heli = heli or db.storage[se_heli.id] and db.storage[se_heli.id].object 
 	heliObject = heliObject or heli and heli:get_helicopter()
+	if not (heliObject) then
+		abort("heli_alife.try_to_reach_target: heliObject is nil! IMPOSSIBLE!")
+		return 
+	end
 	
 	heliObject:TurnEngineSound(true)
 	
@@ -214,7 +218,12 @@ function update(heli,se_heli,heliObject)
 					return 
 				end 
 				
-				if (game.get_game_time():diffSec(se_heli.stay_point_idle) < STAY_POINT_IDLE) then 
+				if (game.get_game_time():diffSec(se_heli.stay_point_idle) < STAY_POINT_IDLE) then
+					
+					if (se_target:clsid() == clsid.online_offline_group_s) then 
+						update_heli_movement(heli,se_heli,heliObject,se_target)
+					end 
+					
 					return 
 				end
 				
@@ -226,10 +235,12 @@ function update(heli,se_heli,heliObject)
 				se_heli.stay_point_idle = nil
 				se_heli.current_target_id = nil
 		
-			elseif (se_heli.current_action == 1) then 
-				if not (is_target_reached(se_heli,se_target)) then
-					try_to_reach_target(heli,se_heli,heliObject,se_target)
-					return 
+			elseif (se_heli.current_action == 1) then
+				if not (xr_conditions.surge_started()) then
+					if not (is_target_reached(se_heli,se_target)) then
+						try_to_reach_target(heli,se_heli,heliObject,se_target)
+						return
+					end
 				end
 
 				if (se_target:clsid() == clsid.smart_terrain) then 
@@ -262,4 +273,28 @@ function update(heli,se_heli,heliObject)
 		se_heli.current_action = 0
 		se_heli.stay_point_idle = game.get_game_time()
 	end	
+end
+
+function update_heli_movement(heli,se_heli,heliObject,se_target)
+	local tg = time_global()
+	local st = db.storage[se_heli.id]
+	if not (st) then 
+		return 
+	end
+	if not (st.change_speed_time == nil or st.change_speed_time < tg) then
+		return 
+	end
+	
+	st.change_speed_time = tg + math.random(8000, 12000)
+	st.speed_is_0 = st.speed_is_0 and false or true
+		
+	st.center_pos = utils.vector_copy_by_val(se_target.position())
+	st.center_pos.y = level.get_bounding_volume().max.y
+
+	local v = st.speed_is_0 and 0 or 8
+	heliObject:SetMaxVelocity(v)
+	heliObject:SetSpeedInDestPoint(v)
+
+	heliObject:GoPatrolByRoundPath(st.center_pos,70,random_choice(true,false))
+	heliObject:LookAtPoint(se_target.position, true)
 end

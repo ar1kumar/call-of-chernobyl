@@ -178,7 +178,7 @@ local function find_valid_target(npc,st,bw)
 	
 	local target = id and (db.storage[id] and db.storage[id].object or level.object_by_id(id))
 
-	if (target and IsHelicopter(target)) then 
+	if (target and IsHelicopter(target) and bind_heli.is_heli_alive(target)) then 
 		if not (current_target) then 
 			local dist = heli_alife.distance_2d_sqr(npc:position(),target:position())
 			if (dist < 40000) then 
@@ -270,7 +270,7 @@ function evaluator_new_combat:evaluate()
 
 	local best_weapon = npc:best_weapon()
 	local cls = best_weapon and best_weapon:clsid()
-	if (best_weapon) and (override or GLOBAL_OVERRIDE or not (alun_utils.isRifle(nil,cls) or alun_utils.isPistol(nil,cls) or alun_utils.isShotgun(nil,cls))) then
+	if (best_weapon) and (override or GLOBAL_OVERRIDE or alun_utils.isLauncher(nil,cls)) then -- not (alun_utils.isRifle(nil,cls) or alun_utils.isPistol(nil,cls) or alun_utils.isShotgun(nil,cls))) then
 		if (find_valid_target(npc,self.st) == true) then
 			--alun_utils.debug_write("after find valid target 1")
 			self.st.bw = best_weapon
@@ -306,7 +306,11 @@ end
 
 function action_new_combat:npc_see(enemy)
 	if (IsHelicopter(enemy,self.st.cls)) then 
-		if (enemy:get_helicopter():isVisible(self.object)) then 
+		local heli = db.storage[enemy:id()].heliObject
+		if not (heli) then 
+			return false
+		end
+		if (heli:isVisible(self.object)) then 
 			self.st.vis = not self.st.vis and 0 or self.st.vis + 1
 			if (self.st.vis >= 10) then
 				self.st.vis = 10
@@ -1089,14 +1093,21 @@ function action_new_combat:execute()
 		return 
 	end
 	
-	local is_heli = IsHelicopter(enemy,self.st.cls)
+	self.st.cls = get_clsid(enemy)
 	
-	if (is_heli ~= true and not enemy:alive()) then
+	local heli
+	if (IsHelicopter(enemy,self.st.cls)) then 
+		heli = db.storage[enemy:id()].heliObject
+		if not (heli) then 
+			self.st.taget_id = nil 
+			return
+		end
+	end
+	
+	if (heli == nil and not enemy:alive()) then
 		self.st.target_id = nil
 		return
 	end
-	
-	self.st.cls = get_clsid(enemy)
 	
 	if (self.st.last_id == nil or self.st.last_id ~= self.st.target_id) then 
 		--[[
@@ -1118,12 +1129,12 @@ function action_new_combat:execute()
 	
 	
 	local tg = time_global()
-	local ene_pos = is_heli and enemy:position() or npc:memory_position(enemy) or enemy:position()
-	local dist = is_heli and heli_alife.distance_2d_sqr(npc:position(),enemy:position()) or ene_pos:distance_to_sqr(npc:position())
-	local mem_time = is_heli and tg or enemy:id() ~= 0 and enemy:memory_time(npc)
-	local see = is_heli and enemy:get_helicopter():isVisible(npc) or mem_time and tg - mem_time <= 1000
+	local ene_pos = heli and enemy:position() or npc:memory_position(enemy) or enemy:position()
+	local dist = heli and heli_alife.distance_2d_sqr(npc:position(),enemy:position()) or ene_pos:distance_to_sqr(npc:position())
+	local mem_time = heli and tg or enemy:id() ~= 0 and enemy:memory_time(npc)
+	local see = heli and heli:isVisible(npc) or mem_time and tg - mem_time <= 1000
 
-	if (is_heli) then 
+	if (heli) then 
 		self:heli_combat_execute(npc,enemy,ene_pos,see,dist)
 	elseif (self.st.rank == "novice") then 
 		self:low_level_ai_execute(npc,enemy,ene_pos,see,dist)

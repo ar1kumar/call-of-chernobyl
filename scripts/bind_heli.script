@@ -42,12 +42,12 @@ function heli_binder:reinit()
 	db.storage[self.object:id()] = {}
 	self.st = db.storage[self.object:id()]
 
-	self.heliObject = self.object:get_helicopter()
+	self.st.heliObject = self.object:get_helicopter()
 
 	self.object:set_callback( callback.helicopter_on_point, self.on_point, self )
 	self.object:set_callback( callback.helicopter_on_hit,   self.on_hit,   self )
 
-	self.st.combat = heli_combat.heli_combat( self.object, self.heliObject )
+	self.st.combat = heli_combat.heli_combat( self.object, self.st.heliObject )
 
 	self.last_hit_snd_timeout = 0
 
@@ -61,7 +61,7 @@ function heli_binder:reinit()
 	self.snd_down	= utils.cfg_get_string( object_ini, "helicopter", "snd_down", self.object, false, "", "heli_down")
 
 	-- на случай загрузки
-	self.st.last_alt       = self.heliObject:GetRealAltitude()
+	self.st.last_alt       = self.st.heliObject:GetRealAltitude()
 	self.st.alt_check_time = time_global() + 1000
 end
 
@@ -94,7 +94,7 @@ function heli_binder:update( delta )
 	if (heli_alife) then
 		self.sobject = not self.sobject and alife():object(self.object:id()) or self.sobject
 		if (self.sobject and self.sobject.player_id) then
-			heli_alife.update(self.object,self.sobject,self.heliObject)
+			heli_alife.update(self.object,self.sobject,self.st.heliObject)
 		end
 	end
 	--alun_utils.debug_write("heli update end")
@@ -109,8 +109,10 @@ function heli_binder:net_spawn( sobject )
 		smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_heli, self.loaded)
 	end
 
-	db.add_obj( self.object )
-	db.add_heli( self.object )
+	db.add_obj(self.object)
+	db.add_heli(self.object)
+	
+	self.st.heliObject = self.object:get_helicopter()
 
 	return true
 end
@@ -150,12 +152,12 @@ function heli_binder:load( packet )
 end
 
 function heli_binder:check_health()
-	local heli = self.heliObject
+	local heli = self.st.heliObject
 
 	--printf( "heli health: %d", heli:GetfHealth() )
 
 	if not heli.m_dead then
-		local health = get_heli_health( self.heliObject, self.st )
+		local health = get_heli_health(heli,self.st)
 
 		if health < self.flame_start_health and not heli.m_flame_started then
 			heli_start_flame( self.object )
@@ -244,7 +246,7 @@ function get_heli_health( heli, st )
 end
 
 function is_heli_alive( obj )
-	return get_heli_health( obj:get_helicopter(), db.storage[obj:id()] ) > 0.005
+	return get_heli_health(obj:get_helicopter(), db.storage[obj:id()]) > 0.005
 end
 
 function heli_start_flame( obj )
