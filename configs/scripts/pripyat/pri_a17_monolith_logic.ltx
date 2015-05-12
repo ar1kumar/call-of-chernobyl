@@ -21,7 +21,7 @@ on_signal = preacher_ready | remark@shoot_ice
 on_info = {+pri_a17_ice_dead} animpoint@pray
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
-invulnerable = true 
+invulnerable = {!actor_enemy} true, false 
 meet = no_meet
 
 [remark@shoot_ice]:walker@generic
@@ -31,7 +31,7 @@ on_signal = anim_end | remark@shoot_ice2
 out_restr = pri_a17_preacher_outrestr
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true 
-invulnerable = true 
+invulnerable = {!actor_enemy} true, false 
 meet = no_meet
 on_info = {+pri_a17_ice_dead} animpoint@pray
 
@@ -43,7 +43,7 @@ on_info = {+pri_a17_ice_dead} animpoint@pray
 out_restr = pri_a17_preacher_outrestr
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
-invulnerable = true 
+invulnerable = {!actor_enemy} true, false 
 meet = no_meet
 
 [animpoint@pray]:walker@generic

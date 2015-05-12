@@ -17,7 +17,7 @@ on_info6 = {+jup_a12_stalker_diplomat_argued} animpoint@stand_start %-jup_a12_st
 meet = meet@stand_start_meet
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 out_restr = jup_a6_sr_noweap
 gather_items_enabled = false
 help_wounded_enabled = false
@@ -36,7 +36,7 @@ on_info5 = {+jup_a12_stalker_prisoner_free} animpoint@stand_after
 on_game_timer = 130 | {-jup_a12_stalker_assaulter_told_story +jup_b217_welcome_tech_talked =actor_in_zone(jup_a12_sr_stalkers_argue)} animpoint@argue %-jup_a12_stalker_diplomat_argued%
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 out_restr = jup_a6_sr_noweap
 gather_items_enabled = false
 help_wounded_enabled = false

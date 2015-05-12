@@ -9,13 +9,13 @@ on_info = {+pri_b305_mooving_signal} walker@signal_role
 out_restr = pri_b305_signal_border_restr
 combat_ignore = true
 combat_ignore_keep_when_attacked = true
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 
 [walker@signal_role]
 path_walk = pri_b305_signal_move
 out_restr = pri_b305_signal_border_restr
 combat_ignore = true
 combat_ignore_keep_when_attacked = true
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 on_signal = pri_b305_signal_lost | %=destroy_object +pri_b305_signal_lost%
 on_game_timer = 300 | {-pri_b305_signal_lost} %=destroy_object +pri_b305_signal_lost%

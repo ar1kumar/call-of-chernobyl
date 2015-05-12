@@ -13,7 +13,7 @@ def_state_standing = guard_na
 on_signal = start | walker@start_timer 
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 danger = danger
 meet = no_meet
 wounded = wounded
@@ -29,7 +29,7 @@ def_state_moving1 = patrol
 def_state_standing = guard_na
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 on_info = {=see_actor -zat_b106_remark} %+zat_b106_remark%
 on_info2 = {+zat_b106_remark_done !is_playing_sound} remark@to_actor  
 danger = danger

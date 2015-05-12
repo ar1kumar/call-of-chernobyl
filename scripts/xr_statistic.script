@@ -280,7 +280,7 @@ function load(package)
 end
 
 function wealthy_functor()
-	if db.actor:money() >= 500000 and not has_alife_info("actor_wealthy") then
+	if db.actor:money() >= 1000000 and not has_alife_info("actor_wealthy") then
 		db.actor:give_info_portion("actor_wealthy")
 		news_manager.send_tip(db.actor, "st_ach_wealthy", nil, "wealthy", nil, nil)
 	end

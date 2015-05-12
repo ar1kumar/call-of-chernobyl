@@ -75,12 +75,20 @@ local function eval_smart_cover_locked(mgr,npc)
 	return (in_smart_cover and state_descr.cover_name == nil) or (not in_smart_cover and state_descr.cover_name ~= nil)
 end
 
+-- NOTICE: May be an issue here. Engine debug mode detects evaluator not returning bool on rare occasions after this function is called. Quite possibly
+-- it could be an engine error with weapon_strapped, weapon_unstrapped, is_weapon_going_to_be_strapped, or active_item
+-- Or an error here
 local function eval_weapon(mgr,npc)
 	local weapon = state_lib.states[mgr.target_state].weapon
 	if (weapon == nil) then
 		return true
 	end
 
+	local activeitem = npc:active_item()
+	if (weapon == "none" or weapon == "drop") and (activeitem == nil) then
+		return true
+	end
+	
 	--printf("npc=%s",npc:name())
 	
 	local bestweapon = npc:best_weapon()
@@ -88,31 +96,22 @@ local function eval_weapon(mgr,npc)
 		return true 
 	end
 	
-	if not IsWeapon(bestweapon) then
-		return true
-	end
-	
-	local activeitem = npc:active_item()
+	--if not IsWeapon(bestweapon) then
+		--return true
+	--end
 
-	if (weapon == "strapped" and
-	   ((state_mgr_weapon.strappable_weapon(bestweapon) and
-	   npc:weapon_strapped() and npc:is_weapon_going_to_be_strapped(bestweapon)) or
-	   (not state_mgr_weapon.strappable_weapon(bestweapon) and activeitem == nil))) then
-		return true
-	end
-
-	if	( (weapon == "unstrapped") or (weapon == "fire") or	(weapon == "sniper_fire") ) and
-		(activeitem) and (bestweapon) and (activeitem:id() == bestweapon:id()) and
-		(not npc:is_weapon_going_to_be_strapped(bestweapon) and npc:weapon_unstrapped()) then
-		return true
-	end
-
-	if (weapon == "none" and activeitem == nil) then
-		return true
-	end
-
-	if (weapon == "drop" and activeitem == nil) then
-		return true
+	if (activeitem == nil) then
+		if not (state_mgr_weapon.strappable_weapon(bestweapon)) then 
+			return true 
+		end
+		if (weapon == "strapped" and npc:weapon_strapped() and npc:is_weapon_going_to_be_strapped(bestweapon)) then 
+			return true
+		end
+	elseif (npc:weapon_unstrapped()) and ((weapon == "unstrapped") or (weapon == "fire") or (weapon == "sniper_fire")) then
+		--if (activeitem:id() == bestweapon:id()) then
+		if not (npc:is_weapon_going_to_be_strapped(bestweapon)) then 
+			return true 
+		end
 	end
 
 	return false

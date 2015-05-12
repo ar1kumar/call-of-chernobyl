@@ -4,7 +4,7 @@ use_camp = false
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 
 [logic@pri_b305_medic]
 suitable = {+pri_b305_medic_home -pri_b305_fifth_cam_end =check_npc_name(pri_a25_base_medic)} true
@@ -24,7 +24,7 @@ gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
 def_state_standing = wait_na
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 
 [remark@answer_1]:remark@def
 on_info   = {+pri_b305_kirilov_where_you_been_done_end -pri_b305_medik_in_freezer_done} %=play_sound(pri_b305_medik_in_freezer) +pri_b305_medik_in_freezer_done%
@@ -54,7 +54,7 @@ target = path | pri_a16_pri_b305_kirillov_closer_walk, 0
 cover_name = pri_a16_animp_medic
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 combat_ignore_keep_when_attacked = true
-invulnerable = true
+invulnerable = {!actor_enemy} true, false
 meet = meet
 out_restr = pri_a16_sr_noweap
 use_camp = false
