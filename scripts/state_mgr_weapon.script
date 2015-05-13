@@ -12,38 +12,35 @@ function eva_state_mgr_weapon:evaluate()
 	if (weapon == nil) then
 		return true
 	end
+	
+	if (activeitem == nil) and (weapon == "drop" or weapon == "none") then
+		return true
+	end
 
 	local bestweapon = self.object:best_weapon()
 	if not (bestweapon) then 
 		return true 
 	end
 	
-	if not IsWeapon(bestweapon) then
-		return true
-	end
+	--if not IsWeapon(bestweapon) then
+		--return true
+	--end
 	
 	local activeitem = self.object:active_item()
 
-	if (weapon == "strapped" and
-	   ((strappable_weapon(bestweapon) and
-	   self.object:weapon_strapped() and self.object:is_weapon_going_to_be_strapped(bestweapon)) or
-	   (not strappable_weapon(bestweapon) and activeitem == nil))) then
-		return true
-	end
-
-	if	( (weapon == "unstrapped") or (weapon == "fire") or	(weapon == "sniper_fire") ) and
-		(activeitem) and (bestweapon) and (activeitem:id() == bestweapon:id()) and
-		(not self.object:is_weapon_going_to_be_strapped(bestweapon) and self.object:weapon_unstrapped()) then
-		return true
-	end
-
-	if (weapon == "none" and activeitem == nil) then
-		return true
-	end
-
-	if (weapon == "drop" and activeitem == nil) then
-		return true
-	end
+	if (activeitem == nil) then
+		if not (state_mgr_weapon.strappable_weapon(bestweapon)) then 
+			return true 
+		end
+		if (weapon == "strapped" and self.object:weapon_strapped() and self.object:is_weapon_going_to_be_strapped(bestweapon)) then 
+			return true
+		end
+	elseif (self.object:weapon_unstrapped()) and ((weapon == "unstrapped") or (weapon == "fire") or (weapon == "sniper_fire")) then
+		--if (activeitem:id() == bestweapon:id()) then
+		if not (self.object:is_weapon_going_to_be_strapped(bestweapon)) then 
+			return true 
+		end
+	end 
 
 	return false
 end
