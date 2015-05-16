@@ -185,6 +185,11 @@ function CGeneralTask:check_task(tm)
 		self.t = db.actor and db.actor:get_task(self.id, true)
 		return
 	end
+	
+	-- DEBUGGING!
+	if (xrs_debug_tools) then 
+		xrs_debug_tools.debug_task_infos[self.id] = self
+	end 
 
 	self.check_time = global_time + 1000 + math.random() + (self.prior*100)
 

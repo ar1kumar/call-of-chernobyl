@@ -22,7 +22,7 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 ---------------------------------------------------------------------------------------------------------
 
 local toggle_hud_list = 	{
-							["top"]  = { "squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
+							["top"]  = { "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
 							["left"] = { "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
 							["right"] = { "planner_hud", "gulag_info_hud", "position_hud", "heli_hud", "wounded_hud","corpse_hud"}
 							}
@@ -37,6 +37,8 @@ local position_file = ""
 
 local keybinds
 actions_by_stalker_ids = nil
+debug_task_infos = nil
+
 local Enable
 
 local hud_display_top
@@ -239,6 +241,9 @@ local function actor_on_hit_callback(binder,npc,amount,local_direction,who,bone_
 end
 
 local function on_game_load()
+	if not (Enable) then 
+		return 
+	end
 	actions_by_stalker_ids = {}
 	for k,v in pairs(_G.xr_actions_id) do
 		actions_by_stalker_ids[v] = k
@@ -350,6 +355,8 @@ function on_game_start()
 	Enable = alun_utils.read_from_ini(ini,"plugin","enable","bool",false,"xrs_debug_tools")
 	if not (Enable) then ini=nil return end
 
+	debug_task_infos = {}
+	
 	local need_save
 	if not (axr_main.config:KeyExist("global_keybinds","debug_demo_record")) then
 		axr_main.config:SetValue("global_keybinds","debug_demo_record","DIK_NUMPAD1")
@@ -924,40 +931,42 @@ function planner_hud_show(hud)
 
 				local function eval_weapon(mgr,npc)
 					local weapon = state_lib.states[mgr.target_state].weapon
-					if (weapon == nil) then
+					if not (weapon) then
 						return true
 					end
 
+					local activeitem = npc:active_item()
+					if (active_item == nil) and (weapon == "none" or weapon == "drop") then 
+						return true
+					end
+					
 					local bestweapon = npc:best_weapon()
 					if not (bestweapon) then 
-						return 
+						return false 
+					end 
+					
+					--if not (alun_utils.item_is_fa(bestweapon)) then
+						--return false
+					--end
+						
+					if (weapon == "strapped") then
+						if (state_mgr_weapon.strappable_weapon(bestweapon)) then 
+							if (npc:weapon_strapped() and npc:is_weapon_going_to_be_strapped(bestweapon)) then 
+								return true
+							end
+						--elseif not(activeitem) then 
+							--return true
+						end
+					end 
+					
+					if not (activeitem and activeitem:id() == bestweapon:id()) then 
+						return false 
 					end
 					
-					if not IsWeapon(bestweapon) then
-						return true
-					end
-					
-					local activeitem = npc:active_item()
-
-					if (weapon == "strapped" and
-					   ((state_mgr_weapon.strappable_weapon(bestweapon) and
-					   npc:weapon_strapped() and npc:is_weapon_going_to_be_strapped(bestweapon)) or
-					   (not state_mgr_weapon.strappable_weapon(bestweapon) and activeitem == nil))) then
-						return true
-					end
-
-					if	( (weapon == "unstrapped") or (weapon == "fire") or	(weapon == "sniper_fire") ) and
-						(activeitem) and (bestweapon) and (activeitem:id() == bestweapon:id()) and
-						(not npc:is_weapon_going_to_be_strapped(bestweapon) and npc:weapon_unstrapped()) then
-						return true
-					end
-
-					if (weapon == "none" and activeitem == nil) then
-						return true
-					end
-
-					if (weapon == "drop" and activeitem == nil) then
-						return true
+					if (activeitem) and (weapon == "unstrapped" or weapon == "fire" or weapon == "sniper_fire") then
+						if (not npc:is_weapon_going_to_be_strapped(bestweapon) and npc:weapon_unstrapped()) then 
+							return true 
+						end
 					end
 
 					return false
@@ -1542,7 +1551,6 @@ function weapon_hud_show(hud)
 	hud:display()
 end
 
-
 function corpse_hud_show(hud)
 	local rbm = release_body_manager.get_release_body_manager()
 	local corpses = rbm.release_objects_table
@@ -1563,6 +1571,35 @@ function corpse_hud_show(hud)
 		end
 	end
 	hud:set_header("-[Release Table]["..count.."]")
+	hud:display()
+end
+
+
+function task_hud_show(hud)
+	for k,v in pairs(debug_task_infos) do
+		local id = alun_utils.load_var(db.actor,k.."_target_id")
+		local o = id and alife():object(id)
+		local smart_id = alun_utils.load_var(db.actor,k.."_id")
+		local smart = smart_id and alife():object(smart_id)
+		
+		local str = alun_utils.sr("status=%s",v.status)
+		
+		if (v.stage and v.stage > 0) then 
+			str = str .. alun_utils.sr(" stage=%s",v.stage)
+		end 
+		
+		if (smart) then 
+			str = str .. alun_utils.sr(" smart=%s",smart:name())
+		end
+		
+		if (o) then 
+			str = str .. alun_utils.sr(" target=%s",o:name())
+		end 
+		
+		hud:add_msg(k,str)
+	end
+
+	hud:set_header("-[Task Debugger]-")
 	hud:display()
 end
 

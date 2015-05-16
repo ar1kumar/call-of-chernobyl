@@ -17,7 +17,9 @@ local ignored_zone = {
 
 -- npcs with jobs at these smarts will be ignored like no_weapon_zone
 local ignored_smarts = {
-						["esc_smart_terrain_2_12"] = true
+						["esc_smart_terrain_2_12"] = true,
+						["zat_stalker_base_smart"] = true,
+						["jup_a6"] = true
 						}
 
 -----------------------
@@ -35,16 +37,18 @@ local function npc_on_update(npc,st)
 			return
 		end 
 			
+		local tg = time_global()
+		--[[
 		if not (st.safe_zone_dtimer) then
 			st.safe_zone_dtimer = 0
 		end
 
-		local tg = time_global()
 		if (tg < st.safe_zone_dtimer) then
 			return
 		end
 
 		st.safe_zone_dtimer = tg + 5000
+		--]]
 
 		local sim = alife()
 		local id = npc:id()
@@ -53,7 +57,7 @@ local function npc_on_update(npc,st)
 			local cid = se_obj.group_id and se_obj.group_id ~= 65535 and se_obj.group_id or id
 			if (cid and safe_zone_npcs[cid]) then
 				db.storage[id].heli_enemy_flag = nil
-				if (tg > safe_zone_npcs[cid] + 6000) then
+				if (tg > safe_zone_npcs[cid] + 8000) then
 					safe_zone_npcs[cid] = nil
 				end
 			else

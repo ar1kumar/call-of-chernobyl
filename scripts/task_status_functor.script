@@ -29,10 +29,10 @@ function check_smart_under_faction_control(task,task_id)
 	local faction_list = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	
 	local tg = time_global()
-	if (__check_smart_time and tg < __check_smart_time) then 
+	if (task.__check_smart_time and tg < task.__check_smart_time) then 
 		return
 	end
-	__check_smart_time = tg+3000
+	task.__check_smart_time = tg+3000
 	
 	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
 		for id,squad in pairs(SIMBOARD.squads) do
@@ -61,6 +61,8 @@ function check_smart_under_faction_control(task,task_id)
 		return "fail"
 	end
 	--]]
+	
+	task.check_smart_under_faction_control = "complete"
 	
 	return "complete"	
 end
