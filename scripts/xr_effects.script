@@ -4175,3 +4175,11 @@ function play_snd(actor, npc, p)
 		snd_obj:play_no_feedback(actor, sound_object.s2d, p[2] or 0, vector(), 1.0)
 	end
 end
+
+function erase_pstor_ctime(actor,npc,p)
+	if not (p[1]) then 
+		return 
+	end 
+	
+	xr_logic.save_ctime(db.actor,p[1],nil)
+end

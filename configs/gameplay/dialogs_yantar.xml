@@ -9,13 +9,119 @@
             </phrase>
 		    <phrase id="1">
                 <text/>
-				<next>1111</next>
+				<next>1111111</next>
             </phrase>
-		    <phrase id="1111">
+		    <phrase id="1111111">
                 <text>yan_stalker_sakharov_start_1</text>
             </phrase>
-          </phrase_list>
+		</phrase_list>
     </dialog>
+	
+	<dialog id="yan_stalker_sakharov_bad_psi_helmet">
+		<precondition>dialogs_yantar.actor_dont_has_psi_helmet</precondition>
+		<dont_has_info>yan_stalker_sakharov_psi_helmet_upgrade</dont_has_info>
+		<phrase_list>
+            <phrase id="0">
+                <text>yan_stalker_sakharov_player_query_psi_helmet</text>
+                <next>10</next>
+            </phrase>
+            <phrase id="10">
+                <text>yan_stalker_sakharov_npc_query_psi_helmet</text>
+                <next>11</next>
+				<next>12</next>
+				<next>13</next>
+            </phrase>
+            <phrase id="11">
+				<precondition>dialogs_yantar.actor_can_afford_bad_psi_helmet</precondition>
+                <text>yan_stalker_sakharov_player_psi_helmet_1_1</text>
+                <next>111</next>
+            </phrase>
+            <phrase id="111">
+                <text>yan_stalker_sakharov_npc_psi_helmet_1_1</text>
+				<next>112</next>
+                <next>13</next>
+            </phrase>
+            <phrase id="112">
+                <text>yan_stalker_sakharov_player_psi_helmet_1_2</text>
+				<action>dialogs_yantar.give_player_bad_psi_helmet</action>
+				<next>113</next>
+            </phrase>
+            <phrase id="113">
+                <text>yan_stalker_sakharov_npc_psi_helmet_1_2</text>
+            </phrase>
+            <phrase id="12">
+				<precondition>dialogs_yantar.actor_can_afford_good_psi_helmet</precondition>
+                <text>yan_stalker_sakharov_player_psi_helmet_2_1</text>
+                <next>121</next>
+            </phrase>
+            <phrase id="121">
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_1</text>
+				<next>122</next>
+                <next>13</next>
+            </phrase>
+            <phrase id="122">
+                <text>yan_stalker_sakharov_player_psi_helmet_2_2</text>
+				<action>dialogs_yantar.take_money_good_psi_helmet</action>
+				<next>123</next>
+            </phrase>
+            <phrase id="123">
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_2</text>
+            </phrase>
+            <phrase id="13">
+                <text>yan_stalker_sakharov_player_psi_helmet_3_1</text>
+				<next>131</next>
+            </phrase>
+			<phrase id="131">
+                <text>yan_stalker_sakharov_npc_psi_helmet_3_1</text>
+            </phrase>
+        </phrase_list>
+	</dialog>
+	<dialog id="yan_stalker_sakharov_good_psi_helmet">
+		<precondition>dialogs_yantar.actor_dont_has_psi_helmet</precondition>
+		<has_info>yan_stalker_sakharov_psi_helmet_upgrade</has_info>
+		<phrase_list>
+			<phrase id="0">
+                <text>yan_stalker_sakharov_player_psi_helmet_2_3</text>
+                <next>2221</next>
+				<next>2222</next>
+            </phrase>			
+			<phrase id="2221">
+				<precondition>dialogs_yantar.actor_has_good_psi_helmet_task_completed</precondition>
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_3</text>
+				<action>dialogs_yantar.give_player_good_psi_helmet</action>
+            </phrase>
+			<phrase id="2222">
+				<precondition>dialogs_yantar.actor_dont_has_good_psi_helmet_task_completed</precondition>
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_3_1</text>
+            </phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="yan_stalker_sakharov_upgrade_psi_helmet">
+		<precondition>dialogs_yantar.actor_has_bad_psi_helmet</precondition>
+		<phrase_list>
+            <phrase id="0">
+                <text>yan_stalker_sakharov_player_psi_helmet_1_3</text>
+                <next>1111</next>
+            </phrase>
+            <phrase id="1111">
+                <text>yan_stalker_sakharov_npc_psi_helmet_1_3</text>
+				<next>1112</next>
+				<next>1113</next>
+            </phrase>
+            <phrase id="1112">
+				<precondition>dialogs_yantar.actor_can_afford_bad_to_good_psi_helmet</precondition>
+                <text>yan_stalker_sakharov_player_psi_helmet_2_2</text>
+				<action>dialogs_yantar.upgrade_player_bad_psi_helmet</action>
+            </phrase>
+            <phrase id="1113">
+                <text>yan_stalker_sakharov_player_psi_helmet_3_1</text>
+				<next>1114</next>
+            </phrase>
+			<phrase id="1114">
+                <text>yan_stalker_sakharov_npc_psi_helmet_3_1</text>
+            </phrase>
+		</phrase_list>
+	</dialog>
 <!--------------- yan_ecolog_vasilyev ----------------->
    <dialog id="yan_ecolog_vasilyev_start_dialog">
         <phrase_list>

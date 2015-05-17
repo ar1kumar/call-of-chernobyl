@@ -1182,7 +1182,7 @@ function pstor_retrieve(obj, varname, defval)
 		return defval
 	end
 
-	if (db.storage[npc_id].pstor and type(db.storage[npc_id].pstor) == "table") then
+	if (db.storage[npc_id].pstor) then
 		local ret_val = db.storage[npc_id].pstor[varname]
 		--printf("xr_logic: pstor_retrieve: %s retrieving a value %s = %s",obj:name(),varname,ret_val)
 		return ret_val or defval
@@ -1191,6 +1191,44 @@ function pstor_retrieve(obj, varname, defval)
 	--printf("xr_logic: pstor_retrieve: %s does not have a db.storage.pstor table - trying to retrieve %s",obj:name(),varname)
 
 	return defval
+end
+
+function save_ctime(obj,varname,val)
+	if not (obj) then
+		return
+	end
+
+	local npc_id = type(obj) == "number" and obj or type(obj.id) == "function" and obj:id() or obj.id
+
+	if not (db.storage[npc_id]) then 
+		return 
+	end 
+	
+	if not (db.storage[npc_id].pstor_ctime) then
+		db.storage[npc_id].pstor_ctime = {}
+	end
+	
+	db.storage[npc_id].pstor_ctime[varname] = val
+end
+
+function load_ctime(obj, varname)
+	local npc_id = obj and (type(obj) == "number" and obj or type(obj.id) == "function" and obj:id() or obj.id)
+
+	if not (npc_id) then
+		printf("xr_logic: error: pstor_retrieve: npc_id is nil for varname = %s, val = %s",varname,defval)
+		return
+	end
+
+	if not (db.storage[npc_id]) then
+		printf("xr_logic.pstor_retrieve: Warning: no db.storage for %s, db.storage is for online objects only",npc_id)
+		return
+	end
+
+	if (db.storage[npc_id].pstor_ctime) then
+		return db.storage[npc_id].pstor_ctime[varname]
+	end
+
+	return
 end
 
 function pstor_save_all(obj, packet)
@@ -1228,6 +1266,24 @@ function pstor_save_all(obj, packet)
 		else
 			printf("xr_logic: pstor_save_all: not registered type '%s' encountered", tv)
 		end
+	end
+	
+	pstor = db.storage[npc_id].pstor_ctime
+	if not pstor then
+		pstor = {}
+		db.storage[npc_id].pstor_ctime = pstor
+	end
+	
+	ctr = 0
+	for k, v in pairs(pstor) do
+		ctr = ctr + 1
+	end
+
+	packet:w_u32(ctr)
+	
+	for k,v in pairs(pstor) do
+		alun_utils.w_stpk(packet,"stringZ",k,obj:name()..":pstor_save_all")
+		alun_utils.w_stpk(packet,"CTime",v,obj:name()..":pstor_save_all:GAMETIME")
 	end
 end
 
@@ -1270,6 +1326,18 @@ function pstor_load_all(obj, reader)
 		printf("xr_logic: pstor_load_all: not registered type '%s' encountered  %s", tn,obj:name())
 		end
 		--printf("_bp: pstor_load_all: loaded [%s]='%s'", varname, utils.to_str(db.storage[npc_id].pstor[varname]))
+	end
+	
+	db.storage[npc_id].pstor_ctime = db.storage[npc_id].pstor_ctime or {}
+	
+	ctr = reader:r_u32()
+
+	for i = 1, ctr do
+		if (reader:r_elapsed() <= 0) then 
+			return 
+		end
+		local varname = reader:r_stringZ()
+		db.storage[npc_id].pstor_ctime[varname] = utils.r_CTime(reader)
 	end
 	
 	if (axr_main) then axr_main.on_pstor_load_all(obj,reader) end

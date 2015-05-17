@@ -15,3 +15,73 @@ function yan_ecolog_semenov_task_1_complete(a,b)
 	end
 	task_manager.get_task_manager():set_task_completed("yan_ecolog_semenov_task_1")
 end
+
+function give_player_bad_psi_helmet(a,b)
+	dialogs.relocate_money_from_actor(a,b,10000)
+	alife():create("bad_psy_helmet",vector(),0,0,0)
+	news_manager.relocate_item(db.actor, "in", "bad_psy_helmet")
+end
+
+function upgrade_player_bad_psi_helmet(a,b)
+	local o = db.actor:object("bad_psy_helmet")
+	if (o) then 
+		local se_itm = alife():object(o:id())
+		alife():release(se_itm,true)
+		news_manager.relocate_item(db.actor, "out", "bad_psy_helmet")
+		dialogs.relocate_money_from_actor(a,b,8000)
+		task_manager.get_task_manager():give_task("yan_stalker_sakharov_psi_helmet_upgrade")
+		xr_logic.save_ctime(db.actor,"yan_stalker_sakharov_psi_helmet_upgrade",game.get_game_time())
+	end
+end
+
+function take_money_good_psi_helmet(a,b)
+	dialogs.relocate_money_from_actor(a,b,17500)
+	task_manager.get_task_manager():give_task("yan_stalker_sakharov_psi_helmet_upgrade")
+	xr_logic.save_ctime(db.actor,"yan_stalker_sakharov_psi_helmet_upgrade",game.get_game_time())
+end
+
+function give_player_good_psi_helmet(a,b)
+	alife():create("good_psy_helmet",vector(),0,0,0)
+	news_manager.relocate_item(db.actor, "in", "good_psy_helmet")
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	if (task_info and task_info["yan_stalker_sakharov_psi_helmet_upgrade"]) then 
+		task_manager.get_task_manager():set_task_completed("yan_stalker_sakharov_psi_helmet_upgrade")
+	end
+end
+
+function actor_has_psi_helmet(a,b)
+	if (db.actor:object("bad_psy_helmet") ~= nil or db.actor:object("good_psy_helmet") ~= nil) then 
+		return true 
+	end 
+	return false
+end
+
+function actor_dont_has_psi_helmet(a,b)
+	return not actor_has_psi_helmet(a,b)
+end
+
+function actor_has_bad_psi_helmet(a,b)
+	return db.actor:object("bad_psy_helmet") ~= nil
+end
+
+function actor_can_afford_bad_psi_helmet(a,b)
+	return db.actor:money() >= 10000
+end
+
+function actor_can_afford_good_psi_helmet(a,b)
+	return db.actor:money() >= 17500
+end
+
+function actor_can_afford_bad_to_good_psi_helmet(a,b)
+	return db.actor:money() >= 8000
+end
+
+function actor_has_good_psi_helmet_task_completed(a,b)
+	local task = task_manager.get_task_manager().task_info["yan_stalker_sakharov_psi_helmet_upgrade"]
+	return task and task.stage == 2
+end
+
+function actor_dont_has_good_psi_helmet_task_completed(a,b)
+	return not actor_has_good_psi_helmet_task_completed(a,b)
+end
