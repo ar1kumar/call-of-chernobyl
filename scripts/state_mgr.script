@@ -85,7 +85,7 @@ local function eval_weapon(mgr,npc)
 	end
 	
 	local activeitem = npc:active_item()
-	if (active_item == nil) and (weapon == "none" or weapon == "drop") then 
+	if (activeitem == nil) and (weapon == "none" or weapon == "drop" or weapon == "strapped") then 
 		return true
 	end
 	
@@ -99,9 +99,6 @@ local function eval_weapon(mgr,npc)
 	--end
 		
 	if (weapon == "strapped") then
-		if not (activeitem) then 
-			return true 
-		end
 		if (state_mgr_weapon.strappable_weapon(bestweapon)) then 
 			if (npc:weapon_strapped() and npc:is_weapon_going_to_be_strapped(bestweapon)) then 
 				return true

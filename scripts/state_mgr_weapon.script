@@ -12,7 +12,7 @@ function eva_state_mgr_weapon:evaluate()
 	end
 	
 	local activeitem = self.object:active_item()
-	if (active_item == nil) and (weapon == "none" or weapon == "drop") then 
+	if (activeitem == nil) and (weapon == "none" or weapon == "drop" or weapon == "strapped") then 
 		return true
 	end
 	
@@ -26,9 +26,6 @@ function eva_state_mgr_weapon:evaluate()
 	--end
 		
 	if (weapon == "strapped") then
-		if not (activeitem) then 
-			return true 
-		end
 		if (state_mgr_weapon.strappable_weapon(bestweapon)) then 
 			if (self.object:weapon_strapped() and self.object:is_weapon_going_to_be_strapped(bestweapon)) then 
 				return true
