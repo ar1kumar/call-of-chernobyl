@@ -244,6 +244,20 @@ local function on_game_load()
 	if not (Enable) then 
 		return 
 	end
+	
+	local i = alun_utils.load_var(db.actor,"debug_warpall")
+	if (i) then 
+		i = i + 1
+		local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
+		if (levels[i]) then 
+			alun_utils.save_var(db.actor,"debug_warpall",i)
+			alun_utils.jump_to_level(levels[i])
+			get_console():execute("flush")
+		else
+			alun_utils.save_var(db.actor,"debug_warpall",nil)
+		end
+	end
+	
 	actions_by_stalker_ids = {}
 	for k,v in pairs(_G.xr_actions_id) do
 		actions_by_stalker_ids[v] = k
@@ -348,6 +362,22 @@ local function on_keypress(key)
 	end
 end 
 
+local function on_level_changing()
+	local i = alun_utils.load_var(db.actor,"debug_warpall")
+	if not (i) then 
+		return
+	end
+	i = i + 1
+	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
+	if (levels[i]) then 
+		alun_utils.save_var(db.actor,"debug_warpall",i)
+		alun_utils.jump_to_level(i)
+		get_console():execute("flush")
+	else
+		alun_utils.save_var(db.actor,"debug_warpall",nil)
+	end
+end
+
 ------------------------------------------------------------------------------------
 --										GAME START
 function on_game_start()
@@ -376,6 +406,7 @@ function on_game_start()
 	callback_register("main_menu_on_keyboard",main_menu_on_keyboard)
 	callback_register("actor_on_hit_callback",actor_on_hit_callback)
 	callback_register("on_keypress",on_keypress)
+	--callback_register("on_level_changing",on_level_changing)
 	
 	actor_info = {}
 

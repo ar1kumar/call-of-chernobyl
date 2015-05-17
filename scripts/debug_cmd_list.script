@@ -1600,6 +1600,15 @@ function cmd.level(me,txt,owner,p)
 	return "level:= there is no level changer between "..level_name.." and "..wrd
 end
 
+function cmd.warpall(me,txt,owner,p)
+	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
+	if (levels[1]) then
+		alun_utils.save_var(db.actor,"debug_warpall",1)
+		alun_utils.jump_to_level(levels[1])
+	end
+	return "warpall := warping to every single level then flushing log"
+end
+
 -- dev_debug
 function cmd.dev_debug(me,txt,owner,p)
 	local wrd = check_and_set_help(me,txt,owner,"[on | off]")
