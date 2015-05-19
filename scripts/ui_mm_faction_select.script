@@ -37,8 +37,13 @@ local function on_game_load()
 		need_save = true
 		
 		local gs = game.translate_string
+		local success = false
 
-		local faction_to_position = {					   -- {level_name, gvid, lvid}
+		--[[
+		-- Note: If you want custom starting positions you can manually enter in gvid, lvid and positions. But for default CoC we used waypoints. This is because
+		-- when level geometry changes the spawns would be incorrect but that will not happen when you use waypoints.
+		-- below is the old method you can use for manual positions. Simply uncomment this block and comment everything in the spawn_path block
+		local faction_to_position = {					   -- {level_name, gvid, lvid,position}
 											["stalker"] 	= {"l01_escape",462,40972,vector():set(-212.7,-23.2,-123)},
 											["bandit"] 		= {"l04_darkvalley",1460,223690,vector():set(49.5,11.4,47)},
 											["csky"] 		= {"k00_marsh"},
@@ -50,12 +55,28 @@ local function on_game_load()
 											["monolith"] 	= {"l11_pripyat",2896,98949,vector():set(0.05,0.12,0.99)}
 		}
 		
-		if (faction_to_position[faction]) then
-			local t = faction_to_position[faction]
-			if (t) then 
-				alun_utils.jump_to_level(t[1],t[2],t[3],t[4])
+		local t = faction_to_position[faction]
+		if (t) then 
+			alun_utils.jump_to_level(t[1],t[2],t[3],t[4])
+			success = true
+		end
+		--]]
+		
+		local spawn_path = patrol("spawn_player_"..faction)
+		if (spawn_path) then 
+			local pos = spawn_path:point(0)
+			local lvid = spawn_path:level_vertex_id(0)
+			local gvid = spawn_path:game_vertex_id(0)
+			local gg = game_graph()
+			if (gvid and gg:valid_vertex_id(gvid)) then
+				local cvertex = gg:vertex(gvid)
+				local lvl = alife():level_name(cvertex:level_id())
+				alun_utils.jump_to_level(lvl,gvid,lvid,pos)
+				success = true
 			end
-			
+		end
+		
+		if (success) then	
 			-- faction diversity
 			if (faction == "killer") then 
 				task_manager.get_task_manager():give_task("esc_m_trader_task_1")
@@ -100,6 +121,8 @@ local function on_game_load()
 					end
 				end
 			end
+		else
+			printf("ui_mm_faction_select: CRITICAL ERROR: JUMP TO LEVEL FAILURE")
 		end
 	end
 
