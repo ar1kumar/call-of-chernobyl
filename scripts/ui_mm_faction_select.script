@@ -84,6 +84,8 @@ local function on_game_load()
 			
 			if (faction ~= "monolith") then 
 				task_manager.get_task_manager():give_task("turn_off_brain_scorcher")
+			else 
+				give_info("bar_deactivate_radar_done") -- disables brain scorcher
 			end
 			
 			local data = stpk_utils.get_actor_data(se_actor)
