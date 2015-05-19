@@ -1451,6 +1451,9 @@ function se_smart_terrain:try_respawn()
 	if (self.disabled) then
 		return
 	end
+	if (has_alife_info("actor_made_wish_for_peace")) then 
+		return 
+	end
 	--alun_utils.debug_write(alun_utils.sr("%s:try_respawn",self:name()))
 	
 	if (self.is_on_actor_level and not has_alife_info("actor_is_sleeping")) then

@@ -155,7 +155,10 @@ function actor_on_item_drop(obj)
 		xr_logic.pstor_store(db.actor,"actor_itm_backpack_id",se_itm.id)
 		alife():release( alife():object(obj:id()) )
 	end
-
+	
+	if (db.actor:has_info("actor_made_wish_for_riches")) then 
+		db.actor:transfer_item(obj,db.actor)
+	end
 end
 
 function monster_on_actor_use_callback(obj,who)

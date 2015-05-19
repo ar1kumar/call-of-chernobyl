@@ -3982,7 +3982,106 @@ function sr_teleport(actor,npc,p)
 end
 
 function make_a_wish(actor,npc,p)
+	local action_list = {}
+	
+	action_list[1] = function()
+		error("WISH GRANTED!",2)
+		return
+	end
+	
+	action_list[2] = function()
+		alife():create("m_controller_psy",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+		alife():create("m_controller_psy",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+		give_info("actor_made_wish")
+		return
+	end 
+	
+	action_list[3] = function()
+		give_info("actor_made_wish_for_peace")
+		give_info("actor_made_wish")
+		local board = SIMBOARD
+		local gg = game_graph()
+		local se_actor = alife():actor()
+		local sim = alife()
 
+		local function remove_squad(p)
+			local squad = p[1] and alife():object(p[1])
+			if not (squad) then
+				return true
+			end
+			
+			--printf("DEBUG: removing squad %s from the game",squad:name())
+			SIMBOARD:assign_squad_to_smart(squad, nil)
+			squad:remove_squad()
+			return true
+		end
+		for id,squad in pairs(board.squads) do
+			create_delayed_event(squad.id,"remove_squad",math.random(1,220),remove_squad,squad.id)
+		end
+		return
+	end 
+	
+	action_list[4] = function()
+		local t = { "Artefacts", "Outfits", "Items (Misc.)", "Items (Consumable)", "Weapons (Addon)", "Weapons (Pistol)", "Weapons (Rifle)", "Weapons (Misc.)", "Ammo" }
+		local sim = alife()
+		local sysini = system_ini()
+		for k,v in pairs(t) do
+			local list = ui_debug_main.get_spawn_table(v)
+			for kk,vv in pairs(list) do 
+				if (sysini:section_exist(vv)) then
+					sim:create(vv,vector(),0,0,0)
+				end
+			end
+		end
+
+		local function remove_backpack(p)
+			local function itr(npc,itm)
+				if (itm:section() == "itm_actor_backpack" or itm:section() == "itm_backpack") then
+					local se_itm = alife():object(itm:id())
+					if (se_itm) then 
+						alife():release(se_itm,true)
+					end
+					return
+				end 
+			end
+			db.actor:iterate_inventory(itr,db.actor)
+		end
+		
+		create_delayed_event(0,"remove_backpack",5,remove_backpack,0)
+		
+		give_info("actor_made_wish_for_riches")
+		give_info("actor_made_wish")
+		return 
+	end
+	
+	action_list[5] = function()
+		local se_actor = alife():actor()
+		local data = stpk_utils.get_actor_data(se_actor)
+		if (data) then
+			data.specific_character = "actor_zombied"
+			stpk_utils.set_actor_data(data,se_actor)
+		end
+		
+		db.actor:set_character_community("actor_zombied", 0, 0)
+		give_info("actor_made_wish_immortal")
+		give_info("actor_made_wish")
+		
+		local spawn_path = patrol("spawn_player_stalker")
+		if (spawn_path) then 
+			local pos = spawn_path:point(0)
+			local lvid = spawn_path:level_vertex_id(0)
+			local gvid = spawn_path:game_vertex_id(0)
+			local gg = game_graph()
+			if (gvid and gg:valid_vertex_id(gvid)) then
+				local cvertex = gg:vertex(gvid)
+				local lvl = alife():level_name(cvertex:level_id())
+				alun_utils.jump_to_level(lvl,gvid,lvid,pos)
+			end
+		end
+		return 
+	end
+	
+	ui_dyn_msg_box.multi_choice(action_list,"st_wish_1","st_wish_2","st_wish_3","st_wish_4","st_wish_5","st_wish_99")
 end
 
 function clear_logic(actor,npc,p)
