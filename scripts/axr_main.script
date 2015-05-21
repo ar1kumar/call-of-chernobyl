@@ -27,7 +27,7 @@ m_data = {}
 REMOVE_ME_LC			= nil 			-- Used by custom jump level command in xrs_debug_tools and faction select
 ------------------------------
 LOUD_SOUND_THRESHOLD 	= 35			-- Used for actor targetting by sim_board.script
-MAX_SQUADS 				= 1000			-- Non-storied Squads above this count will randomly be removed on game load
+MAX_SQUADS 				= 300			-- Non-storied Squads existing on non-linked levels above this count will randomly be removed on game load
 ------------------------------
 
 config = alun_utils.cfg_file(alun_utils.fspath("$game_data$").."axr_options.ini")
@@ -243,40 +243,6 @@ local function remove_squad(p)
 	return true
 end
 
-local function remove_non_story_squads(p)
-	local sor = story_objects.get_story_objects_registry()
-	local board = SIMBOARD
-	local gg = game_graph()
-	local se_actor = alife():actor()
-
-	-- if you don't want certain ids to be removed from game at any point, such as random alife squads used for tasks, check for them here
-	local exclude = { 
-					[task_functor.get_squad_id_by_task_var("esc_m_trader_bounty_target_id",true) or 65535] = true,
-					[task_functor.get_squad_id_by_task_var("zat_b7_bandit_boss_sultan_bounty_target_id",true) or 65535] = true
-					}
-	
-	local sim = alife()
-	local actor_l = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
-	local squad_l
-	for id,squad in pairs(board.squads) do
-		if (squad and squad.m_game_vertex_id and not exclude[id] and sor:get_story_id(id) == nil) then
-			-- simulation_objects.sim_dist_to(se_actor,squad) > 2000
-			squad_l = sim:level_name(gg:vertex(squad.m_game_vertex_id):level_id())
-			if (actor_l ~= squad_l) then
-				if not (string.find(simulation_objects.config:GetValue(actor_l,"target_maps",0,""),squad_l)) then
-					create_delayed_event(squad.id,"remove_squad",math.random(1,220),remove_squad,squad.id)
-					p[1] = p[1] - 1
-				end
-			end
-		end
-
-		if (p[1] < MAX_SQUADS) then
-			return true
-		end
-	end
-	return true
-end
-
 local function event_queue(force)
 	local gt
 	for event_id,actions in pairs(ev_queue) do
@@ -387,29 +353,36 @@ function on_game_load()
 		intercepts.on_game_load[i]()
 	end
 
+	-- Every game load we want to make sure there are no more then MAX_SQUADS existing for stability purposes
 	local count = 0
 	local sor = story_objects.get_story_objects_registry()
-	local board = SIMBOARD
 	local gg = game_graph()
-	local squad_lid
+	local squad_l
 	local sim = alife()
-	local actor_l = sim:level_name(gg:vertex(db.actor:game_vertex_id()):level_id())
-	for id,squad in pairs(board.squads) do
-		if (squad and squad.m_game_vertex_id and sor:get_story_id(id) == nil) then
+	local actor_l = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
+	local squad
+	-- if you don't want certain ids to be removed from game at any point, such as random alife squads used for tasks, check for them here
+	local exclude = { 
+					[task_functor.get_squad_id_by_task_var("esc_m_trader_bounty_target_id",true) or 65535] = true,
+					[task_functor.get_squad_id_by_task_var("zat_b7_bandit_boss_sultan_bounty_target_id",true) or 65535] = true
+					}
+	for i=1,65534 do
+		local squad = sim:object(i)
+		if (squad and squad:clsid() == clsid.online_offline_group_s and not exclude[squad.id] and squad.m_game_vertex_id and sor:get_story_id(squad.id) == nil) then
 			squad_l = sim:level_name(gg:vertex(squad.m_game_vertex_id):level_id())
+			-- squad must not be on actor level
 			if (actor_l ~= squad_l) then
+				-- squad must not be on linked level
 				if not (string.find(simulation_objects.config:GetValue(actor_l,"target_maps",0,""),squad_l)) then
-					count = count + 1
+					if (count > MAX_SQUADS) then
+						create_delayed_event(squad.id,"remove_squad",math.random(1,220),remove_squad,squad.id)
+					else
+						count = count + 1
+					end
 				end
 			end
-		end
+		end 
 	end
-
-	-- Every game load we want to make sure there are no more then MAX_SQUADS existing for stability purposes
-	if (count > MAX_SQUADS) then
-		create_delayed_event(0,"remove_non_story_squads",60,remove_non_story_squads,count)
-	end
-	
 	--[[
 	count = 0
 	local sim = alife()
