@@ -84,18 +84,18 @@ function actor_binder:net_destroy()
 	db.del_actor(self.object)
 	db.delete_enemy(self.object)
 
-	self.object:set_callback(callback.inventory_info, nil)
-	self.object:set_callback(callback.on_item_take, nil)
-	self.object:set_callback(callback.on_item_drop, nil)
-	self.object:set_callback(callback.task_state, nil)
-	self.object:set_callback(callback.level_border_enter, nil)
-	self.object:set_callback(callback.level_border_exit, nil)
-	self.object:set_callback(callback.take_item_from_box, nil)
-	self.object:set_callback(callback.use_object, nil)
-	self.object:set_callback(callback.hit, nil)
-	if (callback.key_press) then
-		self.object:set_callback(callback.key_press, nil)
-	end
+	self.object:set_callback(callback.inventory_info)
+	self.object:set_callback(callback.on_item_take)
+	self.object:set_callback(callback.on_item_drop)
+	self.object:set_callback(callback.task_state)
+	self.object:set_callback(callback.level_border_enter)
+	self.object:set_callback(callback.level_border_exit)
+	self.object:set_callback(callback.take_item_from_box)
+	self.object:set_callback(callback.use_object)
+	self.object:set_callback(callback.hit)
+	self.object:set_callback(callback.key_press)
+	self.object:set_callback(callback.key_release)
+	self.object:set_callback(callback.actor_before_death)
 
 	if(_G.amb_vol~=0) then
 		get_console():execute("snd_volume_eff "..tostring(_G.amb_vol))
@@ -131,9 +131,9 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.take_item_from_box, axr_main.actor_on_item_take_from_box, self)
 	self.object:set_callback(callback.use_object, axr_main.actor_on_item_use, self)
 	self.object:set_callback(callback.hit, axr_main.actor_on_hit_callback, self)
-	if (callback.key_press) then
-		self.object:set_callback(callback.key_press, axr_main.on_keypress, self)
-	end
+	self.object:set_callback(callback.key_press, axr_main.on_key_press, self)
+	self.object:set_callback(callback.key_release, axr_main.on_key_release, self)
+	self.object:set_callback(callback.actor_before_death, axr_main.actor_on_before_death, self)
 end
 
 function anabiotic_callback()

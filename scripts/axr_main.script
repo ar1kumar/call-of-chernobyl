@@ -103,7 +103,9 @@ local intercepts = {
 	on_pstor_load_all			= {},
 
 	-- bind_stalker.script
-	on_keypress					= {},
+	on_key_press				= {},
+	on_key_release				= {},
+	actor_on_before_death		= {},
 	on_game_load				= {},
 	on_game_end					= {},
 	actor_on_update				= {},
@@ -1529,12 +1531,37 @@ function on_save_game_save(fname)
 end
 
 -------------------
--- on_keypress
+-- on_key_press
 -------------------
-function on_keypress(binder,key)
-	if (intercepts.on_keypress) then 
-		for i=1,#intercepts.on_keypress do 
-			intercepts.on_keypress[i](key)
+function on_key_press(binder,key)
+	if (intercepts.on_key_press) then 
+		for i=1,#intercepts.on_key_press do 
+			intercepts.on_key_press[i](key)
+		end
+	end
+end
+
+-------------------
+-- on_key_release
+-------------------
+function on_key_release(binder,key)
+	if (intercepts.on_key_release) then 
+		for i=1,#intercepts.on_key_release do 
+			intercepts.on_key_release[i](key)
+		end
+	end
+end
+
+-------------------
+-- on_actor_before_death
+-------------------
+function actor_on_before_death(binder,whoID)
+	--db.actor:set_health_ex(1)
+	local killer = level.object_by_id(whoID) or db.actor
+	killer:kill(db.actor, true)
+	if (intercepts.actor_on_before_death) then 
+		for i=1,#intercepts.actor_on_before_death do 
+			intercepts.actor_on_before_death[i](whoID)
 		end
 	end
 end
