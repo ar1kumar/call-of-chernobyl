@@ -1530,8 +1530,7 @@ end
 -------------------
 function actor_on_before_death(binder,whoID)
 	--db.actor:set_health_ex(1)
-	local killer = level.object_by_id(whoID) or db.actor
-	killer:kill(db.actor, true)
+	db.actor:kill(db.actor, true)
 	if (intercepts.actor_on_before_death) then 
 		for i=1,#intercepts.actor_on_before_death do 
 			intercepts.actor_on_before_death[i](whoID)
