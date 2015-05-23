@@ -751,18 +751,18 @@ function actor_on_save(binder,packet)
 		
 		if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
 			--printf("actor changing level")
-			if (REMOVE_ME_LC) then
-				local sim = alife()
-				local se_obj = sim:object(REMOVE_ME_LC)
-				if (se_obj) then
-					--printf("removing temp level_changer %s",se_obj:name())
-					sim:release(se_obj,true)
-				end
-			end
-			
 			for i=1,#intercepts.on_level_changing do 
 				intercepts.on_level_changing[i]()
 			end
+		end
+	end
+	
+	if (REMOVE_ME_LC) then
+		local sim = alife()
+		local se_obj = sim:object(REMOVE_ME_LC)
+		if (se_obj) then
+			--printf("removing temp level_changer %s",se_obj:name())
+			sim:release(se_obj,true)
 		end
 	end
 	
