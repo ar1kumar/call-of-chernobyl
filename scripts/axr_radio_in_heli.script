@@ -80,8 +80,7 @@ function evaluator_radio_in_heli:evaluate()
 			return false
 		end
 	end
-	squad.radio_for_help = nil
-
+	
 	if (xr_wounded.is_wounded(npc)) then 
 		return false 
 	end
@@ -142,7 +141,7 @@ function action_radio_in_heli:execute()
 		local squad = get_object_squad(npc)
 		if (squad) then
 			xr_sound.set_sound_play(npc:id(),"backup")
-			squad.radio_for_help = tg+60000
+			squad.radio_for_help = tg+30000
 			for id,heli in pairs(db.heli) do
 				heli_alife.force_target_destination(id,squad.id)
 			end

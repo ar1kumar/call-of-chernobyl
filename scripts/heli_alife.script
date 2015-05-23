@@ -143,6 +143,7 @@ end
 --												PUBLIC
 --------------------------------------------------------------------------------------------------------------
 function force_target_destination(id,target_id)
+	--alun_utils.debug_write("heli_alife: force_target_destination")
 	local sim = alife()
 	local se_heli = sim:object(id)
 	if not (se_heli) then 
@@ -188,6 +189,8 @@ function update(heli,se_heli,heliObject)
 		return
 	end
 	
+	--alun_utils.debug_write("heli_alife: update start")
+	
 	local sim = alife()
 	
 	-- se_heli position never updates to game_object; force it for evaluation purposes (Note: resets if object goes offline)
@@ -210,11 +213,13 @@ function update(heli,se_heli,heliObject)
 			-- If current action is not finished, then return
 			if (se_heli.current_action == 0) then
 				if not (se_heli.stay_point_idle) then 
+					--alun_utils.debug_write("heli_alife: update end 1")
 					se_heli.current_action = nil
 					return 
 				end 
 				
 				if (xr_conditions.surge_started()) then 
+					--alun_utils.debug_write("heli_alife: update end 2")
 					return 
 				end 
 				
@@ -223,7 +228,7 @@ function update(heli,se_heli,heliObject)
 					if (se_target:clsid() == clsid.online_offline_group_s) then 
 						update_heli_movement(heli,se_heli,heliObject,se_target)
 					end 
-					
+					--alun_utils.debug_write("heli_alife: update end 3")
 					return 
 				end
 				
@@ -239,6 +244,7 @@ function update(heli,se_heli,heliObject)
 				if not (xr_conditions.surge_started()) then
 					if not (is_target_reached(se_heli,se_target)) then
 						try_to_reach_target(heli,se_heli,heliObject,se_target)
+						--alun_utils.debug_write("heli_alife: update end 4")
 						return
 					end
 				end
@@ -250,6 +256,7 @@ function update(heli,se_heli,heliObject)
 				se_heli.current_target_id = se_heli.assigned_target_id
 				se_heli.current_action = 0
 				se_heli.stay_point_idle = game.get_game_time()
+				--alun_utils.debug_write("heli_alife: update end 5")
 				return
 			end
 		end
@@ -273,9 +280,12 @@ function update(heli,se_heli,heliObject)
 		se_heli.current_action = 0
 		se_heli.stay_point_idle = game.get_game_time()
 	end	
+	
+	--alun_utils.debug_write("heli_alife: update end")
 end
 
 function update_heli_movement(heli,se_heli,heliObject,se_target)
+	--alun_utils.debug_write("heli_alife: update_heli_movement start")
 	local tg = time_global()
 	local st = db.storage[se_heli.id]
 	if not (st) then 
@@ -288,7 +298,7 @@ function update_heli_movement(heli,se_heli,heliObject,se_target)
 	st.change_speed_time = tg + math.random(8000, 12000)
 	st.speed_is_0 = st.speed_is_0 and false or true
 		
-	st.center_pos = utils.vector_copy_by_val(se_target.position())
+	st.center_pos = utils.vector_copy_by_val(se_target.position)
 	st.center_pos.y = level.get_bounding_volume().max.y
 
 	local v = st.speed_is_0 and 0 or 8
@@ -297,4 +307,6 @@ function update_heli_movement(heli,se_heli,heliObject,se_target)
 
 	heliObject:GoPatrolByRoundPath(st.center_pos,70,random_choice(true,false))
 	heliObject:LookAtPoint(se_target.position, true)
+	
+	--alun_utils.debug_write("heli_alife: update_heli_movement end")
 end

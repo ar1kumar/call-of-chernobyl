@@ -289,6 +289,7 @@ function heli_combat:set_enemy_from_custom_data(combat_enemy)
 end
 
 function heli_combat:set_combat_type(new_combat_type)
+	--alun_utils.debug_write(alun_utils.sr("heli_combat:set_combat_type"))
 	if (self.change_combat_type_allowed and new_combat_type ~= self.combat_type) then
 		self.flyby_initialized  = false
 		self.round_initialized  = false
@@ -300,7 +301,7 @@ end
 function heli_combat:initialize()
 	self.section_changed       = true
 
-	self.combat_type           = combat_type_search
+	self.combat_type           = combat_type_flyby
 
 	self.change_combat_type_allowed = true
 
@@ -320,6 +321,7 @@ function heli_combat:initialize()
 end
 
 function heli_combat:save( packet )
+	--alun_utils.debug_write(alun_utils.sr("heli_combat:save"))
 --	packet:w_bool( self.retreat_already )
 
 --	printf( "heli_combat:save level_changing=%s", tostring( utils.level_changing() ) )
@@ -352,6 +354,7 @@ function heli_combat:save( packet )
 end
 
 function heli_combat:load( packet )
+	--alun_utils.debug_write(alun_utils.sr("heli_combat:load"))
 --	self.retreat_already = packet:r_bool()
 	self.initialized     = packet:r_bool()
 
@@ -405,6 +408,7 @@ function heli_combat:update_custom_data_settings()
 end
 
 function heli_combat:forget_enemy()
+	--alun_utils.debug_write(alun_utils.sr("heli_combat:forget_enemy"))
 	self.st.enemy_id = nil
 	self.enemy = nil
 	self.heliObject:LookAtPoint(vector(), false)
@@ -413,6 +417,7 @@ function heli_combat:forget_enemy()
 end
 
 function heli_combat:update_combat_type( see_enemy )
+	--alun_utils.debug_write(alun_utils.sr("heli_combat:update_combat_type"))
 	if (self.attack_before_retreat ~= true and bind_heli.get_heli_health( self.heliObject, self.st ) < self.flame_start_health) then
 		self.attack_before_retreat = true
 		--self.heliObject.m_use_rocket_on_attack = true
@@ -424,13 +429,6 @@ function heli_combat:update_combat_type( see_enemy )
 		if (self.flyby_states_for_one_pass <= 0) then 
 			if self.attack_before_retreat then
 				self:set_combat_type(combat_type_retreat)
-			else
-				local tg = time_global()
-				self.__keep_type_until = not self.__keep_type_until and tg + 10000 or self.__keep_type_until
-				if (self.__keep_type_until and tg > self.__keep_type_until) then
-					self.__keep_type_until = nil
-					self:set_combat_type(combat_type_round)
-				end
 			end
 		end
 	elseif (self.combat_type == combat_type_round) then
@@ -447,7 +445,7 @@ function heli_combat:update_combat_type( see_enemy )
 			end
 		end
 	elseif (self.combat_type == combat_type_search) then 
-		if (see_enemy and distance_2d(self.object:position(),self.enemy:position()) > self.flyby_attack_dist) then 
+		if (see_enemy and distance_2d(self.object:position(),self.enemy:position()) > self.search_attack_dist) then 
 			self:set_combat_type(combat_type_round)
 		end
 	end 
@@ -465,22 +463,24 @@ function heli_combat:update()
 		return false
 	end
 	
+	--alun_utils.debug_write(alun_utils.sr("heli_combat:update start"))
+	
 	-- job is exclusive, use custom data logic for combat
 	local smart = xr_gulag.get_npc_smart(self.object)
 	local npc_info = smart and smart.npc_info[self.object:id()]
 	if (npc_info and npc_info.job and npc_info.job.exclusive) then 
+		--alun_utils.debug_write(alun_utils.sr("heli_combat:update end 4"))
 		return false
 	end
 	
 	if not (self.enemy_from_custom_data) then
 		if not (self:find_valid_target()) then
 			self:forget_enemy()
+			--alun_utils.debug_write(alun_utils.sr("heli_combat:update end 3"))
 			return false
 		end
 	end
 	
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:update start"))
-
 	self.enemy = self.st.enemy_id and db.storage[self.st.enemy_id] and db.storage[self.st.enemy_id].object
 	if not (self.enemy) then
 		self:forget_enemy()
@@ -558,6 +558,8 @@ function heli_combat:round_update(see_enemy)
 			self.heliObject.m_use_mgun_on_attack = not self.heliObject.m_use_mgun_on_attack
 			self.round_begin_shoot_time = tg + 4000
 		end
+	else
+		self.heliObject.m_use_mgun_on_attack = false
 	end
 	
 	if (self.change_pos_time and tg < self.change_pos_time) then
@@ -586,15 +588,17 @@ function heli_combat:search_update( see_enemy )
 	if (self.combat_use_mgun and see_enemy) then
 		if (self.round_begin_shoot_time == nil or tg > self.round_begin_shoot_time) then
 			self.heliObject.m_use_mgun_on_attack = not self.heliObject.m_use_mgun_on_attack
-			self.round_begin_shoot_time = tg + 4000
+			self.round_begin_shoot_time = tg + 5000
 		end
+	else 
+		self.heliObject.m_use_mgun_on_attack = false
 	end
 	
 	if (self.change_speed_time and tg < self.change_speed_time) then
 		return 
 	end 
 	
-	self.change_speed_time = tg + math.random(8000, 12000)
+	self.change_speed_time = tg + 3000
 
 	self.center_pos = utils.vector_copy_by_val(self.enemy_last_seen_pos)
 	self.center_pos.y = self.safe_altitude
@@ -625,6 +629,7 @@ function heli_combat:flyby_update( see_enemy )
 		else
 			self.state = flyby_state_to_enemy
 		end
+		self.fly_target_pos = nil
 	end
 	
 	if self.was_callback then
@@ -635,8 +640,8 @@ function heli_combat:flyby_update( see_enemy )
 
 	if self.state == flyby_state_to_attack_dist then
 		if not self.state_initialized then
-			local p = self:calc_position_in_radius( self.flyby_attack_dist )
-			self.heliObject:SetDestPosition( p )
+			self.fly_target_pos = self:calc_position_in_radius(self.flyby_attack_dist)
+			self.heliObject:SetDestPosition(self.fly_target_pos)
 			self.change_combat_type_allowed = false
 			self.state_initialized  = true
 		end
@@ -647,12 +652,16 @@ function heli_combat:flyby_update( see_enemy )
 			self.state_initialized = true
 		end
 
-		local p = self.enemy_last_seen_pos or self.enemy and self.enemy:position() or self.object:position()
-		p:set( p.x, self.safe_altitude, p.z )
+		self.fly_target_pos = self.enemy_last_seen_pos or self.enemy and self.enemy:position() or self.object:position()
+		self.fly_target_pos:set( self.fly_target_pos.x, self.safe_altitude, self.fly_target_pos.z )
 
-		self.change_combat_type_allowed = distance_2d( self.object:position(), p ) > self.search_attack_dist
+		self.change_combat_type_allowed = distance_2d( self.object:position(), self.fly_target_pos ) >= self.search_attack_dist
 
-		self.heliObject:SetDestPosition( p )
+		self.heliObject:SetDestPosition(self.fly_target_pos)
+	end
+	
+	if (self.fly_target_pos and distance_2d(self.object:position(),self.fly_target_pos) <= 5) then 
+		self.was_callback = true
 	end
 end
 

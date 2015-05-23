@@ -17,9 +17,24 @@
 		</phrase_list>
     </dialog>
 	
+   <dialog id="yan_stalker_sakharov_about_brain_scorcher">
+		<dont_has_info>yan_stalker_sakharov_actor_asked_brain_scorcher</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>yan_stalker_sakharov_player_query_brain_scorcher</text>
+                <next>10</next>
+            </phrase>
+            <phrase id="10">
+                <text>yan_stalker_sakharov_npc_query_brain_scorcher</text>
+				<give_info>yan_stalker_sakharov_actor_asked_brain_scorcher</give_info>
+            </phrase>
+		</phrase_list>
+    </dialog>
+	
 	<dialog id="yan_stalker_sakharov_bad_psi_helmet">
 		<precondition>dialogs_yantar.actor_dont_has_psi_helmet</precondition>
 		<dont_has_info>yan_stalker_sakharov_psi_helmet_upgrade</dont_has_info>
+		<has_info>yan_stalker_sakharov_actor_asked_brain_scorcher</has_info>
 		<phrase_list>
             <phrase id="0">
                 <text>yan_stalker_sakharov_player_query_psi_helmet</text>
@@ -79,6 +94,7 @@
 	<dialog id="yan_stalker_sakharov_good_psi_helmet">
 		<precondition>dialogs_yantar.actor_dont_has_psi_helmet</precondition>
 		<has_info>yan_stalker_sakharov_psi_helmet_upgrade</has_info>
+		<has_info>yan_stalker_sakharov_actor_asked_brain_scorcher</has_info>
 		<phrase_list>
 			<phrase id="0">
                 <text>yan_stalker_sakharov_player_psi_helmet_2_3</text>
@@ -98,6 +114,7 @@
 	</dialog>
 	<dialog id="yan_stalker_sakharov_upgrade_psi_helmet">
 		<precondition>dialogs_yantar.actor_has_bad_psi_helmet</precondition>
+		<has_info>yan_stalker_sakharov_actor_asked_brain_scorcher</has_info>
 		<phrase_list>
             <phrase id="0">
                 <text>yan_stalker_sakharov_player_psi_helmet_1_3</text>

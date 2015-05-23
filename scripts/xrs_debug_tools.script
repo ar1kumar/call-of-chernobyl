@@ -645,6 +645,14 @@ function heli_hud_show(hud)
 							[3] = "retreat"
 							}
 				hud:add_msg("Combat Type",ct[st.combat.combat_type])
+				
+				if (st.combat.combat_type == 0) then
+					ct = {  [0] = "flyby_state_to_attack_dist",
+							[1] = "flyby_state_to_enemy"
+					}
+					hud:add_msg("Flyby State",ct[st.combat.state])
+					hud:add_msg("flyby_states_for_one_pass",st.combat.flyby_states_for_one_pass)
+				end
 			end
 		end
 	end
@@ -1069,7 +1077,10 @@ function position_hud_show(hud)
 	Y, M, D, h, m, s, ms = game.get_game_time():get( Y, M, D, h, m, s, ms )
 	hud:add_msg("GameTime",string.format("Y:%d M:%d D:%d h:%d m:%d s:%d ms:%d",Y, M, D, h, m, s, ms))
 
-	hud:add_msg("psy_antenna.global_state",sr_psy_antenna.psy_antenna.global_state)
+	if (sr_psy_antenna.psy_antenna) then
+		hud:add_msg("psy_antenna.global_state",sr_psy_antenna.psy_antenna.global_state)
+	end 
+	
 	hud:add_msg("","------nearest campfires------")
 	if (smart_terrain.nearest_to_actor_smart and smart_terrain.nearest_to_actor_smart.id) then
 		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
