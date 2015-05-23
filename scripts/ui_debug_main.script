@@ -155,6 +155,9 @@ function debug_ui:InitCallBacks()
 	self:AddCallback("list_sections", ui_events.LIST_ITEM_SELECT,		 self.OnSelectSectionList,		self)
 	self:AddCallback("list_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnButton_create_clicked,	self)
     --self:AddCallback("btn_create",	  ui_events.BUTTON_CLICKED,          self.OnButton_create_clicked,	self)
+	
+	-- level jump tab
+	self:AddCallback("list_levels_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.JumpToLevel,	self)
 end
 
 function debug_ui:OnConsoleInput()
@@ -1093,6 +1096,29 @@ function debug_ui:FillList(name)
 	end
 end
 
+function debug_ui:FillLevelList()
+	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
+	for i,level in pairs(levels) do
+		local _itm = set_list_text(22)
+		_itm.sect:SetText(game.translate_string(level))
+		_itm.name = level
+		self.levels_list:AddExistingItem(_itm)
+	end
+end 
+
+function debug_ui:JumpToLevel()
+	local item
+	item = self.levels_list:GetSelectedItem()
+	if not(item) then
+		self:SendOutput("UIAdvanced: No level was selected in the list.")
+		return
+	end
+	
+	alun_utils.jump_to_level(item.name)
+	
+	self:OnQuit()
+end 
+
 function debug_ui:OnSelectSectionList()
 	self:FillList(self.sections_list:GetText())
 end
@@ -1326,4 +1352,13 @@ function debug_advanced_ui:InitControls(x, y, xml, owner)
 
 	btn = xml:Init3tButton("tab_advanced:btn_spawn_squad",self)
 	owner:Register(btn, "btn_spawn_squad")
+	
+	
+	owner.levels_list_frame = xml:InitFrame("tab_advanced:list_frame",self)
+	owner.levels_list = xml:InitListBox("tab_advanced:list",self)
+	owner.levels_list:ShowSelectedItem(true)
+
+	owner:Register(owner.levels_list, "list_levels_window")
+	
+	owner:FillLevelList()
 end
