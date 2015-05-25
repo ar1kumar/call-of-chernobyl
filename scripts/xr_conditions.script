@@ -2610,7 +2610,21 @@ function all_avail_smart_stayed_squad_count_ge_by_faction(actor,npc,p)
 		end
 	end
 	return false
-end 
+end
+
+-- same as above but checks all levels
+function all_avail_smart_stayed_squad_count_ge_by_faction_ex(actor,npc,p)
+	if (#p >= 4) then
+		for name,v in pairs(SIMBOARD.smarts_by_names) do
+			if (v.sim_avail == nil or v.sim_avail and xr_logic.pick_section_from_condlist(actor, v, v.sim_avail) == "true") then
+				if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,unpack(p)}) == true) then 
+					return true 
+				end
+			end
+		end
+	end
+	return false
+end
 
 -- Returns true if squads by behavior faction (player_id) of a given count exist at smart out of entire population; including arriving
 -- param1 - smart_name 

@@ -868,10 +868,6 @@ function sim_squad_scripted:can_switch_offline()
 	return cse_alife_online_offline_group.can_switch_offline(self)
 end
 function sim_squad_scripted:can_switch_online()
-	if not (db.actor) then
-		return false 
-	end
-	
 	if (not self.online and is_squad_monster[self.player_id]) then
 		-- Check for exiled zones
 		local zone

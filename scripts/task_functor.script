@@ -202,6 +202,17 @@ function val_smart_terrain_7_4_bandit_trader_stalker_task_target(task_id,field,p
 	end
 end
 
+-- soc pripyat
+function pri_monolith_monolith_trader_stalker_task_target(task_id,field,p)
+	if not (db.actor) then 
+		return 
+	end
+	
+	if (task_id == "pri_monolith_monolith_trader_stalker_task_1") then 
+		return under_faction_control_target_id(task_id)
+	end
+end
+
 -- Jupiter
 function jup_b220_trapper_task_target(task_id,field,p)
 	if not (db.actor) then 
