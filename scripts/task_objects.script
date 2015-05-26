@@ -92,9 +92,6 @@ function CGeneralTask:__init(id)
 	self.reward_money = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "reward_money", nil, false, "", ""))
 	self.reward_item = xr_logic.parse_condlist(nil, "task_manager", "condlist", utils.cfg_get_string(task_ini, id, "reward_item", nil, false, "", ""))
 
-	self.community_relation_delta_fail = utils.cfg_get_number(task_ini, id, "community_relation_delta_fail", nil, false, 0)
-	self.community_relation_delta_complete = utils.cfg_get_number(task_ini, id, "community_relation_delta_complete", nil, false, 0)
-
 	--' Статус квеста, может быть: "normal", "selected", "completed", "fail", "reversed"
 	self.status = "normal"
 
@@ -242,13 +239,8 @@ function CGeneralTask:check_task(tm)
 	end
 	for k,v in pairs(self.condlist) do
 		local t = xr_logic.pick_section_from_condlist(db.actor, db.actor, v)
-		if t ~= nil then
-			--' Проверка на валидность
-			if valid_values[t] ~= true then
-				printf("Invalid task status [%s] for task [%s]", t, self.name)
-			end
+		if (t and valid_values[t]) then 
 			self.last_check_task = t
-			return
 		end
 	end
 	

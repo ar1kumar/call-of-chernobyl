@@ -1,0 +1,39 @@
+[simulation_task_1]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 50
+repeat_timeout = 86400
+storyline = false
+sim_communities = stalker, csky, dolg, ecolog
+title = simulation_task_1_name
+title_functor = general_fetch_task
+descr = simulation_task_1_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_1_about
+fetch_descr = simulation_task_1_fetch_about
+fetch_func = %=setup_supplies_fetch_task(simulation_task_1_fetch:1:4)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_1_fetch_finish
+on_complete = %=reward_money(150) =remove_fetch_item(simulation_task_1_fetch) =inc_task_stage(simulation_task_1)%
+condlist_0 = {!var_target_is_alive(simulation_task_1)} fail
+
+[simulation_task_2]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 50
+repeat_timeout = 86400
+storyline = false
+sim_communities = freedom, killer, bandit
+title = simulation_task_2_name
+title_functor = general_fetch_task
+descr = simulation_task_2_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_2_about
+fetch_descr = simulation_task_2_fetch_about
+fetch_func = %=setup_supplies_fetch_task(simulation_task_2_fetch:1:4)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_2_fetch_finish
+on_complete = %=reward_money(150) =remove_fetch_item(simulation_task_2_fetch) =inc_task_stage(simulation_task_2)%
+condlist_0 = {!var_target_is_alive(simulation_task_2)} fail

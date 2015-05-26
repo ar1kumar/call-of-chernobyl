@@ -94,6 +94,10 @@ function general_fetch_task(task_id,field,p)
 		local tm = task_manager.get_task_manager()
 		local task_info = tm.task_info
 		if (task_info[task_id] and task_info[task_id].stage == 1) then
+			local id = alun_utils.load_var(db.actor,task_id.."_target_id")
+			if (id) then 
+				return id 
+			end
 			local story_id = string.sub(task_id,1,string.find(task_id,"_task")-1)
 			local se_obj = get_story_se_object(story_id)
 			if (se_obj) then
@@ -106,17 +110,14 @@ end
 -- Yantar
 function yan_ecolog_semenov_task_target(task_id,field,p)
 	if (task_id == "yan_ecolog_semenov_task_1") then
-		local npc = get_story_object("yan_ecolog_semenov")
-		if (npc) then
-			if (xr_conditions.check_yan_ecolog_semenov_task_1_stage_1_complete(nil,npc)) then
-				local smart = SIMBOARD.smarts_by_names["yan_smart_terrain_6_4"]
-				if (smart) then 
-					return smart.id
-				end
-			end
-		end
 		local squad = get_story_squad("yan_ecolog_semenov_squad")
-		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
+		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
+			return squad.id
+		end 
+		
+		local tm = task_manager.get_task_manager()
+		local task_info = tm.task_info
+		if (task_info[task_id] and task_info[task_id].stage >= 1) then 
 			return squad.id
 		end
 	end

@@ -225,50 +225,10 @@ function CAtmosFear:loadDefaultParameters()
 	self.ini:SetValue("atmosfear_current_parameters","opt_weather_length_presets","length_default")
 
 	self.ini:SetValue("atmosfear_current_parameters","opt_god_mode","false")
---[[
-	local parameters = xr_s.parse_ini_section_to_array(self.param_ini,"atmosfear_default_parameters")
-	self.opt_weather_balance_presets	= parameters["opt_weather_balance_presets"]
-	self.opt_weather_length_presets		= parameters["opt_weather_length_presets"]
-
-	self.opt_zaton_period_good			= parameters["opt_zaton_period_good"]
-	self.opt_zaton_period_bad			= parameters["opt_zaton_period_bad"]
-	self.opt_zaton_period_good_length	= tonumber(parameters["opt_zaton_period_good_length"])
-	self.opt_zaton_period_bad_length	= tonumber(parameters["opt_zaton_period_bad_length"])
-	self.opt_jupiter_period_good		= parameters["opt_jupiter_period_good"]
-	self.opt_jupiter_period_bad			= parameters["opt_jupiter_period_bad"]
-	self.opt_jupiter_period_good_length	= tonumber(parameters["opt_jupiter_period_good_length"])
-	self.opt_jupiter_period_bad_length	= tonumber(parameters["opt_jupiter_period_bad_length"])
-	self.opt_pripyat_period_good		= parameters["opt_pripyat_period_good"]
-	self.opt_pripyat_period_bad			= parameters["opt_pripyat_period_bad"]
-	self.opt_pripyat_period_good_length	= tonumber(parameters["opt_pripyat_period_good_length"])
-	self.opt_pripyat_period_bad_length	= tonumber(parameters["opt_pripyat_period_bad_length"])
-
-	self.opt_enable_blowout				= tonumber(parameters["opt_enable_blowout"])
-	self.opt_blowout_freq				= tonumber(parameters["opt_blowout_freq"])
-	self.opt_blowout_fate				= parameters["opt_blowout_fate"]
-	self.opt_blowout_warning			= parameters["opt_blowout_warning"]
-	self.opt_blowout_task				= parameters["opt_blowout_task"]
-	self.opt_enable_fallout				= tonumber(parameters["opt_enable_fallout"])
-	self.opt_fallout_freq				= tonumber(parameters["opt_fallout_freq"])
-	self.opt_fallout_fate				= parameters["opt_fallout_fate"]
-	self.opt_fallout_warning			= parameters["opt_fallout_warning"]
-	self.opt_fallout_task				= parameters["opt_fallout_task"]
-	self.opt_enable_psi_storm			= tonumber(parameters["opt_enable_psi_storm"])
-	self.opt_psi_storm_freq				= tonumber(parameters["opt_psi_storm_freq"])
-	self.opt_psi_storm_fate				= parameters["opt_psi_storm_fate"]
-	self.opt_psi_storm_warning			= parameters["opt_psi_storm_warning"]
-	self.opt_psi_storm_task				= parameters["opt_psi_storm_task"]
-
-	self.opt_moon_phase					= parameters["opt_moon_phase"]
-	self.opt_night_brightness			= parameters["opt_night_brightness"]
-
-	self.god_mode						= str_to_bool(parameters["opt_god_mode"])
---]]
 end
 
 function CAtmosFear:loadDefaultConsoleSettings()
 	local console=get_console()
-	--[[
 	console:execute("r2_dof_far 800")
 	console:execute("r2_aa off")
 	console:execute("r2_allow_r1_lights off")
@@ -306,7 +266,6 @@ function CAtmosFear:loadDefaultConsoleSettings()
 	console:execute("rs_c_brightness 1.")
 	console:execute("rs_c_contrast 1.")
 	console:execute("rs_c_gamma 1.")
-	--]]
 end
 
 function str_to_bool(str)

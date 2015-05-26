@@ -9,20 +9,15 @@
 -]]
 -- TODO: Remove all unused COP story functions
 
-function check_yan_ecolog_semenov_task_1_stage_1_complete(actor,npc,p)
-	if (alun_utils.load_var(npc,"yan_ecolog_semenov_task_1_count",0) >= 8) then 
-		return true
+function check_task_stage(actor,npc,p)
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	if (task_info[p[1]] and task_info[p[1]].stage == tonumber(p[2])) then 
+		--printf("p[1] = %s stage=%s",p[1],p[2])
+		return true 
 	end 
 	return false
-end
-
-function check_yan_ecolog_semenov_task_1_stage_2_complete(actor,npc,p)
-	local smart = SIMBOARD.smarts_by_names["yan_smart_terrain_6_4"]
-	if (smart) then 
-		return smart.position:distance_to_sqr(npc:position()) <= 1000
-	end
-	return false
-end
+end 
 
 function bounty_by_id_exists(actor,npc,p)
 	local id = p[1] and alun_utils.load_var(db.actor,p[1])
@@ -2746,6 +2741,17 @@ function actor_goodwill_ge(actor,npc,p)
 	end
 	return false
 end
+
+function var_target_is_alive(actor,npc,p)
+	if (p[1]) then
+		local id = alun_utils.load_var(db.actor,p[1].."_target_id")
+		local se_obj = id and alife():object(id)
+		if (se_obj and se_obj:alive()) then 
+			return true 
+		end
+	end
+	return false
+end 
 
 -------------------------------------------------------------------------------------
 -- Special for Radar

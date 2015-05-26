@@ -129,6 +129,7 @@ end
 function inc_task_stage(actor,npc,p)
 	local task = p[1] and task_manager.get_task_manager().task_info[p[1]]
 	if (task and task.stage) then
+		--printf("inc_task_stage=%s stage=%s",p[1],task.stage)
 		task.stage = task.stage + 1
 	end
 end 
@@ -367,10 +368,41 @@ function setup_weapon_fetch_task(actor,npc,p)
 	alun_utils.save_var(db.actor,p[1],wpn)
 end 
 
+-- param 1 - var name 
+-- param 2 - min count 
+-- param 3 - max count
+function setup_supplies_fetch_task(actor,npc,p)
+	local itm = {
+				"bandage",
+				"antirad",
+				"medkit",
+				"medkit_army",
+				"medkit_scientic",
+
+				"drug_booster",
+				"drug_coagulant",
+				"drug_psy_blockade",
+				"drug_antidot",
+				"drug_radioprotector",
+				"drug_anabiotic",
+
+				"bread",
+				"kolbasa",
+				"conserva",
+				"vodka",
+				"energy_drink"
+				}
+	local itm = itm[math.random(#itm)]
+	dialogs._FETCH_TEXT = game.translate_string(alun_utils.read_from_ini(nil,itm,"inv_name","string"))
+	alun_utils.save_var(db.actor,p[1],itm)
+	alun_utils.save_var(db.actor,p[1].."_count",math.random(p[2] and tonumber(p[2]) or 1,p[3] and tonumber(p[3]) or 1))
+end 
+
 function remove_fetch_item(actor,npc,p)
 	local section = alun_utils.load_var(db.actor,p[1])
 	if (section and db.actor:object(section)) then
-		remove_item(actor, npc, {section,p[2]})
+		local amt = p[2] or alun_utils.load_var(db.actor,p[1].."_count") or 1
+		remove_item(actor, npc, {section,amt})
 	end
 end
 
@@ -2559,8 +2591,17 @@ function make_actor_visible_to_squad(actor,npc,p)
 	end
 end
 
+function pstor_set(actor,npc,p)
+	p[2] = tonumber(p[2])
+	if (p[1] and p[2]) then 
+		alun_utils.save_var(db.actor,p[1],p[2])
+	end
+end
+
 function pstor_reset(actor,npc,p)
-	alun_utils.save_var(db.actor,p[1],nil)
+	if (p[1]) then
+		alun_utils.save_var(db.actor,p[1],nil)
+	end
 end 
 
 function stop_sr_cutscene(actor,npc,p)

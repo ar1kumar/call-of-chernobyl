@@ -172,3 +172,17 @@ function check_if_looted_enough(task,task_id)
 		return "complete"
 	end
 end
+
+function task_type_ecolog_gathered_tissue_samples(task,task_id)
+	if (db.actor and task.stage == 0) then 
+		local count = alun_utils.load_var(db.actor,task_id.."_tissue_count",0)
+		local need = alun_utils.load_var(db.actor,task_id.."_tissue_need",0)
+		
+		if (count >= need) then 
+			task.stage = 1
+		else 
+			task.stage = 0
+		end
+	end
+	return
+end

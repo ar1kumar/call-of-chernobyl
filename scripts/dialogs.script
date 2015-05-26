@@ -1,9 +1,33 @@
+function sim_dynamic_ordered_task_precondition(a,b)
+	local npc = who_is_npc(a, b)
+	local squad = get_object_squad(npc)
+	if not (squad) then 
+		return false 
+	end 
+	
+	local sid = story_objects.get_story_objects_registry():get_story_id(squad.id)
+	if (sid) then 
+		return false 
+	end
+	
+	if (squad and squad:commander_id() ~= npc:id()) then
+		return false
+	end
+	
+	return true
+end
+
 -- Dynamic Ordered Task dialog 
 last_task_id = nil
 function npc_has_ordered_task_to_give(a,b)
 	local npc = who_is_npc(a, b)
 	--return axr_task_manager and axr_task_manager.get_first_available_task(npc) ~= nil or false
 	return last_task_id ~= nil or false
+end
+
+function npc_sim_has_ordered_task_to_give(a,b)
+	local npc = who_is_npc(a, b)
+	return axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true) ~= nil or false
 end
 
 function actor_has_finished_ordered_task(a,b)
@@ -15,9 +39,25 @@ function actor_has_not_finished_ordered_task(a,b)
 	return not actor_has_finished_ordered_task(a,b)
 end
 
+function actor_sim_has_finished_ordered_task(a,b)
+	local npc = who_is_npc(a, b)
+	return axr_task_manager and axr_task_manager.get_first_finished_task(npc,true) ~= nil or false
+end
+
+function actor_sim_has_not_finished_ordered_task(a,b)
+	return not actor_sim_has_finished_ordered_task(a,b)
+end
+
 function text_npc_has_ordered_task_to_give(a,b)
 	local npc = who_is_npc(a, b)
 	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)
+	last_task_id = task_section
+	return game.translate_string(task_section and axr_task_manager.get_task_job_description(task_section) or "st_no_available_task")
+end 
+
+function text_sim_npc_has_ordered_task_to_give(a,b)
+	local npc = who_is_npc(a, b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
 	last_task_id = task_section
 	return game.translate_string(task_section and axr_task_manager.get_task_job_description(task_section) or "st_no_available_task")
 end 
@@ -46,11 +86,41 @@ function text_fetch_task(a,b)
 	return string.format(text,_FETCH_TEXT or "") or ""
 end
 
+function text_sim_fetch_task(a,b)
+	local npc = who_is_npc(a, b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
+
+	if (last_task_id) then
+		while last_task_id and task_section ~= nil and task_section ~= last_task_id do 
+			task_section = axr_task_manager.get_first_available_task(npc,true,true)
+		end
+	else 
+		last_task_id = task_section
+	end
+	
+	if not (task_section) then 
+		last_task_id = nil
+		return game.translate_string("st_nevermind")
+	end
+	
+	axr_task_manager.trigger_fetch_func(task_section)
+
+	local text = game.translate_string(task_section and axr_task_manager.get_fetch_task_description(task_section) or "st_about_fetch_task_default")
+	
+	return string.format(text,_FETCH_TEXT or "") or ""
+end
+
 function text_task_finish(a,b)
 	local npc = who_is_npc(a, b)
 	local task_section = axr_task_manager and axr_task_manager.get_first_finished_task(npc)
-	return game.translate_string(task_section and axr_task_manager.get_task_complete_text(task_section) or "st_default_task_finished")
+	return game.translate_string(task_section and axr_task_manager.get_task_complete_text(task_section) or "st_default_task_finished_"..math.random(1,3))
 end
+
+function text_sim_task_finish(a,b)
+	local npc = who_is_npc(a, b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_finished_task(npc,true)
+	return game.translate_string(task_section and axr_task_manager.get_task_complete_text(task_section) or "st_default_task_finished_"..math.random(1,3))
+end 
 
 function task_is_fetch_task(a,b)
 	local npc = who_is_npc(a, b)
@@ -70,9 +140,24 @@ function npc_set_finished_task_complete(a,b)
 	axr_task_manager.set_finished_task_complete(npc)
 end
 
+function npc_sim_set_finished_task_complete(a,b)
+	local npc = who_is_npc(a, b)
+	axr_task_manager.set_finished_task_complete(npc,true)
+end
+
 function npc_give_last_task_id(a,b)
 	if (last_task_id) then
 		task_manager.get_task_manager():give_task(last_task_id)
+		last_task_id = nil
+	end
+end
+
+function npc_sim_give_last_task_id(a,b)
+	if (last_task_id) then
+		task_manager.get_task_manager():give_task(last_task_id)
+		local npc = who_is_npc(a, b)
+		alun_utils.save_var(npc,last_task_id.."_is_giver",true)
+		alun_utils.save_var(db.actor,last_task_id.."_target_id",npc:id())
 		last_task_id = nil
 	end
 end
@@ -84,10 +169,24 @@ function npc_give_first_available_task(a,b)
 	end
 end
 
+function npc_sim_give_first_available_task(a,b)
+	if (axr_task_manager) then
+		local npc = who_is_npc(a, b)
+		axr_task_manager.npc_give_first_available_ordered_task(npc,nil,true)
+	end
+end
+
 function npc_skip_first_ordered_task(a,b)
 	if (axr_task_manager) then
 		local npc = who_is_npc(a, b)
 		axr_task_manager.get_first_available_task(npc,true)
+	end
+end
+
+function npc_sim_skip_first_ordered_task(a,b)
+	if (axr_task_manager) then
+		local npc = who_is_npc(a, b)
+		axr_task_manager.get_first_available_task(npc,true,true)
 	end
 end
 

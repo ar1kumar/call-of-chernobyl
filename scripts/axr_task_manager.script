@@ -69,11 +69,11 @@ end
 -- automated ordered tasks
 -- tasks must be named <section>_task_<number>
 -- m_trader (ie. Sidorovich) use npc:name() instead
-function get_first_available_task(npc,skip)
+function get_first_available_task(npc,skip,is_sim)
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
 	
-	local sec = npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	local sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
 	local task_id = sec.."1"
 	
 	local count = 1
@@ -84,6 +84,34 @@ function get_first_available_task(npc,skip)
 				skipped_tasks[task_id] = true
 				return
 			else
+				if (is_sim) then 
+					local p = alun_utils.parse_list(task_manager.task_ini,task_id,"sim_communities",true)
+					if (p[character_community(npc)] == true) then 
+						return task_id
+					end
+				else 
+					return task_id
+				end
+			end
+		end
+		count = count + 1
+		task_id = sec..tostring(count)
+	end
+end
+
+function get_first_finished_task(npc,is_sim)
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	
+	local sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	local task_id = sec.."1"
+	
+	local count = 1
+	while (task_manager.task_ini:section_exist(task_id)) do
+	--	printf("get_first_finished_task task_id=%s",task_id)
+		if (task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","float")) then
+			--printf("get_first_finished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
+			if (is_sim ~= true or alun_utils.load_var(npc,task_id.."_is_giver") == true) then 
 				return task_id
 			end
 		end
@@ -92,26 +120,8 @@ function get_first_available_task(npc,skip)
 	end
 end
 
-function get_first_finished_task(npc)
-	local tm = task_manager.get_task_manager()
-	local task_info = tm.task_info
-	
-	local sec = npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
-	local task_id = sec.."1"
-	
-	local count = 1
-	while (task_manager.task_ini:section_exist(task_id)) do
-	--	printf("get_first_finished_task task_id=%s",task_id)
-		if (task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","float")) then
-			return task_id
-		end
-		count = count + 1
-		task_id = sec..tostring(count)
-	end
-end
-
-function set_finished_task_complete(npc)
-	local task_id = get_first_finished_task(npc)
+function set_finished_task_complete(npc,is_sim)
+	local task_id = get_first_finished_task(npc,is_sim)
 	if not (task_id) then 
 		return 
 	end 
@@ -127,11 +137,11 @@ function trigger_fetch_func(task_id)
 	end
 end 
 
-function get_random_available_task(npc)
+function get_random_available_task(npc,is_sim)
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
 	
-	local sec = npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	local sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
 	local task_id = sec.."1"
 	
 	local avail = {}
@@ -170,12 +180,12 @@ function is_task_on_complete_stage(task)
 	return task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task,"stage_complete","number")
 end
 
-function npc_has_task_to_give(npc)
-	return get_first_available_task(npc) ~= nil
+function npc_has_task_to_give(npc,is_sim)
+	return get_first_available_task(npc,nil,is_sim) ~= nil
 end
 
-function npc_give_first_available_ordered_task(npc)
-	local new_task = get_first_available_task(npc)
+function npc_give_first_available_ordered_task(npc,is_sim)
+	local new_task = get_first_available_task(npc,nil,is_sim)
 	if not (new_task) then 
 		return 
 	end 

@@ -92,8 +92,7 @@ on_info1 = {=dist_to_task_target_anomaly_le(15)} beh@task_target_anomaly_1, {=sq
 on_info2 = {-ecolog_companion_task_2_force_started =dist_to_actor_le(3)} %+ecolog_companion_task_2_force_started =force_talk(true)%
 
 [beh@yan_ecolog_semenov_task_1]:beh@general
-mutant_corpse_analysis = {=is_squad_commander !check_yan_ecolog_semenov_task_1_stage_1_complete} true
-on_info1 = {-yan_ecolog_semenov_task_1_complete_force_dialog =dist_to_actor_le(3) =check_yan_ecolog_semenov_task_1_stage_1_complete =check_yan_ecolog_semenov_task_1_stage_2_complete} %+yan_ecolog_semenov_task_1_complete +yan_ecolog_semenov_task_1_complete_force_dialog =force_talk(true)%
+mutant_corpse_analysis = {=is_squad_commander =check_task_stage(yan_ecolog_semenov_task_1:0)} true
 
 ;___________________BANDIT_________________
 [meet@bandit_companion_task_1]:meet

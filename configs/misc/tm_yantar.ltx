@@ -1,16 +1,20 @@
 [yan_ecolog_semenov_task_1]
 icon = ui_inGame2_PD_Opitniy_stalker
-prior = 2
+prior = 20
 storyline = false
 title = yan_ecolog_semenov_task_1_name
 descr = yan_ecolog_semenov_task_1_text
 job_descr = yan_ecolog_semenov_task_1_about
 target_functor = yan_ecolog_semenov_task_target
-on_init = %=add_task_companion(yan_ecolog_semenov_squad) -yan_ecolog_semenov_task_1_complete -yan_ecolog_semenov_task_1_complete_force_dialog%
+status_functor = task_type_ecolog_gathered_tissue_samples
+stage_complete = 2
+task_complete_descr = yan_ecolog_semenov_task_1_finish
+on_init = %=pstor_set(yan_ecolog_semenov_task_1_tissue_need:5) =add_task_companion(yan_ecolog_semenov_squad) +yan_ecolog_semenov_task_1_started -yan_ecolog_semenov_task_1_completed%
 repeat_timeout = 86400
-on_complete = %=remove_task_companion(yan_ecolog_semenov_squad)%
-on_fail = %=remove_task_companion(yan_ecolog_semenov_squad) -yan_ecolog_semenov_task_1_complete -yan_ecolog_semenov_task_1_complete_force_dialog%
+on_complete = %=complete_task_inc_goodwill(5:ecolog) =reward_random_money(4000:4500) =inc_task_stage(yan_ecolog_semenov_task_1) =pstor_reset(yan_ecolog_semenov_task_1_tissue_need) =pstor_reset(yan_ecolog_semenov_task_1_tissue_count) -yan_ecolog_semenov_task_1_started -yan_ecolog_semenov_task_1_completed%
+on_fail = %=remove_task_companion(yan_ecolog_semenov_squad)%
 condlist_0 = {!squad_exist(yan_ecolog_semenov_squad)} fail
+condlist_1 = {=check_task_stage(yan_ecolog_semenov_task_1:1)} %+yan_ecolog_semenov_task_1_completed =inc_task_stage(yan_ecolog_semenov_task_1) =remove_task_companion(yan_ecolog_semenov_squad)%
 
 [yan_stalker_sakharov_task_1]
 icon = ui_inGame2_Nochnaya_ohota
