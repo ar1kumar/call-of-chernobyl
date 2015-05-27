@@ -13,12 +13,19 @@ function on_game_start()
 	
 	local need_save
 	if not (axr_main.config:KeyExist("global_keybinds","companion_cycle_combat_mode")) then
-		axr_main.config:SetValue("global_keybinds","companion_cycle_combat_mode","DIK_NUMPAD3")
+		axr_main.config:SetValue("global_keybinds","companion_cycle_combat_mode","DIK_NUMPAD1")
 		need_save = true
 	end
-
 	if not (axr_main.config:KeyExist("global_keybinds","companion_cycle_move_mode")) then
-		axr_main.config:SetValue("global_keybinds","companion_cycle_move_mode","DIK_NUMPAD4")
+		axr_main.config:SetValue("global_keybinds","companion_cycle_move_mode","DIK_NUMPAD2")
+		need_save = true
+	end
+	if not (axr_main.config:KeyExist("global_keybinds","debug_demo_record")) then
+		axr_main.config:SetValue("global_keybinds","debug_demo_record","DIK_NUMPAD0")
+		need_save = true
+	end
+	if not (axr_main.config:KeyExist("global_keybinds","debug_teleport_cam")) then
+		axr_main.config:SetValue("global_keybinds","debug_teleport_cam","DIK_NUMPADENTER")
 		need_save = true
 	end
 	
