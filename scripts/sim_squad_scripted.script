@@ -109,7 +109,7 @@ function sim_squad_scripted:get_script_target()
 	local smart = new_target and SIMBOARD.smarts_by_names[new_target]
 	if not (smart) then
 		local id = self:commander_id()
-		if (id and alife():has_info(id,"npcx_is_companion")) then 
+		if (id) and (alife():has_info(id,"npcx_is_companion") and not alife():has_info(id,"npcx_no_teleport")) then 
 			return 0 
 		end
 		return

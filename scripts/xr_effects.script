@@ -22,6 +22,10 @@ local function add_special_task_squad(p)
 			return false 
 		end
 		
+		if (p[2]) then 
+			npc:give_info_portion("npcx_no_teleport")
+		end
+		
 		--npc:give_info_portion("npcx_is_companion")
 		npc:give_info_portion("npcx_beh_cannot_dismiss")
 		--axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
@@ -229,8 +233,11 @@ end
 -- Spawn a squad that will become actor companion for special tasks
 -- param 1 - squad section 
 -- param 2 - smart
+-- param 3 - variable name. Will use smart_id in a pstor variable instead
+-- param 4 - disable level transition for the squad
 function setup_companion_task(actor,npc,p)
-	local smart = p[1] and p[2] and SIMBOARD.smarts_by_names[p[2]]
+	local id = p[3] and p[3] ~= "nil" and alun_utils.load_var(db.actor,p[3])
+	local smart = id and alife():object(id) or p[2] and p[2] ~= "nil" and SIMBOARD.smarts_by_names[p[2]]
 	if not (smart) then 
 		return 
 	end 
@@ -240,20 +247,34 @@ function setup_companion_task(actor,npc,p)
 		return
 	end 
 	
-	local squad = alife():create(p[1],smart.position,smart.m_level_vertex_id,smart.m_game_vertex_id)
+	local sim = alife()
+	local squad = sim:create(p[1],smart.position,smart.m_level_vertex_id,smart.m_game_vertex_id)
+	
+	sim:set_switch_online(squad.id,true)
+	sim:set_switch_offline(squad.id,false)
+			
 	squad:create_npc(smart)
 	squad:set_squad_relation()
 	local se_obj
-	local sim = alife()
+	
 	for k in squad:squad_members() do
 		se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
+			if (sim.give_info) then
+				sim:give_info(k.id,"npcx_is_companion")
+				sim:give_info(k.id,"npcx_beh_cannot_dismiss")
+				if (p[4] == "true") then 
+					sim:give_info(k.id,"npcx_no_teleport")
+				end
+			end
+			sim:set_switch_online(k.id,true)
+			sim:set_switch_offline(k.id,false)
 		end
 	end
 
 	--alun_utils.save_var(db.actor,p[3] or "task_companion_slot_1",squad.id)
-	create_delayed_event(0,"add_special_task_squad",5,add_special_task_squad,squad.id)
+	create_delayed_event(0,"add_special_task_squad",5,add_special_task_squad,squad.id,p[4] == "true")
 end
 
 -- setup for special escort to anomaly task

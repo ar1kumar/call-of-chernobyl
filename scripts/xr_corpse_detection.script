@@ -328,7 +328,7 @@ function evaluator_corpse:find_valid_target()
 			local corpse_pos = alun_utils.safe_bone_pos(corpse_npc,"bip01_spine")
 			local dist = npc:position():distance_to_sqr(corpse_pos)
 
-			if (self.a.nearest_corpse_dist == nil or dist <= self.a.nearest_corpse_dist) then
+			if (dist < AlwaysDetectDistance) and (self.a.nearest_corpse_dist == nil or dist <= self.a.nearest_corpse_dist) then
 				local corpse_vertex = level.vertex_id(corpse_pos)
 				if level.vertex_position(corpse_vertex):distance_to_sqr(corpse_pos) > 16 then
 					corpse_vertex = corpse_npc:level_vertex_id()

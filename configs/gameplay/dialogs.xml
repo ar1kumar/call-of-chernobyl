@@ -11,6 +11,30 @@
         <init_func>dialog_manager.init_new_dialog</init_func>
     </dialog>
 
+	<!------------- hostage_companion_task_1 ----------->
+	<dialog id="hostage_companion_task_1_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text />
+                <next>1</next>
+            </phrase>
+			<phrase id="1">
+				<text />
+				<next>111</next>
+			</phrase>
+		    <phrase id="111">
+				<dont_has_info>hostage_companion_task_1_hostage_rescued</dont_has_info>
+                <text>hostage_companion_task_1_start_dialog_1</text>
+				<next>1111</next>
+            </phrase>
+			<phrase id="1111">
+				<text>hostage_companion_task_1_actor_reply</text>
+				<give_info>hostage_companion_task_1_hostage_rescued</give_info>
+				<action>dialogs.action_increase_hostage_task_stage</action>
+			</phrase>
+        </phrase_list>
+    </dialog>
+	
 	<!-- Alundaio -->
 	<dialog id="dm_ordered_task_dialog">
 		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>

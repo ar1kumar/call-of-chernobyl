@@ -100,6 +100,8 @@ local function npc_on_hear_callback(npc,who_id,s_type,dist,sound_power,sound_pos
 	if (xr_wounded.is_wounded(npc) or character_community(npc) == "zombied" or xr_combat_ignore.npc_in_safe_zone(npc)) then
 		return
 	end
+	
+	
 
 	if (s_type == "WPN_hit" or s_type == "MST_attack" or s_type == "MST_damage") and dist < 900 then
 		local who = who_id and (db.storage[who_id] and db.storage[who_id].object)
@@ -166,6 +168,10 @@ local function is_danger(npc,best_danger,script)
 		return false
 	end
 
+	if (xrs_kill_wounded and xrs_kill_wounded.hostage_list[npc:id()]) then 
+		return false 
+	end 
+	
 	local best_danger_object = best_danger:object()
 	local bd_type = best_danger:type()
 

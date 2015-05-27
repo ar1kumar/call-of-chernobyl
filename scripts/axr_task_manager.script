@@ -111,9 +111,20 @@ function get_first_finished_task(npc,is_sim)
 	--	printf("get_first_finished_task task_id=%s",task_id)
 		if (task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","float")) then
 			--printf("get_first_finished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
-			if (is_sim ~= true or alun_utils.load_var(npc,task_id.."_is_giver") == true) then 
+			if (is_sim) then 
+				local id = alun_utils.load_var(db.actor,task_id.."_giver_id")
+				if (id) then 
+					if (npc:id() == id) then 
+						return task_id
+					end 
+					local se_obj = alife():object(npc:id())
+					if (se_obj and se_obj.group_id == id) then 
+						return task_id
+					end 				
+				end
+			else 
 				return task_id
-			end
+			end 
 		end
 		count = count + 1
 		task_id = sec..tostring(count)

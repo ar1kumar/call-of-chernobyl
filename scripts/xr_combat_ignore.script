@@ -282,6 +282,17 @@ function ignore_enemy_by_overrides(obj,enemy,no_check_job)
 		--obj:enable_memory_object(enemy,false)
 		return true
 	end
+	
+	-- enemy_ignore_cond override from custom data logic
+	-- if this is true then npc will IGNORE combat with this specific enemy
+	local ene_st = db.storage[ene_id] and db.storage[ene_id].overrides
+	if (ene_st) then
+		local ignore = ene_st.enemy_ignore and xr_logic.pick_section_from_condlist(obj, enemy, ene_st.enemy_ignore.condlist)
+		if (ignore) and (ignore == "true" or ignore == "always") then
+			--obj:enable_memory_object(enemy,false)
+			return true
+		end
+	end
 
 	-- Ignore enemies because of no_combat_job
 	if (no_check_job ~= true) and (st and st.no_combat_job and xr_logic.pick_section_from_condlist(enemy, obj, st.no_combat_job.condlist) == "true") then

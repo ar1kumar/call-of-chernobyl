@@ -67,6 +67,44 @@ function check_smart_under_faction_control(task,task_id)
 	return "complete"	
 end
 
+function hostage_task(task,task_id)
+	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
+	if not (p[1]) then
+		printf("task_status_function not set up properly! check_if_looted_enough needs an extra param for squad story id! task_id=%s",task_id)
+		return 
+	end 
+	
+	local squad = get_story_squad(p[1])
+	if not (squad) then 
+		return
+	end
+
+	if (task.stage == 0) then 
+		if (xrs_kill_wounded) then 
+			xrs_kill_wounded.hostage_list[squad:commander_id()] = true
+		end
+	else
+		if (xrs_kill_wounded) then 
+			xrs_kill_wounded.hostage_list[squad:commander_id()] = nil
+		end
+		
+		local id = alun_utils.load_var(db.actor,task_id.."_giver_id")
+		local se_obj = id and alife():object(id)
+		if (se_obj) then 
+			if (se_obj:clsid() == clsid.online_offline_group_s) then 
+				return
+			end 
+			
+			if not (se_obj:alive()) then 
+				return "complete"
+			end
+		else 
+			return "complete"
+		end 
+	end
+end 
+
+
 function actor_has_fetch_item(task,task_id)
 	local section = db.actor and alun_utils.load_var(db.actor,task_id.."_fetch")
 	local item = section and db.actor:object(section)

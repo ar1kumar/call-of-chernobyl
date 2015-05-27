@@ -212,7 +212,7 @@ function action_beh:execute()
 
 	if (self.st.target == "waypoint") then
 		return self:beh_path()
-	elseif (self.st.target == "cover" or self.st.target == "cover_near_actor" or self.st.target == "task_target_anomaly" or self.st.target == "scan_area") then 
+	elseif (self.st.target == "cover" or self.st.target == "cover_near_actor" or self.st.target == "task_target_anomaly" or self.st.target == "scan_area" or self.st.target == "task_target_hostage") then 
 		return self:beh_cover()
 	elseif (self.st.behavior == "beh_move") then
 		return self:beh_move()
@@ -240,20 +240,34 @@ end
 
 function action_beh:set_desired_target()
 	local target = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.goto_target)
-	self.st.target = target
+	
 	if (target == nil or target == "" or target == "nil") then
 		return false
 	end
 	
 	if (self.st.desired_target) then
+	
+		if (self.st.target ~= target) then
+			self.st.target = target
+			self.st.desired_target.__keep_until = nil
+		end 
+	
 		local tg = time_global()
-		if (self.st.desired_target.__keep_until and tg < self.st.desired_target.__keep_until) then 
-			return true
+		if (self.st.desired_target.__keep_until) then
+			-- do forever if keep_until is -1
+			if (self.st.desired_target.__keep_until == -1) then 
+				return true 
+			end
+			if (tg < self.st.desired_target.__keep_until) then 
+				return true
+			end
 		end
 		if (self.st.desired_target.level_vertex_id) then
 			db.used_level_vertex_ids[self.st.desired_target.level_vertex_id] = nil
 		end
 	end
+	
+	self.st.target = target
 
 	local t = self.st.desired_target and empty_table(self.st.desired_target) or {}
 	local function set_position_data(id)
@@ -318,6 +332,16 @@ function action_beh:set_desired_target()
 					t.__keep_until = time_global() + 8000
 				end
 			end
+		end
+	elseif (target == "task_target_hostage") then
+		local vid = alun_utils.try_go_cover(self.object,self.object)
+		if (vid) then
+			db.used_level_vertex_ids[vid] = self.object:id()
+			t.level_vertex_id = vid
+			t.position = level.vertex_position(vid)
+			t.direction = self.object:position():sub(t.position)
+			t.object = db.actor
+			t.__keep_until = -1
 		end
 	elseif (target == "waypoint") then
 		t = self:get_current_waypoint()

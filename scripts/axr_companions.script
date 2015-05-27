@@ -131,7 +131,8 @@ end
 
 function companion_squad_can_teleport(squad)
 	local id = squad:commander_id()
-	if (id and alife():has_info(id,"npcx_beh_patrol_mode") or alife():has_info(id,"npcx_beh_wait")) then
+	local sim = alife()
+	if (id) and (sim:has_info(id,"npcx_beh_patrol_mode") or sim:has_info(id,"npcx_beh_wait") or sim:has_info(id,"npcx_no_teleport")) then
 		return false
 	end
 	return true

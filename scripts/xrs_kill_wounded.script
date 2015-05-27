@@ -8,6 +8,7 @@
 evaid = 188112
 actid = 188112
 ----------------------------------------------------------------------------------------------------------------------
+hostage_list = {}
 
 local ini = ini_file("ai_tweaks\\xrs_kill_wounded.ltx")
 local Enable = alun_utils.read_from_ini(ini,"settings","enable","bool",false)
@@ -127,7 +128,19 @@ local function get_rand_vertex(npc,vo)
 end
 
 local function is_wounded(npc)
-	return xr_wounded.is_wounded(npc)
+	return xr_wounded.is_wounded(npc) or hostage_list[npc:id()] == true
+end
+
+local function get_hostage(npc)
+	local squad = get_object_squad(npc)
+	if (squad and squad:commander_id() == npc:id()) then
+		for id,v in pairs(hostage_list) do
+			local vo = level.object_by_id(id)
+			if (vo and npc:position():distance_to_sqr(vo:position()) <= 900) then
+				return vo
+			end
+		end
+	end
 end
 -----------------------------------------------
 class "eva_kill_wounded" ( property_evaluator )
@@ -165,7 +178,7 @@ function eva_kill_wounded:evaluate()
 
 		st.delta = tg+math.random(2000,3000)
 
-		local vo = npc:best_enemy()
+		local vo = npc:best_enemy() or get_hostage(npc)
 		if (vo and IsStalker(vo) and vo:alive() and is_wounded(vo)) then
 			st.current_id = vo:id()
 
@@ -224,7 +237,7 @@ function eva_kill_wounded:evaluate()
 		
 		npc:set_item(object.aim1,st.weapon)
 
-		local vo = npc:best_enemy()
+		local vo = npc:best_enemy() or get_hostage(npc)
 		if (not vo) or (not vo:alive()) or (not is_wounded(vo)) then
 			st.stage = 0
 			return false
@@ -260,6 +273,9 @@ function act_kill_wounded:initialize()
 end
 
 function act_kill_wounded:begin_kill_wounded(vo)
+	if (hostage_list[vo:id()] == true) then
+		return 
+	end
 	if not (self.st.timer) then
 		local tg = time_global()
 
@@ -280,7 +296,7 @@ function act_kill_wounded:execute()
 	action_base.execute(self)
 	local npc = self.object 
 	local st = self.st
-	local vo = npc:best_enemy()
+	local vo = npc:best_enemy() or get_hostage(npc)
 	if (not vo) or (not vo:alive()) or (not is_wounded(vo)) then
 		st.stage = 0
 		return
@@ -377,7 +393,7 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	local wp = world_property
 	temp.action:add_precondition(wp(evaid,true) )
 	temp.action:add_precondition(wp(stalker_ids.property_alive,true))
-	temp.action:add_precondition(wp(stalker_ids.property_enemy,true))
+	--temp.action:add_precondition(wp(stalker_ids.property_enemy,true))
 	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
 	temp.action:add_effect(wp(evaid,false))
 	

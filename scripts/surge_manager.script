@@ -1266,14 +1266,15 @@ function CSurgeManager:kill_all_unhided()
 						["monster"]					= true,
 						["zombied"]					= true
 						 }
+	local sim = alife()
 	for k,v in pairs(board.squads) do
 		local squad = v
 		if(immuned_to_surge_squads[squad.player_id] ~= true and check_squad_level(squad.id) and squad.online) then
 			if not(get_object_story_id(squad.id)) then
 				local squad_npcs = get_squad_members(squad.id)
 				for kk,vv in pairs(squad_npcs) do
-					local obj = alife():object(kk)
-					if(obj and not(get_object_story_id(obj.id))) then
+					local obj = sim:object(kk)
+					if(obj) and not(get_object_story_id(obj.id)) and not(sim:has_info(obj.id,"npcx_is_companion")) then
 						local fate = self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_blowout_fate",0,"killonwave")
 						if(check_squad_smart_props(squad.id)) then
 							--printf("Releasing npc [%s] from squad [%s] because of surge!",obj:name(), squad:name())
@@ -1312,7 +1313,6 @@ function CSurgeManager:kill_all_unhided()
 	end
 	
 	-- don't kill actor if he isn't only a valid level
-	local sim = alife()
 	local actor_level = sim:level_name(game_graph():vertex(sim:actor().m_game_vertex_id):level_id())
 	if (self.atmosfear.valid_levels[actor_level] ~= true) then 
 		return 
