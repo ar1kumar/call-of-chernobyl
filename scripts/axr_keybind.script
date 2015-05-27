@@ -1,0 +1,28 @@
+-- Handler for scripted keybinds 
+
+local function on_key_press(key)
+	if (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_cycle_combat_mode",0,"")]) then 
+		axr_companions.cycle_companions_combat_mode()
+	elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_cycle_move_mode",0,"")]) then 
+		axr_companions.cycle_companions_move_mode()
+	end
+end
+
+function on_game_start()
+	callback_register("on_key_press",on_key_press)
+	
+	local need_save
+	if not (axr_main.config:KeyExist("global_keybinds","companion_cycle_combat_mode")) then
+		axr_main.config:SetValue("global_keybinds","companion_cycle_combat_mode","DIK_NUMPAD3")
+		need_save = true
+	end
+
+	if not (axr_main.config:KeyExist("global_keybinds","companion_cycle_move_mode")) then
+		axr_main.config:SetValue("global_keybinds","companion_cycle_move_mode","DIK_NUMPAD4")
+		need_save = true
+	end
+	
+	if (need_save) then
+		axr_main.config:Save()
+	end
+end 

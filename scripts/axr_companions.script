@@ -380,3 +380,56 @@ function companion_add_waypoints(npc)
 	local s = "5000,patrol | pos:"..pos.x..","..pos.y..","..pos.z
 	alun_utils.save_var(npc,"pathpoint"..tostring(i),s)
 end
+
+local _current_combat_mode = 1
+function cycle_companions_combat_mode()
+	local t = {"set_companion_to_attack_state","set_companion_to_ignore_combat_state","set_companion_to_attack_only_actor_combat_enemy_state"}
+	if (_current_combat_mode+1 > #t) then 
+		_current_combat_mode = 1
+	else 
+		_current_combat_mode = _current_combat_mode + 1
+	end
+	
+	SetHudMsg(game.translate_string("st_"..t[_current_combat_mode]),12)
+	
+	local f = this[t[_current_combat_mode]]
+	if (f) then 
+		for id,squad in pairs(companion_squads) do 
+			if (squad and squad.commander_id) then
+				for k in squad:squad_members() do
+					local member = db.storage[k.id] and db.storage[k.id].object
+					if (member and member:alive()) then
+						f(member)
+					end
+				end
+			end
+		end
+	end
+end 
+
+local _current_move_mode = 1
+function cycle_companions_move_mode()
+	local t = {"set_companion_to_wait_state","set_companion_to_follow_state"}
+	
+	if (_current_move_mode+1 > #t) then 
+		_current_move_mode = 1
+	else 
+		_current_move_mode = _current_move_mode + 1
+	end
+	
+	SetHudMsg(game.translate_string("st_"..t[_current_move_mode]),12)
+	
+	local f = this[t[_current_move_mode]]
+	if (f) then 
+		for id,squad in pairs(companion_squads) do 
+			if (squad and squad.commander_id) then
+				for k in squad:squad_members() do
+					local member = db.storage[k.id] and db.storage[k.id].object
+					if (member and member:alive()) then
+						f(member)
+					end
+				end
+			end
+		end
+	end
+end 
