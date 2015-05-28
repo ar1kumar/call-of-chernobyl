@@ -152,13 +152,11 @@ function generic_object_binder:extrapolate_callback()
 	if not level.patrol_path_exists(patrol_path) then
 		--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
 		return false
-		--printf("bind_monster:extrapolate_callback(). There is no patrol path [%s]", tostring(patrol_path))
 	end
 	if patrol(patrol_path):flags(cur_pt):get() == 0 then
 		--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
 		return true
 	end
-	--printf("_bp: generic_object_binder: extrapolate_callback: cur_pt = %d: false", cur_pt)
 	--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
 	return false
 end

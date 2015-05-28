@@ -22,9 +22,12 @@ end
 
 function opt_menu_on_init(menu)
 	local xml = menu.xml
-	xml:InitStatic("tab_gameplay:cap_check_debug_hud", menu.dlg_gameplay)
-	menu.ck_debug_hud = xml:InitCheck("tab_gameplay:check_debug_hud",	menu.dlg_gameplay)
-	menu:Register(menu.ck_debug_hud,"ck_debug_hud")
+	
+	if string.find(command_line(), "-dbg") then
+		xml:InitStatic("tab_gameplay:cap_check_debug_hud", menu.dlg_gameplay)
+		menu.ck_debug_hud = xml:InitCheck("tab_gameplay:check_debug_hud",	menu.dlg_gameplay)
+		menu:Register(menu.ck_debug_hud,"ck_debug_hud")
+	end
 
 	xml:InitStatic("tab_gameplay:cap_check_radio_mod", menu.dlg_gameplay)
 	menu.ck_radio_mod = xml:InitCheck("tab_gameplay:check_radio_mod",	menu.dlg_gameplay)
@@ -36,14 +39,18 @@ function opt_menu_on_init(menu)
 end 
 
 function opt_menu_on_accept(menu,optMgr,console)
-	axr_main.config:SetValue("debug","enable_hud",menu.ck_debug_hud:GetCheck())
+	if string.find(command_line(), "-dbg") then
+		axr_main.config:SetValue("debug","enable_hud",menu.ck_debug_hud:GetCheck())
+	end
 	axr_main.config:SetValue("features","enable_radio",menu.ck_radio_mod:GetCheck())
 	axr_main.config:SetValue("features","enable_repair_feature",menu.ck_repair_feature:GetCheck())
 	axr_main.config:Save()
 end
 
 function opt_menu_on_set_values(menu,optMgr)
-	menu.ck_debug_hud:SetCheck(axr_main.config:GetValue("debug","enable_hud",1,false))
+	if string.find(command_line(), "-dbg") then
+		menu.ck_debug_hud:SetCheck(axr_main.config:GetValue("debug","enable_hud",1,false))
+	end
 	menu.ck_radio_mod:SetCheck(axr_main.config:GetValue("features","enable_radio",1,false))
 	menu.ck_repair_feature:SetCheck(axr_main.config:GetValue("features","enable_repair_feature",1,false))
 end

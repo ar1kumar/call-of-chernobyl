@@ -184,8 +184,10 @@ function CGeneralTask:check_task(tm)
 	end
 	
 	-- DEBUGGING!
-	if (xrs_debug_tools) then 
-		xrs_debug_tools.debug_task_infos[self.id] = self
+	if (string.find(command_line(), "-dbg")) then
+		if (xrs_debug_tools) then
+			xrs_debug_tools.debug_task_infos[self.id] = self
+		end
 	end 
 
 	self.check_time = global_time + 1000 + math.random() + (self.prior*100)

@@ -131,8 +131,10 @@ function is_enemy(obj,enemy,no_memory)
 	local id = obj:id()
 	local st = db.storage[id]
 	
-	if (xrs_debug_tools and xrs_debug_tools.debug_invis and ene_id == 0) then
-		return false
+	if string.find(command_line(), "-dbg") then
+		if (xrs_debug_tools and xrs_debug_tools.debug_invis and ene_id == 0) then
+			return false
+		end
 	end
 	
 	local obj_is_stalker = IsStalker(obj)

@@ -278,7 +278,10 @@ function on_game_start()
 	
 	phantom_manager.on_game_start()
 	
-	if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
+	if string.find(command_line(), "-dbg") then
+		if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
+	end 
+	
 	-- CoP
 	if (xrs_dyn_music) then xrs_dyn_music.on_game_start() end 
 	

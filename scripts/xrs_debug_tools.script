@@ -397,8 +397,6 @@ function on_game_start()
 	actor_info = {}
 
 	local sect = "plugin"
-	local developer_debug = alun_utils.read_from_ini(ini,"plugin","developer_debug","bool",false)
-	local debug_gulag = alun_utils.read_from_ini(ini,"plugin","debug_gulag","bool",false)
 	position_file = alun_utils.read_from_ini(ini,"plugin","file_save_position_info","string","positional_info.txt")
 
 	keybinds = 	{
@@ -411,9 +409,6 @@ function on_game_start()
 					["toggle_right_hud"] = alun_utils.read_from_ini(ini,"plugin","keybind_toggle_right_hud","string","F3")
 				}
 
-	if (developer_debug) then
-		_G.dev_debug = true
-	end
 end 
 
 -- NPC target for hud display ( nil = off )

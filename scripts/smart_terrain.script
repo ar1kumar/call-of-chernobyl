@@ -1080,7 +1080,7 @@ function se_smart_terrain:get_smart_props()
 	end
 
 	local props = (not self.disabled) and smart_names.get_smart_terrain_name(self)
-	if(props==nil) or ((_G.dev_debug and not axr_main) or axr_main and axr_main.config and axr_main.config:GetValue("debug","enable_hud",1,false) == true) then
+	if(props==nil) or (axr_main.config:GetValue("debug","enable_hud",1,false) == true and string.find(command_line(), "-dbg")) then
 		if (self.disabled) then
 			return "deactivated\\n\\n"..self:name().."  ["..self.id.."]\\n"..self.sim_type.."\\n".."squad_id = "..tostring(self.id)
 		end
@@ -1139,7 +1139,7 @@ function se_smart_terrain:show()
 		return
 	end
 
-	if ((_G.dev_debug and not axr_main) or axr_main and axr_main.config and axr_main.config:GetValue("debug","enable_hud",1,false) == true) then
+	if (axr_main.config:GetValue("debug","enable_hud",1,false) == true and string.find(command_line(), "-dbg")) then
 		if(self.smrt_showed_spot~=nil) then
 			level.map_remove_object_spot(self.id, "alife_presentation_smart_"..self.sim_type.."_"..self.smrt_showed_spot)
 		end
@@ -1172,7 +1172,7 @@ end
 function se_smart_terrain:update()
 	cse_alife_smart_zone.update( self )
 
-	if dev_debug then
+	if (axr_main.config:GetValue("debug","enable_hud",1,false) == true and string.find(command_line(), "-dbg")) then
 		self:show()
 	end
 	

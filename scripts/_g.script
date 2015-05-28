@@ -76,8 +76,6 @@ function load_scheme(filename, scheme, ...)
 end
 
 ----------------------------------------------------------------------
-dev_debug = false
-sim_debug = false
 mus_vol = 0
 amb_vol = 0
 b_discard_settings_shown = false
@@ -799,17 +797,17 @@ end
 
 function give_info (info)
 	db.actor:give_info_portion(info)
-	if (xrs_debug_tools and xrs_debug_tools.actor_info) then
-		xrs_debug_tools.actor_info[info] = true
-	end
+	--if (xrs_debug_tools and xrs_debug_tools.actor_info) then
+	--	xrs_debug_tools.actor_info[info] = true
+	--end
 end
 function disable_info (info)
 	if has_alife_info(info) then
 		printf("*INFO*: disabled npc='single_player' id='%s'", info)
 		db.actor:disable_info_portion(info)
-		if (xrs_debug_tools and xrs_debug_tools.actor_info) then
-			xrs_debug_tools.actor_info[info] = nil
-		end
+		--if (xrs_debug_tools and xrs_debug_tools.actor_info) then
+		--	xrs_debug_tools.actor_info[info] = nil
+		--end
 	end
 end
 

@@ -1944,9 +1944,6 @@ function destroy_object(actor, obj, p)
 
 	local sim = alife()
 	if (axr_main) then
-		if (dev_debug) then
-			printf("xr_effects.destroy_object: se_obj = %s",sobj:name())
-		end
 		create_delayed_event(sobj.id,"safe_release",1,alun_utils.release_object,sobj.id)
 		return
 	end
