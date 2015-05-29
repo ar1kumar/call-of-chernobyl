@@ -59,7 +59,8 @@ function reset_hear_callback(st, section)
 																condlist = xr_logic.parse_condlist(obj, "hear_callback", "hear_callback", parsed_params[5])}
 	end
 	local ini = st.ini
-	if not ini:section_exist(section) then
+	
+	if (ini == nil or not ini:section_exist(section)) then
 		return
 	end
  	local n = ini:line_count(section)
