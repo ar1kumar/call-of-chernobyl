@@ -34,11 +34,12 @@ function debug_ui:__init(owner,binds) super()
 	self.owner = owner
 	self.binds = binds
 	self.txt_console = {}
+	self.tab_list = {}
 	self.console_size = 27
 	self:InitControls()
 	self:InitCallBacks()
 	self.tab:SetActiveTab("spawner")
-	self:SendOutput("Alundaio's xrs_debug_tools version 2.3      [Type help for a list of commands]")
+	self:SendOutput("Alundaio's xrs_debug_tools version 2.5      [Type help for a list of commands]")
 	self.console_relay = false
 end
 
@@ -46,11 +47,21 @@ function debug_ui:__finalize()
 
 end
 
+function debug_ui:CreateTab(uID)
+	self.tab_list[uID] = true
+	self["dlg_"..uID] = this["debug_ui_"..uID](self,binds)
+	self["dlg_"..uID]:InitControls(0,0, self.xml, self)
+	self["dlg_"..uID]:Show(false)
+	self.dialog:AttachChild(self["dlg_"..uID])
+	self.xml:InitWindow("tab_size", 0, self["dlg_"..uID])
+end
+
 function debug_ui:InitControls()
 	self:SetWndRect				(Frect():set(0,0,1024,768))
 	self:Enable					(true)
 
 	local xml					= CScriptXmlInit()
+	self.xml = xml
 	xml:ParseFile				("ui_debug_main.xml")
 
 	xml:InitStatic				("background", self)
@@ -94,33 +105,11 @@ function debug_ui:InitControls()
 	xml:InitStatic("main_dialog:cap_near_id", self.dialog)
 	self.txt_near = xml:InitTextWnd("main_dialog:form:txt_near", self.form)
 
-	-- Tab Spawner
-	self.dlg_spawner = debug_spawner_ui(self,binds)
-	self.dlg_spawner:InitControls(0,0, xml, self)
-	self.dlg_spawner:Show(false)
-	self.dialog:AttachChild(self.dlg_spawner)
-	xml:InitWindow("tab_size", 0, self.dlg_spawner)
-
-	-- Tab HUD options
-	self.dlg_hud = debug_hud_ui(self,binds)
-	self.dlg_hud:InitControls(0,0, xml, self)
-	self.dlg_hud:Show(false)
-	self.dialog:AttachChild(self.dlg_hud)
-	xml:InitWindow("tab_size", 0, self.dlg_hud)
-
-	-- Tab Object Info
-	self.dlg_object = debug_object_ui(self,binds)
-	self.dlg_object:InitControls(0,0, xml, self)
-	self.dlg_object:Show(false)
-	self.dialog:AttachChild(self.dlg_object)
-	xml:InitWindow("tab_size", 0, self.dlg_object)
-
-	-- Tab Advanced
-	self.dlg_advanced = debug_advanced_ui(self,binds)
-	self.dlg_advanced:InitControls(0,0, xml, self)
-	self.dlg_advanced:Show(false)
-	self.dialog:AttachChild(self.dlg_advanced)
-	xml:InitWindow("tab_size", 0, self.dlg_advanced)
+	-- Tabs
+	--self:CreateTab("spawner")
+	--self:CreateTab("editor")
+	--self:CreateTab("object")
+	--self:CreateTab("advanced")
 
 	-- Dialog Tab
 	self.tab = xml:InitTab("main_dialog:tab", self.dialog)
@@ -131,9 +120,18 @@ function debug_ui:SetCurrentValues()
 
 end
 
+function debug_ui:ShowConsole()
+	self.console:Show(true)
+	self.console_input:Show(true)
+end
+
+function debug_ui:HideConsole()
+	self.console:Show(false)
+	self.console_input:Show(false)
+end
+
 function debug_ui:Update()
 	CUIScriptWnd.Update(self)
-
 end
 
 function debug_ui:InitCallBacks()
@@ -155,6 +153,18 @@ function debug_ui:InitCallBacks()
 	self:AddCallback("list_sections", ui_events.LIST_ITEM_SELECT,		 self.OnSelectSectionList,		self)
 	self:AddCallback("list_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnButton_create_clicked,	self)
     --self:AddCallback("btn_create",	  ui_events.BUTTON_CLICKED,          self.OnButton_create_clicked,	self)
+	
+	-- Icon Editor 
+	self:AddCallback("editor_list_sections", ui_events.LIST_ITEM_SELECT,		 self.OnSelectEditorSectionList,	self)
+	self:AddCallback("editor_list_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnEditorTriggerSectionSelection,	self)
+	
+	self:AddCallback("fld_icon_x",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
+	self:AddCallback("fld_icon_y",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
+	self:AddCallback("fld_icon_width",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
+	self:AddCallback("fld_icon_height",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
+	self:AddCallback("fld_addon_offset_x",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
+	self:AddCallback("fld_addon_offset_y",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)	
+	--
 	
 	-- level jump tab
 	self:AddCallback("list_levels_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.JumpToLevel,	self)
@@ -387,21 +397,29 @@ function debug_ui:OnQuit()
 end
 
 function debug_ui:OnTabChange()
-	self.dlg_spawner:Show	(false)
-	self.dlg_hud:Show		(false)
-	self.dlg_object:Show	(false)
-	self.dlg_advanced:Show	(false)
-
+	for k,v in pairs(self.tab_list) do 
+		self["dlg_"..k]:Show(false)
+	end 
+	
 	local ids = self.tab:GetActiveId()
-	if ids == "spawner" then
-		self.dlg_spawner:Show(true)
-	elseif ids == "hud" then
-		self.dlg_hud:Show(true)
-	elseif ids == "object" then
-		self.dlg_object:Show(true)
-	elseif ids == "advanced" then
-		self.dlg_advanced:Show(true)
+	
+	if not (self["dlg_"..ids]) then
+		self:CreateTab(ids)
 	end
+	
+	if (ids == "editor" and self.ui_icon_equipment) then 
+		self:HideConsole()
+		self.ui_icon_equipment:Show(true)
+		self.ui_icon_equipment_back:Show(true)
+		self.icon_square:Show(true)
+	elseif (self.ui_icon_equipment) then
+		self.ui_icon_equipment:Show(false)
+		self.icon_square:Show(false)
+		self.ui_icon_equipment_back:Show(false)
+		self:ShowConsole()
+	end 
+	
+	self["dlg_"..ids]:Show(true)
 end
 
 function debug_ui:OnKeyboard(dik, keyboard_action)
@@ -1073,6 +1091,16 @@ function debug_ui:FillList(name)
 		return
 	end
 
+	
+	local is_squad = string.find(name,"Squad")
+	local cant_spawn_actor = string.find(name,"NPC") or string.find(name,"Physic")
+	
+	if (is_squad) then 
+	--	self.smarts_list:Show(true)
+	else
+	--	self.smarts_list:Show(false)
+	end
+	
 	local ini = system_ini()
 
 	table.sort(spawntbl)
@@ -1084,14 +1112,43 @@ function debug_ui:FillList(name)
 			--_itm.name:SetText(name)
 			_itm.sect:SetText(spawntbl[i])
 
-			if (string.find(name,"Squad")) then
+			if (is_squad) then
 				_itm.no_id = true
 				_itm.squad = true
-			elseif (string.find(name,"NPC") or string.find(name,"Physic")) then
+			elseif (cant_spawn_actor) then
 				_itm.no_id = true
 			end
 
 			self.spawn_list:AddExistingItem(_itm)
+		end
+	end
+end
+
+function debug_ui:FillEditorList(name)
+	self.editor_icon:SetTextureRect(Frect():set(0,0,0,0))
+	
+	if not (name) then
+		self:SendOutput("UIEditor: No spawn table could be created for %s",name)
+		return
+	end
+
+	self.editor_spawn_list:Clear()
+
+	local spawntbl = get_spawn_table(name)
+
+	if not (spawntbl) then
+		self:SendOutput("UIEditor: No spawn table could be created for %s",name)
+		return
+	end
+
+	local ini = system_ini()
+
+	table.sort(spawntbl)
+	for i = 1, #spawntbl do
+		if (ini:section_exist(spawntbl[i])) then
+			local _itm = set_list_text(22)
+			_itm.sect:SetText(spawntbl[i])
+			self.editor_spawn_list:AddExistingItem(_itm)
 		end
 	end
 end
@@ -1121,6 +1178,10 @@ end
 
 function debug_ui:OnSelectSectionList()
 	self:FillList(self.sections_list:GetText())
+end
+
+function debug_ui:OnSelectEditorSectionList()
+	self:FillEditorList(self.editor_sections_list:GetText())
 end
 
 function debug_ui:OnButton_create_clicked()
@@ -1171,21 +1232,168 @@ function debug_ui:OnButton_create_clicked()
 	self:SendOutput("UISpawner: Spawned %s on %s as id %s",se_obj:name(),id == 0 and "Actor" or "level",se_obj.id)
 end
 
+function debug_ui:OnEditorTriggerSectionSelection()
+
+	self.editor_icon:SetTextureRect(Frect():set(0,0,0,0))
+	self.editor_icon_addon:SetTextureRect(Frect():set(0,0,0,0))
+		
+	if self.editor_spawn_list:GetSize() == 0 then
+		self:SendOutput("UIEditor: List is empty.")
+		return
+	end
+	
+	local item
+	item = self.editor_spawn_list:GetSelectedItem()
+	if not(item) then
+		self:SendOutput("UIEditor: No item section was selected in the list.")
+		return
+	end
+
+	local section = item.sect:GetText()	
+	local ini = system_ini()
+	if  not (ini:section_exist(section)) then
+		self:SendOutput(alun_utils.sr("UIEditor: Section %s does not exist",section))
+		return 
+	end 
+	
+	local scale = 0.75
+	
+	
+	local inv_grid_width = alun_utils.read_from_ini(ini,section,"inv_grid_width","float",0)
+	local inv_grid_height = alun_utils.read_from_ini(ini,section,"inv_grid_height","float",0)
+	local inv_grid_x = alun_utils.read_from_ini(ini,section,"inv_grid_x","float",0)
+	local inv_grid_y = alun_utils.read_from_ini(ini,section,"inv_grid_y","float",0)
+
+	local x1 = inv_grid_x*50
+	local y1 = inv_grid_y*50
+
+	local w = inv_grid_width*50
+	local h = inv_grid_height*50
+
+	local x2 = x1 + w
+	local y2 = y1 + h
+	
+	self.editor_icon:InitTexture("ui\\ui_icon_equipment")
+	self.editor_icon:SetTextureRect(Frect():set(x1,y1,x2,y2))
+	self.editor_icon:SetWndSize(vector2():set(w*scale,h*scale))
+	
+	self.fld_icon_x:SetText(tostring(inv_grid_x))
+	self.fld_icon_y:SetText(tostring(inv_grid_y))
+	
+	self.fld_icon_width:SetText(tostring(inv_grid_width))
+	self.fld_icon_height:SetText(tostring(inv_grid_height))
+	
+	local pos = self.ui_icon_equipment:GetWndPos()
+	self.icon_square:SetWndPos(vector2():set( pos.x+x1/4 , pos.y+y1/4 ))
+	self.icon_square:SetWndSize(vector2():set(w/4,h/4))
+	
+	local name = self.addon_list:GetText()
+	if not (name and name ~= "Select Addon Type") then
+		return 
+	end 
+	
+	local scopes = name == "scope" and alun_utils.parse_list(ini,section,"scopes_sect")
+	local scope_sec = section
+	if (scopes and #scopes > 0) then 
+		scope_sec = scopes[1]
+	end 
+	
+	local addon_sec = alun_utils.read_from_ini(ini,scope_sec,name.."_name","string")
+	if not (addon_sec and ini:section_exist(addon_sec)) then
+		return 
+	end
+	
+	local addon_inv_grid_width = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_width","float",0)
+	local addon_inv_grid_height = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_height","float",0)
+	local addon_inv_grid_x = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_x","float",0)
+	local addon_inv_grid_y = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_y","float",0)
+
+	local addon_x1 = addon_inv_grid_x*50
+	local addon_y1 = addon_inv_grid_y*50
+
+	local addon_w = addon_inv_grid_width*50
+	local addon_h = addon_inv_grid_height*50
+
+	local addon_x2 = addon_x1 + addon_w
+	local addon_y2 = addon_y1 + addon_h
+	
+	local offset_x = alun_utils.read_from_ini(ini,scope_sec,name.."_x","float",0)
+	local offset_y = alun_utils.read_from_ini(ini,scope_sec,name.."_y","float",0)
+	
+	self.editor_icon_addon:InitTexture("ui\\ui_icon_equipment")
+	self.editor_icon_addon:SetTextureRect(Frect():set(addon_x1,addon_y1,addon_x2,addon_y2))
+	self.editor_icon_addon:SetWndSize(vector2():set(addon_w*scale,addon_h*scale))
+	
+	pos = self.editor_icon:GetWndPos()
+	self.editor_icon_addon:SetWndPos(vector2():set(pos.x+offset_x*scale,pos.y+offset_y*scale))
+	
+	self.fld_addon_offset_x:SetText(tostring(offset_x))
+	self.fld_addon_offset_y:SetText(tostring(offset_y))
+end 
+
+function debug_ui:OnEditIcon()
+
+	local x1 = tonumber(self.fld_icon_x:GetText())
+	local y1 = x1 and tonumber(self.fld_icon_y:GetText())
+	
+	local w = y1 and tonumber(self.fld_icon_width:GetText())
+	local h = w and tonumber(self.fld_icon_height:GetText())
+	
+	if not (x1 and y1 and w and h) then 
+		return
+	end 
+	
+	local scale = 0.75
+	
+	x1 = x1*50
+	y1 = y1*50 
+	w = w*50 
+	h = h*50
+	
+	local x2 = x1 + w
+	local y2 = y1 + h
+	
+	--self.editor_icon:InitTexture("ui\\ui_icon_equipment")
+	self.editor_icon:SetTextureRect(Frect():set(x1,y1,x2,y2))
+	self.editor_icon:SetWndSize(vector2():set(w*scale,h*scale))
+	
+	local pos = self.ui_icon_equipment:GetWndPos()
+	self.icon_square:SetWndPos(vector2():set( pos.x+x1/4 , pos.y+y1/4 ))
+	self.icon_square:SetWndSize(vector2():set(w/4,h/4))
+	
+	local name = self.addon_list:GetText()
+	if not (name and name ~= "Select Addon Type") then
+		return 
+	end 
+	
+	local offset_x = tonumber(self.fld_addon_offset_x:GetText())
+	local offset_y  = offset_x and tonumber(self.fld_addon_offset_y:GetText())
+	
+	if not (offset_y) then
+		self.editor_icon_addon:SetTextureRect(Frect():set(0,0,0,0))
+		return 
+	end 
+	
+	pos = self.editor_icon:GetWndPos()
+	self.editor_icon_addon:SetWndPos(vector2():set(pos.x+offset_x*scale,pos.y+offset_y*scale))
+end 
+
+
 -- SPAWNER UI
 --[[
 Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
-class "debug_spawner_ui" (CUIWindow)
-function debug_spawner_ui:__init(owner, binds) super()
+class "debug_ui_spawner" (CUIWindow)
+function debug_ui_spawner:__init(owner, binds) super()
 	self.owner = owner
 	self.binds = binds
 end
-function debug_spawner_ui:__finalize()
+function debug_ui_spawner:__finalize()
 
 end
 
-function debug_spawner_ui:InitControls(x, y, xml, owner)
+function debug_ui_spawner:InitControls(x, y, xml, owner)
 	self:SetWndPos(vector2():set(x-50,y))
 	self:SetWndSize(vector2():set(800,416))
 	self:SetAutoDelete(true)
@@ -1215,10 +1423,11 @@ function debug_spawner_ui:InitControls(x, y, xml, owner)
 	--local ctrl = xml:Init3tButton("tab_spawner:btn_create",self)
 	--owner:Register(ctrl, "btn_create")
 
+
 	owner.smarts_list = xml:InitComboBox("tab_spawner:list_smarts", self)
 	owner.smarts_list:ClearList()
 	owner.smarts_list:SetAutoDelete(true)
-
+	
 	local sim = alife()
 	local actor_level = sim:level_name(game_graph():vertex(sim:actor().m_game_vertex_id):level_id())
 	local board = SIMBOARD
@@ -1230,13 +1439,33 @@ function debug_spawner_ui:InitControls(x, y, xml, owner)
 		end
 	end
 
+	owner.smarts_list:SetText("Squad to Smart")
+	
+	--owner.smarts_list:Show(false)
+	
+	owner.smarts_list_cap = xml:InitStatic("tab_spawner:cap_smarts", self)
+
 	--owner:Register(owner.smarts_list, "list_smarts")
 
 	-- Set defaults
-	owner.sections_list:SetText("Weapons (Rifle)")
-	owner:FillList("Weapons (Rifle)")
+	owner.sections_list:SetText("Spawn Sections")
+	--owner:FillList("Weapons (Rifle)")
 
-	owner.smarts_list:SetText("Squad to Smart")
+	------------------------- manual input 
+	xml:InitStatic("tab_spawner:cap_spawn", self)
+	owner.fld_spawn = xml:InitEditBox("tab_spawner:fld_spawn", self)
+
+	btn = xml:Init3tButton("tab_spawner:btn_spawn",self)
+	owner:Register(btn, "btn_spawn")
+
+	xml:InitStatic("tab_spawner:cap_spawn_squad", self)
+	owner.fld_spawn_squad = xml:InitEditBox("tab_spawner:fld_spawn_squad", self)
+
+	xml:InitStatic("tab_spawner:cap_spawn_smart", self)
+	owner.fld_spawn_smart = xml:InitEditBox("tab_spawner:fld_spawn_smart", self)
+
+	btn = xml:Init3tButton("tab_spawner:btn_spawn_squad",self)
+	owner:Register(btn, "btn_spawn_squad")
 end
 
 -- HUD UI
@@ -1244,15 +1473,15 @@ end
 Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
-class "debug_hud_ui" (CUIWindow)
-function debug_hud_ui:__init(owner, binds) super()
+class "debug_ui_hud" (CUIWindow)
+function debug_ui_hud:__init(owner, binds) super()
 	self.owner = owner
 	self.binds = binds
 end
-function debug_hud_ui:__finalize()
+function debug_ui_hud:__finalize()
 
 end
-function debug_hud_ui:InitControls(x, y, xml, owner)
+function debug_ui_hud:InitControls(x, y, xml, owner)
 	self:SetWndPos(vector2():set(x,y))
 	self:SetWndSize(vector2():set(800,416))
 	self:SetAutoDelete(true)
@@ -1269,15 +1498,15 @@ end
 Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
-class "debug_object_ui" (CUIWindow)
-function debug_object_ui:__init(owner, binds) super()
+class "debug_ui_object" (CUIWindow)
+function debug_ui_object:__init(owner, binds) super()
 	self.owner = owner
 	self.binds = binds
 end
-function debug_object_ui:__finalize()
+function debug_ui_object:__finalize()
 
 end
-function debug_object_ui:InitControls(x, y, xml, owner)
+function debug_ui_object:InitControls(x, y, xml, owner)
 	self:SetWndPos(vector2():set(x,y))
 	self:SetWndSize(vector2():set(800,416))
 	self:SetAutoDelete(true)
@@ -1319,15 +1548,15 @@ end
 Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
-class "debug_advanced_ui" (CUIWindow)
-function debug_advanced_ui:__init(owner, binds) super()
+class "debug_ui_advanced" (CUIWindow)
+function debug_ui_advanced:__init(owner, binds) super()
 	self.owner = owner
 	self.binds = binds
 end
-function debug_advanced_ui:__finalize()
+function debug_ui_advanced:__finalize()
 
 end
-function debug_advanced_ui:InitControls(x, y, xml, owner)
+function debug_ui_advanced:InitControls(x, y, xml, owner)
 	self:SetWndPos(vector2():set(x,y))
 	self:SetWndSize(vector2():set(800,416))
 	self:SetAutoDelete(true)
@@ -1338,21 +1567,7 @@ function debug_advanced_ui:InitControls(x, y, xml, owner)
 	local btn = xml:Init3tButton("tab_advanced:btn_execute_string",self)
 	owner:Register(btn, "btn_execute_string")
 
-	xml:InitStatic("tab_advanced:cap_spawn", self)
-	owner.fld_spawn = xml:InitEditBox("tab_advanced:fld_spawn", self)
-
-	btn = xml:Init3tButton("tab_advanced:btn_spawn",self)
-	owner:Register(btn, "btn_spawn")
-
-	xml:InitStatic("tab_advanced:cap_spawn_squad", self)
-	owner.fld_spawn_squad = xml:InitEditBox("tab_advanced:fld_spawn_squad", self)
-
-	xml:InitStatic("tab_advanced:cap_spawn_smart", self)
-	owner.fld_spawn_smart = xml:InitEditBox("tab_advanced:fld_spawn_smart", self)
-
-	btn = xml:Init3tButton("tab_advanced:btn_spawn_squad",self)
-	owner:Register(btn, "btn_spawn_squad")
-	
+	xml:InitStatic("tab_advanced:cap_jump_level", self)
 	
 	owner.levels_list_frame = xml:InitFrame("tab_advanced:list_frame",self)
 	owner.levels_list = xml:InitListBox("tab_advanced:list",self)
@@ -1362,3 +1577,91 @@ function debug_advanced_ui:InitControls(x, y, xml, owner)
 	
 	owner:FillLevelList()
 end
+
+-- ICON EDITOR
+class "debug_ui_editor" (CUIWindow)
+function debug_ui_editor:__init(owner, binds) super()
+	self.owner = owner
+	self.binds = binds
+end
+function debug_ui_editor:__finalize()
+
+end
+function debug_ui_editor:InitControls(x, y, xml, owner)
+	self:SetWndPos(vector2():set(x-50,y))
+	self:SetWndSize(vector2():set(800,416))
+	self:SetAutoDelete(true)
+
+	owner.editor_sections_list = xml:InitComboBox("tab_editor:list_sections", self)
+	owner.editor_sections_list:ClearList()
+	owner.editor_sections_list:SetAutoDelete(true)
+
+	local slist = {"Weapons (Addon)","Items (Misc.)","Weapons (Rifle)","Weapons (Pistol)","Weapons (Misc.)","Outfits","Ammo","Artefacts","Items (Consumable)","Items (Quest)"}
+	table.sort(slist)
+	for i=1,#slist do
+		owner.editor_sections_list:AddItem(slist[i],i-1)
+	end
+
+	owner:Register(owner.editor_sections_list, "editor_list_sections")
+
+	owner.editor_spawn_list_frame = xml:InitFrame("tab_editor:list_frame",self)
+	owner.editor_spawn_list = xml:InitListBox("tab_editor:list",self)
+	owner.editor_spawn_list:ShowSelectedItem(true)
+
+	owner:Register(owner.editor_spawn_list, "editor_list_window")
+
+	owner.editor_icon_back = xml:InitStatic("tab_editor:icon_back",self)
+	owner.editor_icon = xml:InitStatic("tab_editor:icon",self)
+	
+	-- Set defaults
+	owner.editor_sections_list:SetText("Weapons (Rifle)")
+	owner:FillEditorList("Weapons (Rifle)")
+	
+	
+	-------
+	xml:InitStatic("tab_editor:cap_w", self)
+	owner.fld_icon_width = xml:InitEditBox("tab_editor:fld_w", self)
+	owner:Register(owner.fld_icon_width,"fld_icon_width")
+	
+	xml:InitStatic("tab_editor:cap_h", self)
+	owner.fld_icon_height = xml:InitEditBox("tab_editor:fld_h", self)
+	owner:Register(owner.fld_icon_height,"fld_icon_height")
+	
+	xml:InitStatic("tab_editor:cap_x", self)
+	owner.fld_icon_x = xml:InitEditBox("tab_editor:fld_x", self)
+	owner:Register(owner.fld_icon_x,"fld_icon_x")
+	
+	xml:InitStatic("tab_editor:cap_y", self)
+	owner.fld_icon_y = xml:InitEditBox("tab_editor:fld_y", self)
+	owner:Register(owner.fld_icon_y,"fld_icon_y")
+	
+	
+	owner.ui_icon_equipment_back = xml:InitFrame("ui_icon_equipment_back",owner)
+	owner.ui_icon_equipment = xml:InitStatic("ui_icon_equipment",owner)
+	owner.ui_icon_equipment:InitTexture("ui\\ui_icon_equipment")
+	--owner.ui_icon_equipment:SetTextureRect(Frect():set(0,0,300,200))
+	owner.ui_icon_equipment:SetWndSize(vector2():set(512,512))
+	owner.ui_icon_equipment_back:SetWndSize(vector2():set(448,540))
+	
+	
+	owner.icon_square = xml:InitFrame("square",owner)
+	
+	xml:InitStatic("tab_editor:cap_addon_x", self)
+	owner.fld_addon_offset_x = xml:InitEditBox("tab_editor:fld_addon_x", self)
+	owner:Register(owner.fld_addon_offset_x,"fld_addon_offset_x")
+	
+	xml:InitStatic("tab_editor:cap_addon_y", self)
+	owner.fld_addon_offset_y = xml:InitEditBox("tab_editor:fld_addon_y", self)
+	owner:Register(owner.fld_addon_offset_y,"fld_addon_offset_y")
+	
+	owner.addon_list = xml:InitComboBox("tab_editor:list_addon", self)
+	local t = {"Select Addon Type", "silencer", "grenade_launcher", "scope" }
+	for i=1,#t do
+		owner.addon_list:AddItem(t[i],i-1)
+	end
+	
+	owner.addon_list:SetText("Select Addon Type")
+	
+	owner.editor_icon_addon = xml:InitStatic("tab_editor:icon_addon",self)
+end
+

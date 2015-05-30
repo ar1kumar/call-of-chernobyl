@@ -160,17 +160,9 @@ end
 local dynamic_ltx = {}
 function loadLtx(name)
 	local h    = "*"..name
-	local dltx = dynamic_ltx[h]
 
-	if dltx then
-		return dltx, h
-	end
-
-	local l = gulag_general.load_ltx(name)
-	if l ~= nil then
-		dltx = create_ini_file(l)
-		dynamic_ltx[h] = dltx
-		return dltx, h
+	if (dynamic_ltx[h]) then 
+		return dynamic_ltx[h], h, true
 	end
 
 	local function file_exists(name)
@@ -178,17 +170,22 @@ function loadLtx(name)
 	   if f~=nil then io.close(f) return true else return false end
 	end
 
-	if (file_exists(alun_utils.fspath("$game_config$").."gulag\\"..gname..".ltx")) then
-		dltx = ini_file("gulag\\"..name..".ltx")
-		if (dltx) then
-			dynamic_ltx[h] = dltx
-			printf("xr_gulag.loadLtx: gulag file found %s",alun_utils.fspath("$game_gulag$")..name..".ltx")
-			return dltx,h
+	if (file_exists(alun_utils.fspath("$game_config$").."gulag\\"..name..".ltx")) then
+		local ltx = ini_file("gulag\\"..name..".ltx")
+		if (ltx) then
+			dynamic_ltx[h] = ltx
+			printf("xr_gulag.loadLtx: gulag file found %s",name..".ltx")
+			return dynamic_ltx[h],h, false
 		end
 	end
 
-	printf("loadLtx=%s  path=%s",name,alun_utils.fspath("$game_gulag$")..name..".ltx")
-	return nil, nil
+	local l = gulag_general.load_ltx(name)
+	if l ~= nil then
+		dynamic_ltx[h] = create_ini_file(l)
+		return dynamic_ltx[h], h, true
+	end
+	
+	return
 end
 
 function job_in_restrictor(smart, restrictor_name, way_name)

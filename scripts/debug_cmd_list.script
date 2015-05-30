@@ -169,34 +169,21 @@ function cmd.help(me,txt,owner,p)
 
 	if not (sz) or (sz == 0) then return "help := error" end
 
-	local list_sz = command_get_count()
-	local page_count = math.ceil(list_sz/sz)
+	local a = {}
+    for n in pairs(cmd) do
+		if (n ~= "help") then
+			table.insert(a, n)
+		end
+	end
+    table.sort(a)
 
+	local page_count = math.ceil(#a/sz)
 	if (page > page_count) then
 		return "help:= Invaild page"
 	end
-
+	
 	owner:SendOutput("help := Command List [%s of %s]",page,page_count)
-
-	local commands = command_get_list()
-	local a = {}
-    for n in pairs(commands) do table.insert(a, n) end
-    table.sort(a)
-	local ind,k,out
-	for i=1,sz do
-		ind = (page*sz - sz) + i
-		k = ind > 0 and a[ind]
-		out = " "
-
-		if (k == "help") then
-			out = ""
-		end
-
-		if (k and commands[k] and k ~= "help") then
-			out = command_give(k,"help",owner,p)
-		end
-		owner:SendOutput(out)
-	end
+	owner:SendOutputList(a,(page*sz)-sz,sz-1)
 end
 
 -- ECHO
