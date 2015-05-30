@@ -278,10 +278,6 @@ function on_game_start()
 	
 	phantom_manager.on_game_start()
 	
-	if string.find(command_line(), "-dbg") then
-		if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
-	end 
-	
 	-- CoP
 	if (xrs_dyn_music) then xrs_dyn_music.on_game_start() end 
 	
@@ -1385,6 +1381,11 @@ end
 ------------------
 function main_menu_on_init(menu)
 	axr_main_options.main_menu_on_init(menu)
+	
+	-- THIS IS HERE BECAUSE ON_GAME_START is only triggered when alife simulator starts. We need this here to use icon editor
+	if string.find(command_line(), "-dbg") then
+		if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
+	end 
 	
 	if (closecaption and closecaption.main_menu_on_init) then
 		closecaption.main_menu_on_init(menu)

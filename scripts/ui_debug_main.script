@@ -47,6 +47,11 @@ function debug_ui:__finalize()
 
 end
 
+function debug_ui:Reinit(level_present)
+	self.level_present = level_present
+	self.tab:SetActiveTab("editor")
+end 
+
 function debug_ui:CreateTab(uID)
 	self.tab_list[uID] = true
 	self["dlg_"..uID] = this["debug_ui_"..uID](self,binds)
@@ -158,12 +163,15 @@ function debug_ui:InitCallBacks()
 	self:AddCallback("editor_list_sections", ui_events.LIST_ITEM_SELECT,		 self.OnSelectEditorSectionList,	self)
 	self:AddCallback("editor_list_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnEditorTriggerSectionSelection,	self)
 	
-	self:AddCallback("fld_icon_x",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
-	self:AddCallback("fld_icon_y",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
-	self:AddCallback("fld_icon_width",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
-	self:AddCallback("fld_icon_height",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
-	self:AddCallback("fld_addon_offset_x",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)
-	self:AddCallback("fld_addon_offset_y",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIcon,	self)	
+	self:AddCallback("fld_icon_x",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIconX,	self)
+	self:AddCallback("fld_icon_y",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIconY,	self)
+	self:AddCallback("fld_icon_width",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIconW,	self)
+	self:AddCallback("fld_icon_height",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIconH,	self)
+	self:AddCallback("fld_addon_offset_x",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIconOffX,	self)
+	self:AddCallback("fld_addon_offset_y",	  ui_events.EDIT_TEXT_COMMIT, self.OnEditIconOffY,	self)	
+	
+	self:AddCallback("editor_list_addon", ui_events.LIST_ITEM_SELECT,	self.OnEditorTriggerAddonSectionSelection,	self)
+	self:AddCallback("btn_editor_save", ui_events.BUTTON_CLICKED, self.OnEditorSave, self)
 	--
 	
 	-- level jump tab
@@ -392,8 +400,13 @@ end
 
 function debug_ui:OnQuit()
 	self:HideDialog()
-	local console = get_console()
-	console:execute("main_menu off")
+	if (self.level_present) then
+		local console = get_console()
+		console:execute("main_menu off")
+	else 
+		self.owner:ShowDialog()
+		self.owner:Show(true)
+	end
 end
 
 function debug_ui:OnTabChange()
@@ -403,21 +416,36 @@ function debug_ui:OnTabChange()
 	
 	local ids = self.tab:GetActiveId()
 	
+	if (ids == "editor" or not self.level_present) then
+		if not (self.dlg_editor) then
+			self:CreateTab("editor")
+		end
+		
+		self.dlg_editor:Show(true)
+		
+		if (self.ui_icon_equipment) then 
+			self:HideConsole()
+			self.ui_icon_equipment:Show(true)
+			self.ui_icon_equipment_back:Show(true)
+			self.icon_square:Show(true)
+		end
+		return
+	else
+		if not (self.level_present) then 
+			return 
+		end 
+		
+		if (self.ui_icon_equipment) then
+			self.ui_icon_equipment:Show(false)
+			self.icon_square:Show(false)
+			self.ui_icon_equipment_back:Show(false)
+			self:ShowConsole()
+		end
+	end 
+	
 	if not (self["dlg_"..ids]) then
 		self:CreateTab(ids)
 	end
-	
-	if (ids == "editor" and self.ui_icon_equipment) then 
-		self:HideConsole()
-		self.ui_icon_equipment:Show(true)
-		self.ui_icon_equipment_back:Show(true)
-		self.icon_square:Show(true)
-	elseif (self.ui_icon_equipment) then
-		self.ui_icon_equipment:Show(false)
-		self.icon_square:Show(false)
-		self.ui_icon_equipment_back:Show(false)
-		self:ShowConsole()
-	end 
 	
 	self["dlg_"..ids]:Show(true)
 end
@@ -1232,6 +1260,68 @@ function debug_ui:OnButton_create_clicked()
 	self:SendOutput("UISpawner: Spawned %s on %s as id %s",se_obj:name(),id == 0 and "Actor" or "level",se_obj.id)
 end
 
+function debug_ui:OnEditorTriggerAddonSectionSelection()
+	local item
+	item = self.editor_spawn_list:GetSelectedItem()
+	if not(item) then
+		self:SendOutput("UIEditor: No item section was selected in the list.")
+		return
+	end
+
+	local section = item.sect:GetText()	
+	local ini = system_ini()
+	if  not (ini:section_exist(section)) then
+		self:SendOutput(alun_utils.sr("UIEditor: Section %s does not exist",section))
+		return 
+	end 
+	
+	local name = self.addon_list:GetText()
+	if not (name and name ~= "Select Addon Type") then
+		return 
+	end 
+	
+	local scopes = name == "scope" and alun_utils.parse_list(ini,section,"scopes_sect")
+	local scope_sec = section
+	if (scopes and #scopes > 0) then 
+		scope_sec = scopes[1]
+	end 
+	
+	local addon_sec = alun_utils.read_from_ini(ini,scope_sec,name.."_name","string")
+	if not (addon_sec and ini:section_exist(addon_sec)) then
+		return 
+	end
+	
+	local scale = 0.75
+	
+	local addon_inv_grid_width = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_width","float",0)
+	local addon_inv_grid_height = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_height","float",0)
+	local addon_inv_grid_x = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_x","float",0)
+	local addon_inv_grid_y = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_y","float",0)
+
+	local addon_x1 = addon_inv_grid_x*50
+	local addon_y1 = addon_inv_grid_y*50
+
+	local addon_w = addon_inv_grid_width*50
+	local addon_h = addon_inv_grid_height*50
+
+	local addon_x2 = addon_x1 + addon_w
+	local addon_y2 = addon_y1 + addon_h
+	
+	local offset_x = alun_utils.read_from_ini(ini,scope_sec,name.."_x","float",0)
+	local offset_y = alun_utils.read_from_ini(ini,scope_sec,name.."_y","float",0)
+	
+	self.editor_icon_addon:InitTexture("ui\\ui_icon_equipment")
+	self.editor_icon_addon:SetTextureRect(Frect():set(addon_x1,addon_y1,addon_x2,addon_y2))
+	self.editor_icon_addon:SetWndSize(vector2():set(addon_w*scale,addon_h*scale))
+	
+	pos = self.editor_icon:GetWndPos()
+	self.editor_icon_addon:SetWndPos(vector2():set(pos.x+offset_x*scale,pos.y+offset_y*scale))
+	
+	self.fld_addon_offset_x:SetText(tostring(offset_x))
+	self.fld_addon_offset_y:SetText(tostring(offset_y))
+end 
+
+
 function debug_ui:OnEditorTriggerSectionSelection()
 
 	self.editor_icon:SetTextureRect(Frect():set(0,0,0,0))
@@ -1258,18 +1348,22 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	
 	local scale = 0.75
 	
-	
 	local inv_grid_width = alun_utils.read_from_ini(ini,section,"inv_grid_width","float",0)
 	local inv_grid_height = alun_utils.read_from_ini(ini,section,"inv_grid_height","float",0)
 	local inv_grid_x = alun_utils.read_from_ini(ini,section,"inv_grid_x","float",0)
 	local inv_grid_y = alun_utils.read_from_ini(ini,section,"inv_grid_y","float",0)
 
+	self.editor_old_x = inv_grid_x
+	self.editor_old_y = inv_grid_y
+	self.editor_old_w = inv_grid_width
+	self.editor_old_h = inv_grid_height
+	
 	local x1 = inv_grid_x*50
 	local y1 = inv_grid_y*50
-
+	
 	local w = inv_grid_width*50
 	local h = inv_grid_height*50
-
+	
 	local x2 = x1 + w
 	local y2 = y1 + h
 	
@@ -1320,6 +1414,9 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	local offset_x = alun_utils.read_from_ini(ini,scope_sec,name.."_x","float",0)
 	local offset_y = alun_utils.read_from_ini(ini,scope_sec,name.."_y","float",0)
 	
+	self.editor_old_offset_x = offset_x
+	self.editor_old_offset_y = offset_y
+	
 	self.editor_icon_addon:InitTexture("ui\\ui_icon_equipment")
 	self.editor_icon_addon:SetTextureRect(Frect():set(addon_x1,addon_y1,addon_x2,addon_y2))
 	self.editor_icon_addon:SetWndSize(vector2():set(addon_w*scale,addon_h*scale))
@@ -1329,6 +1426,58 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	
 	self.fld_addon_offset_x:SetText(tostring(offset_x))
 	self.fld_addon_offset_y:SetText(tostring(offset_y))
+end 
+
+function debug_ui:OnEditIconX()
+	local v = tonumber(self.fld_icon_x:GetText())
+	if (v and v ~= self.editor_old_x) then 
+		self.need_save_x = true
+	end
+	
+	self:OnEditIcon()
+end 
+
+function debug_ui:OnEditIconY()
+	local v = tonumber(self.fld_icon_y:GetText())
+	if (v and v ~= self.editor_old_y) then 
+		self.need_save_y = true
+	end
+	
+	self:OnEditIcon()
+end 
+
+function debug_ui:OnEditIconW()
+	local v = tonumber(self.fld_icon_w:GetText())
+	if (v and v ~= self.editor_old_w) then 
+		self.need_save_w = true
+	end
+	
+	self:OnEditIcon()
+end 
+
+function debug_ui:OnEditIconH()
+	local v = tonumber(self.fld_icon_h:GetText())
+	if (v and v ~= self.editor_old_h) then 
+		self.need_save_h = true
+	end
+	
+	self:OnEditIcon()
+end 
+
+function debug_ui:OnEditIconOffX()
+	local v = tonumber(self.fld_addon_offset_x:GetText())
+	if (v and v ~= self.editor_old_offset_x) then 
+		self.need_save_offset_x = true
+	end 
+	self:OnEditIcon()
+end 
+
+function debug_ui:OnEditIconOffY()
+	local v = tonumber(self.fld_addon_offset_y:GetText())
+	if (v and v ~= self.editor_old_offset_y) then 
+		self.need_save_offset_y = true
+	end 
+	self:OnEditIcon()
 end 
 
 function debug_ui:OnEditIcon()
@@ -1377,6 +1526,36 @@ function debug_ui:OnEditIcon()
 	pos = self.editor_icon:GetWndPos()
 	self.editor_icon_addon:SetWndPos(vector2():set(pos.x+offset_x*scale,pos.y+offset_y*scale))
 end 
+
+function debug_ui:OnEditorSave()
+	if true then return end
+	if not (self.need_save_x or self.need_save_y or self.need_save_w or self.need_save_h or self.need_save_offset_x or self.need_save_offset_y) then 
+		return 
+	end 
+	
+	local item = self.editor_spawn_list:GetSelectedItem()
+	if not(item) then
+		self:SendOutput("UIEditorSave: No item section was selected in the list.")
+		return
+	end
+
+	local section = item.sect:GetText()	
+	local ini = system_ini()
+	if  not (ini:section_exist(section)) then
+		self:SendOutput(alun_utils.sr("UIEditorSave: Section %s does not exist",section))
+		return 
+	end
+	
+	local function on_execute(path,filename)
+		local ltx = io.open(path.."\\"..filename,"rb")
+		if (ltx) then
+			printf("scanning %s\\%s",path,filename)
+			ltx:close()
+		end
+	end
+
+	lua_extensions.recurse_subdirectories_and_execute(alun_utils.fspath("$game_config$"),{"ltx"},on_execute)
+end
 
 
 -- SPAWNER UI
@@ -1655,6 +1834,7 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	owner:Register(owner.fld_addon_offset_y,"fld_addon_offset_y")
 	
 	owner.addon_list = xml:InitComboBox("tab_editor:list_addon", self)
+	owner:Register(owner.addon_list, "editor_list_addon")
 	local t = {"Select Addon Type", "silencer", "grenade_launcher", "scope" }
 	for i=1,#t do
 		owner.addon_list:AddItem(t[i],i-1)
@@ -1663,5 +1843,8 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	owner.addon_list:SetText("Select Addon Type")
 	
 	owner.editor_icon_addon = xml:InitStatic("tab_editor:icon_addon",self)
+	
+	local btn = xml:Init3tButton("tab_editor:btn_save",self)
+	owner:Register(btn, "btn_editor_save")
 end
 

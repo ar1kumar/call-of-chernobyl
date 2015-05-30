@@ -116,41 +116,6 @@
 
 	</specific_character>
 
-	<!-------------------------- CARDAN ------------------------>
-	<specific_character id="bar_visitors_stalker_mechanic" team_default="1">
-		<name>zat_a2_stalker_mechanic_name</name>
-		<icon>ui_inGame2_Kardan</icon>
-		<map_icon x="1" y="0">
-		</map_icon>
-		<bio>Опытный сталкер. Детальная информация отсутствует.</bio>
-		<class>bar_visitors_stalker_mechanic</class>
-		<community>stalker</community>
-		<mechanic_mode>1</mechanic_mode>
-		<terrain_sect>stalker_terrain</terrain_sect>
-		<snd_config>characters_voice\human_02\stalker\</snd_config>
-		<rank>30</rank>
-		<reputation>0</reputation>
-		<visual>actors\stalker_neutral\stalker_neutral_2_face_1</visual>
-		<supplies>
-        [spawn] \n
-
-        wpn_ak74 \n
-        ammo_5.45x39_fmj = 1 \n
-     	wpn_pm  \n
-      	ammo_9x18_fmj = 1 \n
-        
-
-#include "gameplay\character_items_2.xml"
-#include "gameplay\character_food.xml"
-#include "gameplay\character_drugs.xml"
-    </supplies>
-#include "gameplay\character_criticals_4.xml"
-
-		<start_dialog>bar_visitors_stalker_mechanic_start</start_dialog>
-		<actor_dialog>actor_break_dialog</actor_dialog>
-
-	</specific_character>
-
   <specific_character id="bar_duty_security_squad_leader" team_default = "1">
     <name>st_bar_duty_security_squad_leader_name</name>
     <icon>ui_inGame2_Dolg_4</icon>
@@ -253,5 +218,24 @@
 		<actor_dialog>actor_break_dialog</actor_dialog>	
 
 </specific_character>	
-  
+<specific_character id="bar_visitors_stalker_mechanic" team_default = "1">
+    <name>st_bar_visitors_stalker_mechanic_name</name>
+    <icon>ui_inGame2_Dolg_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+
+    <class>bar_visitors_stalker_mechanic</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+
+    <rank>50</rank>
+    <reputation>0</reputation>
+	<money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_4</visual>
+<supplies></supplies>
+#include "gameplay\character_criticals_4.xml"
+		<start_dialog>bar_visitors_stalker_mechanic_start</start_dialog>
+		<actor_dialog>dm_ordered_task_dialog</actor_dialog>
+		<actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+  </specific_character>
 </xml>

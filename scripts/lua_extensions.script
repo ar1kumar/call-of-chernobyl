@@ -1,0 +1,56 @@
+----------------------
+-- For use with OpenX-ray CoC
+
+loaded = require("lua_extensions")
+local lfs
+if (loaded) then 
+	lfs = require("lfs")
+end 
+
+
+local function get_ext(s)
+	return string.gsub(s,"(.*)%.","")
+end
+
+function recurse_subdirectories_and_execute(node,ext,func)
+	if not (lfs) then 
+		printf("lfs not loaded!")
+		return
+	end 
+	
+	local stack = {}
+	local deepest
+	while not deepest do
+		if (node) then
+			for file in lfs.dir(node) do
+				if lfs.attributes(file,"mode") == "file" then
+					printf(file)
+				elseif lfs.attributes(file,"mode") == "directory" then
+					if (file ~= "..") then
+						for l in lfs.dir(node.."\\"..file) do
+							if (l ~= ".." and l ~= ".") then
+								if lfs.attributes(node.."\\"..file.."\\"..l,"mode") == "file" then
+									for i=1,#ext do
+										if (get_ext(l) == ext[i]) then
+											func(node,l)
+										end
+									end
+								elseif lfs.attributes(node.."\\"..file.."\\"..l,"mode") == "directory" then
+									--print(node .. "\\"..l)
+									table.insert(stack,node .. "\\" .. l)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+
+		if (#stack > 0) then
+			node = stack[#stack]
+			stack[#stack] = nil
+		else
+			deepest = true
+		end
+	end
+end

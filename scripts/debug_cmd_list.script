@@ -164,7 +164,7 @@ end
 -- HELP
 function cmd.help(me,txt,owner,p)
 	local wrd,rest = first_word(txt)
-	local page = wrd and wrd ~= "" and tonumber(wrd) or 1
+	local page = tonumber(txt) or 1
 	local sz = owner.console_size
 
 	if not (sz) or (sz == 0) then return "help := error" end
@@ -176,7 +176,7 @@ function cmd.help(me,txt,owner,p)
 		end
 	end
     table.sort(a)
-
+	
 	local page_count = math.ceil(#a/sz)
 	if (page > page_count) then
 		return "help:= Invaild page"

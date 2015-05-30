@@ -90,12 +90,8 @@ local toggle_top_key = 1
 local toggle_right_key = 1
 local debug_ui
 local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present)
-	if not (level_present) then 
-		return 
-	end 
-	
 	if keyboard_action ~= ui_events.WINDOW_KEY_RELEASED then return end
-	if (keybinds["print_position"] and dik == DIK_keys["DIK_"..keybinds["print_position"]]) then
+	if (level_present and keybinds["print_position"] and dik == DIK_keys["DIK_"..keybinds["print_position"]]) then
 		if (db.actor) then
 			local lvid, gvid = db.actor:level_vertex_id(), db.actor:game_vertex_id()
 			local pos = db.actor:position()
@@ -133,21 +129,21 @@ local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present
 			write_file("valid 			= %s",valid)
 			write_file("","")
 		end
-	elseif (keybinds["toggle_top_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_top_hud"]]) then
+	elseif (level_present and keybinds["toggle_top_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_top_hud"]]) then
 		if ( toggle_top_key < #toggle_hud_list["top"]) then
 			toggle_top_key = toggle_top_key + 1
 		else
 			toggle_top_key = 1
 		end
-			printf("TOP HUD = %s",toggle_hud_list["top"][toggle_top_key])
-	elseif keybinds["toggle_left_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_left_hud"]] then
+		printf("TOP HUD = %s",toggle_hud_list["top"][toggle_top_key])
+	elseif (level_present and keybinds["toggle_left_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_left_hud"]]) then
 		if ( toggle_left_key < #toggle_hud_list["left"]) then
 			toggle_left_key = toggle_left_key + 1
 		else
 			toggle_left_key = 1
 		end
 		printf("LEFT HUD = %s",toggle_hud_list["left"][toggle_left_key])
-	elseif keybinds["toggle_right_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_right_hud"]] then
+	elseif (level_present and keybinds["toggle_right_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_right_hud"]]) then
 		if ( toggle_right_key < #toggle_hud_list["right"]) then
 			toggle_right_key = toggle_right_key + 1
 		else
@@ -160,6 +156,7 @@ local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present
 		end
 
 		if (debug_ui) then
+			debug_ui:Reinit(level_present)
 			debug_ui:ShowDialog(true)
 			main_menu:HideDialog()
 			main_menu:Show(false)
