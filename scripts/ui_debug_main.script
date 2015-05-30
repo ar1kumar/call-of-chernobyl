@@ -1528,7 +1528,11 @@ function debug_ui:OnEditIcon()
 end 
 
 function debug_ui:OnEditorSave()
-	if true then return end
+	local name = self.addon_list:GetText()
+	if not (name and name ~= "Select Addon Type") then
+		return 
+	end 
+	
 	if not (self.need_save_x or self.need_save_y or self.need_save_w or self.need_save_h or self.need_save_offset_x or self.need_save_offset_y) then 
 		return 
 	end 
@@ -1546,10 +1550,35 @@ function debug_ui:OnEditorSave()
 		return 
 	end
 	
+	local scopes = name == "scope" and alun_utils.parse_list(ini,section,"scopes_sect")
+	local search_sec = section
+	if (scopes and #scopes > 0) then 
+		search_sec = scopes[1]
+	end 
+	
 	local function on_execute(path,filename)
-		local ltx = io.open(path.."\\"..filename,"rb")
+		local ltx = io.open(getFS():update_path('$game_config$', filename..'.ltx'),"rb")
+		local t = {}
 		if (ltx) then
-			printf("scanning %s\\%s",path,filename)
+			
+			for line in io.lines(fname) do
+				if not (line == "" or line == "\n") then
+					if (startsWith(line, "[")) then
+						t = str_explode(line,";")
+						t = str_explode(t[1],":")
+
+						sec = string.sub(t[1],2,-2)
+						
+						if (sec == search_sec) then
+							printf("%s FOUND %s\\%s",search_sec,path,filename)
+							
+							
+							
+							return
+						end
+					end
+				end
+			end
 			ltx:close()
 		end
 	end
