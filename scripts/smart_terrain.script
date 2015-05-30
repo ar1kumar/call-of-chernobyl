@@ -111,24 +111,17 @@ function se_smart_terrain:on_register()
 			return
 		end
 	end
-	
-	self.check_time = time_global()
 
 	self.smart_alife_task = CALifeSmartTerrainTask(self.m_game_vertex_id, self.m_level_vertex_id)
 
-	self:load_jobs()
-	
-	if not (self.ini_loaded) then
-		alun_utils.debug_write(alun_utils.sr("%s:ON_REGISTER END (ini_loaded = false)",self:name()))
-		return 
-	end
-	
-	self.b_registred = true
-
 	story_objects.check_spawn_ini_for_story_id(self)
 	simulation_objects.get_sim_obj_registry():register(self)
-	
+
+	self.b_registred = true
+
 	SIMBOARD:init_smart(self)
+
+	self:load_jobs()
 
 	if (self.need_init_npc) then
 		self.need_init_npc = nil
@@ -136,8 +129,9 @@ function se_smart_terrain:on_register()
 	end
 	
 	self:register_delayed_npc()
-	
-	alun_utils.debug_write(alun_utils.sr("%s:ON_REGISTER END (ini_loaded = true)",self:name()))
+
+	self.check_time = time_global()
+	--alun_utils.debug_write(alun_utils.sr("%s:ON_REGISTER END",self:name()))
 end
 
 function se_smart_terrain:on_unregister()
@@ -436,16 +430,11 @@ function se_smart_terrain:load_jobs()
 	--alun_utils.debug_write(alun_utils.sr("%s:load_jobs %s  Before",self:name(),obj and obj:name()))
 
 	-- load job data from dynamic ltx from gulag_general.script
-	if not (self.ltx) then
-		gulag_general.load_job(self)
-	end
+	gulag_general.load_job(self)
 	
 	--alun_utils.debug_write(alun_utils.sr("%s:load_jobs %s  After",self:name(),obj and obj:name()))
 	
-	self.ltx, self.ltx_name, self.ini_loaded = xr_gulag.loadLtx(self:name())
-	if not (self.ini_loaded) then 
-		return 
-	end
+	self.ltx, self.ltx_name = xr_gulag.loadLtx(self:name())
 
 	-- Setup Alife Tasks for smart's gulag jobs
 	local job,active_section,section,ltx, path_field, path_name, smartcover, smartcover_name, prefix_name, job_type
@@ -1189,26 +1178,6 @@ function se_smart_terrain:update()
 	
 	if (self.disabled) then
 		return
-	end
-	
-	if not (self.ini_loaded) then
-		self:load_jobs()
-		
-		self.b_registred = true
-	
-		story_objects.check_spawn_ini_for_story_id(self)
-		simulation_objects.get_sim_obj_registry():register(self)
-		
-		SIMBOARD:init_smart(self)
-
-		if (self.need_init_npc) then
-			self.need_init_npc = nil
-			self:init_npc_after_load()
-		end
-		
-		self:register_delayed_npc()
-	
-		self.ini_loaded = true
 	end
 	
 	--alun_utils.debug_write(alun_utils.sr("%s:update ",self:name()))
