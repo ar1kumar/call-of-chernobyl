@@ -49,7 +49,11 @@ end
 
 function debug_ui:Reinit(level_present)
 	self.level_present = level_present
-	self.tab:SetActiveTab("editor")
+	if not (level_present) then
+		self.tab:SetActiveTab("editor")
+	else 
+		self.tab:SetActiveTab("spawner")
+	end
 end 
 
 function debug_ui:CreateTab(uID)
@@ -126,13 +130,17 @@ function debug_ui:SetCurrentValues()
 end
 
 function debug_ui:ShowConsole()
-	self.console:Show(true)
-	self.console_input:Show(true)
+	if not (self.console:IsShown()) then
+		self.console:Show(true)
+		self.console_input:Show(true)
+	end
 end
 
 function debug_ui:HideConsole()
-	self.console:Show(false)
-	self.console_input:Show(false)
+	if (self.console:IsShown()) then
+		self.console:Show(false)
+		self.console_input:Show(false)
+	end
 end
 
 function debug_ui:Update()

@@ -158,8 +158,10 @@ local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present
 		if (debug_ui) then
 			debug_ui:Reinit(level_present)
 			debug_ui:ShowDialog(true)
-			main_menu:HideDialog()
-			main_menu:Show(false)
+			if (main_menu:IsShown()) then
+				main_menu:HideDialog()
+				main_menu:Show(false)
+			end
 		end
 	end
 end

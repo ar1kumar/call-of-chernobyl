@@ -142,7 +142,7 @@ function is_enemy(obj,enemy,no_memory)
 	if (obj_is_stalker) then
 	
 		-- no item to kill with
-		--[[
+		--[[ Should be fixed in engine now
 		if not (obj:active_item()) then
 			printf("xr_combat_ignore.script - %s does not have active item",obj and obj:name())
 			return false -- hack (sometimes game will crash on game load because npc will try to fire weapon when he doesn't have active item; this seems to fix it)

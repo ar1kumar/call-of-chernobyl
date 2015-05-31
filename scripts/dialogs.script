@@ -579,9 +579,13 @@ function is_not_wounded(first_speaker, second_speaker, dn)
 	return not is_wounded(first_speaker, second_speaker)
 end
 function actor_have_medkit(first_speaker, second_speaker)
-	return first_speaker:object("medkit") ~= nil or
-			 first_speaker:object("medkit_army") ~= nil or
-			 first_speaker:object("medkit_scientic") ~= nil
+	local med = {"medkit","medkit_army","medkit_scientic"}
+	for k,v in pairs(med) do 
+		if (first_speaker:object(v)) then 
+			return true 
+		end
+	end 
+	return false
 end
 function actor_hasnt_medkit(first_speaker, second_speaker)
 	return actor_have_medkit(first_speaker, second_speaker) == false
@@ -592,9 +596,10 @@ end
 function transfer_medkit(first_speaker, second_speaker)
 	local npc = who_is_npc(first_speaker, second_speaker)
 	
-	if (npc:object("medkit_script")) then 
-		xr_wounded.unlock_medkit(npc)
-		return
+	xr_wounded.unlock_medkit(npc)
+	
+	if not (npc:object("medkit_script")) then 
+		alife():create("medkit_script", npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
 	end 
 	
 	local t = {"medkit","medkit_army","medkit_scientic"}
@@ -603,8 +608,6 @@ function transfer_medkit(first_speaker, second_speaker)
 			dialogs.relocate_item_section(npc,t[i],"out")
 		end
 	end 
-	
-	alife():create("medkit_script", npc:position(), npc:level_vertex_id(), npc:game_vertex_id(), npc:id())
 
 	if (npc:relation(db.actor) >= game_object.enemy) then 
 		npc:set_relation(game_object.neutral,db.actor)
