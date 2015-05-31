@@ -1502,14 +1502,14 @@ end
 -------------------------------------------- INI utils
 
 -- INI Reader
-function file_to_table(fname,dir)
+function file_to_table(fname,dir,include)
 	local root = {}
 	local includes
 	local sec_includes
 	local sec, t,_root,key,val
 	for line in io.lines(fname) do
 		if not (line == "" or line == "\n") then
-			if (startsWith(line, "#include")) then
+			if (include == true and startsWith(line, "#include")) then
 				t = str_explode(line,";")
 				t = str_explode(t[1],[["]])
 
@@ -1518,7 +1518,7 @@ function file_to_table(fname,dir)
 				end
 
 				table.insert(includes,t[2])
-				_root = file_to_table(dir..t[2])
+				_root = file_to_table(dir..t[2],dir,include)
 				for k,v in pairs(_root) do root[k] = v end
 			elseif (startsWith(line, "[")) then
 				t = str_explode(line,";")
@@ -1527,7 +1527,7 @@ function file_to_table(fname,dir)
 				sec = string.sub(t[1],2,-2)
 				root[sec] = {}
 
-				if (t[2]) then
+				if (include and t[2]) then
 					if not (sec_includes) then
 						sec_includes = {}
 					end
@@ -1573,13 +1573,13 @@ function file_to_table(fname,dir)
 end
 
 class "cfg_file"
-function cfg_file:__init(fname)
+function cfg_file:__init(fname,include)
 	--printf("fname=%s",fname)
 	local cfg = io.open(fname,"a+")
 	cfg:close()
 	self.fname = fname
-	self.directory = string.match(fname,"(.%S+\\)") or ""
-	self.root,self.includes = file_to_table(fname,self.directory)
+	self.directory = fname:match("(.*\\)") or ""
+	self.root,self.includes = file_to_table(fname,self.directory,include)
 end
 
 function cfg_file:GetValue(sec,key,typ,def)
@@ -1624,6 +1624,15 @@ end
 function cfg_file:SaveExt()
 	local t,sec,comment
 	local str = ""
+	
+	local function addTab(s,n)
+		local l = string.len(s)
+		for i=1,n-l do
+			s = s .. " "
+		end
+		return s
+	end
+
 	for ln in io.lines(self.fname) do
 		ln = trim(ln)
 		if (startsWith(ln,"[")) then
@@ -1638,9 +1647,9 @@ function cfg_file:SaveExt()
 			t = str_explode(ln,"=")
 			if (self.root[sec][t[1]] ~= nil) then
 				if (self.root[sec][t[1]] == "") then
-					ln = t[1] .. "\t" .. comment
+					ln = addTab(t[1],40) .. " = " .. comment
 				else
-					ln = t[1] .. " = " .. tostring(self.root[sec][t[1]]) .. "\t" .. comment
+					ln = addTab(t[1],40) .. " = " .. addTab(tostring(self.root[sec][t[1]]),40) .. comment
 				end
 			end
 		end
