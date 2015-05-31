@@ -30,50 +30,47 @@ local alife = alife
 ------------------------------------------
 -- Localized Functions
 ------------------------------------------
-local function npc_on_update(npc,st)
-	if (character_community(npc) ~= "zombied") then
-	
-		if (npc:has_info("npcx_is_companion")) then 
-			return
-		end 
-			
-		local tg = time_global()
-		--[[
-		if not (st.safe_zone_dtimer) then
-			st.safe_zone_dtimer = 0
-		end
+local function set_safe_zone_flag(npc,st)
+	if (npc:has_info("npcx_is_companion")) then 
+		return
+	end 
+		
+	local tg = time_global()
+	--[[
+	if not (st.safe_zone_dtimer) then
+		st.safe_zone_dtimer = 0
+	end
 
-		if (tg < st.safe_zone_dtimer) then
-			return
-		end
+	if (tg < st.safe_zone_dtimer) then
+		return
+	end
 
-		st.safe_zone_dtimer = tg + 5000
-		--]]
+	st.safe_zone_dtimer = tg + 5000
+	--]]
 
-		local sim = alife()
-		local id = npc:id()
-		local se_obj = sim:object(id)
-		if (se_obj) then
-			local cid = se_obj.group_id and se_obj.group_id ~= 65535 and se_obj.group_id or id
-			if (cid and safe_zone_npcs[cid]) then
-				db.storage[id].heli_enemy_flag = nil
-				if (tg > safe_zone_npcs[cid] + 8000) then
-					safe_zone_npcs[cid] = nil
-				end
-			else
+	local sim = alife()
+	local id = npc:id()
+	local se_obj = sim:object(id)
+	if (se_obj) then
+		local cid = se_obj.group_id and se_obj.group_id ~= 65535 and se_obj.group_id or id
+		if (cid and safe_zone_npcs[cid]) then
+			db.storage[id].heli_enemy_flag = nil
+			if (tg > safe_zone_npcs[cid] + 8000) then
+				safe_zone_npcs[cid] = nil
+			end
+		else
 
-				local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and sim:object(se_obj.m_smart_terrain_id)
+			local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and sim:object(se_obj.m_smart_terrain_id)
 
-				if (smart and ignored_smarts[smart:name()]) then
+			if (smart and ignored_smarts[smart:name()]) then
+				safe_zone_npcs[cid] = tg
+				return
+			end
+
+			for i,v in ipairs (ignored_zone) do
+				local zone = db.zone_by_name[v]
+				if (zone and utils.npc_in_zone(npc, zone)) then
 					safe_zone_npcs[cid] = tg
-					return
-				end
-
-				for i,v in ipairs (ignored_zone) do
-					local zone = db.zone_by_name[v]
-					if (zone and utils.npc_in_zone(npc, zone)) then
-						safe_zone_npcs[cid] = tg
-					end
 				end
 			end
 		end
@@ -111,7 +108,7 @@ end
 --------------------------------
 function on_game_start()
 	callback_register("actor_on_update",actor_on_update)
-	callback_register("npc_on_update",npc_on_update)
+	--callback_register("npc_on_update",npc_on_update)
 	callback_register("npc_on_hit_callback",npc_on_hit_callback)
 	callback_register("npc_on_death_callback",npc_on_death_callback)
 	callback_register("squad_on_npc_death",squad_on_npc_death)
@@ -197,6 +194,9 @@ function is_enemy(obj,enemy,no_memory)
 	-- Ignore enemies with the safe_zone flag
 	if (is_actor ~= true and alife():has_info(ene_id,"npcx_is_companion") ~= true) then
 		if (obj_is_stalker and community ~= "zombied" and not is_monster) then
+		
+			set_safe_zone_flag(obj,st)
+		
 			local se_obj = obj.se_obj or alife():object(id)
 			if (not se_obj) then
 				--printf("xr_combat_ignore: Critical Error dial 911 se_obj is nil!")

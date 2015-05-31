@@ -416,7 +416,7 @@ function sim_squad_scripted:remove_squad()
 		se_obj = sim:object(id)
 		if se_obj then
 			self:unregister_member(id)
-			create_delayed_event(id,"safe_release",1,release_object,id)
+			create_delayed_event(id,"safe_release",1,alun_utils.release_object,id)
 			--sim:release(se_obj,true)
 		end
 	end
@@ -429,7 +429,7 @@ function sim_squad_scripted:remove_npc(npc_id)
 	local npc = sim:object(npc_id)
 	self:on_npc_death(npc)
 	--sim:release(npc, true)
-	create_delayed_event(npc_id,"safe_release",1,release_object,npc_id)
+	create_delayed_event(npc_id,"safe_release",1,alun_utils.release_object,npc_id)
 end
 
 function sim_squad_scripted:on_npc_death(npc,killer)

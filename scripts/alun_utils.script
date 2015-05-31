@@ -638,22 +638,25 @@ function get_squad_count(npc)
 	return c
 end
 
-function safe_release(p)
+function safe_release(p,force)
 	local sim = alife()
 	local se_obj = p[1] and sim:object(p[1])
 	if not (se_obj) then
 		return true
 	end
+	
+	if (force) then 
+		sim:release(se_obj,true)
+	end
 
 	-- wait for it to switch offline
 	if (se_obj.online) then
-		--se_obj:switch_offline()
-		sim:set_switch_online(p[1],false)
-		sim:set_switch_offline(p[1],true)
+		if (se_obj:can_switch_offline()) then
+			se_obj:switch_offline()
+		end
 		return false
 	end
-
-	-- release stalker
+	
 	sim:release(se_obj,true)
 
 	return true

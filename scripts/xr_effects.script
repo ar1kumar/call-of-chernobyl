@@ -5,7 +5,7 @@
 -----------------------------------------------------------
 -- Private
 -----------------------------------------------------------
-local function add_special_task_squad(p)
+local function add_special_task_squad(p,force)
 	local squad = p[1] and alife():object(p[1])
 	if not (squad) then
 		return false
@@ -4262,7 +4262,7 @@ end
 function switch_offline(actor,npc,p)
 	local se_obj = npc and alife():object(npc:id())
 	if (se_obj) then 
-		alun_utils.switch_offline(se_obj.id)
+		se_obj:switch_offline()
 	end
 end
 
@@ -4274,7 +4274,7 @@ function update_visual(p)
 	end
 
 	if (se_npc.online) then
-		alun_utils.switch_offline(se_npc.id)
+		se_npc:switch_offline()
 		return false
 	end
 

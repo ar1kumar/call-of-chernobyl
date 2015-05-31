@@ -87,6 +87,12 @@ function general_resource_precondition(squad,target)
 end
 
 function general_lair_precondition(squad,target)
+
+	-- Fill up all the lairs first
+	if (SIMBOARD.smarts[target.id]) and (SIMBOARD.smarts[target.id].squads[squad.id] or SIMBOARD.smarts[target.id].population < target.max_population) then
+		return true
+	end
+	
 	if (squad.player_id == "monster_predatory_day") then 
 		return in_time_interval(19,6)
 	elseif (squad.player_id == "monster_predatory_night") then 
@@ -186,26 +192,6 @@ function simulation_board:create_squad(spawn_smart, sq_id)
 end
 --' Удалить отряд
 
-local function release_object(p)
-	local sim = alife()
-	local se_obj = p[1] and sim:object(p[1])
-	if not (se_obj) then
-		return true
-	end
-
-	if (se_obj.online) then
-		alun_utils.switch_offline(se_obj.id)
-		return false
-	end
-
-	if not (se_obj.marked_for_release) then
-		--printf("safe released squad %s",se_obj:name())
-		sim:release(se_obj,true)
-		se_obj.marked_for_release = true
-	end
-	return true
-end
-
 function simulation_board:remove_squad(squad)
 	--alun_utils.debug_write(alun_utils.sr("simulation_board:remove_squad %s",squad and squad:name()))
 
@@ -214,7 +200,7 @@ function simulation_board:remove_squad(squad)
 	squad:remove_squad()
 
 	-- Alundaio (Delayed release squad from game)
-	create_delayed_event(squad.id,"safe_release",1,release_object,squad.id)
+	create_delayed_event(squad.id,"safe_release",1,alun_utils.safe_release,squad.id)
 end
 --' Назначение отряда в смарт.
 function simulation_board:assign_squad_to_smart(squad, smart_id)
@@ -361,7 +347,7 @@ function simulation_board:get_squad_target(squad)
 	if size > 0 then
 		tsort(available_targets, function(a,b) return a.prior > b.prior end)
 
-		if (xr_conditions.surge_started()) then
+		if (xr_conditions.surge_started() or is_squad_monster[squad.player_id]) then
 			return available_targets[1].target
 		end
 

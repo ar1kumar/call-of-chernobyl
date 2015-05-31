@@ -109,24 +109,6 @@ function Crelease_body:moving_dead_body(obj,net_spawn)
 	self:add_corpse(obj)
 end
 
-local function release_object(p)
-	local sim = alife()
-	local se_obj = p[1] and sim:object(p[1])
-	if not (se_obj) then
-		return true
-	end
-
-	if (se_obj.online) then
-		alun_utils.switch_offline(se_obj.id)
-		return false
-	end
-
-	--printf("safe released %s",se_obj:name())
-	sim:release(se_obj,true)
-
-	return true
-end
-
 local safety_time
 function Crelease_body:clear(all,dist,now)
 	if not (db.actor) then
@@ -155,7 +137,7 @@ function Crelease_body:clear(all,dist,now)
 				if (now) then
 					sim:release(se_obj,true)
 				else
-					create_delayed_event(id,"safe_release",math.random(1,8),release_object,id)
+					create_delayed_event(id,"safe_release",math.random(1,8),alun_utils.safe_release,id)
 				end
 
 				self.release_objects_table[id] = nil

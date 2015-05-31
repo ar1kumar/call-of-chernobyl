@@ -165,10 +165,14 @@ local function attach_addon(p)
 			end
 		end
 
-		alun_utils.switch_offline(parent.id)
+		if (parent:can_switch_offline()) then
+			parent:switch_offline()
+		end
 		return false
 	elseif (se_wpn.online) then
-		alun_utils.switch_offline(se_wpn.id)
+		if (se_wpn:can_switch_offline()) then
+			se_wpn:switch_offline()
+		end
 		return false
 	end
 
