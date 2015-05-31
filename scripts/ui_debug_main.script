@@ -1590,10 +1590,6 @@ function debug_ui:OnEditorSave()
 	local offset_x = tonumber(self.fld_addon_offset_x:GetText())
 	local offset_y  = offset_x and tonumber(self.fld_addon_offset_y:GetText())
 	
-	if not (offset_y) then
-		return 
-	end 
-	
 	local item = self.editor_spawn_list:GetSelectedItem()
 	if not(item) then
 		self:SendOutput("UIEditorSave: No item section was selected in the list.")
