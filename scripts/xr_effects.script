@@ -960,12 +960,11 @@ function teleport_squad_lvid(actor,npc,p)
 end
 
 function teleport_npc(actor, npc, p)
-	local patrol_point = p[1]
-	local patrol_point_index = p[2] or 0
-	if patrol_point == nil then
-		printf("Wrong parameters in 'teleport_npc' function!!!")
-	end
-	local position = patrol(patrol_point):point(patrol_point_index)
+	if not (p[1] and p[2]) then 
+		return 
+	end 
+	
+	local position = patrol(p[1]):point(tonumber(p[2]) or 0)
 	reset_animation(npc)
 
 	npc:set_npc_position(position)

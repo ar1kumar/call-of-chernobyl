@@ -304,6 +304,10 @@ function on_game_start()
 	--if (xr_visual) then xr_visual.on_game_start() end
 	if (xr_eat_medkit) then xr_eat_medkit.on_game_start() end
 	if (axr_trade_manager) then axr_trade_manager.on_game_start() end
+	
+	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	collectgarbage("collect")
+	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 -------------------
