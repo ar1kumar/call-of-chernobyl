@@ -4080,11 +4080,10 @@ function make_a_wish(actor,npc,p)
 	end
 	
 	action_list[2] = function()
-		alife():create("m_controller_psy",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
-		alife():create("m_controller_psy",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 		give_info("actor_made_wish")
+		give_info("actor_made_wish_for_control")
 		return
-	end 
+	end
 	
 	action_list[3] = function()
 		local sim = alife()

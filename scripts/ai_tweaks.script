@@ -207,6 +207,9 @@ function npc_on_item_take(npc,item)
 
 	local itm_sec = item:section()
 	local sec = weapon:section()
+	if not (itm_sec and sec) then 
+		return 
+	end
 
 	-- check scope status
 	local sc_status = alun_utils.read_from_ini(nil,sec,"scope_status","float",0)
