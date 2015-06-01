@@ -1154,7 +1154,7 @@ function make_dead(p)
 	return true
 end
 
-function make_zombied(p,force)
+function make_zombied(p)
 	local sim = alife()
 	local se_obj = p[1] and sim:object(p[1])
 	if not (se_obj) then
@@ -1162,7 +1162,7 @@ function make_zombied(p,force)
 	end
 
 	-- wait for it to switch offline
-	if (force ~= true and se_obj.online) then
+	if (se_obj.online) then
 		if (se_obj:can_switch_offline()) then
 			se_obj:switch_offline()
 		end
@@ -1189,7 +1189,7 @@ function make_zombied(p,force)
 	return true
 end
 
-function make_explode(p,force)
+function make_explode(p)
 	local sim = alife()
 	local se_obj = p[1] and sim:object(p[1])
 	if not (se_obj) then
@@ -1197,7 +1197,7 @@ function make_explode(p,force)
 	end
 	
 	-- wait for it to switch offline
-	if (force ~= true and se_obj.online) then
+	if (se_obj.online) then
 		if (se_obj:can_switch_offline()) then
 			se_obj:switch_offline()
 		end

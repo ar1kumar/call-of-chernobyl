@@ -595,8 +595,7 @@ function PsiStormManager:kill_obj_at_pos(pos)
 end
 
 function PsiStormManager:turn_to_zombie(obj)
-	local timr = math.random(1,8)
-	create_delayed_event(obj.id,"turn_to_zombie",timr,surge_manager.make_zombied,obj.id)
+	create_delayed_event(obj.id,"turn_to_zombie",math.random(1,8),surge_manager.make_zombied,obj.id)
 	--self.debugMessages[1]:SetText("type: "..tostring(zombie_type))
 end
 

@@ -197,7 +197,8 @@ function simulation_board:remove_squad(squad)
 	squad:remove_squad()
 
 	-- Alundaio (Delayed release squad from game)
-	create_delayed_event(squad.id,"safe_release",1,alun_utils.safe_release,squad.id)
+	--create_delayed_event(squad.id,"safe_release",1,alun_utils.safe_release,squad.id)
+	alife():release(squad,true)
 end
 --' Назначение отряда в смарт.
 function simulation_board:assign_squad_to_smart(squad, smart_id)

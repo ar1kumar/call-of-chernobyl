@@ -133,13 +133,7 @@ function Crelease_body:clear(all,dist,now)
 		if (se_obj and not se_obj:alive()) and (IsStalker(se_obj) or IsMonster(se_obj)) then
 			if (all or pos:distance_to_sqr(se_obj.position) >= dist) then
 				--printf("release_body_manager:safe_remove_npc: releasing %s from the game",se_obj:name())
-
-				if (now) then
-					sim:release(se_obj,true)
-				else
-					create_delayed_event(id,"safe_release",math.random(1,8),alun_utils.safe_release,id)
-				end
-
+				sim:release(se_obj,true)
 				self.release_objects_table[id] = nil
 				self.size = self.size - 1
 			end
