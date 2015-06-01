@@ -1479,7 +1479,20 @@ function get_customdata_or_ini_file(npc, filename)
 			return ini_file(st.job_ini)
 		end
 		--printf("custom_data_or_ini:4!!!")
-		return xr_gulag.loadLtx(string.sub(filename, 2))
+		
+		local gname = string.sub(filename, 2)
+
+		-- dynamic ltx found and already loaded
+		if (db.dynamic_ltx[gname]) then
+			return db.dynamic_ltx[gname]
+		end
+			
+		-- can't find dynamic ltx, try to create it from file
+		if (file_exists(getFS():update_path('$game_config$', "gulag\\"..gname..".ltx"))) then
+			local ltx = ini_file("gulag\\"..gname..".ltx")
+			db.dynamic_ltx[gname] = ltx
+		end
+		return db.dynamic_ltx[gname]
 	else
 		--printf("custom_data_or_ini:5!!!")
 		return ini_file(filename)

@@ -1321,21 +1321,19 @@ function load_job(smart)
 	end
 
 	local gname = smart:name()
-
-	-- Use a gulag if it already exists, cuts loading time down drastically
-	local fname = getFS():update_path('$game_config$', "gulag\\"..gname..".ltx")
-	local f = io.open(fname,"rb")
-	if (f) then
-		-- Note: Some reason I cannot use ini_file() directly
-		local data = f:read("*all")
-		if (data) then
-			-- Read ini from disk because it exists
-			smart.ltx = create_ini_file(data) --ini_file("gulag\\"..gname..".ltx")
+	
+	-- smart has a dynamic ltx already loaded
+	if (db.dynamic_ltx[gname]) then
+		smart.ltx = db.dynamic_ltx[gname]
+		smart.ltx_name = "*"..gname
+	else
+		-- load from file if it exists (cuts load time down)
+		if (file_exists(getFS():update_path('$game_config$', "gulag\\"..gname..".ltx"))) then
+			smart.ltx = ini_file("gulag\\"..gname..".ltx")
 			smart.ltx_name = "*"..gname
-
-			printf("%s found ltx in gamedata\\configs\\gulag | not generating dynamic LTX",gname)
+			db.dynamic_ltx[gname] = smart.ltx
+			printf("DEBUG: %s found ltx in configs\\gulag. Not generating dynamic ltx for smart",gname)
 		end
-		f:close()
 	end
 	
 	ltx = nil

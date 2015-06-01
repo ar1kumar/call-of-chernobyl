@@ -433,6 +433,7 @@ function se_smart_terrain:load_jobs()
 	
 	--alun_utils.debug_write(alun_utils.sr("%s:load_jobs %s  After",self:name(),obj and obj:name()))
 	
+	-- gulag general didn't find existing dymaic ltx, so we must generate a dynamic ltx using the ltx string from gulag_general.script
 	if not (self.ltx) then
 		local l = gulag_general.load_ltx()
 		if (l) then 
