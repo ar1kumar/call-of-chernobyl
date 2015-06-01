@@ -126,11 +126,11 @@ end
 -- xrEngine's FS requires path to be in fs_game.ltx, it's why I don't use it here
 local function file_exists(name)
    local f=io.open(name,"r")
-   if f~=nil then io.close(f) return true else return false end
+   if f~=nil then f:close() return true else return false end
 end
 
 -- called by xr_gulag.script
-function load_ltx(gname)
+function load_ltx()
 	return ltx
 end
 
@@ -1316,21 +1316,30 @@ function load_job(smart)
 
 	if not (beh_ini) then
 		if (file_exists(alun_utils.fspath("$game_config$").."beh_gulag_jobs.ltx")) then
-			beh_ini = alun_utils.cfg_file(alun_utils.fspath("$game_config$").."beh_gulag_jobs.ltx")
+			beh_ini = alun_utils.cfg_file(getFS():update_path('$game_config$', "beh_gulag_jobs.ltx"))
 		end
 	end
 
-	local generate_ltx = true
 	local gname = smart:name()
 
-	-- Use a gulag if it already exists, saves tons of memory and cuts loading time down drastically
-	if (file_exists(alun_utils.fspath("$game_config$").."gulag\\"..gname..".ltx")) then
-		--generate_ltx = false
-		--printf("Not generating dynamic ltx")
-	end
+	-- Use a gulag if it already exists, cuts loading time down drastically
+	local fname = getFS():update_path('$game_config$', "gulag\\"..gname..".ltx")
+	local f = io.open(fname,"rb")
+	if (f) then
+		-- Note: Some reason I cannot use ini_file() directly
+		local data = f:read("*all")
+		if (data) then
+			-- Read ini from disk because it exists
+			smart.ltx = create_ini_file(data) --ini_file("gulag\\"..gname..".ltx")
+			smart.ltx_name = "*"..gname
 
+			printf("%s found ltx in gamedata\\configs\\gulag | not generating dynamic LTX",gname)
+		end
+		f:close()
+	end
+	
 	ltx = nil
-	if (generate_ltx) then
+	if not (smart.ltx) then
 		ltx =  "" ..
 		"[meet@generic_lager]\n"..
 		"close_distance                 = {=is_wounded} 0, {!surge_started !after_first_meet !actor_friend =is_squad_commander =actor_has_weapon} 10, 2\n"..
@@ -1422,8 +1431,8 @@ function load_job(smart)
 	end
 
 	-- write dynamic ltx to file
-	if (generate_ltx) then
-		local cfg = io.open(alun_utils.fspath("$game_config$").."gulag\\"..gname..".ltx","wb+")
+	if not (smart.ltx) then
+		local cfg = io.open(getFS():update_path('$game_config$', "gulag\\"..gname..".ltx"),"wb+")
 		if (cfg) then
 			cfg:write(ltx)
 			cfg:close()

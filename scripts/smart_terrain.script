@@ -113,15 +113,14 @@ function se_smart_terrain:on_register()
 	end
 
 	self.smart_alife_task = CALifeSmartTerrainTask(self.m_game_vertex_id, self.m_level_vertex_id)
-
+	self:load_jobs()
+	
 	story_objects.check_spawn_ini_for_story_id(self)
 	simulation_objects.get_sim_obj_registry():register(self)
 
 	self.b_registred = true
 
 	SIMBOARD:init_smart(self)
-
-	self:load_jobs()
 
 	if (self.need_init_npc) then
 		self.need_init_npc = nil
@@ -434,7 +433,17 @@ function se_smart_terrain:load_jobs()
 	
 	--alun_utils.debug_write(alun_utils.sr("%s:load_jobs %s  After",self:name(),obj and obj:name()))
 	
-	self.ltx, self.ltx_name = xr_gulag.loadLtx(self:name())
+	if not (self.ltx) then
+		local l = gulag_general.load_ltx()
+		if (l) then 
+			self.ltx = create_ini_file(l)
+			self.ltx_name = "*"..self:name()
+		end
+		if not (self.ltx) then 
+			printf("CRITICAL ERROR: %s does not have a dynamic ltx!",self:name())
+			return
+		end
+	end
 
 	-- Setup Alife Tasks for smart's gulag jobs
 	local job,active_section,section,ltx, path_field, path_name, smartcover, smartcover_name, prefix_name, job_type

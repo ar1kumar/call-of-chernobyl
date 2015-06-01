@@ -87,12 +87,7 @@ function general_resource_precondition(squad,target)
 end
 
 function general_lair_precondition(squad,target)
-
-	-- Fill up all the lairs first
-	if (SIMBOARD.smarts[target.id]) and (SIMBOARD.smarts[target.id].squads[squad.id] or SIMBOARD.smarts[target.id].population < target.max_population) then
-		return true
-	end
-	
+	--[[
 	if (squad.player_id == "monster_predatory_day") then 
 		return in_time_interval(19,6)
 	elseif (squad.player_id == "monster_predatory_night") then 
@@ -105,6 +100,8 @@ function general_lair_precondition(squad,target)
 		return true
 	end 
 	return in_time_interval(19,6)
+	--]]
+	return true -- Will fill up all the lairs first, by monster squads
 end
 
 --------------------------------------------------------------------------------------------------------

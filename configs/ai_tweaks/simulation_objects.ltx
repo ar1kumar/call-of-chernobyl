@@ -1,3 +1,6 @@
+; This is used for determining which levels to deactivate and remove from simulation. "Linked" levels will have level transiting enabled and respawns active.
+; This is done to alleviate the performance issues with having hundreds of active squads and smart terrain updates
+
 [k00_marsh]
 target_maps = l03_agroprom, l01_escape, l08_yantar
 
@@ -56,13 +59,13 @@ target_maps = l12_stancia, l13_generators, l11_hospital
 target_maps = l12_stancia_2
 
 [zaton]
-target_maps = jupiter, pripyat, l12_stancia
+target_maps = pripyat, l12_stancia
 
-[jupiter]
-target_maps = l10_red_forest, zaton, jupiter_underground, pripyat, l11_pripyat
+[jupiter] ;Note: Jupiter so active with many smarts that it's not a good idea to re-enable this without performance issues
+;target_maps = l10_red_forest, zaton, jupiter_underground, pripyat, l11_pripyat
 
 [pripyat]
-target_maps = zaton, jupiter, jupiter_underground, l11_pripyat
+target_maps = zaton, l11_pripyat
 
 [jupiter_underground]
 target_maps = jupiter, pripyat

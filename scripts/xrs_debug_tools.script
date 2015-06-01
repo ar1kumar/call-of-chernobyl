@@ -1077,7 +1077,17 @@ function position_hud_show(hud)
 			end
 		end
 	end
-
+	
+	hud:add_msg("","------ MISC. ------")
+	local count = 0
+	local ao = alife().object
+	for i=1,65534 do
+		if (ao(i) ~= nil) then
+			count = count + 1
+		end
+	end
+	hud:add_msg("GameObject IDs",count)
+	
 	hud:display()
 end
 

@@ -304,10 +304,6 @@ function on_game_start()
 	--if (xr_visual) then xr_visual.on_game_start() end
 	if (xr_eat_medkit) then xr_eat_medkit.on_game_start() end
 	if (axr_trade_manager) then axr_trade_manager.on_game_start() end
-	
-	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	collectgarbage("collect")
-	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 -------------------
@@ -392,7 +388,7 @@ function on_game_load()
 					-- squad must not be on linked level
 					if not (string.find(simulation_objects.config:GetValue(actor_l,"target_maps",0,""),squad_l)) then
 						if (count > MAX_SQUADS) then
-							create_delayed_event(squad.id,"remove_squad",math.random(1,220),remove_squad,squad.id)
+							create_delayed_event(squad.id,"remove_squad",math.random(1,5),remove_squad,squad.id)
 						else
 							count = count + 1
 						end
@@ -401,16 +397,6 @@ function on_game_load()
 			end
 		end 
 	end
-	--[[
-	count = 0
-	local sim = alife()
-	for i=1,65534 do
-		if (sim:object(i)) then
-			count = count + 1
-		end
-	end
-	printf("axr_main.on_game_load: There are %s object ids in use.",count)
-	--]]
 
 	-- clean up intercepts table if callbacks are unused
 	-- if needed this can be removed so that callbacks can be registered any time, not just before or during on_game_load
@@ -419,6 +405,10 @@ function on_game_load()
 			intercepts[i] = nil
 		end
 	end
+	
+	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	collectgarbage("collect")
+	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 -------------------
