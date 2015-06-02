@@ -224,7 +224,7 @@ function is_enemy(obj,enemy,no_memory)
 	if not (is_actor) then
 		local pos1 = obj:position()
 		local pos2 = enemy:position()
-		if (is_monster and math.abs(pos1.y-pos2.y) > 1200) then 
+		if (is_monster and math.abs(pos1.y-pos2.y) > 30) then 
 			return false 
 		end 
 		
@@ -339,6 +339,7 @@ function action_process_enemy:enemy_callback(npc, enemy)
 		end
 
 		-- Set smart alarm
+		--[[
 		local sim = alife()
 		local se_obj = npc.se_obj or sim:object(id)
 		if (se_obj and se_obj.m_smart_terrain_id ~= 65535) then
@@ -349,8 +350,19 @@ function action_process_enemy:enemy_callback(npc, enemy)
 				smart_obj.base_on_actor_control:actor_attack()
 			end
 		end
+		--]]
 		
-		return true
+		-- avoid shooting at ground or ceiling, let danger mode take over
+		-- This problem does not exist AI vs. player. AI vs. AI they seem to see through walls no matter what you set for transparency threshold
+		if (enemy:id() ~= 0) then
+			local pos1 = npc:position()
+			local pos2 = enemy:position()
+			if ( math.abs(pos1.y - pos2.y) < 6 ) then 
+				return true 
+			end
+		else 
+			return true
+		end
 	end
 	
 	local st = db.storage[id]

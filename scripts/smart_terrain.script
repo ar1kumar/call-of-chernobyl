@@ -113,14 +113,15 @@ function se_smart_terrain:on_register()
 	end
 
 	self.smart_alife_task = CALifeSmartTerrainTask(self.m_game_vertex_id, self.m_level_vertex_id)
-	self:load_jobs()
 	
 	story_objects.check_spawn_ini_for_story_id(self)
 	simulation_objects.get_sim_obj_registry():register(self)
-
+	
 	self.b_registred = true
 
 	SIMBOARD:init_smart(self)
+	
+	self:load_jobs()
 
 	if (self.need_init_npc) then
 		self.need_init_npc = nil
