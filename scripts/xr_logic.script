@@ -1488,7 +1488,9 @@ function get_customdata_or_ini_file(npc, filename)
 		end
 			
 		-- can't find dynamic ltx, try to create it from file
-		if (file_exists(getFS():update_path('$game_config$', "gulag\\"..gname..".ltx"))) then
+		local f = io.open(getFS():update_path('$game_config$', "gulag\\"..gname..".ltx"),"r")
+		if (f) then
+			f:close()
 			local ltx = ini_file("gulag\\"..gname..".ltx")
 			db.dynamic_ltx[gname] = ltx
 		end
