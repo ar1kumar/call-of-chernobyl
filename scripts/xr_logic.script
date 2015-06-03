@@ -119,7 +119,7 @@ function generic_scheme_overrides(npc)
 --]]--
 function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_name)
 	--printf("DEBUG: enable_scripts: npc:name()=%s", npc:name())
-
+	
 	local npc_id = npc:id()
 	local st     = db.storage[npc_id]
 
@@ -130,7 +130,7 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 
 	local actual_ini
 	local actual_ini_filename
-	if not ini:section_exist(section_logic) then
+	if (ini and not ini:section_exist(section_logic)) then
 		if gulag_name == "" then
 			-- Общие схемы должны работать и без logic:
 			actual_ini_filename = ini_filename
@@ -1491,9 +1491,13 @@ function get_customdata_or_ini_file(npc, filename)
 		local f = io.open(getFS():update_path('$game_config$', "gulag\\"..gname..".ltx"),"r")
 		if (f) then
 			f:close()
-			local ltx = ini_file("gulag\\"..gname..".ltx")
-			db.dynamic_ltx[gname] = ltx
+			db.dynamic_ltx[gname] = ini_file("gulag\\"..gname..".ltx")
 		end
+		
+		if not (db.dynamic_ltx[gname]) then 
+			printf("ERROR: xr_logic.get_customdata_or_ini_file: Failure to load ltx for %s",gname)
+		end
+		
 		return db.dynamic_ltx[gname]
 	else
 		--printf("custom_data_or_ini:5!!!")

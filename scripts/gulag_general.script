@@ -358,13 +358,15 @@ job_info_by_job_type_id = {
 ------------------------------------------------------------------------------------
 -- Smart Job Automation functions
 ------------------------------------------------------------------------------------
-local function init_campfire_point_jobs(smart,stalker_jobs,gname)
+local function init_campfire_point_jobs(smart,stalker_jobs,gname,skip)
 	local name, job_ltx
 	local max_jobs = smart.max_population > 0 and smart.max_population*3 or 1
 	for i=1, max_jobs do
 		name = gname.."_campfire_point_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 0})
-
+		if not (skip) then
+			rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 0})
+		end 
+		
 		if (ltx) then
 			job_ltx = [[
 [logic@%s]
@@ -392,13 +394,15 @@ anim = {!npc_community(zombied)} sit_ass, guard
 	end
 end
 
-local function init_generic_point_jobs(smart,stalker_jobs,gname)
+local function init_generic_point_jobs(smart,stalker_jobs,gname,skip)
 	local name, job_ltx
 	local max_jobs = smart.max_population > 0 and smart.max_population*3 or 1
 	for i=1, max_jobs do
 		name = gname.."_point_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 1})
-
+		if not (skip) then
+			rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 1})
+		end 
+		
 		if (ltx) then
 			job_ltx = [[
 [logic@%s]
