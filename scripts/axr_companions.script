@@ -453,11 +453,12 @@ end
 
 function move_to_point(begin)
 	if (begin) then 
-		SetHudMsg(game.translate_string("st_move_to_point"),8)
+		SetHudMsg(game.translate_string("Hold then release"),8)
 		--_draw_part = particles_object("weapons\\light_signal")
 		_draw_part = particles_object("_samples_particles_\\flash_light")
 		--_draw_part = particles_object("static\\net_base_blue")
 	elseif (_draw_part) then
+		SetHudMsg(game.translate_string("st_move_to_point"),8)
 		_draw_part:stop()
 		_draw_part = nil
 		local r = level.get_target_dist and level.get_target_dist()
