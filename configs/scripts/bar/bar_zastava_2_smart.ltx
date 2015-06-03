@@ -3,6 +3,7 @@
 active = beh@bar_zastava_2_minigunner_excl
 suitable = {!surge_started} true
 prior = 60
+on_death = death@bar_zastava_2_minigunner
 
 [meet@general]
 close_anim 		= nil
@@ -61,6 +62,7 @@ meet_on_talking = false
 active = walker@duty2_guard1_reach
 suitable = {=npc_community(dolg) !surge_started} true
 prior = 100
+on_death = death@bar_zastava_2_duty2_guard1
 
 [walker@duty2_guard1_reach]
 path_walk = walker_1_walk
@@ -90,6 +92,7 @@ use_camp = false
 active = walker@duty2_guard2
 suitable = {=npc_community(dolg) !surge_started} true
 prior = 100
+on_death = death@bar_zastava_2_duty2_guard2
 
 [walker@duty2_guard2]
 path_walk = walker_2_walk
@@ -110,6 +113,7 @@ meet = no_meet
 active = walker@duty2_guard3
 suitable = {=npc_community(dolg)  !surge_started} true
 prior = 100
+on_death = death@bar_zastava_2_duty2_guard3
 
 [walker@duty2_guard3]
 path_walk = walker_3_walk
@@ -139,6 +143,7 @@ use_camp = false
 active = walker@duty2_guard4
 suitable = {=check_npc_name(bar_zastava_2_commander) =npc_in_zone(bar_zastava_restrictor_2) !surge_started} true
 prior = 100
+on_death = death@bar_zastava_2_duty2_guard4
 
 [walker@duty2_guard4]
 path_walk = walker_4_walk
@@ -159,6 +164,7 @@ meet = no_meet
 active = walker@duty2_guard5_reach
 suitable = {=npc_community(dolg)  !surge_started} true
 prior = 100
+on_death = death@bar_zastava_2_duty2_guard5
 
 [walker@duty2_guard5_reach]
 path_walk = walker_5_walk
@@ -183,3 +189,20 @@ help_wounded_enabled = true
 corpse_detection_enabled = true
 use_camp = false
 
+[death@bar_zastava_2_minigunner]
+on_info  = %+bar_zastava_2_minigunner_dead%
+
+[death@bar_zastava_2_duty2_guard1]
+on_info  = %+bar_zastava_2_duty2_guard1_dead%
+
+[death@bar_zastava_2_duty2_guard2]
+on_info  = %+bar_zastava_2_duty2_guard2_dead%
+
+[death@bar_zastava_2_duty2_guard3]
+on_info  = %+bar_zastava_2_duty2_guard3_dead%
+
+[death@bar_zastava_2_duty2_guard4]
+on_info  = %+bar_zastava_2_duty2_guard4_dead%
+
+[death@bar_zastava_2_duty2_guard5]
+on_info  = %+bar_zastava_2_duty2_guard5_dead%
