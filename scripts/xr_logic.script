@@ -130,7 +130,7 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 
 	local actual_ini
 	local actual_ini_filename
-	if (ini and not ini:section_exist(section_logic)) then
+	if (not ini:section_exist(section_logic)) then
 		if gulag_name == "" then
 			-- Общие схемы должны работать и без logic:
 			actual_ini_filename = ini_filename
@@ -1500,6 +1500,19 @@ function get_customdata_or_ini_file(npc, filename)
 		
 		return db.dynamic_ltx[gname]
 	else
+		-- dynamic ltx found and already loaded
+		if (db.dynamic_ltx[filename]) then
+			return db.dynamic_ltx[filename]
+		end
+
+		-- can't find dynamic ltx, try to create it from file
+		local f = io.open(getFS():update_path('$game_config$', "gulag\\"..filename..".ltx"),"r")
+		if (f) then
+			f:close()
+			db.dynamic_ltx[filename] = ini_file("gulag\\"..filename..".ltx")
+			return db.dynamic_ltx[gname]
+		end
+		
 		--printf("custom_data_or_ini:5!!!")
 		return ini_file(filename)
 	end

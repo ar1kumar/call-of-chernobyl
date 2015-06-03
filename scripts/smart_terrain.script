@@ -439,8 +439,9 @@ function se_smart_terrain:load_jobs()
 		if not (self.ltx) then 
 			printf("CRITICAL ERROR: %s does not have a dynamic ltx!",self:name())
 			return
+		else
+			db.dynamic_ltx[self:name()] = self.ltx
 		end
-		db.dynamic_ltx[self:name()] = self.ltx
 	end
 
 	-- Setup Alife Tasks for smart's gulag jobs

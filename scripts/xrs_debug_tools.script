@@ -901,6 +901,7 @@ function planner_hud_show(hud)
 				hud:add_msg("Alife Act ID",actid)
 			end
 			
+			--[[
 			local anomaly_action = manager:action(stalker_ids.action_anomaly_planner)
 			local anomaly_action_planner = cast_planner(anomaly_action)
 			actid = anomaly_action_planner and anomaly_action_planner:initialized() and anomaly_action_planner:current_action_id()
@@ -909,6 +910,7 @@ function planner_hud_show(hud)
 				hud:add_msg("Anomaly Act",name)
 				hud:add_msg("Anomaly Act ID",actid)
 			end
+			--]]
 			
 			--hud:add_msg("Inside Anomaly",manager:evaluator(stalker_ids.property_inside_anomaly):evaluate())
 
