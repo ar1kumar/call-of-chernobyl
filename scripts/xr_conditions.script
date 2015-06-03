@@ -2698,10 +2698,18 @@ end
 
 function var_target_is_alive(actor,npc,p)
 	if (p[1]) then
-		local id = alun_utils.load_var(db.actor,p[1].."_target_id")
+		local id = alun_utils.load_var(db.actor,p[1].."_giver_id")
 		local se_obj = id and alife():object(id)
-		if (se_obj and se_obj:alive()) then 
-			return true 
+		if (se_obj) then 
+			if (se_obj:clsid() == clsid.online_offline_group_s) then
+				id = se_obj:commander_id()
+				local obj = db.storage[id] and db.storage[id].object
+				if (obj and obj:alive()) then
+					return true
+				end
+			elseif (se_obj:alive()) then 
+				return true
+			end
 		end
 	end
 	return false
