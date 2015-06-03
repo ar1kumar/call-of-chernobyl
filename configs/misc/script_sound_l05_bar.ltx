@@ -2,6 +2,12 @@
 bar_barman_greeting
 bar_barman_farewell
 bar_dolg_hangar_bridge_hello
+bar_guard_stop
+bar_guard_prohodi
+bar_dolg_speech
+bar_dolg_warn
+dolg_megafon_kill
+bar_dolg_alarm
 
 [bar_barman_greeting]
 type = npc
@@ -20,3 +26,39 @@ type = npc
 path = scenario\bar\dolg_guard\duty_hangar_1
 shuffle = seq
 idle = 0,0,100
+
+[bar_guard_stop]
+type = npc
+path = scenario\bar\bar_guard\bar_guard_stop_
+shuffle = rnd
+idle = 1,1,100
+
+[bar_guard_prohodi]
+type = npc
+path = scenario\bar\bar_guard\bar_guard_prohodi_
+shuffle = seq
+idle = 1,1,100
+
+[bar_dolg_speech]
+type = 3d
+path = characters_voice\scenario\bar\megafon\mega_duty_propaganda_
+shuffle = rnd
+idle = 5,15,100
+
+[bar_dolg_warn]
+type = 3d
+path = characters_voice\scenario\bar\megafon\duty_gunfire_mega_1
+shuffle = seq
+idle = 1,1,100
+
+[dolg_megafon_kill]
+type = 3d
+path = characters_voice\scenario\bar\megafon\duty_gunfire_mega_3
+shuffle = seq
+idle = 1,1,100
+
+[bar_dolg_alarm]
+type = 3d
+path = characters_voice\scenario\bar\megafon\megaphone_duty_alarm
+shuffle = rnd
+idle = 5,20,100

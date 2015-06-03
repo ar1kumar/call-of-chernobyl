@@ -1,0 +1,38 @@
+[logic]
+active = ph_idle@wait
+
+[ph_idle@wait]
+on_info = {=actor_in_zone(bar_dolg_territory)} ph_idle@start_propaganda
+on_info2 = {=actor_has_weapon} ph_idle@warn
+on_info3 = {=check_smart_alarm_status(bar_dolg_bunker)} ph_idle@alarm
+on_info4 = {=check_smart_alarm_status(bar_dolg_general)} ph_idle@alarm
+on_info5 = {=check_smart_alarm_status(bar_visitors)} ph_idle@alarm
+on_info6 = {=check_smart_alarm_status(bar_zastava)} ph_idle@alarm
+on_info7 = {=check_smart_alarm_status(bar_zastava_2)} ph_idle@alarm
+ 
+[ph_idle@start_propaganda]
+on_info = %=play_sound(bar_dolg_speech)%
+on_info2 = {=actor_has_weapon} ph_idle@warn
+on_info3 = {=check_smart_alarm_status(bar_dolg_bunker)} ph_idle@alarm
+on_info4 = {=check_smart_alarm_status(bar_dolg_general)} ph_idle@alarm
+on_info5 = {=check_smart_alarm_status(bar_visitors)} ph_idle@alarm
+on_info6 = {=check_smart_alarm_status(bar_zastava)} ph_idle@alarm
+on_info7 = {=check_smart_alarm_status(bar_zastava_2)} ph_idle@alarm
+
+[ph_idle@warn]
+on_info = %=play_sound(bar_dolg_warn)%
+on_timer = 5000 | ph_idle@wait
+on_info2 = {!actor_has_weapon} ph_idle@wait
+
+;[ph_idle@kill]
+;on_info = %=play_sound(dolg_megafon_kill)%
+;on_timer = 5000 | ph_idle@wait
+
+[ph_idle@alarm]
+on_info = %=play_sound(bar_dolg_alarm)%
+on_timer = 5000 | ph_idle@wait
+on_info2 = {!check_smart_alarm_status(bar_dolg_bunker)} ph_idle@wait
+on_info3 = {!check_smart_alarm_status(bar_dolg_general)} ph_idle@wait
+on_info4 = {!check_smart_alarm_status(bar_visitors)} ph_idle@wait
+on_info5 = {!check_smart_alarm_status(bar_zastava)} ph_idle@wait
+on_info6 = {!check_smart_alarm_status(bar_zastava_2)} ph_idle@wait
