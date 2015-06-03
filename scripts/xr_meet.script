@@ -62,16 +62,18 @@ function evaluator_contact:evaluate()
 			return false
 		end
 		
+		--[[ Not needed now that companions can be ordered to move
 		if (self.a.gtfo == true) then 
 			return true 
 		end 
 		
-		 if (self.object:has_info("npcx_is_companion")) then --or not get_object_story_id(self.object:id())) then
+		if (self.object:has_info("npcx_is_companion")) then --or not get_object_story_id(self.object:id())) then
 			if (db.actor:position():distance_to_sqr(self.object:position()) < 1.6) and not (good_acts[alun_utils.get_current_action_id(self.object)]) then
 				self.a.gtfo = true
 				return true
 			end
-		end 
+		end
+		--]]
 
 		local squad = self.object and get_object_squad(self.object)
 		local commander = squad and squad:commander_id() ~= self.object:id() and level.object_by_id(squad:commander_id())
