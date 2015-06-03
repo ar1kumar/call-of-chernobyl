@@ -278,7 +278,7 @@ function on_game_start()
 	
 	phantom_manager.on_game_start()
 	
-	if string.find(command_line(), "-dbg") then
+	if (DEV_DEBUG) then
 		if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
 	end 
 	
@@ -406,6 +406,7 @@ function on_game_load()
 		end
 	end
 	
+	-- debugging
 	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
 	collectgarbage("collect")
 	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
@@ -1144,13 +1145,13 @@ function npc_on_death_callback(npc,who)
 end
 
 -------------------
--- npc_on_get_all_from_corpse(npc,corpse)
+-- npc_on_get_all_from_corpse(npc,corpse,item,lootable)
 -------------------
-function npc_on_get_all_from_corpse(npc,corpse)
+function npc_on_get_all_from_corpse(npc,corpse,item,lootable)
 	--alun_utils.debug_write("npc_on_get_all_from_corpse")
 	if (intercepts.npc_on_get_all_from_corpse) then
 		for i=1, #intercepts.npc_on_get_all_from_corpse do
-			intercepts.npc_on_get_all_from_corpse[i](npc,corpse)
+			intercepts.npc_on_get_all_from_corpse[i](npc,corpse,item,lootable)
 		end
 	end
 end
@@ -1392,7 +1393,7 @@ function main_menu_on_init(menu)
 	axr_main_options.main_menu_on_init(menu)
 	
 	-- THIS IS HERE BECAUSE ON_GAME_START is only triggered when alife simulator starts. We need this here to use icon editor
-	if string.find(command_line(), "-dbg") then
+	if (DEV_DEBUG) then
 		if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
 	end 
 	

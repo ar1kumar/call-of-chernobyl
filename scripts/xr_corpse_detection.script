@@ -202,6 +202,9 @@ function get_all_from_corpse(npc)
 	local items_value = 0
 	local sec
 	local function get_item(corpse,item)
+		if (axr_main) then
+			axr_main.npc_on_get_all_from_corpse(npc,corpse_npc,item,lootable_table[item:section()])
+		end
 		if (lootable_table[item:section()] ~= nil) then
 			if (items_value < 100) then
 				items_value = items_value+item:cost()*item:condition()/30
@@ -223,10 +226,6 @@ function get_all_from_corpse(npc)
 		count = 254
 	end
 	alun_utils.save_var(npc,"s_loot_count",count+1)
-	
-	if (axr_main) then
-		axr_main.npc_on_get_all_from_corpse(npc,corpse_npc)
-	end
 end
 
 ----------------------------------------------------------------------------------------------------------------------

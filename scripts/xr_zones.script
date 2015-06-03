@@ -15,6 +15,47 @@ function bind(obj)
 			obj:bind_object(arena_zone_binder(obj))
 		end
 	end
+	
+	--obj:bind_object(script_zone_binder(obj))
+end
+
+
+class "script_zone_binder"
+function script_zone_binder:__init(obj) super(obj)
+
+end 
+
+function script_zone_binder:net_spawn(se_obj)
+	if not object_binder.net_spawn(self, se_obj) then
+		return false
+	end
+
+	self.object:set_callback(callback.zone_enter, self.on_enter, self)
+	self.object:set_callback(callback.zone_exit, self.on_exit, self)
+
+	return true
+end 
+
+function script_zone_binder:net_destroy()
+	self.object:set_callback(callback.zone_enter, nil)
+	self.object:set_callback(callback.zone_exit, nil)
+
+	object_binder.net_destroy(self)
+end
+
+function script_zone_binder:save(packet)
+	object_binder.save(self, packet)
+end
+function script_zone_binder:load(packet)
+	object_binder.load(self, packet)
+end
+
+function script_zone_binder:on_enter(zone, obj)
+	printf("[zone %s] on_enter obj=%s, clsid=%s", zone and zone:name(), obj and obj:name())
+
+end
+function script_zone_binder:on_exit(zone, obj)
+	printf("[zone %s] on_exit obj=%s, clsid=%s", zone and zone:name(), obj and obj:name())
 end
 
 --'--------------------------------------------------------------------------------------------------------------------

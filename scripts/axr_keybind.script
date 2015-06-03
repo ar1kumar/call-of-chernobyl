@@ -1,15 +1,56 @@
 -- Handler for scripted keybinds 
 
 local function on_key_press(key)
+	-- Order ALL Companions to cycle between Aggressive, Passive and Assist modes
 	if (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_cycle_combat_mode",0,"")]) then 
 		axr_companions.cycle_companions_combat_mode()
+	-- Order ALL Companions to Wait or Follow
 	elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_cycle_move_mode",0,"")]) then 
 		axr_companions.cycle_companions_move_mode()
+	-- Order ALL Companions to move to point at cursor
+	elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_move_to_point",0,"")]) then 
+		axr_companions.move_to_point(true)
+	-- Quick access to demo_record
+	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_demo_record",0,"")]) then 
+		get_console():execute("demo_record t")
+	-- Teleport to last demo_record camera position
+	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_teleport_cam",0,"")]) then 
+		if (xrs_debug_tools.LastCameraPos) then
+			db.actor:set_actor_position(xrs_debug_tools.LastCameraPos)
+		end
+	-- Select Object on key press and teleports it on key release!
+	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_select_object",0,"")]) then
+		DEBUG_NPC = level.get_target_obj and level.get_target_obj()
+		if (DEBUG_NPC) then 
+			SetHudMsg(alun_utils.sr("%s Hold then release key to new position",DEBUG_NPC:name()),8)
+		end
+	end
+end
+
+local function on_key_release(key)
+	if (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_move_to_point",0,"")]) then 
+		axr_companions.move_to_point(false)
+	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_select_object",0,"")]) then
+		if (DEBUG_NPC) then
+			local r = level.get_target_dist and level.get_target_dist()
+			if (r) then
+				if (IsStalker(DEBUG_NPC) or IsMonster(DEBUG_NPC)) then
+					local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
+					if (lvid) then 
+						DEBUG_NPC:set_npc_position(level.vertex_position(lvid))
+					end
+				else
+					--DEBUG_NPC:position():add( device().cam_dir:mul(r) ) -- doesn't work
+				end
+			end
+			SetHudMsg("",1)
+		end
 	end
 end
 
 function on_game_start()
 	callback_register("on_key_press",on_key_press)
+	callback_register("on_key_release",on_key_release)
 	
 	local need_save
 	if not (axr_main.config:KeyExist("global_keybinds","companion_cycle_combat_mode")) then
@@ -20,12 +61,22 @@ function on_game_start()
 		axr_main.config:SetValue("global_keybinds","companion_cycle_move_mode","DIK_NUMPAD2")
 		need_save = true
 	end
+	if not (axr_main.config:KeyExist("global_keybinds","companion_move_to_point")) then
+		axr_main.config:SetValue("global_keybinds","companion_move_to_point","DIK_NUMPAD3")
+		need_save = true
+	end
+	
+	-- For debug
 	if not (axr_main.config:KeyExist("global_keybinds","debug_demo_record")) then
 		axr_main.config:SetValue("global_keybinds","debug_demo_record","DIK_NUMPAD0")
 		need_save = true
 	end
 	if not (axr_main.config:KeyExist("global_keybinds","debug_teleport_cam")) then
 		axr_main.config:SetValue("global_keybinds","debug_teleport_cam","DIK_NUMPADENTER")
+		need_save = true
+	end
+	if not (axr_main.config:KeyExist("global_keybinds","debug_select_object")) then
+		axr_main.config:SetValue("global_keybinds","debug_select_object","DIK_NUMPAD9")
 		need_save = true
 	end
 	

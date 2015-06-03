@@ -184,7 +184,7 @@ function CGeneralTask:check_task(tm)
 	end
 	
 	-- DEBUGGING!
-	if (string.find(command_line(), "-dbg")) then
+	if (DEV_DEBUG) then
 		if (xrs_debug_tools) then
 			xrs_debug_tools.debug_task_infos[self.id] = self
 		end

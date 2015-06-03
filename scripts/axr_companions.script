@@ -6,13 +6,16 @@ by Alundaio
 	This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 -]]
 
---TODO: Make it so patrol/waiting npcs do not follow actor to new levels. Maybe set their own squad id as target?
-
 ask_anyone_to_be_companion = false
 allow_story_squads = false
 max_actor_squad_size = 0
 
 companion_squads = {}
+------------------------------------------
+local _current_move_mode = 1
+local _current_combat_mode = 1
+local _draw_part
+
 ------------------------------------------
 -- Localized Functions
 ------------------------------------------
@@ -108,6 +111,21 @@ local function on_level_changing()
 	end
 end
 
+local function actor_on_update()
+	if (_draw_part) then 
+		local r = level.get_target_dist and level.get_target_dist()
+		if (r) then
+			local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
+			local pos = level.vertex_position(lvid)
+			--if not(_draw_part:playing()) then
+				_draw_part:play_at_pos(vector():set(pos.x,pos.y-0.5,pos.z))
+			--else 
+			--	_draw_part:move_to(pos,pos)
+			--end
+		end
+	end
+end 
+
 ---------------------------------
 -- Register Callbacks
 ---------------------------------
@@ -122,6 +140,7 @@ function on_game_start()
 	callback_register("squad_can_switch_offline",squad_can_switch_offline)
 	callback_register("npc_on_net_spawn",npc_on_net_spawn)
 	callback_register("on_level_changing",on_level_changing)
+	callback_register("actor_on_update",actor_on_update)
 
 	DisabledFactions = alun_utils.parse_list(ini,"main","disabled_factions",true)
 	ask_anyone_to_be_companion = alun_utils.read_from_ini(ini,"main","anyone_as_companion","bool",false)
@@ -369,7 +388,7 @@ function companion_remove_waypoints(npc)
 	end
 end
 
-function companion_add_waypoints(npc)
+function companion_add_waypoints(npc,pos)
 	local i = 1
 	local p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
 	while p do 
@@ -381,7 +400,6 @@ function companion_add_waypoints(npc)
 	alun_utils.save_var(npc,"pathpoint"..tostring(i),s)
 end
 
-local _current_combat_mode = 1
 function cycle_companions_combat_mode()
 	local t = {"set_companion_to_attack_state","set_companion_to_ignore_combat_state","set_companion_to_attack_only_actor_combat_enemy_state"}
 	if (_current_combat_mode+1 > #t) then 
@@ -390,7 +408,7 @@ function cycle_companions_combat_mode()
 		_current_combat_mode = _current_combat_mode + 1
 	end
 	
-	SetHudMsg(game.translate_string("st_"..t[_current_combat_mode]),12)
+	SetHudMsg(game.translate_string("st_"..t[_current_combat_mode]),8)
 	
 	local f = this[t[_current_combat_mode]]
 	if (f) then 
@@ -407,7 +425,6 @@ function cycle_companions_combat_mode()
 	end
 end 
 
-local _current_move_mode = 1
 function cycle_companions_move_mode()
 	local t = {"set_companion_to_wait_state","set_companion_to_follow_state"}
 	
@@ -417,7 +434,7 @@ function cycle_companions_move_mode()
 		_current_move_mode = _current_move_mode + 1
 	end
 	
-	SetHudMsg(game.translate_string("st_"..t[_current_move_mode]),12)
+	SetHudMsg(game.translate_string("st_"..t[_current_move_mode]),8)
 	
 	local f = this[t[_current_move_mode]]
 	if (f) then 
@@ -433,3 +450,30 @@ function cycle_companions_move_mode()
 		end
 	end
 end 
+
+function move_to_point(begin)
+	if (begin) then 
+		SetHudMsg(game.translate_string("st_move_to_point"),8)
+		--_draw_part = particles_object("weapons\\light_signal")
+		_draw_part = particles_object("_samples_particles_\\flash_light")
+		--_draw_part = particles_object("static\\net_base_blue")
+	elseif (_draw_part) then
+		_draw_part:stop()
+		_draw_part = nil
+		local r = level.get_target_dist and level.get_target_dist()
+		if (r) then
+			local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
+			for id,squad in pairs(companion_squads) do 
+				if (squad and squad.commander_id) then
+					local st = db.storage[squad:commander_id()]
+					local member = st and st.object
+					if (member and member:alive()) then
+						if (st.beh) then 
+							st.beh.rally_lvid = lvid
+						end
+					end
+				end
+			end
+		end
+	end
+end

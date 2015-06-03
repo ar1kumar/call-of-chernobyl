@@ -159,6 +159,7 @@ local function init_custom_data(npc, ini, section, st, scheme)
 	st.path_index 		= alun_utils.load_var(npc,"path_index",1)
 	st.wait_delay		= nil
 	st.am_i_reached 	= nil
+	st.rally_lvid		= nil
 
 	st.use_camp  		= utils.cfg_get_bool(ini, section, "use_camp",npc, false, false)
 	st.sound_idle		= xr_logic.parse_condlist(npc, section, "sound_idle", 	utils.cfg_get_string(ini, section, "sound_idle", npc, false, "", "nil"))
@@ -190,7 +191,6 @@ end
 
 function action_beh:initialize()
 	action_base.initialize(self)
-	self.st.assist_point = nil
 	self.keep_state_until = time_global()
 	self.st.approved_actions = {}
 end
@@ -208,6 +208,11 @@ function action_beh:execute()
 
 	if not ( self:set_desired_target() ) then
 		return
+	end
+	
+	if (self.st.last_behavior ~= self.st.behavior) then
+		self.st.last_behavior = self.st.behavior
+		self.st.rally_lvid = nil
 	end
 
 	if (self.st.target == "waypoint") then
@@ -250,6 +255,7 @@ function action_beh:set_desired_target()
 		if (self.st.target ~= target) then
 			self.st.target = target
 			self.st.desired_target.__keep_until = nil
+			self.st.rally_lvid = nil
 		end 
 	
 		local tg = time_global()
@@ -438,7 +444,7 @@ function action_beh:set_state()
 		new_state = self.st.run_animation
 	end
 	
-	state_mgr.set_state(self.object, new_state,nil, nil, nil, { animation = true })
+	state_mgr.set_state(self.object, new_state,nil, nil, nil, { fast_set = true, animation = true })
 end
 
 class "position_node"
@@ -488,19 +494,15 @@ function action_beh:beh_move()
 		local target
 
 		local dist_from_self_to_goto_target = self.object:position():distance_to(self.st.desired_target.position)
-		local dist_from_assist_pt_to_goto_target
 
-		if ( self.st.assist_point ) then
-			dist_from_assist_pt_to_goto_target = level.vertex_position(self.st.assist_point):distance_to(self.st.desired_target.position)
-		end
-
-		if (dist_from_assist_pt_to_goto_target == nil or dist_from_self_to_goto_target >= self.st.desired_distance) then
+		if (self.st.rally_lvid or dist_from_self_to_goto_target >= self.st.desired_distance) then
 			select_new_pt = true
 		end
 
 		if ( select_new_pt ) then
 			local node = position_node(2)
-			self.st.assist_point = node:select_best_vertex_id(self.object,self.st.desired_target.direction,self.st.desired_target.level_vertex_id,self.st.desired_distance) or self.st.desired_target.level_vertex_id --self.object:level_vertex_id()
+			self.st.assist_point = self.st.rally_lvid or node:select_best_vertex_id(self.object,self.st.desired_target.direction,self.st.desired_target.level_vertex_id,self.st.desired_distance) or self.st.desired_target.level_vertex_id --self.object:level_vertex_id()
+			self.keep_state_until = nil
 		end 
 		
 		if ( self.st.assist_point ) then

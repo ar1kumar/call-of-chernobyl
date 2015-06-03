@@ -1049,6 +1049,7 @@ function CSurgeManager:kill_obj_at_pos(pos)
 								local sr = self.covers[i]
 								if(sr and sr:inside(obj.position)) then
 									release = false
+									break
 								end
 							end
 							if(release) then
@@ -1098,6 +1099,7 @@ function CSurgeManager:get_objects_to_kill()
 								local sr = self.covers[i]
 								if(sr and sr:inside(obj.position)) then
 									release = false
+									break
 								end
 							end
 							if(release) then
@@ -1295,6 +1297,7 @@ function CSurgeManager:kill_all_unhided()
 								local sr = self.covers[i]
 								if(sr and sr:inside(obj.position)) then
 									release = false
+									break
 								end
 							end
 							if(release) then
@@ -1371,6 +1374,7 @@ function CSurgeManager:kill_all_unhided_after_actor_death()
 						local sr = self.covers[i]
 						if(sr and sr:inside(obj.position)) then
 							release = false
+							break
 						end
 					end
 					if(release) then

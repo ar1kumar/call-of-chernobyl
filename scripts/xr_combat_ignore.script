@@ -128,7 +128,7 @@ function is_enemy(obj,enemy,no_memory)
 	local id = obj:id()
 	local st = db.storage[id]
 	
-	if string.find(command_line(), "-dbg") then
+	if (DEV_DEBUG) then
 		if (xrs_debug_tools and xrs_debug_tools.debug_invis and ene_id == 0) then
 			return false
 		end
