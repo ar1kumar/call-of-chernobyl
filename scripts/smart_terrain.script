@@ -197,11 +197,6 @@ function se_smart_terrain:read_params()
 	local parsed_condlist = xr_logic.parse_condlist(nil, "smart_terrain", "max_population", max_population)
 	self.max_population = tonumber(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, parsed_condlist))
 
-	local smart_control_section = utils.cfg_get_string(ini, "smart_terrain", "smart_control", self, false, "", nil)
-	if smart_control_section ~= nil then
-		self.base_on_actor_control = smart_terrain_control.CBaseOnActorControl(self, ini, smart_control_section)
-	end
-	
 	self.death_idle_time = utils.cfg_get_number(ini, "smart_terrain", "death_idle_time", 	self, false, 600)
 
 	if level.patrol_path_exists(self:name() .. "_traveller_actor") then
@@ -544,8 +539,6 @@ function se_smart_terrain:update_jobs()
 		return
 	end
 	
-	self:check_alarm()
-
 	-- Fill NPC Job Info and Give them a job
 	for id,se_obj in pairs(self.arriving_npc) do 
 		if (se_obj) then 
@@ -909,13 +902,6 @@ function se_smart_terrain:STATE_Write(packet)
 		alun_utils.w_stpk(packet,"CTime",v,"dead_time CTime")
 	end
 
-	if self.base_on_actor_control ~= nil then
-		alun_utils.w_stpk(packet,"bool",true,"base_on_actor_control")
-		self.base_on_actor_control:save(packet)
-	else
-		alun_utils.w_stpk(packet,"bool",false,"base_on_actor_control")
-	end
-
 	if self.respawn_point then
 		alun_utils.w_stpk(packet,"bool",true,"respawn_point")
 		local n = 0
@@ -993,18 +979,6 @@ function se_smart_terrain:STATE_Read(packet, size)
 	end
 
 	self.need_init_npc = true
-
-	if self.script_version > 9 then
-		if packet:r_bool() == true then
-			if (self.disabled ~= true and self.base_on_actor_control) then
-				self.base_on_actor_control:load(packet)
-			else
-				-- smart is disabled, read as dummy
-				packet:r_u8()
-				utils.r_CTime(packet)
-			end
-		end
-	end
 
 	local respawn_point = packet:r_bool()
 	--printf("LOAD RESPAWN %s", self:name())
@@ -1250,10 +1224,6 @@ function se_smart_terrain:update()
 	end
 
 	self:update_jobs()
-
-	if self.base_on_actor_control then
-		self.base_on_actor_control:update()
-	end
 end
 
 function se_smart_terrain:set_alarm()
@@ -1262,11 +1232,13 @@ end
 
 function se_smart_terrain:check_alarm()
 	if self.smart_alarm_time == nil then
-		return
+		return false
 	end
-	if game.get_game_time():diffSec(self.smart_alarm_time) > 21600 then
+	if game.get_game_time():diffSec(self.smart_alarm_time) > 5 then
 		self.smart_alarm_time = nil
+		return false
 	end
+	return true
 end
 
 function se_smart_terrain:find_job_by_section(section)
@@ -1383,9 +1355,6 @@ function smart_terrain_squad_count(board_smart_squads)
 end
 
 function se_smart_terrain:sim_available()
-	if self.base_on_actor_control ~= nil and self.base_on_actor_control.status ~= smart_terrain_control.NORMAL then
-		return false
-	end
 	return true
 end
 

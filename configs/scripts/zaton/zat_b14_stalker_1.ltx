@@ -91,8 +91,8 @@ meet = no_meet
 path_walk = zat_b14_stalker_1_walk_3
 path_look = zat_b14_stalker_1_look_3
 def_state_moving1 = sprint
-on_info = {=npc_in_zone(zat_a2_sr_noweap) =check_smart_alarm_status(zat_stalker_base_smart:normal)} walker@item_3
-on_info2 = {=npc_in_zone(zat_a2_sr_noweap) =actor_in_zone(zat_a2_sr_noweap) =actor_enemy !check_smart_alarm_status(zat_stalker_base_smart:normal)} walker@fight_2
+on_info = {=npc_in_zone(zat_a2_sr_noweap)} walker@item_3
+on_info2 = {=npc_in_zone(zat_a2_sr_noweap) =actor_in_zone(zat_a2_sr_noweap) =actor_enemy} walker@fight_2
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 wounded = wounded
 meet = no_meet
@@ -102,9 +102,9 @@ out_restr = zat_a2_sr_noweap
 path_walk = zat_b14_stalker_1_walk_4
 path_look = zat_b14_stalker_1_look_4
 def_state_moving1 = run
-on_info = {!npc_in_zone(zat_surge_hide_a2) !check_smart_alarm_status(zat_stalker_base_smart:normal)} walker@item_2
+on_info = {!npc_in_zone(zat_surge_hide_a2)} walker@item_2
 on_info2 ={=npc_in_zone(zat_surge_hide_a2)} walker@item_4 
-on_info3 = {=npc_in_zone(zat_a2_sr_noweap) !npc_in_zone(zat_surge_hide_a2) =actor_in_zone(zat_a2_sr_noweap) =actor_enemy !check_smart_alarm_status(zat_stalker_base_smart:normal)} walker@fight_2
+on_info3 = {=npc_in_zone(zat_a2_sr_noweap) !npc_in_zone(zat_surge_hide_a2) =actor_in_zone(zat_a2_sr_noweap) =actor_enemy} walker@fight_2
 combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
 wounded = wounded
 meet = no_meet

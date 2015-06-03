@@ -940,30 +940,10 @@ end
 -------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------
-local alarm_statuses = {
-	normal = smart_terrain_control.NORMAL,
-	danger = smart_terrain_control.DANGER,
-	alarm = smart_terrain_control.ALARM
-}
-
 -- Функции поддержки безопасности баз
 function check_smart_alarm_status(actor, npc, p)
-	local smart_name = p[1]
-	local status = alarm_statuses[p[2]]
-
-	if status == nil then
-		printf("Wrong status[%s] in 'check_smart_alarm_status'", tostring(p[2]))
-	end
-
-	local smart = SIMBOARD:get_smart_by_name(smart_name)
-
-	local smart_control = smart.base_on_actor_control
-
-	if smart_control == nil then
-		printf("Cannot calculate 'check_smart_alarm_status' for smart %s", tostring(smart_name))
-	end
-
-	return smart_control:get_status() == status
+	local smart = p[1] and SIMBOARD:get_smart_by_name(p[1])
+	return smart and smart:check_alarm() or false
 end
 
 -------------------------------------------------------------------------------------------------------
@@ -2173,6 +2153,19 @@ function npc_squad_has_enemy(actor,npc,p)
 			return true
 		end
 	end
+end
+
+-- Returns true if a NPC at a certain smart was hit by calling NPC
+-- param 1 is smart name
+function hit_by_enemy_on_smart(actor,npc,p)
+	local id = db.storage[npc:id()].hitted_by
+	local who = id and level.object_by_id(id)
+	if (not who or not who:alive()) then
+    return false
+	end
+
+	local smart = xr_gulag.get_npc_smart(who)
+	return p and p[1] and smart and smart:name() == p[1] or false
 end
 
 -- Returns true if a NPC at a certain smart was hit by calling NPC
