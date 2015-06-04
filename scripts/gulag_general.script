@@ -29,9 +29,9 @@ camper                     			45
 sniper                     			30
 beh                        			30
 collector                  			25
-guard                     				25
+guard                     			25
 patrol                     			25 (-1 per follower)
-sleep                     				20
+sleep                     			20
 walker                     			15
 animpoint                  			15
 campfire_point						10
@@ -43,11 +43,11 @@ Exclusive jobs should be used for jobs you want everyone else locked out of, suc
 They are also useful for filling up jobs with a specific character or squad type. Like a faction smart.
 
 
-
 2. Never use the same logic section names (ie. 'logic@walker_1') between exclusive jobs and auto-generated jobs for each smart.
 There is a table that a smart_terrain uses called 'npc_by_job_section' which would require that every logic section is uniquely named.
 To avoid this simply give exclusive jobs a prefix, like 'logic@exclusive_walker_1_walk_1'
 
+3. Squad smart population is based on sim squad count. Do not count jobs for squads with target_smart as a field in squad descriptions
 --]]
 
 -- HOW TO ADD HELI JOBS:

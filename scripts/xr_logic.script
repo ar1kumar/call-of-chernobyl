@@ -131,14 +131,13 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 	local actual_ini
 	local actual_ini_filename
 	if (not ini:section_exist(section_logic)) then
-		if gulag_name == "" then
-			-- Общие схемы должны работать и без logic:
+		--if gulag_name == "" then
 			actual_ini_filename = ini_filename
-			actual_ini = ini -- персонаж не обязательно должен иметь секцию logic
-		else
+			actual_ini = ini
+		--else
 			-- Иначе это персонаж Gulag-а и ему не задали работу:
-			printf("ERROR: object '%s': unable to find section '%s' in '%s'", npc:name(), section_logic, tostring(ini_filename))
-		end
+		--	printf("ERROR: xr_logic.configure_schemes: object '%s': unable to find section '%s' in '%s' gulag_name=%s", npc:name(), section_logic, tostring(ini_filename))
+		--end
 	else
 		local filename = utils.cfg_get_string(ini, section_logic, "cfg", npc, false, "")
 		if filename then
