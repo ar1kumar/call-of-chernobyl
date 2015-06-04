@@ -1332,6 +1332,31 @@ function squads_in_zone_b41(actor, npc, p)
 	return true
 end
 
+function squads_in_zone_yan_smart_terrain_6_4(actor, npc, p)
+	local smart = SIMBOARD:get_smart_by_name("yan_smart_terrain_6_4")
+	local zone = db.zone_by_name["yan_smart_terrain_6_4_sr_light"]
+	local al = alife()
+
+	if zone == nil then
+		return false
+	end
+	if smart == nil then
+		return false
+	end
+
+	for k,v in pairs(SIMBOARD.smarts[smart.id].squads) do
+		if v ~= nil then
+			for j in v:squad_members() do
+				if not zone:inside(j.object.position) then
+					return false
+				end
+			end
+		end
+	end
+
+	return true
+end
+
 
 --' Проверка в таргет кондлисте задания, соответствует ли имя сквада переданному
 function target_squad_name(actor, obj, p)
