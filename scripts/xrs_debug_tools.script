@@ -360,6 +360,10 @@ end
 ------------------------------------------------------------------------------------
 --										GAME START
 function on_game_start()
+	if (keybinds) then 
+		return -- obviously on_game_start already triggered if this exists
+	end 
+	
 	local ini = ini_file("debug\\xrs_debug_tools.ltx")
 	debug_task_infos = {}
 
@@ -846,7 +850,7 @@ function planner_hud_show(hud)
 				hud:add_msg("Mgr. Act",name)
 				hud:add_msg("Mgr. Act ID",actid)
 			end
-
+			
 			local combat_action = manager:action(stalker_ids.action_combat_planner)
 			local combat_action_planner = cast_planner(combat_action)
 			actid = combat_action_planner and combat_action_planner:initialized() and combat_action_planner:current_action_id()

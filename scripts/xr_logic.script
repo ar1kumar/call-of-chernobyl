@@ -1,122 +1,3 @@
-----------------------------------------------------------------------------------------------------
--- Script switching logic
-----------------------------------------------------------------------------------------------------
--- Разработчик: Andrey Fidrya (Zmey) af@svitonline.com
-----------------------------------------------------------------------------------------------------
---function printf()
---end
-
---[[
-----------------------------------------------------------------------------------------------------
--- ФУНКЦИИ, КОТОРЫЕ РАЗРЕШЕНО ВЫЗЫВАТЬ ИЗ ДРУГИХ СКРИПТОВ
-----------------------------------------------------------------------------------------------------
-	Активация схем производится с помощью функций:
-
-function gulag_activate(npc, ini, section, gulag_name, death, combat, actor_dialogs, trade, hit)
-Предназначение:
-	активирует заданную схему, используется схемой гулаг. Тип скрипта определяется автоматически по имени секции.
-Здесь:
-	npc - персонаж, для которого будет активирована схема
-	ini - его customdata
-	section - имя секции, которая должна быть активирована
-	gulag_name - имя гулага, которое будет добавлено спереди к именам путей
-	death, combat, actor_dialogs, trade, hit - имена секций, задающих поведение при смерти и в бою
-
-function assign_storage_and_bind(npc, ini, scheme, section)
-Предназначение:
-	Вызывает функцию add_to_binder схемы, а также создает (если его еще нет) и возвращает ссылку на storage
-	для схемы. Примечание: в storage при этом могут оставаться старые данные, схема должна очистить его
-	самостоятельно.
-
-function subscribe_action_for_events(npc, storage, new_action)
-Предназначение:
-	Регистрирует класс для получения нотификаций о таких событиях как сброс схемы, сохранение и т.д.
-	Класс реализует соответствующие функции (reset_scheme() и т.д.), которые будут вызываться из xr_logic
-	в нужные моменты.
-
-function pick_section_from_condlist(actor, npc, condlist)
-Предназначение:
-	Проверяет условия condlist, и если они успешны - ставит указанные infoportions и возвращает текст.
-	Если условия не выполняются - возвращает nil.
-
-function try_switch_to_another_section(npc, st, actor)
-Предназчанение:
-	Используя настройки xr_logic из storage персонажа, пытается переключить его на другую схему, если
-	хоть одно из условий переключения сработало. Обычно вызывается из метода update класса персонажа.
-
-function is_active(npc, st)
-Предназначение:
-	Вызывается из evaluator-а (или в самом начале update у предметов и монстров) для проверки, что данная
-	схема сейчас активна (схема определяется по данным в storage).
-
-function cfg_get_switch_conditions(ini, section, npc)
-Предназначение:
-	Считывает все возможные условия переключения схем.
-
-function parse_condlist(npc, section, field, src)
-Предназначение:
-	Распарсивает условия вида: {+infop1} section1 %-infop2%, {+infop3 -infop4} section2 ... в таблицу.
-	Параметры section и field используются только в сообщениях об ошибках. Если строка src считана не из файла,
-	а передается в эту функцию гулагом, то нужно задать следующие параметры:
---]]
---		section = "[[[gulag_tasks.script]]]"
---		field = "[[[gulag_name=имя_гулага]]]"
---[[
-----------------------------------------------------------------------------------------------------
--- ПРИВАТНЫЕ ФУНКЦИИ
-----------------------------------------------------------------------------------------------------
-
-function activate_by_section(npc, ini, section, loading)
-Предназначение:
-	Активирует указанную секцию. Если в данный момент какая-либо секция уже активирована, сообщает об ошибке.
-
-function switch_to_section(npc, st, section)
-Предназначение:
-	Выполняет переключение с одной секции на другую, если новая секция не nil. Если же она nil, остается
-	активной старая секция.
-
-function abort_syntax_error_in_cond(npc, section, field)
-Предназначение:
-	Сообщает о синтаксической ошибке в условиях переключения схем секции section и поля field, и останавливает
-	игру.
-
-function parse_infop(rslt, str)
-Предназначение:
-	Распарсивает условия вида " +infop1 =func -infop2 " и т.д. (все не перечислены) в таблицу.
-
-function cfg_get_number_and_condlist(ini, section, field, npc)
-function cfg_get_string_and_condlist(ini, section, field, npc)
-function cfg_get_condlist(ini, section, field, npc)
-Предназначение:
-	Считывает из customdata различные условия переключения схем.
-
-function add_condition(lst, at, cond)
-Предназначение:
-	Добавляет условие в список условий переключения схем.
-
-function cfg_get_overrides(ini, section, npc)
-Предназначение:
-	Считывает настройки для схем общего поведения.
-
-function generic_scheme_overrides(npc)
-Предназначение:
-	Возвращает ссылку на настройки схем общего поведения, актуальные для работающей в данный момент схемы,
-	либо nil, если ни одна из секций не активна, либо настройки не заданы.
-
---]]
-
---[[
--- Предназначение:
---      вызывается при включении набора скриптов через секцию logic у персонажа. Если в секции logic присутствует только
---      поле cfg, использует конфигурационный файл, заданный в этом поле, и возвращает новый ini file.
--- Здесь:
---	npc - персонаж, для которого будет активирована схема
---	ini - его customdata
---	stype - тип скрипта. Поскольку имя секции все еще неизвестно, его нужно задавать явно. Допустимые значения
---	        перечислены в файле modules.script.
---	section - имя секции logic
---	gulag_name - имя гулага, если скрипт включается гулагом, а не биндером
---]]--
 function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_name)
 	--printf("DEBUG: enable_scripts: npc:name()=%s", npc:name())
 	
@@ -130,14 +11,15 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 
 	local actual_ini
 	local actual_ini_filename
-	if (not ini:section_exist(section_logic)) then
-		--if gulag_name == "" then
+	if not (ini:section_exist(section_logic)) then
+		if (ini_filename == "<customdata>") then 
 			actual_ini_filename = ini_filename
 			actual_ini = ini
-		--else
-			-- Иначе это персонаж Gulag-а и ему не задали работу:
-		--	printf("ERROR: xr_logic.configure_schemes: object '%s': unable to find section '%s' in '%s' gulag_name=%s", npc:name(), section_logic, tostring(ini_filename))
-		--end
+		else 
+			actual_ini_filename = ini_filename
+			actual_ini = ini
+			printf("ERROR: xr_logic.configure_schemes: object '%s': unable to find section '%s' in '%s' gulag_name=%s", npc:name(), section_logic, ini_filename,gulag_name)
+		end
 	else
 		local filename = utils.cfg_get_string(ini, section_logic, "cfg", npc, false, "")
 		if filename then
@@ -1480,22 +1362,6 @@ function get_customdata_or_ini_file(npc, filename)
 		--printf("custom_data_or_ini:4!!!")
 		
 		local gname = string.sub(filename, 2)
-
-		-- dynamic ltx found and already loaded
-		if (db.dynamic_ltx[gname]) then
-			return db.dynamic_ltx[gname]
-		end
-			
-		-- can't find dynamic ltx, try to create it from file
-		local f = io.open(getFS():update_path('$game_config$', "gulag\\"..gname..".ltx"),"r")
-		if (f) then
-			f:close()
-			db.dynamic_ltx[gname] = ini_file("gulag\\"..gname..".ltx")
-		end
-		
-		if not (db.dynamic_ltx[gname]) then 
-			printf("ERROR: xr_logic.get_customdata_or_ini_file: Failure to load ltx for %s",gname)
-		end
 		
 		return db.dynamic_ltx[gname]
 	else
@@ -1504,14 +1370,6 @@ function get_customdata_or_ini_file(npc, filename)
 			return db.dynamic_ltx[filename]
 		end
 
-		-- can't find dynamic ltx, try to create it from file
-		local f = io.open(getFS():update_path('$game_config$', "gulag\\"..filename..".ltx"),"r")
-		if (f) then
-			f:close()
-			db.dynamic_ltx[filename] = ini_file("gulag\\"..filename..".ltx")
-			return db.dynamic_ltx[filename]
-		end
-		
 		--printf("custom_data_or_ini:5!!!")
 		return ini_file(filename)
 	end

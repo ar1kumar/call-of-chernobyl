@@ -27,7 +27,7 @@ local function has_known_info(obj)
 		char_ini = st.ini
 	end
 
-	local known_info = alun_utils.read_from_ini(char_ini,st.section_logic,"known_info","string") or "known_info"
+	local known_info = st.section_logic and alun_utils.read_from_ini(char_ini,st.section_logic,"known_info","string") or "known_info"
 	if (char_ini and char_ini:section_exist(known_info)) then
 		return true
 	end

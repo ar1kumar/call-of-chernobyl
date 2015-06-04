@@ -2343,23 +2343,6 @@ function obj_on_job(actor,npc,p)
 	return st and st.active_section == p[3] or false
 end
 
--- Returns true if a NPC occupies a given job
--- param 1 is job section (ie. "logic@walker_1")
--- param 2 is smart name
--- param 3 is optional check for active_section
-function is_obj_on_job(actor,npc,p)
-	local board = SIMBOARD
-	local smart = p[2] and board and board.smarts_by_names[p[2]]
-	local id = smart and smart.npc_by_job_section[p[1]]
-	local st = id and db.storage[id]
-	local obj = id and (st and st.object or level.object_by_id(id))
-	--printf("obj=%s",obj and obj:name())
-	if not (p[3]) then
-		return obj and obj:alive() or false
-	end
-	return st and st.active_section == p[3] or false
-end
-
 -- Returns true if a NPC sees another NPC on a given job
 -- param 1 is smart name
 -- param 2 is job section (ie. "logic@walker_1") in this case omit 'logic@'

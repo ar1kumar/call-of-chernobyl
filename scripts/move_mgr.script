@@ -23,21 +23,6 @@ local state_moving = 1
 local state_standing = 2
 
 local sync = {}
-
-local ini = ini_file("ai_tweaks\\move_mgr.ltx")
-local Enable = alun_utils.read_from_ini(ini,"settings","enable","bool",true)
-local AllowSleepAnytime = alun_utils.read_from_ini(ini,"settings","allow_sleep_anytime","bool",false)
-local AllowSleepState = alun_utils.read_from_ini(ini,"settings","allow_sleep_state","bool",true)
-local AllowRndState	= alun_utils.read_from_ini(ini,"settings","allow_random_state","bool",true)
-local AllowSleepBag = alun_utils.read_from_ini(ini,"settings","allow_sleepbag","bool",true)
-local SuggestedWaitTimes = alun_utils.collect_section(ini,"suggested_wait_times",true)
-local SleepChanceBySquadID = alun_utils.collect_section(ini,"sleep_chance_by_squad_behaviors",true)
-local SleepHoursBySquadID = alun_utils.collect_section(ini,"sleep_hours_by_squad_behaviors",true)
-local RandomStates = alun_utils.collect_section(ini,"random_states")
-local ObjectForState = alun_utils.collect_section(ini,"object_for_state",true)
-local SoundSets = alun_utils.collect_section(ini,"sound_sets",true)
-ini = nil
-
 -------------------------------------------------------------------------------------------------------------------------
 function choose_look_point(patrol_look, path_look_info, search_for)
 	local this_val -- значение флагов текущей точки
@@ -211,6 +196,7 @@ function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, te
 			return
 		end
 
+		--[[
 		local cnt = self.patrol_walk:count()
 		for i=0,cnt-1 do
 			if not (self.object:accessible(self.patrol_walk:level_vertex_id(i)) and self.patrol_walk:level_vertex_id(i) < 4294967295) then
@@ -226,6 +212,8 @@ function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, te
 			self:disable()
 			return
 		end
+		--]]
+		
 		if not path_walk_info then
 			printf("object '%s': path_walk ('%s') field was supplied, but path_walk_info field is nil",self.object:name(), path_walk)
 			self:disable()
@@ -284,7 +272,7 @@ function move_mgr:continue()
 		return
 	end
 
-	printf("_bp: object '%s': continue moving", self.object:name())
+	--printf("_bp: object '%s': continue moving", self.object:name())
 	self:setup_movement_by_patrol_path()
 end
 
@@ -307,7 +295,7 @@ function move_mgr:setup_movement_by_patrol_path()
 
 	local is_term, idx = self:standing_on_terminal_waypoint()
 	if is_term then
-		printf("_bp: object '%s': TERMINAL WAYPOINT", self.object:name())
+		--printf("_bp: object '%s': TERMINAL WAYPOINT", self.object:name())
 		-- —тоим на терминальной вершине пути  - сразу иммитировать прибытие
 		self:waypoint_callback(self.object, nil, idx)
 	else
@@ -315,7 +303,6 @@ function move_mgr:setup_movement_by_patrol_path()
 		self:update_movement_state()
 	end
 
-	local sect = self.object:section()
 end
 
 function move_mgr:arrived_to_first_waypoint()
@@ -561,7 +548,7 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 		--printf("ERROR: move_mgr: waypoint_callback: index is -1 or nil")
 		return
 	end
-
+	
 	self.last_index = index
 
 	if self.patrol_walk:terminal(index) then
@@ -601,23 +588,28 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 	local sig = self.path_walk_info[index]["sig"]
 	if sig then
 		self:scheme_set_signal(sig)
-	elseif index == #self.path_walk_info -1 then
+	elseif index == #self.path_walk_info - 1 then
 		self:scheme_set_signal("path_end")
 	end
 
 	local stop_probability = self.path_walk_info[index]["p"]
 
-	if not self.patrol_look or
-		 (stop_probability and tonumber(stop_probability) < math.random(1, 100)) then
+	if (stop_probability and tonumber(stop_probability) < math.random(1, 100)) then
 		self:update_movement_state() --' идти дальше
 		return
 	end
-
+	
+	if not (self.patrol_look) then 
+		state_mgr.set_state(self.object, xr_logic.pick_section_from_condlist(db.actor, self.object, self.default_state_standing))
+		return
+	end 
+	
 	-- «начение флагов точки, которую будем искать:
 	local search_for = self.path_walk_info[index].flags
-
 	if search_for:get() == 0 then
-		self:update_movement_state() --' идти дальше
+		state_mgr.set_state(self.object, xr_logic.pick_section_from_condlist(db.actor, self.object, self.default_state_standing))
+		self:update_standing_state(self.patrol_look:point(0), self.sound_after_anim_start)
+		self.state = state_standing
 		return
 	end
 
@@ -632,56 +624,6 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 		end
 
 		local suggested_wait_time = self.path_look_info[pt_chosen_idx]["t"]
-
-		if (Enable and character_community(self.object) ~= "zombied") and (self.cur_state_standing == "sit" or self.cur_state_standing == "sit_knee" or self.cur_state_standing == "sit_ass") then
-			local squad = get_object_squad(self.object)
-			local comm = squad and SleepChanceBySquadID[squad.player_id] and squad.player_id or character_community(self.object)
-
-			-- Set default sleeping habits
-			local sleepchance = comm and tonumber(SleepChanceBySquadID[comm]) or 0.7
-			local sleephours = comm and SleepHoursBySquadID[comm] and alun_utils.str_explode(SleepHoursBySquadID[comm],",") or {3,22}
-
-			if (AllowSleepState and math.random() < sleepchance) then
-				if ((AllowSleepAnytime == false and level.get_time_hours() < tonumber(sleephours[1]) or level.get_time_hours() > tonumber(sleephours[2])) or AllowSleepAnytime == true) then
-					if ((not Only_sleep_in_camp) or (db.storage[obj:id()] and db.storage[obj:id()].walker and db.storage[obj:id()].walker.use_camp)) then
-						self.cur_state_standing = "sleep"
-
-						suggested_wait_time = SuggestedWaitTimes["sleep"] and SuggestedWaitTimes["sleep"] ~= "*" and tonumber(SuggestedWaitTimes["sleep"]) or 45000
-
-						--printf("%s set state to sleep with a %s wait time",self.object:name(),suggested_wait_time)
-						if (SoundSets["sleep"]) then
-							local t = alun_utils.str_explode(SoundSets["sleep"],",")
-							if (t[2] and math.random() < tonumber(t[2])) then
-								self.play_sound = t[1]
-								self.play_sound_idle = time_global() + math.random(1000,suggested_wait_time)
-							end
-						end
-					end
-				end
-			elseif (AllowRndState) then
-				local _t = {}
-				for i=1,#RandomStates do
-					if (not ObjectForState[RandomStates[i]]) or (ObjectForState[RandomStates[i]] and self.object:object(ObjectForState[RandomStates[i]])) then
-						table.insert(_t,RandomStates[i])
-					end
-				end
-				table.insert(_t,self.cur_state_standing)
-				local new_state = _t[math.random(#_t)]
-
-				self.cur_state_standing = new_state
-				suggested_wait_time = SuggestedWaitTimes[new_state] and SuggestedWaitTimes[new_state] ~= "*" and tonumber(SuggestedWaitTimes[new_state]) or default_wait_time
-				if (SoundSets[new_state]) then
-					local t = alun_utils.str_explode(SoundSets[new_state],",")
-					if (t[2] and math.random() < tonumber(t[2])) then
-						self.play_sound = t[1]
-						self.play_sound_idle = time_global() + math.random(1000,tonumber(suggested_wait_time))
-					end
-				end
-				--printf("%s set state to %s with a %s wait time",self.object:name(),new_state,suggested_wait_time)
-			end
-		end
-
-
 		if suggested_wait_time then
 			if suggested_wait_time == '*' then
 				self.pt_wait_time = nil -- -1
@@ -709,9 +651,8 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 
 		--' —разу же стартовать update, не ждать execute. “огда, если мы уже смотрим
 		--' в нужную сторону - не будет паузы в несколько миллисекунд на поворот.
-		self:update()
+		--self:update()
 	else
-		printf("object '%s': path_walk '%s', index %d: cannot find corresponding point(s) on path_look '%s'",
-			self.object:name(), tostring(self.path_walk), tostring(index), tostring(self.path_look))
+		printf("object '%s': path_walk '%s', index %d: cannot find corresponding point(s) on path_look '%s'",self.object:name(), tostring(self.path_walk), tostring(index), tostring(self.path_look))
 	end
 end

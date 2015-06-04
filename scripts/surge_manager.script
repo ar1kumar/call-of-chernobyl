@@ -1508,6 +1508,31 @@ function actor_in_cover()
 	end
 end
 
+function npc_in_cover(npc)
+	local m = get_surge_manager()
+	for i = 1,#m.covers do
+		if(m.covers[i]:inside(npc:position())) then
+			return true
+		end
+	end
+	return false
+end
+
+function job_in_surge_cover(se_obj,job)
+	if not (job.alife_task) then 
+		return false 
+	end 
+	
+	local m = get_surge_manager()
+	for i = 1,#m.covers do
+		if(m.covers[i]:inside(job.alife_task:position())) then
+			return true
+		end
+	end
+	
+	return false
+end
+
 function stop_surge()
 	local m = get_surge_manager()
 	if(m.started) then

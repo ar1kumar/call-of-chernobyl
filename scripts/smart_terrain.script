@@ -426,24 +426,12 @@ function se_smart_terrain:load_jobs()
 
 	-- load job data from dynamic ltx from gulag_general.script
 	gulag_general.load_job(self)
-	
+	if not (self.ltx) then 
+		printf("CRITICAL ERROR: %s does not have a dynamic ltx!",self:name())
+		return
+	end
 	--alun_utils.debug_write(alun_utils.sr("%s:load_jobs %s  After",self:name(),obj and obj:name()))
 	
-	-- gulag general didn't find existing dymaic ltx, so we must generate a dynamic ltx using the ltx string from gulag_general.script
-	if not (self.ltx) then
-		local l = gulag_general.load_ltx()
-		if (l) then 
-			self.ltx = create_ini_file(l)
-			self.ltx_name = "*"..self:name()
-		end
-		if not (self.ltx) then 
-			printf("CRITICAL ERROR: %s does not have a dynamic ltx!",self:name())
-			return
-		else
-			db.dynamic_ltx[self:name()] = self.ltx
-		end
-	end
-
 	-- Setup Alife Tasks for smart's gulag jobs
 	local job,active_section,section,ltx, path_field, path_name, smartcover, smartcover_name, prefix_name, job_type
 	local gg, CALifeSmartTerrainTask,level = game_graph(),CALifeSmartTerrainTask,level
@@ -578,11 +566,11 @@ function se_smart_terrain:update_jobs()
 	end
 end
 
-function se_smart_terrain:select_npc_job(npc_info,now)
+function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 	if (self.disabled) then
 		return
 	end
-	
+
 	--alun_utils.debug_write(alun_utils.sr("%s:select_npc_job %s",self:name()))
 	
 	if not (npc_info and npc_info.se_obj and npc_info.stype) then 
@@ -596,7 +584,7 @@ function se_smart_terrain:select_npc_job(npc_info,now)
 	end
 	
 	local new_job
-
+	
 	-- If the NPC has an existing job link, validate it and iterate job table
 	-- for a higher priority job according to defined STEP_SIZE
 	if (npc_info.job) then
@@ -630,11 +618,13 @@ function se_smart_terrain:select_npc_job(npc_info,now)
 					-- Check empty job
 					if (npc_id == nil or npc_id == npc_info.se_obj.id) then
 						-- Find only higher priority jobs if already linked to a job
-						
 						if (gulag_general.get_job_prior(itr_job) > gulag_general.get_job_prior(npc_info.job)) then
 							if (job_avail_to_npc(npc_info, itr_job, self)) then
-								new_job = itr_job
-								npc_info.current_index = 1
+								-- Only take this higher priority job if when there is either no surge or if job is not in surge cover during surge; takes exclusive no matter what
+								if (itr_job.exclusive or not xr_conditions.surge_started() or not surge_manager.job_in_surge_cover(npc_info.se_obj,npc_info.job)) then 
+									new_job = itr_job
+									npc_info.current_index = 1
+								end
 							end
 						else
 							-- Found a job with npc_id but npc isn't on the job, remove it
