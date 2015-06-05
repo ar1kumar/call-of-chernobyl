@@ -528,7 +528,7 @@ function execute_script_on_squad_not_commander(obj,script_to_execute,...)
 	end
 end
 
-function nearest_object(match)
+function nearest_object(s,offline)
 	local dist
 	local nearest
 	local min_dist
@@ -537,9 +537,9 @@ function nearest_object(match)
 		local obj = alife():object(i)
 		if (obj) then
 			is_match = false
-			if (type(match) == "string" and string.find(obj:section_name(),match)) then
+			if (type(s) == "string" and string.find(obj:name(),s)) then
 				is_match = true
-			elseif (type(match) == "number" and match == obj:clsid()) then
+			elseif (type(s) == "number" and s == obj:clsid()) then
 				is_match = true
 			end
 
@@ -558,8 +558,10 @@ function nearest_object(match)
 	end
 
 	if (nearest) then
-		if (simulation_objects.is_on_the_same_level(nearest, alife():actor()) and min_dist <= alife():switch_distance()^2) then
-			return nearest,min_dist
+		if (simulation_objects.is_on_the_same_level(nearest, alife():actor())) then
+			if (offline or min_dist <= alife():switch_distance()^2) then
+				return nearest,min_dist
+			end
 		end
 	end
 end

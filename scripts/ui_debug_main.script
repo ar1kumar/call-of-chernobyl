@@ -525,28 +525,39 @@ end
 function debug_ui:FindNearest(txt)
 	if (txt and txt ~= "") then
 		local near,dist
-		if (txt == "clsid.script_stalker") then
-			near,dist = alun_utils.nearest_object(clsid.script_stalker)
+		if (string.find(txt,"clsid")) then
+			local cls = string.sub(txt,7)
+			if (clsid[cls]) then
+				near,dist = alun_utils.nearest_object(clsid[cls],true)
+			end
 		else
-			near,dist = alun_utils.nearest_object(txt)
+			near,dist = alun_utils.nearest_object(txt,true)
 		end
 
 
 		if (near) then
 			local id = near.id
-			local st = db.storage[id]
-			local scheme = st and st.active_scheme
-			local section = st and st.active_section
-			local logic = st and st.section_logic
-			local ini_filename = st and st.ini_filename
+			local st = near:clsid() == clsid.script_stalker and db.storage[id]
+			if (st) then
+				local scheme = st.active_scheme
+				local section = st.active_section
+				local logic = st.section_logic
+				local ini_filename = st.ini_filename
 
-			self.fld_id:SetText(id or "")
-			self.fld_section:SetText(section or "")
-			self.fld_logic:SetText(logic or "")
-			self.fld_filename:SetText(ini_filename or "")
-			self.fld_focus:SetText(id or "")
-			self.fld_reload:SetText(id or "")
-			self.txt_near:SetText(id)
+				if not (self.dlg_object) then 
+					self:CreateTab("object")
+				end 
+				
+				if (self.fld_id) then
+					self.fld_id:SetText(id or "")
+					self.fld_section:SetText(section or "")
+					self.fld_logic:SetText(logic or "")
+					self.fld_filename:SetText(ini_filename or "")
+					self.fld_focus:SetText(id or "")
+					self.fld_reload:SetText(id or "")
+				end
+				self.txt_near:SetText(id)
+			end
 			self:SendOutput("%s with ID %s found with distance %s",near:name(),id,dist)
 		else
 			--printf("Could not find object matching name")

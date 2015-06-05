@@ -460,13 +460,23 @@ function actor_on_info_callback(binder,npc,info_id)
 	end
 end
 
+--------------------
+--
+--------------------
+function actor_on_leave_dialog()
+	if (intercepts.actor_on_leave_dialog) then
+		for i=1, #intercepts.actor_on_leave_dialog do
+			intercepts.actor_on_leave_dialog[i]()
+		end
+	end
+end
+	
 -------------------
 -- actor_on_update()
 -------------------
 local actor_sound_incr
 local actor_reload
 local actor_scope
-local actor_talking
 actor_light = nil
 function actor_on_update(se_actor,delta)
 	--alun_utils.debug_write("actor_on_update")
@@ -511,19 +521,9 @@ function actor_on_update(se_actor,delta)
 		db.actor.radiation = -1
 	end
 
-	if (intercepts.actor_on_leave_dialog) then
-		if (db.actor:is_talking() and not actor_talking) then 
-			actor_talking = true
-		elseif (db.actor:is_talking() ~= true and actor_talking) then 
-			actor_talking = nil
-			for i=1, #intercepts.actor_on_leave_dialog do
-				intercepts.actor_on_leave_dialog[i](se_actor)
-			end
-		end
-	end
-	
 	-- Are-wide sound decrement
 	-- comment block this routine if need to optimize
+	--[[
 	actor_sound_incr = actor_sound_incr and actor_sound_incr - 0.25
 	if (actor_sound_incr and actor_sound_incr < 0) then
 		actor_sound_incr = 0
@@ -537,6 +537,7 @@ function actor_on_update(se_actor,delta)
 			--printf("Actor is quiet")
 		--end
 	end
+	--]]
 
 	local wpn = db.actor:active_item()
 	if (wpn) then
@@ -557,6 +558,7 @@ function actor_on_update(se_actor,delta)
 
 			-- Area-wide sound threshold (Check sim_board how it's used)
 			-- comment block this routine if need to optimize
+			--[[
 			local se_obj = alife():object(wpn:id())
 			local data = se_obj and stpk_utils.get_weapon_data(se_obj)
 			if (data and data.weapon_state == 5) then
@@ -577,6 +579,7 @@ function actor_on_update(se_actor,delta)
 					db.storage[0].loud_lvid = db.actor:level_vertex_id()
 				end
 			end
+			--]]
 		end
 
 		if (intercepts.actor_on_weapon_zoom_in) then

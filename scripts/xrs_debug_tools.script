@@ -777,9 +777,9 @@ function stalker_data_hud_show(hud)
 		if (stalker_id ~= obj:id()) then
 			stalker_id = obj:id()
 			local se_obj = alife():object(stalker_id)
-			alun_utils.switch_offline(se_obj.id)
+			--alun_utils.switch_offline(se_obj.id)
 			stalker_data = stpk_utils.get_stalker_data(se_obj)
-			alun_utils.switch_online(se_obj.id)
+			--alun_utils.switch_online(se_obj.id)
 		end
 		hud:add_msg("Character Name",stalker_data.character_name)
 		hud:add_msg("Spec Char",stalker_data.specific_character)
@@ -838,7 +838,7 @@ end
 function planner_hud_show(hud)
 	local obj = get_debug_npc() or NEAREST_STALKER
 	hud:set_header("-[Planner Info]-")
-	if (obj) then
+	if (obj and obj:id() ~= 0) then
 		local manager = obj.motivation_action_manager and obj:motivation_action_manager()
 		if (manager and manager:initialized()) then
 			hud:add_msg("Name",obj:name())
@@ -935,7 +935,7 @@ function planner_hud_show(hud)
 					end
 
 					local activeitem = npc:active_item()
-					if (active_item == nil) and (weapon == "none" or weapon == "drop") then 
+					if (activeitem == nil) and (weapon == "none" or weapon == "drop") then 
 						return true
 					end
 					

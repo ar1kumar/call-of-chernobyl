@@ -347,18 +347,7 @@ function action_process_enemy:enemy_callback(npc, enemy)
 				smart:set_alarm()
 			end
 		end
-		
-		-- avoid shooting at ground or ceiling, let danger mode take over
-		-- This problem does not exist AI vs. player. AI vs. AI they seem to see through walls no matter what you set for transparency threshold
-		if (enemy:id() ~= 0) then
-			local pos1 = npc:position()
-			local pos2 = enemy:position()
-			if ( math.abs(pos1.y - pos2.y) < 6 ) then 
-				return true 
-			end
-		else 
-			return true
-		end
+		return true
 	end
 	
 	local st = db.storage[id]
