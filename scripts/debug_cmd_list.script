@@ -433,73 +433,6 @@ function cmd.collectgarbage(me,txt,owner,p)
 	end
 end
 
-
-local function parse_waypoint(pathname, wpflags, wpname, owner)
-
-	local rslt = {}
-
-	rslt.flags = wpflags
-
-	local at
-	if string.find(wpname, "|", at, true) == nil then
-		return rslt
-	end
-
-	--[[
-	file = io.open("axr_debug_log.txt","a+")
-	if (file) then
-		file:write(alun_utils.sr("[%s] %s", pathname, wpname).."\n")
-		file:close()
-	end
-	--]]
-
-	local par_num
-	local fld
-	local val
-
-	par_num = 1
-	for param in string.gfind(wpname, "([%w%+~_\\%=%{%}%s%!%-%,%*]+)|*") do
-		if par_num == 1 then
-			-- continue
-		else
-			if param == "" then
-				owner:SendOutput("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
-				printf("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
-			else
-				local t_pos = string.find(param, "=", 1, true)
-				if (t_pos) then
-					fld = string.sub(param, 1,t_pos - 1)
-					if not (fld and fld ~= "") then
-						owner:SendOutput("path '%s': waypoint '%s': syntax error while parsing the param '%s': no field specified",pathname, wpname, param)
-						printf("path '%s': waypoint '%s': syntax error while parsing the param '%s': no field specified",pathname, wpname, param)
-					else
-						val = string.sub(param, t_pos + 1)
-						if not (val and val ~= "") then
-							val = "true"
-						end
-
-						if fld == "a" then
-							rslt[fld] = xr_logic.parse_condlist(db.actor, "waypoint_data", "anim_state", val)
-
-							if not (state_lib.states[val]) then
-								owner:SendOutput("path '%s': waypoint '%s': not a valid state_lib anim  %s", pathname, wpname,val)
-								printf("path '%s': waypoint '%s': not a valid state_lib anim %s", pathname, wpname,val)
-							end
-						else
-							rslt[fld] = val
-						end
-					end
-				else
-					owner:SendOutput("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
-					printf("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
-				end
-			end
-		end
-		par_num = par_num + 1
-	end
-	return rslt
-end
-
 function cmd.attach(me,txt,owner,p)
 	local wpn = db.actor:active_item()
 	if (wpn) then
@@ -572,6 +505,72 @@ function cmd.detach(me,txt,owner,p)
 	return "detach:= addon was not detached from active weapon"
 end 
 
+local function parse_waypoint(pathname, wpflags, wpname, owner, tRet)
+
+	local rslt = {}
+
+	rslt.flags = wpflags
+
+	local at
+	if string.find(wpname, "|", at, true) == nil then
+		return rslt
+	end
+
+	--[[
+	file = io.open("axr_debug_log.txt","a+")
+	if (file) then
+		file:write(alun_utils.sr("[%s] %s", pathname, wpname).."\n")
+		file:close()
+	end
+	--]]
+
+	local par_num
+	local fld
+	local val
+
+	par_num = 1
+	for param in string.gfind(wpname, "([%w%+~_\\%=%{%}%s%!%-%,%*]+)|*") do
+		if par_num == 1 then
+			-- continue
+		else
+			if param == "" then
+				owner:SendOutput("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
+				printf("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
+			else
+				local t_pos = string.find(param, "=", 1, true)
+				if (t_pos) then
+					fld = string.sub(param, 1,t_pos - 1)
+					if not (fld and fld ~= "") then
+						tRet[#tRet+1] = alun_utils.sr("path '%s': waypoint '%s': syntax error while parsing the param '%s': no field specified",pathname, wpname, param)
+						printf("path '%s': waypoint '%s': syntax error while parsing the param '%s': no field specified",pathname, wpname, param)
+					else
+						val = string.sub(param, t_pos + 1)
+						if not (val and val ~= "") then
+							val = "true"
+						end
+
+						if fld == "a" then
+							rslt[fld] = xr_logic.parse_condlist(db.actor, "waypoint_data", "anim_state", val)
+
+							if not (state_lib.states[val]) then
+								tRet[#tRet+1] = alun_utils.sr("path '%s': waypoint '%s': not a valid state_lib anim  %s", pathname, wpname,val)
+								printf("path '%s': waypoint '%s': not a valid state_lib anim %s", pathname, wpname,val)
+							end
+						else
+							rslt[fld] = val
+						end
+					end
+				else
+					tRet[#tRet+1] = alun_utils.sr("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
+					printf("path '%s': waypoint '%s': syntax error in waypoint name", pathname, wpname)
+				end
+			end
+		end
+		par_num = par_num + 1
+	end
+	return rslt
+end
+
 function cmd.waypoint(me,txt,owner,p)
 	local wrd = check_and_set_help(me,txt,owner,"[checkall | checklevel]")
 	if not (wrd) then return end
@@ -626,8 +625,19 @@ function cmd.waypoint(me,txt,owner,p)
 									printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
 								end
 							end
-			
-							parse_waypoint(name,ptr:flags(n),ptr:name(n),owner)
+							parse_waypoint(name,ptr:flags(n),ptr:name(n),owner,t)
+						end
+					end
+					-- Validate look waypoint also
+					name = gname.."_"..job.."_"..i.."_look"
+					if (level.patrol_path_exists(name)) then 
+						ptr = patrol(name)
+						if (ptr) then 
+							checked = true
+							cnt = ptr:count()
+							for n=0,cnt-1 do
+								parse_waypoint(name,ptr:flags(n),ptr:name(n),owner,t)
+							end
 						end
 					end
 					i = i + 1
