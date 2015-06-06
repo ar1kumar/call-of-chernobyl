@@ -160,6 +160,7 @@ function PatrolManager:get_commander(npc)
 	local commander = self.npc_list[self.commander_id].soldier
 	if commander == nil then
 		abort ("Patrol commander not present in PatrolManager[%s]", self.target_name)
+		return
 	end
 	return level.object_by_id(commander)
 end

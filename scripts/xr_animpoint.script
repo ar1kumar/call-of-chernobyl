@@ -4,6 +4,7 @@
 	modified_by: Alundaio
 --]]
 
+local math = math
 local function angle_to_direction(oangle)
 	local yaw = oangle.y
 	local pitch = oangle.x
@@ -11,10 +12,10 @@ local function angle_to_direction(oangle)
 end
 
 local assoc_tbl = 	{
-						idle = {director = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
-						harmonica = {director = {"_harmonica"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
-						guitar = {director = {"_guitar"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
-						story = {director = {"", "_weapon"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
+						idle = {director = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon", "_roast_kolbasa", "_roast_kolbasa_bred", "_roast_bred", "_sleep"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon", "_roast_kolbasa", "_roast_kolbasa_bred", "_roast_bred", "_sleep"}},
+						harmonica = {director = {"_harmonica"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon", "_roast_kolbasa", "_roast_kolbasa_bred", "_roast_bred", "_sleep"}},
+						guitar = {director = {"_guitar"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon", "_roast_kolbasa", "_roast_kolbasa_bred", "_roast_bred", "_sleep"}},
+						story = {director = {"", "_weapon"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon", "_roast_kolbasa", "_roast_kolbasa_bred", "_roast_bred", "_sleep"}},
 					}
 --------------------------------------------------------------------------------
 -- Animated Point
@@ -58,15 +59,14 @@ function action_reach_animpoint:execute()
 
 	self.object:set_dest_level_vertex_id(self.st.animpoint.position_vertex)
 
-	self.object:set_desired_direction(self.st.animpoint.smart_direction)
+	--self.object:set_desired_direction(self.st.animpoint.smart_direction)
 	self.object:set_path_type(game_object.level_path)
 
     --printf("%s animpoint position riched %s", npc:name(), npc:position():distance_to_sqr(self.vertex_position))
-    local distance_reached = self.object:position():distance_to_sqr(self.st.animpoint.vertex_position) <= self.st.reach_distance
 
     local reach_movement = xr_logic.pick_section_from_condlist(db.actor, nil, self.st.reach_movement)
 
-	if distance_reached then
+	if (self.object:position():distance_to_sqr(self.st.animpoint.vertex_position) <= self.st.reach_distance) then
 		state_mgr.set_state(self.object, reach_movement, nil, nil, {look_position = self.st.animpoint.look_position}  )
 	else
 		state_mgr.set_state(self.object, reach_movement)
@@ -119,6 +119,7 @@ function animpoint:initialize()
 	self.camp = nil
 	self.st.base_action = nil
 	self.current_action = nil
+	self.vertex_position = nil
 	self.position = nil
 	self.smart_direction = nil
 	self.look_position = nil
@@ -162,13 +163,10 @@ function animpoint:activate_scheme(loading, npc, switching_scheme)
 end
 --' Рассчитывает позицию, куда идти
 function animpoint:calculate_position()
-	--printf("CALCULATE POSITION")
-	
 	--alun_utils.debug_write("animpoint:calculate_position")
 
 	local smartcover = se_smart_cover.registered_smartcovers[self.st.cover_name]
 	if smartcover == nil then
-		--print_table(se_smart_cover.registered_smartcovers)
 		printf("There is no smart_cover with name [%s]", self.st.cover_name)
 		return
 	end
@@ -176,20 +174,10 @@ function animpoint:calculate_position()
 	self.position = se_smart_cover.registered_smartcovers[self.st.cover_name].position
 	self.position_vertex = level.vertex_id(self.position)
 	self.vertex_position = level.vertex_position(self.position_vertex)
-
 	self.smart_direction = self.st.direction or angle_to_direction(smartcover.angle)
 
-	self.st.smart_direction = self.smart_direction
-	--printf("self.st.direction = %s || self.smart_direction = %s",self.st.direction and alun_utils.vector_to_string(self.st.direction),self.smart_direction and alun_utils.vector_to_string(self.smart_direction))
-	--printf("%s pos %s", self.st.cover_name, vec_to_str(self.position))
-	--printf("%s dir %s", self.st.cover_name, vec_to_str(self.smart_direction))
-
 	local look_dir = self.smart_direction:normalize()
-	self.look_position = vector():set( 	self.position.x + 10*look_dir.x,
-										self.position.y,
-										self.position.z + 10*look_dir.z)
-
-
+	self.look_position = vector():set(self.vertex_position.x + 10*look_dir.x,self.vertex_position.y,self.vertex_position.z + 10*look_dir.z)
 
 	-- Также получаем дескриптор позиции, и формируем список доступных действий.
 	local description_name = smartcover:description()
@@ -202,66 +190,35 @@ function animpoint:calculate_position()
 	self.st.description = description_name
 	self.avail_actions = xr_animpoint_predicates.associations[description_name]
 	self.st.approved_actions = {}
-
---[[ Перенес инициализацию в :start(). Так как здесь еще неизвестно мы в кампе или нет, а это очень критично для гитар и гармошек.
-	-- Если задан авеил анимейшнз, то мы игнорим ассоциации с нашим смарткавером.
-	if self.st.avail_animations ~= nil then
-		-- animations are set from custom_data?
-		for k, v in pairs(self.st.avail_animations) do
-			table.insert(self.st.approved_actions, {predicate = function() return true end, name = v})
-		end
-	else
-		if self.avail_actions ~= nil then
-			for k,v in pairs(self.avail_actions) do
-				-- Убираем те действия, которые не подходят по прекондишну
-				--printf("checking approved actions %s", self.npc_id)
-				if v.predicate(self.npc_id)==true then
-					table.insert(self.st.approved_actions, v)
-				end
-			end
-		end
-	end
-
-	if(#self.st.approved_actions==0) then
-		printf("There is no approved actions for stalker[%s] in animpoint[%s]", db.storage[self.npc_id].object:name(), self.object:name())
-	end
-	]]
 end
 --' Возвращает достиг ли персонаж точки начала работы схемы
 function animpoint:position_riched()
-	-- Если мы уже что то делаем, то значит что стопудова дошли
-	if self.current_action ~= nil then
-		return true
-	end
-
-	if self.position == nil then
-		return false
-	end
-
 	local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
-
-	if npc == nil then
+	if not (npc) then
 		return false
 	end
-
-	--printf("%s animpoint position riched %s", npc:name(), npc:position():distance_to_sqr(self.vertex_position))
-	local distance_reached = npc:position():distance_to_sqr(self.vertex_position) <= self.st.reach_distance
-
-	-- Если дистанция достигнута и игрок уже играет нужную анимацию - считаем что пришли.
-
---	if distance_reached then
---		printf("current_state %s", state)
---	end
-
-	local v1 = -math.deg(math.atan2(self.smart_direction.x, self.smart_direction.z))
-	local v2 = -math.deg(math.atan2(npc:direction().x, npc:direction().z))
-
-	local rot_y = math.min( math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2) )
-
-	--printf("%s animpoint direction riched %s %s %s", npc:name(), v1, v2, rot_y)
-	local direction_reached = rot_y < 50
-
-	return distance_reached and direction_reached
+	
+	if not (self.position) then
+		return false
+	end
+	
+	local dist = npc:position():distance_to_sqr(self.position)
+	if (self.current_action and dist <= self.st.reach_distance) then 
+		return true
+	end 
+	
+	if (dist <= self.st.reach_distance+2) then
+		local dir = utils.vector_copy_by_val(self.smart_direction:normalize())
+		npc:set_desired_direction(dir)
+		local v1 = -math.deg(math.atan2(dir.x, dir.z))
+		local v2 = -math.deg(math.atan2(npc:direction().x, npc:direction().z))
+		local rot_y = math.min( math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2) )
+		if (rot_y <= 50 and dist <= self.st.reach_distance) then
+			return true 
+		end 
+	end 
+	
+	return false
 end
 function animpoint:fill_approved_actions()
 	local is_in_camp = self.camp ~= nil
@@ -283,16 +240,12 @@ function animpoint:fill_approved_actions()
 			end
 		end
 	end
-
-	--if(#self.st.approved_actions==0) then
-		--printf("There is no approved actions for stalker[%s] in animpoint[%s]", db.storage[self.npc_id].object:name(), self.object:name())
-	--end
 end
 -- Чувак дошел до точки и может начинать работать
 function animpoint:start()
 	-- Определяем, находится ли точка в каком то из кампов
 	if self.st.use_camp then
-		self.camp = sr_camp.get_current_camp(self.position)
+		self.camp = sr_camp.get_current_camp(self.vertex_position)
 	end
 
 	self:fill_approved_actions()
@@ -317,8 +270,6 @@ function animpoint:start()
 end
 -- Чувак ушел с точки
 function animpoint:stop()
-	--printf("STOP")
-	--callstack()
 	if self.camp ~= nil then
 		self.camp:unregister_npc(self.npc_id)
 	end
@@ -331,7 +282,7 @@ function animpoint:get_action()
 end
 
 function animpoint:update()
-	if not (self.position) then
+	if not (self.vertex_position) then
 		return
 	end
 	local tmp_actions = {}
@@ -363,10 +314,17 @@ function animpoint:update()
 
 	local camp_action, is_director = self.camp:get_camp_action(self.npc_id)
 	local tbl = {}
+	
 	if(is_director) then
 		--printf(" [%s] is director", self.npc_id)
 		tbl = assoc_tbl[camp_action].director
+		self.__dtimer = nil
 	else
+		if (self._was_director == false) then 
+			self._was_director = true
+			self.current_action = nil
+		end 
+		
 		self.__dtimer = not self.__dtimer and time_global() + math.random(10000,15000) or self.__dtimer
 		if (self.current_action and time_global() < self.__dtimer) then
 			return
@@ -392,15 +350,6 @@ function animpoint:update()
 	end
 
 	if not found then
-	--[[
-		printf("***")
-		print_table(self.st.approved_actions)
-		printf("***")
-		print_table(tbl)
-		printf("***")
-		printf("No actions found %s", self.npc_id)
-]]
-
 		table.insert(tmp_actions, descr)
 	end
 
@@ -410,15 +359,11 @@ function animpoint:update()
 
 	--action - выбранный экшн из доступных
 	if(self.st.base_action) then
-		--printf("		have base_action")
 		if(self.st.base_action==descr.."_weapon") then
-			--printf("		still play_weapon_anim")
 			action = descr.."_weapon"
 		end
 
-		--printf(" *** [%s]==[%s] and [%s]==[%s]", action, descr.."_weapon", self.st.base_action, descr )
 		if(action==descr.."_weapon") and (self.st.base_action==descr) then
-			--printf("		LFN")
 			table.remove(tmp_actions, rnd)
 			action = tmp_actions[math.random(#tmp_actions)]
 		end
@@ -429,10 +374,7 @@ function animpoint:update()
 			self.st.base_action = descr
 		end
 	end
-
-
-	--printf("update_current_action %s", tostring(action))
-
+	
 	self.current_action = action
 end
 
@@ -503,7 +445,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.logic	  		= xr_logic.cfg_get_switch_conditions(ini, section, npc)
 	st.cover_name		= utils.cfg_get_string(ini, section, "cover_name", npc, false, "", "$script_id$_cover")
 	st.use_camp 		= utils.cfg_get_bool(ini, section, "use_camp", npc, false, true)
-	st.reach_distance	= utils.cfg_get_number(ini, section, "reach_distance", npc, false, 0.75)
+	st.reach_distance	= utils.cfg_get_number(ini, section, "reach_distance", npc, false, 1)
 	--st.reach_movement	= utils.cfg_get_string(ini, section, "reach_movement", npc, false, "", "walk")
 	st.reach_movement = xr_logic.parse_condlist(db.actor, "animpoint", "reach_movement", utils.cfg_get_string(ini, section, "reach_movement", npc, false, "", "walk"))
 	st.reach_distance = st.reach_distance*st.reach_distance

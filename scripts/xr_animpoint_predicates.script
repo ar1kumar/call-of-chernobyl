@@ -77,14 +77,14 @@ end
 
 function animpoint_predicate_need_sleep(id, camp)
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc and level.get_time_hours() < 5 or level.get_time_hours() > 22) then
+	if (npc and level.get_time_hours() < 5 or level.get_time_hours() > 20) then
 		if (db.storage[id].check_sleep and time_global() < db.storage[id].check_sleep) then
 			return db.storage[id].need_sleep == true
 		end
 
 		db.storage[id].check_sleep = time_global() + 320000
 
-		if (math.random(100) > 1) then
+		if (math.random(100) > 80) then
 			db.storage[id].need_sleep = true
 			return true
 		end
@@ -95,7 +95,6 @@ function animpoint_predicate_need_sleep(id, camp)
 end
 
 function animpoint_predicate_roast(id,camp)
-if true then return true end -- debug
 	local npc = db.storage[id] and db.storage[id].object
 	if (npc) then
 		local smart = xr_gulag.get_npc_smart(npc)
@@ -107,7 +106,7 @@ if true then return true end -- debug
 				for id,v in pairs(fires) do
 					if (v:is_on()) then
 						obj = lobi(id)
-						if (obj and obj:position():distance_to_sqr(npc:position()) <= 35) then
+						if (obj and obj:position():distance_to_sqr(npc:position()) <= 7) then
 							return true
 						end
 					end
@@ -175,7 +174,7 @@ animpoint_sit_ass = {
 							{name = "animpoint_sit_ass_roast_kolbasa", predicate = xr_animpoint_predicates.animpoint_predicate_roast},
 							{name = "animpoint_sit_ass_roast_bred", predicate = xr_animpoint_predicates.animpoint_predicate_roast},
 							{name = "animpoint_sit_ass_roast_kolbasa_bred", predicate = xr_animpoint_predicates.animpoint_predicate_roast},
-							--{name = "animpoint_sit_ass_sleep", predicate = xr_animpoint_predicates.animpoint_predicate_need_sleep},
+							{name = "animpoint_sit_ass_sleep", predicate = xr_animpoint_predicates.animpoint_predicate_need_sleep},
                             {name = "animpoint_sit_ass", predicate = xr_animpoint_predicates.const_predicate_true},
 							{name = "animpoint_sit_ass_eat_bread", predicate = xr_animpoint_predicates.animpoint_predicate_bread},
 							{name = "animpoint_sit_ass_eat_kolbasa", predicate = xr_animpoint_predicates.animpoint_predicate_kolbasa},
@@ -190,7 +189,7 @@ animpoint_sit_knee = {
 							{name = "animpoint_sit_knee_roast_kolbasa", predicate = xr_animpoint_predicates.animpoint_predicate_roast},
 							{name = "animpoint_sit_knee_roast_bred", predicate = xr_animpoint_predicates.animpoint_predicate_roast},
 							{name = "animpoint_sit_knee_roast_kolbasa_bred", predicate = xr_animpoint_predicates.animpoint_predicate_roast},
-							--{name = "animpoint_sit_knee_sleep", predicate = xr_animpoint_predicates.animpoint_predicate_need_sleep},
+							{name = "animpoint_sit_knee_sleep", predicate = xr_animpoint_predicates.animpoint_predicate_need_sleep},
                             {name = "animpoint_sit_knee", predicate = xr_animpoint_predicates.const_predicate_true},
 							{name = "animpoint_sit_knee_eat_bread", predicate = xr_animpoint_predicates.animpoint_predicate_bread},
 							{name = "animpoint_sit_knee_eat_kolbasa", predicate = xr_animpoint_predicates.animpoint_predicate_kolbasa},

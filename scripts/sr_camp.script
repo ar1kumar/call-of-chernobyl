@@ -1,6 +1,4 @@
 local npc_role = {noone=0, listener=1, director=2}
-CAMP_SECTION = "camp"
-
 --------------------------------------------------------------------------------
 -- Precondition functions
 --------------------------------------------------------------------------------
@@ -8,7 +6,6 @@ function sr_camp_idle_precondition(camp)
 	return true
 end
 function sr_camp_harmonica_precondition(camp)
-	--printf("camp harmonica precondition")
 	if(#camp.harmonica_table>0) then
 		local n = 0
 		for k,v in pairs(camp.npc) do
@@ -17,25 +14,16 @@ function sr_camp_harmonica_precondition(camp)
 		if(n>1) then
 			for k,v in pairs(camp.npc) do				
 				local scheme = db.storage[k] and db.storage[k].active_scheme and  db.storage[k][db.storage[k].active_scheme]
-				
 				local npc = db.storage[k] and db.storage[k].object
-
-				--printf("	is director %s", tostring(v.harmonica==npc_role.director))
-				--printf("    base_action %s", tostring(scheme.base_action) )
-				--printf("    description %s", tostring(scheme.description) )
 				if(v.harmonica==npc_role.director) and (scheme ~= nil and scheme.base_action == scheme.description) and npc ~= nil and not xr_meet.is_meet(npc) then
-				--if(v.harmonica==npc_role.director) then
-					--printf("	return true [%s]", k)
 					return true
 				end
 			end
 		end
 	end
-	--printf("	return false")
 	return false
 end
 function sr_camp_guitar_precondition(camp)
-	--printf("camp guitar precondition")
 	if(#camp.guitar_table>0) then
 		local n = 0
 		for k,v in pairs(camp.npc) do
@@ -44,21 +32,13 @@ function sr_camp_guitar_precondition(camp)
 		if(n>1) then
 			for k,v in pairs(camp.npc) do
 				local scheme = db.storage[k] and db.storage[k].active_scheme and db.storage[k][db.storage[k].active_scheme]
-				
 				local npc = db.storage[k] and db.storage[k].object
-				--printf("	is director %s", tostring(v.guitar==npc_role.director))
-				--printf("    base_action %s", tostring(scheme.base_action) )
-				--printf("    description %s", tostring(scheme.description) )
-				
 				if(v.guitar==npc_role.director) and (scheme ~= nil and scheme.base_action == scheme.description) and npc ~= nil and not xr_meet.is_meet(npc) then
-				--if(v.guitar==npc_role.director) then
-					--printf("	return true [%s]", k)
 					return true
 				end
 			end
 		end
 	end
-	--printf("	return false")
 	return false
 end
 function sr_camp_story_precondition(camp)
@@ -86,11 +66,11 @@ class "CCampManager"
 function CCampManager:__init(object, ini)
 	self.object = object
 	self.ini = ini
-	local stories = utils.cfg_get_string(ini, CAMP_SECTION, "stories", nil, false, "", "test_story")
+	local stories = utils.cfg_get_string(ini, "camp", "stories", nil, false, "", "test_story")
 		self.story_table = parse_names(stories)
-	local guitars = utils.cfg_get_string(ini, CAMP_SECTION, "guitar_themes", nil, false, "", "test_guitar")
+	local guitars = utils.cfg_get_string(ini, "camp", "guitar_themes", nil, false, "", "test_guitar")
 		self.guitar_table = parse_names(guitars)
-	local harmonicas = utils.cfg_get_string(ini, CAMP_SECTION, "harmonica_themes", nil, false, "", "test_harmonica")
+	local harmonicas = utils.cfg_get_string(ini, "camp", "harmonica_themes", nil, false, "", "test_harmonica")
 		self.harmonica_table = parse_names(harmonicas)
 	self.npc = {}
 	self.schemes = {}
@@ -99,7 +79,7 @@ function CCampManager:__init(object, ini)
 	-- Текущее состояние
 	self.active_state = "idle"
 	--' Для теста создаем объект истории
-	self.sound_manager = sound_manager.get_sound_manager(CAMP_SECTION..self.object:id())
+	self.sound_manager = sound_manager.get_sound_manager("camp"..self.object:id())
 	self.sound_manager_started = true
 	-- Состояния кемпа
 	self.states = {
@@ -117,7 +97,7 @@ function CCampManager:__init(object, ini)
 								general_state = "listen",
 								min_time = 30000,
 								max_time = 120000,
-								timeout = 3000,
+								timeout = 0,
 								transitions = {idle = 100, harmonica = 0, guitar = 0, story = 0},
 								precondition = sr_camp_harmonica_precondition
 								},
@@ -126,7 +106,7 @@ function CCampManager:__init(object, ini)
 								general_state = "listen",
 								min_time = 30000,
 								max_time = 120000,
-								timeout = 4500,
+								timeout = 0,
 								transitions = {idle = 100, harmonica = 0, guitar = 0, story = 0},
 								precondition = sr_camp_guitar_precondition
 							 },
@@ -157,6 +137,12 @@ function CCampManager:update()
 		return
 	end
 
+	-- To stop air guitar
+	if (self.active_state == "guitar" or self.active_state == "harmonica") then 
+		self.director = nil
+		self.active_state_time = 0
+	end
+	
 	-- Если кто-то говорит айдловую фразу, ждем пока он договорит.
 	if(self.idle_talker~=nil) then
 		if(xr_sound.sound_table[self.idle_talker]) then
@@ -165,19 +151,16 @@ function CCampManager:update()
 			self.idle_talker = nil
 		end
 	end
-
+	
 	-- Выбор состояния кемпа. Тут решается что делать дальше.
 	--printf("camp time %s", tostring(self.active_state_time - time_global()))
-	if(self.active_state_time < time_global()) then
+	if (self.active_state_time < time_global()) then
 		self:set_next_state()
-		if self:get_director() == false then
-		
+		if not self:get_director() then
 			self.active_state = "idle"
 			for k,v in pairs(self.npc) do
 				v.state = self.active_state
 			end
-		
-			--self:set_next_state()
 		end
 
 		self.sound_manager_started = false
@@ -212,26 +195,20 @@ function CCampManager:update()
 			xr_sound.set_sound_play(self.idle_talker, "state")
 		end
 	end
-
-
 end
 function CCampManager:set_next_state()
-	--printf("CAMP set_next_state")
 	local transitions = self.states[self.active_state].transitions
 	local rnd = math.random(100)
 	for k,v in pairs(transitions) do
-		--printf("check %s value %s rnd %s", k, v, rnd )
 		if(rnd<v) then
 			if self.states[k].precondition(self) == true then
 				self.active_state = k
-				--printf("FOUND")
 				break
 			end
 		else
 			rnd = rnd - v
 		end
 	end
-	--printf("active state %s", self.active_state)
 	for k,v in pairs(self.npc) do
 		v.state = self.active_state
 	end
@@ -261,14 +238,13 @@ function CCampManager:get_director()
 		return
 	end
 	if(#directors<1) then
-		return false
-		--printf("There is no director for state [%s]. Camp [%s]!!!", self.active_state, self.object:name())
+		return
 	elseif(#directors==1) then
 		self.director = directors[1]
 	else
 		self.director = directors[math.random(#directors)]
 	end
-	--printf("camp director [%s]", self.director)
+	return self.director
 end
 function CCampManager:set_story()
 	if(self.active_state=="story") then
@@ -298,7 +274,6 @@ function CCampManager:register_npc(npc_id)
 
 	-- При регистрации персонажа, проверяем какие роли он может выполнять.
 	for k,v in pairs(self.states) do
-		--printf("FIND NPC ROLE %s", npc_id)
 		local role = self:get_npc_role(npc_id, k)
 		if(role==npc_role.noone) then
 			printf("Wrong role for npc[%s] with id[%d] in camp [%s]!!!", npc:name(), npc_id, self.object:name())
@@ -311,7 +286,6 @@ function CCampManager:register_npc(npc_id)
 end
 -- Убирает персонажа из кемпа
 function CCampManager:unregister_npc(npc_id)
---	local npc_id = npc:id()
 	-- Если удаляется режиссер лагеря
 	if self.director == npc_id then
 		self.sound_manager_started = false
@@ -339,11 +313,9 @@ function CCampManager:get_npc_role(npc_id, state)
 	local descr = scheme.description
 	if(state=="harmonica") or (state=="guitar") then
 		descr = descr and descr.."_"..state or state
-		--printf("finding music director [%s]", descr) 
 		for i = 1,#npc_actions do
 			--printf("check action [%s]", npc_actions[i].name)
 			if(npc_actions[i].name==descr) then
-				--printf("DIRECTOR FOUND music")
 				return npc_role.director
 			end
 		end
@@ -375,7 +347,6 @@ function start_guitar(npc)
 	local camp_id = db.storage[npc:id()].registred_camp
 	if camp_id == nil then
 		return	
-		--printf("trying to play guitar without camp [%s]",tostring(npc:name()))
 	end
 	local camp = bind_camp.camps[camp_id].camp
 
@@ -389,7 +360,6 @@ function start_harmonica(npc)
 	local camp_id = db.storage[npc:id()].registred_camp
 	if camp_id == nil then	
 		return
-		--printf("trying to play harmonica without camp")
 	end
 	local camp = bind_camp.camps[camp_id].camp
 

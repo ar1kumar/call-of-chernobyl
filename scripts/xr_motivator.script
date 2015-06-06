@@ -282,6 +282,10 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 end
 
 function motivator_binder:death_callback(victim, who)
+	if not (self.object) then 
+		error(alun_utils.sr("CRITICAL ERROR: motivator_binder:death_callback : Game Object is nil and binder is not! %s",self.name),2)
+	end
+	
 	self:hit_callback(victim, 1, vector():set(0,0,0), who, "from_death_callback")
 
 	local id = self.object:id()

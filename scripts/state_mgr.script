@@ -314,10 +314,6 @@ function eva_state_mgr_locked:evaluate()
 		callstack()
 		return false
 	end
-	-- Alundaio's note:
-	-- BUG* NPCs can be stuck in corners of AI map after danger or combat because is_body_turning continously returns true, so I removed it
-	-- Another bug is that if you disable the body turning here, animpoint animations can mess up and end up having npcs face wrong way.
-	-- So this is why I do the check for animpoint_action
 
 	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
 	if not (self.st.planner:initialized() and self.st.mgr and self.st.mgr:initialized()) then
@@ -327,8 +323,12 @@ function eva_state_mgr_locked:evaluate()
 	if (eval_weapon(self.st,self.object)) then 
 		return false
 	end
-
-	return self.object:is_body_turning() --(self.object:is_body_turning() and (self.st.target_state == "zat_b20_noah_jump" or self.st.mgr:current_action_id() == xr_actions_id.animpoint_action + 1)) or false
+	
+	if (self.object:is_body_turning()) then 
+		return true
+	end
+	
+	return false
 end
 
 class "eva_state_mgr_locked_external" (property_evaluator)

@@ -447,6 +447,10 @@ local function execute_search_corpse(npc,self)
 		local corpse = db.storage[self.a.selected_corpse_id] and db.storage[self.a.selected_corpse_id].object or level.object_by_id(self.a.selected_corpse_id)
 		look_pos = corpse and alun_utils.safe_bone_pos(corpse,"bip01_spine") or self.a.vertex_position
 
+		if (corpse and IsMonster(corpse)) then 
+			state_mgr.set_state(npc,"field_dress",nil,nil,{look_position = look_pos})
+			return
+		end
 		state_mgr.set_state(npc,"search_corpse",nil,nil,{look_position = look_pos})
 	else
 	

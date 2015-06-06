@@ -506,7 +506,6 @@ function sim_squad_scripted:check_invulnerability()
 	local invulnerability = xr_logic.pick_section_from_condlist(db.actor, self, self.invulnerability) == "true"
 	local npc_st
 	local npc
-	local object_by_id = level.object_by_id
 	for k in self:squad_members() do
 		npc_st = db.storage[k.id]
 		npc = npc_st and npc_st.ini and npc_st.object
@@ -653,9 +652,8 @@ function sim_squad_scripted:set_squad_sympathy(sympathy)
 	local symp = sympathy or self.sympathy
 	if(symp~=nil) then
 		local npc
-		local object_by_id = level.object_by_id
 		for k in self:squad_members() do
-			npc = db.storage[k.id] and db.storage[k.id].object or object_by_id(k.id)
+			npc = db.storage[k.id] and db.storage[k.id].object
 			if(npc) then
 				game_relations.set_npc_sympathy(npc, symp)
 			else
@@ -684,9 +682,8 @@ function sim_squad_scripted:set_squad_relation(relation)
 	if(rel ~= nil) then
 		local npc
 		local sim = alife()
-		local object_by_id = level.object_by_id
 		for k in self:squad_members() do
-			npc = db.storage[k.id] and db.storage[k.id].object or object_by_id(k.id)
+			npc = db.storage[k.id] and db.storage[k.id].object
 			if(npc) then
 				game_relations.set_npcs_relation(npc, db.actor, rel)
 			else
@@ -729,9 +726,8 @@ function sim_squad_scripted:set_squad_position(position)
 	end
 
 	local cl_object
-	local object_by_id = level.object_by_id
 	for k in self:squad_members() do
-		cl_object = object_by_id(k.id)
+		cl_object = db.storage[k.id] and db.storage[k.id].object
 		if not (db.offline_objects[k.id]) then
 			db.offline_objects[k.id] = {}
 		end

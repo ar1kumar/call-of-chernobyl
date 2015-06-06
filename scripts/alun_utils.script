@@ -1692,7 +1692,7 @@ function cfg_file:Save()
 
 		for key,val in pairs(self.root[section]) do
 			if (val == "") then
-				str = str .. key .. "\n"
+				str = str .. key .. " =\n"
 			else
 				str = str .. key .. " = " .. tostring(val) .. "\n"
 			end

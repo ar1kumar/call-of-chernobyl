@@ -24,6 +24,19 @@ local function on_key_press(key)
 		if (DEBUG_NPC) then 
 			SetHudMsg(alun_utils.sr("%s Hold then release key to new position",DEBUG_NPC:name()),8)
 		end
+	-- In-game Attachment Editor. Allows you to attach an item to an NPC then edit the offsets in real-time
+	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_attachment_ui",0,"")]) then 
+		if not (this.debug_ui_attach) then 
+			this.debug_ui_attach = ui_debug_main.debug_ui_attach()
+		end 
+		
+		if (this.debug_ui_attach) then 
+			if not (this.debug_ui_attach:IsShown()) then 
+				this.debug_ui_attach:ShowDialog(true)
+			else 
+				this.debug_ui_attach:HideDialog()
+			end
+		end
 	end
 end
 
@@ -77,6 +90,10 @@ function on_game_start()
 	end
 	if not (axr_main.config:KeyExist("global_keybinds","debug_select_object")) then
 		axr_main.config:SetValue("global_keybinds","debug_select_object","DIK_NUMPAD9")
+		need_save = true
+	end
+	if not (axr_main.config:KeyExist("global_keybinds","debug_attachment_ui")) then
+		axr_main.config:SetValue("global_keybinds","debug_attachment_ui","DIK_INSERT")
 		need_save = true
 	end
 	

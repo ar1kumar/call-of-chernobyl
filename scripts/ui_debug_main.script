@@ -1709,7 +1709,6 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 class "debug_ui_spawner" (CUIWindow)
 function debug_ui_spawner:__init(owner, binds) super()
 	self.owner = owner
-	self.binds = binds
 end
 function debug_ui_spawner:__finalize()
 
@@ -1802,7 +1801,6 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 class "debug_ui_hud" (CUIWindow)
 function debug_ui_hud:__init(owner, binds) super()
 	self.owner = owner
-	self.binds = binds
 end
 function debug_ui_hud:__finalize()
 
@@ -1827,7 +1825,6 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 class "debug_ui_object" (CUIWindow)
 function debug_ui_object:__init(owner, binds) super()
 	self.owner = owner
-	self.binds = binds
 end
 function debug_ui_object:__finalize()
 
@@ -1877,7 +1874,6 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 class "debug_ui_advanced" (CUIWindow)
 function debug_ui_advanced:__init(owner, binds) super()
 	self.owner = owner
-	self.binds = binds
 end
 function debug_ui_advanced:__finalize()
 
@@ -1908,7 +1904,6 @@ end
 class "debug_ui_editor" (CUIWindow)
 function debug_ui_editor:__init(owner, binds) super()
 	self.owner = owner
-	self.binds = binds
 end
 function debug_ui_editor:__finalize()
 
@@ -1995,3 +1990,263 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	owner:Register(btn, "btn_editor_save")
 end
 
+---------------------------------------------------- Attach Offsets
+local _attached
+local _last_section
+
+class "debug_ui_attach" (CUIScriptWnd)
+function debug_ui_attach:__init(owner, binds) super()
+	self:SetWndRect				(Frect():set(0,0,1024,768))
+	self:Enable					(true)
+
+	local xml					= CScriptXmlInit()
+	self.xml = xml
+	xml:ParseFile				("ui_debug_main.xml")
+	
+	self:SetAutoDelete(true)
+	self.owner = owner
+	self.need_save = {}
+
+	local ctrl = CUIWindow()
+	self.xml:InitWindow("wnd_attach_editor:file_item:main",0,ctrl)
+	self.form = self.xml:InitStatic("wnd_attach_editor:form",self)
+	self.xml:InitFrame("wnd_attach_editor:form:list_frame",self.form)
+
+	ctrl = self.xml:Init3tButton("wnd_attach_editor:form:btn_attach",self.form)
+	self:Register(ctrl, "button_attach_npc")
+	self:AddCallback("button_attach_npc", ui_events.BUTTON_CLICKED, self.OnAttach, self)
+	
+	--[[
+	ctrl = self.xml:Init3tButton("wnd_attach_editor:form:btn_save",self.form)
+	self:Register(ctrl, "button_attach_save")
+	self:AddCallback("button_attach_save", ui_events.BUTTON_CLICKED, self.OnAttachSave, self)
+	--]]
+	
+	xml:InitStatic("wnd_attach_editor:form:cap_pos", self.form)
+	xml:InitStatic("wnd_attach_editor:form:cap_angle", self.form)
+	
+	self.flds = {"x","y","z","rot_x","rot_y","rot_z"}
+	for i=1,#self.flds do
+		xml:InitStatic("wnd_attach_editor:form:cap_"..self.flds[i], self.form)
+		self["fld_attach_"..self.flds[i]] = xml:InitEditBox("wnd_attach_editor:form:fld_"..self.flds[i], self.form)
+		self:Register(self["fld_attach_"..self.flds[i]],"fld_attach_"..self.flds[i])
+		
+		self:AddCallback("fld_attach_"..self.flds[i],	  ui_events.EDIT_TEXT_COMMIT, self["On_fld_attach_"..self.flds[i]],	self)
+	end 
+
+	self.attachable = xml:InitComboBox("wnd_attach_editor:form:list_attach", self.form)
+	self:Register(self.attachable, "attach_list")
+	self:AddCallback("attach_list", ui_events.LIST_ITEM_SELECT,	self.OnAttachListSelect,self)
+	
+	local t = alun_utils.parse_list(system_ini(),"stalker","attachable_items")
+	if (#t > 0) then
+		for i=1,#t do
+			if (system_ini():section_exist(t[i])) then
+				self.attachable:AddItem(t[i],i-1)
+			end
+		end
+	end
+end
+function debug_ui_attach:__finalize()
+
+end
+function debug_ui_attach:OnAttachListSelect()
+
+	local section = self.attachable:GetText()
+	if not (section and system_ini():section_exist(section)) then 
+		return 
+	end 
+	
+	local pos = alun_utils.parse_list(system_ini(),section,"attach_position_offset")
+	local angle = alun_utils.parse_list(system_ini(),section,"attach_angle_offset")
+	
+	if not (#pos > 0) then
+		return 
+	end
+	
+	for i=1,#pos do 
+		if (self["fld_attach_"..self.flds[i]]) then 
+			self["fld_attach_"..self.flds[i]]:SetText(pos[i])
+		end
+	end
+	
+	if not (#angle > 0) then
+		return
+	end
+	
+	for i=1,#angle do 
+		if (self["fld_attach_"..self.flds[i+3]]) then 
+			self["fld_attach_"..self.flds[i+3]]:SetText(angle[i])
+		end
+	end
+end
+function debug_ui_attach:OnAttachSave(sec)
+
+	local section = sec or self.attachable:GetText()
+	if not (section and system_ini():section_exist(section)) then 
+		return 
+	end 
+	
+	local need_save
+	local fld
+	local vals = {}
+	for i=1,#self.flds do
+		fld = self["fld_attach_"..self.flds[i]]
+		if not (fld) then 
+			return 
+		end
+		
+		if not (tonumber(fld:GetText())) then 
+			return 
+		end
+		
+		if (self.need_save[self.flds[i]] == true) then
+			need_save = true
+		end
+		
+		vals[self.flds[i]] = tonumber(fld:GetText())
+	end 
+	
+	if not (need_save) then 
+		return 
+	end
+
+	local function file_exists(path)
+		return io.open(path) ~= nil
+	end
+	
+	local function on_execute(path,filename,quit)
+		local fullpath = path.."\\"..filename
+		local ltx = io.open(fullpath,"rb")
+		if (ltx) then
+			local data = ltx:read("*all")
+			ltx:close()
+			if (data) then
+				if (string.find(data,"["..section.."]",nil,true)) then
+					ltx = alun_utils.cfg_file(fullpath)
+					if (ltx) then
+						if (self.need_save.x or self.need_save.y or self.need_save.z) then
+							ltx:SetValue(section,"attach_position_offset",vals.x .. ", " .. vals.y .. ", " .. vals.z)
+						end
+						
+						if (self.need_save.rot_x or self.need_save.rot_y or self.need_save.rot_z) then
+							ltx:SetValue(section,"attach_angle_offset",vals.rot_x .. ", " .. vals.rot_y .. ", " .. vals.rot_z)
+						end
+						
+						ltx:SaveExt()
+						return
+					end
+				end
+			end
+		end
+	end
+
+	local sp = alun_utils.fspath("$game_config$")
+	sp = string.sub(sp,0,string.len(sp)-1)
+	lua_extensions.recurse_subdirectories_and_execute(sp,{"ltx"},on_execute)
+	
+	if (reload_system_ini) then 
+		reload_system_ini()
+	end
+end
+function debug_ui_attach:On_fld_attach_x()
+	self:OnEditAttach("x")
+end 
+function debug_ui_attach:On_fld_attach_y()
+	self:OnEditAttach("y")
+end 
+function debug_ui_attach:On_fld_attach_z()
+	self:OnEditAttach("z")
+end 
+function debug_ui_attach:On_fld_attach_rot_x()
+	self:OnEditAttach("rot_x")
+end 
+function debug_ui_attach:On_fld_attach_rot_y()
+	self:OnEditAttach("rot_y")
+end 
+function debug_ui_attach:On_fld_attach_rot_z()
+	self:OnEditAttach("rot_z")
+end 
+function debug_ui_attach:OnEditAttach(fld)
+	if not (_attached) then 
+		return 
+	end 
+	local section = self.attachable:GetText()
+	if not (section and system_ini():section_exist(section)) then 
+		return 
+	end
+	
+	local itm = level.object_by_id(_attached)
+	if not (itm) then 
+		return 
+	end 
+	
+	if not (section == itm:section()) then
+		printf("ERROR: ui_debug_main.debug_ui_attach : section in combo box is not same section as item! itm=%s selected=%s",itm:section(),section)
+		return 
+	end 
+	
+	self.need_save[fld] = true
+
+	self:OnAttachSave(section)
+	
+	itm:attachable_item_load_attach(section)
+end 
+function debug_ui_attach:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_RELEASED then
+		local keybinds = self.binds or {}
+		if (dik == DIK_keys.DIK_ESCAPE) then
+			self:OnQuit()
+		end
+	end
+	return true
+end
+local function delayed_attach(p)
+	local itm = p[1] and level.object_by_id(p[1])
+	if (itm) then
+		itm:enable_attachable_item(true)
+		_attached = itm:id()
+		return true
+	end
+	return false
+end
+function debug_ui_attach:OnAttach()
+	local npc = xrs_debug_tools.get_debug_npc() or xrs_debug_tools.NEAREST_STALKER
+	if not (npc and npc:id() ~= 0) then
+		return 
+	end
+	
+	local section = self.attachable:GetText()
+	if not (section and system_ini():section_exist(section)) then 
+		return 
+	end
+	
+	if (_last_section ~= section) then 
+		_last_section = section
+		if (_attached) then 
+			local itm = level.object_by_id(_attached)
+			if (itm) then
+				itm:enable_attachable_item(false)
+			end
+			_attached = nil
+		end
+	end
+		
+	local itm = npc:object(section)
+	if not (itm) then 
+		local se_itm = alife():create(section,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
+		if (se_itm) then
+			create_delayed_event(se_itm.id,"delayed_attach",1,delayed_attach,se_itm.id)
+		end
+	else
+		if (_attached) then 
+			itm:enable_attachable_item(false)
+		end
+		_attached = itm:id()
+		create_delayed_event(itm:id(),"delayed_attach",1,delayed_attach,itm:id())
+	end
+end 
+function debug_ui_attach:OnQuit()
+	self:HideDialog()
+end
