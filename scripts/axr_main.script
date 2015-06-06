@@ -27,7 +27,7 @@ m_data = {}
 REMOVE_ME_LC			= nil 			-- Used by custom jump level command in xrs_debug_tools and faction select
 ------------------------------
 LOUD_SOUND_THRESHOLD 	= 35			-- Used for actor targetting by sim_board.script
-MAX_SQUADS 				= 300			-- Non-storied Squads existing on non-linked levels above this count will randomly be removed on game load
+MAX_SQUADS 				= 150			-- Non-storied (Monster) Squads existing on non-linked levels above this count will randomly be removed on game load
 ------------------------------
 
 config = alun_utils.cfg_file(alun_utils.fspath("$game_data$").."axr_options.ini")
@@ -357,6 +357,7 @@ function on_game_load()
 	end
 
 	-- Every game load we want to make sure there are no more then MAX_SQUADS existing for stability purposes
+	--[[
 	local count = 0
 	local sor = story_objects.get_story_objects_registry()
 	local gg = game_graph()
@@ -367,12 +368,12 @@ function on_game_load()
 	local passed
 	-- if you don't want certain ids to be removed from game at any point, such as random alife squads used for tasks, check for them here
 	local exclude = { 
-					[task_functor.get_squad_id_by_task_var("esc_m_trader_bounty_target_id",true) or 65535] = true,
-					[task_functor.get_squad_id_by_task_var("zat_b7_bandit_boss_sultan_bounty_target_id",true) or 65535] = true
+					--[task_functor.get_squad_id_by_task_var("esc_m_trader_bounty_target_id",true) or 65535] = true,
+					--[task_functor.get_squad_id_by_task_var("zat_b7_bandit_boss_sultan_bounty_target_id",true) or 65535] = true
 					}
 	for i=1,65534 do
 		local squad = sim:object(i)
-		if (squad and squad:clsid() == clsid.online_offline_group_s and not exclude[squad.id] and squad.m_game_vertex_id and not(get_object_story_id(squad.id))) then
+		if (squad and squad:clsid() == clsid.online_offline_group_s and is_squad_monster[squad.player_id] and not exclude[squad.id] and squad.m_game_vertex_id and not(get_object_story_id(squad.id))) then
 			passed = true
 			for k in squad:squad_members() do
 				if (get_object_story_id(k.id)) then 
@@ -397,6 +398,7 @@ function on_game_load()
 			end
 		end 
 	end
+	--]]
 
 	-- clean up intercepts table if callbacks are unused
 	-- if needed this can be removed so that callbacks can be registered any time, not just before or during on_game_load

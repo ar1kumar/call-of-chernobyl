@@ -188,6 +188,15 @@ function motivator_binder:on_item_drop(item)
 	-- End Alundaio
 end
 function motivator_binder:net_destroy()
+	self.object:set_callback(callback.use_object)
+	self.object:set_callback(callback.on_item_take)
+	self.object:set_callback(callback.on_item_drop)
+	self.object:set_patrol_extrapolate_callback(nil)
+	self.object:set_callback(callback.hit)
+	self.object:set_callback(callback.death)
+	self.object:set_callback(callback.sound)
+	self.object:set_callback(callback.take_item_from_box)
+	
 	-- start [Alundaio]
 	if (axr_main) then
 		axr_main.npc_on_net_destroy(self.object)
@@ -219,19 +228,7 @@ function motivator_binder:net_destroy()
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
 
-	self:clear_callbacks()
-
 	object_binder.net_destroy(self)
-end
-
-function motivator_binder:clear_callbacks()
-	self.object:set_patrol_extrapolate_callback(nil)
-	self.object:set_callback(callback.hit, nil)
-	self.object:set_callback(callback.death, nil)
-	self.object:set_callback(callback.sound, nil)
-	--Alundaio
-	self.object:set_callback(callback.take_item_from_box, nil)
-	--Alundaio
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
@@ -334,8 +331,6 @@ function motivator_binder:death_callback(victim, who)
 
 	db.delete_enemy(self.object)
 
-	self:clear_callbacks()
-
 	if (actor_stats.remove_from_ranking) then
 		local community = character_community(self.object)
 		if (community ~= "zombied" and community ~= "monolith") then
@@ -348,6 +343,10 @@ function motivator_binder:death_callback(victim, who)
 	db.storage[id].death_time = game.get_game_time()
 	db.storage[id].death_by_id = who:id()
 	-- End [Alundaio]
+	
+	self.object:set_callback(callback.hit)
+	self.object:set_callback(callback.death)
+	self.object:set_callback(callback.sound)
 end
 
 function motivator_binder:use_callback(obj, who)
