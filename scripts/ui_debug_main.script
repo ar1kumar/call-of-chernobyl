@@ -5,6 +5,582 @@ Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
 
+id_to_spawn_table = {
+		[1] = "Ammo",
+		[2] = "Artefacts",
+		[3] = "Items (Consumable)",
+		[4] = "Items (Misc.)",
+		[5] = "Items (Quest)",
+		[6] = "NPC (Mutant)",				
+		[7] = "NPC (Stalker)",				
+		[8] = "Outfits",
+		[9] = "Physic (Misc.)",				
+		[10] = "Squads (Mutant)",			
+		[11] = "Squads (Stalker)",			
+		[12] = "Weapons (Addon)",
+		[13] = "Weapons (Misc.)",
+		[14] = "Weapons (Pistol)",
+		[15] = "Weapons (Rifle)"
+}
+
+function get_spawn_table(name)
+	if (name == "Artefacts") then
+		return {
+				"af_medusa", 		    -- 1
+				"af_cristall_flower",   -- 2
+				"af_night_star", 	    -- 3
+				"af_vyvert", 		    -- 4
+				"af_gravi", 		    -- 5
+				"af_gold_fish", 	    -- 6
+				"af_cristall", 		    -- 7
+				"af_fireball", 	        -- 8
+				"af_dummy_glassbeads",  -- 9
+				"af_eye", 			    -- 10
+				"af_fire", 			    -- 11
+				"af_blood", 		    -- 12
+				"af_mincer_meat", 	    -- 13
+				"af_soul", 			    -- 14
+				"af_fuzz_kolobok", 	    -- 15
+				"af_baloon", 		    -- 16
+				"af_glass", 		    -- 17
+				"af_electra_sparkler",  -- 18
+				"af_electra_flash",     -- 19
+				"af_electra_moonlight", -- 20
+				"af_dummy_battery", 	-- 21
+				"af_dummy_dummy", 		-- 22
+				"af_ice", 				-- 23
+				"af_compass", 			-- 24
+				"af_oasis_heart", 		-- 25
+				"jup_b1_half_artifact", -- 26
+				"af_quest_b14_twisted", -- 27
+				"af_drops",				-- 28
+				"af_ameba_slime", 		-- 29
+				"af_ameba_slug",		-- 30
+				"af_ameba_mica",		-- 31
+				"af_dummy_spring",		-- 32
+				"af_dummy_pellicle",	-- 33
+				"af_rusty_thorn",		-- 34
+				"af_rusty_kristall", 	-- 35
+				"af_rusty_sea",	-- 36
+				}
+	elseif (name == "Outfits") then
+		return {
+				"helm_respirator",
+				"helm_hardhat",
+				"helm_protective",
+				"helm_tactic",
+				"helm_battle",
+				"helm_respirator_joker",
+				"helm_hardhat_snag",
+				"helm_m40",
+				
+				--Freedom
+				"svoboda_novice_outfit",
+				"svoboda_light_outfit",
+				"svoboda_heavy_outfit",
+				"svoboda_heavy_outfit_2",
+				"svoboda_exo_outfit",
+				
+				--Ecolog
+				"ecolog_outfit_green",
+				"ecolog_outfit_orange",
+				"scientific_outfit",
+				"ecolog_guard_outfit",
+				
+				--Stalker
+				"novice_outfit",
+				"stalker_outfit",
+				"stalker_outfit_barge",
+				"exo_outfit",
+				
+				--Bandit
+				"bandit_novice_outfit",
+				"banditmerc_outfit",
+				"trenchcoat_outfit",
+				
+				-- Duty
+				"dolg_novice_outfit",
+				"dolg_outfit",
+				"dolg_heavy_outfit",
+				"dolg_exo_outfit",
+				
+				-- Army
+				"military_outfit",
+				"specops_outfit",
+				
+				-- Clear Sky
+				"cs_novice_outfit",
+				"cs_light_outfit",
+				"cs_medium_outfit",
+				"cs_heavy_outfit",
+				
+				-- Mercenary
+				"merc_outfit",
+				
+				
+				"god_outfit"
+				}
+	elseif (name == "Items (Misc.)") then
+		return {
+				"device_torch",
+				"detector_simple",
+				"detector_advanced",
+				"detector_elite",
+				"detector_scientific",
+				"itm_actor_backpack",
+				"itm_backpack",
+				"itm_sleepbag",
+				"itm_pda_common",
+				"itm_pda_uncommon",
+				"itm_pda_rare",
+				"itm_gunsmith_toolkit",
+				"itm_gunsmith_toolkit_tier_2",
+				"stalker_patch",
+				"ecolog_patch",
+				"duty_patch",
+				"merc_patch",
+				"freedom_patch",
+				"bandit_patch",
+				"army_patch",
+				"monolith_patch",
+				"csky_patch"
+				}
+	elseif (name == "Items (Consumable)") then
+		return {
+				"bandage",
+				"antirad",
+				"medkit",
+				"medkit_army",
+				"medkit_scientic",
+
+				"drug_booster",
+				"drug_coagulant",
+				"drug_psy_blockade",
+				"drug_antidot",
+				"drug_radioprotector",
+				"drug_anabiotic",
+
+				"bread",
+				"kolbasa",
+				"conserva",
+				"vodka",
+				"energy_drink"
+				}
+	elseif (name == "Weapons (Addon)") then
+		return {
+				"wpn_addon_scope",
+				"wpn_addon_scope_x2.7",
+				"wpn_addon_scope_detector",
+				"wpn_addon_scope_night",
+				"wpn_addon_scope_susat",
+				"wpn_addon_scope_susat_x1.6",
+				"wpn_addon_scope_susat_custom",
+				"wpn_addon_scope_susat_dusk",
+				"wpn_addon_scope_susat_night",
+				"wpn_addon_silencer",
+				"wpn_addon_grenade_launcher",
+				"wpn_addon_grenade_launcher_m203"
+				}
+	elseif (name == "Weapons (Pistol)") then
+		return  {
+				"wpn_beretta",
+				"wpn_desert_eagle",
+				"wpn_desert_eagle_nimble",
+				"wpn_pm",
+				"wpn_pm_actor",
+				"wpn_pb",
+				"wpn_fort",
+				"wpn_fort_snag",
+				"wpn_hpsa",
+				"wpn_walther",
+				"wpn_sig220",
+				"wpn_sig220_nimble",
+				"wpn_colt1911",
+				"wpn_usp",
+				"wpn_usp_nimble"
+				}
+	elseif (name == "Weapons (Rifle)") then
+		return {
+				"wpn_bm16",
+				"wpn_toz34",
+				"wpn_wincheaster1300",
+				"wpn_spas12",
+				"wpn_spas12_nimble",
+				"wpn_protecta",
+				"wpn_protecta_nimble",
+				"wpn_ak74u",
+				"wpn_mp5",
+				"wpn_ak74",
+				"wpn_abakan",
+				"wpn_l85",
+				"wpn_lr300",
+				"wpn_sig550",
+				"wpn_groza",
+				"wpn_val",
+				"wpn_vintorez",
+				"wpn_svu",
+				"wpn_svd",
+				"wpn_rg-6",
+				"wpn_rpg7",
+				"wpn_g36",
+				"wpn_fn2000",
+				"wpn_pkm",
+				"wpn_gauss",
+				"wpn_wincheaster1300_trapper",
+				"wpn_ak74u_snag",
+				"wpn_mp5_nimble",
+				"wpn_sig550_luckygun",
+				"wpn_groza_nimble",
+				"wpn_vintorez_nimble",
+				"wpn_svu_nimble",
+				"wpn_svd_nimble",
+				"wpn_g36_nimble",
+				"wpn_fn2000_nimble",
+				"wpn_pkm_zulus",
+				"pri_a17_gauss_rifle"
+			}
+	elseif (name == "Weapons (Misc.)") then
+		return	{
+				"grenade_f1",
+				"grenade_rgd5",
+				"grenade_gd-05",
+				"wpn_knife",
+				"wpn_binoc",
+				"wpn_mine"
+--				"explosive_barrel",
+--				"explosive_mobiltank",
+--				"explosive_dinamit"
+				}
+	elseif (name == "Items (Quest)") then
+		return {
+		        "bad_psy_helmet",
+				"good_psy_helmet",
+				"jup_a9_conservation_info",
+				"jup_a9_power_info",
+				"jup_a9_way_info",
+				"jup_a9_evacuation_info",
+				"jup_a9_meeting_info",
+				"jup_a9_losses_info",
+				"jup_a9_delivery_info",
+				"jup_b10_ufo_memory",
+				"jup_b10_ufo_memory_2",
+				"jup_b10_notes_01",
+				"jup_b10_notes_02",
+				"jup_b10_notes_03",
+				"jup_b205_sokolov_note",
+				"jup_b206_plant",
+				"jup_b209_monster_scanner",
+				"jup_b200_tech_materials_wire",
+				"jup_b200_tech_materials_acetone",
+				"jup_b200_tech_materials_textolite",
+				"jup_b200_tech_materials_transistor",
+				"jup_b200_tech_materials_capacitor",
+				"jup_b202_bandit_pda",
+				"device_flash_snag",
+				"jup_b9_blackbox",
+				"jup_b32_scanner_device",
+				"jup_b46_duty_founder_pda",
+				"jup_b207_merc_pda_with_contract",
+				"jup_b47_jupiter_products_info",
+				"jup_b47_merc_pda",
+				"toolkit_1",
+				"toolkit_2",
+				"toolkit_3",
+				"zat_b33_safe_container",
+				"zat_b57_gas",
+				"zat_b12_key_1",
+				"zat_b12_key_2",
+				"zat_b12_documents_1",
+				"zat_b12_documents_2",
+				"device_pda_port_bandit_leader",
+				"zat_b40_notebook",
+				"zat_b40_pda_1",
+				"zat_b40_pda_2",
+				"device_pda_zat_b5_dealer",
+				"zat_b20_noah_pda",
+				"zat_a23_access_card",
+				"zat_a23_gauss_rifle_docs",
+				"zat_b44_barge_pda",
+				"zat_b39_joker_pda",
+				"zat_b22_medic_pda",
+				"pri_b35_lab_x8_key",
+				"pri_b306_envoy_pda",
+				"pri_b36_monolith_hiding_place_pda",
+				"pri_a25_explosive_charge_item",
+				"pri_a19_american_experiment_info",
+				"pri_a19_lab_x16_info",
+				"pri_a19_lab_x10_info",
+				"pri_a19_lab_x7_info",
+				"pri_a19_lab_x18_info",
+				"zat_a23_labx8_key",
+				"lx8_service_instruction"
+				}
+	elseif (name == "Ammo") then
+		return {
+				"ammo_9x18_fmj",
+				"ammo_9x18_pmm",
+				"ammo_9x19_fmj",
+				"ammo_9x19_pbp",
+				"ammo_11.43x23_fmj",
+				"ammo_11.43x23_hydro",
+				"ammo_5.45x39_fmj",
+				"ammo_5.45x39_ap",
+				"ammo_5.56x45_ss190",
+				"ammo_5.56x45_ap",
+				"ammo_pkm_100",
+				"ammo_7.62x54_7h1",
+				"ammo_gauss",
+				"ammo_gauss_cardan",
+				"ammo_9x39_pab9",
+				"ammo_9x39_ap",
+				"ammo_12x70_buck",
+				"ammo_12x76_zhekan",
+				"ammo_og-7b",
+				"ammo_vog-25",
+				"ammo_m209"
+				}
+	elseif (name == "NPC (Stalker)") then
+		return {
+				"sim_default_stalker_0",
+				"sim_default_stalker_1",
+				"sim_default_stalker_2",
+				"sim_default_stalker_3",
+				"sim_default_stalker_4",
+				"sim_default_bandit_0",
+				"sim_default_bandit_1",
+				"sim_default_bandit_2",
+				"sim_default_bandit_3",
+				"sim_default_bandit_4",
+				"sim_default_killer_0",
+				"sim_default_killer_1",
+				"sim_default_killer_2",
+				"sim_default_killer_3",
+				"sim_default_killer_4",
+				"sim_default_duty_0",
+				"sim_default_duty_1",
+				"sim_default_duty_2",
+				"sim_default_duty_3",
+				"sim_default_duty_4",
+				"sim_default_freedom_0",
+				"sim_default_freedom_1",
+				"sim_default_freedom_2",
+				"sim_default_freedom_3",
+				"sim_default_freedom_4",
+				"sim_default_army_0",
+				"sim_default_army_1",
+				"sim_default_army_2",
+				"sim_default_army_3",
+				"sim_default_army_4",
+				"sim_default_monolith_0",
+				"sim_default_monolith_1",
+				"sim_default_monolith_2",
+				"sim_default_monolith_3",
+				"sim_default_monolith_4",
+				"sim_monolith_sniper",
+				"sim_monolith_specnaz_rg6",
+				"sim_default_zombied_0",
+				"sim_default_zombied_1",
+				"sim_default_zombied_2",
+				"sim_default_zombied_3",
+				"sim_default_zombied_4",
+				"sim_default_csky_0",
+				"sim_default_csky_1",
+				"sim_default_csky_2",
+				"sim_default_csky_3",
+				"sim_default_csky_4",
+				"sim_default_ecolog_0",
+				"sim_default_ecolog_1",
+				"sim_default_ecolog_2",
+				"sim_default_ecolog_3",
+				"sim_default_ecolog_4",
+				"sim_default_military_0",
+				"sim_default_military_1",
+				"sim_default_military_2",
+				"sim_default_military_3",
+				"sim_default_military_4"
+				}
+	elseif (name == "NPC (Monster)") then
+		return {
+				"cat_weak",
+				"cat_normal",
+				"cat_strong",
+				"dog_weak",
+				"dog_normal",
+				"dog_strong",
+				"rat_weak",
+				"rat_normal",
+				"rat_strong",
+				"chimera_weak",
+				"chimera_normal",
+				"chimera_strong",
+				"m_controller_normal",
+				"m_controller_normal2",
+				"bloodsucker_weak",
+				"bloodsucker_normal",
+				"bloodsucker_strong",
+				"boar_weak",
+				"boar_normal",
+				"boar_strong",
+				"flesh_weak",
+				"flesh_normal",
+				"flesh_strong",
+				"fracture_weak",
+				"fracture_normal",
+				"fracture_strong",
+				"zombie_weak",
+				"zombie_normal",
+				"zombie_strong",
+				"gigant_weak",
+				"gigant_normal",
+				"gigant_strong",
+				"snork_weak",
+				"snork_normal",
+				"snork_strong",
+				"pseudodog_weak",
+				"pseudodog_normal",
+				"pseudodog_strong",
+				"burer_weak",
+				"burer_normal",
+				"burer_strong",
+				"tushkano_weak",
+				"tushkano_normal",
+				"tushkano_strong",
+				"borya_normal",
+				"psysucker_weak",
+				"psysucker_normal",
+				"psysucker_strong",
+				"m_controller_psy"
+				}
+	elseif (name == "Squads (Stalker)") then
+		return {
+				"stalker_sim_squad_novice",
+				"stalker_sim_squad_advanced",
+				"stalker_sim_squad_veteran",
+				"bandit_sim_squad_novice",
+				"bandit_sim_squad_advanced",
+				"bandit_sim_squad_veteran",
+				"duty_sim_squad_novice",
+				"duty_sim_squad_advanced",
+				"duty_sim_squad_veteran",
+				"freedom_sim_squad_novice",
+				"freedom_sim_squad_advanced",
+				"freedom_sim_squad_veteran",
+				"army_sim_squad_novice",
+				"army_sim_squad_advanced",
+				"army_sim_squad_veteran",
+				"merc_sim_squad_novice",
+				"merc_sim_squad_advanced",
+				"merc_sim_squad_veteran",
+				"monolith_sim_squad_novice",
+				"monolith_sim_squad_advanced",
+				"monolith_sim_squad_veteran",
+				"csky_sim_squad_novice",
+				"csky_sim_squad_advanced",
+				"csky_sim_squad_veteran",
+				"ecolog_sim_squad_novice",
+				"ecolog_sim_squad_advanced",
+				"ecolog_sim_squad_veteran",
+				"zombied_sim_squad_novice",
+				"zombied_sim_squad_advanced",
+				"zombied_sim_squad_veteran"
+				}
+	elseif (name == "Squads (Monster)") then
+		return {
+				"simulation_bloodsucker",
+				"simulation_boar",
+				"simulation_burer",
+				"simulation_dog",
+				"simulation_pseudodog",
+				"simulation_flesh",
+				"simulation_snork",
+				"simulation_controller",
+				"simulation_mix_dogs",
+				"simulation_mix_boar_flesh",
+				"simulation_poltergeist_tele",
+				"simulation_chimera",
+				"simulation_chimera_zaton",
+				"simulation_chimera_pripyat",
+				"simulation_chimera_jupiter",
+				"simulation_psy_dog",
+				"simulation_tushkano",
+				"simulation_gigant",
+				"simulation_cat",
+				"simulation_zombie",
+				"simulation_rat",
+				"simulation_rats",
+				"simulation_fracture",
+				"simulation_psysucker",
+				"simulation_controller_psy"
+				}
+	elseif (name == "Physic (Misc.)") then
+		return {
+				"mine_blow",
+				"jup_b209_ph_scanner",
+				"jup_b207_depot_cover",
+				"pri_a28_actor_hideout",
+				"jup_b219_gate",
+				"pri_a25_explosive_charge",
+				"pri_a28_earth_helli_1",
+				"pri_a28_earth_helli_2",
+				"jup_b206_plant_ph",
+				"shooting_target_1",
+				"balon_01",
+				"balon_02",
+				"balon_02link",
+				"balon_02a",
+				"bidon",
+				"bochka_close_1",
+				"bochka_close_2",
+				"bochka_close_3",
+				"bochka_close_4",
+				"gaz_balon",
+				"disel_generator",
+				"krisagenerator",
+				"ventilator_01",
+				"ventilator_02",
+				"ventilator_03",
+				"ventilator_04",
+				"ventilator_05",
+				"notebook",
+				"priemnik_gorizont",
+				"rupor",
+				"transiver",
+				"tv_1",
+				"table_lamp_01",
+				"komp_monitor",
+				"komp_klava",
+				"komp_block",
+				"debris_01",
+				"wood_fence_1",
+				"wood_fence_2",
+				"wood_fence_3",
+				"wood_fence_4",
+				"banka_kraski_1",
+				"kanistra_01",
+				"tiski",
+				"kanistra_02",
+				"vedro_01",
+				"axe",
+				"hammer",
+				"hatch_01",
+				"keyga",
+				"lopata",
+				"molot",
+				"pick",
+				"riffler",
+				"saw",
+				"box_1a",
+				"box_1b",
+				"box_1c",
+				"box_bottle_1",
+				"box_metall_01",
+				"box_wood_01",
+				"box_wood_02",
+				"box_paper"
+				}
+	end
+end
+
 ------------------------------------------------------------
 -- List box
 ------------------------------------------------------------
@@ -567,564 +1143,6 @@ function debug_ui:FindNearest(txt)
 	end
 end
 
-function get_spawn_table(name)
-	if (name == "Artefacts") then
-		return {
-				"af_medusa", 		    -- 1
-				"af_cristall_flower",   -- 2
-				"af_night_star", 	    -- 3
-				"af_vyvert", 		    -- 4
-				"af_gravi", 		    -- 5
-				"af_gold_fish", 	    -- 6
-				"af_cristall", 		    -- 7
-				"af_fireball", 	        -- 8
-				"af_dummy_glassbeads",  -- 9
-				"af_eye", 			    -- 10
-				"af_fire", 			    -- 11
-				"af_blood", 		    -- 12
-				"af_mincer_meat", 	    -- 13
-				"af_soul", 			    -- 14
-				"af_fuzz_kolobok", 	    -- 15
-				"af_baloon", 		    -- 16
-				"af_glass", 		    -- 17
-				"af_electra_sparkler",  -- 18
-				"af_electra_flash",     -- 19
-				"af_electra_moonlight", -- 20
-				"af_dummy_battery", 	-- 21
-				"af_dummy_dummy", 		-- 22
-				"af_ice", 				-- 23
-				"af_compass", 			-- 24
-				"af_oasis_heart", 		-- 25
-				"jup_b1_half_artifact", -- 26
-				"af_quest_b14_twisted", -- 27
-				"af_drops",				-- 28
-				"af_ameba_slime", 		-- 29
-				"af_ameba_slug",		-- 30
-				"af_ameba_mica",		-- 31
-				"af_dummy_spring",		-- 32
-				"af_dummy_pellicle",	-- 33
-				"af_rusty_thorn",		-- 34
-				"af_rusty_kristall", 	-- 35
-				"af_rusty_sea",	-- 36
-				}
-	elseif (name == "Outfits") then
-		return {
-				"helm_respirator",
-				"helm_hardhat",
-				"helm_protective",
-				"helm_tactic",
-				"helm_battle",
-				"helm_respirator_joker",
-				"helm_hardhat_snag",
-				"helm_m40",
-				
-				--Freedom
-				"svoboda_novice_outfit",
-				"svoboda_light_outfit",
-				"svoboda_heavy_outfit",
-				"svoboda_heavy_outfit_2",
-				"svoboda_exo_outfit",
-				
-				--Ecolog
-				"ecolog_outfit_green",
-				"ecolog_outfit_orange",
-				"scientific_outfit",
-				"ecolog_guard_outfit",
-				
-				--Stalker
-				"novice_outfit",
-				"stalker_outfit",
-				"stalker_outfit_barge",
-				"exo_outfit",
-				
-				--Bandit
-				"bandit_novice_outfit",
-				"banditmerc_outfit",
-				"trenchcoat_outfit",
-				
-				-- Duty
-				"dolg_novice_outfit",
-				"dolg_outfit",
-				"dolg_heavy_outfit",
-				"dolg_exo_outfit",
-				
-				-- Army
-				"military_outfit",
-				"specops_outfit",
-				
-				-- Clear Sky
-				"cs_novice_outfit",
-				"cs_light_outfit",
-				"cs_medium_outfit",
-				"cs_heavy_outfit",
-				
-				-- Mercenary
-				"merc_outfit",
-				
-				
-				"god_outfit"
-				}
-	elseif (name == "Items (Misc.)") then
-		return {
-				"device_torch",
-				"detector_simple",
-				"detector_advanced",
-				"detector_elite",
-				"detector_scientific",
-				"itm_actor_backpack",
-				"itm_backpack",
-				"itm_sleepbag",
-				"itm_pda_common",
-				"itm_pda_uncommon",
-				"itm_pda_rare",
-				"itm_gunsmith_toolkit",
-				"itm_gunsmith_toolkit_tier_2",
-				"stalker_patch",
-				"ecolog_patch",
-				"duty_patch",
-				"merc_patch",
-				"freedom_patch",
-				"bandit_patch",
-				"army_patch",
-				"monolith_patch",
-				"csky_patch"
-				}
-	elseif (name == "Items (Consumable)") then
-		return {
-				"bandage",
-				"antirad",
-				"medkit",
-				"medkit_army",
-				"medkit_scientic",
-
-				"drug_booster",
-				"drug_coagulant",
-				"drug_psy_blockade",
-				"drug_antidot",
-				"drug_radioprotector",
-				"drug_anabiotic",
-
-				"bread",
-				"kolbasa",
-				"conserva",
-				"vodka",
-				"energy_drink"
-				}
-	elseif (name == "Weapons (Addon)") then
-		return {
-				"wpn_addon_scope",
-				"wpn_addon_scope_x2.7",
-				"wpn_addon_scope_detector",
-				"wpn_addon_scope_night",
-				"wpn_addon_scope_susat",
-				"wpn_addon_scope_susat_x1.6",
-				"wpn_addon_scope_susat_custom",
-				"wpn_addon_scope_susat_dusk",
-				"wpn_addon_scope_susat_night",
-				"wpn_addon_silencer",
-				"wpn_addon_grenade_launcher",
-				"wpn_addon_grenade_launcher_m203"
-				}
-	elseif (name == "Weapons (Pistol)") then
-		return  {
-				"wpn_beretta",
-				"wpn_desert_eagle",
-				"wpn_desert_eagle_nimble",
-				"wpn_pm",
-				"wpn_pm_actor",
-				"wpn_pb",
-				"wpn_fort",
-				"wpn_fort_snag",
-				"wpn_hpsa",
-				"wpn_walther",
-				"wpn_sig220",
-				"wpn_sig220_nimble",
-				"wpn_colt1911",
-				"wpn_usp",
-				"wpn_usp_nimble"
-				}
-	elseif (name == "Weapons (Rifle)") then
-		return {
-				"wpn_bm16",
-				"wpn_toz34",
-				"wpn_wincheaster1300",
-				"wpn_spas12",
-				"wpn_spas12_nimble",
-				"wpn_protecta",
-				"wpn_protecta_nimble",
-				"wpn_ak74u",
-				"wpn_mp5",
-				"wpn_ak74",
-				"wpn_abakan",
-				"wpn_l85",
-				"wpn_lr300",
-				"wpn_sig550",
-				"wpn_groza",
-				"wpn_val",
-				"wpn_vintorez",
-				"wpn_svu",
-				"wpn_svd",
-				"wpn_rg-6",
-				"wpn_rpg7",
-				"wpn_g36",
-				"wpn_fn2000",
-				"wpn_pkm",
-				"wpn_gauss",
-				"wpn_wincheaster1300_trapper",
-				"wpn_ak74u_snag",
-				"wpn_mp5_nimble",
-				"wpn_sig550_luckygun",
-				"wpn_groza_nimble",
-				"wpn_vintorez_nimble",
-				"wpn_svu_nimble",
-				"wpn_svd_nimble",
-				"wpn_g36_nimble",
-				"wpn_fn2000_nimble",
-				"wpn_pkm_zulus",
-				"pri_a17_gauss_rifle"
-			}
-	elseif (name == "Weapons (Misc.)") then
-		return	{
-				"grenade_f1",
-				"grenade_rgd5",
-				"grenade_gd-05",
-				"wpn_knife",
-				"wpn_binoc",
-				"wpn_mine",
-				"explosive_barrel",
-				"explosive_mobiltank",
-				"explosive_dinamit"
-				}
-	elseif (name == "Items (Quest)") then
-		return {
-		        "bad_psy_helmet",
-				"good_psy_helmet",
-				"jup_a9_conservation_info",
-				"jup_a9_power_info",
-				"jup_a9_way_info",
-				"jup_a9_evacuation_info",
-				"jup_a9_meeting_info",
-				"jup_a9_losses_info",
-				"jup_a9_delivery_info",
-				"jup_b10_ufo_memory",
-				"jup_b10_ufo_memory_2",
-				"jup_b10_notes_01",
-				"jup_b10_notes_02",
-				"jup_b10_notes_03",
-				"jup_b205_sokolov_note",
-				"jup_b206_plant",
-				"jup_b209_monster_scanner",
-				"jup_b200_tech_materials_wire",
-				"jup_b200_tech_materials_acetone",
-				"jup_b200_tech_materials_textolite",
-				"jup_b200_tech_materials_transistor",
-				"jup_b200_tech_materials_capacitor",
-				"jup_b202_bandit_pda",
-				"device_flash_snag",
-				"jup_b9_blackbox",
-				"jup_b32_scanner_device",
-				"jup_b46_duty_founder_pda",
-				"jup_b207_merc_pda_with_contract",
-				"jup_b47_jupiter_products_info",
-				"jup_b47_merc_pda",
-				"toolkit_1",
-				"toolkit_2",
-				"toolkit_3",
-				"zat_b33_safe_container",
-				"zat_b57_gas",
-				"zat_b12_key_1",
-				"zat_b12_key_2",
-				"zat_b12_documents_1",
-				"zat_b12_documents_2",
-				"device_pda_port_bandit_leader",
-				"zat_b40_notebook",
-				"zat_b40_pda_1",
-				"zat_b40_pda_2",
-				"device_pda_zat_b5_dealer",
-				"zat_b20_noah_pda",
-				"zat_a23_access_card",
-				"zat_a23_gauss_rifle_docs",
-				"zat_b44_barge_pda",
-				"zat_b39_joker_pda",
-				"zat_b22_medic_pda",
-				"pri_b35_lab_x8_key",
-				"pri_b306_envoy_pda",
-				"pri_b36_monolith_hiding_place_pda",
-				"pri_a25_explosive_charge_item",
-				"pri_a19_american_experiment_info",
-				"pri_a19_lab_x16_info",
-				"pri_a19_lab_x10_info",
-				"pri_a19_lab_x7_info",
-				"pri_a19_lab_x18_info",
-				"zat_a23_labx8_key",
-				"lx8_service_instruction"
-				}
-	elseif (name == "Ammo") then
-		return {
-				"ammo_9x18_fmj",
-				"ammo_9x18_pmm",
-				"ammo_9x19_fmj",
-				"ammo_9x19_pbp",
-				"ammo_11.43x23_fmj",
-				"ammo_11.43x23_hydro",
-				"ammo_5.45x39_fmj",
-				"ammo_5.45x39_ap",
-				"ammo_5.56x45_ss190",
-				"ammo_5.56x45_ap",
-				"ammo_pkm_100",
-				"ammo_7.62x54_7h1",
-				"ammo_gauss",
-				"ammo_gauss_cardan",
-				"ammo_9x39_pab9",
-				"ammo_9x39_ap",
-				"ammo_12x70_buck",
-				"ammo_12x76_zhekan",
-				"ammo_og-7b",
-				"ammo_vog-25",
-				"ammo_m209"
-				}
-	elseif (name == "NPC (Stalker)") then
-		return {
-				"sim_default_stalker_0",
-				"sim_default_stalker_1",
-				"sim_default_stalker_2",
-				"sim_default_stalker_3",
-				"sim_default_stalker_4",
-				"sim_default_bandit_0",
-				"sim_default_bandit_1",
-				"sim_default_bandit_2",
-				"sim_default_bandit_3",
-				"sim_default_bandit_4",
-				"sim_default_killer_0",
-				"sim_default_killer_1",
-				"sim_default_killer_2",
-				"sim_default_killer_3",
-				"sim_default_killer_4",
-				"sim_default_duty_0",
-				"sim_default_duty_1",
-				"sim_default_duty_2",
-				"sim_default_duty_3",
-				"sim_default_duty_4",
-				"sim_default_freedom_0",
-				"sim_default_freedom_1",
-				"sim_default_freedom_2",
-				"sim_default_freedom_3",
-				"sim_default_freedom_4",
-				"sim_default_army_0",
-				"sim_default_army_1",
-				"sim_default_army_2",
-				"sim_default_army_3",
-				"sim_default_army_4",
-				"sim_default_monolith_0",
-				"sim_default_monolith_1",
-				"sim_default_monolith_2",
-				"sim_default_monolith_3",
-				"sim_default_monolith_4",
-				"sim_monolith_sniper",
-				"sim_monolith_specnaz_rg6",
-				"sim_default_zombied_0",
-				"sim_default_zombied_1",
-				"sim_default_zombied_2",
-				"sim_default_zombied_3",
-				"sim_default_zombied_4",
-				"sim_default_csky_0",
-				"sim_default_csky_1",
-				"sim_default_csky_2",
-				"sim_default_csky_3",
-				"sim_default_csky_4",
-				"sim_default_ecolog_0",
-				"sim_default_ecolog_1",
-				"sim_default_ecolog_2",
-				"sim_default_ecolog_3",
-				"sim_default_ecolog_4",
-				"sim_default_military_0",
-				"sim_default_military_1",
-				"sim_default_military_2",
-				"sim_default_military_3",
-				"sim_default_military_4"
-				}
-	elseif (name == "NPC (Mutant)") then
-		return {
-				"cat_weak",
-				"cat_normal",
-				"cat_strong",
-				"dog_weak",
-				"dog_normal",
-				"dog_strong",
-				"rat_weak",
-				"rat_normal",
-				"rat_strong",
-				"chimera_weak",
-				"chimera_normal",
-				"chimera_strong",
-				"m_controller_normal",
-				"m_controller_normal2",
-				"bloodsucker_weak",
-				"bloodsucker_normal",
-				"bloodsucker_strong",
-				"boar_weak",
-				"boar_normal",
-				"boar_strong",
-				"flesh_weak",
-				"flesh_normal",
-				"flesh_strong",
-				"fracture_weak",
-				"fracture_normal",
-				"fracture_strong",
-				"zombie_weak",
-				"zombie_normal",
-				"zombie_strong",
-				"gigant_weak",
-				"gigant_normal",
-				"gigant_strong",
-				"snork_weak",
-				"snork_normal",
-				"snork_strong",
-				"pseudodog_weak",
-				"pseudodog_normal",
-				"pseudodog_strong",
-				"burer_weak",
-				"burer_normal",
-				"burer_strong",
-				"tushkano_weak",
-				"tushkano_normal",
-				"tushkano_strong",
-				"borya_normal",
-				"psysucker_weak",
-				"psysucker_normal",
-				"psysucker_strong",
-				"m_controller_psy"
-				}
-	elseif (name == "Squads (Stalker)") then
-		return {
-				"stalker_sim_squad_novice",
-				"stalker_sim_squad_advanced",
-				"stalker_sim_squad_veteran",
-				"bandit_sim_squad_novice",
-				"bandit_sim_squad_advanced",
-				"bandit_sim_squad_veteran",
-				"duty_sim_squad_novice",
-				"duty_sim_squad_advanced",
-				"duty_sim_squad_veteran",
-				"freedom_sim_squad_novice",
-				"freedom_sim_squad_advanced",
-				"freedom_sim_squad_veteran",
-				"army_sim_squad_novice",
-				"army_sim_squad_advanced",
-				"army_sim_squad_veteran",
-				"merc_sim_squad_novice",
-				"merc_sim_squad_advanced",
-				"merc_sim_squad_veteran",
-				"monolith_sim_squad_novice",
-				"monolith_sim_squad_advanced",
-				"monolith_sim_squad_veteran",
-				"csky_sim_squad_novice",
-				"csky_sim_squad_advanced",
-				"csky_sim_squad_veteran",
-				"ecolog_sim_squad_novice",
-				"ecolog_sim_squad_advanced",
-				"ecolog_sim_squad_veteran",
-				"zombied_sim_squad_novice",
-				"zombied_sim_squad_advanced",
-				"zombied_sim_squad_veteran"
-				}
-	elseif (name == "Squads (Monster)") then
-		return {
-				"simulation_bloodsucker",
-				"simulation_boar",
-				"simulation_burer",
-				"simulation_dog",
-				"simulation_pseudodog",
-				"simulation_flesh",
-				"simulation_snork",
-				"simulation_controller",
-				"simulation_mix_dogs",
-				"simulation_mix_boar_flesh",
-				"simulation_poltergeist_tele",
-				"simulation_chimera",
-				"simulation_chimera_zaton",
-				"simulation_chimera_pripyat",
-				"simulation_chimera_jupiter",
-				"simulation_psy_dog",
-				"simulation_tushkano",
-				"simulation_gigant",
-				"simulation_cat",
-				"simulation_zombie",
-				"simulation_rat",
-				"simulation_rats",
-				"simulation_fracture",
-				"simulation_psysucker",
-				"simulation_controller_psy"
-				}
-	elseif (name == "Physic (Misc.)") then
-		return {
-				"mine_blow",
-				"jup_b209_ph_scanner",
-				"jup_b207_depot_cover",
-				"pri_a28_actor_hideout",
-				"jup_b219_gate",
-				"pri_a25_explosive_charge",
-				"pri_a28_earth_helli_1",
-				"pri_a28_earth_helli_2",
-				"jup_b206_plant_ph",
-				"shooting_target_1",
-				"balon_01",
-				"balon_02",
-				"balon_02link",
-				"balon_02a",
-				"bidon",
-				"bochka_close_1",
-				"bochka_close_2",
-				"bochka_close_3",
-				"bochka_close_4",
-				"gaz_balon",
-				"disel_generator",
-				"krisagenerator",
-				"ventilator_01",
-				"ventilator_02",
-				"ventilator_03",
-				"ventilator_04",
-				"ventilator_05",
-				"notebook",
-				"priemnik_gorizont",
-				"rupor",
-				"transiver",
-				"tv_1",
-				"table_lamp_01",
-				"komp_monitor",
-				"komp_klava",
-				"komp_block",
-				"debris_01",
-				"wood_fence_1",
-				"wood_fence_2",
-				"wood_fence_3",
-				"wood_fence_4",
-				"banka_kraski_1",
-				"kanistra_01",
-				"tiski",
-				"kanistra_02",
-				"vedro_01",
-				"axe",
-				"hammer",
-				"hatch_01",
-				"keyga",
-				"lopata",
-				"molot",
-				"pick",
-				"riffler",
-				"saw",
-				"box_1a",
-				"box_1b",
-				"box_1c",
-				"box_bottle_1",
-				"box_metall_01",
-				"box_wood_01",
-				"box_wood_02",
-				"box_paper"
-				}
-	end
-end
-
 function debug_ui:FillList(name)
 	if not (name) then
 		self:SendOutput("UISpawner: No spawn table could be created for %s",name)
@@ -1640,9 +1658,7 @@ function debug_ui:OnEditorSave()
 	end
 	
 	local function on_execute(path,filename,quit)
-		--local fullpath = getFS():update_path('$game_config$', filename)
 		local fullpath = path.."\\"..filename
-		--printf("%s",fullpath)
 		local ltx = io.open(fullpath,"rb")
 		if (ltx) then
 			local data = ltx:read("*all")
@@ -1663,7 +1679,6 @@ function debug_ui:OnEditorSave()
 						if (self.need_save_h) then
 							ltx:SetValue(section,"inv_grid_height",h)
 						end
-						
 						ltx:SaveExt()
 					end
 				end
@@ -1676,7 +1691,6 @@ function debug_ui:OnEditorSave()
 						if (self.need_save_offset_y) then
 							ltx:SetValue(search_sec,self._addons[ind].."_y",offset_y)
 						end
-						
 						ltx:SaveExt()
 					end
 				end
@@ -1719,15 +1733,12 @@ function debug_ui_spawner:InitControls(x, y, xml, owner)
 	self:SetWndSize(vector2():set(800,416))
 	self:SetAutoDelete(true)
 
-
 	owner.sections_list = xml:InitComboBox("tab_spawner:list_sections", self)
 	owner.sections_list:ClearList()
 	owner.sections_list:SetAutoDelete(true)
 
-	local slist = {"Weapons (Addon)","Items (Misc.)","Weapons (Rifle)","Weapons (Pistol)","Weapons (Misc.)","Outfits","Ammo","Artefacts","Items (Consumable)","Items (Quest)","NPC (Stalker)","Squads (Stalker)","NPC (Mutant)", "Physic (Misc.)","Squads (Monster)"}
-	table.sort(slist)
-	for i=1,#slist do
-		owner.sections_list:AddItem(slist[i],i-1)
+	for i=1,#id_to_spawn_table do
+		owner.sections_list:AddItem(id_to_spawn_table[i],i-1)
 	end
 
 	owner:Register(owner.sections_list, "list_sections")
@@ -1917,10 +1928,11 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	owner.editor_sections_list:ClearList()
 	owner.editor_sections_list:SetAutoDelete(true)
 
-	local slist = {"Weapons (Addon)","Items (Misc.)","Weapons (Rifle)","Weapons (Pistol)","Weapons (Misc.)","Outfits","Ammo","Artefacts","Items (Consumable)","Items (Quest)"}
-	table.sort(slist)
-	for i=1,#slist do
-		owner.editor_sections_list:AddItem(slist[i],i-1)
+	local invalid_ids = {[6] = true , [7] = true, [9] = true, [10] = true, [11] = true}
+	for i=1,#id_to_spawn_table do
+		if not (invalid_ids[i]) then
+			owner.editor_sections_list:AddItem(id_to_spawn_table[i],i-1)
+		end
 	end
 
 	owner:Register(owner.editor_sections_list, "editor_list_sections")
@@ -2038,20 +2050,44 @@ function debug_ui_attach:__init(owner, binds) super()
 	self:Register(self.attachable, "attach_list")
 	self:AddCallback("attach_list", ui_events.LIST_ITEM_SELECT,	self.OnAttachListSelect,self)
 	
-	local t = alun_utils.parse_list(system_ini(),"stalker","attachable_items")
+	local sys_ini = system_ini()
+	local t = alun_utils.parse_list(sys_ini,"stalker","attachable_items")
 	if (#t > 0) then
 		for i=1,#t do
-			if (system_ini():section_exist(t[i])) then
+			if (sys_ini:section_exist(t[i])) then
 				self.attachable:AddItem(t[i],i-1)
 			end
 		end
 	end
+	
+	self.weapons = xml:InitComboBox("wnd_attach_editor:form:list_weapons", self.form)
+	self:Register(self.weapons, "weapon_list")
+	self:AddCallback("weapon_list", ui_events.LIST_ITEM_SELECT,	self.OnWeaponListSelect,self)
+	
+	local valid_ids = {13,14,15} -- Weapon spawn tables only
+	
+	for n=1,#valid_ids do 
+		local slist = get_spawn_table(valid_ids[n])
+		if (slist) then 
+			local cnt = 0
+			for i=1,#slist do
+				if (sys_ini:section_exist(slist[i])) then
+					self.weapons:AddItem(slist[i],cnt)
+					cnt = cnt + 1
+				end
+			end
+		end
+	end 
 end
 function debug_ui_attach:__finalize()
 
 end
 function debug_ui_attach:OnAttachListSelect()
-
+	self._last = "attach"
+	for i=1,#self.flds do
+		self.need_save[self.flds[i]] = nil
+	end 
+	
 	local section = self.attachable:GetText()
 	if not (section and system_ini():section_exist(section)) then 
 		return 
@@ -2080,13 +2116,41 @@ function debug_ui_attach:OnAttachListSelect()
 		end
 	end
 end
-function debug_ui_attach:OnAttachSave(sec)
-
-	local section = sec or self.attachable:GetText()
+function debug_ui_attach:OnWeaponListSelect()
+	self._last = "weapon"
+	for i=1,#self.flds do
+		self.need_save[self.flds[i]] = nil
+	end 
+	
+	local section = self.weapons:GetText()
 	if not (section and system_ini():section_exist(section)) then 
 		return 
 	end 
 	
+	local pos = alun_utils.parse_list(system_ini(),section,"position")
+	local angle = alun_utils.parse_list(system_ini(),section,"orientation")
+	
+	if not (#pos > 0) then
+		return 
+	end
+	
+	for i=1,#pos do 
+		if (self["fld_attach_"..self.flds[i]]) then 
+			self["fld_attach_"..self.flds[i]]:SetText(pos[i])
+		end
+	end
+	
+	if not (#angle > 0) then
+		return
+	end
+	
+	for i=1,#angle do 
+		if (self["fld_attach_"..self.flds[i+3]]) then 
+			self["fld_attach_"..self.flds[i+3]]:SetText(angle[i])
+		end
+	end
+end
+function debug_ui_attach:OnAttachSave(section)
 	local need_save
 	local fld
 	local vals = {}
@@ -2125,12 +2189,22 @@ function debug_ui_attach:OnAttachSave(sec)
 				if (string.find(data,"["..section.."]",nil,true)) then
 					ltx = alun_utils.cfg_file(fullpath)
 					if (ltx) then
-						if (self.need_save.x or self.need_save.y or self.need_save.z) then
-							ltx:SetValue(section,"attach_position_offset",vals.x .. ", " .. vals.y .. ", " .. vals.z)
-						end
-						
-						if (self.need_save.rot_x or self.need_save.rot_y or self.need_save.rot_z) then
-							ltx:SetValue(section,"attach_angle_offset",vals.rot_x .. ", " .. vals.rot_y .. ", " .. vals.rot_z)
+						if (self._last == "attach") then
+							if (self.need_save.x or self.need_save.y or self.need_save.z) then
+								ltx:SetValue(section,"attach_position_offset",vals.x .. ", " .. vals.y .. ", " .. vals.z)
+							end
+							
+							if (self.need_save.rot_x or self.need_save.rot_y or self.need_save.rot_z) then
+								ltx:SetValue(section,"attach_angle_offset",vals.rot_x .. ", " .. vals.rot_y .. ", " .. vals.rot_z)
+							end
+						elseif (self._last == "weapon") then
+							if (self.need_save.x or self.need_save.y or self.need_save.z) then
+								ltx:SetValue(section,"position",vals.x .. ", " .. vals.y .. ", " .. vals.z)
+							end
+							
+							if (self.need_save.rot_x or self.need_save.rot_y or self.need_save.rot_z) then
+								ltx:SetValue(section,"orientation",vals.rot_x .. ", " .. vals.rot_y .. ", " .. vals.rot_z)
+							end
 						end
 						
 						ltx:SaveExt()
@@ -2171,7 +2245,7 @@ function debug_ui_attach:OnEditAttach(fld)
 	if not (_attached) then 
 		return 
 	end 
-	local section = self.attachable:GetText()
+	local section = self._last == "attach" and self.attachable:GetText() or self._last == "weapon" and self.weapons:GetText() or nil
 	if not (section and system_ini():section_exist(section)) then 
 		return 
 	end

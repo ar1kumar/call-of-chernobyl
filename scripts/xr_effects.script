@@ -4111,14 +4111,16 @@ function make_a_wish(actor,npc,p)
 	end 
 	
 	action_list[4] = function()
-		local t = { "Artefacts", "Outfits", "Items (Misc.)", "Items (Consumable)", "Weapons (Addon)", "Weapons (Pistol)", "Weapons (Rifle)", "Weapons (Misc.)", "Ammo" }
 		local sim = alife()
 		local sysini = system_ini()
-		for k,v in pairs(t) do
-			local list = ui_debug_main.get_spawn_table(v)
-			for kk,vv in pairs(list) do 
-				if (sysini:section_exist(vv)) then
-					sim:create(vv,vector(),0,0,0)
+		local invalid_ids = {[5] = true, [6] = true , [7] = true, [9] = true, [10] = true, [11] = true}
+		for k,v in pairs(ui_debug_main.id_to_spawn_table) do
+			if not (invalid_ids[k]) then
+				local list = ui_debug_main.get_spawn_table(v)
+				for kk,vv in pairs(list) do 
+					if (sysini:section_exist(vv)) then
+						sim:create(vv,vector(),0,0,0)
+					end
 				end
 			end
 		end
