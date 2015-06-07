@@ -1533,30 +1533,28 @@ function weapon_hud_show(hud)
 		wpn = db.actor:active_item()
 	end
 
-	if (wpn == nil or not alun_utils.item_is_fa(wpn)) then
-		return
-	end
+	if (wpn and alun_utils.item_is_fa(wpn)) then
+		local sobj = alife():object(wpn:id())
+		local data = sobj and stpk_utils.get_weapon_data(sobj)
 
-	local sobj = alife():object(wpn:id())
-	local data = sobj and stpk_utils.get_weapon_data(sobj)
-
-	if (wpn and data) then
-		local sec = wpn:section()
-		hud:add_msg("Weapon",sec)
-		hud:add_msg("Visual",data.visual_name)
-		hud:add_msg("Visual Flag",data.visual_flags)
-		local ef_main_weapon_type = alun_utils.read_from_ini(nil,sec,"ef_main_weapon_type","string","nil")
-		hud:add_msg("ef_main_weapon_type",ef_main_weapon_type)
-		local ef_weapon_type = alun_utils.read_from_ini(nil,sec,"ef_weapon_type","string","nil")
-		hud:add_msg("ef_weapon_type",ef_weapon_type)
-		hud:add_msg("Condition",data.condition and math.floor(data.condition*100))
-		hud:add_msg("Upgrades",table.concat(data.upgrades,","))
-		hud:add_msg("Weapon State",data.weapon_state)
-		hud:add_msg("AmmoCurrent",data.ammo_current)
-		hud:add_msg("AmmoClip",data.ammo_elapsed)
-		hud:add_msg("AddonFlag",data.addon_flags)
-		hud:add_msg("AmmoType",data.ammo_type)
-		hud:add_msg("XZ1",data.xz1)
+		if (data) then
+			local sec = wpn:section()
+			hud:add_msg("Weapon",sec)
+			hud:add_msg("Visual",data.visual_name)
+			hud:add_msg("Visual Flag",data.visual_flags)
+			local ef_main_weapon_type = alun_utils.read_from_ini(nil,sec,"ef_main_weapon_type","string","nil")
+			hud:add_msg("ef_main_weapon_type",ef_main_weapon_type)
+			local ef_weapon_type = alun_utils.read_from_ini(nil,sec,"ef_weapon_type","string","nil")
+			hud:add_msg("ef_weapon_type",ef_weapon_type)
+			hud:add_msg("Condition",data.condition and math.floor(data.condition*100))
+			hud:add_msg("Upgrades",table.concat(data.upgrades,","))
+			hud:add_msg("Weapon State",data.weapon_state)
+			hud:add_msg("AmmoCurrent",data.ammo_current)
+			hud:add_msg("AmmoClip",data.ammo_elapsed)
+			hud:add_msg("AddonFlag",data.addon_flags)
+			hud:add_msg("AmmoType",data.ammo_type)
+			hud:add_msg("XZ1",data.xz1)
+		end
 	end
 
 	hud:set_header("-[Weapon Info]-")

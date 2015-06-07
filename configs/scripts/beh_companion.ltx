@@ -50,7 +50,7 @@ out_restr = {=actor_in_zone(zat_a2_sr_noweap)} zat_a2_sr_noweap, {=actor_in_zone
 ;reset_distance = 2
 abuse = false
 snd_on_use 				= {=is_wounded} nil, {!is_squad_commander} meet_use_no_talk_leader
-close_distance          = {=is_wounded} 1, 2
+close_distance          = {=is_wounded} 1, {!is_squad_commander} 0, 2
 close_anim              = {=is_wounded} nil, {!is_squad_commander} nil, {+npcx_beh_substate_stealth -npcx_beh_substate_relax} hide_no_wpn, guard_na
 close_snd_hello         = nil
 close_snd_bye           = nil
