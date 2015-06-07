@@ -318,13 +318,8 @@ function animpoint:update()
 	if(is_director) then
 		--printf(" [%s] is director", self.npc_id)
 		tbl = assoc_tbl[camp_action].director
-		self.__dtimer = nil
+		self.__dtimer = 0
 	else
-		if (self._was_director == false) then 
-			self._was_director = true
-			self.current_action = nil
-		end 
-		
 		self.__dtimer = not self.__dtimer and time_global() + math.random(10000,15000) or self.__dtimer
 		if (self.current_action and time_global() < self.__dtimer) then
 			return
@@ -376,6 +371,11 @@ function animpoint:update()
 	end
 	
 	self.current_action = action
+	
+	local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
+	if (npc) then
+		state_mgr.set_state(npc, action, nil, nil, {fast_set = true, look_position = self.look_position},{animation_position = self.position, animation_direction = self.smart_direction} )		
+	end
 end
 
 --------------------------------------------------------------------------------
