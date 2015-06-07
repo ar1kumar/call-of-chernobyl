@@ -498,7 +498,7 @@ function trader_hud_show(hud)
 	end
 
 	local near = get_nearest_trader("cam")
-	if (near) then
+	if (near and near:alive()) then
 		st = db.storage[near:id()]
 		if (st) then
 			hud:add_msg("Section Name",near:section())
@@ -647,7 +647,7 @@ function monster_hud_show(hud)
 	end
 
 	local near = get_nearest_monster("cam")
-	if (near) then
+	if (near and near:alive()) then
 		st = db.storage[near:id()]
 		local sobj = alife():object(near:id())
 
@@ -703,7 +703,7 @@ function position_other_hud_show(hud)
 	local obj = DEBUG_NPC or get_target_at_cursor() or NEAREST_STALKER
 
 	hud:set_header("-[Pos. Info]-")
-	if (obj) then
+	if (obj and obj:alive()) then
 		local se_obj = alife():object(obj:id())
 		if (se_obj) then
 			local lvid, gvid = obj:level_vertex_id(), obj:game_vertex_id()
@@ -733,7 +733,7 @@ end
 function wounded_hud_show(hud)
 	local obj = get_debug_npc() or NEAREST_STALKER
 	hud:set_header("-[Wound Info]-")
-	if (obj) then
+	if (obj and obj:alive()) then
 		hud:add_msg("Name",obj:name())
 		local st = db.storage[obj:id()]
 		if (st) then
@@ -773,7 +773,7 @@ local stalker_data = {}
 function stalker_data_hud_show(hud)
 	local obj = get_debug_npc() or NEAREST_STALKER
 	hud:set_header("-[Stalker Packet Data]-")
-	if (obj) then
+	if (obj and obj:alive()) then
 		if (stalker_id ~= obj:id()) then
 			stalker_id = obj:id()
 			local se_obj = alife():object(stalker_id)
@@ -838,7 +838,7 @@ end
 function planner_hud_show(hud)
 	local obj = get_debug_npc() or NEAREST_STALKER
 	hud:set_header("-[Planner Info]-")
-	if (obj and obj:id() ~= 0) then
+	if (obj and obj:id() ~= 0 and obj:alive()) then
 		local manager = obj.motivation_action_manager and obj:motivation_action_manager()
 		if (manager and manager:initialized()) then
 			hud:add_msg("Name",obj:name())
@@ -1004,6 +1004,10 @@ function planner_hud_show(hud)
 end
 
 function position_hud_show(hud)
+	if not (db.actor) then 
+		return 
+	end 
+	
 	local pos = db.actor:position()
 	local cam
 	if (pos:distance_to_sqr(device().cam_pos) > 25) then
@@ -1057,9 +1061,9 @@ function position_hud_show(hud)
 	
 	hud:add_msg("","------ MISC. ------")
 	local count = 0
-	local ao = alife().object
+	local sim = alife()
 	for i=1,65534 do
-		if (ao(i) ~= nil) then
+		if (sim:object(i) ~= nil) then
 			count = count + 1
 		end
 	end
@@ -1100,7 +1104,7 @@ end
 
 function squad_info_hud_show(hud)
 	local near = get_debug_npc() or NEAREST_STALKER
-	if (near) then
+	if (near and near:alive()) then
 		local st = db.storage[near:id()]
 		if (st) then
 			local squad = get_object_squad(near)
@@ -1151,7 +1155,7 @@ end
 function stalker_info_hud_show(hud)
 	local near = get_debug_npc() or NEAREST_STALKER
 
-	local st = near and db.storage[near:id()]
+	local st = near and near:alive() and db.storage[near:id()]
 	if (st) then
 		local sobj = alife():object(near:id())
 
@@ -1293,7 +1297,7 @@ end
 
 function enemy_hud_show(hud)
 	local near = get_debug_npc() or NEAREST_STALKER
-	if (near) then
+	if (near and near:alive()) then
 		local id = near:id()
 		local se_obj = alife():object(id)
 		local st = db.storage[id]
@@ -1311,10 +1315,6 @@ function enemy_hud_show(hud)
 				hud:add_msg("Script Combat",st.script_combat_type)
 			end
 
-			if (st.overrides and st.overrides.combat_ignore) then
-				hud:add_msg("CombatIgnoreCond",xr_logic.pick_section_from_condlist(be, near, st.overrides.combat_ignore.condlist))
-			end
-
 			if (be) then
 				hud:add_msg("Best Enemy",be and be:name())
 			end
@@ -1323,6 +1323,9 @@ function enemy_hud_show(hud)
 			if (ene) then
 				-- What I call pure enemy is an evaluated enemy before combat ignore condition check
 				hud:add_msg("Pure Enemy",ene and ene:name())
+				if (st.overrides and st.overrides.combat_ignore) then
+					hud:add_msg("combat_ignore_cond",xr_logic.pick_section_from_condlist(ene, near, st.overrides.combat_ignore.condlist))
+				end
 			end
 			
 			local tg = time_global()
@@ -1419,7 +1422,7 @@ end
 
 function anim_hud_show(hud)
 	local near = get_debug_npc() or NEAREST_STALKER
-	if (near) then
+	if (near and near:alive()) then
 		local st = db.storage[near:id()]
 		if (st) then
 			local sobj = alife():object(near:id())
@@ -1489,7 +1492,7 @@ end
 
 function behavior_hud_show(hud)
 	local near = get_debug_npc() or NEAREST_STALKER
-	if (near) then
+	if (near and near:alive()) then
 		local st = db.storage[near:id()].beh
 		if (st) then
 			local target = st.desired_target and st.desired_target.object and st.desired_target.object:name()
@@ -1523,7 +1526,7 @@ end
 function weapon_hud_show(hud)
 	local near = get_debug_npc() or NEAREST_STALKER
 	local wpn
-	if (near) then
+	if (near and near:alive()) then
 		wpn = near:active_item()
 	else
 		near = db.actor

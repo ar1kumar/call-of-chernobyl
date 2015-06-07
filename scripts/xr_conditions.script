@@ -254,9 +254,7 @@ function is_enemy_actor_or_companion(enemy,npc)
 		return true 
 	end 
 	if (alife():has_info(id,"npcx_is_companion")) then
-		if (npc:relation(db.actor) >= game_object.enemy) then 
-			return true 
-		end
+		return true 
 	end
 	return false
 end

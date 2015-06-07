@@ -975,42 +975,51 @@ function npc_on_update(npc,st)
 	end 
 	
 	local wpn = npc:best_weapon()
-	if (wpn and alun_utils.item_is_fa(wpn)) then
-	
+	if (wpn) then
+		local is_firearm
 		if (intercepts.npc_on_weapon_no_ammo) then
-			local inmag = wpn:get_ammo_in_magazine()
-			if (inmag == 0) then
-				if not (st.weapon_reload) then
-					st.weapon_reload = true
-					npc_on_weapon_no_ammo(npc,wpn,st)
+			is_firearm = alun_utils.item_is_fa(wpn) 
+			if (is_firearm) then
+				local inmag = wpn:get_ammo_in_magazine()
+				if (inmag == 0) then
+					if not (st.weapon_reload) then
+						st.weapon_reload = true
+						npc_on_weapon_no_ammo(npc,wpn,st)
+					end
+				else
+					st.weapon_reload = nil
 				end
-			else
-				st.weapon_reload = nil
 			end
 		end
 
 		if (intercepts.npc_on_weapon_sight) then
-			local sight_type = npc:sight_params().m_sight_type
-			if (sight_type) and (sight_type == 4 or sight_type == 9 or sight_type == 10) then
-				if not (st.sight_type) then
-					npc_on_weapon_sight(npc,wpn,st,sight_type)
-					st.sight_type = sight_type
-				end
-			else
-				if (st.sight_type) then
-					st.sight_type = nil
-					npc_on_weapon_unsight(npc,wpn,st,sight_type)
+			is_firearm = is_firearm ~= nil and is_firearm or alun_utils.item_is_fa(wpn) -- we do this so that if they're no intercepts then we don't needlessly call item_is_fa
+			if (is_firearm) then
+				local sight_type = npc:sight_params().m_sight_type
+				if (sight_type) and (sight_type == 4 or sight_type == 9 or sight_type == 10) then
+					if not (st.sight_type) then
+						npc_on_weapon_sight(npc,wpn,st,sight_type)
+						st.sight_type = sight_type
+					end
+				else
+					if (st.sight_type) then
+						st.sight_type = nil
+						npc_on_weapon_unsight(npc,wpn,st,sight_type)
+					end
 				end
 			end
 		end
 
 		if (intercepts.npc_on_weapon_state_change) then
-			local sobj = alife():object(wpn:id())
-			local data = stpk_utils.get_weapon_data(sobj)
+			is_firearm = is_firearm ~= nil and is_firearm or alun_utils.item_is_fa(wpn) -- we do this so that if they're no intercepts then we don't needlessly call item_is_fa
+			if (is_firearm) then
+				local sobj = alife():object(wpn:id())
+				local data = stpk_utils.get_weapon_data(sobj)
 
-			if (data and st.weapon_state ~= data.weapon_state) then
-				npc_on_weapon_state_change(npc,wpn,st,data.weapon_state)
-				st.weapon_state = data.weapon_state
+				if (data and st.weapon_state ~= data.weapon_state) then
+					npc_on_weapon_state_change(npc,wpn,st,data.weapon_state)
+					st.weapon_state = data.weapon_state
+				end
 			end
 		end
 	end
