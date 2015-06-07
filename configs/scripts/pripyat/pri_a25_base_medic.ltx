@@ -10,7 +10,7 @@ path_walk = medic_walk
 path_look = medic_look
 def_state_standing = wait_na
 on_info = walker@refrigerator %=teleport_npc(pri_a25_smart_terrain_medic_walk)%  
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 
@@ -23,7 +23,7 @@ def_state_standing = wait_na
 on_info = {+pri_a25_antenna_destroyed} %=play_sound(pri_a25_freezer_knock)%
 on_info2 = {+pri_a25_freezer_can_talk} remark@a25_timer %=stop_sound%
 on_info3 = {=actor_enemy} %=actor_neutral%
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 
@@ -34,7 +34,7 @@ on_info = {=actor_enemy} %=actor_neutral%
 target = story | actor
 anim = wait_na
 on_game_timer = 10 | remark@a25_dialog
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 
@@ -44,7 +44,7 @@ meet = meet@pri_25
 target = story | actor
 anim = wait_na
 on_info = {=actor_enemy} %=actor_neutral%
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 

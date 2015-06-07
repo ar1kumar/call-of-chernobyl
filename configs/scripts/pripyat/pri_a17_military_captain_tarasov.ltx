@@ -22,7 +22,7 @@ combat_ignore_cond = {=fighting_dist_ge (15)} true
 on_info = {+pri_a17_mon_ambush_killed +pri_a17_actor_has_gauss_rifle -pri_a17_actor_attack_military} walker@safe, {+pri_a17_patrol_dead} walker@squad_go_check, walker@teleported
 on_info2 = {+pri_a17_teleport_step_1 -pri_a17_taras_teleported} % +pri_a17_taras_teleported =teleport_npc(pri_a17_taras_go1)%
 meet = no_meet
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 
@@ -169,7 +169,7 @@ anim = bloodsucker_search
 target = path | pri_a17_taras_chek_look, 0
 on_signal = anim_end | walker@defend %+pri_a17_get_in_cover%
 on_info = {=health_le(0.99) !actor_enemy} %=restore_health% 
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 meet = no_meet
 

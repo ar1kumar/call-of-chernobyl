@@ -2,7 +2,7 @@
 reach_movement = walk_noweap
 use_camp = false
 meet = meet@jup_a6_animpoint_meet
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 out_restr = jup_a6_sr_noweap
@@ -349,7 +349,7 @@ path_walk = duty_guard_walk
 path_look = duty_guard_look
 def_state_standing = wait_na
 meet = meet@jup_a6_animpoint_meet
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 out_restr = jup_a6_sr_noweap
 gather_items_enabled = false
 help_wounded_enabled = false
@@ -362,7 +362,7 @@ path_walk = duty_guard_walk
 path_look = duty_guard_look
 def_state_standing = wait_na
 meet = meet@jup_a6_animpoint_meet
-combat_ignore_cond = {!is_enemy_actor_or_companion} true, false
+combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 out_restr = jup_a6_sr_noweap
@@ -381,7 +381,7 @@ prior = 61
 path_walk = duty_guarder_walk
 path_look = duty_guarder_look
 on_info = {!actor_enemy =see_actor !npc_in_zone(jup_a6_sr_light) =actor_has_weapon =actor_in_zone(jup_a6_sr_noweap) =dist_to_actor_le(35)} remark@jup_a6_duty_guarder
-combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light) !is_enemy_actor_or_companion} true, false
+combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light)} true, false
 out_restr = jup_a6_sr_noweap
 in_restr = jup_a6_sr_light
 meet = no_meet
@@ -391,7 +391,7 @@ anim = threat
 target = story | actor
 on_info = %=play_sound(jup_a6_base_guard)%
 on_game_timer = 75 | walker@jup_a6_duty_guarder
-combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light) !is_enemy_actor_or_companion} true, false
+combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light)} true, false
 out_restr = jup_a6_sr_noweap
 in_restr = jup_a6_sr_light
 meet = no_meet
@@ -407,7 +407,7 @@ prior = 61
 path_walk = freedom_guarder_walk
 path_look = freedom_guarder_look
 on_info = {!actor_enemy =see_actor !npc_in_zone(jup_a6_sr_light) =actor_has_weapon =actor_in_zone(jup_a6_sr_noweap) =dist_to_actor_le(35)} remark@jup_a6_freedom_guarder
-combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light) !is_enemy_actor_or_companion} true, false
+combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light)} true, false
 out_restr = jup_a6_sr_noweap
 in_restr = jup_a6_sr_light
 meet = no_meet
@@ -417,7 +417,7 @@ anim = threat
 target = story | actor
 on_info = %=play_sound(jup_a6_base_guard)%
 on_game_timer = 75 | walker@jup_a6_freedom_guarder
-combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light) !is_enemy_actor_or_companion} true, false
+combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light)} true, false
 out_restr = jup_a6_sr_noweap
 in_restr = jup_a6_sr_light
 meet = no_meet

@@ -186,6 +186,10 @@ local function is_danger(npc,best_danger,script)
 
 		return danger_in_radius(npc,best_danger,bd_type)
 	end
+	
+	if (xr_combat_ignore.npc_in_safe_zone(npc)) then 
+		return false 
+	end
 
 	if (bd_type == danger_object.entity_corpse) then
 		if (best_danger_object and IsStalker(best_danger_object) and character_community(best_danger_object) == character_community(npc)) then

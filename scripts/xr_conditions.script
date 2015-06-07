@@ -249,6 +249,9 @@ function is_enemy_actor(enemy, npc)
 end
 
 function is_enemy_actor_or_companion(enemy,npc)
+	if not (npc:relation(enemy) >= game_object.enemy) then
+		return false
+	end
 	local id = enemy:id()
 	if (id == 0) then 
 		return true 
