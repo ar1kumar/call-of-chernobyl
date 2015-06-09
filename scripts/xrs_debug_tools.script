@@ -1525,27 +1525,24 @@ end
 
 function weapon_hud_show(hud)
 	local near = get_debug_npc() or NEAREST_STALKER
-	local wpn
-	if (near and near:alive()) then
-		wpn = near:active_item()
-	else
-		near = db.actor
-		wpn = db.actor:active_item()
-	end
+	local wpn = near and near:alive() and near:active_item() or db.actor:active_item()
 
-	if (wpn and alun_utils.item_is_fa(wpn)) then
+	if (wpn) then
 		local sobj = alife():object(wpn:id())
-		local data = sobj and stpk_utils.get_weapon_data(sobj)
-
+		local data = sobj and IsWeapon(wpn) and stpk_utils.get_weapon_data(sobj)
+		local sec = wpn:section()
+		hud:add_msg("Weapon",sec)
+		local owner = sobj and sobj.parent_id ~= 65535 and level.object_by_id(sobj.parent_id)
+		if (owner) then
+			hud:add_msg("Owner",owner:name())
+		end
+		local ef_main_weapon_type = alun_utils.read_from_ini(nil,sec,"ef_main_weapon_type","string","nil")
+		hud:add_msg("ef_main_weapon_type",ef_main_weapon_type)
+		local ef_weapon_type = alun_utils.read_from_ini(nil,sec,"ef_weapon_type","string","nil")
+		hud:add_msg("ef_weapon_type",ef_weapon_type)			
 		if (data) then
-			local sec = wpn:section()
-			hud:add_msg("Weapon",sec)
 			hud:add_msg("Visual",data.visual_name)
 			hud:add_msg("Visual Flag",data.visual_flags)
-			local ef_main_weapon_type = alun_utils.read_from_ini(nil,sec,"ef_main_weapon_type","string","nil")
-			hud:add_msg("ef_main_weapon_type",ef_main_weapon_type)
-			local ef_weapon_type = alun_utils.read_from_ini(nil,sec,"ef_weapon_type","string","nil")
-			hud:add_msg("ef_weapon_type",ef_weapon_type)
 			hud:add_msg("Condition",data.condition and math.floor(data.condition*100))
 			hud:add_msg("Upgrades",table.concat(data.upgrades,","))
 			hud:add_msg("Weapon State",data.weapon_state)

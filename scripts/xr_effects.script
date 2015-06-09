@@ -292,8 +292,9 @@ function setup_task_target_anomaly(actor,npc,p)
 	alun_utils.save_var(db.actor,"task_target_anomaly",target_name)
 end
 
--- param1 - variable name 
--- param2+ - sections
+-- param1 - variable name
+-- param2 - count
+-- param3+ - sections
 function setup_generic_fetch_task(actor,npc,p)
 	if (p[1] and p[2] and p[3]) then 
 		local sec = #p > 3 and p[math.random(3,#p)] or p[3]
@@ -309,8 +310,8 @@ function setup_generic_fetch_task(actor,npc,p)
 		end
 	end
 end
---{=setup_generic_fetch_task(var_name:mutant_part_controller_glass:mutant_part_controller_hand:mutant_part_burer_hand:mutant_part_pseudogigant_eye:mutant_part_pseudogigant_hand:mutant_part_chimera_claw:mutant_part_chimera_kogot)}
 
+-- param1 - variable name
 function setup_rare_mutant_fetch_task(actor,npc,p)
 	local parts = { 
 	"mutant_part_controller_glass",

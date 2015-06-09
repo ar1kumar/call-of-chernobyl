@@ -143,8 +143,12 @@ function animation:set_state(new_state, fast_set)
 
 	--alun_utils.debug_write(alun_utils.sr("animation:set_state %s state=%s fast_set=%s",self.npc:name(),new_state,fast_set))
 
+	--if (self.npc:animation_count() == 0) then 
+	--	self.states.anim_marker = nil
+	--end
+	
 	-- Быстрый выход, если понадобится.
-	if fast_set == true then
+	if (fast_set == true) then
 		--printf(" FAST SET %s  sid(%s)", self.npc:name(), self.sid)
 
 		-- clear_animations
@@ -186,10 +190,6 @@ function animation:set_state(new_state, fast_set)
 
 		self.states.next_rnd = time_global()
 		return
-	end
-	
-	if (self.npc:animation_count() == 0) then 
-		self.states.anim_marker = nil
 	end
 	
 	self.states.target_state = new_state
@@ -478,6 +478,8 @@ local removable = {
 	["wpn_binoc"] = true,
 	["medkit_script"] = true,
 	["hand_radio"] = true,
+	["anim_knife"] = true,
+	["anim_binoc"] = true,
 	["hand_radio_r"] = true
 }
 

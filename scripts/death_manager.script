@@ -165,30 +165,21 @@ function keep_item(npc, item)
 	end 
 	
 	local section = item:section()
-
-	local ini = npc:spawn_ini()
-
-	if ini and ini:section_exist("keep_items")
-			and	section ~= "guitar_a"
-			and	section ~= "harmonica_a"
-			and section ~= "wpn_binoc"
-			and section ~= "device_torch"
-			and section ~= "device_pda" then
-		return
-	end
-
-	if IsArtefact(item) then
-		return
-	end
---	printf("keep_item:item ["..item:name().."] npc_name ["..npc:name().."]")
 	if section == "bolt" then
 		return
 	end
-
-	if always_keep_item[section] == true then
+	
+	-- release all animation objects
+	if (section == "medkit_script" or section == "guitar_a" or section == "harmonica_a" or section == "wpn_binoc" or section == "anim_binoc" or section == "anim_knife" 
+		or section == "device_torch" or section == "device_pda" or section == "hand_radio" or section == "hand_radio_r") then
+		alife():release(alife():object(item:id()), true)
+		return 
+	end
+	
+	if IsArtefact(item) then
 		return
 	end
-	--printf("item name [%s]", item:name())
+
 	local cls = item:clsid()
 	if IsWeapon(item,cls) and not(cls==clsid.wpn_grenade_rgd5_s or cls==clsid.wpn_grenade_f1_s) then
 		set_weapon_drop_condition(item)
@@ -199,32 +190,6 @@ function keep_item(npc, item)
 		return
 	end
 	alife():release(alife():object(item:id()), true)
-
---[[
-	local item_id = item:id()
-	local item_in_slot = npc:item_in_slot(2)
-	if item_in_slot ~= nil and item_in_slot:id() == item_id then
-		--' Тут надо уменьшить кондишн оружия
-		item:set_condition((math.random(40)+40)/100)
-		return
-	end
-	item_in_slot = npc:item_in_slot(3)
-	if item_in_slot ~= nil and item_in_slot:id() == item_id then
-		--' Тут надо уменьшить кондишн оружия
-		item:set_condition((math.random(40)+40)/100)
-		return
-	end
-
---  npc:mark_item_dropped(item)
-	local item_in_slot = npc:item_in_slot(4)
-	if item_in_slot ~= nil and item_in_slot:id() == item_id	then
-		return
-	end
-	if not npc:marked_dropped(item) then
---		printf("releasing object ["..item:name().."]")
-		alife():release(alife():object(item:id()), true)
-	end
-	]]
 end
 
 function set_weapon_drop_condition(item)

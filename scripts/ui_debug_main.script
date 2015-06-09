@@ -241,15 +241,15 @@ function get_spawn_table(name)
 			}
 	elseif (name == "Weapons (Misc.)") then
 		return	{
+--				"explosive_barrel",
+--				"explosive_mobiltank",
+--				"explosive_dinamit",
 				"grenade_f1",
 				"grenade_rgd5",
 				"grenade_gd-05",
 				"wpn_knife",
 				"wpn_binoc",
 				"wpn_mine"
---				"explosive_barrel",
---				"explosive_mobiltank",
---				"explosive_dinamit"
 				}
 	elseif (name == "Items (Quest)") then
 		return {
@@ -399,7 +399,7 @@ function get_spawn_table(name)
 				"sim_default_military_3",
 				"sim_default_military_4"
 				}
-	elseif (name == "NPC (Monster)") then
+	elseif (name == "NPC (Mutant)") then
 		return {
 				"cat_weak",
 				"cat_normal",
@@ -484,7 +484,7 @@ function get_spawn_table(name)
 				"zombied_sim_squad_advanced",
 				"zombied_sim_squad_veteran"
 				}
-	elseif (name == "Squads (Monster)") then
+	elseif (name == "Squads (Mutant)") then
 		return {
 				"simulation_bloodsucker",
 				"simulation_boar",
@@ -586,14 +586,6 @@ end
 ------------------------------------------------------------
 class "set_list_text" (CUIListBoxItem)
 function set_list_text:__init(height) super(height)
---[[
-	self.name					= self:GetTextItem()
-	self.name:SetWndRect		(Frect():set(0,0,300,22))
-	self:SetTextColor			(GetARGB(255, 210, 210, 210))
-	self.name:SetFont			(GetFontLetterica18Russian())
-	self.name:SetWndSize		(vector2():set(400,height))
-	self.name:SetEllipsis		(true)
-]]
 	self.sect					= self:GetTextItem()
 	self.sect:SetWndRect		(Frect():set(0,0,300,22))
 	self:SetTextColor			(GetARGB(255, 216, 186, 140))
@@ -2060,6 +2052,8 @@ function debug_ui_attach:__init(owner, binds) super()
 		end
 	end
 	
+	-- TODO:
+	-- NOT IMPLEMENTED FULLY YET
 	self.weapons = xml:InitComboBox("wnd_attach_editor:form:list_weapons", self.form)
 	self:Register(self.weapons, "weapon_list")
 	self:AddCallback("weapon_list", ui_events.LIST_ITEM_SELECT,	self.OnWeaponListSelect,self)

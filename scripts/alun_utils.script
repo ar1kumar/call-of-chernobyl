@@ -1529,12 +1529,17 @@ function cfg_file:SaveExt()
 			comment = string.find(ln,";")
 			comment = comment and string.sub(ln,comment) or ""
 
+			if (comment ~= "") then
+				comment = addTab("\t",40) .. comment
+			end 
+			
 			t = str_explode(ln,"=")
 			if (self.root[sec][t[1]] ~= nil) then
 				if (self.root[sec][t[1]] == "") then
-					ln = addTab(t[1],40) .. " = " .. comment
+					ln = addTab(t[1],40) .. " =" .. comment
+					 
 				else
-					ln = addTab(t[1],40) .. " = " .. addTab(tostring(self.root[sec][t[1]]),40) .. comment
+					ln = addTab(t[1],40) .. " = " .. tostring(self.root[sec][t[1]]) .. comment
 				end
 			end
 		end
