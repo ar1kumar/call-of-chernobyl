@@ -1,0 +1,9 @@
+[logic]
+active = sr_idle@start
+
+[sr_idle@start]
+on_actor_inside = sr_idle@call
+
+[sr_idle@call]
+on_info = %=play_sound(sar_monolith_call)%
+on_info2 = {+actor_made_wish} nil
