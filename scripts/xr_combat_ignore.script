@@ -258,7 +258,7 @@ end
 
 function ignore_enemy_by_overrides(obj,enemy,no_check_job)
 	if not (enemy) then
-		return false
+		return true
 	end
 	
 	if (enemy:section() == "mar_smart_terrain_base_dog_doctor") then 
@@ -267,11 +267,6 @@ function ignore_enemy_by_overrides(obj,enemy,no_check_job)
 
 	local id = obj:id()
 	local ene_id = enemy:id()
-
-	local se_ene = alife():object(ene_id)
-	if not (se_ene) then
-		return true
-	end
 
 	local st = db.storage[id] and db.storage[id].overrides
 	if not (st) then
