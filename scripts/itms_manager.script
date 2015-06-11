@@ -444,9 +444,9 @@ end
 
 
 
-function loot_mutant(obj,clsid,t,npc)
-	local clsid = clsid or obj and obj:clsid()
-	if not (clsid) then
+function loot_mutant(obj,cls,t,npc)
+	local cls = cls or obj and obj:clsid()
+	if not (cls) then
 		return
 	end
 
@@ -472,8 +472,7 @@ function loot_mutant(obj,clsid,t,npc)
 		[clsid.rat]				= "rat"
 	}
 
-	--printf("loot_mutant: collecting section=%s",clsid_to_section[clsid])
-	local loot_table = alun_utils.collect_section(ini,clsid_to_section[clsid])
+	local loot_table = alun_utils.collect_section(ini,clsid_to_section[cls])
 
 	local loot,sec
 	for i=1,#loot_table do
