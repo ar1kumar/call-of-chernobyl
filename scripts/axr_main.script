@@ -505,6 +505,14 @@ function actor_on_update(se_actor,delta)
 		end
 	end
 
+	-- WISH GRANTER ZOMBIED-IMMORTALITY
+	if (db.actor:has_info("actor_made_wish_immortal")) then 
+		db.actor.health = 1
+		db.actor.bleeding = 1
+		db.actor.psy_health = 1
+		db.actor.radiation = -1
+	end
+	
 	if not upd_dtimer then
 		upd_dtimer = tg + 250
 	end
@@ -514,14 +522,6 @@ function actor_on_update(se_actor,delta)
 	end
 	upd_dtimer = tg + 250
 	
-	-- WISH GRANTER ZOMBIED-IMMORTALITY
-	if (db.actor:has_info("actor_made_wish_immortal")) then 
-		db.actor.health = 1
-		db.actor.bleeding = 1
-		db.actor.psy_health = 1
-		db.actor.radiation = -1
-	end
-
 	-- Are-wide sound decrement
 	-- comment block this routine if need to optimize
 	--[[
