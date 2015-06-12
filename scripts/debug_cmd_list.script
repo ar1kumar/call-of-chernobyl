@@ -1288,8 +1288,11 @@ function cmd.crow(me,txt,owner,p)
 
 	if (wrd == "on") then
 		local se_crow = alun_utils.nearest_object("m_crow")
-		xrs_debug_tools.crow_fun = se_crow.id
-		return "crow:= enabled"
+		if (se_crow) then
+			xrs_debug_tools.crow_fun = se_crow.id
+			return "crow:= enabled"
+		end
+		return "crow:= no crows found"
 	end
 
 	if (wrd == "off") then

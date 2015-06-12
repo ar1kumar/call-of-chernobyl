@@ -67,7 +67,7 @@ cl_run_back_0				=	1,	  0.2,	    1,   0.4,     1
 cl_run_fwd_0				=	1,	  0.2,	    1,   0.4,     1
 
 ; Formula for Visibility
-;Value = time_delta ? time_quant * luminocity_factor * (1.f + velocity_factor*object_velocity) * (distance - object_distance) ? (distance - always_visible_distance)
+;Value = time_delta / time_quant * luminocity_factor * (1.f + velocity_factor*object_velocity) * (distance - object_distance) / (distance - always_visible_distance)
 ;Value >= visibility_threshold
 
 ;transparency_threshold is done during ray_query

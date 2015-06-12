@@ -1286,6 +1286,9 @@ function stalker_info_hud_show(hud)
 				hud:add_msg("Kill wounded",vo:name())
 			end
 		end
+		
+		local ph_shell = near:get_physics_shell()
+		hud:add_msg("PH Shell",ph_shell  ~= nil)
 
 		local dist = device().cam_pos:distance_to(near:position())
 		hud:add_msg("distance",string.format("%d (%dm)",dist*dist,dist))
@@ -1529,7 +1532,8 @@ function weapon_hud_show(hud)
 
 	if (wpn) then
 		local sobj = alife():object(wpn:id())
-		local data = sobj and IsWeapon(wpn) and stpk_utils.get_weapon_data(sobj)
+		local id = wpn:id()
+		local data = sobj and alun_utils.item_is_fa(wpn) and stpk_utils.get_weapon_data(sobj)
 		local sec = wpn:section()
 		hud:add_msg("Weapon",sec)
 		local owner = sobj and sobj.parent_id ~= 65535 and level.object_by_id(sobj.parent_id)
@@ -1575,6 +1579,11 @@ function corpse_hud_show(hud)
 				end
 			end
 			count = count + 1
+		end
+		
+		if (obj) then 
+			local ph_shell = obj:get_physics_shell()
+			hud:add_msg("PH Shell",ph_shell  ~= nil)
 		end
 	end
 	hud:set_header("-[Release Table]["..count.."]")

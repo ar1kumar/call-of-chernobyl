@@ -8,6 +8,285 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 local stpk = net_packet()
 local uppk = net_packet()
 
+
+-- only use if you don't know the object class, otherwise call get_* directly to avoid needless overhead
+function get_object_data(sobj)
+	if not (sobj) then
+		return 
+	end
+	local m_classes =
+	{
+		["S_ACTOR"]  = this.get_actor_data,
+
+		["AI_STL_S"] = this.get_stalker_data,
+		--["AI_TRD_S"] = "cse_alife_trader",
+
+		["SM_BLOOD"] = this.get_monster_data,
+		["SM_BOARW"] = this.get_monster_data,
+		["SM_BURER"] = this.get_monster_data,
+		["SM_CAT_S"] = this.get_monster_data,
+		["SM_CHIMS"] = this.get_monster_data,
+		["SM_CONTR"] = this.get_monster_data,
+		["AI_CROW"]  = this.get_abstract_data, -- could be wrong
+		["SM_DOG_S"] = this.get_monster_data,
+		["SM_FLESH"] = this.get_monster_data,
+		["SM_IZLOM"] = this.get_monster_data,
+		["SM_GIANT"] = this.get_monster_data,
+		["AI_PHANT"] = this.get_abstract_data, -- could be wrong
+		["SM_POLTR"] = this.get_monster_data,
+		["SM_P_DOG"] = this.get_monster_data,
+		["SM_DOG_P"] = this.get_monster_data,
+		["SM_DOG_F"] = this.get_monster_data,
+		["AI_RAT"]   = this.get_monster_data,
+		["SM_SNORK"] = this.get_monster_data,
+		["SM_TUSHK"] = this.get_monster_data,
+		["SM_ZOMBI"] = this.get_monster_data,
+
+		["C_HLCP_S"] = this.get_heli_data,
+		--["SCRPTCAR"] = "cse_alife_car",
+
+		["ARTEFACT"] = this.get_item_data,
+		["SCRPTART"] = this.get_item_data,
+
+		--["AI_GRAPH"] = "cse_alife_graph_point",
+
+		["ON_OFF_S"] = this.get_squad_data,
+
+		["LVL_CHNG"] = this.get_level_changer_data,
+		["SCRIPTZN"] = this.get_space_restrictor_data,
+		--["Z_TEAMBS"] = "cse_alife_team_base_zone",
+		["SPC_RS_S"] = this.get_space_restrictor_data,
+		["SMRT_C_S"] = this.get_smart_cover_data,
+		--["SMRTTRRN"] = "se_smart_terrain",
+
+		["II_ATTCH"] = this.get_item_data,
+		["II_BTTCH"] = this.get_item_data,
+
+		["II_DOC"]   = this.get_item_document_data,
+
+		["SO_HLAMP"] = this.get_lamp_data,
+		--["O_SEARCH"] = "cse_alife_object_projector",
+		["TORCH_S"]  = this.get_item_data,
+
+		--["O_BRKBL"]  = "cse_alife_object_breakable",
+		["O_CLMBL"]  = this.get_climable_data,
+
+		["O_PHYS_S"] = this.get_physic_data,
+		["O_DSTR_S"] = this.get_physic_data,
+		--["P_SKELET"] = "cse_alife_ph_skeleton_object",
+
+		["S_INVBOX"] = this.get_inv_box_data,
+
+		["DET_SIMP"] = this.get_item_data,
+		["DET_ADVA"] = this.get_item_data,
+		["DET_ELIT"] = this.get_item_data,
+		["DET_SCIE"] = this.get_item_data,
+
+		["E_STLK"]   = this.get_item_data,
+		["E_HLMET"]  = this.get_item_data,
+
+		["II_BANDG"] = this.get_item_data,
+		["II_MEDKI"] = this.get_item_data,
+		["II_ANTIR"] = this.get_item_data,
+		["II_BOTTL"] = this.get_item_data,
+		["II_FOOD"]  = this.get_item_data,
+		["S_FOOD"]   = this.get_item_data,
+
+		["S_PDA"]    = this.get_item_pda_data,
+		["D_PDA"]    = this.get_item_pda_data,
+
+		["II_BOLT"]  = this.get_item_data,
+
+		["WP_AK74"] = this.get_weapon_data,
+		["WP_ASHTG"] = this.get_weapon_data,
+		["WP_BINOC"] = this.get_weapon_data,
+		["WP_BM16"] = this.get_weapon_data,
+		["WP_GROZA"] = this.get_weapon_data,
+		["WP_HPSA"] = this.get_weapon_data,
+		["WP_KNIFE"] = this.get_weapon_data,
+		["WP_LR300"] = this.get_weapon_data,
+		["WP_PM"] = this.get_weapon_data,
+		["WP_RG6"] = this.get_weapon_data,
+		["WP_RPG7"] = this.get_weapon_data,
+		["WP_SVD"] = this.get_weapon_data,
+		["WP_SVU"] = this.get_weapon_data,
+		["WP_VAL"] = this.get_weapon_data,
+		["W_MOUNTD"] = this.get_weapon_data,
+		["W_STMGUN"] = this.get_weapon_data,
+
+		["S_EXPLO"]  = this.get_item_data,
+
+		--["AMMO_S"]   = "cse_alife_item_ammo",
+		--["S_OG7B"]   = "cse_alife_item_ammo",
+		--["S_VOG25"]  = "cse_alife_item_ammo",
+		--["S_M209"]   = "cse_alife_item_ammo",
+
+		["G_F1_S"]   = this.get_item_data,
+		["G_RGD5_S"] = this.get_item_data,
+
+		["WP_SCOPE"] = this.get_item_data,
+		["WP_SILEN"] = this.get_item_data,
+		["WP_GLAUN"] = this.get_item_data,
+
+		["ZS_MBALD"] = this.get_anom_zone_data,
+		["ZS_GALAN"] = this.get_anom_zone_data,
+		["ZS_MINCE"] = this.get_anom_zone_data,
+		["ZS_RADIO"] = this.get_anom_zone_data,
+		["ZS_TORRD"] = this.get_anom_zone_data,
+		["ZS_BFUZZ"] = this.get_anom_zone_data,
+
+		["Z_MBALD"]  = this.get_anom_zone_data,
+		["Z_RADIO"]  = this.get_anom_zone_data,
+		["Z_CFIRE"]  = this.get_anom_zone_data,
+		["Z_NOGRAV"] = this.get_anom_zone_data,
+		["Z_TORRID"] = this.get_anom_zone_data
+	}
+	local class = alun_utils.read_from_ini(nil,sobj:section_name(),"class","string",nil)
+	if not (class) then 
+		return 
+	end 
+	
+	return m_classes[class] and m_classes[class](sobj) or nil
+end 
+
+function set_object_data(t,sobj)
+	if not (sobj) then
+		return 
+	end
+	local m_classes =	{
+		["S_ACTOR"]  = this.set_actor_data,
+
+		["AI_STL_S"] = this.set_stalker_data,
+		--["AI_TRD_S"] = "cse_alife_trader",
+
+		["SM_BLOOD"] = this.set_monster_data,
+		["SM_BOARW"] = this.set_monster_data,
+		["SM_BURER"] = this.set_monster_data,
+		["SM_CAT_S"] = this.set_monster_data,
+		["SM_CHIMS"] = this.set_monster_data,
+		["SM_CONTR"] = this.set_monster_data,
+		["AI_CROW"]  = this.set_abstract_data, -- could be wrong
+		["SM_DOG_S"] = this.set_monster_data,
+		["SM_FLESH"] = this.set_monster_data,
+		["SM_IZLOM"] = this.set_monster_data,
+		["SM_GIANT"] = this.set_monster_data,
+		["AI_PHANT"] = this.set_abstract_data, -- could be wrong
+		["SM_POLTR"] = this.set_monster_data,
+		["SM_P_DOG"] = this.set_monster_data,
+		["SM_DOG_P"] = this.set_monster_data,
+		["SM_DOG_F"] = this.set_monster_data,
+		["AI_RAT"]   = this.set_monster_data,
+		["SM_SNORK"] = this.set_monster_data,
+		["SM_TUSHK"] = this.set_monster_data,
+		["SM_ZOMBI"] = this.set_monster_data,
+
+		["C_HLCP_S"] = this.set_heli_data,
+		--["SCRPTCAR"] = "cse_alife_car",
+
+		["ARTEFACT"] = this.set_item_data,
+		["SCRPTART"] = this.set_item_data,
+
+		--["AI_GRAPH"] = "cse_alife_graph_point",
+
+		["ON_OFF_S"] = this.set_squad_data,
+
+		["LVL_CHNG"] = this.set_level_changer_data,
+		["SCRIPTZN"] = this.set_space_restrictor_data,
+		--["Z_TEAMBS"] = "cse_alife_team_base_zone",
+		["SPC_RS_S"] = this.set_space_restrictor_data,
+		["SMRT_C_S"] = this.set_smart_cover_data,
+		--["SMRTTRRN"] = "se_smart_terrain",
+
+		["II_ATTCH"] = this.set_item_data,
+		["II_BTTCH"] = this.set_item_data,
+
+		["II_DOC"]   = this.set_item_document_data,
+
+		["SO_HLAMP"] = this.set_lamp_data,
+		--["O_SEARCH"] = "cse_alife_object_projector",
+		["TORCH_S"]  = this.set_item_data,
+
+		--["O_BRKBL"]  = "cse_alife_object_breakable",
+		["O_CLMBL"]  = this.set_climable_data,
+
+		["O_PHYS_S"] = this.set_physic_data,
+		["O_DSTR_S"] = this.set_physic_data,
+		--["P_SKELET"] = "cse_alife_ph_skeleton_object",
+
+		["S_INVBOX"] = this.set_inv_box_data,
+
+		["DET_SIMP"] = this.set_item_data,
+		["DET_ADVA"] = this.set_item_data,
+		["DET_ELIT"] = this.set_item_data,
+		["DET_SCIE"] = this.set_item_data,
+
+		["E_STLK"]   = this.set_item_data,
+		["E_HLMET"]  = this.set_item_data,
+
+		["II_BANDG"] = this.set_item_data,
+		["II_MEDKI"] = this.set_item_data,
+		["II_ANTIR"] = this.set_item_data,
+		["II_BOTTL"] = this.set_item_data,
+		["II_FOOD"]  = this.set_item_data,
+		["S_FOOD"]   = this.set_item_data,
+
+		["S_PDA"]    = this.set_item_pda_data,
+		["D_PDA"]    = this.set_item_pda_data,
+
+		["II_BOLT"]  = this.set_item_data,
+
+		["WP_AK74"] = this.set_weapon_data,
+		["WP_ASHTG"] = this.set_weapon_data,
+		["WP_BINOC"] = this.set_weapon_data,
+		["WP_BM16"] = this.set_weapon_data,
+		["WP_GROZA"] = this.set_weapon_data,
+		["WP_HPSA"] = this.set_weapon_data,
+		["WP_KNIFE"] = this.set_weapon_data,
+		["WP_LR300"] = this.set_weapon_data,
+		["WP_PM"] = this.set_weapon_data,
+		["WP_RG6"] = this.set_weapon_data,
+		["WP_RPG7"] = this.set_weapon_data,
+		["WP_SVD"] = this.set_weapon_data,
+		["WP_SVU"] = this.set_weapon_data,
+		["WP_VAL"] = this.set_weapon_data,
+		["W_MOUNTD"] = this.set_weapon_data,
+		["W_STMGUN"] = this.set_weapon_data,
+
+		["S_EXPLO"]  = this.set_item_data,
+
+		--["AMMO_S"]   = "cse_alife_item_ammo",
+		--["S_OG7B"]   = "cse_alife_item_ammo",
+		--["S_VOG25"]  = "cse_alife_item_ammo",
+		--["S_M209"]   = "cse_alife_item_ammo",
+
+		["G_F1_S"]   = this.set_item_data,
+		["G_RGD5_S"] = this.set_item_data,
+
+		["WP_SCOPE"] = this.set_item_data,
+		["WP_SILEN"] = this.set_item_data,
+		["WP_GLAUN"] = this.set_item_data,
+
+		["ZS_MBALD"] = this.set_anom_zone_data,
+		["ZS_GALAN"] = this.set_anom_zone_data,
+		["ZS_MINCE"] = this.set_anom_zone_data,
+		["ZS_RADIO"] = this.set_anom_zone_data,
+		["ZS_TORRD"] = this.set_anom_zone_data,
+		["ZS_BFUZZ"] = this.set_anom_zone_data,
+
+		["Z_MBALD"]  = this.set_anom_zone_data,
+		["Z_RADIO"]  = this.set_anom_zone_data,
+		["Z_CFIRE"]  = this.set_anom_zone_data,
+		["Z_NOGRAV"] = this.set_anom_zone_data,
+		["Z_TORRID"] = this.set_anom_zone_data
+	}
+	local class = alun_utils.read_from_ini(nil,sobj:section_name(),"class","string",nil)
+	if not (class) then 
+		return 
+	end 
+	
+	return m_classes[class] and m_classes[class](t,sobj) or nil
+end 
+
 function get_abstract_data(stpk)
 	if (stpk:r_eof()) then 
 		return
@@ -79,9 +358,6 @@ function get_squad_data(sobj)
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_alife_online_offline_group_properties_packet(t,stpk)
@@ -106,9 +382,6 @@ function get_weapon_data(sobj)
 	end
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
-	if (stpk:r_eof()) then 
-		return
-	end
 	stpk:r_seek(2)
 	
 	local t = {}
@@ -140,9 +413,6 @@ function get_item_data(sobj)
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -173,9 +443,6 @@ function get_inv_box_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -204,9 +471,6 @@ function get_item_document_data(sobj)
 	stpk:w_begin(0)
 	sobj:STATE_Write(stpk)
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -238,9 +502,6 @@ function get_item_pda_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -274,9 +535,6 @@ function get_actor_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -312,9 +570,6 @@ function get_stalker_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_trader_abstract_properties_packet(t,stpk)
@@ -346,6 +601,38 @@ function set_stalker_data(t,sobj)
 	end
 end
 
+function get_monster_data(sobj)
+	if not (sobj) then return end
+	stpk:w_begin(0)
+	sobj:STATE_Write(stpk)
+	
+	stpk:r_seek(2)
+	
+	local t = {}
+	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
+	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
+	stpk_utils.parse_cse_alife_creature_abstract_properties_packet(t,stpk)
+	stpk_utils.parse_cse_alife_monster_abstract_properties_packet(t,stpk)
+	stpk_utils.parse_cse_ph_skeleton_properties_packet(t,stpk)
+	stpk_utils.parse_se_monster_properties_packet(t,stpk)
+	return t
+end
+
+function set_monster_data(t,sobj)
+	if sobj then
+		stpk:w_begin(0)
+		stpk_utils.fill_cse_alife_object_properties_packet(t,stpk)
+		stpk_utils.fill_cse_visual_properties_packet(t,stpk)
+		stpk_utils.fill_cse_alife_creature_abstract_properties_packet(t,stpk)
+		stpk_utils.fill_cse_alife_monster_abstract_properties_packet(t,stpk)
+		stpk_utils.fill_cse_ph_skeleton_properties_packet(t,stpk)
+		stpk_utils.fill_se_monster_properties_packet(t,stpk)
+		local size = stpk:w_tell()
+		stpk:r_seek(2)
+		
+		sobj:STATE_Read(stpk,size)
+	end
+end
 
 function get_smart_cover_data(sobj)
 	if not sobj then
@@ -355,10 +642,7 @@ function get_smart_cover_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
-	
+
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_shape_properties_packet(t,stpk)
@@ -401,9 +685,6 @@ function get_climable_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -433,9 +714,6 @@ function get_heli_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -486,9 +764,6 @@ function get_lamp_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -520,9 +795,6 @@ function get_physic_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -554,9 +826,6 @@ function get_space_restrictor_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -587,9 +856,6 @@ function get_anom_zone_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
 	
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
@@ -627,10 +893,7 @@ function get_level_changer_data(sobj)
 	sobj:STATE_Write(stpk)
 	
 	stpk:r_seek(2)
-	if (stpk:r_eof()) then 
-		return
-	end
-	
+
 	local t = {}
 	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
 	stpk_utils.parse_cse_shape_properties_packet(t,stpk)

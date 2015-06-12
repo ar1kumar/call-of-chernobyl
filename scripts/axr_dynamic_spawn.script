@@ -1,7 +1,7 @@
 --[[
 -- axr_dynamic_spawn
 -- Alundaio
--- Updated 3/10/2014: Now requires Xetrill's lua.jit dll due to use of marshal library for encoding/decoding tables into blobs
+-- Updated 3/10/2014: Now requires use of marshal library for encoding/decoding tables into blobs
 
 	Copyright (C) 2012 Alundaio
 	This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
@@ -731,7 +731,7 @@ end
 -- cse_alife_item_document
 -------------------------------------------
 function dynamic.cse_alife_item_document(se_obj,t)
-	local data = stpk_utils.get_item_data(se_obj)
+	local data = stpk_utils.get_item_document_data(se_obj)
 	if not (data) then 
 		return 
 	end
