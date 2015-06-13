@@ -3,7 +3,8 @@ active    = sr_idle@wait
  
 [sr_idle@wait]
 ;on_info = {+bar_deactivate_radar_done} sr_sound_act@psy_sound %=run_cam_effector(radar_stop:2506:false)%
-on_info = {+bar_deactivate_radar_done} sr_idle@passive %=run_cam_effector(radar_stop:2506:false) =play_sound(brain_scorcher_rumble) =disable_ui%
+on_info = {=actor_community(actor_monolith)} sr_idle@nil
+on_info2 = {+bar_deactivate_radar_done} sr_idle@passive %=run_cam_effector(radar_stop:2506:false) =play_sound(brain_scorcher_rumble) =disable_ui%
 
 ;[sr_sound_act@psy_sound]
 ;snd = affects\psy_blackout
