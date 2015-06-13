@@ -56,6 +56,10 @@ function light_campfire(npc)
 		return eval_reset(st)
 	end 
 	
+	if (render_get_dx_level() == 655361) then 
+		camp:enable_anomaly()
+	end 
+	
 	if (CFZone:is_on()) then
 		return eval_reset(st)
 	end
@@ -110,6 +114,8 @@ function eva_turn_on_campfire:find_valid_target()
 	if (campfires == nil or empty(campfires)) then
 		return false
 	end
+	
+	local is_dx11 = render_get_dx_level() == 655361
 
 	local npc_id = npc:id()
 	local camp, selected_id
@@ -153,10 +159,12 @@ function eva_turn_on_campfire:evaluate()
 		return false 
 	end
 
-	--local hrs = level.get_time_hours()
-	--if not (hrs < 6 or hrs > 19) then
-		--return false
-	--end
+	--[[
+	local hrs = level.get_time_hours()
+	if not (hrs < 6 or hrs > 19) then
+		return false
+	end
+	--]]
 
 	-- testing
 	--if (state_mgr.get_state(npc) == "roast_kolbasa") then

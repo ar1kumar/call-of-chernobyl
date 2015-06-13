@@ -20,7 +20,8 @@ id_to_spawn_table = {
 		[12] = "Weapons (Addon)",
 		[13] = "Weapons (Misc.)",
 		[14] = "Weapons (Pistol)",
-		[15] = "Weapons (Rifle)"
+		[15] = "Weapons (Rifle)",
+		[16] = "Vehicles"
 }
 
 function get_spawn_table(name)
@@ -529,6 +530,26 @@ function get_spawn_table(name)
 				"simulation_psysucker",
 				"simulation_controller_psy"
 				}
+	elseif (name == "Vehicles") then 
+		return { 
+				"veh_niva",
+				"veh_uaz_01",
+				"veh_uaz_02",
+				"veh_uaz_buhanka",
+				"veh_zaz",
+				"veh_zaz_968",
+				"veh_moskvich",
+				"veh_tr13",
+				"veh_zil_130",
+				"veh_zil_131",
+				"veh_kamaz_fura",
+				"veh_kamaz",
+				"veh_laz",
+				"veh_kavz",
+				"veh_gaz",
+				"veh_btr",
+				"veh_hl2baggi"
+		}
 	elseif (name == "Physic (Misc.)") then
 		return {
 				"mine_blow",
@@ -1170,6 +1191,7 @@ function debug_ui:FillList(name)
 	
 	local is_squad = string.find(name,"Squad")
 	local cant_spawn_actor = string.find(name,"NPC") or string.find(name,"Physic")
+	local is_veh = string.find(name,"Vehicles")
 	
 	if (is_squad) then 
 	--	self.smarts_list:Show(true)
@@ -1193,6 +1215,9 @@ function debug_ui:FillList(name)
 				_itm.squad = true
 			elseif (cant_spawn_actor) then
 				_itm.no_id = true
+			elseif (is_veh) then 
+				_itm.no_id = true
+				_itm.spawn_at_look = true
 			end
 
 			self.spawn_list:AddExistingItem(_itm)
@@ -1282,7 +1307,15 @@ function debug_ui:OnButton_create_clicked()
 	end
 
 	local pos, lvid, gvid
-	if (self.spawn_pos) then
+	
+	if (item.spawn_at_look) then 
+		gvid = db.actor:game_vertex_id()
+		local r = level.get_target_dist and level.get_target_dist() or 3
+		pos = utils.vector_copy_by_val(db.actor:position())
+		pos:add(device().cam_dir:mul(r))
+		pos = vector():set(pos.x,db.actor:position().y,pos.z)
+		lvid = level.vertex_id(pos)
+	elseif (self.spawn_pos) then
 		pos = self.spawn_pos
 		lvid = self.spawn_lvid
 		gvid = self.spawn_gvid

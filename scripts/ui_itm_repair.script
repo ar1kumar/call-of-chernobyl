@@ -98,7 +98,7 @@ function repair_ui:InitControls()
 
 	ctrl					= CUIWindow()
 	self.xml:InitWindow			("itm_repair:file_item:main",0,ctrl)
-
+	
 	self.file_item_main_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
 
 	self.xml:InitWindow			("itm_repair:file_item:fn",0,ctrl)
@@ -108,6 +108,8 @@ function repair_ui:InitControls()
 	self.file_item_fd_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
 
 	self.form				= self.xml:InitStatic("itm_repair:form",self)
+	--background window
+	self.xml:InitFrame			("itm_repair:form:frame",self.form)
 	--self.form:SetWndPos(vector2():set(device().width/2-(self.form:GetWidth()+70), device().height/2 - self.form:GetHeight()))
 	self.form:SetWndPos(vector2():set(0, 0))
 
