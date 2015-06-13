@@ -7,8 +7,8 @@ on_actor_inside = sr_timer@1 %=play_snd(characters_voice\scenario\radar\rad_hat_
  
 [sr_timer@1]
 type = dec
-start_value = 1000000
+start_value = 360000
 on_value = 5 | %=play_snd(characters_voice\scenario\radar\rad_hat_2)% | 0 | nil %=kill_actor%
-on_actor_outside = sr_idle
+;on_actor_outside = sr_idle
 on_info = {+bar_deactivate_radar_done} nil
 string = st_helmet_countdown
