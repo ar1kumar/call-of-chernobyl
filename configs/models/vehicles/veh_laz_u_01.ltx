@@ -1,120 +1,123 @@
 ;-------------------------------------------------------------------------------
-;----- Трактор Т-40 ------------------------------------------------------------
+;----- ЛАЗ-42021 ---------------------------------------------------------------
 ;-------------------------------------------------------------------------------
 
 [car_definition]
-camera_pos			= 0.0,2.2,-0.88
 
-driving_wheels			= back_left_wheel,back_right_wheel                                      ; ведущие колёса
+camera_pos			= -0.3, 2.0, 1.8	;смещение камеры в кабине влево-вправо, вверх-вниз, вперед-назад
+
+driving_wheels			= back_left_wheel,back_right_wheel   ; ведущие колёса
 steering_wheels			= front_left_wheel,front_right_wheel                                    ; рулевые колёса
-breaking_wheels			= back_left_wheel,back_right_wheel,front_left_wheel,front_right_wheel   ; тормозящие колёса
-doors				= left_door,right_door                                                  ; двери
+breaking_wheels			= front_left_wheel,front_right_wheel,back_left_wheel,back_right_wheel   ; тормозящие колёса
+doors				= doors                                                                 ; двери
 steer				= stearing_wheel                                                        ; руль
 driver_place			= seat_left                                                             ; место водителя
 exhausts			= exhausts                                                              ; выхлопная труба
-exhaust_particles 		= vehiclefx\exhaust_1
-
-damage				= damage_bones
+exhaust_particles		= vehiclefx\exhaust_1
 
 ;-------------------------------------------------------------------------------
 ;------ Factory parameters of Engine -------------------------------------------
 
-fuel_tank			= 80         	; L
-fuel_consumption		= 1.8		    ; L / (100k R); liters per 100 000 rotations
-engine_power			= 37        	; horse_power (kW=hp*0.808) max power
-max_power_rpm			= 2200        	; (nominal rpm ) on this rpm value engine power reaches maximum
-max_torque_rpm			= 1600       	; on this rpm engine torque reaches maximum
+fuel_tank			= 170		; L
+fuel_consumption		= 19		; L / (100k R); liters per 100 000 rotations
+engine_power			= 180		; horse_power (kW=hp*0.808) max power
+max_power_rpm			= 4000		; (nominal rpm ) on this rpm value engine power reaches maximum
+max_torque_rpm			= 3500		; on this rpm engine torque reaches maximum
 
 power_increment_factor		= 0.02
-power_decrement_factor		= 0.7
-rpm_increment_factor		= 0.02
-rpm_decrement_factor		= 0.7
-m_power_neutral_factor		= 0.75
+power_decrement_factor		= 0.15
+rpm_increment_factor		= 0.05
+rpm_decrement_factor		= 0.3
+m_power_neutral_factor		= 0.25
 
 ; additional engine parameters
 
-max_engine_rpm			= 4000		; rpm (5000) rpm will never be more
-idling_engine_rpm		= 600       	; rpm (750) min rpm - starts from this rpm value
+max_engine_rpm			= 5000		; rpm (5000) rpm will never be more
+idling_engine_rpm		= 750		; rpm (750) min rpm - starts from this rpm value
 
 ;-------------------------------------------------------------------------------
 ;------ Adjustment a wheel -----------------------------------------------------
 
-reference_radius		= 0.88		; Радиус колеса, используемый при просчёте двигателя
-axle_friction     		= 0.0001	; Ослабление скорости в неетральной позиции. (N*m)
-steering_speed    		= 0.4       ; Время поворота рулевого колеса, в максимум. rps (1)
-steering_torque   		= 900000    ; Сила гидроусилителя руля. (N*m)
-break_torque			= 0.065		; Сила тормозных колодок. (N*m
-break_time        		= 0.9       ; время нарастания силы торможения до максимума, при подтормаживании (стрелка назад)
-hand_break_torque		= 0.06  	; сила торможения пробелом (по умолчанию = break_torque)
+reference_radius		= 0.57
+axle_friction			= 0.0001
+steering_speed			= 0.7
+steering_torque			= 90000
+break_torque			= 0.05
+break_time			= 0.7
+hand_break_torque		= 0.07
 
 ;-------------------------------------------------------------------------------
 ;------ Gearbox ----------------------------------------------------------------
 
-main_gear_ratio    		= 25.15         ; Передаточное отношение
-auto_transmission  		= on            ; Автоматическая коробка (on/off)
+main_gear_ratio			= 30.1		; Передаточное отношение
+auto_transmission		= on		; Автоматическая коробка (on/off)
 
 [transmission_gear_ratio]
-										; shift down/ shift up. (rpm, необходимое для переключения)
-R                  		= 3.000,1600,16000
-N1                 		= 4.113,1600,2400
-N2                 		= 2.571,1600,2400
-;N3       	          	= 1.607,1600,2400
-;N4				= 1.004,1600,16000
+
+R				= 5.02, 2500,4250;740,  3000	; shift down/ shift up. (rpm, iaiaoiaeiia aey ia?aee??aiey)
+N1				= 5.38, 2500,4250;740,  1500
+N2				= 4.29, 2500,4250;1200, 2750
+N3				= 3.04, 2500,4250;2050, 2850
+N4				= 2.25, 2500,4250;2200, 3000
 
 ;-------------------------------------------------------------------------------
 ;------ Rest Adjustment --------------------------------------------------------
 
 [lights]
-headlights         		= f1,f2
+headlights			= f1,f2
 
 [f1]
-bone               		= left_light
-color              		= 0.6,0.6,0.6,0.5
-range              		= 25
-cone_angle         		= 80
-spot_texture       		= lights\lights_torch_01
-glow_texture       		= glow\glow_Yellow
-glow_radius        		= 0.5
+bone				= left_light
+color				= 1.0,1.0,1.0,1.0
+range				= 40
+cone_angle			= 90
+spot_texture			= lights\lights_ray1
+glow_texture			= glow\glow_Yellow
+glow_radius			= 0
 
 [f2]
 bone				= right_light
-color				= 0.6,0.6,0.6,0.6
-range				= 25
-cone_angle			= 80
-spot_texture			= lights\lights_torch_01
+color				= 1.0,1.0,1.0,1.0
+range				= 40
+cone_angle			= 90
+spot_texture			= lights\lights_ray1
 glow_texture			= glow\glow_Yellow
-glow_radius			= 0.5
+glow_radius			= 0
 
 [car_sound]
 snd_volume			= 1.0
-snd_name			= car\veh_zaz\traktor_run
-;engine_sound_start_dellay	= 0.5
-;engine_start			= car\veh_zaz\engine_start
-engine_stop			= car\veh_zaz\engine_stop
-transmission_switch		= car\veh_zaz\gearchange
-explosion_sound			= weapons\heli_explosion
-relative_pos			= 0.0,0.5,2.0.
+snd_name			= car\veh_laz\engine_run
+engine_sound_start_dellay	= 0.5
+engine_start			= car\veh_laz\engine_start
+engine_stop			= car\veh_laz\engine_stop
+transmission_switch		= car\veh_laz\gearchange
+explosion_sound			= 
+relative_pos			= 0.0,0.5,1.5.
 
 ;-------------------------------------------------------------------------------
 ;------ damage params ----------------------------------------------------------
 
 [damage_particles]
 
-explosion_particles		= explosions\expl_vehichels
+explosion_particles		= explosions\expl_car
 car_damage_particles1		= explosions\expl_car_smoke_small
 car_damage_particles2		= explosions\expl_car_smoke_big
 wheels_damage_particles1	= vehiclefx\exhaust_1
 wheels_damage_particles2	= vehiclefx\exhaust_1
-
-particle_bones1			= kabina
-particle_bones2			= root
+particle_bones1			= root
+particle_bones2			= exhausts
+;particle_bones1		= front_bamper
+particle_bones3			= back_right_wheel
+particle_bones4			= front_left_wheel
+particle_bones5			= front_right_wheel
+particle_bones6			= back_left_wheel
 
 ;-------------------------------------------------------------------------------
 ;------ particle bones ---------------------------------------------------------
 
 [particle_bones]
-root				=  0.5,-0.5,1
-kabina				=  0.5,-0.5,1
+root				= 0,-0.5,1
+exhausts			= 0,0,0
 
 ;-------------------------------------------------------------------------------
 ;------ damage items -----------------------------------------------------------
@@ -124,17 +127,13 @@ back_left_wheel			= 5000
 back_right_wheel		= 5000
 front_left_wheel		= 5000
 front_right_wheel		= 5000
-left_door			= 2000
-right_door			= 2000
+doors				= 2000
 
 ;-------------------------------------------------------------------------------
 ;------ collisiondamage --------------------------------------------------------
 
 [collision_damage]
 root				= 0.0001
-kabina				= 0.0001
-left_door			= 0.0001
-right_door			= 0.0001
 back_left_wheel			= 0.00001
 back_right_wheel		= 0.00001
 front_left_wheel		= 0.00001
@@ -144,14 +143,14 @@ front_right_wheel		= 0.00001
 ;------ damage bones -----------------------------------------------------------
 
 [damage_bones]			;аналогично секции в актере, но без анимаций
-;bone_name     			= <hit_scale>,<-1>,<wound_scale>
-;<hit_scale> 			- коэфф. изменения хита (уменьшения здоровья)
-;<wound_scale> 			- коэфф. изменения величины открытой раны - незадействован
+;bone_name			= <hit_scale>,<-1>,<wound_scale>
+;<hit_scale>			- коэфф. изменения хита (уменьшения здоровья)
+;<wound_scale>			- коэфф. изменения величины открытой раны - незадействован
 
-default       			= 1, -1, 0.1
+default				= 1, -1, 0.1
 
 [immunities]
-burn_immunity			= 0.0       ;коэффициенты иммунитета
+burn_immunity			= 0.0	;коэффициенты иммунитета
 strike_immunity			= 0.0
 shock_immunity			= 0.0
 wound_immunity			= 0.0
@@ -184,10 +183,10 @@ light_time 			= 0.5
 ;трассы от осколков
 fragment_speed			= 76
 fragment_tracer_max_length	= 3
-explode_duration		= 50			;подолжительность взрыва (с)
+explode_duration    		= 50			;подолжительность взрыва (с)
 
 ;звуки
-snd_explode			= weapons\heli_explosion
+snd_explode 			= weapons\heli_explosion
 ;wallmarks
 wallmark_section		= explosion_marks
 
@@ -200,9 +199,11 @@ effect_sect_name= effector_explode_hit
 [collide]
 not_collide_parts		= 1
 
+;-------------------------------------------------------------------------------
+;------ destroyed part ---------------------------------------------------------
+
 [autoremove_parts]
 time				= 60
 
 ;-------------------------------------------------------------------------------
 ;------ End params -------------------------------------------------------------
-;-------------------------------------------------------------------------------
