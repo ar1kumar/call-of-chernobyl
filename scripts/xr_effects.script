@@ -274,7 +274,7 @@ function setup_companion_task(actor,npc,p)
 	end
 
 	--alun_utils.save_var(db.actor,p[3] or "task_companion_slot_1",squad.id)
-	create_delayed_event(0,"add_special_task_squad",5,add_special_task_squad,squad.id,p[4] == "true")
+	CreateDelayedEvent(0,"add_special_task_squad",5,add_special_task_squad,squad.id,p[4] == "true")
 end
 
 -- setup for special escort to anomaly task
@@ -1410,7 +1410,7 @@ function remove_npc(actor, npc, p)
 	if npc_id ~= nil then
 		local sim = alife()
 		if (axr_main) then
-			create_delayed_event(npc_id,"safe_release",5,alun_utils.release_object,npc_id)
+			CreateDelayedEvent(npc_id,"safe_release",5,alun_utils.release_object,npc_id)
 			return
 		end
 		sim:release(sim:object(npc_id), true)
@@ -1736,7 +1736,6 @@ end
 function on_tutor_gameover_quickload()
 	local c = get_console()
 	c:execute("load_last_save")
-	if (axr_main) then axr_main.on_save_game_load("load_last_save") end
 end
 
 
@@ -1944,7 +1943,7 @@ function destroy_object(actor, obj, p)
 
 	local sim = alife()
 	if (axr_main) then
-		create_delayed_event(sobj.id,"safe_release",1,alun_utils.release_object,sobj.id)
+		CreateDelayedEvent(sobj.id,"safe_release",1,alun_utils.release_object,sobj.id)
 		return
 	end
 	sim:release(sobj, true)
@@ -2921,7 +2920,6 @@ function scenario_autosave(actor, npc, p)
 		local prefix = axr_misery and axr_misery.ActorClass or user_name()
 		local save_param = prefix.." - "..game.translate_string(save_name)
 
-		if (axr_main) then axr_main.on_save_game_save(save_param) end
 		get_console():execute("save "..save_param)
 	end
 end
@@ -4103,7 +4101,7 @@ function make_a_wish(actor,npc,p)
 		for i=1,65534 do
 			squad = sim:object(i)
 			if (squad and squad:clsid() == clsid.online_offline_group_s) then 
-				create_delayed_event(squad.id,"remove_this_squad",math.random(1,10),remove_this_squad,squad.id)
+				CreateDelayedEvent(squad.id,"remove_this_squad",math.random(1,10),remove_this_squad,squad.id)
 			end
 		end
 		give_info("actor_made_wish_for_peace")
@@ -4139,7 +4137,7 @@ function make_a_wish(actor,npc,p)
 			db.actor:iterate_inventory(itr,db.actor)
 		end
 		
-		create_delayed_event(0,"remove_backpack",5,remove_backpack,0)
+		CreateDelayedEvent(0,"remove_backpack",5,remove_backpack,0)
 		
 		give_info("actor_made_wish_for_riches")
 		give_info("actor_made_wish")
@@ -4256,7 +4254,7 @@ function change_visual(actor,npc,p)
 		return
 	end
 	if (axr_main) then
-		create_delayed_event(sobj.id,"update_visual",5,update_visual,sobj.id,p[1])
+		CreateDelayedEvent(sobj.id,"update_visual",5,update_visual,sobj.id,p[1])
 	end
 end
 

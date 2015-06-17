@@ -641,6 +641,18 @@ function r_CTime( p, caller )
 		return 0
 	end
 end
+
+function CTime_to_table(ct)
+	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
+	Y, M, D, h, m, s, ms = ct:get(Y, M, D, h, m, s, ms)
+	return { Y=Y, M=M, D=D, h=h, m=m, s=s, ms=ms }
+end
+
+function CTime_from_table(t)
+	local ct = game.CTime()
+	ct:set(t.Y,t.M,t.D,t.h,t.m,t.s,t.ms)
+	return ct
+end
 ---------------------------------------------------------------------------
 
 -- отослать в ближайшую разрешённую ноду по направлению к заданной.

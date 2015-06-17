@@ -2,47 +2,137 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-function callback_register(name,func)
-	axr_main.callback_register(name,func)
-end 
-
-function callback_unregister(name,func)
-	axr_main.callback_unregister(name,func)
-end
+GAME_VERSION = "1.0.5"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
-end 	
+end
 
---------------------------------------------------------------------
-function memoize (f) --supports only first argument
-	local mem = {} -- memoizing table
-	setmetatable(mem, {__mode = "kv"}) -- make it weak
-	return function (x,...) -- new version of ’f’, with memoizing
-		local r = x and mem[x]
-		if r == nil then -- no previous result?
-			r = f(x,...) -- calls original function
-			if (x) then
-				mem[x] = r -- store result for reuse
+-------------------------------------------------------------------------------------------------
+-- Use marshal library for saving persistent data (like xr_logic pstor)
+-- marshal library can encode tables, functions, strings and numbers to easily allow persistent data storage to file
+-- This is used for db.storage[id].pstor, surge_manager, mines, and coc_treasure_manager.script if enabled
+-- See alife_storage_manager.script for implementation
+require("lua_extensions")
+marshal = require "marshal"
+USE_MARSHAL = marshal ~= nil
+
+function RegisterScriptCallback(name,func)
+	axr_main.callback_set(name,func)
+end 
+
+function UnregisterScriptCallback(name,func)
+	axr_main.callback_unset(name,func)
+end
+
+-- Call this from a script to create a new callback to functions that register for it with RegisterScriptCallback
+-- Every time this function is executed it will callback to all registered members
+-- If axr_main.script has a function by this name, it will automatically trigger it!
+function CreateScriptCallback(name,...)
+	-- callback to all registered functions
+	axr_main.make_callback(name,...)
+	
+	-- check if axr_main has it's own function to execute
+	if (axr_main[name]) then 
+		axr_main[name](...)
+	end
+end
+--------------------------------------------
+-- Displays message on middle-top of screen for n amount of milliseconds
+-- Overwritten with each use!
+-- param 1 - Message as string
+-- param 2 - Milliseconds as number
+--------------------------------------------
+function SetHudMsg(msg,n)
+	msg = tostring(msg)
+	local hud = get_hud()
+	hud:AddCustomStatic("not_enough_money_mine", true)
+	hud:GetCustomStatic("not_enough_money_mine"):wnd():TextControl():SetTextST(msg)
+	axr_main.ShowMessageTime = time_global() + n*1000
+end
+
+--------------------------------------------------------------------------------------------
+-- 								Delayed Event Queue
+--
+-- Events must have a unique id. Such as object id or another identifier unique to the occasion.
+-- Action id must be unique to the specific Event. This allows a single event to have many queued
+-- actions waiting to happen.
+--
+-- Returning true will remove the queued action. Returning false will execute the action continuously.
+-- This allows for events to wait for a specific occurrence, such as triggering after a certain amount of
+-- time only when object is offline
+--
+-- param 1 - Event ID as type<any>
+-- param 2 - Action ID as type<any>
+-- param 3 - Timer in seconds as type<number>
+-- param 4 - Function to execute as type<function>
+-- extra params are passed to executing function as table as param 1
+
+-- see on_game_load or state_mgr_animation.script for example uses
+-- This does not persists through saves! So only use for non-important things.
+-- For example, do not try to destroy npcs unless you do not care that it can fail before player saved then loaded.
+----------------------------------------------------------------------------------------------
+local ev_queue = {}
+function CreateDelayedEvent(ev_id,act_id,timer,f,...)
+	if not (ev_queue[ev_id]) then
+		ev_queue[ev_id] = {}
+		ev_queue[ev_id].size = 0
+	end
+
+	if not (ev_queue[ev_id][act_id]) then
+		ev_queue[ev_id][act_id] = {}
+		ev_queue[ev_id][act_id].game_time = game.get_game_time()
+		ev_queue[ev_id][act_id].timer = timer
+		ev_queue[ev_id][act_id].f = f
+		ev_queue[ev_id][act_id].p = {...}
+		ev_queue[ev_id].size = ev_queue[ev_id].size + 1
+	end
+end
+function ProcessEventQueue(force)
+	local gt
+	for event_id,actions in pairs(ev_queue) do
+
+		for action_id,act in pairs(actions) do
+			--alun_utils.debug_write(alun_utils.sr("event_queue: event_id=%s action_id=%s",event_id,action_id))
+			if (action_id ~= "size") then
+				gt = act.game_time
+				if (gt == nil) or (force) or (game.get_game_time():diffSec(gt) >= act.timer) then
+					if (act.f(act.p,force) == true) then
+						ev_queue[event_id][action_id] = nil
+						ev_queue[event_id].size = ev_queue[event_id].size - 1
+					end
+				end
 			end
 		end
-		return r
+
+		if (ev_queue[event_id].size == 0) then
+			ev_queue[event_id] = nil
+		end
 	end
 end
 --------------------------------------------------------------------
-game.CTime.__size = 4 * 9 -- guess based on ctime.h tm; most likely wrong
-function game_CTime___persist(self)
-	local Y, M, D, h, m, s, ms = 0,0,0,0,0,0,0
-	Y, M, D, h, m, s, ms = self:get(Y, M, D, h, m, s, ms)
-	return function ()
-		local t = game.CTime()
-		t:set(Y, M, D, h, m, s, ms)
-		return t
+-- Serialization for Marshal Library
+--------------------------------------------------------------------
+--[[ sadly doesn't seem reliable
+if (marshal) then
+	game.CTime.__size = 4 * 9 -- guess based on ctime.h tm; most likely wrong
+	function game_CTime___persist(self)
+		local Y, M, D, h, m, s, ms = 0,0,0,0,0,0,0
+		Y, M, D, h, m, s, ms = self:get(Y, M, D, h, m, s, ms)
+		return function ()
+			local t = game.CTime()
+			t:set(Y, M, D, h, m, s, ms)
+			return t
+		end
 	end
+	local _t = game.CTime()
+	local _m = getmetatable(_t)
+	_m.__persist = game_CTime___persist
+	
+	
+	
 end
-local _t = game.CTime()
-local _m = getmetatable(_t)
-_m.__persist = game_CTime___persist
+--]]
 --------------------------------------------------------------------
 function empty	(container)
 	if (type(container) == "function") then
@@ -66,7 +156,7 @@ end
 schemes = {}
 schemes_by_stype = {}
 
-function load_scheme(filename, scheme, ...)
+function LoadScheme(filename, scheme, ...)
 	assert(_G[filename],filename.." is nil!")
 	schemes[scheme] = filename
 	
@@ -271,7 +361,7 @@ function random_choice(...)
 	end
 end
 
-function set_current_time (hour, min, sec)
+function set_current_time(hour, min, sec)
 	local current_time_factor = level.get_time_factor ()
 	printf ("Need time : %d:%d:%d", hour, min, sec)
 	local current_time = game.time ()
@@ -646,6 +736,9 @@ function start_game_callback()
 	aa = alife()
 
 	printf("start_game_callback")
+	if (USE_MARSHAL) then 
+		printf("using marshal library")
+	end 
 	-- Alundaio
 	if (axr_main) then axr_main.on_game_start() end
 	-- End Alundaio

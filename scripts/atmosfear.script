@@ -3,8 +3,11 @@
 -- Made by Cromm Cruac ---------------------------------------------------------
 -- for AtmosFear 3 -------------------------------------------------------------
 -- 25.06.2011 ------------------------------------------------------------------
+-- modified by Alundaio
+	-- added INI support
+	-- valid levels auto-detected
 --------------------------------------------------------------------------------
-local atmosfear = nil
+local AtmosFear = nil
 
 class "CAtmosFear"
 function CAtmosFear:__init()
@@ -17,11 +20,10 @@ function CAtmosFear:__init()
 	self.valid_levels = {}
 	
 	local gini = game_ini()
-	local sim = alife()
+	local sim,gg = alife(),game_graph()
 	local weather
 	
-	if (sim) then  -- alife simulator started
-		local gg = game_graph()
+	if (sim and gg) then  -- alife simulator started
 		local level_name
 		for level in gg:levels() do
 			level_name = sim:level_name(level.id)
@@ -42,7 +44,7 @@ function CAtmosFear:__init()
 	
 	self.ini = alun_utils.cfg_file(alun_utils.fspath("$game_data$").."atmosfear_options.ini")
 	if not (self.ini:SectionExist("atmosfear_current_parameters")) then
-	self:loadDefaultParameters()
+		self:loadDefaultParameters()
 		self.ini:Save()
 	end
 	--self.debugMessages[18]:SetText("aspectRatio="..tostring(self.aspectRatio))
@@ -118,80 +120,6 @@ function CAtmosFear:hit_power(power,hit_type)
 	--self.debugMessages[11]:SetText("gametime="..tostring(CTimeToSec(game.get_game_time())))
 	--self.debugMessages[12]:SetText("expiration set to="..tostring(xr_logic.pstor_retrieve(db.actor,"drug_psy_blockade_expiration")))
 	return hit_power
-end
-
-function CAtmosFear:save(packet)
-	--[[
-	packet:w_stringZ(self.opt_weather_balance_presets)
-	packet:w_stringZ(self.opt_weather_length_presets)
-	packet:w_stringZ(self.opt_zaton_period_good)
-	packet:w_stringZ(self.opt_zaton_period_bad)
-	packet:w_u32(self.opt_zaton_period_good_length)
-	packet:w_u32(self.opt_zaton_period_bad_length)
-	packet:w_stringZ(self.opt_jupiter_period_good)
-	packet:w_stringZ(self.opt_jupiter_period_bad)
-	packet:w_u32(self.opt_jupiter_period_good_length)
-	packet:w_u32(self.opt_jupiter_period_bad_length)
-	packet:w_stringZ(self.opt_pripyat_period_good)
-	packet:w_stringZ(self.opt_pripyat_period_bad)
-	packet:w_u32(self.opt_pripyat_period_good_length)
-	packet:w_u32(self.opt_pripyat_period_bad_length)
-	packet:w_u32(self.opt_enable_blowout)
-	packet:w_u32(self.opt_blowout_freq)
-	packet:w_stringZ(self.opt_blowout_fate)
-	packet:w_stringZ(self.opt_blowout_warning)
-	packet:w_stringZ(self.opt_blowout_task)
-	packet:w_u32(self.opt_enable_fallout)
-	packet:w_u32(self.opt_fallout_freq)
-	packet:w_stringZ(self.opt_fallout_fate)
-	packet:w_stringZ(self.opt_fallout_warning)
-	packet:w_stringZ(self.opt_fallout_task)
-	packet:w_u32(self.opt_enable_psi_storm)
-	packet:w_u32(self.opt_psi_storm_freq)
-	packet:w_stringZ(self.opt_psi_storm_fate)
-	packet:w_stringZ(self.opt_psi_storm_warning)
-	packet:w_stringZ(self.opt_psi_storm_task)
-	packet:w_stringZ(self.opt_moon_phase)
-	packet:w_stringZ(self.opt_night_brightness)
-	--]]
-end
-
-function CAtmosFear:load(packet)
-	--[[
-	set_save_marker(packet, "load", false, "AtmosFear")
-	self.opt_weather_balance_presets 			= packet:r_stringZ()
-	self.opt_weather_length_presets				= packet:r_stringZ()
-	self.opt_zaton_period_good					= packet:r_stringZ()
-	self.opt_zaton_period_bad					= packet:r_stringZ()
-	self.opt_zaton_period_good_length			= packet:r_u32()
-	self.opt_zaton_period_bad_length			= packet:r_u32()
-	self.opt_jupiter_period_good				= packet:r_stringZ()
-	self.opt_jupiter_period_bad					= packet:r_stringZ()
-	self.opt_jupiter_period_good_length			= packet:r_u32()
-	self.opt_jupiter_period_bad_length			= packet:r_u32()
-	self.opt_pripyat_period_good				= packet:r_stringZ()
-	self.opt_pripyat_period_bad					= packet:r_stringZ()
-	self.opt_pripyat_period_good_length			= packet:r_u32()
-	self.opt_pripyat_period_bad_length			= packet:r_u32()
-	self.opt_enable_blowout						= packet:r_u32()
-	self.opt_blowout_freq						= packet:r_u32()
-	self.opt_blowout_fate						= packet:r_stringZ()
-	self.opt_blowout_warning					= packet:r_stringZ()
-	self.opt_blowout_task						= packet:r_stringZ()
-	self.opt_enable_fallout						= packet:r_u32()
-	self.opt_fallout_freq						= packet:r_u32()
-	self.opt_fallout_fate						= packet:r_stringZ()
-	self.opt_fallout_warning					= packet:r_stringZ()
-	self.opt_fallout_task						= packet:r_stringZ()
-	self.opt_enable_psi_storm					= packet:r_u32()
-	self.opt_psi_storm_freq						= packet:r_u32()
-	self.opt_psi_storm_fate						= packet:r_stringZ()
-	self.opt_psi_storm_warning					= packet:r_stringZ()
-	self.opt_psi_storm_task						= packet:r_stringZ()
-	self.opt_moon_phase							= packet:r_stringZ()
-	self.opt_night_brightness					= packet:r_stringZ()
-	set_save_marker(packet, "load", true, "AtmosFear")
-	--]]
 end
 
 function CAtmosFear:loadDefaultParameters()
@@ -291,9 +219,9 @@ function CTimeAddSec(ctime,sec)
 end
 
 function get_atmosfear()
-	if atmosfear == nil then
-		atmosfear = CAtmosFear()
+	if AtmosFear == nil then
+		AtmosFear = CAtmosFear()
 	end
-	return atmosfear
+	return AtmosFear
 end
 

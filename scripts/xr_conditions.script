@@ -1429,15 +1429,29 @@ function squad_npc_count_ge(actor, npc, p)
 end
 
 function surge_complete()
-	return surge_manager.is_finished()
+	if (psi_storm_manager and psi_storm_manager.is_loaded()) then 
+		if not (psi_storm_manager.is_finished()) then 
+			return false
+		end
+	end 
+	if (surge_manager and surge_manager.is_loaded()) then
+		return surge_manager.is_finished()
+	end
+	return true
 end
 
 function surge_started()
-	return surge_manager.is_started() or psi_storm_manager and psi_storm_manager.is_started() or fallout_manager and fallout_manager.is_started()
+	if (psi_storm_manager and psi_storm_manager.is_loaded() and psi_storm_manager.is_started()) then 
+		return true 
+	end 
+	if (surge_manager and surge_manager.is_loaded() and surge_manager.is_started()) then 
+		return true 
+	end
+	return false
 end
 
 function surge_kill_all()
-	return surge_manager.is_killing_all()
+	return surge_manager and surge_manager.is_killing_all() or false
 end
 
 function signal_rocket_flying(actor, npc, p)
@@ -2046,7 +2060,7 @@ end
 --------------------------------------------------------------------------------
 
 function actor_in_surge_cover(actor, npc, p)
-	return surge_manager.actor_in_cover()
+	return surge_manager and surge_manager.actor_in_cover()
 end
 
 function is_door_blocked_by_npc(actor, obj)
@@ -2097,11 +2111,6 @@ function upgrade_hint_kardan(actor, npc, p)
 	inventory_upgrades.cur_hint = hint_table
 
 	return can_upgrade >= 2
-end
-
--- AtmosFear Fallout
-function fallout_complete()
-	return fallout_manager.is_finished()
 end
 
 -- AtmosFear Psi Storm

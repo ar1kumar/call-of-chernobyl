@@ -55,12 +55,12 @@ end
 --								ON GAME START
 -----------------------------------------------------------------------------
 function on_game_start()
-	callback_register("npc_on_death_callback",npc_on_death_callback)
-	callback_register("npc_on_hit_callback",npc_on_hit_callback)
-	callback_register("monster_on_death_callback",npc_on_death_callback)
-	callback_register("monster_on_hit_callback",npc_on_hit_callback)
-	callback_register("squad_on_npc_death",squad_on_npc_death)
-	callback_register("actor_on_leave_dialog",actor_on_leave_dialog)
+	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
+	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
+	RegisterScriptCallback("monster_on_death_callback",npc_on_death_callback)
+	RegisterScriptCallback("monster_on_hit_callback",npc_on_hit_callback)
+	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
+	RegisterScriptCallback("actor_on_leave_dialog",actor_on_leave_dialog)
 end
 
 ------------------------------------------------------------------------------

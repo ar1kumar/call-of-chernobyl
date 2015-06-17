@@ -51,15 +51,15 @@ ShowMessageTime = nil
 
 
 function on_game_start()
-	callback_register("on_game_load",on_game_load)
-	callback_register("actor_on_update",actor_on_update)
-	callback_register("actor_on_item_drop",actor_on_item_drop)
-	callback_register("monster_on_actor_use_callback",monster_on_actor_use_callback)
-	callback_register("actor_on_item_use",actor_on_item_use)
-	callback_register("actor_on_item_take_from_box",actor_on_item_take_from_box)
-	callback_register("physic_object_on_use_callback",physic_object_on_use_callback)
-	callback_register("squad_assign_new_target",squad_assign_new_target)
-	--callback_register("npc_on_item_take_from_box",npc_on_item_take_from_box)
+	RegisterScriptCallback("on_game_load",on_game_load)
+	RegisterScriptCallback("actor_on_update",actor_on_update)
+	RegisterScriptCallback("actor_on_item_drop",actor_on_item_drop)
+	RegisterScriptCallback("monster_on_actor_use_callback",monster_on_actor_use_callback)
+	RegisterScriptCallback("actor_on_item_use",actor_on_item_use)
+	RegisterScriptCallback("actor_on_item_take_from_box",actor_on_item_take_from_box)
+	RegisterScriptCallback("physic_object_on_use_callback",physic_object_on_use_callback)
+	RegisterScriptCallback("squad_assign_new_target",squad_assign_new_target)
+	--RegisterScriptCallback("npc_on_item_take_from_box",npc_on_item_take_from_box)
 end
 
 function on_game_load()

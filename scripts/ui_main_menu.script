@@ -17,7 +17,7 @@ function main_menu:__init() super()
 	self.mbox_mode = 0
     self:InitControls()
     self:InitCallBacks()
-	if (axr_main and axr_main.main_menu_on_init) then axr_main.main_menu_on_init(self)	end
+	CreateScriptCallback("main_menu_on_init",self)
 end
 
 function main_menu:__finalize()
@@ -37,7 +37,7 @@ function main_menu:InitControls()
 
 	local _ver = xml:InitStatic		("static_version",self)
 	local mm						= _G.main_menu.get_main_menu()
-	_ver:TextControl():SetText		("ver. 1.0.5")
+	_ver:TextControl():SetText		(GAME_VERSION)
 end
 
 function main_menu:Show(f)
@@ -108,7 +108,6 @@ function main_menu:LoadLastSave()
 	local					console = get_console()
 	console:execute			("main_menu off")
 	console:execute			("load_last_save")
-	if (axr_main) then axr_main.on_save_game_load("load_last_save") end
 end
 
 function main_menu:OnButton_last_save()
@@ -160,7 +159,7 @@ end
 function main_menu:OnButton_return_game()
 	local console = get_console()
 	console:execute("main_menu off")
-	if (axr_main) then axr_main.main_menu_on_quit(self) end
+	CreateScriptCallback("main_menu_on_quit",self)
 end
 
 function main_menu:OnButton_new_novice_game()
@@ -287,7 +286,7 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	local bind = dik_to_bind(dik)
 	local console = get_console()
 
-	if (axr_main) then axr_main.main_menu_on_keyboard(dik,keyboard_action,self,level.present()) end
+	CreateScriptCallback("main_menu_on_keyboard",dik,keyboard_action,self,level.present())
 
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if (dik == DIK_keys.DIK_ESCAPE and level.present()) then
@@ -298,7 +297,6 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 			if (db.actor and db.actor:alive()) or (IsGameTypeSingle() ~= true) then
 				local console = get_console()
 				local fname = user_name() .. " - quicksave"
-				if (axr_main) then axr_main.on_save_game_save(fname) end
 				console:execute("save " .. fname)
 			end
 		elseif (dik == DIK_keys.DIK_F9) then
@@ -310,7 +308,6 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 				else
 					console:execute	("load " .. fname)
 				end
-				if (axr_main) then axr_main.on_save_game_load(fname) end
 			end
 		elseif (dik == DIK_keys.DIK_Q) then
 			self:OnMessageQuitWin()

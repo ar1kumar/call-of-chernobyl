@@ -124,11 +124,11 @@ end
 -- Register Callbacks
 -----------------------------------
 function on_game_start()
-	callback_register("npc_on_item_take",on_item_take)
-	callback_register("npc_on_item_drop",on_item_drop)
-	callback_register("npc_on_death_callback",on_death_callback)
-	callback_register("monster_on_death_callback",monster_on_death_callback)
-	callback_register("on_pstor_load_all",on_pstor_load_all)
+	RegisterScriptCallback("npc_on_item_take",on_item_take)
+	RegisterScriptCallback("npc_on_item_drop",on_item_drop)
+	RegisterScriptCallback("npc_on_death_callback",on_death_callback)
+	RegisterScriptCallback("monster_on_death_callback",monster_on_death_callback)
+	RegisterScriptCallback("on_pstor_load_all",on_pstor_load_all)
 end
 
 function get_all_from_corpse(npc)
@@ -202,9 +202,7 @@ function get_all_from_corpse(npc)
 	local items_value = 0
 	local sec
 	local function get_item(corpse,item)
-		if (axr_main) then
-			axr_main.npc_on_get_all_from_corpse(npc,corpse_npc,item,lootable_table[item:section()])
-		end
+		CreateScriptCallback("npc_on_get_all_from_corpse",npc,corpse_npc,item,lootable_table[item:section()])
 		if (lootable_table[item:section()] ~= nil) then
 			if (items_value < 100) then
 				items_value = items_value+item:cost()*item:condition()/30

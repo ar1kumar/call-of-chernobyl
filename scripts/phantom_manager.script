@@ -72,7 +72,7 @@ function try_respawn(p)
 		return false
 	end
 	
-	create_delayed_event(id,"dynamic_phantom_respawn",30,respawn,id,sec)
+	CreateDelayedEvent(id,"dynamic_phantom_respawn",30,respawn,id,sec)
 	
 	return false
 end 
@@ -86,12 +86,12 @@ function monster_on_net_spawn(npc)
 	if not (can_spawn) then 
 		return
 	end 
-	create_delayed_event(npc:id(),"dynamic_phantom_try_respawn",5,try_respawn,npc:id())
+	CreateDelayedEvent(npc:id(),"dynamic_phantom_try_respawn",5,try_respawn,npc:id())
 end
 
 function on_game_start()
 	if (level.spawn_item) then
-		callback_register("monster_on_net_spawn",monster_on_net_spawn)
+		RegisterScriptCallback("monster_on_net_spawn",monster_on_net_spawn)
 	end
 end 
 

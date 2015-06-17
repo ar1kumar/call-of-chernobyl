@@ -107,11 +107,11 @@ end
 -- Callback Register
 --------------------------------
 function on_game_start()
-	callback_register("actor_on_update",actor_on_update)
-	--callback_register("npc_on_update",npc_on_update)
-	callback_register("npc_on_hit_callback",npc_on_hit_callback)
-	callback_register("npc_on_death_callback",npc_on_death_callback)
-	callback_register("squad_on_npc_death",squad_on_npc_death)
+	RegisterScriptCallback("actor_on_update",actor_on_update)
+	--RegisterScriptCallback("npc_on_update",npc_on_update)
+	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
+	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
+	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 end
 
 function is_enemy(obj,enemy,no_memory)
@@ -331,7 +331,7 @@ function action_process_enemy:enemy_callback(npc, enemy)
 		-- keep track of actor enemies
 		if (ene_id == 0 and not fighting_with_actor_npcs[id]) then
 			fighting_with_actor_npcs[id] = true
-			if (axr_main) then axr_main.npc_on_fighting_actor(npc) end
+			CreateScriptCallback("npc_on_fighting_actor",npc)
 		end
 
 		-- Set smart alarm

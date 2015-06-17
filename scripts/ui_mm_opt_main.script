@@ -1,12 +1,11 @@
 class "options_dialog" (CUIScriptWnd)
 
 function options_dialog:__init() super()
-
 	self.m_preconditions	= {}
     self:InitControls()
     self:InitCallBacks()
 	self.tab:SetActiveTab("video")
-	if (axr_main) then axr_main.opt_menu_on_init(self) end
+	CreateScriptCallback("opt_menu_on_init",self)
 end
 
 function options_dialog:__finalize()
@@ -97,7 +96,7 @@ function options_dialog:SetCurrentValues()
 	opt:SetCurrentValues("key_binding")
 	opt:SaveBackupValues("key_binding")
 
-	if (axr_main) then axr_main.opt_menu_on_set_values(self,opt) end
+	CreateScriptCallback("opt_menu_on_set_values",self,opt)
 
 	self:UpdateDependControls()
 end
@@ -191,7 +190,7 @@ function options_dialog:OnBtnAccept()
 	opt:SaveValues("mm_opt_sound")
 	opt:SaveValues("mm_opt_controls")
 
-	if (axr_main) then axr_main.opt_menu_on_accept(self,opt,console) end
+	CreateScriptCallback("opt_menu_on_accept",self,opt,console)
 
 	if opt:NeedVidRestart() then
 		_G.b_discard_settings_shown = true

@@ -1225,11 +1225,11 @@ function disable_ui_only(first_speaker, second_speaker)
 end
 
 function is_surge_running(first_speaker, second_speaker)
-	return surge_manager.get_surge_manager().started == true
+	return xr_conditions.surge_started()
 end
 
 function is_surge_not_running(first_speaker, second_speaker)
-	return surge_manager.get_surge_manager().finished == true
+	return not xr_conditions.surge_started()
 end
 
 ---------------------

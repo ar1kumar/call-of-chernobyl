@@ -103,8 +103,8 @@ function animpoint_predicate_roast(id,camp)
 			if (fires) then
 				local lobi = level.object_by_id
 				local obj
-				for id,v in pairs(fires) do
-					if (v:is_on()) then
+				for id,binder in pairs(fires) do
+					if (binder.object and binder.campfire and binder.campfire:is_on()) then
 						obj = lobi(id)
 						if (obj and obj:position():distance_to_sqr(npc:position()) <= 7) then
 							return true

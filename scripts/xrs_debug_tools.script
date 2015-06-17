@@ -367,11 +367,11 @@ function on_game_start()
 	local ini = ini_file("debug\\xrs_debug_tools.ltx")
 	debug_task_infos = {}
 
-	callback_register("on_game_load",on_game_load)
-	callback_register("actor_on_update",actor_on_update)
-	callback_register("main_menu_on_keyboard",main_menu_on_keyboard)
-	callback_register("actor_on_hit_callback",actor_on_hit_callback)
-	--callback_register("on_level_changing",on_level_changing)
+	RegisterScriptCallback("on_game_load",on_game_load)
+	RegisterScriptCallback("actor_on_update",actor_on_update)
+	RegisterScriptCallback("main_menu_on_keyboard",main_menu_on_keyboard)
+	RegisterScriptCallback("actor_on_hit_callback",actor_on_hit_callback)
+	--RegisterScriptCallback("on_level_changing",on_level_changing)
 	
 	actor_info = {}
 
@@ -1049,10 +1049,10 @@ function position_hud_show(hud)
 			local campfires = db.campfire_table_by_smart_names[smart:name()]
 			if (campfires) then
 				local camp
-				for id,campfire in pairs(campfires) do
-					camp = level.object_by_id(id)
-					if (camp) then
-						hud:add_msg(camp:name(), alun_utils.sr("id=%s is_on=%s selected=%s",id,campfire:is_on(),axr_turn_on_campfire.already_selected[id]) )
+				for id,binder in pairs(campfires) do
+					camp = binder.object
+					if (camp and binder.campfire) then
+						hud:add_msg(camp:name(), alun_utils.sr("id=%s is_on=%s selected=%s",id,binder.campfire:is_on(),axr_turn_on_campfire.already_selected[id]) )
 					end
 				end
 			end
@@ -1060,14 +1060,18 @@ function position_hud_show(hud)
 	end
 	
 	hud:add_msg("","------ MISC. ------")
-	local count = 0
-	local sim = alife()
-	for i=1,65534 do
-		if (sim:object(i) ~= nil) then
-			count = count + 1
+	__tmr_pos_hud = not __tmr_pos_hud and time_global()+5000 or __tmr_pos_hud
+	if (time_global() > __tmr_pos_hud) then
+		__tmr_pos_hud = nil
+		_g_o_count = 0
+		local sim = alife()
+		for i=1,65534 do
+			if (sim:object(i) ~= nil) then
+				_g_o_count = _g_o_count + 1
+			end
 		end
 	end
-	hud:add_msg("GameObject IDs",count)
+	hud:add_msg("GameObject IDs",_g_o_count)
 	
 	hud:display()
 end

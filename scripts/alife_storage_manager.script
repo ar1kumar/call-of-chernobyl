@@ -1,0 +1,131 @@
+--[[
+	This script handles the serialization of data using the marshal library and the saving of this data to disk depending
+	on save game name. What this means is that you can save entire tables to disk instead of saving to object packet.
+	This script was created to alleviate issues with using packets to save dynamic data (pstor) which lead to save corruption.
+	Also it removes some restrictions on what you can save.
+	
+	*only store valid lua types such as numbers, strings, boolean or tables that contain these valid types. Use utils.CTime_to_table to store CTime
+	
+	*Supposedly you can save userdata if you write a proper __persist method for the metatable but I have failed to achieve proper results with serializing CTime.
+	
+	*You must register for 'save_state' and 'load_state' and add your own table to m_data for it to be encoded then stored in *.dat
+	*Although marshal is pretty fast, keep in mind that encoding/decoding a ton of data, saves will start to noticeablely take longer to save/load.
+	*For testing/debugging you can uncomment the print_table calls in save_state and load_state. It will save the before and after tables to print_table.txt in your main directory.
+	
+	
+	by: Alundaio
+--]]
+local m_data = {}
+local function on_pstor_load_all(obj,packet)
+	local id = obj:id()
+	if not (m_data and m_data.pstor_all and m_data.pstor_all[id]) then 
+		return
+	end 
+	
+	db.storage[id].pstor = m_data.pstor_all[id]
+	
+	if (m_data.pstor_ctime and m_data.pstor_ctime[id]) then
+		if not (db.storage[id].pstor_ctime) then 
+			db.storage[id].pstor_ctime = {}
+		end 
+		for k,t in pairs(m_data.pstor_ctime[id]) do 
+			db.storage[id].pstor_ctime[k] = CTime_from_table(t)
+		end
+	end 
+	
+	m_data.pstor_all[id] = nil
+end
+
+function on_game_start()
+	if not (USE_MARSHAL) then 
+		return 
+	end
+	RegisterScriptCallback("on_pstor_load_all",on_pstor_load_all)
+end
+
+-- called from engine!
+function CALifeStorageManager_save(fname)
+	if not (USE_MARSHAL) then 
+		return 
+	end 
+
+	local path = getFS():update_path('$game_saves$', '') .. fname:sub(0,-6):lower() .. ".dat"
+	local savegame = io.open(path,"wb")
+	if (savegame) then
+
+		CreateScriptCallback("save_state",m_data)
+
+		for id,t in pairs(db.storage) do
+			if (t and type(t) == "table") then
+				if (t.pstor) then
+					if not (m_data.pstor_all) then
+						m_data.pstor_all = {}
+					end
+					m_data.pstor_all[id] = t.pstor
+				end
+				-- maybe too ridiculous?
+				if (t.pstor_ctime) then 
+					if not (m_data.pstor_ctime) then 
+						m_data.pstor_ctime = {}
+					end
+					
+					if not (m_data.pstor_ctime[id]) then 
+						m_data.pstor_ctime[id] = {}
+					end
+					
+					for k,ct in pairs(t.pstor_ctime) do
+						m_data.pstor_ctime[id][k] = utils.CTime_to_table(ct)
+					end
+				end
+			end
+		end
+
+		--alun_utils.print_table(m_data,"m_data_on_save ("..path..")")
+		
+		local data = marshal.encode(m_data)
+		if (data) then
+			printf("axr_main: saving custom data %s",path)
+			savegame:write(data)
+			savegame:close()
+		end
+	end	
+end 
+
+-- called from engine
+function CALifeStorageManager_load(fname)
+	if not (USE_MARSHAL) then 
+		return 
+	end 
+	
+	local path = fname:sub(0,-6) .. ".dat"
+	
+	local savegame = io.open(path,"rb")
+	if not (savegame) then
+		return
+	end
+
+	local data = savegame:read("*all")
+	savegame:close()
+
+	if not (data) then
+		return
+	end
+
+	m_data = marshal.decode(data)
+	
+	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
+
+	CreateScriptCallback("load_state",m_data)
+	
+	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	--collectgarbage("collect")
+	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+end
+
+function get_state()
+	return m_data
+end
+
+function decode(s)
+	return s and marshal.decode(s)
+end

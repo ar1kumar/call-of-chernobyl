@@ -90,11 +90,11 @@ local function load_state(data)
 end
 
 function on_game_start()
-	if not (axr_main.USE_MARSHAL) then
+	if not (USE_MARSHAL) then
 		return
 	end
-	callback_register("save_state",save_state)
-	callback_register("load_state",load_state)
+	RegisterScriptCallback("save_state",save_state)
+	RegisterScriptCallback("load_state",load_state)
 end
 
 
@@ -195,7 +195,7 @@ function set_best_weapon(hit_amount)
 end
 
 function save(package)
-	if (axr_main and axr_main.USE_MARSHAL) then
+	if (USE_MARSHAL) then
 		return
 	end
 	package:w_u16(actor_statistic.surges)
@@ -236,7 +236,7 @@ function save(package)
 end
 
 function load(package)
-	if (axr_main and axr_main.USE_MARSHAL) then
+	if (USE_MARSHAL) then
 		return
 	end
 	actor_statistic = {}

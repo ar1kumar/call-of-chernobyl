@@ -82,11 +82,10 @@ function action_point_campfire:activate_scheme()
 				end
 				return vertex_id
 			end
-			for id,camp in pairs(fires) do
-				campfire = level.object_by_id(id)
-				if (campfire) then 
-					local dir = utils.vector_copy_by_val(campfire:direction())
-					local pos = campfire:position()
+			for id,binder in pairs(fires) do
+				if (binder.object) then 
+					local dir = utils.vector_copy_by_val(binder.object:direction())
+					local pos = binder.object:position()
 					t[#t+1] = pos
 					for i=1,6 do
 						vid = create_campfire_point(pos,vector_rotate_y(dir,i*60))

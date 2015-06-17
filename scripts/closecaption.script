@@ -54,9 +54,9 @@ end
 
 -- called directly from axr_main
 function main_menu_on_quit()
-	callback_unregister("opt_menu_on_set_values",opt_menu_on_set_values)
-	callback_unregister("opt_menu_on_init",opt_menu_on_init)
-	callback_unregister("opt_menu_on_accept",opt_menu_on_accept)
+	UnregisterScriptCallback("opt_menu_on_set_values",opt_menu_on_set_values)
+	UnregisterScriptCallback("opt_menu_on_init",opt_menu_on_init)
+	UnregisterScriptCallback("opt_menu_on_accept",opt_menu_on_accept)
 end
 
 -- called directly from axr_main
@@ -69,9 +69,9 @@ function main_menu_on_init()
 		ini:Save()
 	end
 
-	callback_register("opt_menu_on_set_values",opt_menu_on_set_values)
-	callback_register("opt_menu_on_init",opt_menu_on_init)
-	callback_register("opt_menu_on_accept",opt_menu_on_accept)
+	RegisterScriptCallback("opt_menu_on_set_values",opt_menu_on_set_values)
+	RegisterScriptCallback("opt_menu_on_init",opt_menu_on_init)
+	RegisterScriptCallback("opt_menu_on_accept",opt_menu_on_accept)
 end
 
 local snd_ids = {
@@ -500,7 +500,7 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 								else
 									local gt = time_global() + 500
 									table.insert(delayed_cc, {sound, showtime, sender, sender_faction, sender_id, -delay_sound - 1, dt = gt})
-									callback_register("actor_on_update", on_actor_update_cc)
+									RegisterScriptCallback("actor_on_update", on_actor_update_cc)
 									return true
 								end
 							else
@@ -818,7 +818,7 @@ function on_actor_update_cc()
 			table.remove(delayed_cc, 1)
 		end
 	else
-		callback_unregister("actor_on_update", on_actor_update_cc)
+		UnregisterScriptCallback("actor_on_update", on_actor_update_cc)
 	end
 end
 

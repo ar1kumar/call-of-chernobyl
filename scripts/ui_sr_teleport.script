@@ -66,22 +66,25 @@ function msg_box_ui:OnMsgOk()
 		return
 	end
 
-	local p = pos and alun_utils.str_explode(pos,",")
-	pos = p and vector():set(tonumber(p[1]),tonumber(p[2]),tonumber(p[3]))
-
-	db.actor:set_actor_position(pos or point and point:point(0))
-	--db.actor:set_actor_position(pos or point and patrol(v.point):point(0))
-
-	if (pos and p[4]) then
-		db.actor:set_actor_direction(tonumber(p[4]))
-	end
-
 	if not (self.disable_msg) then
 		level.add_pp_effector("black.ppe", 1313, false)
 	end
 	
 	if (alun_utils.read_from_ini(ini,self.name,"autosave","bool",false)) then 
 		xr_effects.scenario_autosave(nil,nil, {alun_utils.read_from_ini(ini,self.name,"hint","string","moving")})
+	end
+	
+	local p = pos and alun_utils.str_explode(pos,",")
+	pos = p and vector():set(tonumber(p[1]),tonumber(p[2]),tonumber(p[3]))
+
+	if (db.vehicle and db.actor.detach_vehicle) then
+		db.actor:detach_vehicle()
+	end
+	db.actor:set_actor_position(pos or point and point:point(0))
+	--db.actor:set_actor_position(pos or point and patrol(v.point):point(0))
+
+	if (pos and p[4]) then
+		db.actor:set_actor_direction(tonumber(p[4]))
 	end
 end
 

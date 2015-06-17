@@ -77,50 +77,6 @@ function sleep_dialog:TestAndShow()
 	local bleeding = db.actor.bleeding > 0
 	local radiation = db.actor.radiation > 0
 
-	-- Vanilla; left for compatibility purposes
-	if not (axr_main) then
-		self.sleep_mb:InitMessageBox("message_box_ok")
-
-		if (bleeding or radiation) then
-			if (bleeding and radiation) then
-				self.sleep_mb:SetText("sleep_warning_all_pleasures")
-			elseif (bleeding) then
-				self.sleep_mb:SetText("sleep_warning_bleeding")
-			elseif (radiation) then
-				self.sleep_mb:SetText("sleep_warning_radiation")
-			end
-			self.sleep_mb:ShowDialog(true)
-			return
-		end
-
-		if (xr_conditions.surge_started()) then
-			local sm = surge_manager.get_surge_manager()
-			local safe
-			local zone
-			for i=1,#sm.covers do
-				zone = sm.covers[i]
-				if (zone and zone:inside(db.actor:position())) then
-					safe = true
-					break
-				end
-			end
-
-			if not (safe) then
-				self.sleep_mb:SetText("You cannot sleep during an emission!")
-				self.sleep_mb:ShowDialog(true)
-				return
-			end
-		end
-
-		--if (xr_logic.pstor_retrieve(db.actor,"drowse",0) < 0.2) then
-			--self.sleep_mb:SetText("You are no tired.")
-		--end
-
-		self:Initialize()
-		self:ShowDialog(true)
-		return
-	end
-
 	if (sleep_control.ph_sleepbag_id and sleep_control.item_section) then
 		local sim = alife()
 		sim:create(sleep_control.item_section,db.actor:position(),0,0,0)
@@ -141,17 +97,7 @@ function sleep_dialog:TestAndShow()
 
 	if (xr_conditions.surge_started()) then
 		local sm = surge_manager.get_surge_manager()
-		local safe
-		local zone
-		for i=1,#sm.covers do
-			zone = sm.covers[i]
-			if (zone and zone:inside(db.actor:position())) then
-				safe = true
-				break
-			end
-		end
-
-		if not (safe) then
+		if not (sm.actor_in_cover()) then
 			SetHudMsg("Not crazy enough to sleep during this shit",4)
 			return
 		end

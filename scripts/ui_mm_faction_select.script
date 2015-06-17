@@ -15,11 +15,12 @@ local function on_game_load()
 		return 
 	end
 	
+	local need_save
 	-- FACTION NEW GAME START
 	local se_actor = alife():object(db.actor:id())
-	local need_save
 	
-	local new_character_name = config:GetValue("temp","new_game_character_name",3)
+	
+	local new_character_name = config:GetValue("temp","new_game_character_name",3) or ""
 	if (new_character_name and new_character_name ~= "") then 
 		config:SetValue("temp","new_game_character_name")
 		need_save = true
@@ -31,7 +32,16 @@ local function on_game_load()
 		end
 	end
 	
-	local faction = config:GetValue("temp","new_game_faction",3)
+	local faction = config:GetValue("temp","new_game_faction",3) or ""
+	
+	if (USE_MARSHAL and config:GetValue("temp","new_game_hardcore_mode",1) == true) then 
+		-- shitty way to make a uuid but should be good enough to track the same saves
+		math.randomseed(os.time())
+		alife_storage_manager.get_state().uuid = GAME_VERSION .. "_" .. tostring(math.random(100)) .. tostring(math.random()) .. tostring(math.random(1000))
+		config:SetValue("temp","new_game_hardcore_mode")
+		need_save = true
+	end 
+	
 	if (faction and faction ~= "") then 
 		config:SetValue("temp","new_game_faction")
 		need_save = true
@@ -139,15 +149,50 @@ function actor_on_update()
 		set_money = nil
 	end
 	
-	callback_unregister("actor_on_update",this.actor_on_update)
+	UnregisterScriptCallback("actor_on_update",this.actor_on_update)
+end
+
+local function actor_on_before_death()
+	if not (USE_MARSHAL) then 
+		return 
+	end 
+	
+	local uuid = alife_storage_manager.get_state().uuid
+	if not (uuid) then 
+		return -- not in hardcore mode
+	end
+	
+	local fs = getFS()
+	local flist = fs:file_list_open_ex("$game_saves$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*.dat")
+	local f_cnt = flist:Size()
+
+	for	it=0, f_cnt-1 	do
+		local file = flist:GetAt(it)
+		local file_name = string.sub(file:NameFull(), 0, (string.len(file:NameFull()) - string.len(".dat")))
+
+		printf("file_name = %s",file_name)
+		local f = io.open(fs:update_path('$game_saves$', '')..file_name..".dat","rb")
+		if (f) then 
+			local data = f:read("*all")
+			f:close()
+			if (data) then 
+				local decoded = alife_storage_manager.decode(data)
+				if (decoded and decoded.uuid == uuid) then 
+					printf("match found uuid = %s",uuid)
+					ui_load_dialog.delete_save_game(file_name)
+				end
+			end
+		end
+	end
 end
 
 ------------------
 -- on_game_start()
 ------------------
 function on_game_start()
-	callback_register("on_game_load",on_game_load)
-	callback_register("actor_on_update",actor_on_update)
+	RegisterScriptCallback("on_game_load",on_game_load)
+	RegisterScriptCallback("actor_on_update",actor_on_update)
+	RegisterScriptCallback("actor_on_before_death",actor_on_before_death)
 end 
 
 --------------------------------------------------------------
@@ -212,6 +257,11 @@ function faction_ui:InitControls(f)
 	self.scroll_v:AddWindow(self.desc_text, true)
 	
 	self:OnFactionSelect("stalker")
+	
+	if (USE_MARSHAL) then
+		xml:InitStatic("main_dialog:cap_check_hardcore",self.dialog)
+		self.ck_hardcore = xml:InitCheck("main_dialog:check_hardcore",	self.dialog)
+	end
 end 
 
 function faction_ui:InitCallBacks(f)
@@ -334,7 +384,11 @@ function faction_ui:OnStartGame()
 		-- don't start game with no name. TODO: Add msgbox warning
 		return
 	end
-
+	
+	if (self.ck_hardcore and self.ck_hardcore:GetCheck()) then 
+		axr_main.config:SetValue("temp","new_game_hardcore_mode",true)
+	end 
+	
 	if (self.selected_faction) then 
 		axr_main.config:SetValue("temp","new_game_faction",self.selected_faction)
 	end

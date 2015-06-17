@@ -36,7 +36,7 @@ end
 -- 						ON GAME START
 -------------------------------------------------------------
 function on_game_start()
-	load_scheme("axr_turn_on_campfire","turn_on_campfire",0)
+
 end
 
 -------------------------------------------------------------
@@ -118,19 +118,18 @@ function eva_turn_on_campfire:find_valid_target()
 	local is_dx11 = render_get_dx_level() == 655361
 
 	local npc_id = npc:id()
-	local camp, selected_id
-	for id,kamp in pairs(campfires) do
-		if (already_selected[id] == nil and not kamp:is_on()) then
-			camp = level.object_by_id(id)
-			if (camp) then
+	local selected_id
+	for id,binder in pairs(campfires) do
+		if (binder.object and binder.campfire) then
+			if (already_selected[id] == nil and not binder.campfire:is_on()) then
 				if (self.st.selected_id and already_selected[self.st.selected_id]) then
 					already_selected[self.st.selected_id] = nil
 				end
 				self.st.selected_id = id
 				already_selected[id] = npc:id()
-				self.st.vid = camp:level_vertex_id()
-				self.st.pos = camp:position()
-				self.st.state = camp:position():distance_to_sqr(npc:position()) > 900 and "rush" or "patrol"
+				self.st.vid = binder.object:level_vertex_id()
+				self.st.pos = binder.object:position()
+				self.st.state = binder.object:position():distance_to_sqr(npc:position()) > 900 and "rush" or "patrol"
 				return true
 			end
 		end

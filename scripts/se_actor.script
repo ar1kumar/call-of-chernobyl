@@ -11,8 +11,8 @@ function se_actor:on_register()
 	simulation_objects.get_sim_obj_registry():register(self)
 	self.m_registred = true
 	--Alundaio
-	if (axr_main) then axr_main.se_actor_on_register(self) end
-	--Alundaio
+	CreateScriptCallback("se_actor_on_register",self)
+
 	if not self.start_position_filled then
 		SIMBOARD:fill_start_position()
 		self.start_position_filled = true
@@ -24,15 +24,15 @@ function se_actor:on_unregister()
 	unregister_story_object_by_id(self.id)
 	simulation_objects.get_sim_obj_registry():unregister(self)
 	--Alundaio
-	if (axr_main) then axr_main.se_actor_on_unregister(self) end
-	--Alundaio
+	CreateScriptCallback("se_actor_on_unregister",self)
 end
 
 --------------------
 function se_actor:STATE_Write(packet)
 	-- Alundaio
-	--if (axr_main) then axr_main.se_actor_on_STATE_Write(self,packet) end
-	-- Alundaio
+	CreateScriptCallback("se_actor_on_STATE_Write",self)
+	--Alundaio
+
 	cse_alife_creature_actor.STATE_Write(self, packet)
 	set_save_marker(packet, "save", false, "se_actor")
 	packet:w_bool(self.start_position_filled)
@@ -42,7 +42,7 @@ end
 --------------------
 function se_actor:STATE_Read(packet, size)
 	-- Alundaio
-	--if (axr_main) then axr_main.se_actor_on_STATE_Read(self,packet,size) end
+	CreateScriptCallback("se_actor_on_STATE_Read",self)
 	-- Alundaio
 	cse_alife_creature_actor.STATE_Read(self, packet, size)
 

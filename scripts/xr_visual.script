@@ -15,9 +15,9 @@ function on_game_start()
 	UseDeathDrop = alun_utils.read_from_ini(ini,"main","use_death_drop","bool",false)
 	UsePlayerID = alun_utils.read_from_ini(ini,"main","use_player_id","bool",false)
 
-	callback_register("npc_on_death_callback",death_callback)
-	callback_register("npc_on_item_take",npc_on_item_take)
-	--callback_register("npc_on_update",npc_on_update)
+	RegisterScriptCallback("npc_on_death_callback",death_callback)
+	RegisterScriptCallback("npc_on_item_take",npc_on_item_take)
+	--RegisterScriptCallback("npc_on_update",npc_on_update)
 end
 
 -- This is used as default rating if no rating can be calculated from an outfit item
@@ -108,7 +108,7 @@ function npc_on_item_take(npc,item)
 	end
 
 	if (is_outfit_better(npc,sec)) then
-		create_delayed_event(npc:id(),"equip_outfit",2,equip_outfit,npc:id(),item:id(),new_visual)
+		CreateDelayedEvent(npc:id(),"equip_outfit",2,equip_outfit,npc:id(),item:id(),new_visual)
 	end
 end
 
@@ -127,13 +127,13 @@ function npc_loot_dead(npc,corpse)
 	if (is_outfit_better(npc,corpse_outfit)) then
 		if not (UseDeathDrop) then
 			local id = npc:id()
-			create_delayed_event(id,"equip_outfit",2,equip_outfit,id,false,new_visual)
+			CreateDelayedEvent(id,"equip_outfit",2,equip_outfit,id,false,new_visual)
 		end
 
 		local naked_visual = alun_utils.read_from_ini(ini,"community_to_naked",character_community(corpse),"string",nil)
 		if (naked_visual) then
 			local id = corpse:id()
-			create_delayed_event(id,"equip_outfit",2,equip_outfit,id,false,naked_visual)
+			CreateDelayedEvent(id,"equip_outfit",2,equip_outfit,id,false,naked_visual)
 		end
 	end
 end

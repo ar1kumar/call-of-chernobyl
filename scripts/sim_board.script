@@ -181,7 +181,7 @@ function simulation_board:create_squad(spawn_smart, sq_id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 			-- Alundaio
-			if (axr_main) then	axr_main.squad_on_npc_creation(squad,se_obj,spawn_smart) end
+			CreateScriptCallback("squad_on_npc_creation",squad,se_obj,spawn_smart)
 			-- Alundaio
 		end
     end
@@ -197,7 +197,7 @@ function simulation_board:remove_squad(squad)
 	squad:remove_squad()
 
 	-- Alundaio (Delayed release squad from game)
-	--create_delayed_event(squad.id,"safe_release",1,alun_utils.safe_release,squad.id)
+	--CreateDelayedEvent(squad.id,"safe_release",1,alun_utils.safe_release,squad.id)
 	alife():release(squad,true)
 end
 --' Назначение отряда в смарт.

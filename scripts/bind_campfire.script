@@ -16,44 +16,30 @@ function campfire_binder:net_spawn(server_object)
 	end
 	local smart_name = string.gsub(self.object:name(), "_campfire_%d*", "")
 	if SIMBOARD.smarts_by_names[smart_name] then
-		if (render_get_dx_level() == 655361) then 
-			self.object:disable_anomaly()
-		end
-		self.campfire:turn_off()
-		
 		if db.campfire_table_by_smart_names[smart_name] == nil then
 			db.campfire_table_by_smart_names[smart_name] = {}
 		end
-		db.campfire_table_by_smart_names[smart_name][self.object:id()] = self.campfire
+		db.campfire_table_by_smart_names[smart_name][self.object:id()] = self
 	end
 	return true
 end
 function campfire_binder:update(delta)
 	object_binder.update(self, delta)
 end
-function turn_on_campfires_by_smart_name(smart_name)
---[[
-	local smart_campfires = db.campfire_table_by_smart_names[smart_name]
-	if smart_campfires ~= nil and not empty(smart_campfires) then
-		for k,v in pairs (smart_campfires) do
-			if not v:is_on() then
-				v:turn_on()
-			end
-		end
-	end
---]]
-end
 function turn_off_campfires_by_smart_name(smart_name)
---[[
 	local smart_campfires = db.campfire_table_by_smart_names[smart_name]
 	if smart_campfires ~= nil and not empty(smart_campfires) then
 		for k,v in pairs (smart_campfires) do
-			if v:is_on() then
-				v:turn_off()
+			if (v.object) then
+				if (render_get_dx_level() == 655361) then 
+					v.object:disable_anomaly()
+				end
+			end
+			if (v.campfire and v.campfire:is_on()) then
+				v.campfire:turn_off()
 			end
 		end
 	end
---]]
 end
 
 

@@ -29,10 +29,10 @@ local was_in_silence = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function on_game_start()
-	callback_register("actor_on_update",on_actor_update)
-	callback_register("on_game_end",on_actor_destroy)
-	callback_register("main_menu_on_init",main_menu_on)
-	callback_register("main_menu_on_quit",main_menu_off)
+	RegisterScriptCallback("actor_on_update",on_actor_update)
+	RegisterScriptCallback("on_game_end",on_actor_destroy)
+	RegisterScriptCallback("main_menu_on_init",main_menu_on)
+	RegisterScriptCallback("main_menu_on_quit",main_menu_off)
 end
 
 function initialize_themes()

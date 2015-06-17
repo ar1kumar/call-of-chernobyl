@@ -11,19 +11,19 @@ secret_stashes = nil
 ini = nil
 
 function on_game_start()
-	if not (axr_main.USE_MARSHAL) then
+	if not (USE_MARSHAL) then
 		return
 	end
 	
 	ini = ini_file("dynamic_spawn.ltx")
 	
 	-- Disable features of dynamic spawn if USE_MARSHAL is disabled
-	callback_register("on_game_load",on_game_load)
-	callback_register("actor_on_item_take_from_box",actor_on_item_take_from_box)
-	callback_register("actor_on_item_take",actor_on_item_take)
-	callback_register("actor_on_update",actor_on_update)
-	callback_register("save_state",save_state)
-	callback_register("load_state",load_state)
+	RegisterScriptCallback("on_game_load",on_game_load)
+	RegisterScriptCallback("actor_on_item_take_from_box",actor_on_item_take_from_box)
+	RegisterScriptCallback("actor_on_item_take",actor_on_item_take)
+	RegisterScriptCallback("actor_on_update",actor_on_update)
+	RegisterScriptCallback("save_state",save_state)
+	RegisterScriptCallback("load_state",load_state)
 end
 
 
@@ -160,7 +160,7 @@ function parse_ltx(actor,sections,ltx_data)
 	local sim = alife()
 	for sec in string.gmatch(ltx_data,"%[(.-)%]") do
 		gvid = alun_utils.read_from_ini(ini,sec,"game_vertex_id","float",nil)
-		if (gvid and (axr_main.USE_MARSHAL and is_on_the_same_level(actor,gvid))) then
+		if (gvid and (USE_MARSHAL and is_on_the_same_level(actor,gvid))) then
 			if (ini:line_exist(sec,"on_info")) then
 				if not (on_info_sections) then
 					on_info_sections = {}

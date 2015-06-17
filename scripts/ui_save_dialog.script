@@ -247,7 +247,6 @@ function save_dialog:SaveFile(fileName)
 		-- clear excess corpses everytime player saves
 		--release_body_manager.get_release_body_manager():clear(nil,nil,true)
 		local console = get_console()
-		if (axr_main) then axr_main.on_save_game_save(fileName) end
 		console:execute("save " .. fileName)
 	end
 end

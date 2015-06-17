@@ -116,8 +116,8 @@ end
 --------------------------------
 function on_game_start()
 	if not (Enable) then return end
-	callback_register("npc_on_death_callback",npc_on_death_callback)
-	callback_register("npc_on_update",npc_on_update)
+	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
+	RegisterScriptCallback("npc_on_update",npc_on_update)
 end
 
 
@@ -274,6 +274,11 @@ end
 
 function act_kill_wounded:begin_kill_wounded(vo)
 	if (hostage_list[vo:id()] == true) then
+		-- force squad enemy to actor because they have a hostage
+		local squad = get_object_squad(self.object)
+		if (squad) then 
+			squad:set_squad_relation("enemy")
+		end
 		return 
 	end
 	if not (self.st.timer) then

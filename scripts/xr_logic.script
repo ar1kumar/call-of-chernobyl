@@ -465,7 +465,6 @@ function switch_to_section(npc, ini, section)
 	if active_section then
 		local st = db.storage[npc_id][db.storage[npc_id].active_scheme]
 		issue_event(npc, st, "deactivate", npc, st)
-		--if (axr_main) then axr_main.scheme_deactivate(npc,db.storage[npc_id].active_scheme,db.storage[npc_id][db.storage[npc_id].active_scheme]) end
 	end
 	db.storage[npc_id].exit_from_smartcover_initialized = nil
 	db.storage[npc_id].active_section = nil
@@ -1039,7 +1038,7 @@ function pstor_store(obj, varname, val)
 		db.storage[npc_id].pstor = {}
 	end
 
-	if not (axr_main and axr_main.USE_MARSHAL) then
+	if not (USE_MARSHAL) then
 		local tv = type(val)
 		if val ~= nil and not pstor_is_registered_type(tv) then
 			printf("xr_logic: pstor_store: not registered type '%s' encountered [name=%s varname=%s ]", tv,obj:name(),varname)
@@ -1114,7 +1113,8 @@ function load_ctime(obj, varname)
 end
 
 function pstor_save_all(obj, packet)
-	if (axr_main and axr_main.USE_MARSHAL) then
+	if (USE_MARSHAL) then
+		CreateScriptCallback("on_pstor_save_all",obj,packet)
 		return
 	end
 
@@ -1170,15 +1170,8 @@ function pstor_save_all(obj, packet)
 end
 
 function pstor_load_all(obj, reader)
-	if (axr_main and axr_main.USE_MARSHAL) then
-		if not (axr_main.m_data.pstor_all) then
-			return
-		end
-
-		local id = obj:id()
-		db.storage[id].pstor = axr_main.m_data.pstor_all[id]
-		axr_main.m_data.pstor_all[id] = nil
-		axr_main.on_pstor_load_all(obj,reader)
+	if (USE_MARSHAL) then
+		CreateScriptCallback("on_pstor_load_all",obj,reader)
 		return
 	end
 
@@ -1221,8 +1214,6 @@ function pstor_load_all(obj, reader)
 		local varname = reader:r_stringZ()
 		db.storage[npc_id].pstor_ctime[varname] = utils.r_CTime(reader)
 	end
-	
-	if (axr_main) then axr_main.on_pstor_load_all(obj,reader) end
 end
 
 function save_obj(obj, packet)

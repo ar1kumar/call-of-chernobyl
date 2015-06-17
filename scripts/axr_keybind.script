@@ -16,6 +16,9 @@ local function on_key_press(key)
 	-- Teleport to last demo_record camera position
 	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_teleport_cam",0,"")]) then 
 		if (xrs_debug_tools.LastCameraPos) then
+			if (db.vehicle and db.actor.detach_vehicle) then 
+				db.actor:detach_vehicle()
+			end
 			db.actor:set_actor_position(xrs_debug_tools.LastCameraPos)
 		end
 	-- Select Object on key press and teleports it on key release!
@@ -53,7 +56,12 @@ local function on_key_release(key)
 						DEBUG_NPC:set_npc_position(level.vertex_position(lvid))
 					end
 				else
-					--DEBUG_NPC:position():add( device().cam_dir:mul(r) ) -- doesn't work
+					if (DEBUG_NPC.force_set_position) then
+						local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
+						if (lvid) then
+							DEBUG_NPC:force_set_position(level.vertex_position(lvid))
+						end
+					end
 				end
 			end
 			SetHudMsg("",1)
@@ -62,8 +70,8 @@ local function on_key_release(key)
 end
 
 function on_game_start()
-	callback_register("on_key_press",on_key_press)
-	callback_register("on_key_release",on_key_release)
+	RegisterScriptCallback("on_key_press",on_key_press)
+	RegisterScriptCallback("on_key_release",on_key_release)
 	
 	local need_save
 	if not (axr_main.config:KeyExist("global_keybinds","companion_cycle_combat_mode")) then

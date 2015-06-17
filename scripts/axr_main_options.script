@@ -29,8 +29,10 @@ function opt_menu_on_init(menu)
 	menu.ck_radio_mod = xml:InitCheck("tab_gameplay:check_radio_mod",	menu.dlg_gameplay)
 	menu:Register(menu.ck_radio_mod,"ck_radio_mod")
 
+	--[[ Eh...too crash prone 
 	xml:InitStatic("tab_gameplay:cap_check_spawn_antifreeze", menu.dlg_gameplay)
 	menu.ck_spawn_antifreeze = xml:InitCheck("tab_gameplay:check_spawn_antifreeze",	menu.dlg_gameplay)
+	--]]
 end 
 
 function opt_menu_on_accept(menu,optMgr,console)

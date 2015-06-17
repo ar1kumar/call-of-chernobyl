@@ -72,7 +72,7 @@ function generic_object_binder:update(delta)
 	local id = self.object:id()
 
 	-- Start [Alundaio]
-	if (axr_main) then axr_main.monster_on_update(self.object,self.st) end
+	CreateScriptCallback("monster_on_update",self.object,self.st)
 	-- End [Alundaio]
 
 	if not object_alive then
@@ -200,7 +200,7 @@ function generic_object_binder:death_callback(victim, who)
 	else
 		release_body_manager.get_release_body_manager():moving_dead_body(self.object)
 		-- Alundaio
-		if (axr_main) then axr_main.monster_on_death_callback(victim,who) end
+		CreateScriptCallback("monster_on_death_callback",victim,who)
 		db.storage[id].death_time = game.get_game_time()
 		db.storage[id].death_by_id = who:id()
 		-- End Alundaio
@@ -225,7 +225,7 @@ function generic_object_binder:hit_callback(obj, amount, local_direction, who, b
 	end
 
 	-- Alundaio
-	if (axr_main) then axr_main.monster_on_hit_callback(obj, amount, local_direction, who, bone_index) end
+	CreateScriptCallback("monster_on_hit_callback",obj,amount,local_direction,who,bone_index)
 	-- End Alundaio
 end
 
@@ -238,7 +238,7 @@ end
 
 function generic_object_binder:use_callback(obj, who)
 	-- Alundaio
-	if (axr_main) then axr_main.monster_on_actor_use_callback(obj,who) end
+	CreateScriptCallback("monster_on_actor_use_callback",obj,who)
 	-- Alundaio
 end
 
@@ -255,7 +255,7 @@ function generic_object_binder:net_spawn(sobject)
 	end
 
 	-- Alundaio
-	if (axr_main) then axr_main.monster_on_net_spawn(self.object,sobject) end
+	CreateScriptCallback("monster_on_net_spawn",self.object,sobject)
 	-- Alundaio
 	
 	if not self.object:alive() then

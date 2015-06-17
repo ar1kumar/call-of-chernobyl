@@ -26,11 +26,10 @@ function actor_binder:__init (obj) super(obj)
 	self.last_detective_achievement_spawn_time 	= nil
 	self.last_mutant_hunter_achievement_spawn_time	= nil
 	-- Alundaio
-	axr_main.actor_on_init(self)
+	CreateScriptCallback("actor_on_init",self)
 	-- End Alundaio
 	-- AtmosFear
 	if (atmosfear) then self.atmosfear=atmosfear.get_atmosfear() end
-	if (fallout_manager) then self.fallout_manager = fallout_manager.get_fallout_manager() end
 	if (psi_storm_manager) then self.psi_storm_manager = psi_storm_manager.get_psi_storm_manager() end
 	-- alundaio
 end
@@ -63,7 +62,7 @@ function actor_binder:net_spawn(data)
 	self.loaded = false
 
 	-- alundaio
-	axr_main.on_game_load()
+	CreateScriptCallback("on_game_load",self)
 	-- end alundaio
 
 	return true
@@ -84,25 +83,32 @@ function actor_binder:net_destroy()
 	db.del_actor(self.object)
 	db.delete_enemy(self.object)
 
-	self.object:set_callback(callback.inventory_info)
-	self.object:set_callback(callback.on_item_take)
-	self.object:set_callback(callback.on_item_drop)
-	self.object:set_callback(callback.task_state)
-	self.object:set_callback(callback.level_border_enter)
-	self.object:set_callback(callback.level_border_exit)
-	self.object:set_callback(callback.take_item_from_box)
-	self.object:set_callback(callback.use_object)
-	if (callback.hit) then
-		self.object:set_callback(callback.hit)
-	end
-	if (callback.key_press) then
-		self.object:set_callback(callback.key_press)
-	end
-	if (callback.key_release) then
-		self.object:set_callback(callback.key_release)
-	end
-	if (callback.actor_before_death) then
-		self.object:set_callback(callback.actor_before_death)
+	local t = {
+				-- vanilla
+				callback.inventory_info,
+				callback.on_item_take,
+				callback.on_item_drop,
+				callback.task_state,
+				callback.trade_sell_buy_item,
+				callback.take_item_from_box,
+				callback.use_object,
+				
+				-- coc
+				callback.hit,
+				callback.key_press,
+				callback.key_release,
+				callback.actor_before_death,
+				callback.on_attach_vehicle,
+				callback.on_detach_vehicle,
+				callback.on_use_vehicle,
+				callback.weapon_jammed,
+				callback.weapon_zoom_in,
+				callback.weapon_zoom_out
+	}
+	for i=1,#t do 
+		if (t[i]) then 
+			self.object:set_callback(t[i])
+		end
 	end
 
 	if(_G.amb_vol~=0) then
@@ -119,7 +125,7 @@ function actor_binder:net_destroy()
 	end
 
 	-- Alundaio
-	axr_main.on_game_end()
+	CreateScriptCallback("on_game_end",obj,reader)
 	-- Alundaio
 	object_binder.net_destroy(self)
 end
@@ -149,6 +155,24 @@ function actor_binder:reinit()
 	end
 	if (callback.actor_before_death) then
 		self.object:set_callback(callback.actor_before_death, axr_main.actor_on_before_death, self)
+	end
+	if (callback.on_attach_vehicle) then 
+		self.object:set_callback(callback.on_attach_vehicle, axr_main.on_attach_vehicle, self)
+	end 
+	if (callback.on_detach_vehicle) then 
+		self.object:set_callback(callback.on_detach_vehicle, axr_main.on_detach_vehicle, self)
+	end 
+	if (callback.on_use_vehicle) then 
+		self.object:set_callback(callback.on_use_vehicle, axr_main.on_use_vehicle, self)
+	end
+	if (callback.weapon_jammed) then 
+		self.object:set_callback(callback.weapon_jammed, axr_main.actor_on_weapon_jammed, self)
+	end
+	if (callback.weapon_zoom_in) then 
+		self.object:set_callback(callback.weapon_zoom_in, axr_main.actor_on_weapon_zoom_in, self)
+	end
+	if (callback.weapon_zoom_out) then 
+		self.object:set_callback(callback.weapon_zoom_out, axr_main.actor_on_weapon_zoom_out, self)
 	end
 end
 
@@ -268,7 +292,7 @@ function actor_binder:update(delta)
 			--printf("hiding weapon!!!")
 			self.weapon_hide_in_dialog = true
 		end
-	else
+	else              
 		if self.weapon_hide_in_dialog == true then
 			--printf("restoring weapon!!!")
 			self.object:restore_weapon()
@@ -281,34 +305,20 @@ function actor_binder:update(delta)
 		sr_psy_antenna.psy_antenna:update(delta)
 	end
 
-	if(self.surge_manager) then
-		if(self.f_surge_manager_loaded ~= true) then
-			self.surge_manager:initialize()
-			self.f_surge_manager_loaded = true
-		end
-		if(self.surge_manager.levels_respawn[level.name()]) then
-			self.surge_manager:respawn_artefacts_and_replace_anomaly_zone()
-		end
-		self.surge_manager:update()
-	end
-
-	-- AtmosFear
-	--printf("actor update before psi_storm_manager")
-	if(self.psi_storm_manager) then
-		if(self.f_psi_storm_manager_loaded ~= true) then
-			self.psi_storm_manager:initialize()
-			self.f_psi_storm_manager_loaded = true
-		end
-		self.psi_storm_manager:update()
-	end
-	--printf("actor update after psi_storm_manager before fallout_manager")
-	if(self.fallout_manager) then
-		self.fallout_manager:update()
-	end
 	--printf("actor update before atmosfear update")
 	if(self.atmosfear) then
 		self.atmosfear:update()
 	end
+	
+	if(self.surge_manager) then
+		self.surge_manager:update()
+	end
+
+	--printf("actor update before psi_storm_manager")
+	if(self.psi_storm_manager) then
+		self.psi_storm_manager:update()
+	end
+
 	--printf("actor update after atmosfear update")
 	if not db.actor:has_info("atmosfear_default_console_settings_loaded") then
 		self.atmosfear:loadDefaultConsoleSettings()
@@ -320,8 +330,7 @@ function actor_binder:update(delta)
 	simulation_objects.get_sim_obj_registry():update_avaliability(alife():actor())
 
 	-- alundaio
-	--printf("actor update before axr_main")
-	axr_main.actor_on_update(self,delta)
+	CreateScriptCallback("actor_on_update",self,delta)
 	-- alundaio
 	
 	local tg = time_global()
@@ -355,12 +364,7 @@ function actor_binder:save(packet)
 	xr_logic.pstor_save_all(self.object, packet)
 	self.weather_manager:save(packet)
 	release_body_manager.get_release_body_manager():save(packet)
-	self.surge_manager:save(packet)
-	-- Atmosfear
-	if (fallout_manager) then self.fallout_manager:save(packet) end
-	if (psi_storm_manager) then self.psi_storm_manager:save(packet) end
-	-- Atmosfear
-
+	
 	sr_psy_antenna.save( packet )
 
 	alun_utils.w_stpk(packet,"bool",SIMBOARD.simulation_started, "sim started")
@@ -399,7 +403,7 @@ function actor_binder:save(packet)
 	end
 
 	--alundaio
-	axr_main.actor_on_save(self,packet)
+	CreateScriptCallback("actor_on_save",self,packet)
 	-- alundaio end
 	set_save_marker(packet, "save", true, "actor_binder")
 	--alun_utils.debug_write("--------------- actor_binder:save -------- End")
@@ -427,15 +431,6 @@ function actor_binder:load(reader)
 	xr_logic.pstor_load_all(self.object, reader)
 	self.weather_manager:load(reader)
 	release_body_manager.get_release_body_manager():load(reader)
-	self.surge_manager:load(reader)
-	self.f_surge_manager_loaded = true
-	-- Atmosfear
-	if (fallout_manager) then self.fallout_manager:load(reader) end
-	if (psi_storm_manager) then
-		self.psi_storm_manager:load(reader)
-		self.f_psi_storm_manager_loaded = true
-	end
-	-- Atmosfear
 
 	sr_psy_antenna.load(reader)
 	SIMBOARD.simulation_started = reader:r_bool()
@@ -467,7 +462,7 @@ function actor_binder:load(reader)
 		self.last_mutant_hunter_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
 	end
 	--alundaio
-	axr_main.actor_on_load(self,reader)
+	CreateScriptCallback("actor_on_load",self,reader)
 	-- end alundaio
 	set_save_marker(reader, "load", true, "actor_binder")
 end

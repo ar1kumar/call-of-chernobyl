@@ -94,7 +94,7 @@ function general_fetch_task(task_id,field,p)
 		local tm = task_manager.get_task_manager()
 		local task_info = tm.task_info
 		if (task_info[task_id] and task_info[task_id].stage == 1) then
-			local id = alun_utils.load_var(db.actor,task_id.."_target_id")
+			local id = alun_utils.load_var(db.actor,task_id.."_target_id") or alun_utils.load_var(db.actor,task_id.."_giver_id")
 			if (id) then 
 				return id 
 			end
@@ -257,7 +257,7 @@ function simulation_task_target(task_id,field,p)
 		return 
 	end
 	
-	if (task_id == "simulation_task_3") then
+	if (task_id == "simulation_task_3" or task_id == "simulation_task_4" or task_id == "simulation_task_5") then
 		local squad = get_story_squad("hostage_companion_task_1")
 		local tm = task_manager.get_task_manager()
 		local task = tm.task_info[task_id]
@@ -445,27 +445,27 @@ end
 --AtmosFear Fallout
 
 function fallout_task_title(id, field, p)
-	return fallout_manager.get_task_title()
+	return fallout_manager and fallout_manager.get_task_title() or ""
 end
 
 function fallout_task_descr(id, field, p)
-	return fallout_manager.get_task_descr()
+	return fallout_manager and fallout_manager.get_task_descr() or ""
 end
 
 function fallout_task_target(id, field, p)
-	return fallout_manager.get_task_target()
+	return fallout_manager and fallout_manager.get_task_target() or nil
 end
 
 --AtmosFear Psi Storm
 
 function psi_storm_task_title(id, field, p)
-	return psi_storm_manager.get_task_title()
+	return psi_storm_manager and psi_storm_manager.get_task_title() or ""
 end
 
 function psi_storm_task_descr(id, field, p)
-	return psi_storm_manager.get_task_descr()
+	return psi_storm_manager and psi_storm_manager.get_task_descr() or ""
 end
 
 function psi_storm_task_target(id, field, p)
-	return psi_storm_manager.get_task_target()
+	return psi_storm_manager and psi_storm_manager.get_task_target() or nil
 end

@@ -75,8 +75,8 @@ function on_game_start()
 		LootTable = alun_utils.collect_section(ini,"lootable",true)
 	end
 
-	callback_register("npc_on_item_take",npc_on_item_take)
-	callback_register("actor_on_item_take",actor_on_item_take)
+	RegisterScriptCallback("npc_on_item_take",npc_on_item_take)
+	RegisterScriptCallback("actor_on_item_take",actor_on_item_take)
 end
 
 

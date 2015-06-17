@@ -48,119 +48,6 @@ function check_and_set_help(caller,txt,owner,msg)
 	return wrd,rest
 end
 
--- cmd.inventory_owner
-function cmd.inventory_owner(me,txt,owner,p)
-	local wrd,rest = check_and_set_help(me,txt,owner,"[removeall]")
-	if (wrd == "removeall") then 
-		wrd = first_word(rest)
-		if (wrd == "help") then 
-			return "inventory_owner:= try 'inventory_owner removeall id:<number>'"
-		end 
-		
-		local id
-		for s in string.gmatch(txt,"id:(%d+)") do
-			id = tonumber(s)
-		end
-		if not (id) then
-			return "inventory_owner:= type 'inventory_owner removeall help'"
-		end
-		
-		local se_obj
-		local sim = alife()
-		local count = 0
-		for i=1,65534 do 
-			se_obj = sim:object(i)
-			if (se_obj and se_obj.parent_id == id) then 
-				sim:release(se_obj,true)
-				count = count + 1
-			end
-		end
-		if (count > 0) then 
-			return "inventory_owner:= removed %s children from inventory_owner",count
-		end
-		return "inventory_owner:= failed to remove any children from inventory_owner"
-	end
-	return "inventory_owner:= type 'inventory_owner help' for a list of subcommands"
-end 
-
--- cmd.antifreeze
-function antifreeze_switch(p)
-	local sim = alife()
-	local se_obj = sim:object(p[1])
-	if not (se_obj) then 
-		return true 
-	end 
-	if (se_obj:can_switch_offline()) then
-		alun_utils.switch_offline(se_obj.id)
-	elseif (se_obj:can_switch_online()) then
-		alun_utils.switch_online(se_obj.id)
-	end
-	return true
-end 
-function cmd.antifreeze(me,txt,owner,p)
-	local wrd = check_and_set_help(me,txt,owner,"[npc [<time>]] (ex.1: antifreeze 5 | ex.2: antifreeze npc 5)")
-	
-	local function tele_to_actor(p)
-		local sim = alife()
-		local se_obj = sim:object(p[1])
-		if not (se_obj) then 
-			return true 
-		end
-		if (se_obj:clsid() == clsid.online_offline_group_s) then
-			alun_utils.teleport_squad(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
-		elseif (IsStalker(se_obj) or IsMonster(se_obj)) then 
-			if (alife().teleport_object) then 
-				alife():teleport_object(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
-			end
-		end
-		return true
-	end  
-	
-	local function repeater(p)
-		create_delayed_event(p[1],"antifreeze",wrd,antifreeze_switch,p[1])
-		return false
-	end
-	
-	if (wrd == "npc") then 
-		local _strt, _end = string.find(txt,"%d+")
-		if (_strt and _end) then
-			wrd = string.sub(txt,_strt, _end)
-			wrd = string.lower(wrd)
-		end
-
-		wrd = wrd ~= "" and tonumber(wrd) or 5
-
-		se_obj = alife():create("sim_default_stalker_0", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
-		if not (se_obj) then 
-			return "antifreeze:= failed to create stalker "
-		end
-		create_delayed_event(se_obj.id,"repeater",10,repeater,se_obj.id)
-	else 
-		wrd = tonumber(wrd) or 5 
-		
-		if not (smart_terrain.nearest_to_actor_smart.id) then 
-			return "antifreeze:= no nearest smart"
-		end 
-		
-		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
-		if not (smart) then 
-			return "antifreeze:= smart by id " .. smart_terrain.nearest_to_actor_smart.id .. "does not exist."
-		end 
-		
-		local se_obj = SIMBOARD:create_squad(smart,"stalker_sim_squad_novice")
-		if not (se_obj) then 
-			return "antifreeze:= failed to create squad "
-		end 
-		
-		se_obj.scripted_target = "actor"
-		
-		create_delayed_event(se_obj.id,"teleport",5,tele_to_actor,se_obj.id)
-		create_delayed_event(se_obj.id,"repeater",10,repeater,se_obj.id)
-	end
-	
-	return "antifreeze:= created object and teleported to your position!"
-end 
-
 -- HELP
 function cmd.help(me,txt,owner,p)
 	local wrd,rest = first_word(txt)
@@ -756,8 +643,7 @@ function cmd.execute(me,txt,owner,p)
 	local wrd = check_and_set_help(me,txt,owner,"<string>")
 	if not (wrd) then return end
 
-	local loadstring = alun_utils.memoize(loadstring)
-	local f,err = loadstring(wrd)
+	local f,err = assert(loadstring(wrd))
 	if (f) then
 		f()
 	else
@@ -1414,6 +1300,7 @@ function cmd.time(me,txt,owner,p)
 
 	local t = alun_utils.str_explode(txt,",")
 	if (t) then
+		--set_current_time(tonumber(t[1]),tonumber(t[2]),tonumber(t[3]))
 		level.change_game_time( tonumber(t[1]),tonumber(t[2]),tonumber(t[3]) )
 		level_weathers.get_weather_manager():forced_weather_change()
 	end
@@ -1890,4 +1777,133 @@ function cmd.info(me,txt,owner,p)
 		return
 	end
 	return "info:= type info help for a list of subcommands"
+end
+
+-- cmd.inventory_owner
+function cmd.inventory_owner(me,txt,owner,p)
+	local wrd,rest = check_and_set_help(me,txt,owner,"[removeall]")
+	if (wrd == "removeall") then 
+		wrd = first_word(rest)
+		if (wrd == "help") then 
+			return "inventory_owner:= try 'inventory_owner removeall id:<number>'"
+		end 
+		
+		local id
+		for s in string.gmatch(txt,"id:(%d+)") do
+			id = tonumber(s)
+		end
+		if not (id) then
+			return "inventory_owner:= type 'inventory_owner removeall help'"
+		end
+		
+		local se_obj
+		local sim = alife()
+		local count = 0
+		for i=1,65534 do 
+			se_obj = sim:object(i)
+			if (se_obj and se_obj.parent_id == id) then 
+				sim:release(se_obj,true)
+				count = count + 1
+			end
+		end
+		if (count > 0) then 
+			return "inventory_owner:= removed %s children from inventory_owner",count
+		end
+		return "inventory_owner:= failed to remove any children from inventory_owner"
+	end
+	return "inventory_owner:= type 'inventory_owner help' for a list of subcommands"
+end 
+
+-- cmd.antifreeze
+function antifreeze_switch(p)
+	local sim = alife()
+	local se_obj = sim:object(p[1])
+	if not (se_obj) then 
+		return true 
+	end 
+	if (se_obj:can_switch_offline()) then
+		alun_utils.switch_offline(se_obj.id)
+	elseif (se_obj:can_switch_online()) then
+		alun_utils.switch_online(se_obj.id)
+	end
+	return true
+end 
+function cmd.antifreeze(me,txt,owner,p)
+	local wrd = check_and_set_help(me,txt,owner,"[npc [<time>]] (ex.1: antifreeze 5 | ex.2: antifreeze npc 5)")
+	
+	local function tele_to_actor(p)
+		local sim = alife()
+		local se_obj = sim:object(p[1])
+		if not (se_obj) then 
+			return true 
+		end
+		if (se_obj:clsid() == clsid.online_offline_group_s) then
+			alun_utils.teleport_squad(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+		elseif (IsStalker(se_obj) or IsMonster(se_obj)) then 
+			if (alife().teleport_object) then 
+				alife():teleport_object(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+			end
+		end
+		return true
+	end  
+	
+	local function repeater(p)
+		CreateDelayedEvent(p[1],"antifreeze",wrd,antifreeze_switch,p[1])
+		return false
+	end
+	
+	if (wrd == "npc") then 
+		local _strt, _end = string.find(txt,"%d+")
+		if (_strt and _end) then
+			wrd = string.sub(txt,_strt, _end)
+			wrd = string.lower(wrd)
+		end
+
+		wrd = wrd ~= "" and tonumber(wrd) or 5
+
+		se_obj = alife():create("sim_default_stalker_0", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id())
+		if not (se_obj) then 
+			return "antifreeze:= failed to create stalker "
+		end
+		CreateDelayedEvent(se_obj.id,"repeater",10,repeater,se_obj.id)
+	else 
+		wrd = tonumber(wrd) or 5 
+		
+		if not (smart_terrain.nearest_to_actor_smart.id) then 
+			return "antifreeze:= no nearest smart"
+		end 
+		
+		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
+		if not (smart) then 
+			return "antifreeze:= smart by id " .. smart_terrain.nearest_to_actor_smart.id .. "does not exist."
+		end 
+		
+		local se_obj = SIMBOARD:create_squad(smart,"stalker_sim_squad_novice")
+		if not (se_obj) then 
+			return "antifreeze:= failed to create squad "
+		end 
+		
+		se_obj.scripted_target = "actor"
+		
+		CreateDelayedEvent(se_obj.id,"teleport",5,tele_to_actor,se_obj.id)
+		CreateDelayedEvent(se_obj.id,"repeater",10,repeater,se_obj.id)
+	end
+	
+	return "antifreeze:= created object and teleported to your position!"
+end 
+
+function cmd.pstor_test(me,txt,owner,p)
+	local wrd = check_and_set_help(me,txt,owner,"saves 2000 boolean to db.actor using pstor_store")
+	if not (db.actor) then 
+		return "pstor_test:= actor not present"
+	end 
+	
+	for _ = 1, 2000 do
+		local var = tostring( math.random() ):sub( 1, 10 )
+		local val = tostring( math.random() ):sub( 1, 10 )
+		printf("%s | %s",var,val)
+		xr_logic.pstor_store( db.actor, var, val )
+	end
+
+	return "pstor_test:= successfully saved 2000 values to db.actor pstor"
 end
