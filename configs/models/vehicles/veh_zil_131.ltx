@@ -20,7 +20,7 @@ damage				= damage_bones
 ;------ Factory parameters of Engine -------------------------------------------
 
 fuel_tank			= 340         	; L
-fuel_consumption		= 40		; L / (100k R); liters per 100 000 rotations
+fuel_consumption		= 12 ;40		; L / (100k R); liters per 100 000 rotations
 engine_power			= 150        	; horse_power (kW=hp*0.808) max power
 max_power_rpm			= 3000        	; (nominal rpm ) on this rpm value engine power reaches maximum
 max_torque_rpm			= 2600       	; on this rpm engine torque reaches maximum
@@ -48,12 +48,12 @@ break_time			= 0.5         	; время нарастания силы торможения до максимума, при
 
 ;------ Gearbox ----------------------------------------------------------------
 
-main_gear_ratio			= 15.63		; Передаточное отношение
+main_gear_ratio			= 20.63 ;15.63		; Передаточное отношение
 auto_transmission		= on		; Автоматическая коробка (on/off)
 
 [transmission_gear_ratio]
 										; shift down/ shift up. (rpm, необходимое для переключения)
-R				= 4.63, 2500,3500;950, 3000
+R				= 4.73, 2500,3500;950, 3000
 N1				= 4.73, 2500,3500;950, 850
 N2				= 3.29, 2500,3500;1550, 1850
 N3				= 2.39, 2500,3500;2050, 2850
@@ -119,8 +119,8 @@ front_left_wheel		= 5000
 front_right_wheel		= 5000
 back_left_wheel2		= 5000
 back_right_wheel2		= 5000
-left_door			= 2000
-right_door			= 2000
+left_door			= 3000
+right_door			= 3000
 
 ;------ collisiondamage --------------------------------------------------------
 
@@ -145,15 +145,25 @@ front_right_wheel		= 0.00001
 default       			= 1, -1, 0.1
 
 [immunities]
-burn_immunity			= 0.0       ;коэффициенты иммунитета
-strike_immunity			= 0.0
-shock_immunity			= 0.0
-wound_immunity			= 0.0
-radiation_immunity		= 0.0
-telepatic_immunity		= 0.0
-chemical_burn_immunity		= 0.0
-explosion_immunity		= 0.0
-fire_wound_immunity		= 0.0
+;burn_immunity			= 0.0       ;коэффициенты иммунитета
+;strike_immunity			= 0.0
+;shock_immunity			= 0.0
+;wound_immunity			= 0.0
+;radiation_immunity		= 0.0
+;telepatic_immunity		= 0.0
+;chemical_burn_immunity		= 0.0
+;explosion_immunity		= 0.0
+;fire_wound_immunity		= 0.0
+
+burn_immunity         	= 0.04       ;коэффициенты иммунитета
+strike_immunity       	= 0.001
+shock_immunity        	= 0.0
+wound_immunity        	= 0.0
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.1
+fire_wound_immunity   	= 0.03
 
 ;----------------explosion params-----------------------------------------------
 

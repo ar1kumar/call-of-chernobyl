@@ -11,7 +11,8 @@ angular_factor			= 0.5
 
 [car_definition]
 
-camera_pos			= -0.4, 1.45, -0.07
+;camera_pos			= -0.4, 1.45, -0.07
+camera_pos  = -0.4, 1.39, 0.2
 
 driving_wheels			= back_left_wheel,back_right_wheel					; ведущие колёса
 steering_wheels			= front_left_wheel,front_right_wheel					; рулевые колёса
@@ -27,7 +28,7 @@ damage				= damage_bones
 ;------ Factory parameters of Engine -------------------------------------------
 
 fuel_tank			= 46		; L
-fuel_consumption		= 8		; L / (100k R); liters per 100 000 rotations
+fuel_consumption		= 1.93; 8		; L / (100k R); liters per 100 000 rotations
 engine_power			= 75		; horse_power (kW=hp*0.808) max power
 max_power_rpm			= 5400		; (nominal rpm ) on this rpm value engine power reaches maximum
 max_torque_rpm			= 3000		; on this rpm engine torque reaches maximum
@@ -147,21 +148,30 @@ back_left_wheel			= 5000
 back_right_wheel		= 5000
 front_left_wheel		= 5000
 front_right_wheel		= 5000
-left_door			= 1000
-right_door			= 1000
+left_door			= 3000
+right_door			= 3000
 
 ;-------------------------------------------------------------------------------
 ;------ collisiondamage --------------------------------------------------------
 
 [collision_damage]
-root				= 0.0001
-kabina				= 0.0001
-left_door			= 0.0001
-right_door			= 0.0001
-back_left_wheel			= 0.00001
-back_right_wheel		= 0.00001
-front_left_wheel		= 0.00001
-front_right_wheel		= 0.00001
+;root				= 0.0001
+;kabina				= 0.0001
+;left_door			= 0.0001
+;right_door			= 0.0001
+;back_left_wheel			= 0.00001
+;back_right_wheel		= 0.00001
+;front_left_wheel		= 0.00001
+;front_right_wheel		= 0.00001
+
+root                  = 0.00001
+kabina                = 0.0001
+left_door             = 0.0001
+right_door            = 0.0001
+back_left_wheel       = 0.00001
+back_right_wheel      = 0.00001
+front_left_wheel      = 0.00001
+front_right_wheel     = 0.00001
 
 ;-------------------------------------------------------------------------------
 ;------ damage bones -----------------------------------------------------------
@@ -185,15 +195,25 @@ front_left_wheel		= 1, -1, 0.1
 front_right_wheel		= 1, -1, 0.1
 
 [immunities]
-burn_immunity			= 0.0			;коэффициенты иммунитета
-strike_immunity			= 0.0
-shock_immunity			= 0.0
-wound_immunity			= 0.0
-radiation_immunity		= 0.0
-telepatic_immunity		= 0.0
-chemical_burn_immunity		= 0.0
-explosion_immunity		= 0.0
-fire_wound_immunity		= 0.0
+;burn_immunity			= 0.0			;коэффициенты иммунитета
+;strike_immunity			= 0.0
+;shock_immunity			= 0.0
+;wound_immunity			= 0.0
+;radiation_immunity		= 0.0
+;telepatic_immunity		= 0.0
+;chemical_burn_immunity		= 0.0
+;explosion_immunity		= 0.0
+;fire_wound_immunity		= 0.0
+
+burn_immunity         	= 0.04       ;коэффициенты иммунитета
+strike_immunity       	= 0.02
+shock_immunity        	= 0.001
+wound_immunity        	= 0.0
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.2
+fire_wound_immunity   	= 0.06
 
 ;-------------------------------------------------------------------------------
 ;----------------explosion params-----------------------------------------------

@@ -18,9 +18,9 @@ exhaust_particles		= vehiclefx\exhaust_1
 ;-------------------------------------------------------------------------------
 ;------ Factory parameters of Engine -------------------------------------------
 
-fuel_tank			= 170		; L
-fuel_consumption		= 19		; L / (100k R); liters per 100 000 rotations
-engine_power			= 180		; horse_power (kW=hp*0.808) max power
+fuel_tank			= 140 ;170		; L
+fuel_consumption		= 1.43 ;19		; L / (100k R); liters per 100 000 rotations
+engine_power			= 140 ;180		; horse_power (kW=hp*0.808) max power
 max_power_rpm			= 4000		; (nominal rpm ) on this rpm value engine power reaches maximum
 max_torque_rpm			= 3500		; on this rpm engine torque reaches maximum
 
@@ -49,7 +49,7 @@ hand_break_torque		= 0.07
 ;-------------------------------------------------------------------------------
 ;------ Gearbox ----------------------------------------------------------------
 
-main_gear_ratio			= 30.1		; Передаточное отношение
+main_gear_ratio			= 16.1 ;30.1		; Передаточное отношение
 auto_transmission		= on		; Автоматическая коробка (on/off)
 
 [transmission_gear_ratio]
@@ -150,15 +150,25 @@ front_right_wheel		= 0.00001
 default				= 1, -1, 0.1
 
 [immunities]
-burn_immunity			= 0.0	;коэффициенты иммунитета
-strike_immunity			= 0.0
-shock_immunity			= 0.0
-wound_immunity			= 0.0
-radiation_immunity		= 0.0
-telepatic_immunity		= 0.0
-chemical_burn_immunity		= 0.0
-explosion_immunity		= 0.0
-fire_wound_immunity		= 0.0
+;burn_immunity			= 0.0	;коэффициенты иммунитета
+;strike_immunity			= 0.0
+;shock_immunity			= 0.0
+;wound_immunity			= 0.0
+;radiation_immunity		= 0.0
+;telepatic_immunity		= 0.0
+;chemical_burn_immunity		= 0.0
+;explosion_immunity		= 0.0
+;fire_wound_immunity		= 0.0
+
+burn_immunity         	= 0.05       ;коэффициенты иммунитета
+strike_immunity       	= 0.001
+shock_immunity        	= 0.001
+wound_immunity        	= 0.0
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.1
+fire_wound_immunity   	= 0.03
 
 ;-------------------------------------------------------------------------------
 ;----------------explosion params-----------------------------------------------

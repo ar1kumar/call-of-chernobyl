@@ -11,7 +11,8 @@ angular_factor			= 0.3
 
 [car_definition]
 
-camera_pos			= -0.4, 1.45, 0.2	;смещение камеры в кабине влево-вправо, вверх-вниз, вперед-назад
+;camera_pos			= -0.4, 1.45, 0.2	;смещение камеры в кабине влево-вправо, вверх-вниз, вперед-назад
+camera_pos        	= -0.4, 1.42, 0.02
 
 driving_wheels			= back_left_wheel,back_right_wheel,front_left_wheel,front_right_wheel   ; ведущие колёса
 steering_wheels			= front_left_wheel,front_right_wheel                                    ; рулевые колёса
@@ -25,47 +26,52 @@ exhausts			= exhausts                                                           
 ;-------------------------------------------------------------------------------
 ;------ Factory parameters of Engine -------------------------------------------
 
-fuel_tank			= 42		; L
-fuel_consumption		= 10		; L / (100k R); liters per 100 000 rotations
-engine_power			= 75		; horse_power (kW=hp*0.808) max power
-max_power_rpm			= 4000		; (nominal rpm ) on this rpm value engine power reaches maximum
+fuel_tank			= 45 ;42		; L
+fuel_consumption		= 2.3 ;10		; L / (100k R); liters per 100 000 rotations
+engine_power			= 80 ;75		; horse_power (kW=hp*0.808) max power
+max_power_rpm			= 5400 ;4000		; (nominal rpm ) on this rpm value engine power reaches maximum
 max_torque_rpm			= 3000		; on this rpm engine torque reaches maximum
 
 power_increment_factor		= 0.02
 power_decrement_factor		= 0.1
 rpm_increment_factor		= 0.1
-rpm_decrement_factor		= 0.4
-m_power_neutral_factor		= 0.25
+rpm_decrement_factor		= 0.3 ;0.4
+m_power_neutral_factor		= 0.75 ;0.25
 
 ; additional engine parameters
 
-max_engine_rpm			= 5000		; rpm (5000) rpm will never be more
-idling_engine_rpm		= 850		; rpm (750) min rpm - starts from this rpm value
+max_engine_rpm			= 6000 ;5000		; rpm (5000) rpm will never be more
+idling_engine_rpm		= 900; 850		; rpm (750) min rpm - starts from this rpm value
 
 ;-------------------------------------------------------------------------------
 ;------ Adjustment a wheel -----------------------------------------------------
 
-reference_radius		= 0.38		; Радиус колеса, используемый при просчёте двигателя
-axle_friction			= 0.1		; Ослабление скорости в неетральной позиции. (N*m)
-steering_speed			= 1.0		; Время поворота рулевого колеса, в максимум. rps (1)
-steering_torque			= 900		; Сила гидроусилителя руля. (N*m)
-break_torque			= 0.012		; Сила тормозных колодок. (N*m)
-break_time			= 1.0		; время нарастания силы торможения до максимума, при подтормаживании (стрелка назад)
-hand_break_torque		= 0.012		; сила торможения пробелом (по умолчанию = break_torque)
+reference_radius		= 0.35 ;0.38		; Радиус колеса, используемый при просчёте двигателя
+axle_friction			= 0.00001 ;0.1		; Ослабление скорости в неетральной позиции. (N*m)
+steering_speed			= 0.9 ;1.0		; Время поворота рулевого колеса, в максимум. rps (1)
+steering_torque			= 90000 ;900		; Сила гидроусилителя руля. (N*m)
+break_torque			= 0.045 ;0.012		; Сила тормозных колодок. (N*m)
+break_time				= 1.0		; время нарастания силы торможения до максимума, при подтормаживании (стрелка назад)
+hand_break_torque		= 0.04 ;0.012		; сила торможения пробелом (по умолчанию = break_torque)
 
 ;-------------------------------------------------------------------------------
 ;------ Gearbox ----------------------------------------------------------------
 
-main_gear_ratio			= 20.3		; Передаточное отношение
+main_gear_ratio			= 21 ;20.3		; Передаточное отношение
 auto_transmission		= on		; Автоматическая коробка (on/off)
 
 [transmission_gear_ratio]
 										; shift down/ shift up. (rpm, необходимое для переключения)
-R				= 2.73, 2500,4250	
-N1				= 4.73, 2500,4250
-N2				= 3.29, 2500,4250
-N3				= 2.39, 2500,4250
-N4				= 1.96, 2500,4250
+;R				= 2.73, 2500,4250	
+;N1				= 4.73, 2500,4250
+;N2				= 3.29, 2500,4250
+;N3				= 2.39, 2500,4250
+;N4				= 1.96, 2500,4250
+R						= 3.340,2700,16000
+N1						= 4.242,2700,5700
+N2						= 3.989,2700,5700
+N3						= 2.289,2700,5700
+N4						= 1.000,2700,16000
 
 ;-------------------------------------------------------------------------------
 ;------ Rest Adjustment --------------------------------------------------------
@@ -135,27 +141,45 @@ front_bamper			= 0,0,0
 ;------ damage items -----------------------------------------------------------
 
 [damage_items]
-back_left_wheel			= 5000
-back_right_wheel		= 5000
-front_left_wheel		= 5000
-front_right_wheel		= 5000
-left_door			= 2000
-right_door			= 2000
+;back_left_wheel			= 5000
+;back_right_wheel		= 5000
+;front_left_wheel		= 5000
+;front_right_wheel		= 5000
+;left_door			= 2000
+;right_door			= 2000
+
+back_left_wheel   		= 5000
+back_right_wheel  		= 5000
+front_left_wheel  		= 5000
+front_right_wheel 		= 5000
+left_door         		= 3000
+right_door        		= 3000
 
 ;-------------------------------------------------------------------------------
 ;------ collisiondamage --------------------------------------------------------
 
 [collision_damage]
+;root				= 0.0001
+;front_bamper		= 0.001
+;kabina				= 0.0001
+;left_door			= 0.0001
+;right_door			= 0.0001
+;back_door			= 0.0001
+;back_left_wheel		= 0.00001
+;back_right_wheel	= 0.00001
+;front_left_wheel	= 0.00001
+;front_right_wheel	= 0.00001
+
 root				= 0.0001
-front_bamper			= 0.001
+front_bamper		= 0.0001
 kabina				= 0.0001
 left_door			= 0.0001
 right_door			= 0.0001
 back_door			= 0.0001
-back_left_wheel			= 0.00001
-back_right_wheel		= 0.00001
-front_left_wheel		= 0.00001
-front_right_wheel		= 0.00001
+back_left_wheel		= 0.00001
+back_right_wheel	= 0.00001
+front_left_wheel	= 0.00001
+front_right_wheel	= 0.00001
 
 ;-------------------------------------------------------------------------------
 ;------ damage bones -----------------------------------------------------------
@@ -168,16 +192,25 @@ front_right_wheel		= 0.00001
 default				= 1, -1, 0.1
 
 [immunities]
-burn_immunity			= 0.0       ;коэффициенты иммунитета
-strike_immunity			= 0.0
-shock_immunity			= 0.0
-wound_immunity			= 0.0
-radiation_immunity		= 0.0
-telepatic_immunity		= 0.0
-chemical_burn_immunity		= 0.0
-explosion_immunity		= 0.0
-fire_wound_immunity		= 0.0
+;burn_immunity			= 0.0       ;коэффициенты иммунитета
+;strike_immunity		= 0.0
+;shock_immunity			= 0.0
+;wound_immunity			= 0.0
+;radiation_immunity		= 0.0
+;telepatic_immunity		= 0.0
+;chemical_burn_immunity	= 0.0
+;explosion_immunity		= 0.0
+;fire_wound_immunity	= 0.0
 
+burn_immunity         	= 0.04       ;коэффициенты иммунитета
+strike_immunity       	= 0.001
+shock_immunity        	= 0.001
+wound_immunity        	= 0.0
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.2
+fire_wound_immunity   	= 0.06
 
 ;-------------------------------------------------------------------------------
 ;----------------explosion params-----------------------------------------------
