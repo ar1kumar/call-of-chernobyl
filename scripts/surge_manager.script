@@ -211,7 +211,6 @@ function CSurgeManager:new_surge_time(reset)
 end
 
 function CSurgeManager:skip_surge()
-	printf("skip_surge")
 	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
 	Y, M, D, h, m, s, ms = self.inited_time:get(Y, M, D, h, m, s, ms)
 	self.last_surge_time:set(Y, M, D, h, m, s + self.surge_time, ms)
@@ -322,10 +321,12 @@ function CSurgeManager:end_surge(manual)
 		self:kill_all_unhided()
 	end
 
-	self:respawn_artefacts_and_replace_anomaly_zone()
-	xr_statistic.inc_surges_counter()
+	-- fix abuse from sleeping to respawn anoms
+	if not (self.time_forwarded) then
+		self:respawn_artefacts_and_replace_anomaly_zone()
+	end
 	
-	self.zombie_count = nil
+	xr_statistic.inc_surges_counter()
 end
 
 function CSurgeManager:pos_in_cover(pos)
@@ -1679,7 +1680,7 @@ function set_surge_task(task)
 end
 
 function is_started()
-	return SurgeManager.started
+	return SurgeManager and SurgeManager.started
 end
 
 function is_killing_all()
@@ -1690,11 +1691,11 @@ function is_killing_all()
 end
 
 function is_finished()
-	return SurgeManager.finished == true
+	return SurgeManager == nil and true or SurgeManager.finished == true
 end
 
 function is_loaded()
-	return SurgeManager.loaded == true
+	return SurgeManager and SurgeManager.loaded == true
 end
 
 function resurrect_skip_message()

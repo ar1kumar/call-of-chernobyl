@@ -25,33 +25,6 @@ local function on_key_press(key)
 			end
 		end
 		--]]
-		if not (db.actor:object("script_hud_motion")) then 
-			alife():create("script_hud_motion",vector(),0,0,0)
-		else 
-		
-			local wpn = db.actor:item_in_slot(13)
-			printf("%s",wpn and wpn:section())
-			db.actor:activate_slot(13)
-			
-			if (wpn) then 
-				printf("item_state = %s",wpn:get_state())
-
-				wpn:play_hud_motion("anm_throw_begin",false,wpn:get_state())
-				--wpn:play_hud_motion("anm_reload_g",true,wpn:get_state())
-				--wpn:play_hud_motion("anm_bore",true,wpn:get_state())
-
-				--wpn:switch_state(2)
-				--wpn:render_hud_item(false)
-
-
-				--printf("has_upgrade = %s",wpn:has_upgrade("up_fiftha_ak74u"))
-				--wpn:add_upgrade("up_gr_firstab_abakan")
-				
-				local function iter(upgr)
-					printf("%s",upgr)
-				end
-				--wpn:iterate_installed_upgrades(iter)
-			end
 		end
 	-- Select Object on key press and teleports it on key release!
 	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_select_object",0,"")]) then
