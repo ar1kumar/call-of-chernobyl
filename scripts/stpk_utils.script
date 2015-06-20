@@ -1151,6 +1151,25 @@ function fill_cse_ph_skeleton_properties_packet(ret,stpk)
 	stpk:w_u16(ret.source_id)
 end
 
+--[[
+local object_flags = {
+		[1] = "flUseSwitches",
+		[2] = "flSwitchOnline",
+		[4] = "flSwitchOffline",
+		[8] = "flInteractive",
+		[16] = "flVisibleForAI",
+		[32] = "flUsefulForAI",
+		[64] = "flOfflineNoMove",
+		[128] = "flUsedAI_Locations",
+		[256] = "flUseGroupBehaviour",
+		[512] = "flCanSave",
+		[1024] = "flVisibleForMap",
+		[2048] = "flUseSmartTerrains",
+		[4096] = "flCheckForSeparator",
+		[8192] = "flCorpseRemoval"
+}
+--]]
+
 -- cse_alife_object_properties
 function parse_cse_alife_object_properties_packet(ret,stpk)
 	ret.game_vertex_id = stpk:r_u16()
@@ -1537,6 +1556,12 @@ end
 
 -- cse_alife_space_restrictor_properties
 function parse_cse_alife_space_restrictor_properties_packet(ret,stpk)
+	--[[
+		[0] = "NONE default restrictor",
+		[1] = "OUT default restrictor",
+		[2] = "IN default restrictor",
+		[3] = "NOT A restrictor"
+	--]]
 	ret.restrictor_type = stpk:r_u8()
 end
 

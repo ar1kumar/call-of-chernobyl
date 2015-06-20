@@ -21,11 +21,29 @@ id_to_spawn_table = {
 		[13] = "Weapons (Misc.)",
 		[14] = "Weapons (Pistol)",
 		[15] = "Weapons (Rifle)",
-		[16] = "Vehicles"
+		[16] = "Vehicles",
+		[17] = "Anomaly"
 }
 
 function get_spawn_table(name)
-	if (name == "Artefacts") then
+	if (name == "Anomaly") then 
+		return {
+				"zone_mine_gravitational_weak",
+				"zone_mine_thermal_weak",
+				"zone_mine_acidic_weak",
+				"zone_mine_electric_weak",
+				"zone_field_radioactive_weak",
+				"zone_mine_steam_weak",
+				"zone_field_psychic_weak",
+				--"fireball_zone",
+				--"fireball_electric_zone",
+				--"fireball_acidic_zone",
+				"zone_mine_field",
+				"zone_mine_field_soc",
+				"zone_no_gravity",
+				"zone_teleport"
+		}
+	elseif (name == "Artefacts") then
 		return {
 				"af_medusa", 		    -- 1
 				"af_cristall_flower",   -- 2
@@ -860,10 +878,18 @@ end
 function debug_ui:OnBtnTeleport()
 	local pos = xrs_debug_tools.LastCameraPos
 	if (pos) then
-		if (db.vehicle and db.actor.detach_vehicle) then 
-			db.actor:detach_vehicle()
+		--[[
+		if (db.vehicle) then 
+			db.vehicle:force_set_position(pos)
+		else 
+			db.actor:set_actor_position(pos)
 		end
+		--]]
+		if (db.vehicle) then 
+			db.actor:detach_vehicle()
+		end 
 		db.actor:set_actor_position(pos)
+		
 		self:OnQuit()
 	end
 end
@@ -1194,7 +1220,7 @@ function debug_ui:FillList(name)
 	local is_squad = string.find(name,"Squad")
 	local cant_spawn_actor = string.find(name,"NPC") or string.find(name,"Physic")
 	local is_veh = string.find(name,"Vehicles")
-	
+	local is_anom = string.find(name,"Anomaly")
 	if (is_squad) then 
 	--	self.smarts_list:Show(true)
 	else
@@ -1220,6 +1246,10 @@ function debug_ui:FillList(name)
 			elseif (is_veh) then 
 				_itm.no_id = true
 				_itm.spawn_at_look = true
+			elseif (is_anom) then 
+				_itm.no_id = true
+				_itm.spawn_at_look = true
+				_itm.is_anom = true
 			end
 
 			self.spawn_list:AddExistingItem(_itm)
@@ -1338,6 +1368,21 @@ function debug_ui:OnButton_create_clicked()
 	if not (se_obj) then
 		self:SendOutput("UISpawner: Failure to create item with alife create method %s",section)
 		return
+	end
+	
+	if (item.is_anom) then 
+		local data = stpk_utils.get_anom_zone_data(se_obj)
+		if (data) then
+			data.object_flags = 31
+			--data.artefact_spawn_count = 1
+			data.restrictor_type = 0
+			data.shapes = {}
+			data.shapes[1] = {}
+			data.shapes[1].shtype = 0
+			data.shapes[1].offset = vector():set(0,0,0)
+			data.shapes[1].radius = 5
+			stpk_utils.set_anom_zone_data(data,se_obj)
+		end
 	end
 
 	self:SendOutput("UISpawner: Spawned %s on %s as id %s",se_obj:name(),id == 0 and "Actor" or "level",se_obj.id)

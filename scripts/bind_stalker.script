@@ -245,7 +245,7 @@ function actor_binder:update(delta)
 			self.object:give_info_portion("level_changer_icons")
 		end
 		pda.fill_primary_objects()
-		self.object:activate_slot(3)
+		self.object:activate_slot(self.loaded_active_slot)
 		self.bCheckStart = false
 	end
 	
@@ -445,8 +445,6 @@ function actor_binder:load(reader)
 	task_manager.get_task_manager():load(reader)
 
 	self.loaded_active_slot = reader:r_u8()
-
-	self.loaded_slot_applied = false
 
 	local b = reader:r_bool()
 	if(b) then

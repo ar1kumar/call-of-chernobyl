@@ -14,13 +14,41 @@ local function on_key_press(key)
 	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_demo_record",0,"")]) then 
 		get_console():execute("demo_record t")
 	-- Teleport to last demo_record camera position
-	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_teleport_cam",0,"")]) then 
+	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_test",0,"")]) then
+		-- depreciated, added through engine by pressing enter while in demo_record
+		--[[
 		if (xrs_debug_tools.LastCameraPos) then
 			if (db.vehicle and db.actor.detach_vehicle) then 
-				db.actor:detach_vehicle()
+				db.vehicle:force_set_position(xrs_debug_tools.LastCameraPos)
+			else 
+				db.actor:set_actor_position(xrs_debug_tools.LastCameraPos,true)
 			end
-			db.actor:set_actor_position(xrs_debug_tools.LastCameraPos)
 		end
+		--]]
+		--[[ testing only
+		db.actor:activate_slot(13)
+		local wpn = db.actor:active_item()
+		if (wpn) then 
+			--printf("item_state = %s",wpn:get_state())
+
+			--wpn:play_hud_motion("anm_throw_begin",false,wpn:get_hud_item_state())
+			--wpn:play_hud_motion("anm_reload_g",true,wpn:get_hud_item_state())
+			--wpn:play_hud_motion("anm_bore",true,wpn:get_hud_item_state())
+
+			--wpn:switch_state(2)
+			--wpn:render_hud_item(false)
+			--wpn:deactivate_hud_item()
+
+			--printf("has_upgrade = %s",wpn:has_upgrade("up_fiftha_ak74u"))
+			--wpn:add_upgrade("up_gr_firstab_abakan")
+			
+			local function iter(upgr)
+				printf("%s",upgr)
+			end
+			--wpn:iterate_installed_upgrades(iter)
+		end
+		--]]
+		
 	-- Select Object on key press and teleports it on key release!
 	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_select_object",0,"")]) then
 		DEBUG_NPC = level.get_target_obj and level.get_target_obj()
@@ -51,16 +79,18 @@ local function on_key_release(key)
 			local r = level.get_target_dist and level.get_target_dist()
 			if (r) then
 				if (IsStalker(DEBUG_NPC) or IsMonster(DEBUG_NPC)) then
-					local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
+					local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,level.get_target_dist)
 					if (lvid) then 
 						DEBUG_NPC:set_npc_position(level.vertex_position(lvid))
 					end
 				else
 					if (DEBUG_NPC.force_set_position) then
-						local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
-						if (lvid) then
-							DEBUG_NPC:force_set_position(level.vertex_position(lvid))
-						end
+						local pos = utils.vector_copy_by_val(device().cam_pos)
+						pos:add(device().cam_dir:mul(r))
+						--local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
+						--if (lvid) then
+							DEBUG_NPC:force_set_position(pos) --level.vertex_position(lvid))
+						--end
 					end
 				end
 			end
@@ -92,8 +122,8 @@ function on_game_start()
 		axr_main.config:SetValue("global_keybinds","debug_demo_record","DIK_NUMPAD0")
 		need_save = true
 	end
-	if not (axr_main.config:KeyExist("global_keybinds","debug_teleport_cam")) then
-		axr_main.config:SetValue("global_keybinds","debug_teleport_cam","DIK_NUMPADENTER")
+	if not (axr_main.config:KeyExist("global_keybinds","debug_test")) then
+		axr_main.config:SetValue("global_keybinds","debug_test","DIK_NUMPADENTER")
 		need_save = true
 	end
 	if not (axr_main.config:KeyExist("global_keybinds","debug_select_object")) then

@@ -118,7 +118,7 @@ function CSurgeManager:start(manual)
 
 	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
 	Y, M, D, h, m, s, ms = self.last_surge_time:get(Y, M, D, h, m, s, ms)
-	if(manual) then
+	if(manual or not self.inited_time) then
 		self.inited_time = game.get_game_time()
 	else
 		self.inited_time:set(Y, M, D, h, m, s + self._delta, ms)

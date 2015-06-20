@@ -9,10 +9,6 @@ by Alundaio
 -- axr_options.ini
 config = alun_utils.cfg_file(alun_utils.fspath("$game_data$").."axr_options.ini")
 -------------------------------------------------------------------------------------------------
-REMOVE_ME_LC = nil 			-- Used by custom jump level command in xrs_debug_tools and faction select
-------------------------------
-
-
 
 
 --[[ 				REGISTER YOUR SCRIPT HERE
@@ -226,7 +222,31 @@ end
 -------------------
 function on_game_load()
 	math.randomseed(time_global())
-
+	
+	--[[ persistent car
+		-- Issue: car won't spawn in good location
+		-- CoC didn't have vehicles in mind during development. If you want vehicle to transition levels correctly
+		-- You will need to create waypoints on every level for the vehicle to spawn in a good location and use car:force_set_position(patrol("wp_car_spawn_"..level_name):point(0))
+		-- Then attach actor to the vehicle on game load (or first update)
+	--]]
+	--[[
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.vehicle_data and m_data.vehicle_data.section) then
+		local function attach_veh(p)
+			local car = p and p[1] and level.object_by_id(p[1])
+			if not (db.actor and car) then 
+				return false
+			end 
+			db.actor:attach_vehicle(car)
+			return true
+		end
+		
+		local se_car = alife():create(m_data.vehicle_data.section,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+		CreateDelayedEvent(0,"attach_vehicle",1,attach_veh,se_car.id)
+		m_data.vehicle_data = nil
+	end
+	--]]
+	
 	-- clean up intercepts table if callbacks are unused
 	-- if needed this can be removed so that callbacks can be registered any time, not just before or during on_game_load
 	--[[
@@ -370,20 +390,44 @@ end
 -- actor_on_save(bind_stalker,packet)
 -------------------
 function actor_on_save(binder,packet)
-
-	if (intercepts.on_level_changing) then
-		local sim,gg = alife(),game_graph()
-		local actor_gv = sim and gg:vertex(sim:actor().m_game_vertex_id)
-		
-		if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
-			--printf("actor changing level")
-			CreateScriptCallback("on_level_changing")
-		end
-	end
+	local sim,gg = alife(),game_graph()
+	local actor_gv = sim and gg:vertex(sim:actor().m_game_vertex_id)
 	
-	if (REMOVE_ME_LC) then
+	if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
+		--printf("DEBUG: actor changing level")
+		CreateScriptCallback("on_level_changing")
+		
+		-- if not using persistent car
+		if (db.vehicle) then 
+			db.actor:detach_vehicle()
+		end
+		
+		-- persistent car
+		--[[
+		local car = db.actor:get_attached_vehicle()
+		if (car) then 
+			--printf("DEBUG: Store car")
+			-- force a detach
+			db.actor:detach_vehicle()
+			
+			local m_data = alife_storage_manager.get_state()
+			if not (m_data.vehicle_data) then
+				m_data.vehicle_data = {}
+			end 
+			
+			-- TODO: store all values for car, like health, gas etc.
+			m_data.vehicle_data.section = car:section()
+			
+			-- destroy car
+			local se_car = sim:object(car:id())
+			sim:release(se_car,true)
+		end
+		--]]
+	end
+
+	if (this.REMOVE_ME_LC) then
 		local sim = alife()
-		local se_obj = sim:object(REMOVE_ME_LC)
+		local se_obj = sim:object(this.REMOVE_ME_LC)
 		if (se_obj) then
 			--printf("removing temp level_changer %s",se_obj:name())
 			sim:release(se_obj,true)
