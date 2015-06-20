@@ -44,7 +44,10 @@ local function actor_on_update(binder,delta)
 end
 
 local function actor_on_init(binder)
-	SurgeManager = CSurgeManager()
+	if not (SurgeManager) then 
+		--printf("surge actor_on_init")
+		SurgeManager = CSurgeManager()
+	end
 end
 
 function on_game_start()
@@ -408,7 +411,7 @@ function CSurgeManager:update()
 	local diff_game_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/2)
 ------------------------------------update here--------------------------------
 
-	printf("diff_sec = %s",diff_sec)
+	--printf("diff_sec = %s",diff_sec)
 	if(prev_sec~=diff_sec) then
 		--self.debugMessages[1]:SetText("dif_sec: "..tostring(diff_sec))
 		--local rnd_sound = math_random(4000)
@@ -1509,6 +1512,7 @@ function actor_on_save(binder,packet)
 end 
 
 function actor_on_load(binder,packet)
+	--printf("actor on load")
 	if not (SurgeManager) then 
 		SurgeManager = CSurgeManager()
 	end 
@@ -1588,7 +1592,9 @@ function load_state(m_data)
 	
 	if not (SurgeManager) then 
 		SurgeManager = CSurgeManager()
+		--printf("load state")
 	end 
+	
 	
 	local mgr = SurgeManager
 	mgr.finished = m_data.SurgeManager.finished

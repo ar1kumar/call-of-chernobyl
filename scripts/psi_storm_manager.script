@@ -26,7 +26,9 @@ local function actor_on_update(binder,delta)
 end
 
 local function actor_on_init(binder)
-	PsiStormManager = CPsiStormManager()
+	if not (PsiStormManager) then 
+		PsiStormManager = CPsiStormManager()
+	end
 end
 
 function on_game_start()

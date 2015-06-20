@@ -185,6 +185,7 @@ end
 
 -------------------
 -- actor_on_save(bind_stalker,packet)
+-- IMPORTANT: Cannot be used as callback because this needs to be done in specific order, just call script directly!
 -------------------
 function actor_on_save(binder,packet)
 	local sim,gg = alife(),game_graph()
@@ -234,15 +235,20 @@ function actor_on_save(binder,packet)
 	if (coc_treasure_manager) then
 		coc_treasure_manager.save(packet)
 	end
+	surge_manager.actor_on_save(binder,packet)
+	psi_storm_manager.actor_on_save(binder,packet)
 end
 
 -------------------
 -- actor_on_load(bind_stalker,packet)
+-- IMPORTANT: Cannot be used as callback because this needs to be done in specific order, just call script directly!
 -------------------
 function actor_on_load(binder,packet)
 	if (coc_treasure_manager) then
 		coc_treasure_manager.load(packet)
 	end
+	surge_manager.actor_on_load(binder,packet)
+	psi_storm_manager.actor_on_load(binder,packet)
 end
 
 ---------------------------------------------

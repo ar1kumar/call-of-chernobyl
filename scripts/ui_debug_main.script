@@ -1187,8 +1187,12 @@ function debug_ui:FindNearest(txt)
 					self.fld_section:SetText(section or "")
 					self.fld_logic:SetText(logic or "")
 					self.fld_filename:SetText(ini_filename or "")
-					self.fld_focus:SetText(id or "")
-					self.fld_reload:SetText(id or "")
+					if (self.fld_focus) then
+						self.fld_focus:SetText(id or "")
+					end
+					if (self.fld_reload) then
+						self.fld_reload:SetText(id or "")
+					end
 				end
 				self.txt_near:SetText(id)
 			end
