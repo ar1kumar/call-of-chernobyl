@@ -570,15 +570,12 @@ end
 function WeatherManager:save(F)
 	set_save_marker(F, "save", false, "WeatherManager")
 	-- printf("WEATHER SAVE")
-	F:w_stringZ(self.levelWeather)
+	F:w_stringZ(self.levelWeather or "atmosfear_transition")
 	F:w_stringZ(self.period)
 	F:w_u32(self.last_period_change_hour);
 	F:w_u32(self.next_period_change_hour);
 	--F:w_stringZ(self.update_level);
 	-- printf("str = "..tostring(self:get_state_as_string()))
-	if self:get_state_as_string() == "" then
-		-- printf("str = empty string")
-	end
 	F:w_stringZ(self:get_state_as_string())
 	F:w_u32(self.update_time)
 	F:w_stringZ(tostring(self.weather_fx))
