@@ -211,6 +211,8 @@ function send_treasure(param)
 	else
 		db.actor:give_game_news(news_caption, "", "ui_inGame2_Polucheni_koordinaty_taynika", 0, 3000)
 	end
+	
+	xr_sound.set_sound_play(actor:id(), "pda_tips")
 end
 
 function get_inv_name(section)
