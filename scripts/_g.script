@@ -48,7 +48,7 @@ function SetHudMsg(msg,n)
 	local hud = get_hud()
 	hud:AddCustomStatic("not_enough_money_mine", true)
 	hud:GetCustomStatic("not_enough_money_mine"):wnd():TextControl():SetTextST(msg)
-	axr_main.ShowMessageTime = time_global() + n*1000
+	bind_stalker_ext.ShowMessageTime = time_global() + n*1000
 end
 
 --------------------------------------------------------------------------------------------
@@ -586,9 +586,9 @@ function IsHelicopter(object, id)
 end
 
 function IsWeapon(object, id)
-	--if (object and object.is_weapon) then 
-		--return object:is_weapon()
-	--end
+	if (object and object.is_weapon_magazined) then 
+		return object:is_weapon_magazined()
+	end
 	id = id or get_clsid(object)
 	return id and weapon_classes[id] == true or false
 end

@@ -96,8 +96,7 @@ function sleep_dialog:TestAndShow()
 	end
 
 	if (xr_conditions.surge_started()) then
-		local sm = surge_manager.SurgeManager
-		if not (sm.actor_in_cover()) then
+		if not (surge_manager.actor_in_cover()) then
 			SetHudMsg("Not crazy enough to sleep during this shit",4)
 			return
 		end

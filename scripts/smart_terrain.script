@@ -1019,7 +1019,8 @@ function se_smart_terrain:init_npc_after_load()
 	local new_info
 	for id, info in pairs(self.npc_info) do
 		sobj = sim:object(id)
-		if (sobj) and (IsStalker(sobj) or IsMonster(sobj) or IsHelicopter(sobj)) then
+		local cls = sobj and sobj:clsid()
+		if (cls) and (IsStalker(nil,cls) or IsMonster(nil,cls) or IsHelicopter(nil,cls)) then
 			new_info = self:fill_npc_info(sobj)
 			new_info.job = self:find_job_by_section(info.job_section)
 

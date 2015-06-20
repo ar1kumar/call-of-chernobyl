@@ -123,14 +123,15 @@ function Crelease_body:clear(all,dist,now)
 	local pos = db.actor:position()
 	dist = dist or MIN_RELEASE_DISTANCE
 
-	local se_obj, obj
+	local se_obj, obj, cls
 	for id, v in pairs(self.release_objects_table) do
 		if (all == nil and self.size < BODY_MAX_COUNT) then
 			return
 		end
 
-		se_obj = sim:object(id)
-		if (se_obj and not se_obj:alive()) and (IsStalker(se_obj) or IsMonster(se_obj)) then
+		se_obj = id ~= 0 and id ~= 65535 and sim:object(id)
+		cls = se_obj and se_obj:clsid()
+		if (cls) and (IsStalker(nil,cls) or IsMonster(nil,cls)) and not (se_obj:alive()) then
 			if (all or pos:distance_to_sqr(se_obj.position) >= dist) then
 				--printf("release_body_manager:safe_remove_npc: releasing %s from the game",se_obj:name())
 				sim:release(se_obj,true)
@@ -142,7 +143,6 @@ function Crelease_body:clear(all,dist,now)
 			self.size = self.size - 1
 		end
 	end
-
 end
 
 function Crelease_body:save(packet)

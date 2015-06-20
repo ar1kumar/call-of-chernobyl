@@ -1060,6 +1060,7 @@ function position_hud_show(hud)
 	end
 	
 	hud:add_msg("","------ MISC. ------")
+	hud:add_msg("is_actor_outdoors",not db.actor:is_actor_outdoors())
 	__tmr_pos_hud = not __tmr_pos_hud and time_global()+5000 or __tmr_pos_hud
 	if (time_global() > __tmr_pos_hud) then
 		__tmr_pos_hud = nil

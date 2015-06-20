@@ -1835,9 +1835,10 @@ function cmd.antifreeze(me,txt,owner,p)
 		if not (se_obj) then 
 			return true 
 		end
-		if (se_obj:clsid() == clsid.online_offline_group_s) then
+		local cls = se_obj:clsid()
+		if (cls == clsid.online_offline_group_s) then
 			alun_utils.teleport_squad(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
-		elseif (IsStalker(se_obj) or IsMonster(se_obj)) then 
+		elseif (IsStalker(nil,cls) or IsMonster(nil,cls)) then 
 			if (alife().teleport_object) then 
 				alife():teleport_object(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
 			end
