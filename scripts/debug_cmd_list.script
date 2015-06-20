@@ -572,7 +572,7 @@ function cmd.surge(me,txt,owner,p)
 	local wrd = check_and_set_help(me,txt,owner,"[start|stop]")
 	if not (wrd) then return end
 
-	local sm = surge_manager.get_surge_manager()
+	local sm = surge_manager.SurgeManager
 	if not (sm) then return "No surge manager!" end
 
 	if (wrd == "start") then
@@ -591,7 +591,7 @@ function cmd.psi_storm(me,txt,owner,p)
 	local wrd = check_and_set_help(me,txt,owner,"[start|stop]")
 	if not (wrd) then return end
 
-	local sm = psi_storm_manager and psi_storm_manager.get_psi_storm_manager()
+	local sm = psi_storm_manager and psi_storm_manager.PsiStormManager
 	if not (sm) then return "No psi_storm manager!" end
 
 	if (wrd == "start") then
@@ -1462,9 +1462,7 @@ function cmd.level(me,txt,owner,p)
 	local function create_lc(gvid,vertex)
 		local se_obj = sim:create("level_changer",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 		if (se_obj) then
-			if (axr_main) then 
-				axr_main.REMOVE_ME_LC = se_obj.id
-			end 
+			bind_stalker_ext.REMOVE_ME_LC = se_obj.id
 			local lvid = vertex:level_vertex_id()
 			local pos = vertex:level_point()
 

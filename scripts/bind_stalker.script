@@ -1,9 +1,3 @@
--- Callbacks are handled by axr_main
--- To keep everything modular, register for callbacks instead of editing script directly
--- This way, to disable your features, all someone has to do is comment a single line in axr_main.on_game_start
--- or even better, remove the *.script
--- alundaio
-
 function init(obj)
 	xr_motivator.AddToMotivator(obj)
 end
@@ -17,21 +11,15 @@ class "actor_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:__init (obj) super(obj)
 	self.bCheckStart = false
-	self.weather_manager = level_weathers.get_weather_manager()
-	self.surge_manager = surge_manager.get_surge_manager()
-
 	self.last_level_name = "nil"
 	self.deimos_intensity = nil
 
 	self.last_detective_achievement_spawn_time 	= nil
 	self.last_mutant_hunter_achievement_spawn_time	= nil
-	-- Alundaio
-	CreateScriptCallback("actor_on_init",self)
-	-- End Alundaio
-	-- AtmosFear
-	if (atmosfear) then self.atmosfear=atmosfear.get_atmosfear() end
-	if (psi_storm_manager) then self.psi_storm_manager = psi_storm_manager.get_psi_storm_manager() end
-	-- alundaio
+
+	bind_stalker_ext.actor_on_init(self)
+	
+	self.weather_manager = level_weathers.get_weather_manager()
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -54,17 +42,15 @@ function actor_binder:net_spawn(data)
 		level.enable_input()
 	end
 
-	self.weather_manager:reset()
 	death_manager.init_drop_settings()
 	self.task_manager = task_manager.get_task_manager()
 	self.spawn_frame = device().frame
 	self.already_jumped = false
 	self.loaded = false
 
-	-- alundaio
-	CreateScriptCallback("on_game_load",self)
-	-- end alundaio
-
+	bind_stalker_ext.actor_on_net_spawn(self)
+	self.weather_manager:reset()
+	
 	return true
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -83,6 +69,7 @@ function actor_binder:net_destroy()
 	db.del_actor(self.object)
 	db.delete_enemy(self.object)
 
+	-- remove callbacks
 	local t = {
 				-- vanilla
 				callback.inventory_info,
@@ -123,10 +110,9 @@ function actor_binder:net_destroy()
 		sr_psy_antenna.psy_antenna:destroy()
 		sr_psy_antenna.psy_antenna = false
 	end
+	
+	bind_stalker_ext.actor_on_net_destroy(self)
 
-	-- Alundaio
-	CreateScriptCallback("on_game_end",obj,reader)
-	-- Alundaio
 	object_binder.net_destroy(self)
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -136,50 +122,40 @@ function actor_binder:reinit()
 	db.storage[npc_id] = empty_table(db.storage[npc_id])
 	self.st = db.storage[npc_id]
 
-	self.object:set_callback(callback.task_state, self.task_callback, self)
 	
-	self.object:set_callback(callback.inventory_info, axr_main.actor_on_info_callback, self)
-	self.object:set_callback(callback.on_item_take, axr_main.actor_on_item_take, self)
-	self.object:set_callback(callback.on_item_drop, axr_main.actor_on_item_drop, self)
-	self.object:set_callback(callback.trade_sell_buy_item, axr_main.actor_on_trade, self)
-	self.object:set_callback(callback.take_item_from_box, axr_main.actor_on_item_take_from_box, self)
-	self.object:set_callback(callback.use_object, axr_main.actor_on_item_use, self)
-	if (callback.hit) then
-		self.object:set_callback(callback.hit, axr_main.actor_on_hit_callback, self)
-	end
-	if (callback.key_press) then
-		self.object:set_callback(callback.key_press, axr_main.on_key_press, self)
-	end
-	if (callback.key_release) then
-		self.object:set_callback(callback.key_release, axr_main.on_key_release, self)
-	end
-	if (callback.actor_before_death) then
-		self.object:set_callback(callback.actor_before_death, axr_main.actor_on_before_death, self)
-	end
-	if (callback.on_attach_vehicle) then 
-		self.object:set_callback(callback.on_attach_vehicle, axr_main.on_attach_vehicle, self)
-	end 
-	if (callback.on_detach_vehicle) then 
-		self.object:set_callback(callback.on_detach_vehicle, axr_main.on_detach_vehicle, self)
-	end 
-	if (callback.on_use_vehicle) then 
-		self.object:set_callback(callback.on_use_vehicle, axr_main.on_use_vehicle, self)
-	end
-	if (callback.weapon_jammed) then 
-		self.object:set_callback(callback.weapon_jammed, axr_main.actor_on_weapon_jammed, self)
-	end
-	if (callback.weapon_zoom_in) then 
-		self.object:set_callback(callback.weapon_zoom_in, axr_main.actor_on_weapon_zoom_in, self)
-	end
-	if (callback.weapon_zoom_out) then 
-		self.object:set_callback(callback.weapon_zoom_out, axr_main.actor_on_weapon_zoom_out, self)
+		local t = {
+				-- vanilla
+				["inventory_info"] 			= bind_stalker_ext.actor_on_info_callback,
+				["on_item_take"] 			= bind_stalker_ext.actor_on_item_take,
+				["on_item_drop"] 			= bind_stalker_ext.actor_on_item_drop,
+				["task_state"] 				= bind_stalker_ext.actor_on_task_callback,
+				["trade_sell_buy_item"]		= bind_stalker_ext.actor_on_item_drop,
+				["take_item_from_box"]		= bind_stalker_ext.actor_on_item_take_from_box,
+				["use_object"]				= bind_stalker_ext.actor_on_item_use,
+				
+				-- coc
+				["hit"]						= bind_stalker_ext.actor_on_hit_callback,
+				["key_press"]				= bind_stalker_ext.on_key_press,
+				["key_release"]				= bind_stalker_ext.on_key_release,
+				["actor_before_death"]		= bind_stalker_ext.actor_before_death,
+				["on_attach_vehicle"]		= bind_stalker_ext.actor_on_attach_vehicle,
+				["on_detach_vehicle"]		= bind_stalker_ext.actor_on_detach_vehicle,
+				["on_use_vehicle"]			= bind_stalker_ext.actor_on_use_vehicle,
+				["weapon_jammed"]			= bind_stalker_ext.actor_on_weapon_jammed,
+				["weapon_zoom_in"]			= bind_stalker_ext.actor_on_weapon_zoom_in,
+				["weapon_zoom_out"]			= bind_stalker_ext.actor_on_weapon_zoom_out
+	}
+	for cb,func in pairs(t) do 
+		if (callback[cb] and func) then 
+			self.object:set_callback(callback[cb],func,self)
+		end
 	end
 end
 
 function anabiotic_callback()
 	level.add_cam_effector("camera_effects\\surge_01.anm", 10, false, "bind_stalker.anabiotic_callback2")
 	local rnd = math.random(35,45)
-	local m = surge_manager.get_surge_manager()
+	local m = surge_manager.SurgeManager
 	if(m.started) then
 		local tf = level.get_time_factor()
 		local diff_sec = math.ceil(game.get_game_time():diffSec(m.inited_time)/tf)
@@ -190,7 +166,7 @@ function anabiotic_callback()
 			m:end_surge()
 		end
 	end
-	m = psi_storm_manager and psi_storm_manager.get_psi_storm_manager()
+	m = psi_storm_manager and psi_storm_manager.PsiStormManager
 	if(m and m.started) then
 		local tf = level.get_time_factor()
 		local diff_sec = math.ceil(game.get_game_time():diffSec(m.inited_time)/tf)
@@ -212,18 +188,6 @@ function anabiotic_callback2()
 	_G.amb_vol = 0
 	_G.mus_vol = 0
 	disable_info("anabiotic_in_process")
-end
-----------------------------------------------------------------------------------------------------------------------
-
-function actor_binder:task_callback(_task, _state)
-	if _state ~= task.fail then
-		if _state == task.completed then
-			news_manager.send_task(db.actor, "complete", _task)
-		else
-			news_manager.send_task(db.actor, "new", _task)
-		end
-	end
-	task_manager.task_callback(_task, _state)
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -248,21 +212,6 @@ function actor_binder:update(delta)
 		self.object:activate_slot(self.loaded_active_slot)
 		self.bCheckStart = false
 	end
-	
-	--[[ Prevents actor from falling below map
-	local vid = db.actor:level_vertex_id()
-	last_valid_vertex_id = vid < 4294967295 and vid
-	
-	if not (level_min_y) then 
-		level_min_y = level.get_bounding_volume().min.y
-	end
-	
-	if (db.actor:position().y < level_min_y) then 
-		if (last_valid_vertex_id) then
-			db.actor:set_actor_position(level.vertex_position(last_valid_vertex_id))
-		end
-	end
-	--]]
 	
 	self.task_manager:update()
 
@@ -305,33 +254,10 @@ function actor_binder:update(delta)
 		sr_psy_antenna.psy_antenna:update(delta)
 	end
 
-	--printf("actor update before atmosfear update")
-	if(self.atmosfear) then
-		self.atmosfear:update()
-	end
-	
-	if(self.surge_manager) then
-		self.surge_manager:update()
-	end
-
-	--printf("actor update before psi_storm_manager")
-	if(self.psi_storm_manager) then
-		self.psi_storm_manager:update()
-	end
-
-	--printf("actor update after atmosfear update")
-	if not db.actor:has_info("atmosfear_default_console_settings_loaded") then
-		self.atmosfear:loadDefaultConsoleSettings()
-		db.actor:give_info_portion("atmosfear_default_console_settings_loaded")
-	end
-	-- End AtmosFear
-
 	-- јпдейт доступности дл€ симул€ции.
 	simulation_objects.get_sim_obj_registry():update_avaliability(alife():actor())
 
-	-- alundaio
-	CreateScriptCallback("actor_on_update",self,delta)
-	-- alundaio
+	bind_stalker_ext.actor_on_update(self,delta)
 	
 	local tg = time_global()
 	if (self.last_update and tg < self.last_update) then
@@ -402,9 +328,8 @@ function actor_binder:save(packet)
 		alun_utils.w_stpk(packet,"CTime",self.last_mutant_hunter_achievement_spawn_time, "hunter spawn time")
 	end
 
-	--alundaio
-	CreateScriptCallback("actor_on_save",self,packet)
-	-- alundaio end
+	bind_stalker_ext.actor_on_save(self,packet)
+
 	set_save_marker(packet, "save", true, "actor_binder")
 	--alun_utils.debug_write("--------------- actor_binder:save -------- End")
 end
@@ -459,8 +384,8 @@ function actor_binder:load(reader)
 	if stored_achievement_time == true then
 		self.last_mutant_hunter_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
 	end
-	--alundaio
-	CreateScriptCallback("actor_on_load",self,reader)
-	-- end alundaio
+
+	bind_stalker_ext.actor_on_load(self,reader)
+
 	set_save_marker(reader, "load", true, "actor_binder")
 end

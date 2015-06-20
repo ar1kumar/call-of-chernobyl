@@ -96,7 +96,7 @@ function sleep_dialog:TestAndShow()
 	end
 
 	if (xr_conditions.surge_started()) then
-		local sm = surge_manager.get_surge_manager()
+		local sm = surge_manager.SurgeManager
 		if not (sm.actor_in_cover()) then
 			SetHudMsg("Not crazy enough to sleep during this shit",4)
 			return
@@ -179,7 +179,7 @@ function dream_callback()
 	local hours = sleep_control.forced or sleep_control.time_track:GetIValue()
 	local mins = 0
 	if not in_cover then
-		local sm = surge_manager.get_surge_manager()
+		local sm = surge_manager.SurgeManager
 		local sde = game.get_game_time():diffSec(sm.last_surge_time)
 		local stime = sde+hours*3600+600-sm._delta
 		if stime > 0 then
@@ -195,9 +195,9 @@ function dream_callback()
 
 	-- I disabled sleep_actor_safe, no longer in use
 	if (itms_manager.sleep_actor_safe) then
-		surge_manager.get_surge_manager().time_forwarded = true
+		surge_manager.SurgeManager.time_forwarded = true
 		if (psi_storm_manager) then
-			psi_storm_manager.get_psi_storm_manager().time_forwarded = true
+			psi_storm_manager.PsiStormManager.time_forwarded = true
 		end
 		if(surge_manager.is_started() and level_weathers.get_weather_manager().weather_fx) then
 			level.stop_weather_fx()
@@ -205,7 +205,7 @@ function dream_callback()
 			level_weathers.get_weather_manager():forced_weather_change()
 		end
 	else
-		surge_manager.get_surge_manager().skip_message = true
+		surge_manager.SurgeManager.skip_message = true
 		if (math.random() < 0.025 * hours) then
 			sleep_control.force_surge = true
 		end

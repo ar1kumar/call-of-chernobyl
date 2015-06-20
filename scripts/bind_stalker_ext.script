@@ -1,0 +1,314 @@
+--[[
+	bind_stalker_ext.script
+	
+	Extends the functionality of bind_stalker.script without filling it with clutter
+	
+	by: Alundaio
+--]]
+
+-------------------
+-- actor_on_init
+-------------------
+function actor_on_init(binder)
+	CreateScriptCallback("actor_on_init",binder)
+end 
+
+-------------------
+-- actor_on_net_spawn
+-------------------
+function actor_on_net_spawn()
+	-- persistent car
+	-- Issue: car won't spawn in good location
+	-- CoC didn't have vehicles in mind during development. If you want vehicle to transition levels correctly
+	-- You will need to create waypoints on every level for the vehicle to spawn in a good location and use car:force_set_position(patrol("wp_car_spawn_"..level_name):point(0))
+	-- Then attach actor to the vehicle on game load (or first update)
+
+	--[[
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.vehicle_data and m_data.vehicle_data.section) then
+		local function attach_veh(p)
+			local car = p and p[1] and level.object_by_id(p[1])
+			if not (db.actor and car) then 
+				return false
+			end 
+			db.actor:attach_vehicle(car)
+			return true
+		end
+		
+		local se_car = alife():create(m_data.vehicle_data.section,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+		CreateDelayedEvent(0,"attach_vehicle",1,attach_veh,se_car.id)
+		m_data.vehicle_data = nil
+	end
+	--]]
+	
+	CreateScriptCallback("on_game_load",binder)
+end
+
+-------------------------------------
+-- actor_on_net_destroy
+-------------------------------------
+function actor_on_net_destroy(binder)
+	CreateScriptCallback("actor_on_net_destroy",binder)
+end 
+
+-------------------
+-- actor_on_update
+-------------------
+actor_light = nil
+function actor_on_update(binder,delta)
+	local tg = time_global()
+	
+	-- evaluate event queue
+	ProcessEventQueue()
+
+	-- Check HudMsg
+	if (ShowMessageTime) then
+		local hud = get_hud()
+		local custom_static = hud:GetCustomStatic("not_enough_money_mine")
+		if custom_static ~= nil and tg > ShowMessageTime then
+			hud:RemoveCustomStatic("not_enough_money_mine")
+			ShowMessageTime = nil
+		end
+	end
+
+	-- WISH GRANTER ZOMBIED-IMMORTALITY
+	if (db.actor:has_info("actor_made_wish_immortal")) then 
+		db.actor.health = 1
+		db.actor.bleeding = 1
+		db.actor.psy_health = 1
+		db.actor.radiation = -1
+	end
+	
+	local torch = db.actor:object("device_torch")
+	if (torch and not actor_light and torch:torch_enabled()) then
+		actor_light = true
+		CreateScriptCallback("actor_on_torch_enabled")
+	elseif (torch and not torch:torch_enabled()) then
+		if (actor_light) then
+			actor_light = false
+			CreateScriptCallback("actor_on_torch_disabled")
+		end
+	end
+	
+	--[[ Prevents actor from falling below map (works just commented out because not needed)
+	local vid = db.actor:level_vertex_id()
+	last_valid_vertex_id = vid < 4294967295 and vid
+	
+	if not (level_min_y) then 
+		level_min_y = level.get_bounding_volume().min.y
+	end
+	
+	if (db.actor:position().y < level_min_y) then 
+		if (last_valid_vertex_id) then
+			db.actor:set_actor_position(level.vertex_position(last_valid_vertex_id))
+		end
+	end
+	--]]
+	
+	CreateScriptCallback("actor_on_update",binder,delta)
+end
+
+-------------------
+-- actor_on_weapon_no_ammo(wpn)
+-------------------
+-- TODO: add in engine
+function actor_on_weapon_no_ammo(binder,wpn)
+	CreateScriptCallback("actor_on_weapon_no_ammo",wpn)
+end
+
+-------------------
+-- actor_on_weapon_zoom_in(wpn)
+-------------------
+function actor_on_weapon_zoom_in(binder,obj,wpn)
+	CreateScriptCallback("actor_on_weapon_zoom_in",wpn)
+end
+
+-------------------
+-- actor_on_weapon_zoom_out(wpn)
+-------------------
+function actor_on_weapon_zoom_out(binder,obj,wpn)
+	CreateScriptCallback("actor_on_weapon_zoom_out",wpn)
+end
+
+-------------------
+-- actor_on_item_take(item)
+-------------------
+function actor_on_item_take(binder,item)
+	if IsArtefact(item) then
+		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
+		if anomal_zone ~= nil then
+			anomal_zone:on_artefact_take(item)
+		else
+			bind_anomaly_zone.artefact_ways_by_id[item:id()] = nil
+		end
+		local artefact = item:get_artefact()
+		artefact:FollowByPath("NULL",0,vector():set(500,500,500))
+		xr_statistic.inc_founded_artefacts_counter(item:id())
+	end
+	treasure_manager.get_treasure_manager():on_item_take(item:id())
+	CreateScriptCallback("actor_on_item_take",item)
+end
+
+-------------------
+-- actor_on_item_use(item)
+-------------------
+function actor_on_item_use(binder,item)
+	local sec = item:section()
+	if (sec == "drug_anabiotic") then 
+		xr_effects.disable_ui_only(db.actor, nil)
+		level.add_cam_effector("camera_effects\\surge_02.anm", 10, false, "bind_stalker.anabiotic_callback")
+		level.add_pp_effector("surge_fade.ppe", 11, false)
+		give_info("anabiotic_in_process")
+		local con = get_console()
+		_G.mus_vol = con:get_float("snd_volume_music")
+		_G.amb_vol = con:get_float("snd_volume_eff")
+		con:execute("snd_volume_music 0")
+		con:execute("snd_volume_eff 0")
+	elseif (sec == "drug_psy_blockade" or sec == "drug_radioprotector" or sec == "drug_antidot") then
+		local boost_time = system_ini():r_float(sec,"boost_time")
+		xr_logic.pstor_store(db.actor,sec.."_expiration",utils.CTimeAddSec(game.get_game_time(),boost_time*level.get_time_factor()))
+	end 
+	CreateScriptCallback("actor_on_item_use",item,sec)
+end
+
+-------------------
+-- actor_on_trade(item)
+-------------------
+function actor_on_trade(binder,item,sell_bye,money)
+	if sell_bye == true then
+		 game_stats.money_trade_update (money)
+	else
+		 game_stats.money_trade_update (-money)
+	end
+	CreateScriptCallback("actor_on_trade",item,sell_bye,money)
+end
+
+-------------------
+-- actor_on_save(bind_stalker,packet)
+-------------------
+function actor_on_save(binder,packet)
+	local sim,gg = alife(),game_graph()
+	local actor_gv = sim and gg:vertex(sim:actor().m_game_vertex_id)
+	
+	if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
+		--printf("DEBUG: actor changing level")
+		CreateScriptCallback("on_level_changing")
+		
+		-- if not using persistent car
+		if (db.vehicle) then 
+			db.actor:detach_vehicle()
+		end
+		
+		-- persistent car
+		--[[
+		local car = db.actor:get_attached_vehicle()
+		if (car) then 
+			--printf("DEBUG: Store car")
+			-- force a detach
+			db.actor:detach_vehicle()
+			
+			local m_data = alife_storage_manager.get_state()
+			if not (m_data.vehicle_data) then
+				m_data.vehicle_data = {}
+			end 
+			
+			-- TODO: store all values for car, like health, gas etc.
+			m_data.vehicle_data.section = car:section()
+			
+			-- destroy car
+			local se_car = sim:object(car:id())
+			sim:release(se_car,true)
+		end
+		--]]
+	end
+
+	if (this.REMOVE_ME_LC) then
+		local sim = alife()
+		local se_obj = sim:object(this.REMOVE_ME_LC)
+		if (se_obj) then
+			--printf("removing temp level_changer %s",se_obj:name())
+			sim:release(se_obj,true)
+		end
+	end
+	
+	if (coc_treasure_manager) then
+		coc_treasure_manager.save(packet)
+	end
+end
+
+-------------------
+-- actor_on_load(bind_stalker,packet)
+-------------------
+function actor_on_load(binder,packet)
+	if (coc_treasure_manager) then
+		coc_treasure_manager.load(packet)
+	end
+end
+
+---------------------------------------------
+-- on_key_press
+---------------------------------------------
+function on_key_press(binder,key)
+	CreateScriptCallback("on_key_press",key)
+end
+
+---------------------------------------------
+-- on_key_release
+---------------------------------------------
+function on_key_release(binder,key)
+	CreateScriptCallback("on_key_release",key)
+end
+
+---------------------------------------------
+-- on_actor_before_death
+---------------------------------------------
+function actor_on_before_death(binder,whoID)
+	-- if you want to keep actor alive, then use db.actor:set_health_ex(1) and do not use db.actor:kill(db.actor,true)
+	--db.actor:set_health_ex(1)
+	
+	-- This is necessary to avoid engine crash when player dies with holder
+	if (db.vehicle and db.actor.detach_vehicle) then 
+		db.actor:detach_vehicle()
+	end
+	
+	db.actor:kill(db.actor, true)
+	
+	CreateScriptCallback("actor_on_before_death",whoID)
+end
+
+---------------------------------------------
+-- on_attach_vehicle
+---------------------------------------------
+function actor_on_attach_vehicle(binder,obj)
+	db.vehicle = obj
+	CreateScriptCallback("actor_on_attach_vehicle",obj)
+end
+
+---------------------------------------------
+-- on_detach_vehicle
+---------------------------------------------
+function actor_on_detach_vehicle(binder,obj)
+	db.vehicle = nil
+	CreateScriptCallback("actor_on_detach_vehicle",obj)
+end
+
+---------------------------------------------
+-- 	on_use_vehicle
+---------------------------------------------
+function actor_on_use_vehicle(binder,obj)
+	CreateScriptCallback("actor_on_use_vehicle",obj)
+end
+
+---------------------------------------------
+--	actor_on_task_callback
+---------------------------------------------
+function actor_on_task_callback(binder,_task, _state)
+	if _state ~= task.fail then
+		if _state == task.completed then
+			news_manager.send_task(db.actor, "complete", _task)
+		else
+			news_manager.send_task(db.actor, "new", _task)
+		end
+	end
+	task_manager.task_callback(_task, _state)
+end

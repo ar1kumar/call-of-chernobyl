@@ -7,270 +7,267 @@
 	-- added INI support to remove dependency on savegame
 	-- removed fallout manager
 --------------------------------------------------------------------------------
-local aspectRatio = 1
+
+config = alun_utils.cfg_file(getFS():update_path('$game_data$', '').."atmosfear_options.ini")
+
+
 
 class "af_options_dialog" (CUIScriptWnd)
-
 function af_options_dialog:__init() super()
-	if(device().width/device().height>(1024/768+0.01)) then
-		aspectRatio = 0.8
-	end
-	--self.atmosfear=CAtmosFearFake()
-	self.atmosfear=atmosfear.get_atmosfear()
-
-	self.ini = alun_utils.cfg_file(alun_utils.fspath("$game_config$").."atmosfear_default_settings.ltx")
+	self.default_settings = alun_utils.cfg_file(getFS():update_path('$game_config$', '').."atmosfear_default_settings.ltx")
+	
 	-- Create INI if sections are missing
 	local need_save
 
-	if not (self.ini:SectionExist("atmosfear_default_parameters")) then
-		for level,v in pairs(self.atmosfear.valid_levels) do
-			self.ini:SetValue("atmosfear_default_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
-			self.ini:SetValue("atmosfear_default_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
-			self.ini:SetValue("atmosfear_default_parameters","opt_"..level.."_period_good_length",random_choice(4,6,8))
-			self.ini:SetValue("atmosfear_default_parameters","opt_"..level.."_period_bad_length",random_choice(4,6,8))
+	if not (self.default_settings:SectionExist("atmosfear_default_parameters")) then
+		for level,v in pairs(atmosfear.valid_levels) do
+			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_good_length",random_choice(4,6,8))
+			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_bad_length",random_choice(4,6,8))
 		end
 
-		self.ini:SetValue("atmosfear_default_parameters","opt_enable_blowout",1)
-		self.ini:SetValue("atmosfear_default_parameters","opt_blowout_freq",48)
-		self.ini:SetValue("atmosfear_default_parameters","opt_blowout_fate","turntozombie")
-		self.ini:SetValue("atmosfear_default_parameters","opt_blowout_warning","radio_siren")
-		self.ini:SetValue("atmosfear_default_parameters","opt_blowout_task","give")
-		--self.ini:SetValue("atmosfear_default_parameters","opt_enable_fallout",0)
-		--self.ini:SetValue("atmosfear_default_parameters","opt_fallout_freq",12)
-		--self.ini:SetValue("atmosfear_default_parameters","opt_fallout_fate","poison")
-		--self.ini:SetValue("atmosfear_default_parameters","opt_fallout_warning","siren")
-		--self.ini:SetValue("atmosfear_default_parameters","opt_fallout_task","give")
-		self.ini:SetValue("atmosfear_default_parameters","opt_enable_psi_storm",1)
-		self.ini:SetValue("atmosfear_default_parameters","opt_psi_storm_freq",24)
-		self.ini:SetValue("atmosfear_default_parameters","opt_psi_storm_fate","kill")
-		self.ini:SetValue("atmosfear_default_parameters","opt_psi_storm_warning","siren")
-		self.ini:SetValue("atmosfear_default_parameters","opt_psi_storm_task","give")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_enable_blowout",1)
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_blowout_freq",48)
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_blowout_fate","turntozombie")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_blowout_warning","radio_siren")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_blowout_task","give")
+		--self.default_settings:SetValue("atmosfear_default_parameters","opt_enable_fallout",0)
+		--self.default_settings:SetValue("atmosfear_default_parameters","opt_fallout_freq",12)
+		--self.default_settings:SetValue("atmosfear_default_parameters","opt_fallout_fate","poison")
+		--self.default_settings:SetValue("atmosfear_default_parameters","opt_fallout_warning","siren")
+		--self.default_settings:SetValue("atmosfear_default_parameters","opt_fallout_task","give")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_enable_psi_storm",1)
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_psi_storm_freq",24)
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_psi_storm_fate","kill")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_psi_storm_warning","siren")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_psi_storm_task","give")
 
-		self.ini:SetValue("atmosfear_default_parameters","opt_moon_phase","8days")
-		self.ini:SetValue("atmosfear_default_parameters","opt_night_brightness","slight")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_moon_phase","8days")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_night_brightness","slight")
 
-		self.ini:SetValue("atmosfear_default_parameters","opt_weather_balance_presets","balance_default")
-		self.ini:SetValue("atmosfear_default_parameters","opt_weather_length_presets","length_default")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_weather_balance_presets","balance_default")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_weather_length_presets","length_default")
 
-		self.ini:SetValue("atmosfear_default_parameters","opt_god_mode","false")
+		self.default_settings:SetValue("atmosfear_default_parameters","opt_god_mode","false")
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("atmosfear_option_names")) then
-		self.ini:SetValue("atmosfear_option_names","kill","st_list_fate_kill")
-		self.ini:SetValue("atmosfear_option_names","explode","st_list_fate_explode")
-		self.ini:SetValue("atmosfear_option_names","nowarning","st_list_warning_none")
-		self.ini:SetValue("atmosfear_option_names","clear_foggy","st_list_periods_clear_foggy")
-		self.ini:SetValue("atmosfear_option_names","siren","st_list_warning_siren")
-		self.ini:SetValue("atmosfear_option_names","foggy_rainy","st_list_periods_foggy_rainy")
-		self.ini:SetValue("atmosfear_option_names","turntozombie","st_list_fate_turntozombie")
-		self.ini:SetValue("atmosfear_option_names","balance_bad","st_list_weather_balance_preset_bad")
-		self.ini:SetValue("atmosfear_option_names","dontgive","st_list_task_none")
-		self.ini:SetValue("atmosfear_option_names","slight","st_list_night_brightness_slight")
-		self.ini:SetValue("atmosfear_option_names","balance_good","st_list_weather_balance_preset_good")
-		self.ini:SetValue("atmosfear_option_names","96","st_list_freq_96")
-		self.ini:SetValue("atmosfear_option_names","48","st_list_freq_48")
-		self.ini:SetValue("atmosfear_option_names","24","st_list_freq_24")
-		self.ini:SetValue("atmosfear_option_names","12","st_list_freq_12")
-		self.ini:SetValue("atmosfear_option_names","unhurt","st_list_fate_none")
-		self.ini:SetValue("atmosfear_option_names","poison","st_list_fate_poison")
-		self.ini:SetValue("atmosfear_option_names","killatwave","st_list_fate_killatwave")
-		self.ini:SetValue("atmosfear_option_names","length_custom","st_list_weather_length_preset_custom")
-		self.ini:SetValue("atmosfear_option_names","medium","st_list_night_brightness_medium")
-		self.ini:SetValue("atmosfear_option_names","balance_custom","st_list_weather_balance_preset_custom")
-		self.ini:SetValue("atmosfear_option_names","length_default","st_list_weather_length_preset_default")
-		self.ini:SetValue("atmosfear_option_names","clear","st_list_periods_clear")
-		self.ini:SetValue("atmosfear_option_names","killatend","st_list_fate_killatend")
-		self.ini:SetValue("atmosfear_option_names","radio","st_list_warning_radio")
-		self.ini:SetValue("atmosfear_option_names","killorturn","st_list_fate_killorturn")
-		self.ini:SetValue("atmosfear_option_names","dark","st_list_night_brightness_dark")
-		self.ini:SetValue("atmosfear_option_names","balance_default","st_list_weather_balance_preset_default")
-		self.ini:SetValue("atmosfear_option_names","bright","st_list_night_brightness_bright")
-		self.ini:SetValue("atmosfear_option_names","stormy","st_list_periods_stormy")
-		self.ini:SetValue("atmosfear_option_names","length_long","st_list_weather_length_preset_long")
-		self.ini:SetValue("atmosfear_option_names","rainy","st_list_periods_rainy")
-		self.ini:SetValue("atmosfear_option_names","foggy","st_list_periods_foggy")
-		self.ini:SetValue("atmosfear_option_names","length_short","st_list_weather_length_preset_short")
-		self.ini:SetValue("atmosfear_option_names","radio_siren","st_list_warning_radio_siren")
-		self.ini:SetValue("atmosfear_option_names","give","st_list_task_give")
+	if not (self.default_settings:SectionExist("atmosfear_option_names")) then
+		self.default_settings:SetValue("atmosfear_option_names","kill","st_list_fate_kill")
+		self.default_settings:SetValue("atmosfear_option_names","explode","st_list_fate_explode")
+		self.default_settings:SetValue("atmosfear_option_names","nowarning","st_list_warning_none")
+		self.default_settings:SetValue("atmosfear_option_names","clear_foggy","st_list_periods_clear_foggy")
+		self.default_settings:SetValue("atmosfear_option_names","siren","st_list_warning_siren")
+		self.default_settings:SetValue("atmosfear_option_names","foggy_rainy","st_list_periods_foggy_rainy")
+		self.default_settings:SetValue("atmosfear_option_names","turntozombie","st_list_fate_turntozombie")
+		self.default_settings:SetValue("atmosfear_option_names","balance_bad","st_list_weather_balance_preset_bad")
+		self.default_settings:SetValue("atmosfear_option_names","dontgive","st_list_task_none")
+		self.default_settings:SetValue("atmosfear_option_names","slight","st_list_night_brightness_slight")
+		self.default_settings:SetValue("atmosfear_option_names","balance_good","st_list_weather_balance_preset_good")
+		self.default_settings:SetValue("atmosfear_option_names","96","st_list_freq_96")
+		self.default_settings:SetValue("atmosfear_option_names","48","st_list_freq_48")
+		self.default_settings:SetValue("atmosfear_option_names","24","st_list_freq_24")
+		self.default_settings:SetValue("atmosfear_option_names","12","st_list_freq_12")
+		self.default_settings:SetValue("atmosfear_option_names","unhurt","st_list_fate_none")
+		self.default_settings:SetValue("atmosfear_option_names","poison","st_list_fate_poison")
+		self.default_settings:SetValue("atmosfear_option_names","killatwave","st_list_fate_killatwave")
+		self.default_settings:SetValue("atmosfear_option_names","length_custom","st_list_weather_length_preset_custom")
+		self.default_settings:SetValue("atmosfear_option_names","medium","st_list_night_brightness_medium")
+		self.default_settings:SetValue("atmosfear_option_names","balance_custom","st_list_weather_balance_preset_custom")
+		self.default_settings:SetValue("atmosfear_option_names","length_default","st_list_weather_length_preset_default")
+		self.default_settings:SetValue("atmosfear_option_names","clear","st_list_periods_clear")
+		self.default_settings:SetValue("atmosfear_option_names","killatend","st_list_fate_killatend")
+		self.default_settings:SetValue("atmosfear_option_names","radio","st_list_warning_radio")
+		self.default_settings:SetValue("atmosfear_option_names","killorturn","st_list_fate_killorturn")
+		self.default_settings:SetValue("atmosfear_option_names","dark","st_list_night_brightness_dark")
+		self.default_settings:SetValue("atmosfear_option_names","balance_default","st_list_weather_balance_preset_default")
+		self.default_settings:SetValue("atmosfear_option_names","bright","st_list_night_brightness_bright")
+		self.default_settings:SetValue("atmosfear_option_names","stormy","st_list_periods_stormy")
+		self.default_settings:SetValue("atmosfear_option_names","length_long","st_list_weather_length_preset_long")
+		self.default_settings:SetValue("atmosfear_option_names","rainy","st_list_periods_rainy")
+		self.default_settings:SetValue("atmosfear_option_names","foggy","st_list_periods_foggy")
+		self.default_settings:SetValue("atmosfear_option_names","length_short","st_list_weather_length_preset_short")
+		self.default_settings:SetValue("atmosfear_option_names","radio_siren","st_list_warning_radio_siren")
+		self.default_settings:SetValue("atmosfear_option_names","give","st_list_task_give")
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("list_blowout_fate")) then
-		self.ini:SetValue("list_blowout_fate","list_fate_killatwave",1)
-		self.ini:SetValue("list_blowout_fate","list_fate_killatend",0)
-		self.ini:SetValue("list_blowout_fate","list_fate_explode",3)
-		self.ini:SetValue("list_blowout_fate","list_fate_turntozombie",2)
+	if not (self.default_settings:SectionExist("list_blowout_fate")) then
+		self.default_settings:SetValue("list_blowout_fate","list_fate_killatwave",1)
+		self.default_settings:SetValue("list_blowout_fate","list_fate_killatend",0)
+		self.default_settings:SetValue("list_blowout_fate","list_fate_explode",3)
+		self.default_settings:SetValue("list_blowout_fate","list_fate_turntozombie",2)
 		need_save = true
 	end
 
 	--[[
-	if not (self.ini:SectionExist("list_fallout_fate")) then
-		self.ini:SetValue("list_fallout_fate","list_fate_poison",0)
-		self.ini:SetValue("list_fallout_fate","list_fate_none",1)
+	if not (self.default_settings:SectionExist("list_fallout_fate")) then
+		self.default_settings:SetValue("list_fallout_fate","list_fate_poison",0)
+		self.default_settings:SetValue("list_fallout_fate","list_fate_none",1)
 		need_save = true
 	end
 	--]]
 
-	if not (self.ini:SectionExist("list_psi_storm_fate")) then
-		self.ini:SetValue("list_psi_storm_fate","list_fate_kill",0)
-		self.ini:SetValue("list_psi_storm_fate","list_fate_turntozombie",1)
-		self.ini:SetValue("list_psi_storm_fate","list_fate_none",2)
+	if not (self.default_settings:SectionExist("list_psi_storm_fate")) then
+		self.default_settings:SetValue("list_psi_storm_fate","list_fate_kill",0)
+		self.default_settings:SetValue("list_psi_storm_fate","list_fate_turntozombie",1)
+		self.default_settings:SetValue("list_psi_storm_fate","list_fate_none",2)
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("list_blowout_task")) then
-		self.ini:SetValue("list_blowout_task","list_task_give",0)
-		self.ini:SetValue("list_blowout_task","list_task_none",1)
+	if not (self.default_settings:SectionExist("list_blowout_task")) then
+		self.default_settings:SetValue("list_blowout_task","list_task_give",0)
+		self.default_settings:SetValue("list_blowout_task","list_task_none",1)
 		need_save = true
 	end
 
 	--[[
-	if not (self.ini:SectionExist("list_fallout_task")) then
-		self.ini:SetValue("list_fallout_task","list_task_give",0)
-		self.ini:SetValue("list_fallout_task","list_task_none",1)
+	if not (self.default_settings:SectionExist("list_fallout_task")) then
+		self.default_settings:SetValue("list_fallout_task","list_task_give",0)
+		self.default_settings:SetValue("list_fallout_task","list_task_none",1)
 		need_save = true
 	end
 	--]]
 
-	if not (self.ini:SectionExist("list_psi_storm_task")) then
-		self.ini:SetValue("list_psi_storm_task","list_task_give",0)
-		self.ini:SetValue("list_psi_storm_task","list_task_none",1)
+	if not (self.default_settings:SectionExist("list_psi_storm_task")) then
+		self.default_settings:SetValue("list_psi_storm_task","list_task_give",0)
+		self.default_settings:SetValue("list_psi_storm_task","list_task_none",1)
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("atmosfear_preset_length_short")) then
-		for level,v in pairs(self.atmosfear.valid_levels) do
-			self.ini:SetValue("atmosfear_preset_length_short",level.."_period_good_length",3)
-			self.ini:SetValue("atmosfear_preset_length_short",level.."_period_bad_length",3)
+	if not (self.default_settings:SectionExist("atmosfear_preset_length_short")) then
+		for level,v in pairs(atmosfear.valid_levels) do
+			self.default_settings:SetValue("atmosfear_preset_length_short",level.."_period_good_length",3)
+			self.default_settings:SetValue("atmosfear_preset_length_short",level.."_period_bad_length",3)
 		end
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("atmosfear_preset_length_long")) then
-		for level,v in pairs(self.atmosfear.valid_levels) do
-			self.ini:SetValue("atmosfear_preset_length_long",level.."_period_good_length",3)
-			self.ini:SetValue("atmosfear_preset_length_long",level.."_period_bad_length",3)
+	if not (self.default_settings:SectionExist("atmosfear_preset_length_long")) then
+		for level,v in pairs(atmosfear.valid_levels) do
+			self.default_settings:SetValue("atmosfear_preset_length_long",level.."_period_good_length",3)
+			self.default_settings:SetValue("atmosfear_preset_length_long",level.."_period_bad_length",3)
 		end
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("atmosfear_preset_length_default")) then
-		for level,v in pairs(self.atmosfear.valid_levels) do
-			self.ini:SetValue("atmosfear_preset_length_default",level.."_period_good_length",random_choice(4,6,8))
-			self.ini:SetValue("atmosfear_preset_length_default",level.."_period_bad_length",random_choice(4,6,8))
+	if not (self.default_settings:SectionExist("atmosfear_preset_length_default")) then
+		for level,v in pairs(atmosfear.valid_levels) do
+			self.default_settings:SetValue("atmosfear_preset_length_default",level.."_period_good_length",random_choice(4,6,8))
+			self.default_settings:SetValue("atmosfear_preset_length_default",level.."_period_bad_length",random_choice(4,6,8))
 		end
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("list_weather_length_presets")) then
-		self.ini:SetValue("list_weather_length_presets","list_weather_length_preset_short",1)
-		self.ini:SetValue("list_weather_length_presets","list_weather_length_preset_default",0)
-		self.ini:SetValue("list_weather_length_presets","list_weather_length_preset_custom",3)
-		self.ini:SetValue("list_weather_length_presets","list_weather_length_preset_long",2)
+	if not (self.default_settings:SectionExist("list_weather_length_presets")) then
+		self.default_settings:SetValue("list_weather_length_presets","list_weather_length_preset_short",1)
+		self.default_settings:SetValue("list_weather_length_presets","list_weather_length_preset_default",0)
+		self.default_settings:SetValue("list_weather_length_presets","list_weather_length_preset_custom",3)
+		self.default_settings:SetValue("list_weather_length_presets","list_weather_length_preset_long",2)
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("atmosfear_preset_balance_bad")) then
-		for level,v in pairs(self.atmosfear.valid_levels) do
-			self.ini:SetValue("atmosfear_preset_balance_bad",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
-			self.ini:SetValue("atmosfear_preset_balance_bad",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+	if not (self.default_settings:SectionExist("atmosfear_preset_balance_bad")) then
+		for level,v in pairs(atmosfear.valid_levels) do
+			self.default_settings:SetValue("atmosfear_preset_balance_bad",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+			self.default_settings:SetValue("atmosfear_preset_balance_bad",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 		end
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("atmosfear_preset_balance_good")) then
-		for level,v in pairs(self.atmosfear.valid_levels) do
-			self.ini:SetValue("atmosfear_preset_balance_good",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
-			self.ini:SetValue("atmosfear_preset_balance_good",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+	if not (self.default_settings:SectionExist("atmosfear_preset_balance_good")) then
+		for level,v in pairs(atmosfear.valid_levels) do
+			self.default_settings:SetValue("atmosfear_preset_balance_good",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+			self.default_settings:SetValue("atmosfear_preset_balance_good",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 		end
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("atmosfear_preset_balance_default")) then
-		for level,v in pairs(self.atmosfear.valid_levels) do
-			self.ini:SetValue("atmosfear_preset_balance_default",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
-			self.ini:SetValue("atmosfear_preset_balance_default",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+	if not (self.default_settings:SectionExist("atmosfear_preset_balance_default")) then
+		for level,v in pairs(atmosfear.valid_levels) do
+			self.default_settings:SetValue("atmosfear_preset_balance_default",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+			self.default_settings:SetValue("atmosfear_preset_balance_default",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 		end
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("list_periods")) then
-		self.ini:SetValue("list_periods","list_periods_stormy",5)
-		self.ini:SetValue("list_periods","list_periods_clear",0)
-		self.ini:SetValue("list_periods","list_periods_rainy",4)
-		self.ini:SetValue("list_periods","list_periods_foggy_rainy",3)
-		self.ini:SetValue("list_periods","list_periods_clear_foggy",1)
-		self.ini:SetValue("list_periods","list_periods_foggy",2)
+	if not (self.default_settings:SectionExist("list_periods")) then
+		self.default_settings:SetValue("list_periods","list_periods_stormy",5)
+		self.default_settings:SetValue("list_periods","list_periods_clear",0)
+		self.default_settings:SetValue("list_periods","list_periods_rainy",4)
+		self.default_settings:SetValue("list_periods","list_periods_foggy_rainy",3)
+		self.default_settings:SetValue("list_periods","list_periods_clear_foggy",1)
+		self.default_settings:SetValue("list_periods","list_periods_foggy",2)
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("list_weather_balance_presets")) then
-		self.ini:SetValue("list_weather_balance_presets","list_weather_balance_preset_default",0)
-		self.ini:SetValue("list_weather_balance_presets","list_weather_balance_preset_custom",3)
-		self.ini:SetValue("list_weather_balance_presets","list_weather_balance_preset_good",1)
-		self.ini:SetValue("list_weather_balance_presets","list_weather_balance_preset_bad",2)
+	if not (self.default_settings:SectionExist("list_weather_balance_presets")) then
+		self.default_settings:SetValue("list_weather_balance_presets","list_weather_balance_preset_default",0)
+		self.default_settings:SetValue("list_weather_balance_presets","list_weather_balance_preset_custom",3)
+		self.default_settings:SetValue("list_weather_balance_presets","list_weather_balance_preset_good",1)
+		self.default_settings:SetValue("list_weather_balance_presets","list_weather_balance_preset_bad",2)
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("list_blowout_freq")) then
-		self.ini:SetValue("list_blowout_freq","list_freq_48",2)
-		self.ini:SetValue("list_blowout_freq","list_freq_24",1)
-		self.ini:SetValue("list_blowout_freq","list_freq_12",0)
-		self.ini:SetValue("list_blowout_freq","list_freq_96",3)
+	if not (self.default_settings:SectionExist("list_blowout_freq")) then
+		self.default_settings:SetValue("list_blowout_freq","list_freq_48",2)
+		self.default_settings:SetValue("list_blowout_freq","list_freq_24",1)
+		self.default_settings:SetValue("list_blowout_freq","list_freq_12",0)
+		self.default_settings:SetValue("list_blowout_freq","list_freq_96",3)
 		need_save = true
 	end
 
 	--[[
-	if not (self.ini:SectionExist("list_fallout_freq")) then
-		self.ini:SetValue("list_fallout_freq","list_freq_48",2)
-		self.ini:SetValue("list_fallout_freq","list_freq_24",1)
-		self.ini:SetValue("list_fallout_freq","list_freq_12",0)
-		self.ini:SetValue("list_fallout_freq","list_freq_96",3)
+	if not (self.default_settings:SectionExist("list_fallout_freq")) then
+		self.default_settings:SetValue("list_fallout_freq","list_freq_48",2)
+		self.default_settings:SetValue("list_fallout_freq","list_freq_24",1)
+		self.default_settings:SetValue("list_fallout_freq","list_freq_12",0)
+		self.default_settings:SetValue("list_fallout_freq","list_freq_96",3)
 		need_save = true
 	end
 	--]]
 	
-	if not (self.ini:SectionExist("list_psi_storm_freq")) then
-		self.ini:SetValue("list_psi_storm_freq","list_freq_48",2)
-		self.ini:SetValue("list_psi_storm_freq","list_freq_24",1)
-		self.ini:SetValue("list_psi_storm_freq","list_freq_12",0)
-		self.ini:SetValue("list_psi_storm_freq","list_freq_96",3)
+	if not (self.default_settings:SectionExist("list_psi_storm_freq")) then
+		self.default_settings:SetValue("list_psi_storm_freq","list_freq_48",2)
+		self.default_settings:SetValue("list_psi_storm_freq","list_freq_24",1)
+		self.default_settings:SetValue("list_psi_storm_freq","list_freq_12",0)
+		self.default_settings:SetValue("list_psi_storm_freq","list_freq_96",3)
 		need_save = true
 	end
 
 	--[[
-	if not (self.ini:SectionExist("list_fallout_warning")) then
-		self.ini:SetValue("list_fallout_warning","list_warning_siren",0)
-		self.ini:SetValue("list_fallout_warning","list_warning_none",1)
+	if not (self.default_settings:SectionExist("list_fallout_warning")) then
+		self.default_settings:SetValue("list_fallout_warning","list_warning_siren",0)
+		self.default_settings:SetValue("list_fallout_warning","list_warning_none",1)
 		need_save = true
 	end
 	--]]
 
-	if not (self.ini:SectionExist("list_psi_storm_warning")) then
-		self.ini:SetValue("list_psi_storm_warning","list_warning_siren",0)
-		self.ini:SetValue("list_psi_storm_warning","list_warning_none",1)
+	if not (self.default_settings:SectionExist("list_psi_storm_warning")) then
+		self.default_settings:SetValue("list_psi_storm_warning","list_warning_siren",0)
+		self.default_settings:SetValue("list_psi_storm_warning","list_warning_none",1)
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("list_blowout_warning")) then
-		self.ini:SetValue("list_blowout_warning","list_warning_radio_siren",0)
-		self.ini:SetValue("list_blowout_warning","list_warning_radio",1)
-		self.ini:SetValue("list_blowout_warning","list_warning_siren",2)
-		self.ini:SetValue("list_blowout_warning","list_warning_none",3)
+	if not (self.default_settings:SectionExist("list_blowout_warning")) then
+		self.default_settings:SetValue("list_blowout_warning","list_warning_radio_siren",0)
+		self.default_settings:SetValue("list_blowout_warning","list_warning_radio",1)
+		self.default_settings:SetValue("list_blowout_warning","list_warning_siren",2)
+		self.default_settings:SetValue("list_blowout_warning","list_warning_none",3)
 		need_save = true
 	end
 
-	if not (self.ini:SectionExist("list_night_brightness")) then
-		self.ini:SetValue("list_night_brightness","list_night_brightness_bright",3)
-		self.ini:SetValue("list_night_brightness","list_night_brightness_dark",0)
-		self.ini:SetValue("list_night_brightness","list_night_brightness_slight",1)
-		self.ini:SetValue("list_night_brightness","list_night_brightness_medium",2)
+	if not (self.default_settings:SectionExist("list_night_brightness")) then
+		self.default_settings:SetValue("list_night_brightness","list_night_brightness_bright",3)
+		self.default_settings:SetValue("list_night_brightness","list_night_brightness_dark",0)
+		self.default_settings:SetValue("list_night_brightness","list_night_brightness_slight",1)
+		self.default_settings:SetValue("list_night_brightness","list_night_brightness_medium",2)
 		need_save = true
 	end
 
 	if (need_save) then
-		self.ini:Save()
+		self.default_settings:Save()
 	end
 
 	self.m_preconditions	= {}
@@ -355,7 +352,7 @@ end
 
 function af_options_dialog:OptionsFromIni(combo, section)
 	combo:ClearList()
-	local options = self.ini:GetKeys(section)
+	local options = self.default_settings:GetKeys(section)
 	local inv_options = {}
 	if options~=nil then
 		for option, value in pairs(options) do
@@ -415,10 +412,10 @@ end
 function af_options_dialog:SetComboValue(option_name,af_option)
 	local combo = self["list_"..option_name]
 	if af_option==nil then
-		af_option=self.ini:GetValue("atmosfear_option_names","opt_"..option_name)
+		af_option=self.default_settings:GetValue("atmosfear_option_names","opt_"..option_name)
 	end
-	if af_option and self.ini:KeyExist("atmosfear_option_names",af_option) then
-		local option = self.ini:GetValue("atmosfear_option_names",af_option)
+	if af_option and self.default_settings:KeyExist("atmosfear_option_names",af_option) then
+		local option = self.default_settings:GetValue("atmosfear_option_names",af_option)
 		combo:SetText(game.translate_string(option))
 	else
 		combo:SetText("option not found")
@@ -428,7 +425,7 @@ end
 function af_options_dialog:SetRadioValue(radio_name,af_option)
 	local radio = self["radio_"..radio_name]
 	if af_option==nil then
-		af_option=self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..radio_name)
+		af_option=config:GetValue("atmosfear_current_parameters","opt_"..radio_name)
 	end
 	if radio~=nil and af_option~=nil then
 		radio:SetActiveTab(af_option)
@@ -438,7 +435,7 @@ end
 function af_options_dialog:SetLengthRadioValue(radio_name,af_option)
 	local radio = self["radio_"..radio_name]
 	if af_option==nil then
-		af_option=self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..radio_name)
+		af_option=config:GetValue("atmosfear_current_parameters","opt_"..radio_name)
 	end
 	if radio~=nil and af_option~=nil then
 		radio:SetActiveTab(af_option)
@@ -448,7 +445,7 @@ end
 function af_options_dialog:SetCheckValue(name,af_option)
 	local checkbox = self["check_"..name]
 	if af_option==nil then
-		af_option=self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..name)
+		af_option=config:GetValue("atmosfear_current_parameters","opt_"..name)
 	end
 	if checkbox~=nil and af_option~=nil then
 		if (tonumber(af_option)==1) then
@@ -462,7 +459,7 @@ end
 function af_options_dialog:GetComboValue(option_name)
 	local selected = self["list_"..option_name]:GetText()
 
-	local parameters = self.ini:GetKeys("atmosfear_option_names")
+	local parameters = self.default_settings:GetKeys("atmosfear_option_names")
 	for option, name in pairs(parameters) do
 		if game.translate_string(name)==selected then
 			return option
@@ -485,15 +482,15 @@ function af_options_dialog:GetCheckValue(option_name)
 end
 
 function af_options_dialog:SetComboOption(option_name, number)
-	self.atmosfear.ini:SetValue("atmosfear_current_parameters","opt_"..option_name,number and tonumber(self:GetComboValue(option_name)) or self:GetComboValue(option_name))
+	config:SetValue("atmosfear_current_parameters","opt_"..option_name,number and tonumber(self:GetComboValue(option_name)) or self:GetComboValue(option_name))
 end
 
 function af_options_dialog:SetRadioOption(option_name, number)
-	self.atmosfear.ini:SetValue("atmosfear_current_parameters","opt_"..option_name,number and tonumber(self:GetRadioValue(option_name)) or self:GetRadioValue(option_name))
+	config:SetValue("atmosfear_current_parameters","opt_"..option_name,number and tonumber(self:GetRadioValue(option_name)) or self:GetRadioValue(option_name))
 end
 
 function af_options_dialog:SetCheckOption(option_name, number)
-	self.atmosfear.ini:SetValue("atmosfear_current_parameters","opt_"..option_name,self:GetCheckValue(option_name))
+	config:SetValue("atmosfear_current_parameters","opt_"..option_name,self:GetCheckValue(option_name))
 end
 
 --######################################################################################################################
@@ -502,68 +499,68 @@ end
 
 function af_options_dialog:SetCurrentValues()
 
-	for level,v in pairs(self.atmosfear.valid_levels) do
-		self:SetComboValue(level.."_period_good", self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..level.."_period_good",0,"clear_foggy"))
-		self:SetComboValue(level.."_period_bad", self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..level.."_period_bad",0,"rainy"))
-		self:SetRadioValue(level.."_period_good_length", self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..level.."_period_good_length",0,"6"))
-		self:SetRadioValue(level.."_period_bad_length",	self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..level.."_period_bad_length",0,"6"))
+	for level,v in pairs(atmosfear.valid_levels) do
+		self:SetComboValue(level.."_period_good", config:GetValue("atmosfear_current_parameters","opt_"..level.."_period_good",0,"clear_foggy"))
+		self:SetComboValue(level.."_period_bad", config:GetValue("atmosfear_current_parameters","opt_"..level.."_period_bad",0,"rainy"))
+		self:SetRadioValue(level.."_period_good_length", config:GetValue("atmosfear_current_parameters","opt_"..level.."_period_good_length",0,"6"))
+		self:SetRadioValue(level.."_period_bad_length",	config:GetValue("atmosfear_current_parameters","opt_"..level.."_period_bad_length",0,"6"))
 	end
 
-	self:SetCheckValue("enable_blowout",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_enable_blowout",0,"1"))
-	self:SetComboValue("blowout_freq",				self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_blowout_freq",0,"48"))
-	self:SetComboValue("blowout_fate",				self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_blowout_fate",0,"turntozombie"))
-	self:SetComboValue("blowout_warning",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_blowout_warning",0,"radio_siren"))
-	self:SetComboValue("blowout_task",				self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_blowout_task",0,"give"))
-	--self:SetCheckValue("enable_fallout",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_enable_fallout",0,"0"))
-	--self:SetComboValue("fallout_freq",				self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_fallout_freq",0,"12"))
-	--self:SetComboValue("fallout_fate",				self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_fallout_fate",0,"poison"))
-	--self:SetComboValue("fallout_warning",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_fallout_warning",0,"siren"))
-	--self:SetComboValue("fallout_task",				self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_fallout_task",0,"give"))
-	self:SetCheckValue("enable_psi_storm",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",0,"1"))
-	self:SetComboValue("psi_storm_freq",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",0,"24"))
-	self:SetComboValue("psi_storm_fate",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_psi_storm_fate",0,"kill"))
-	self:SetComboValue("psi_storm_warning",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_psi_storm_warning",0,"siren"))
-	self:SetComboValue("psi_storm_task",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_psi_storm_task",0,"give"))
+	self:SetCheckValue("enable_blowout",			config:GetValue("atmosfear_current_parameters","opt_enable_blowout",0,"1"))
+	self:SetComboValue("blowout_freq",				config:GetValue("atmosfear_current_parameters","opt_blowout_freq",0,"48"))
+	self:SetComboValue("blowout_fate",				config:GetValue("atmosfear_current_parameters","opt_blowout_fate",0,"turntozombie"))
+	self:SetComboValue("blowout_warning",			config:GetValue("atmosfear_current_parameters","opt_blowout_warning",0,"radio_siren"))
+	self:SetComboValue("blowout_task",				config:GetValue("atmosfear_current_parameters","opt_blowout_task",0,"give"))
+	--self:SetCheckValue("enable_fallout",			config:GetValue("atmosfear_current_parameters","opt_enable_fallout",0,"0"))
+	--self:SetComboValue("fallout_freq",				config:GetValue("atmosfear_current_parameters","opt_fallout_freq",0,"12"))
+	--self:SetComboValue("fallout_fate",				config:GetValue("atmosfear_current_parameters","opt_fallout_fate",0,"poison"))
+	--self:SetComboValue("fallout_warning",			config:GetValue("atmosfear_current_parameters","opt_fallout_warning",0,"siren"))
+	--self:SetComboValue("fallout_task",				config:GetValue("atmosfear_current_parameters","opt_fallout_task",0,"give"))
+	self:SetCheckValue("enable_psi_storm",			config:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",0,"1"))
+	self:SetComboValue("psi_storm_freq",			config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",0,"24"))
+	self:SetComboValue("psi_storm_fate",			config:GetValue("atmosfear_current_parameters","opt_psi_storm_fate",0,"kill"))
+	self:SetComboValue("psi_storm_warning",			config:GetValue("atmosfear_current_parameters","opt_psi_storm_warning",0,"siren"))
+	self:SetComboValue("psi_storm_task",			config:GetValue("atmosfear_current_parameters","opt_psi_storm_task",0,"give"))
 
-	self:SetRadioValue("moon_phase",				self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_moon_phase",0,"8days"))
-	self:SetComboValue("night_brightness",			self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_night_brightness",0,"slight"))
+	self:SetRadioValue("moon_phase",				config:GetValue("atmosfear_current_parameters","opt_moon_phase",0,"8days"))
+	self:SetComboValue("night_brightness",			config:GetValue("atmosfear_current_parameters","opt_night_brightness",0,"slight"))
 
-	self:SetComboValue("weather_balance_presets",	self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_weather_balance_presets",0,"balance_default"))
-	self:SetComboValue("weather_length_presets",	self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_weather_length_presets",0,"length_default"))
+	self:SetComboValue("weather_balance_presets",	config:GetValue("atmosfear_current_parameters","opt_weather_balance_presets",0,"balance_default"))
+	self:SetComboValue("weather_length_presets",	config:GetValue("atmosfear_current_parameters","opt_weather_length_presets",0,"length_default"))
 
 	self.dlg_weather:Show		(true)
 end
 
 function af_options_dialog:SetDefaultValues()
 
-	for level,v in pairs(self.atmosfear.valid_levels) do
-		self:SetComboValue(level.."_period_good", self.ini:GetValue("atmosfear_default_parameters","opt_"..level.."_period_good",0,"clear_foggy"))
-		self:SetComboValue(level.."_period_bad", self.ini:GetValue("atmosfear_default_parameters","opt_"..level.."_period_bad",0,"rainy"))
-		self:SetRadioValue(level.."_period_good_length", self.ini:GetValue("atmosfear_default_parameters","opt_"..level.."_period_good_length",0,"6"))
-		self:SetRadioValue(level.."_period_bad_length",	self.ini:GetValue("atmosfear_default_parameters","opt_"..level.."_period_bad_length",0,"6"))
+	for level,v in pairs(atmosfear.valid_levels) do
+		self:SetComboValue(level.."_period_good", self.default_settings:GetValue("atmosfear_default_parameters","opt_"..level.."_period_good",0,"clear_foggy"))
+		self:SetComboValue(level.."_period_bad", self.default_settings:GetValue("atmosfear_default_parameters","opt_"..level.."_period_bad",0,"rainy"))
+		self:SetRadioValue(level.."_period_good_length", self.default_settings:GetValue("atmosfear_default_parameters","opt_"..level.."_period_good_length",0,"6"))
+		self:SetRadioValue(level.."_period_bad_length",	self.default_settings:GetValue("atmosfear_default_parameters","opt_"..level.."_period_bad_length",0,"6"))
 	end
 
-	self:SetCheckValue("enable_blowout",			self.ini:GetValue("atmosfear_default_parameters","opt_enable_blowout",0,"1"))
-	self:SetComboValue("blowout_freq",				self.ini:GetValue("atmosfear_default_parameters","opt_blowout_freq",0,"48"))
-	self:SetComboValue("blowout_fate",				self.ini:GetValue("atmosfear_default_parameters","opt_blowout_fate",0,"turntozombie"))
-	self:SetComboValue("blowout_warning",			self.ini:GetValue("atmosfear_default_parameters","opt_blowout_warning",0,"radio_siren"))
-	self:SetComboValue("blowout_task",				self.ini:GetValue("atmosfear_default_parameters","opt_blowout_task",0,"give"))
-	--self:SetCheckValue("enable_fallout",			self.ini:GetValue("atmosfear_default_parameters","opt_enable_fallout",0,"0"))
-	--self:SetComboValue("fallout_freq",				self.ini:GetValue("atmosfear_default_parameters","opt_fallout_freq",0,"12"))
-	--self:SetComboValue("fallout_fate",				self.ini:GetValue("atmosfear_default_parameters","opt_fallout_fate",0,"poison"))
-	--self:SetComboValue("fallout_warning",			self.ini:GetValue("atmosfear_default_parameters","opt_fallout_warning",0,"siren"))
-	--self:SetComboValue("fallout_task",				self.ini:GetValue("atmosfear_default_parameters","opt_fallout_task",0,"give"))
-	self:SetCheckValue("enable_psi_storm",			self.ini:GetValue("atmosfear_default_parameters","opt_enable_psi_storm",0,"1"))
-	self:SetComboValue("psi_storm_freq",			self.ini:GetValue("atmosfear_default_parameters","opt_psi_storm_freq",0,"24"))
-	self:SetComboValue("psi_storm_fate",			self.ini:GetValue("atmosfear_default_parameters","opt_psi_storm_fate",0,"kill"))
-	self:SetComboValue("psi_storm_warning",			self.ini:GetValue("atmosfear_default_parameters","opt_psi_storm_warning",0,"siren"))
-	self:SetComboValue("psi_storm_task",			self.ini:GetValue("atmosfear_default_parameters","opt_psi_storm_task",0,"give"))
+	self:SetCheckValue("enable_blowout",			self.default_settings:GetValue("atmosfear_default_parameters","opt_enable_blowout",0,"1"))
+	self:SetComboValue("blowout_freq",				self.default_settings:GetValue("atmosfear_default_parameters","opt_blowout_freq",0,"48"))
+	self:SetComboValue("blowout_fate",				self.default_settings:GetValue("atmosfear_default_parameters","opt_blowout_fate",0,"turntozombie"))
+	self:SetComboValue("blowout_warning",			self.default_settings:GetValue("atmosfear_default_parameters","opt_blowout_warning",0,"radio_siren"))
+	self:SetComboValue("blowout_task",				self.default_settings:GetValue("atmosfear_default_parameters","opt_blowout_task",0,"give"))
+	--self:SetCheckValue("enable_fallout",			self.default_settings:GetValue("atmosfear_default_parameters","opt_enable_fallout",0,"0"))
+	--self:SetComboValue("fallout_freq",				self.default_settings:GetValue("atmosfear_default_parameters","opt_fallout_freq",0,"12"))
+	--self:SetComboValue("fallout_fate",				self.default_settings:GetValue("atmosfear_default_parameters","opt_fallout_fate",0,"poison"))
+	--self:SetComboValue("fallout_warning",			self.default_settings:GetValue("atmosfear_default_parameters","opt_fallout_warning",0,"siren"))
+	--self:SetComboValue("fallout_task",				self.default_settings:GetValue("atmosfear_default_parameters","opt_fallout_task",0,"give"))
+	self:SetCheckValue("enable_psi_storm",			self.default_settings:GetValue("atmosfear_default_parameters","opt_enable_psi_storm",0,"1"))
+	self:SetComboValue("psi_storm_freq",			self.default_settings:GetValue("atmosfear_default_parameters","opt_psi_storm_freq",0,"24"))
+	self:SetComboValue("psi_storm_fate",			self.default_settings:GetValue("atmosfear_default_parameters","opt_psi_storm_fate",0,"kill"))
+	self:SetComboValue("psi_storm_warning",			self.default_settings:GetValue("atmosfear_default_parameters","opt_psi_storm_warning",0,"siren"))
+	self:SetComboValue("psi_storm_task",			self.default_settings:GetValue("atmosfear_default_parameters","opt_psi_storm_task",0,"give"))
 
-	self:SetRadioValue("moon_phase",				self.ini:GetValue("atmosfear_default_parameters","opt_moon_phase",0,"8days"))
-	self:SetComboValue("night_brightness",			self.ini:GetValue("atmosfear_default_parameters","opt_night_brightness",0,"slight"))
+	self:SetRadioValue("moon_phase",				self.default_settings:GetValue("atmosfear_default_parameters","opt_moon_phase",0,"8days"))
+	self:SetComboValue("night_brightness",			self.default_settings:GetValue("atmosfear_default_parameters","opt_night_brightness",0,"slight"))
 
-	self:SetComboValue("weather_balance_presets",	self.ini:GetValue("atmosfear_default_parameters","opt_weather_balance_presets",0,"balance_default"))
-	self:SetComboValue("weather_length_presets",	self.ini:GetValue("atmosfear_default_parameters","opt_weather_length_presets",0,"length_default"))
+	self:SetComboValue("weather_balance_presets",	self.default_settings:GetValue("atmosfear_default_parameters","opt_weather_balance_presets",0,"balance_default"))
+	self:SetComboValue("weather_length_presets",	self.default_settings:GetValue("atmosfear_default_parameters","opt_weather_length_presets",0,"length_default"))
 end
 
 function af_options_dialog:InitCallBacks()
@@ -638,7 +635,7 @@ function af_options_dialog:OnBtnLoadDefaultSettings()
 end
 
 function af_options_dialog:OnMsgUserYes()
-	self.atmosfear:loadDefaultConsoleSettings()
+	self:loadDefaultConsoleSettings()
 	self.message_box_user_done:InitMessageBox("message_box_ok")
 	self.message_box_user_done:SetText("st_msg_load_user_done")
 	self.message_box_user_done:ShowDialog(true)
@@ -655,7 +652,7 @@ end
 
 function af_options_dialog:OnWeatherBalancePresets()
 	local selected = self:GetComboValue("weather_balance_presets")
-	local parameters = self.atmosfear.ini:GetKeys("atmosfear_preset_"..selected)
+	local parameters = config:GetKeys("atmosfear_preset_"..selected)
 	if parameters~=nil then
 		for option, name in pairs(parameters) do
 			self:SetComboValue(option,name)
@@ -665,7 +662,7 @@ end
 
 function af_options_dialog:OnWeatherLengthPresets()
 	local selected = self:GetComboValue("weather_length_presets")
-	local parameters = self.atmosfear.ini:GetKeys("atmosfear_preset_"..selected)
+	local parameters = config:GetKeys("atmosfear_preset_"..selected)
 	if parameters~=nil then
 		for option, name in pairs(parameters) do
 			self:SetRadioValue(option,name)
@@ -685,11 +682,11 @@ end
 function af_options_dialog:OnBtnAccept()
 
 	local update_period
-	for level,v in pairs(self.atmosfear.valid_levels) do
+	for level,v in pairs(atmosfear.valid_levels) do
 		self:SetComboOption(level.."_period_good",false)
 		self:SetComboOption(level.."_period_bad",false)
 
-		if (not update_period) and (self.atmosfear.ini:GetValue("atmosfear_current_parameters",level.."_period_good_length") ~= tonumber(self:GetRadioValue(level.."_period_good_length")) or self.atmosfear.ini:GetValue("atmosfear_current_parameters",level.."_period_bad_length") ~= tonumber(self:GetRadioValue(level.."_period_bad_length"))) then
+		if (not update_period) and (config:GetValue("atmosfear_current_parameters",level.."_period_good_length") ~= tonumber(self:GetRadioValue(level.."_period_good_length")) or config:GetValue("atmosfear_current_parameters",level.."_period_bad_length") ~= tonumber(self:GetRadioValue(level.."_period_bad_length"))) then
 			update_period = true
 		end
 	end
@@ -698,17 +695,17 @@ function af_options_dialog:OnBtnAccept()
 		level_weathers.get_weather_manager():get_next_period_change_hour(level_weathers.get_weather_manager().period)
 	end
 
-	if (self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_enable_blowout") and self:GetCheckValue("enable_blowout")==1) or self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_blowout_freq")~=tonumber(self:GetComboValue("blowout_freq")) then
+	if (config:GetValue("atmosfear_current_parameters","opt_enable_blowout") and self:GetCheckValue("enable_blowout")==1) or config:GetValue("atmosfear_current_parameters","opt_blowout_freq")~=tonumber(self:GetComboValue("blowout_freq")) then
 		self:SetComboOption("blowout_freq",true)
 		if (level.present()) then
-			surge_manager.get_surge_manager():new_surge_time(true)
+			surge_manager.SurgeManager:new_surge_time(true)
 		end
 	end
 
-	if (self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_enable_psi_storm") == 0 and self:GetCheckValue("enable_psi_storm")==1) or self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_psi_storm_freq")~=tonumber(self:GetComboValue("psi_storm_freq")) then
+	if (config:GetValue("atmosfear_current_parameters","opt_enable_psi_storm") == 0 and self:GetCheckValue("enable_psi_storm")==1) or config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq")~=tonumber(self:GetComboValue("psi_storm_freq")) then
 		self:SetComboOption("psi_storm_freq",true)
 		if (level.present()) then
-			if (psi_storm_manager) then psi_storm_manager.get_psi_storm_manager():new_psi_storm_time(true) end
+			if (psi_storm_manager) then psi_storm_manager.PsiStormManager:new_psi_storm_time(true) end
 		end
 	end
 
@@ -726,12 +723,12 @@ function af_options_dialog:OnBtnAccept()
 	self:SetComboOption("psi_storm_warning",false)
 	self:SetComboOption("psi_storm_task",false)
 
-	if self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_moon_phase") ~= self:GetRadioValue("moon_phase") then
+	if config:GetValue("atmosfear_current_parameters","opt_moon_phase") ~= self:GetRadioValue("moon_phase") then
 		self:SetRadioOption("moon_phase",false)
 		level_weathers.get_weather_manager():select_weather(true)
 	end
 
-	if self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_night_brightness") ~= self:GetComboValue("night_brightness") then
+	if config:GetValue("atmosfear_current_parameters","opt_night_brightness") ~= self:GetComboValue("night_brightness") then
 		self:SetComboOption("night_brightness",false)
 		level_weathers.get_weather_manager():select_weather(true)
 	end
@@ -750,7 +747,7 @@ function af_options_dialog:OnBtnAccept()
 	--self.message_box_save:SetText("st_msg_after_save")
 	--self.message_box_save:ShowDialog(true)
 
-	self.atmosfear.ini:Save()
+	config:Save()
 end
 
 function af_options_dialog:OnBtnCancel()
@@ -792,6 +789,47 @@ end
 
 function af_options_dialog:Update()
 	CUIScriptWnd.Update(self)
+end
+
+function af_options_dialog:loadDefaultConsoleSettings()
+	local console=get_console()
+	console:execute("r2_dof_far 800")
+	console:execute("r2_aa off")
+	console:execute("r2_allow_r1_lights off")
+	console:execute("r2_dof -0.400000,1.400000,500.000000")
+	console:execute("r2_dof_enable on")
+	console:execute("r2_dof_kernel 2.")
+	console:execute("r2_dof_sky 0.")
+	console:execute("r2_exp_donttest_shad off")
+	console:execute("r2_gi off")
+	console:execute("r2_ls_bloom_fast off")
+	console:execute("r2_sun on")
+	console:execute("r2_sun_depth_far_bias -0.00002")
+	console:execute("r2_sun_depth_far_scale 1.")
+	console:execute("r2_sun_depth_near_bias 0.00007")
+	console:execute("r2_sun_depth_near_scale 1.")
+	console:execute("r2_sun_details on")
+	console:execute("r2_sun_far 180.")
+	console:execute("r2_sun_focus on")
+	console:execute("r2_sun_lumscale 1.")
+	console:execute("r2_sun_lumscale_amb 0.1")
+	console:execute("r2_sun_lumscale_hemi 0.6")
+	console:execute("r2_sun_near 30.")
+	console:execute("r2_sun_near_border 0.75")
+	console:execute("r2_sun_quality st_opt_high")
+	console:execute("r2_sun_shafts st_opt_low")
+	console:execute("r2_sun_tsm on")
+	console:execute("r2_sun_tsm_bias -0.01")
+	console:execute("r2_sun_tsm_proj 0.3")
+	console:execute("r2_tf_mipbias 0.")
+	console:execute("r2_tonemap on")
+	console:execute("r2_tonemap_adaptation 0.2")
+	console:execute("r2_tonemap_amount 1.")
+	console:execute("r2_tonemap_lowlum 0.4")
+	console:execute("r2_tonemap_middlegray 1.1")
+	console:execute("rs_c_brightness 1.")
+	console:execute("rs_c_contrast 1.")
+	console:execute("rs_c_gamma 1.")
 end
 
 --######################################################################################################################
@@ -881,6 +919,11 @@ function af_opt_weather:InitControls(x, y, xml, handler)
 	handler:RegisterCombo		(xml, "weather_dialog", "weather_balance_presets", nil, self)
 	handler:RegisterCombo		(xml, "weather_dialog", "weather_length_presets", nil, self)
 
+	local aspectRatio = 1
+	if(device().width/device().height>(1024/768+0.01)) then
+		aspectRatio = 0.8
+	end
+	
 	local k = 0
 	for level_name,v in pairs(handler.atmosfear.valid_levels) do
 		k = k + 1
@@ -952,16 +995,3 @@ function af_opt_default:InitControls(x, y, xml, handler)
 	handler:Register				(btn, "btn_load_default_settings")
 end
 
---######################################################################################################################
---#													FAKE AF														#
---######################################################################################################################
-
-class "CAtmosFearFake" (CUIWindow)
-
-function CAtmosFearFake:__init() super()
-
-end
-
-function CAtmosFearFake:loadDefaultParameters()
-
-end

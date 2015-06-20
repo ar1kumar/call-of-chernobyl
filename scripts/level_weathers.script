@@ -9,7 +9,6 @@ local diff_game_2sec = 0
 
 class "WeatherManager"
 function WeatherManager:__init()
-	self.atmosfear=atmosfear.get_atmosfear()
 	self.wfx_time = 0
 	self.weather_fx = nil
 	self.update_time = 0
@@ -141,27 +140,21 @@ function WeatherManager:round(n, precision)
 end
 
 function WeatherManager:get_level_name()
-	if (self.atmosfear.valid_levels[level.name()]) then
-		return level.name()
-	end
 
-	for level,v in pairs(self.atmosfear.valid_levels) do
-		return level
-	end
 end
 
 function WeatherManager:get_next_period_change_hour(period)
 	local hour=0
-	local level_name=self:get_level_name()
-	if not (level_name) then
+	local level_name = level.name()
+	if not (atmosfear.valid_levels[level_name]) then
 		return 1
 	end
 
 	if period=="good" then
-		local len = self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_good_length",2,6)
+		local len = atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_good_length",2,6)
 		hour = math.random(math.ceil(len*2/3),len)+self.last_period_change_hour+1
 	else
-		local len = self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_bad_length",2,6)
+		local len = atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_bad_length",2,6)
 		hour = math.random(math.ceil(len*2/3),len)+self.last_period_change_hour+1
 	end
 	if hour>23 then
@@ -172,14 +165,12 @@ end
 
 function WeatherManager:change_period()
 	local current_hour=level.get_time_hours()
-	local surge_manager=surge_manager.get_surge_manager()
-	local psi_manager= psi_storm_manager and psi_storm_manager.get_psi_storm_manager()
 
 	local g_time = game.get_game_time()
-	local diff_s = math.floor(surge_manager._delta - g_time:diffSec(surge_manager.last_surge_time))
-	local diff_p = psi_storm_manager and math.floor(psi_manager._delta - g_time:diffSec(psi_manager.last_psi_storm_time)) or 0
+	local diff_s = math.floor(surge_manager.SurgeManager._delta - g_time:diffSec(surge_manager.SurgeManager.last_surge_time))
+	local diff_p = psi_storm_manager and math.floor(psi_storm_manager.PsiStormManager._delta - g_time:diffSec(psi_storm_manager.PsiStormManager.last_psi_storm_time)) or 0
 
-	if (diff_s<7200 and self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1) ==1) or (diff_p<7200 and self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==1) or level.is_wfx_playing() then
+	if (diff_s<7200 and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1) ==1) or (diff_p<7200 and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==1) or level.is_wfx_playing() then
 		self.pre_blowout_period=true
 		self.next_period_change_hour=self.next_period_change_hour+1
 		if self.next_period_change_hour>23 then
@@ -235,15 +226,15 @@ function WeatherManager:apply_dof()
 				local fx_dof_kernel=self:round(current_dof_kernel-((current_dof_kernel-4)*(1-percentOfTransition)))
 				console:execute("r2_dof_far "..tostring(fx_dof_far))
 				console:execute("r2_dof_kernel "..tostring(fx_dof_kernel))
-				--self.atmosfear.debugMessages[13]:SetText("fx dof fade out")
-				--self.atmosfear.debugMessages[14]:SetText("fx_dof_far: "..tostring(fx_dof_far))
-				--self.atmosfear.debugMessages[15]:SetText("fx_dof_ker: "..tostring(fx_dof_kernel))
+				--atmosfear.debugMessages[13]:SetText("fx dof fade out")
+				--atmosfear.debugMessages[14]:SetText("fx_dof_far: "..tostring(fx_dof_far))
+				--atmosfear.debugMessages[15]:SetText("fx_dof_ker: "..tostring(fx_dof_kernel))
 			else
 				console:execute("r2_dof_far "..tostring(current_dof_far))
 				console:execute("r2_dof_kernel "..tostring(current_dof_kernel))
-				--self.atmosfear.debugMessages[13]:SetText("normal dof")
-				--self.atmosfear.debugMessages[14]:SetText("dof_far: "..tostring(current_dof_far))
-				--self.atmosfear.debugMessages[15]:SetText("dof_ker: "..tostring(current_dof_kernel))
+				--atmosfear.debugMessages[13]:SetText("normal dof")
+				--atmosfear.debugMessages[14]:SetText("dof_far: "..tostring(current_dof_far))
+				--atmosfear.debugMessages[15]:SetText("dof_ker: "..tostring(current_dof_kernel))
 			end
 		else
 			if self.fx_started==nil then
@@ -260,9 +251,9 @@ function WeatherManager:apply_dof()
 				local fx_dof_kernel=self:round(current_dof_kernel-((current_dof_kernel-4)*percentOfTransition))
 				console:execute("r2_dof_far "..tostring(fx_dof_far))
 				console:execute("r2_dof_kernel "..tostring(fx_dof_kernel))
-				--self.atmosfear.debugMessages[13]:SetText("fx dof fade in")
-				--self.atmosfear.debugMessages[14]:SetText("fx_dof_far: "..tostring(fx_dof_far))
-				--self.atmosfear.debugMessages[15]:SetText("fx_dof_ker: "..tostring(fx_dof_kernel))
+				--atmosfear.debugMessages[13]:SetText("fx dof fade in")
+				--atmosfear.debugMessages[14]:SetText("fx_dof_far: "..tostring(fx_dof_far))
+				--atmosfear.debugMessages[15]:SetText("fx_dof_ker: "..tostring(fx_dof_kernel))
 			end
 
 
@@ -351,7 +342,7 @@ function WeatherManager:get_moon_phase()
 	if h >=12 then
 		day = day+1
 	end
-	local moon = self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_moon_phase",0,"8days")
+	local moon = atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_moon_phase",0,"8days")
 	local phase
 	if moon=="28days" then
 		phase = math.floor(math.mod(day,28)/3.5)
@@ -360,8 +351,8 @@ function WeatherManager:get_moon_phase()
 	else
 		phase = string.sub(moon,5)
 	end
-	--self.atmosfear.debugMessages[3]:SetText("phase="..tostring(phase))
-	--self.atmosfear.debugMessages[4]:SetText("opt="..tostring(self.atmosfear.opt_moon_phase))
+	--atmosfear.debugMessages[3]:SetText("phase="..tostring(phase))
+	--atmosfear.debugMessages[4]:SetText("opt="..tostring(atmosfear.opt_moon_phase))
 	return tostring(phase)
 end
 
@@ -370,7 +361,7 @@ function WeatherManager:select_weather(now)
 	local weather = xr_logic.pick_section_from_condlist(db.actor, db.actor, self.weather_list)
 	-- CC add period to name
 	if weather=="atmosfear" then
-		local level_name=self:get_level_name()
+		local level_name = level.name()
 		if self.transition_period==true then
 			weather = weather.."_transition"
 			self.transition_period=false
@@ -378,14 +369,14 @@ function WeatherManager:select_weather(now)
 			weather = weather.."_pre_blowout"
 			self.pre_blowout_period=false
 		else
-			local period = level_name and self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_"..self.period)
+			local period = level_name and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_"..self.period)
 			if not (period) then
 				printf("level_weathers: opt_%s_peroid_%s does not exist in atmosfear_current_parameters",level_name,self.period)
 				period = "clear"
 			end
 			weather = weather.."_"..period
 		end
-		--self.atmosfear.debugMessages[5]:SetText("weather= "..tostring(weather))
+		--atmosfear.debugMessages[5]:SetText("weather= "..tostring(weather))
 	end
 	self.levelWeather = weather
 
@@ -401,11 +392,11 @@ function WeatherManager:select_weather(now)
 			--self.debugMessages[4]:SetText("self.state["..weather.."].current_state="..tostring(self.state[weather].current_state))
 		end
 		local st=self.state[weather]
-		weather_section_name="af3_"..self.atmosfear.ini:GetValue("atmosfear_current_parameters","opt_night_brightness").."_"..st.current_state
+		weather_section_name="af3_"..atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_night_brightness").."_"..st.current_state
 		if st.current_state=="clear" or st.current_state=="partly" then
 			weather_section_name = weather_section_name.."_"..self:get_moon_phase()
 		end
-		--self.atmosfear.debugMessages[6]:SetText("weather_section_name= "..tostring(weather_section_name))
+		--atmosfear.debugMessages[6]:SetText("weather_section_name= "..tostring(weather_section_name))
 		if now then
 			self.curr_weather=st.current_state
 			self.next_weather=st.current_state
@@ -617,7 +608,7 @@ function WeatherManager:launch_meteorites()
 	local particle_pos=vector():set(actor_pos.x, actor_pos.y+500, actor_pos.z)
 	self.meteorites_particle:play_at_pos(particle_pos)
 	--self.meteorites_on=true
-	--self.atmosfear.debugMessages[4]:SetText("meteorites launched")
+	--atmosfear.debugMessages[4]:SetText("meteorites launched")
 end
 
 function WeatherManager:stop_meteorites()
@@ -626,7 +617,7 @@ function WeatherManager:stop_meteorites()
 		self.meteorites_particle=nil
 	end
 	--self.meteorites_on=false
-	--self.atmosfear.debugMessages[4]:SetText("meteorites stopped")
+	--atmosfear.debugMessages[4]:SetText("meteorites stopped")
 end
 
 function WeatherManager:meteorites()
@@ -648,7 +639,7 @@ end
 --##################################################################################################
 
 function WeatherManager:distant_storm()
-	--self.atmosfear.debugMessages[1]:SetText("diff_sec ="..tostring(diff_sec))
+	--atmosfear.debugMessages[1]:SetText("diff_sec ="..tostring(diff_sec))
 
 	if self.distant_storm_on==nil and (self.next_weather=="cloudy"  and level.get_time_minutes()>=30) then
 		local rnd = math.random()
@@ -658,12 +649,12 @@ function WeatherManager:distant_storm()
 			self.thunder_index=1
 		else
 			self.distant_storm_on = false
-			--self.atmosfear.debugMessages[2]:SetText("no storm")
+			--atmosfear.debugMessages[2]:SetText("no storm")
 		end
 	end
 
 	if self.distant_storm_on==true and ((self.curr_weather=="cloudy" and level.get_time_minutes()<=30) or (self.next_weather=="cloudy"  and level.get_time_minutes()>=30)) and not level.is_wfx_playing() then
-		--self.atmosfear.debugMessages[2]:SetText("storm on")
+		--atmosfear.debugMessages[2]:SetText("storm on")
 		if self.next_thunder_at == nil then
 			self.next_thunder_at = diff_sec + math.random(5, 10)
 		end
@@ -671,13 +662,13 @@ function WeatherManager:distant_storm()
 			self:lightning()
 			self.next_thunder_at = diff_sec + math.random(5, 10)
 		end
-		--self.atmosfear.debugMessages[5]:SetText("next thunder ("..tostring(self.thunder_index)..") at= "..tostring(self.next_thunder_at))
+		--atmosfear.debugMessages[5]:SetText("next thunder ("..tostring(self.thunder_index)..") at= "..tostring(self.next_thunder_at))
 	end
 
 	if self.distant_storm_on~=nil and (self.next_weather~="cloudy" and level.get_time_minutes()>=30) then
 		self.distant_storm_on=nil
 		self.next_thunder_at=nil
-		--self.atmosfear.debugMessages[2]:SetText("storm ended")
+		--atmosfear.debugMessages[2]:SetText("storm ended")
 	end
 
 	for key,thunder in pairs(self.thunders) do
@@ -686,7 +677,7 @@ function WeatherManager:distant_storm()
 			if thunder.sound ~= nil and thunder.sound:playing() then
 				thunder.sound:stop()
 			end
-			--self.atmosfear.debugMessages[4]:SetText("removing "..tostring(key))
+			--atmosfear.debugMessages[4]:SetText("removing "..tostring(key))
 			thunder=nil
 		end
 		if life_time>=4 and life_time<30 and thunder.hit==false then
@@ -694,7 +685,7 @@ function WeatherManager:distant_storm()
 				thunder.sound:stop()
 			end
 			if thunder.sound ~= nil then
-				--self.atmosfear.debugMessages[3]:SetText("play sound for "..tostring(key))
+				--atmosfear.debugMessages[3]:SetText("play sound for "..tostring(key))
 				thunder.sound:play_at_pos(db.actor, thunder.sound_pos)
 				thunder.sound.volume = 0.33
 			end
@@ -741,7 +732,7 @@ function WeatherManager:lightning()
 	--local angle_dec=math.random(-110,-70)
 	local angle_dec=math.random(direction[1],direction[2])
 	local angle_rad=math.rad(angle_dec)
-	--self.atmosfear.debugMessages[12]:SetText("direction("..tostring(self.thunder_index)..")= "..tostring(angle_dec))
+	--atmosfear.debugMessages[12]:SetText("direction("..tostring(self.thunder_index)..")= "..tostring(angle_dec))
 	local last_hour_str=self:get_hour_as_string(self.last_hour)
 	local next_hour_str=self:get_hour_as_string(self.next_hour)
 	local last_dist=self.far_distances[self.curr_weather][last_hour_str]
@@ -762,17 +753,17 @@ function WeatherManager:lightning()
 		local particle_pos=vector():set(actor_pos.x+pos_x, actor_pos.y+10, actor_pos.z+pos_z)
 		local sound_pos=vector():set(actor_pos.x+sound_pos_x, actor_pos.y, actor_pos.z+sound_pos_z)
 		self.thunders[self.thunder_index]={effect=effect, particle_pos=particle_pos,sound=sound, sound_pos=sound_pos, start_time=diff_sec, hit=false}
-		--self.atmosfear.debugMessages[13]:SetText("("..tostring(self.thunder_index)..") launched")
+		--atmosfear.debugMessages[13]:SetText("("..tostring(self.thunder_index)..") launched")
 		--[[
-		self.atmosfear.debugMessages[11]:SetText("index="..tostring(self.thunder_index))
-		self.atmosfear.debugMessages[12]:SetText("angle="..tostring(angle_dec))
-		self.atmosfear.debugMessages[14]:SetText("pos_x="..tostring(pos_x))
-		self.atmosfear.debugMessages[15]:SetText("pos_z="..tostring(pos_z))
-		self.atmosfear.debugMessages[16]:SetText("start="..tostring(diff_game_sec))
+		atmosfear.debugMessages[11]:SetText("index="..tostring(self.thunder_index))
+		atmosfear.debugMessages[12]:SetText("angle="..tostring(angle_dec))
+		atmosfear.debugMessages[14]:SetText("pos_x="..tostring(pos_x))
+		atmosfear.debugMessages[15]:SetText("pos_z="..tostring(pos_z))
+		atmosfear.debugMessages[16]:SetText("start="..tostring(diff_game_sec))
 		]]--
 		self.thunders[self.thunder_index].effect:play_at_pos(self.thunders[self.thunder_index].particle_pos)
 		self.thunder_index=self.thunder_index+1
 	else
-		--self.atmosfear.debugMessages[13]:SetText("("..tostring(self.thunder_index)..") beyond the map - not launched")
+		--atmosfear.debugMessages[13]:SetText("("..tostring(self.thunder_index)..") beyond the map - not launched")
 	end
 end
