@@ -26,8 +26,8 @@ damage				= damage_bones
 ;-------------------------------------------------------------------------------
 ;------ Factory parameters of Engine -------------------------------------------
 
-fuel_tank			= 175         	; L
-fuel_consumption		= 32		; L / (100k R); liters per 100 000 rotations
+fuel_tank			= 250 ;175         	; L
+fuel_consumption		= 8 ;32		; L / (100k R); liters per 100 000 rotations
 engine_power			= 130        	; horse_power (kW=hp*0.808) max power
 max_power_rpm			= 3000        	; (nominal rpm ) on this rpm value engine power reaches maximum
 max_torque_rpm			= 2600       	; on this rpm engine torque reaches maximum
@@ -49,7 +49,7 @@ idling_engine_rpm		= 850       	; rpm (750) min rpm - starts from this rpm value
 reference_radius		= 0.64		; Радиус колеса, используемый при просчёте двигателя
 axle_friction     		= 0.0001       	; Ослабление скорости в неетральной позиции. (N*m)
 steering_speed    		= 0.5         	; Время поворота рулевого колеса, в максимум. rps (1)
-steering_torque   		= 900000.    	; Сила гидроусилителя руля. (N*m)
+steering_torque   		= 900000    	; Сила гидроусилителя руля. (N*m)
 break_torque			= 0.070		; Сила тормозных колодок. (N*m
 hand_break_torque		= 0.067		; сила торможения пробелом (по умолчанию = break_torque)
 break_time        		= 1.0         	; время нарастания силы торможения до максимума, при подтормаживании (стрелка назад)
@@ -63,7 +63,7 @@ auto_transmission		= on            ; Автоматическая коробка (on/off)
 [transmission_gear_ratio]
 										; shift down/ shift up. (rpm, необходимое для переключения)
 R				= 4.63, 2500,3500;950, 3000
-N1				= 4.73, 2500,3500;950, 1000
+N1				= 4.73, 2500,3500;950, 850
 N2				= 3.29, 2500,3500;1550, 1850
 N3				= 2.39, 2500,3500;2050, 2850
 N4				= 1.96, 2500,3500;2350, 3550
@@ -143,10 +143,16 @@ right_door			= 2000
 ;------ collisiondamage --------------------------------------------------------
 
 [collision_damage]
-root				= 0.05
-kabina				= 0.05
-left_door			= 0.05
-right_door			= 0.05
+;root				= 0.05
+;kabina				= 0.05
+;left_door			= 0.05
+;right_door			= 0.05
+
+root                  	= 0.0001
+kabina                	= 0.0001
+left_door             	= 0.0001
+right_door            	= 0.0001
+
 
 
 ;-------------------------------------------------------------------------------
@@ -160,15 +166,25 @@ right_door			= 0.05
 default				= 1, -1, 0.1
 
 [immunities]
-burn_immunity			= 0.0							;коэффициенты иммунитета
-strike_immunity			= 0.0
-shock_immunity			= 0.0
-wound_immunity			= 0.0
-radiation_immunity		= 0.0
-telepatic_immunity		= 0.0
-chemical_burn_immunity		= 0.0
-explosion_immunity		= 0.0
-fire_wound_immunity		= 0.0
+;burn_immunity			= 0.0							;коэффициенты иммунитета
+;strike_immunity			= 0.0
+;shock_immunity			= 0.0
+;wound_immunity			= 0.0
+;radiation_immunity		= 0.0
+;telepatic_immunity		= 0.0
+;chemical_burn_immunity		= 0.0
+;explosion_immunity		= 0.0
+;fire_wound_immunity		= 0.0
+
+burn_immunity         	= 0.05       ;коэффициенты иммунитета
+strike_immunity       	= 0.001
+shock_immunity        	= 0.0
+wound_immunity        	= 0.0
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.05
+fire_wound_immunity   	= 0.05
 ;-------------------------------------------------------------------------------
 ;----------------explosion params-----------------------------------------------
 

@@ -4,7 +4,8 @@
 
 [car_definition]
 
-camera_pos			= -0.46, 1.94, 1.25	;смещение камеры в кабине влево-вправо, вверх-вниз, вперед-назад
+;camera_pos			= -0.46, 1.94, 1.25	;смещение камеры в кабине влево-вправо, вверх-вниз, вперед-назад
+camera_pos				= -0.3, 1.8, 1.2
 
 driving_wheels			= front_left_wheel,front_right_wheel   ; ведущие колёса;back_left_wheel,back_right_wheel,
 steering_wheels			= front_left_wheel,front_right_wheel                                    ; рулевые колёса
@@ -19,24 +20,24 @@ exhaust_particles		= vehiclefx\exhaust_1
 
 fuel_tank			= 80		; L
 fuel_consumption		= 2.6		; L / (100k R); liters per 100 000 rotations
-engine_power			= 55		; horse_power (kW=hp*0.808) max power
+engine_power			= 65 ;55		; horse_power (kW=hp*0.808) max power
 max_power_rpm			= 4000		; (nominal rpm ) on this rpm value engine power reaches maximum
 max_torque_rpm			= 3000		; on this rpm engine torque reaches maximum
 
 power_increment_factor	= 0.02
 power_decrement_factor	= 0.1
-rpm_increment_factor	= 0.1
+rpm_increment_factor	= 0.08 ;0.1
 rpm_decrement_factor	= 0.4
 m_power_neutral_factor	= 0.25
 
 ; additional engine parameters
 
 max_engine_rpm    	    = 4600			; rpm (5000) rpm will never be more
-idling_engine_rpm		= 1850       	; rpm (750) min rpm - starts from this rpm value
+idling_engine_rpm		= 850 ;1850       	; rpm (750) min rpm - starts from this rpm value
 
 ;------ Adjustment a wheel -----------------------------------------------------
 
-reference_radius  		= 0.38		; Радиус колеса, используемый при просчёте двигателя
+reference_radius  		= 0.44 ;0.38		; Радиус колеса, используемый при просчёте двигателя
 axle_friction     		= 0.0001	; Ослабление скорости в нейтральной позиции. (N*m)
 steering_speed    		= 0.8       ; Время поворота рулевого колеса, в максимум. rps (1)
 steering_torque   		= 90000		; Сила гидроусилителя руля. (N*m)
@@ -46,16 +47,16 @@ hand_break_torque 	    = 0.055      ; сила торможения пробелом (по умолчанию = b
 
 ;------ Gearbox ----------------------------------------------------------------
 
-main_gear_ratio    		= 7.3        	; Передаточное отношение
+main_gear_ratio    		= 17.3 ;7.3        	; Передаточное отношение
 auto_transmission  		= on            ; Автоматическая коробка (on/off)
 
 [transmission_gear_ratio]
 										; shift down/ shift up. (rpm, необходимое для переключения)
-R                  		= 5.9, 2500,4250	
-N1                 		= 5.73, 2500,4250
-N2                 		= 4.29, 2500,4250
-N3                 		= 3.39, 2500,4250
-N4                 		= 2.96, 2500,4250
+R                  		= 4.9, 2500,4250	
+N1                 		= 4.73, 2500,4250
+N2                 		= 3.29, 2800,4250
+N3                 		= 2.39, 3200,4250
+N4                 		= 1.96, 4000,4250
 
 ;------ Rest Adjustment --------------------------------------------------------
 
@@ -123,9 +124,9 @@ right_door        		= 2000
 ;------ collisiondamage --------------------------------------------------------
 
 [collision_damage]
-root			        = 0.001
+root			        = 0.0001
 ;front_bamper	        = 0.001
-kabina			        = 0.001
+;kabina			        = 0.001
 ;left_door		        = 0.0001
 ;right_door		        = 0.0001
 ;back_door		        = 0.0001
@@ -144,16 +145,25 @@ front_right_wheel	    = 0.00001
 default       			= 1, -1, 0.1
 
 [immunities]
-burn_immunity         	= 0.0       ;коэффициенты иммунитета
-strike_immunity       	= 0.0
-shock_immunity        	= 0.0
+;burn_immunity         	= 0.0       ;коэффициенты иммунитета
+;strike_immunity       	= 0.0
+;shock_immunity        	= 0.0
+;wound_immunity        	= 0.0
+;radiation_immunity    	= 0.0
+;telepatic_immunity    	= 0.0
+;chemical_burn_immunity 	= 0.0
+;explosion_immunity    	= 0.0
+;fire_wound_immunity   	= 0.0
+
+burn_immunity         	= 0.04       ;коэффициенты иммунитета
+strike_immunity       	= 0.004
+shock_immunity        	= 0.001
 wound_immunity        	= 0.0
 radiation_immunity    	= 0.0
 telepatic_immunity    	= 0.0
 chemical_burn_immunity 	= 0.0
-explosion_immunity    	= 0.0
-fire_wound_immunity   	= 0.0
-
+explosion_immunity    	= 0.2
+fire_wound_immunity   	= 0.04
 ;----------------explosion params-----------------------------------------------
 
 [explosion]

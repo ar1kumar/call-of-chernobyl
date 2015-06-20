@@ -10,7 +10,8 @@ angular_factor    		= 0.5
 ;-------------------------------------------------------------------------------
 
 [car_definition]
-camera_pos			= -0.25, 1.2, -0.1	;смещение камеры в кабине влево-вправо, вверх-вниз, вперед-назад
+;camera_pos			= -0.25, 1.2, -0.1	;смещение камеры в кабине влево-вправо, вверх-вниз, вперед-назад
+camera_pos        		=  -0.25, 1.1, 0 (влево-вправо/вниз-вверх/вперед-назад)
 
 driving_wheels			= back_left_wheel,back_right_wheel					; ведущие колёса
 steering_wheels			= front_left_wheel,front_right_wheel					; рулевые колёса
@@ -34,7 +35,7 @@ max_torque_rpm			= 2500		; on this rpm engine torque reaches maximum
 
 power_increment_factor		= 0.02
 power_decrement_factor		= 0.1
-rpm_increment_factor		= 0.1
+rpm_increment_factor		= 0.05 ;0.1
 rpm_decrement_factor		= 0.3
 m_power_neutral_factor		= 0.75
 
@@ -46,10 +47,10 @@ idling_engine_rpm		= 850		; rpm (750) min rpm - starts from this rpm value
 ;-------------------------------------------------------------------------------
 ;------ Adjustment a wheel -----------------------------------------------------
 
-reference_radius		= 0.49		; Радиус колеса, используемый при просчёте двигателя
-axle_friction			= 0.00001	; Ослабление скорости в неетральной позиции. (N*m)
-steering_speed			= 0.8		; Время поворота рулевого колеса, в максимум. rps (1)
-steering_torque			= 900000	; Сила гидроусилителя руля. (N*m)
+reference_radius		= 0.48 ;0.49		; Радиус колеса, используемый при просчёте двигателя
+axle_friction			= 0.001 ;0.00001	; Ослабление скорости в неетральной позиции. (N*m)
+steering_speed			= 0.6 ;0.8		; Время поворота рулевого колеса, в максимум. rps (1)
+steering_torque			= 90000 ;900000	; Сила гидроусилителя руля. (N*m)
 break_torque			= 0.07		; Сила тормозных колодок. (N*m)
 break_time			= 1.0		; время нарастания силы торможения до максимума, при подтормаживании (стрелка назад)
 hand_break_torque		= 0.06		; сила торможения пробелом (по умолчанию = break_torque)
@@ -57,16 +58,16 @@ hand_break_torque		= 0.06		; сила торможения пробелом (по умолчанию = break_torq
 ;-------------------------------------------------------------------------------
 ;------ Gearbox ----------------------------------------------------------------
 
-main_gear_ratio			= 14.63		; Передаточное отношение
+main_gear_ratio			= 8.63 ;14.63		; Передаточное отношение
 auto_transmission		= on		; Автоматическая коробка (on/off)
 
 [transmission_gear_ratio]
 										; shift down/ shift up. (rpm, необходимое для переключения)
-R				= 3.73, 2500,4250	
-N1				= 4.73, 2500,4250
-N2				= 3.29, 2500,4250
-N3				= 2.39, 2500,4250
-N4				= 1.96, 2500,4250
+R                  		= 5.73, 2500,4250	
+N1                 		= 5.73, 2500,4250
+N2                 		= 4.29, 2500,4250
+N3                 		= 3.39, 2500,4250
+N4                 		= 2.96, 2500,4250
 
 ;-------------------------------------------------------------------------------
 ;------ Rest Adjustment --------------------------------------------------------
@@ -132,8 +133,8 @@ back_left_wheel   		= 5000
 back_right_wheel  		= 5000
 front_left_wheel  		= 5000
 front_right_wheel 		= 5000
-;left_door         		= 1000
-front_door        		= 1000
+;left_door         		= 3000
+front_door        		= 3000
 ;back_door         		= 300
 
 ;-------------------------------------------------------------------------------
@@ -162,15 +163,25 @@ front_right_wheel		= 0.00001
 default				= 1, -1, 0.1
 
 [immunities]
-burn_immunity			= 0.0			;коэффициенты иммунитета
-strike_immunity			= 0.0
-shock_immunity			= 0.0
-wound_immunity			= 0.0
-radiation_immunity		= 0.0
-telepatic_immunity		= 0.0
-chemical_burn_immunity		= 0.0
-explosion_immunity		= 0.0
-fire_wound_immunity		= 0.0
+;burn_immunity			= 0.0			;коэффициенты иммунитета
+;strike_immunity			= 0.0
+;shock_immunity			= 0.0
+;wound_immunity			= 0.0
+;radiation_immunity		= 0.0
+;telepatic_immunity		= 0.0
+;chemical_burn_immunity		= 0.0
+;explosion_immunity		= 0.0
+;fire_wound_immunity		= 0.0
+
+burn_immunity         	= 0.05       ;коэффициенты иммунитета
+strike_immunity       	= 0.001
+shock_immunity        	= 0.001
+wound_immunity        	= 0.01
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.25
+fire_wound_immunity   	= 0.09
 
 ;-------------------------------------------------------------------------------
 ;----------------explosion params-----------------------------------------------
