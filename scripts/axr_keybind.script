@@ -25,7 +25,18 @@ local function on_key_press(key)
 			end
 		end
 		--]]
+		local wpn = db.actor:active_item()
+		if (wpn and wpn:section() == "wpn_abakan") then
+			wpn:add_upgrade("up_gr_firstab_abakan")
+			printf("hi")
 		end
+		
+		local function itr(sec)
+			printf("%s",sec)
+		end 
+		
+		wpn:iterate_installed_upgrades(itr)
+		
 	-- Select Object on key press and teleports it on key release!
 	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_select_object",0,"")]) then
 		DEBUG_NPC = level.get_target_obj and level.get_target_obj()

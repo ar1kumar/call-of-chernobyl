@@ -73,7 +73,7 @@ end
 -- For example, do not try to destroy npcs unless you do not care that it can fail before player saved then loaded.
 ----------------------------------------------------------------------------------------------
 local ev_queue = {}
-function CreateDelayedEvent(ev_id,act_id,timer,f,...)
+function CreateTimeEvent(ev_id,act_id,timer,f,...)
 	if not (ev_queue[ev_id]) then
 		ev_queue[ev_id] = {}
 		ev_queue[ev_id].size = 0
@@ -97,7 +97,7 @@ function ProcessEventQueue(force)
 			if (action_id ~= "size") then
 				gt = act.game_time
 				if (gt == nil) or (force) or (game.get_game_time():diffSec(gt) >= act.timer) then
-					if (act.f(act.p,force) == true) then
+					if (act.f(unpack(act.p)) == true) then
 						ev_queue[event_id][action_id] = nil
 						ev_queue[event_id].size = ev_queue[event_id].size - 1
 					end
@@ -110,10 +110,16 @@ function ProcessEventQueue(force)
 		end
 	end
 end
+function ProcessEventQueueState(m_data,save)
+	if (save) then 
+		m_data.event_queue = ev_queue
+	else
+		ev_queue = m_data.event_queue or ev_queue
+	end
+end
 --------------------------------------------------------------------
--- Serialization for Marshal Library
+-- Serialization of userdata for Marshal Library
 --------------------------------------------------------------------
---[[ sadly doesn't seem reliable
 if (marshal) then
 	game.CTime.__size = 4 * 9 -- guess based on ctime.h tm; most likely wrong
 	function game_CTime___persist(self)
@@ -128,11 +134,7 @@ if (marshal) then
 	local _t = game.CTime()
 	local _m = getmetatable(_t)
 	_m.__persist = game_CTime___persist
-	
-	
-	
 end
---]]
 --------------------------------------------------------------------
 function empty	(container)
 	if (type(container) == "function") then
@@ -654,14 +656,6 @@ function id_by_sid( sid )
 	return nil
 end
 
---package.path = [[gamedata\scripts\?.script;gamedata\scripts\lib\?.lua]]
--- do
--- 	local status, result = pcall(require, 'StackTracePlus')
--- 	if status then
--- 		_G.STP = result
--- 	end
--- end
-
 function abort(msg, ...)
 	if not (msg) then return end
 	local fmt = tostring(msg)
@@ -707,15 +701,6 @@ function set_inactivate_input_time(delta)
 	level.disable_input()
 end
 
--- іринимает: позициі положения, позициі куда смотреть, время сна в минутах.
---[[
-function set_sleep_relocate(point, look, timeout)
-	db.storage[db.actor:id()].sleep_relocate_time = game.get_game_time()
-	db.storage[db.actor:id()].sleep_relocate_idle = timeout*60
-	db.storage[db.actor:id()].sleep_relocate_point = point
-	db.storage[db.actor:id()].sleep_relocate_look = look
-end
-]]--
 
 -- проверяет целую часть числа на нечетность
 function odd( x )

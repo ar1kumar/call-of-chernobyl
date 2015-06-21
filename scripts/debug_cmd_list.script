@@ -1813,9 +1813,9 @@ function cmd.inventory_owner(me,txt,owner,p)
 end 
 
 -- cmd.antifreeze
-function antifreeze_switch(p)
+function antifreeze_switch(id)
 	local sim = alife()
-	local se_obj = sim:object(p[1])
+	local se_obj = sim:object(id)
 	if not (se_obj) then 
 		return true 
 	end 
@@ -1829,9 +1829,9 @@ end
 function cmd.antifreeze(me,txt,owner,p)
 	local wrd = check_and_set_help(me,txt,owner,"[npc [<time>]] (ex.1: antifreeze 5 | ex.2: antifreeze npc 5)")
 	
-	local function tele_to_actor(p)
+	local function tele_to_actor(id)
 		local sim = alife()
-		local se_obj = sim:object(p[1])
+		local se_obj = sim:object(id)
 		if not (se_obj) then 
 			return true 
 		end
@@ -1846,8 +1846,8 @@ function cmd.antifreeze(me,txt,owner,p)
 		return true
 	end  
 	
-	local function repeater(p)
-		CreateDelayedEvent(p[1],"antifreeze",wrd,antifreeze_switch,p[1])
+	local function repeater(a)
+		CreateTimeEvent(a,"antifreeze",wrd,antifreeze_switch,a)
 		return false
 	end
 	
@@ -1864,7 +1864,7 @@ function cmd.antifreeze(me,txt,owner,p)
 		if not (se_obj) then 
 			return "antifreeze:= failed to create stalker "
 		end
-		CreateDelayedEvent(se_obj.id,"repeater",10,repeater,se_obj.id)
+		CreateTimeEvent(se_obj.id,"repeater",10,repeater,se_obj.id)
 	else 
 		wrd = tonumber(wrd) or 5 
 		
@@ -1884,8 +1884,8 @@ function cmd.antifreeze(me,txt,owner,p)
 		
 		se_obj.scripted_target = "actor"
 		
-		CreateDelayedEvent(se_obj.id,"teleport",5,tele_to_actor,se_obj.id)
-		CreateDelayedEvent(se_obj.id,"repeater",10,repeater,se_obj.id)
+		CreateTimeEvent(se_obj.id,"teleport",5,tele_to_actor,se_obj.id)
+		CreateTimeEvent(se_obj.id,"repeater",10,repeater,se_obj.id)
 	end
 	
 	return "antifreeze:= created object and teleported to your position!"

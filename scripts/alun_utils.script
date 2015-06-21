@@ -84,9 +84,9 @@ function jump_to_level(new_level,specific_gvid,specific_lvid,specific_pos)
 	end
 end 
 
-function release_object(p)
+function release_object(id)
 	local sim = alife()
-	local se_obj = p[1] and sim:object(p[1])
+	local se_obj = id and sim:object(id)
 	if not (se_obj) then
 		return true
 	end
@@ -158,7 +158,13 @@ function print_table(tbl,header)
 			elseif (type(v) == "number" or type(v) == "boolean") then
 				txt = txt .. tab(depth) .. key .. " = " .. tostring(v)
 			elseif (type(v) == "userdata") then
-				txt = txt .. tab(depth) .. key .. " = \"userdata\""
+				if (v.diffSec) then 
+					local Y, M, D, h, m, s, ms = 0,0,0,0,0,0,0
+					Y, M, D, h, m, s, ms = v:get(Y, M, D, h, m, s, ms)
+					txt = sr("%s%s%s = { Y=%s, M=%s, D=%s, h=%s, m=%s, s=%s, ms=%s } ",txt,tab(depth),key,Y, M, D, h, m, s, ms)
+				else
+					txt = txt .. tab(depth) .. key .. " = \"userdata\""
+				end
 			else
 				txt = txt .. tab(depth) .. key .. " = \"" .. tostring(v) .. "\""
 			end

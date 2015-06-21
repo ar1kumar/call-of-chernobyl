@@ -32,8 +32,7 @@ function dynamic_phantom_count(sec)
 end
 
 ----------------------------------------------------------------------------------------
-function respawn(p)
-	local id = p[1]
+function respawn(id,sec)
 	if not (id) then 
 		return true 
 	end
@@ -42,13 +41,12 @@ function respawn(p)
 		return true 
 	end
 	
-	spawn_dynamic_phantom(p[2],npc:position(),npc:level_vertex_id())
+	spawn_dynamic_phantom(sec,npc:position(),npc:level_vertex_id())
 	
 	return true
 end 
 
-function try_respawn(p)
-	local id = p[1]
+function try_respawn(id)
 	if not (id) then 
 		return true 
 	end
@@ -72,7 +70,7 @@ function try_respawn(p)
 		return false
 	end
 	
-	CreateDelayedEvent(id,"dynamic_phantom_respawn",30,respawn,id,sec)
+	CreateTimeEvent(id,"dynamic_phantom_respawn",30,respawn,id,sec)
 	
 	return false
 end 
@@ -86,7 +84,7 @@ function monster_on_net_spawn(npc)
 	if not (can_spawn) then 
 		return
 	end 
-	CreateDelayedEvent(npc:id(),"dynamic_phantom_try_respawn",5,try_respawn,npc:id())
+	CreateTimeEvent(npc:id(),"dynamic_phantom_try_respawn",5,try_respawn,npc:id())
 end
 
 function on_game_start()

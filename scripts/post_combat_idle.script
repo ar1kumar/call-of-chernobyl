@@ -157,9 +157,7 @@ function action_post_combat_wait:execute()
 	self.st.animation:set_state(state)
 	self.st.animation:set_control()
 	
-	local dir = utils.vector_copy_by_val(self.object:direction())
-	local vec = vector_rotate_y(dir,-180)
-	self.object:set_desired_direction(vec)
+	npc:set_sight(look.direction,-self.object:direction():getH())
 end
 
 function action_post_combat_wait:finalize()

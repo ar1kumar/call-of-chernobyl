@@ -821,6 +821,7 @@ function stalker_data_hud_show(hud)
 		end
 		hud:add_msg("Out Rest.",stalker_data.base_out_restrictors)
 		hud:add_msg("In Rest.",stalker_data.base_in_restrictors)
+		hud:add_msg("is_npc_indoors",obj:is_npc_indoors())
 	end
 	hud:display()
 end
@@ -1060,7 +1061,7 @@ function position_hud_show(hud)
 	end
 	
 	hud:add_msg("","------ MISC. ------")
-	hud:add_msg("is_actor_outdoors",not db.actor:is_actor_indoors())
+	hud:add_msg("is_actor_indoors",db.actor:is_actor_indoors())
 	__tmr_pos_hud = not __tmr_pos_hud and time_global()+5000 or __tmr_pos_hud
 	if (time_global() > __tmr_pos_hud) then
 		__tmr_pos_hud = nil
@@ -1561,6 +1562,21 @@ function weapon_hud_show(hud)
 			hud:add_msg("AmmoType",data.ammo_type)
 			hud:add_msg("XZ1",data.xz1)
 		end
+		
+		local states = {
+		eIdle,				--= 0
+		eShowing,			--= 1
+		eHiding,			--= 2
+		eHidden,			--= 3
+		eBore,				--= 4
+		eFire,				--= 5
+        eFire2, 			--= 6
+        eReload, 			--= 7
+        eMisfire, 			--= 8
+        eMagEmpty,			--= 9
+        eSwitch				--= 10
+		}
+		hud:add_msg("State",alun_utils.sr("%s (%s)",states[wpn:get_state()],wpn:get_state()))
 	end
 
 	hud:set_header("-[Weapon Info]-")

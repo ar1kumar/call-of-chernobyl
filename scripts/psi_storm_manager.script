@@ -13,10 +13,10 @@
 PsiStormManager = nil
 ---------------------------------------------------------------------
 
-local prev_sec 			= -1
+local prev_sec 				= -1
 local prev_game_sec 		= -1
-local diff_sec 			= -1
-local diff_game_sec		= -1
+local diff_sec 				= -1
+local diff_game_sec			= -1
 local min_psi_storm_time 	= 12*60*60
 local max_psi_storm_time 	= 24*60*60
 local artifact_chance 		= 0.05
@@ -473,7 +473,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 end
 
 function CPsiStormManager:turn_to_zombie(obj)
-	CreateDelayedEvent(obj.id,"turn_to_zombie",math.random(1,8),surge_manager.make_zombied,obj.id)
+	CreateTimeEvent(obj.id,"turn_to_zombie",math.random(1,8),surge_manager.make_zombied,obj.id)
 	--self.debugMessages[1]:SetText("type: "..tostring(zombie_type))
 end
 
@@ -657,9 +657,11 @@ function get_task_descr()
 end
 
 function get_task_target()
+	--[[
 	if(surge_manager.actor_in_cover()) then
 		return nil
 	end
 	local m = surge_manager.SurgeManager
 	return m.best_cover and m.best_cover:id()
+	--]]
 end

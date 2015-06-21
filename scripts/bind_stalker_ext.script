@@ -26,8 +26,8 @@ function actor_on_net_spawn()
 	--[[
 	local m_data = alife_storage_manager.get_state()
 	if (m_data.vehicle_data and m_data.vehicle_data.section) then
-		local function attach_veh(p)
-			local car = p and p[1] and level.object_by_id(p[1])
+		local function attach_veh(id)
+			local car = id and level.object_by_id(id)
 			if not (db.actor and car) then 
 				return false
 			end 
@@ -36,7 +36,7 @@ function actor_on_net_spawn()
 		end
 		
 		local se_car = alife():create(m_data.vehicle_data.section,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
-		CreateDelayedEvent(0,"attach_vehicle",1,attach_veh,se_car.id)
+		CreateTimeEvent(0,"attach_vehicle",1,attach_veh,se_car.id)
 		m_data.vehicle_data = nil
 	end
 	--]]

@@ -194,7 +194,7 @@ function CGeneralTask:check_task(tm)
 
 	local t_tile = task_functor[self.title_functor](self.id, "title", self.title)
 	if self.current_title ~= t_tile then
-		printf("task [%s] updated due to title change from [%s] to [%s]", tostring(self.id), tostring(self.current_title), tostring(t_tile))
+		--printf("task [%s] updated due to title change from [%s] to [%s]", tostring(self.id), tostring(self.current_title), tostring(t_tile))
 		task_updated = true
 		self.current_title = t_tile
 		self.t:set_title(game.translate_string(t_tile))
@@ -202,7 +202,7 @@ function CGeneralTask:check_task(tm)
 
 	local t_descr = task_functor[self.descr_functor](self.id, "descr", self.descr)
 	if self.current_descr ~= t_descr then
-		printf("task [%s] updated due to description change from [%s] to [%s]", tostring(self.id), tostring(self.current_descr), tostring(t_descr))
+		--printf("task [%s] updated due to description change from [%s] to [%s]", tostring(self.id), tostring(self.current_descr), tostring(t_descr))
 		task_updated = true
 		self.current_descr = t_descr
 		self.t:set_description(game.translate_string(t_descr))
@@ -211,7 +211,7 @@ function CGeneralTask:check_task(tm)
 	local t_target = task_functor[self.target_functor](self.id, "target", self.target)
 	self:check_level(t_target)
 	if self.current_target ~= t_target then
-		printf("task [%s] updated due to target change from [%s] to [%s]", tostring(self.id), tostring(self.current_target), tostring(t_target))
+		--printf("task [%s] updated due to target change from [%s] to [%s]", tostring(self.id), tostring(self.current_target), tostring(t_target))
 		if self.current_target == nil then
 			task_updated = true
 			self.t:change_map_location(self.spot, t_target)
@@ -290,7 +290,7 @@ function CGeneralTask:reverse_task()
 end
 --' Деактивация квеста
 function CGeneralTask:deactivate_task(task)
-	printf("deactivate task %s", self.id)
+	--printf("deactivate task %s", self.id)
 
 	self.check_time = nil
 	if self.last_check_task == "fail" then

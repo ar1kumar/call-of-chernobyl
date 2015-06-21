@@ -189,6 +189,10 @@ function update(heli,se_heli,heliObject)
 		return
 	end
 	
+	if (xr_conditions.surge_started()) then 
+		return 
+	end 
+				
 	--alun_utils.debug_write("heli_alife: update start")
 	
 	local sim = alife()
@@ -215,11 +219,6 @@ function update(heli,se_heli,heliObject)
 				if not (se_heli.stay_point_idle) then 
 					--alun_utils.debug_write("heli_alife: update end 1")
 					se_heli.current_action = nil
-					return 
-				end 
-				
-				if (xr_conditions.surge_started()) then 
-					--alun_utils.debug_write("heli_alife: update end 2")
 					return 
 				end 
 				

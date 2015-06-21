@@ -115,7 +115,7 @@ local function actor_on_update()
 	if (_draw_part) then 
 		local r = level.get_target_dist and level.get_target_dist()
 		if (r) then
-			local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
+			local lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
 			local pos = level.vertex_position(lvid)
 			--if not(_draw_part:playing()) then
 				_draw_part:play_at_pos(vector():set(pos.x,pos.y-0.5,pos.z))
@@ -463,7 +463,7 @@ function move_to_point(begin)
 		_draw_part = nil
 		local r = level.get_target_dist and level.get_target_dist()
 		if (r) then
-			local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
+			local lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
 			for id,squad in pairs(companion_squads) do 
 				if (squad and squad.commander_id) then
 					local st = db.storage[squad:commander_id()]

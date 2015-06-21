@@ -86,7 +86,10 @@ local function on_game_load()
 			end
 		end
 		
-		if (success) then	
+		if (success) then
+			-- set default goodwill for all factions vs. actor's new faction
+			game_relations.set_community_goodwill_for_faction(faction)
+			
 			-- faction diversity
 			if (faction == "killer") then 
 				task_manager.get_task_manager():give_task("esc_m_trader_task_1")

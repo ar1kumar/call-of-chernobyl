@@ -171,6 +171,13 @@ function set_level_faction_community(obj)
 	end
 end
 
+function set_community_goodwill_for_faction(faction)
+	local communities = alun_utils.get_communities_list()
+	for i,community in pairs(communities) do 
+		relation_registry.set_community_goodwill(community, 0, relation_registry.community_relation(community,faction))
+	end
+end
+
 function check_all_squad_members(squad_name, relation)
 	local squad = get_story_squad(squad_name)
 	if squad == nil then return false end

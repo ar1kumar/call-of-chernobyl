@@ -353,10 +353,10 @@ end
 function generic_object_binder:save(packet)
 	--alun_utils.debug_write("\n-------bind_monster save start------ "..self.object:name(),true)
 	set_save_marker(packet, "save", false, "generic_object_binder")
+	object_binder.save(self, packet)
 	if not (self.object:alive()) then
 		alun_utils.w_stpk(packet,"CTime",db.storage[self.object:id()].death_time or game.get_game_time(),self.object:name()..":generic_object_binder:save:GAMETIME")
 	end
-	object_binder.save(self, packet)
 	xr_logic.save_obj(self.object, packet)
 	set_save_marker(packet, "save", true, "generic_object_binder")
 	--alun_utils.debug_write("\n-------bind_monster save END----------"..self.object:name(),true)
@@ -366,10 +366,10 @@ function generic_object_binder:load(reader)
 	--alun_utils.debug_write("\n-------bind_monster load start------ "..self.object:name(),true)
 	self.loaded = true
 	set_save_marker(reader, "load", false, "generic_object_binder")
+	object_binder.load(self, reader)
 	if not (self.object:alive()) then
 		db.storage[self.object:id()].death_time = utils.r_CTime(reader,"bind_monster")
 	end
-	object_binder.load(self, reader)
 	xr_logic.load_obj(self.object, reader)
 	set_save_marker(reader, "load", true, "generic_object_binder")
 	--alun_utils.debug_write("\n--------bind monster load END -------"..self.object:name())

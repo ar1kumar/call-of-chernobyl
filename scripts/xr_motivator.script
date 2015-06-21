@@ -159,6 +159,15 @@ function motivator_binder:net_spawn(sobject)
 	return true
 end
 function motivator_binder:on_item_take(item)
+	local wpn = self.object:active_item()
+	if (wpn and wpn:is_weapon_magazined()) then
+		if (item) then 
+			if (item:is_scope() or item:is_silencer() or item:is_grenade_launcher()) then 
+				wpn:weapon_addon_attach(item)
+			end 
+		end
+	end
+			
 	-- Alundaio
 	CreateScriptCallback("npc_on_item_take",self.object,item)
 	-- End Alundaio

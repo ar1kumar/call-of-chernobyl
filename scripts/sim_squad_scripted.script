@@ -109,7 +109,10 @@ function sim_squad_scripted:get_script_target()
 	local smart = new_target and SIMBOARD.smarts_by_names[new_target]
 	if not (smart) then
 		local id = self:commander_id()
-		if (id) and (alife():has_info(id,"npcx_is_companion") and not alife():has_info(id,"npcx_no_teleport")) then 
+		if (id) and (alife():has_info(id,"npcx_is_companion")) then
+			if (alife():has_info(id,"npcx_no_teleport")) then 
+				return self.id
+			end
 			return 0 
 		end
 		return
@@ -383,9 +386,9 @@ end
 --***********************************************************************************************
 --*										MEMBERS_CONTROL											*
 --***********************************************************************************************
-local function release_object(p)
+local function release_object(id)
 	local sim = alife()
-	local se_obj = p[1] and sim:object(p[1])
+	local se_obj = id and sim:object(id)
 	if not (se_obj) then
 		return true
 	end
@@ -416,7 +419,7 @@ function sim_squad_scripted:remove_squad()
 		se_obj = sim:object(id)
 		if se_obj then
 			self:unregister_member(id)
-			--CreateDelayedEvent(id,"safe_release",1,alun_utils.release_object,id)
+			--CreateTimeEvent(id,"safe_release",1,alun_utils.release_object,id)
 			sim:release(se_obj,true)
 		end
 	end
@@ -429,7 +432,7 @@ function sim_squad_scripted:remove_npc(npc_id)
 	local npc = sim:object(npc_id)
 	self:on_npc_death(npc)
 	sim:release(npc, true)
-	--CreateDelayedEvent(npc_id,"safe_release",1,alun_utils.release_object,npc_id)
+	--CreateTimeEvent(npc_id,"safe_release",1,alun_utils.release_object,npc_id)
 end
 
 function sim_squad_scripted:on_npc_death(npc,killer)

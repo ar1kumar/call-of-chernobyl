@@ -63,23 +63,20 @@ function CALifeStorageManager_save(fname)
 					end
 					m_data.pstor_all[id] = t.pstor
 				end
-				-- maybe too ridiculous?
-				if (t.pstor_ctime) then 
-					if not (m_data.pstor_ctime) then 
-						m_data.pstor_ctime = {}
+		
+				-- serialization with game.CTime.__persist
+				if (t.pstor_ctime) then
+					if not (m_data.pstor_ctime) then
+						m_data.pstor_all = {}
 					end
-					
-					if not (m_data.pstor_ctime[id]) then 
-						m_data.pstor_ctime[id] = {}
-					end
-					
-					for k,ct in pairs(t.pstor_ctime) do
-						m_data.pstor_ctime[id][k] = utils.CTime_to_table(ct)
-					end
+					m_data.pstor_ctime[id] = t.pstor_ctime
 				end
 			end
 		end
-
+		
+		ProcessEventQueueState(m_data,true)
+		
+		-- for debugging save state
 		--alun_utils.print_table(m_data,"m_data_on_save ("..path..")")
 		
 		local data = marshal.encode(m_data)
@@ -113,13 +110,12 @@ function CALifeStorageManager_load(fname)
 
 	m_data = marshal.decode(data)
 	
+	ProcessEventQueueState(m_data,false)
+	
+	-- For debugging save state
 	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
 
 	CreateScriptCallback("load_state",m_data)
-	
-	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	--collectgarbage("collect")
-	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 function get_state()
