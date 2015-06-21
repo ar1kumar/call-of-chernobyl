@@ -2,7 +2,7 @@
 GroupControlSection	= spawn_group
 ;$spawn              = "monsters\cat"			; option for Level Editor
 $npc			    = on						; option for Level Editor
-;$prefetch 			= 16
+$prefetch 			= 16
 Scheduled		    = on						; option for ALife Simulator
 Human		     	= off						; option for ALife Simulator
 Health				= 200						; option for ALife Simulator
@@ -171,18 +171,18 @@ Morale_Despondent_Threashold	= 0.5
 
 
 ; Sounds
-sound_idle				= monsters\cat\1
-sound_eat				= monsters\cat\2
-sound_aggressive		= monsters\cat\3
-sound_attack_hit		= monsters\cat\4
-sound_take_damage		= monsters\cat\5
-sound_die				= monsters\cat\6
-sound_threaten			= monsters\cat\7
-sound_landing			= monsters\cat\8
-sound_steal				= monsters\cat\9
-sound_panic				= monsters\cat\10
-sound_growling			= monsters\cat\11
-sound_die_in_anomaly	= monsters\cat\12
+sound_idle				= monsters\cat\c_hit_
+sound_eat				= monsters\cat\c_eat_
+sound_aggressive		= monsters\cat\c_attack_
+sound_attack_hit		= monsters\cat\c_attack_
+sound_take_damage		= monsters\cat\c_hit_
+sound_die				= monsters\cat\c_die_
+sound_threaten			= monsters\cat\c_attack_
+sound_landing			= monsters\cat\c_idle_
+sound_steal				= monsters\cat\c_attack_
+sound_panic				= monsters\cat\c_hit_
+sound_growling			= monsters\cat\c_attack_
+sound_die_in_anomaly	= monsters\cat\c_die_
 
 killer_clsids				= Z_MINCER,Z_GALANT,ZS_BFUZZ,ZS_MBALD,ZS_GALAN,ZS_MINCE
 
@@ -201,7 +201,7 @@ idle_sound_delay		= 55000
 eat_sound_delay			= 3000
 attack_sound_delay		= 6000
 
-sound_distant_idle			= monsters\cat\1
+sound_distant_idle			= monsters\cat\c_idle_
 distant_idle_sound_delay	= 80000
 distant_idle_sound_range	= 100.0	
 
@@ -209,7 +209,7 @@ DamagedThreshold		= 0.4
 critical_wound_threshold		= -1
 critical_wound_decrease_quant	= 0.
 
-material				= creatures\small
+material				= creatures\medium
 
 min_view_distance   		= 0.8				; коэффициент, который множится на eye_range, в зависимости от угла
 max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
