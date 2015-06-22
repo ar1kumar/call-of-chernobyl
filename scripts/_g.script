@@ -28,7 +28,7 @@ end
 -- Call this from a script to create a new callback to functions that register for it with RegisterScriptCallback
 -- Every time this function is executed it will callback to all registered members
 -- If axr_main.script has a function by this name, it will automatically trigger it!
-function CreateScriptCallback(name,...)
+function SendScriptCallback(name,...)
 	-- callback to all registered functions
 	axr_main.make_callback(name,...)
 	
@@ -159,7 +159,10 @@ schemes = {}
 schemes_by_stype = {}
 
 function LoadScheme(filename, scheme, ...)
-	assert(_G[filename],filename.." is nil!")
+	if not (_G[filename]) then
+		printf("ERROR: Trying to load scheme that does not exist! %s",filename)
+		return 
+	end
 	schemes[scheme] = filename
 	
 	local p = {...}

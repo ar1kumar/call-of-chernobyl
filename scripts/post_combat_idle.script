@@ -9,7 +9,7 @@ function evaluator_combat_enemy:__init(storage, name) super(nil, name)
 end
 
 function evaluator_combat_enemy:evaluate()
-	--alun_utils.debug_write("eva_combat_enemy")
+	--alun_utils.debug_write("post_combat_idle: eva_combat_enemy")
 	local npc = self.object
 	local best_enemy = npc:best_enemy()
 
@@ -87,6 +87,8 @@ end
 
 function action_post_combat_wait:execute()
 	action_base.execute(self)
+	
+	--alun_utils.debug_write("action_post_combat_wait:execute start")
 
 	if (self.anim_started) then 
 		return 
@@ -116,11 +118,15 @@ function action_post_combat_wait:execute()
 			npc:set_sight(look.path_dir,nil,0)
 			self.st.lvid = utils.send_to_nearest_accessible_vertex(npc,new_vid)
 			self.st.stage = 1 
+			
+			--alun_utils.debug_write("action_post_combat_wait:execute end 1")
 			return
 		end
 	elseif (self.st.stage == 1) then
 		if (self.st.lvid and npc:level_vertex_id() ~= self.st.lvid) then 
 			self.st.lvid = utils.send_to_nearest_accessible_vertex(npc,self.st.lvid)
+			
+			--alun_utils.debug_write("action_post_combat_wait:execute end 2")
 			return
 		end
 	end
@@ -157,7 +163,10 @@ function action_post_combat_wait:execute()
 	self.st.animation:set_state(state)
 	self.st.animation:set_control()
 	
-	npc:set_sight(look.direction,-self.object:direction():getH())
+	local dir = npc:direction()
+	npc:set_sight(look.direction,vector():set(-dir.x,-dir.y,-dir.z))
+	
+	--alun_utils.debug_write("action_post_combat_wait:execute end 3")
 end
 
 function action_post_combat_wait:finalize()

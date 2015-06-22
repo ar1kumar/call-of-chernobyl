@@ -11,7 +11,7 @@ function se_actor:on_register()
 	simulation_objects.get_sim_obj_registry():register(self)
 	self.m_registred = true
 	--Alundaio
-	CreateScriptCallback("se_actor_on_register",self)
+	SendScriptCallback("se_actor_on_register",self)
 
 	if not self.start_position_filled then
 		SIMBOARD:fill_start_position()
@@ -24,13 +24,13 @@ function se_actor:on_unregister()
 	unregister_story_object_by_id(self.id)
 	simulation_objects.get_sim_obj_registry():unregister(self)
 	--Alundaio
-	CreateScriptCallback("se_actor_on_unregister",self)
+	SendScriptCallback("se_actor_on_unregister",self)
 end
 
 --------------------
 function se_actor:STATE_Write(packet)
 	-- Alundaio
-	CreateScriptCallback("se_actor_on_STATE_Write",self)
+	SendScriptCallback("se_actor_on_STATE_Write",self)
 	--Alundaio
 
 	cse_alife_creature_actor.STATE_Write(self, packet)
@@ -42,7 +42,7 @@ end
 --------------------
 function se_actor:STATE_Read(packet, size)
 	-- Alundaio
-	CreateScriptCallback("se_actor_on_STATE_Read",self)
+	SendScriptCallback("se_actor_on_STATE_Read",self)
 	-- Alundaio
 	cse_alife_creature_actor.STATE_Read(self, packet, size)
 

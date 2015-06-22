@@ -17,7 +17,7 @@ function main_menu:__init() super()
 	self.mbox_mode = 0
     self:InitControls()
     self:InitCallBacks()
-	CreateScriptCallback("main_menu_on_init",self)
+	SendScriptCallback("main_menu_on_init",self)
 end
 
 function main_menu:__finalize()
@@ -159,7 +159,7 @@ end
 function main_menu:OnButton_return_game()
 	local console = get_console()
 	console:execute("main_menu off")
-	CreateScriptCallback("main_menu_on_quit",self)
+	SendScriptCallback("main_menu_on_quit",self)
 end
 
 function main_menu:OnButton_new_novice_game()
@@ -286,7 +286,7 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	local bind = dik_to_bind(dik)
 	local console = get_console()
 
-	CreateScriptCallback("main_menu_on_keyboard",dik,keyboard_action,self,level.present())
+	SendScriptCallback("main_menu_on_keyboard",dik,keyboard_action,self,level.present())
 
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if (dik == DIK_keys.DIK_ESCAPE and level.present()) then

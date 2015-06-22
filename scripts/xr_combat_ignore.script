@@ -331,7 +331,7 @@ function action_process_enemy:enemy_callback(npc, enemy)
 		-- keep track of actor enemies
 		if (ene_id == 0 and not fighting_with_actor_npcs[id]) then
 			fighting_with_actor_npcs[id] = true
-			CreateScriptCallback("npc_on_fighting_actor",npc)
+			SendScriptCallback("npc_on_fighting_actor",npc)
 		end
 
 		-- Set smart alarm

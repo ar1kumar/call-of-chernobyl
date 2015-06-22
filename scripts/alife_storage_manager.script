@@ -4,7 +4,8 @@
 	This script was created to alleviate issues with using packets to save dynamic data (pstor) which lead to save corruption.
 	Also it removes some restrictions on what you can save.
 	
-	*only store valid lua types such as numbers, strings, boolean or tables that contain these valid types. Use utils.CTime_to_table to store CTime
+	*only store valid lua types such as numbers, strings, boolean, functions or tables that contain these valid types. Userdata needs to have a special
+	__persist function defined in it's metatable. See how it is done for CTime in _G.script
 	
 	*Supposedly you can save userdata if you write a proper __persist method for the metatable but I have failed to achieve proper results with serializing CTime.
 	
@@ -53,7 +54,7 @@ function CALifeStorageManager_save(fname)
 	local savegame = io.open(path,"wb")
 	if (savegame) then
 
-		CreateScriptCallback("save_state",m_data)
+		SendScriptCallback("save_state",m_data)
 
 		for id,t in pairs(db.storage) do
 			if (t and type(t) == "table") then
@@ -115,13 +116,9 @@ function CALifeStorageManager_load(fname)
 	-- For debugging save state
 	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
 
-	CreateScriptCallback("load_state",m_data)
+	SendScriptCallback("load_state",m_data)
 end
 
 function get_state()
 	return m_data
-end
-
-function decode(s)
-	return s and marshal.decode(s)
 end

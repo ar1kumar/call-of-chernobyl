@@ -150,7 +150,7 @@ function generic_physics_binder:use_callback(obj, who)
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", obj, who)
 	end
 	-- Alundaio
-	CreateScriptCallback("physic_object_on_use_callback",self.object,who)
+	SendScriptCallback("physic_object_on_use_callback",self.object,who)
 	-- Alundaio
 end
 
@@ -164,7 +164,7 @@ function generic_physics_binder:hit_callback(obj, amount, local_direction, who, 
 	end
 
 	--Alundaio
-	CreateScriptCallback("physic_object_on_hit_callback",obj, amount, local_direction, who, bone_index)
+	SendScriptCallback("physic_object_on_hit_callback",obj, amount, local_direction, who, bone_index)
 	--Alundaio
 end
 

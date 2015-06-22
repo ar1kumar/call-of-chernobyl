@@ -10,7 +10,7 @@
 -- actor_on_init
 -------------------
 function actor_on_init(binder)
-	CreateScriptCallback("actor_on_init",binder)
+	SendScriptCallback("actor_on_init",binder)
 end 
 
 -------------------
@@ -41,14 +41,14 @@ function actor_on_net_spawn()
 	end
 	--]]
 	
-	CreateScriptCallback("on_game_load",binder)
+	SendScriptCallback("on_game_load",binder)
 end
 
 -------------------------------------
 -- actor_on_net_destroy
 -------------------------------------
 function actor_on_net_destroy(binder)
-	CreateScriptCallback("actor_on_net_destroy",binder)
+	SendScriptCallback("actor_on_net_destroy",binder)
 end 
 
 -------------------
@@ -82,11 +82,11 @@ function actor_on_update(binder,delta)
 	local torch = db.actor:object("device_torch")
 	if (torch and not actor_light and torch:torch_enabled()) then
 		actor_light = true
-		CreateScriptCallback("actor_on_torch_enabled")
+		SendScriptCallback("actor_on_torch_enabled")
 	elseif (torch and not torch:torch_enabled()) then
 		if (actor_light) then
 			actor_light = false
-			CreateScriptCallback("actor_on_torch_disabled")
+			SendScriptCallback("actor_on_torch_disabled")
 		end
 	end
 	
@@ -105,7 +105,7 @@ function actor_on_update(binder,delta)
 	end
 	--]]
 	
-	CreateScriptCallback("actor_on_update",binder,delta)
+	SendScriptCallback("actor_on_update",binder,delta)
 end
 
 -------------------
@@ -113,21 +113,21 @@ end
 -------------------
 -- TODO: add in engine
 function actor_on_weapon_no_ammo(binder,wpn)
-	CreateScriptCallback("actor_on_weapon_no_ammo",wpn)
+	SendScriptCallback("actor_on_weapon_no_ammo",wpn)
 end
 
 -------------------
 -- actor_on_weapon_zoom_in(wpn)
 -------------------
 function actor_on_weapon_zoom_in(binder,obj,wpn)
-	CreateScriptCallback("actor_on_weapon_zoom_in",wpn)
+	SendScriptCallback("actor_on_weapon_zoom_in",wpn)
 end
 
 -------------------
 -- actor_on_weapon_zoom_out(wpn)
 -------------------
 function actor_on_weapon_zoom_out(binder,obj,wpn)
-	CreateScriptCallback("actor_on_weapon_zoom_out",wpn)
+	SendScriptCallback("actor_on_weapon_zoom_out",wpn)
 end
 
 -------------------
@@ -146,7 +146,7 @@ function actor_on_item_take(binder,item)
 		xr_statistic.inc_founded_artefacts_counter(item:id())
 	end
 	treasure_manager.get_treasure_manager():on_item_take(item:id())
-	CreateScriptCallback("actor_on_item_take",item)
+	SendScriptCallback("actor_on_item_take",item)
 end
 
 -------------------
@@ -168,7 +168,7 @@ function actor_on_item_use(binder,item)
 		local boost_time = system_ini():r_float(sec,"boost_time")
 		xr_logic.pstor_store(db.actor,sec.."_expiration",utils.CTimeAddSec(game.get_game_time(),boost_time*level.get_time_factor()))
 	end 
-	CreateScriptCallback("actor_on_item_use",item,sec)
+	SendScriptCallback("actor_on_item_use",item,sec)
 end
 
 -------------------
@@ -180,7 +180,7 @@ function actor_on_trade(binder,item,sell_bye,money)
 	else
 		 game_stats.money_trade_update (-money)
 	end
-	CreateScriptCallback("actor_on_trade",item,sell_bye,money)
+	SendScriptCallback("actor_on_trade",item,sell_bye,money)
 end
 
 -------------------
@@ -193,7 +193,7 @@ function actor_on_save(binder,packet)
 	
 	if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
 		--printf("DEBUG: actor changing level")
-		CreateScriptCallback("on_level_changing")
+		SendScriptCallback("on_level_changing")
 		
 		-- if not using persistent car
 		if (db.vehicle) then 
@@ -255,14 +255,14 @@ end
 -- on_key_press
 ---------------------------------------------
 function on_key_press(binder,key)
-	CreateScriptCallback("on_key_press",key)
+	SendScriptCallback("on_key_press",key)
 end
 
 ---------------------------------------------
 -- on_key_release
 ---------------------------------------------
 function on_key_release(binder,key)
-	CreateScriptCallback("on_key_release",key)
+	SendScriptCallback("on_key_release",key)
 end
 
 ---------------------------------------------
@@ -279,7 +279,7 @@ function actor_on_before_death(binder,whoID)
 	
 	db.actor:kill(db.actor, true)
 	
-	CreateScriptCallback("actor_on_before_death",whoID)
+	SendScriptCallback("actor_on_before_death",whoID)
 end
 
 ---------------------------------------------
@@ -287,7 +287,7 @@ end
 ---------------------------------------------
 function actor_on_attach_vehicle(binder,obj)
 	db.vehicle = obj
-	CreateScriptCallback("actor_on_attach_vehicle",obj)
+	SendScriptCallback("actor_on_attach_vehicle",obj)
 end
 
 ---------------------------------------------
@@ -295,14 +295,14 @@ end
 ---------------------------------------------
 function actor_on_detach_vehicle(binder,obj)
 	db.vehicle = nil
-	CreateScriptCallback("actor_on_detach_vehicle",obj)
+	SendScriptCallback("actor_on_detach_vehicle",obj)
 end
 
 ---------------------------------------------
 -- 	on_use_vehicle
 ---------------------------------------------
 function actor_on_use_vehicle(binder,obj)
-	CreateScriptCallback("actor_on_use_vehicle",obj)
+	SendScriptCallback("actor_on_use_vehicle",obj)
 end
 
 ---------------------------------------------

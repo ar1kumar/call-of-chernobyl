@@ -7,15 +7,10 @@
 --function printf()
 --end
 
-aim_ratio = 40
-min_ratio = 1500
-
-
 combat_action_ids = {	[stalker_ids.action_combat_planner] = true,
 						[stalker_ids.action_danger_planner] = true,
 						[stalker_ids.action_anomaly_planner] = true,
-						[xrs_kill_wounded.actid] = true,
-						[axr_new_combat.actid] = true
+						[xrs_kill_wounded.actid] = true
 						--[xr_danger.actid] = true
 }
 
@@ -75,9 +70,6 @@ local function eval_smart_cover_locked(mgr,npc)
 	return (in_smart_cover and state_descr.cover_name == nil) or (not in_smart_cover and state_descr.cover_name ~= nil)
 end
 
--- NOTICE: May be an issue here. Engine debug mode detects evaluator not returning bool on rare occasions after this function is called. Quite possibly
--- it could be an engine error with weapon_strapped, weapon_unstrapped, is_weapon_going_to_be_strapped, or active_item
--- Or an error here
 local function eval_weapon(mgr,npc)
 	local weapon = state_lib.states[mgr.target_state].weapon
 	if not (weapon) then
@@ -255,7 +247,7 @@ end
 
 function act_state_mgr_to_idle:execute()
 	--callstack()
-	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_to_idle:execute %s",self.object:name()))
+	----alun_utils.debug_write(alun_utils.sr("act_state_mgr_to_idle:execute %s",self.object:name()))
 	action_base.execute(self)
 	if (self.st.target_state ~= "idle") and (self.object:best_enemy() or self.object:best_danger()) then
 		self.object:clear_animations()
@@ -282,7 +274,7 @@ function eva_state_mgr_end:__init(name, st) super (nil, name)
 end
 
 function eva_state_mgr_end:evaluate()
-	--alun_utils.debug_write("",true)
+	----alun_utils.debug_write("",true)
 	if not (self.object) then 
 		callstack()
 		return false
@@ -359,7 +351,7 @@ function act_state_mgr_end:execute()
 	self:weapon_update()
 end
 function act_state_mgr_end:weapon_update()
-	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_end:weapon_update %s",self.object:name()))
+	----alun_utils.debug_write(alun_utils.sr("act_state_mgr_end:weapon_update %s",self.object:name()))
 	if self.st.callback and self.st.callback.timeout then
 		if self.st.callback.begin == nil then
 			self.st.callback.begin = time_global()
@@ -393,8 +385,8 @@ function act_state_mgr_end:weapon_update()
 				return 
 			end
 			if (t == "sniper_fire") then
-				local aim = self.object:position():distance_to(pos)*aim_ratio or min_ratio
-				self.object:set_item(object.fire1, wpn, 1, aim <= min_ratio and min_ratio or aim)
+				local aim = self.object:position():distance_to(pos)*40 or 1500
+				self.object:set_item(object.fire1, wpn, 1, aim <= 1500 and 1500 or aim)
 				--self.object:set_sight(look.fire_point,alun_utils.safe_bone_pos(look_object,"bip01_neck"))
 			else
 				self.object:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.object, o, state_lib.states[self.st.target_state]))
@@ -525,7 +517,7 @@ function state_manager:update()
 		end
 	end
 
-	--alun_utils.debug_write("\n-----STATE MANAGER UPDATE----",true)
+	----alun_utils.debug_write("\n-----STATE MANAGER UPDATE----",true)
 	
 	--printf("state_manager:update() %s",self.npc:name())
 	self.planner:update()
@@ -559,14 +551,14 @@ function state_manager:update()
 	local gid = self.planner:current_action_id()
 	--]]
 	
-	--alun_utils.debug_write(alun_utils.sr("goap_action = %s current_action = %s",gid,(id and xrs_debug_tools.actions_by_stalker_ids[id] or id)))
+	----alun_utils.debug_write(alun_utils.sr("goap_action = %s current_action = %s",gid,(id and xrs_debug_tools.actions_by_stalker_ids[id] or id)))
 	-- END DEBUG PLANNER
 	
 	local lid
 	local id = self.planner:current_action_id()
 
 	while id and id ~= lid and id ~= state_mgr_goap.operators["end"] and id ~= state_mgr_goap.operators["locked"] do
-		--alun_utils.debug_write("current_action_id = "..(xrs_debug_tools.actions_by_stalker_ids[id] or id),true)
+		----alun_utils.debug_write("current_action_id = "..(xrs_debug_tools.actions_by_stalker_ids[id] or id),true)
 		self.planner:update()
 		
 		lid = id
@@ -695,5 +687,5 @@ function is_npc_in_combat(npc)
 	end
 
 	local current_action_id = mgr:current_action_id()
-	return current_action_id == stalker_ids.action_combat_planner or current_action_id == xrs_kill_wounded.actid or current_action_id == axr_new_combat.actid
+	return current_action_id == stalker_ids.action_combat_planner or current_action_id == xrs_kill_wounded.actid
 end

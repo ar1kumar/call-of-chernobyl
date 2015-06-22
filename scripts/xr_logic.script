@@ -1114,7 +1114,7 @@ end
 
 function pstor_save_all(obj, packet)
 	if (USE_MARSHAL) then
-		CreateScriptCallback("on_pstor_save_all",obj,packet)
+		SendScriptCallback("on_pstor_save_all",obj,packet)
 		return
 	end
 
@@ -1171,7 +1171,7 @@ end
 
 function pstor_load_all(obj, reader)
 	if (USE_MARSHAL) then
-		CreateScriptCallback("on_pstor_load_all",obj,reader)
+		SendScriptCallback("on_pstor_load_all",obj,reader)
 		return
 	end
 

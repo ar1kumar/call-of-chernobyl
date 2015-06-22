@@ -146,7 +146,7 @@ end
 function dialog_wnd_closed()
 	--printf("---:>Talk Dialog hide")
 	dialog_closed = true
-	CreateScriptCallback("actor_on_leave_dialog")
+	SendScriptCallback("actor_on_leave_dialog")
 end
 
 function get_stat(index) -- index= int        return string

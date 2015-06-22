@@ -164,7 +164,7 @@ function sim_squad_scripted:update()
 		return
 	end
 	
-	CreateScriptCallback("squad_on_update",self)
+	SendScriptCallback("squad_on_update",self)
 
 	local sim = alife()
 	local se_actor = sim:actor()
@@ -441,7 +441,7 @@ function sim_squad_scripted:on_npc_death(npc,killer)
 	self.sound_manager:unregister_npc(npc.id)
 	self:unregister_member(npc.id)
 	-- Alundaio
-	CreateScriptCallback("squad_on_npc_death",self,npc,killer)
+	SendScriptCallback("squad_on_npc_death",self,npc,killer)
 	-- End Alundaio
 	if self:npc_count() == 0 then
 		self.current_action = nil
@@ -577,7 +577,7 @@ function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_i
 		db.spawned_vertex_by_id[obj.id] = lv_id
 	end
 	-- Alundaio
-	CreateScriptCallback("squad_on_add_npc",self,obj,spawn_section,spawn_position,lv_id,gv_id)
+	SendScriptCallback("squad_on_add_npc",self,obj,spawn_section,spawn_position,lv_id,gv_id)
 	-- End Alundaio
 	return obj.id
 end
@@ -844,7 +844,7 @@ end
 function sim_squad_scripted:on_unregister()
 	cse_alife_online_offline_group.on_unregister( self )
 	unregister_story_object_by_id(self.id)
-	CreateScriptCallback("squad_on_unregister",self)
+	SendScriptCallback("squad_on_unregister",self)
 	SIMBOARD.squads[self.id] = nil
 	SIMBOARD:assign_squad_to_smart(self, nil)
 	simulation_objects.get_sim_obj_registry():unregister(self)

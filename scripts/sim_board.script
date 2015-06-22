@@ -181,7 +181,7 @@ function simulation_board:create_squad(spawn_smart, sq_id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 			-- Alundaio
-			CreateScriptCallback("squad_on_npc_creation",squad,se_obj,spawn_smart)
+			SendScriptCallback("squad_on_npc_creation",squad,se_obj,spawn_smart)
 			-- Alundaio
 		end
     end

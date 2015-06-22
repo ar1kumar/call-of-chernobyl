@@ -152,7 +152,7 @@ function motivator_binder:net_spawn(sobject)
 	self.object:group_throw_time_interval(2000)
 
 	-- start [Alundaio]
-	CreateScriptCallback("npc_on_net_spawn",self.object,sobject)
+	SendScriptCallback("npc_on_net_spawn",self.object,sobject)
 	-- End [Alundaio]
 
 	--alun_utils.debug_write(sobject:name()..":net_spawn() end")
@@ -169,19 +169,19 @@ function motivator_binder:on_item_take(item)
 	end
 			
 	-- Alundaio
-	CreateScriptCallback("npc_on_item_take",self.object,item)
+	SendScriptCallback("npc_on_item_take",self.object,item)
 	-- End Alundaio
 end
 
 --Alundaio
 function motivator_binder:take_item_from_box(box,item)
-	CreateScriptCallback("npc_on_item_take_from_box",self.object,box,item)
+	SendScriptCallback("npc_on_item_take_from_box",self.object,box,item)
 end
 --Alundaio
 
 function motivator_binder:on_item_drop(item)
 	-- Alundaio
-	CreateScriptCallback("npc_on_item_drope",self.object,item)
+	SendScriptCallback("npc_on_item_drope",self.object,item)
 	-- End Alundaio
 end
 function motivator_binder:net_destroy()
@@ -195,7 +195,7 @@ function motivator_binder:net_destroy()
 	self.object:set_callback(callback.take_item_from_box)
 	
 	-- start [Alundaio]
-	CreateScriptCallback("npc_on_net_destroy",self.object)
+	SendScriptCallback("npc_on_net_destroy",self.object)
 	-- end [Alundaio]
 	xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] = nil
 
@@ -269,7 +269,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	-- start [Alundaio]
-	CreateScriptCallback("npc_on_hit_callback",obj,amount,local_direction,who,bone_index)
+	SendScriptCallback("npc_on_hit_callback",obj,amount,local_direction,who,bone_index)
 	-- end [Alundaio]
 end
 
@@ -332,7 +332,7 @@ function motivator_binder:death_callback(victim, who)
 	end
 	release_body_manager.get_release_body_manager():moving_dead_body(self.object)
 	-- Start [Alundaio]
-	CreateScriptCallback("npc_on_death_callback",self.object,who)
+	SendScriptCallback("npc_on_death_callback",self.object,who)
 	db.storage[id].death_time = game.get_game_time()
 	db.storage[id].death_by_id = who:id()
 	-- End [Alundaio]
@@ -355,7 +355,7 @@ function motivator_binder:use_callback(obj, who)
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", obj, who)
 	end
 	-- start [Alundaio]
-	CreateScriptCallback("npc_on_use",obj,who)
+	SendScriptCallback("npc_on_use",obj,who)
 	-- end [Alundaio]
 end
 
@@ -443,7 +443,7 @@ function motivator_binder:update(delta)
 	--alun_utils.debug_write("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name())
 
 	-- Start [Alundaio]
-	CreateScriptCallback("npc_on_update",object,db.storage[id])
+	SendScriptCallback("npc_on_update",object,db.storage[id])
 	-- End [Alundaio]
 	
 	--alun_utils.debug_write("motivator_bind:update %s END AFTER AXR_MAIN",self.object and self.object:name())
@@ -519,6 +519,6 @@ function addCommonPrecondition(action)
 	action:add_precondition(wp(xr_evaluators_id.corpse_exist, false))
 	action:add_precondition(wp(stalker_ids.property_items, false))
 	-- start [Alundaio]
-	CreateScriptCallback("npc_add_precondition",action)
+	SendScriptCallback("npc_add_precondition",action)
 	-- end [Alundaio]
 end

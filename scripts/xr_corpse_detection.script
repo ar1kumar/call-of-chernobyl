@@ -202,7 +202,7 @@ function get_all_from_corpse(npc)
 	local items_value = 0
 	local sec
 	local function get_item(corpse,item)
-		CreateScriptCallback("npc_on_get_all_from_corpse",npc,corpse_npc,item,lootable_table[item:section()])
+		SendScriptCallback("npc_on_get_all_from_corpse",npc,corpse_npc,item,lootable_table[item:section()])
 		if (lootable_table[item:section()] ~= nil) then
 			if (items_value < 100) then
 				items_value = items_value+item:cost()*item:condition()/30
