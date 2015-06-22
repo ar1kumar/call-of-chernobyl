@@ -217,7 +217,7 @@ function action_door:close_door(disable_snd)
 	else
 		self.joint:set_max_force_and_velocity(200, 3, 0)
 	end
-	--self.block = true -- Закрываем и блокируем	
+	self.block = true -- Закрываем и блокируем	
 	self.soundless_block = disable_snd
 	
 	local ph_obj = self.object:get_physics_object()
