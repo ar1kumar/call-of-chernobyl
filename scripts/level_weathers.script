@@ -296,7 +296,7 @@ function WeatherManager:update()
 	else
 		self.weather_fx = nil
 	end
-	if not benchmark.weather then
+	--if not benchmark.weather then
 		if self.last_hour~=level.get_time_hours() then
 				self.last_hour=level.get_time_hours()
 				self.next_hour=self.last_hour+1
@@ -311,7 +311,7 @@ function WeatherManager:update()
 			-- Устанавливаем погоду на текущем уровне
 			self:select_weather(false)
 		end
-	end
+	--end
 	-- CC applying DOF every sec
 	diff_game_2sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor()*5)
 	if (prev_game_2sec~=diff_game_2sec) then

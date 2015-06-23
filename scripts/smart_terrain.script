@@ -15,8 +15,6 @@ local level,alife,game_graph,math,pairs,tostring,tonumber = level,alife,game_gra
 local locations_ini			= ini_file("misc\\smart_terrain_masks.ltx")
 nearest_to_actor_smart = {id = nil , dist = math.huge}
 
---local valid_territory = xs_utils.toLookupTable("default","base","resource","territory","lair")
-
 local function job_avail_to_npc(npc_info, job, smart)
 	if (smart.dead_time[job.section]) then
 		return false
