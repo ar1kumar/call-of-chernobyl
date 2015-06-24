@@ -2,11 +2,15 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.0.5"
+GAME_VERSION = "1.0.5 RC"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
 end
+
+-- Improves performance if true, by disabling update methods for squads and smart terrains on levels not linked in configs\ai_tweaks\simulation_objects.ltx
+-- But this means simulation will only be active on actor level and linked levels everything else will remain in an idle state
+DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = true
 
 -------------------------------------------------------------------------------------------------
 -- Use marshal library for saving persistent data (like xr_logic pstor)
@@ -17,8 +21,12 @@ require("lua_extensions")
 marshal = require "marshal"
 USE_MARSHAL = marshal ~= nil
 
-function RegisterScriptCallback(name,func)
-	axr_main.callback_set(name,func)
+
+-------------------------------------------------------------------------------------------------------
+-- 											SCRIPTED CALLBACKS
+-------------------------------------------------------------------------------------------------------
+function RegisterScriptCallback(name,func,...)
+	axr_main.callback_set(name,func,...)
 end 
 
 function UnregisterScriptCallback(name,func)
@@ -230,6 +238,7 @@ function time_global()
 	return device():time_global()
 end
 
+--[[ does not work on 1.6 xray because of multithreading
 function wait_game(time_to_wait)
 	verify_if_thread_is_running()
 	if (time_to_wait == nil) then
@@ -253,6 +262,7 @@ function wait(time_to_wait)
 		end
 	end
 end
+--]]
 
 function action(obj,...)
 	local arg = {...}
@@ -295,25 +305,6 @@ function round (value)
 	local max = min + 1
 	if value - min > max - value then return max end
 	return min
-end
-
-function debug_get_level_object(obj_name)
-	local res = level.debug_object(obj_name)
-	while res == nil do
-		-- printf("get_level_object() is waiting for object \"%s\"", obj_name)
-		res	= level.object(obj_name)
-		wait()
-	end
-	return res
-end
-
-function debug_get_actor()
-	local res	   = level.debug_actor()
-	while res == nil do
-		res	= level.debug_actor()
-		wait()
-	end
-	return	res
 end
 
 function distance_between(obj1, obj2)
@@ -366,21 +357,6 @@ function random_choice(...)
 	end
 end
 
-function set_current_time(hour, min, sec)
-	local current_time_factor = level.get_time_factor ()
-	printf ("Need time : %d:%d:%d", hour, min, sec)
-	local current_time = game.time ()
-	local c_day = math.floor (current_time / 86400000)
-	local c_time = current_time - c_day * 86400000
-	local n_time = (sec + min * 60 + hour * 3600) * 1000
-
-	if c_time > n_time then c_day = c_day + 1 end
-	n_time = n_time + c_day * 86400000
-	level.set_time_factor (10000)
-	while game.time () < n_time do wait () end
-	level.set_time_factor (current_time_factor)
-end
-
 function random_number (min_value, max_value)
 	math.randomseed (device ():time_global ())
 	if min_value == nil and max_value == nil then
@@ -389,7 +365,6 @@ function random_number (min_value, max_value)
 		return math.random (min_value, max_value)
 	end
 end
-
 
 function parse_names( s )
 	local t = {}
@@ -423,11 +398,6 @@ function parse_nums( s )
 		table.insert( t, tonumber( entry ) )
 	end
 	return t
-end
-
--- Находится ли обьект в онлайне.
-function is_object_online(obj_id)
-	return level.object_by_id(obj_id) ~= nil
 end
 
 function get_clsid(obj)

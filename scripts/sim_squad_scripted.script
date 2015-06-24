@@ -127,28 +127,31 @@ function sim_squad_scripted:update()
 
 	if not (self.first_update) then
 		self.first_update = true
-		local sim = alife()
-		local se_actor = sim:actor()
-		local gg = game_graph()
+		
+		if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
+			local sim = alife()
+			local se_actor = sim:actor()
+			local gg = game_graph()
 
-		--printf("m_game_vertex_id=%s actor.m_game_vertex_id=%s",self.m_game_vertex_id,se_actor.m_game_vertex_id)
-		if (se_actor and gg:valid_vertex_id(self.m_game_vertex_id) and gg:valid_vertex_id(se_actor.m_game_vertex_id)) then
-			local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
-			local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
+			--printf("m_game_vertex_id=%s actor.m_game_vertex_id=%s",self.m_game_vertex_id,se_actor.m_game_vertex_id)
+			if (se_actor and gg:valid_vertex_id(self.m_game_vertex_id) and gg:valid_vertex_id(se_actor.m_game_vertex_id)) then
+				local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
+				local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
 
-			-- Disable any squad that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
-			if (level ~= actor_level) and (self:commander_id() and not sim:has_info(self:commander_id(),"npcx_is_companion")) then
-				local sfind = string.find
-				if not (sfind(simulation_objects.config:GetValue(actor_level,"target_maps",0,""),level)) then
-					SIMBOARD.squads[self.id] = nil
-					if (self.smart_id) then
-						--SIMBOARD.tmp_entered_squad[self.smart_id] = nil
-						SIMBOARD.tmp_assigned_squad[self.smart_id] = nil
+				-- Disable any squad that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
+				if (level ~= actor_level) and (self:commander_id() and not sim:has_info(self:commander_id(),"npcx_is_companion")) then
+					local sfind = string.find
+					if not (sfind(simulation_objects.config:GetValue(actor_level,"target_maps",0,""),level)) then
+						SIMBOARD.squads[self.id] = nil
+						if (self.smart_id) then
+							--SIMBOARD.tmp_entered_squad[self.smart_id] = nil
+							SIMBOARD.tmp_assigned_squad[self.smart_id] = nil
+						end
+						simulation_objects.get_sim_obj_registry():unregister(self)
+						self.disabled = true
+						--printf("%s disabled",self:name())
+						return
 					end
-					simulation_objects.get_sim_obj_registry():unregister(self)
-					self.disabled = true
-					--printf("%s disabled",self:name())
-					return
 				end
 			end
 		end

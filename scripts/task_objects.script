@@ -14,11 +14,7 @@ function get_guider(target_level)
 	return nil
 end
 
-local valid_values = {
-	complete 	= true,
-	fail 		= true,
-	reversed 	= true
-}
+
 
 --[[
 C++ class task {
@@ -31,22 +27,6 @@ C++ class task {
 		const task_dummy = 65535;
 };
 ]]
-
-local status_by_id = {
-	[0] = "normal",
-	[1] = "selected",
-	[2] = "completed",
-	[3] = "fail",
-	[4] = "reversed"
-}
-
-local id_by_status = {
-	normal 		= 0,
-	selected	= 1,
-	completed	= 2,
-	fail		= 3,
-	reversed	= 4
-}
 
 class "CGeneralTask"
 function CGeneralTask:__init(id)
@@ -122,6 +102,23 @@ function CGeneralTask:__init(id)
 	
 	self.current_target = task_functor[self.target_functor](self.id, "target", self.target)
 	self.dont_send_update_news = utils.cfg_get_bool(task_ini, id, "dont_send_update_news", nil, false, false)
+	
+	if (USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+		
+		-- load state
+		local m_data = alife_storage_manager.get_state()
+		if (m_data.task_objects and m_data.task_objects[self.id]) then
+			self.status = m_data.task_objects[self.id].status
+			self.timeout = m_data.task_objects[self.id].timeout
+			self.inited_time = m_data.task_objects[self.id].inited_time
+			self.current_title = m_data.task_objects[self.id].current_title
+			self.current_descr = m_data.task_objects[self.id].current_descr
+			self.current_target = m_data.task_objects[self.id].current_target
+			self.stage = m_data.task_objects[self.id].stage
+			m_data.task_objects[self.id] = nil
+		end		
+	end 
 end
 
 function CGeneralTask:get_title()
@@ -239,6 +236,13 @@ function CGeneralTask:check_task(tm)
 	if task_updated and not(self.dont_send_update_news) then
 		news_manager.send_task(db.actor, "updated", self.t)
 	end
+	
+	local valid_values = {
+		complete 	= true,
+		fail 		= true,
+		reversed 	= true
+	}
+
 	for k,v in pairs(self.condlist) do
 		local t = xr_logic.pick_section_from_condlist(db.actor, db.actor, v)
 		if (t and valid_values[t]) then 
@@ -357,6 +361,18 @@ function CGeneralTask:remove_guider_spot(target)
 end
 -- Save quest
 function CGeneralTask:save(packet)
+	if (USE_MARSHAL) then 
+		return 
+	end
+	
+	local id_by_status = {
+	normal 		= 0,
+	selected	= 1,
+	completed	= 2,
+	fail		= 3,
+	reversed	= 4
+	}
+
 	--set_save_marker(packet, "save", false, "CGeneralTask")
 	alun_utils.w_stpk(packet,"u8",id_by_status[self.status] or 0,"CGeneralTask:id_by_status")
 	if (self.status == "completed" or self.status == "fail") then
@@ -374,6 +390,18 @@ function CGeneralTask:save(packet)
 end
 -- Load quest
 function CGeneralTask:load(packet)
+	if (USE_MARSHAL) then 
+		return 
+	end
+	
+	local status_by_id = {
+	[0] = "normal",
+	[1] = "selected",
+	[2] = "completed",
+	[3] = "fail",
+	[4] = "reversed"
+	}
+
 	--set_save_marker(packet, "load", false, "CGeneralTask")
 	self.status = status_by_id[packet:r_u8()]
 	if (self.status == "completed" or self.status == "fail") then
@@ -394,3 +422,21 @@ function CGeneralTask:load(packet)
 	end
 	--set_save_marker(packet, "load", true, "CGeneralTask")
 end
+
+function CGeneralTask:save_state(m_data)
+	if not (m_data.task_objects) then
+		m_data.task_objects = {}
+	end
+	
+	if not (m_data.task_objects[self.id]) then 
+		m_data.task_objects[self.id] = {}
+	end
+	
+	m_data.task_objects[self.id].status = self.status
+	m_data.task_objects[self.id].timeout = self.timeout
+	m_data.task_objects[self.id].inited_time = self.inited_time
+	m_data.task_objects[self.id].current_title = self.current_title
+	m_data.task_objects[self.id].current_descr = self.current_descr
+	m_data.task_objects[self.id].current_target = self.current_target
+	m_data.task_objects[self.id].stage = self.stage
+end 

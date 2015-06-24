@@ -53,6 +53,7 @@ function CALifeStorageManager_save(fname)
 	local path = getFS():update_path('$game_saves$', '') .. fname:sub(0,-6):lower() .. ".dat"
 	local savegame = io.open(path,"wb")
 	if (savegame) then
+		m_data.GAME_VERSION = GAME_VERSION
 
 		SendScriptCallback("save_state",m_data)
 
@@ -114,7 +115,7 @@ function CALifeStorageManager_load(fname)
 	ProcessEventQueueState(m_data,false)
 	
 	-- For debugging save state
-	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
+	alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
 
 	SendScriptCallback("load_state",m_data)
 end

@@ -158,31 +158,30 @@ local intercepts = {
 -- param 1 - name as type<string> (ie. intercepts[name])
 -- param 2 - function to execute as type<function> or type<table>
 -----------------------------------------------------------
-function callback_set(name,func)
+function callback_set(name,func,userdata)
 	--printf("callback_set %s",name)
 	if not (func) then
 		return
 	end
 	if (intercepts[name]) then
-		table.insert(intercepts[name],func)
+		if (userdata) then 
+			local function wrapper(...)
+				func(userdata,...)
+			end
+			intercepts[name][userdata] = wrapper
+		else
+			intercepts[name][func] = func
+		end
 	end
 end
 
-function callback_unset(name,func)
+function callback_unset(name,func,userdata)
 	if not (intercepts[name]) then
 		return
 	end
-
-	local index
-	for i=#intercepts[name],1,-1 do
-		if (intercepts[name][i] == func) then
-			index = i
-			break
-		end
-	end
-
-	if (index) then
-		table.remove(intercepts[name],index)
+	intercepts[name][func] = nil
+	if (userdata) then 
+		intercepts[name][userdata] = nil
 	end
 end
 
@@ -191,11 +190,10 @@ function make_callback(name,...)
 	if not (intercepts[name]) then
 		return 
 	end
-	for i=1, #intercepts[name] do
-		if (intercepts[name][i]) then
-			intercepts[name][i](...)
-		end
-	end
+	
+	for k,func in pairs(intercepts[name]) do 
+		func(...)
+	end 
 end
 
 --------------------------------------------------------------------------------------------------------------------
@@ -221,8 +219,8 @@ end
 -------------------
 function squad_can_switch_offline(squad,npc)
 	if (intercepts.squad_can_switch_offline) then 
-		for i=1, #intercepts.squad_can_switch_offline do
-			if (intercepts.squad_can_switch_offline[i](squad) == false) then
+		for k, func in pairs(intercepts.squad_can_switch_offline) do
+			if (func(squad) == false) then
 				return false
 			end
 		end
@@ -235,8 +233,8 @@ end
 function squad_assign_new_target(squad)
 	if (intercepts.squad_assign_new_target) then
 		local id
-		for i=1, #intercepts.squad_assign_new_target do
-			id = intercepts.squad_assign_new_target[i](squad)
+		for k, func in pairs(intercepts.squad_assign_new_target) do
+			id = func(squad)
 			if (id) then
 				break
 			end
@@ -251,8 +249,8 @@ end
 function squad_can_help_actor(squad)
 	if (intercepts.squad_can_help_actor) then 
 		local flag
-		for i=1, #intercepts.squad_can_help_actor do
-			flag = intercepts.squad_can_help_actor[i](squad)
+		for k, func in pairs(intercepts.squad_can_help_actor) do
+			flag = func(squad)
 			if (flag) then
 				break
 			end

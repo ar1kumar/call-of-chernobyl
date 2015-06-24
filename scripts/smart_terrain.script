@@ -103,11 +103,13 @@ function se_smart_terrain:on_register()
 
 	-- Disable any smart terrain that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
 	if not (self.is_on_actor_level) then
-		if not (string.find(simulation_objects.config:GetValue(actor_level,"target_maps",0,""),self.smart_level)) then
-			SIMBOARD.smarts[self.id] = nil
-			self.disabled = true
-			--alun_utils.debug_write(alun_utils.sr("%s:ON_REGISTER END (DISABLED)",self:name()))
-			return
+		if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
+			if not (string.find(simulation_objects.config:GetValue(actor_level,"target_maps",0,""),self.smart_level)) then
+				SIMBOARD.smarts[self.id] = nil
+				self.disabled = true
+				--alun_utils.debug_write(alun_utils.sr("%s:ON_REGISTER END (DISABLED)",self:name()))
+				return
+			end
 		end
 	end
 

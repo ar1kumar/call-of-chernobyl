@@ -535,23 +535,20 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 	local dst = db.storage[bdo:id()]
 	local killer = dependent_object or dst and dst.death_by_id and (db.storage[dst.death_by_id] and db.storage[dst.death_by_id].object or level.object_by_id(dst.death_by_id))
 
-	--if (st.stage >= 3 and killer and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
-		--[[
+	if (st.stage >= 3 and killer and killer:id() == 0 and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
 		local squad = get_object_squad(npc)
 		if (squad) then
 			for k in squad:squad_members() do
 				npc = db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id)
 				if(npc) then
-					game_relations.set_npcs_relation(npc, killer, -1000)
+					npc:force_set_goodwill( -1000, killer)
 				end
 			end
 		else
-			game_relations.set_npcs_relation(npc, killer, -1000)
+			npc:force_set_goodwill( -1000, killer)
 		end
-
-		printf("xr_danger.script_action_danger_corpse: forced enemies %s and %s",npc:name(), killer:name())
-		--]]
-	--end
+		--printf("xr_danger.script_action_danger_corpse: forced enemies %s and %s",npc:name(), killer:name())
+	end
 
 	--printf("stage = %s",st.stage)
 	if (st.stage == 1) then

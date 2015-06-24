@@ -116,6 +116,7 @@ end
 -- currently only implemented for stype_stalker schemes
 -- automates binding for generic schemes ONLY
 -- xr_logic already handles 'active section' schemes by calling set_scheme
+-- active section schemes are schemes that only execute if they are activated by custom logic (ie. walker@my_section)
 ----------------------------------------
 --[[ Alundaio
 
@@ -127,7 +128,8 @@ it's possible that evaluators for assigned property ids will not exist when bein
 never need to assign evaluator properties of eachother to their actions as preconditions.
 
 setup_generic_scheme is where the action and evaluator are created and assigned. Assign it's default (i.e. it's own id) effects/precondition if necessary. It is okay to assign 
-engine properties to the action here, (i.e. stalker_ids) since they should exist at time of binding.
+engine properties to the action here, (i.e. stalker_ids) since they should exist at time of binding. look at any scheme I've written that has scheme_type = generic in the comment header
+as an example.
 
 configure_actions is where properties of other generic schemes may be safely added to actions.
 --]]

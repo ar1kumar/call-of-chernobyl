@@ -149,16 +149,18 @@ function is_enemy(obj,enemy,no_memory)
 		if (no_memory ~= true) then
 			local tg = time_global()
 			local time_in_memory = tg - obj:memory_time(enemy)
-
 			if (time_in_memory < 0) then
 				--obj:enable_memory_object(enemy,false)
-				time_in_memory = time_in_memory + xr_logic.pstor_retrieve(obj,"mem_time_offset",0)
-			end
-
-			if (ene_id == 0 and time_in_memory > 120000 or time_in_memory > 60000) then
-				--	obj:enable_memory_object(enemy,false)
-				xr_logic.pstor_store(obj,"mem_time_offset",tg)
-				return false
+				--time_in_memory = time_in_memory + xr_logic.pstor_retrieve(obj,"mem_time_offset",0)
+				if (ene_id == 0 and time_in_memory < -120000 or time_in_memory < -60000) then 
+					return false 
+				end
+			else 
+				if (ene_id == 0 and time_in_memory > 120000 or time_in_memory > 60000) then
+					--	obj:enable_memory_object(enemy,false)
+					--xr_logic.pstor_store(obj,"mem_time_offset",tg)
+					return false
+				end
 			end
 		end
 	end
