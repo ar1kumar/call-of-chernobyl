@@ -787,8 +787,8 @@ eat_portions_num = 1
 
 wounds_heal_perc = 0
 
-; Собстно мина которая на земле
-[mine_blow]:explosive_barrel
+; For actor only!
+[mine_actor]:explosive_barrel
 
 GroupControlSection	= spawn_group
 discovery_dependency =
@@ -850,6 +850,10 @@ snd_explode 			= weapons\rgd5_explode
 immunities_sect			= personnel_mine_immunities_sect
 ;wallmarks
 wallmark_section		= explosion_marks
+
+;
+[mine_proximity]
+script_binding		= m_mines.add_neutral_mine
 
 [personnel_mine_immunities_sect]
 ;коэффициенты для попаданий различными типами хитов

@@ -20,6 +20,18 @@ reach_distance = 10
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
+on_info1 = {=actor_in_zone(cit_merc_trader_if_actor_steal)} animpoint@trader_stand_as_enemy  %=dec_faction_goodwill_to_actor(killer:500) =actor_enemy%
+
+[animpoint@trader_stand_as_enemy]
+cover_name = cit_killers_merc_trader_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@trader
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
 
 [meet@trader]
 close_anim 		= nil
@@ -48,6 +60,18 @@ meet = meet@mechanic
 combat_ignore_cond = true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info1 = {=actor_in_zone(cit_merc_trader_if_actor_steal)} animpoint@mech_stand_as_enemy %=actor_enemy%
+
+[animpoint@mech_stand_as_enemy]
+cover_name = cit_killers_merc_mechanic_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@mechanic
 reach_distance = 10
 gather_items_enabled = false
 help_wounded_enabled = false

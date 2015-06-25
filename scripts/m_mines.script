@@ -7,7 +7,7 @@
 -- Revamped by Alundaio to fix everything Swartz suggested
 -- Now turns NPCs who see actor place mines hostile
 -- Now has a primer before it will react to targets
--- Uses persistent storage featured in axr_main with Xetrill's lua jit dll and marshal library
+-- Uses persistent storage marshal library
 ----------------------
 local BLOW_RADIUS = 2.5
 local PRIMER_FACTOR = 5					-- Time to activate in human seconds
@@ -176,7 +176,7 @@ end
 
 local function actor_on_item_use(itm)
 	if (itm:section() == "wpn_mine") then
-   		alife():create("mine_blow",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+   		alife():create("mine_actor",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 	end
 end
 
