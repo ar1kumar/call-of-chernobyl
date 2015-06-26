@@ -154,11 +154,10 @@ end
 
 function npc_sim_give_last_task_id(a,b)
 	if (last_task_id) then
-		task_manager.get_task_manager():give_task(last_task_id)
 		local npc = who_is_npc(a, b)
 		local squad = get_object_squad(npc)
 		local id = squad and squad.id or npc:id()
-		alun_utils.save_var(db.actor,last_task_id.."_giver_id",id)
+		task_manager.get_task_manager():give_task(last_task_id,id)
 		last_task_id = nil
 	end
 end
@@ -345,18 +344,6 @@ function text_trade_npc_pda(a,b)
 
 	return npc_text
 end
--- Hostage
-function action_increase_hostage_task_stage(a,b)
-	local tm = task_manager.get_task_manager()
-	local task = tm.task_info["simulation_task_3"]
-	if (task) then 
-		task.stage = task.stage + 1
-	end
-	local npc = who_is_npc(a, b)
-	npc:disable_info_portion("npcx_no_teleport")
-end
-
-
 
 -- Dynamic Surrender dialog
 function victim_is_bounty(a,b)

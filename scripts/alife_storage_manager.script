@@ -9,7 +9,7 @@
 	
 	*Supposedly you can save userdata if you write a proper __persist method for the metatable but I have failed to achieve proper results with serializing CTime.
 	
-	*You must register for 'save_state' and 'load_state' and add your own table to m_data for it to be encoded then stored in *.dat
+	*You must register for 'save_state' and 'load_state' and add your own table to m_data for it to be encoded then stored in *.scoc
 	*Although marshal is pretty fast, keep in mind that encoding/decoding a ton of data, saves will start to noticeablely take longer to save/load.
 	*For testing/debugging you can uncomment the print_table calls in save_state and load_state. It will save the before and after tables to print_table.txt in your main directory.
 		
@@ -50,7 +50,7 @@ function CALifeStorageManager_save(fname)
 		return 
 	end 
 
-	local path = getFS():update_path('$game_saves$', '') .. fname:sub(0,-6):lower() .. ".dat"
+	local path = getFS():update_path('$game_saves$', '') .. fname:sub(0,-6):lower() .. ".scoc"
 	local savegame = io.open(path,"wb")
 	if (savegame) then
 		m_data.GAME_VERSION = GAME_VERSION
@@ -87,6 +87,8 @@ function CALifeStorageManager_save(fname)
 			savegame:write(data)
 			savegame:close()
 		end
+		
+		empty_table(m_data)
 	end	
 end 
 
@@ -96,7 +98,7 @@ function CALifeStorageManager_load(fname)
 		return 
 	end 
 	
-	local path = fname:sub(0,-6) .. ".dat"
+	local path = fname:sub(0,-6) .. ".scoc"
 	
 	local savegame = io.open(path,"rb")
 	if not (savegame) then
@@ -115,7 +117,7 @@ function CALifeStorageManager_load(fname)
 	ProcessEventQueueState(m_data,false)
 	
 	-- For debugging save state
-	alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
+	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
 
 	SendScriptCallback("load_state",m_data)
 end

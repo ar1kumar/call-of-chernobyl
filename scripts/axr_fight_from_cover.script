@@ -1,0 +1,357 @@
+--[[
+	scheme_type: generic
+	author: Alundaio
+	
+	Scripted combat scheme that forces npc to be cautious and fight from cover. If a home_point is set then they will try to cover near here.
+--]]
+
+--------------------------------------
+actid = 188118
+evaid = 188118
+--------------------------------------
+local math_random = math.random
+
+-------------------------------------------------------------------------------------
+--												PRIVATE
+--------------------------------------------------------------------------------------
+local function validate(npc,vid)
+	if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
+		return db.used_level_vertex_ids[vid] == nil or db.used_level_vertex_ids[vid] == npc:id()
+	end 
+	return false
+end 
+
+local function lmove(npc,vid,st)
+	if (vid == nil or vid >= 4294967295) then 
+		return 
+	end
+	
+	if (db.used_level_vertex_ids[vid] == npc:id()) then
+		npc:set_dest_level_vertex_id(vid)
+		return vid 
+	end
+	
+	if (st.vid) then 
+		db.used_level_vertex_ids[st.vid] = nil
+	end
+	
+	if not (npc:accessible(vid)) then
+		local vtemp = vector()
+		vid, vtemp = npc:accessible_nearest(vid and level.vertex_position(vid) or npc:position(), vtemp )
+	end
+
+	db.used_level_vertex_ids[vid] = npc:id()
+	st.vid = vid
+	
+	npc:set_dest_level_vertex_id(vid)
+	return vid
+end
+
+local function lmove_ns(npc,vid,st)
+	if (vid == nil or vid >= 4294967295) then 
+		return 
+	end
+	
+	if (db.used_level_vertex_ids[vid] == npc:id()) then
+		npc:set_dest_level_vertex_id(vid)
+		return vid 
+	end
+	
+	if (st.vid) then 
+		db.used_level_vertex_ids[st.vid] = nil
+	end
+	
+	if not (npc:accessible(vid)) then
+		local vtemp = vector()
+		vid, vtemp = npc:accessible_nearest(vid and level.vertex_position(vid) or npc:position(), vtemp )
+	end
+
+	st.vid = vid
+	
+	npc:set_dest_level_vertex_id(vid)
+	return vid
+end
+
+local good_acts = {
+					[xr_actions_id.smartcover_action] = true,
+					[xr_actions_id.smartcover_action+2] = true
+					}
+
+--------------------------------------------------------------------------------------
+--												EVALUATOR FIGHT FROM COVER
+--------------------------------------------------------------------------------------
+
+class "evaluator_fight_from_cover" (property_evaluator)
+function evaluator_fight_from_cover:__init(npc,name,storage) super (nil, name)
+	self.st = storage
+	self.st.stage = 0
+end
+
+function evaluator_fight_from_cover:evaluate()
+	--alun_utils.debug_write("eva_fight_from_cover")
+	local npc = self.object
+	if good_acts[alun_utils.get_current_action_id(npc)] then
+		return false
+	end
+	
+	if (db.storage[npc:id()].active_scheme == "camper") then 
+		return false 
+	end
+	
+	if (xr_wounded.is_wounded(npc)) then 
+		return false 
+	end 
+	
+	local st = db.storage[npc:id()]
+	if (st and st.help_wounded and st.help_wounded.selected_id ~= nil) then 
+		return false 
+	end
+	
+	local bw = npc:best_weapon()
+	if not (bw and alun_utils.isSniper(bw)) then
+		if not (alun_utils.load_var(npc,"fight_from_point")) then 
+			return false 
+		end
+	end
+	
+	local be = npc:best_enemy()
+	if (be and be:alive() and not xr_wounded.is_wounded(be)) then
+		if (_G.schemes["facer"]) then
+			local mgr = npc:motivation_action_manager()
+			if (mgr) then
+				 return not mgr:evaluator(xrs_facer.evid_steal_up_facer):evaluate()
+			end
+		else
+			return true
+		end
+	end
+
+	return false
+end
+
+--------------------------------------------------------------------------------------
+--												ACTION FIGHT FROM COVER
+--------------------------------------------------------------------------------------
+
+class "action_fight_from_cover" (action_base)
+function action_fight_from_cover:__init (npc,name,storage) super (nil,name)
+	self.st = storage
+end
+function action_fight_from_cover:initialize()
+	action_base.initialize(self)
+	local npc = self.object
+	npc:set_desired_position()
+	npc:set_desired_direction()
+end
+
+function action_fight_from_cover:try_go_cover(npc,enemy,ene_pos,dist)
+	--alun_utils.debug_write(alun_utils.sr("action_fight_from_cover:try_go_cover"))
+	local lvid = alun_utils.load_var(npc,"fight_from_point")
+	local pos  = lvid and level.vertex_position(lvid) or npc:position()
+	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,5,db.used_level_vertex_ids)
+	if (validate(npc,vid)) then -- and level.vertex_position(vid):distance_to_sqr(npc:position()) < dist) then
+		return lmove(npc,vid,self.st)
+	end
+end
+
+function action_fight_from_cover:try_go_backward(npc)
+	--alun_utils.debug_write(alun_utils.sr("action_fight_from_cover:try_go_backward"))
+	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math_random(160,200))
+	local vid
+	local radius = 8
+	local base_point = npc:level_vertex_id()
+	while (radius > 0) do
+		vid = level.vertex_in_direction(base_point,dir,radius)
+		if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then
+			return lmove_ns(npc,vid,self.st)
+		end
+		radius = radius - 1
+	end
+end
+
+function action_fight_from_cover:try_to_strafe(npc,enemy,ene_pos,dist)
+	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:try_to_strafe"))
+	--alun_utils.debug_nearest(npc,"try_to_strafe")
+	local dir = {}
+	dir[1] = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math.random(-87,-93))
+	dir[2] = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math.random(87,93))
+	local vid
+	local radius
+	local base_point = npc:level_vertex_id()
+	
+	for i=1,2 do
+		radius = 3
+		while (radius > 1) do
+			vid = level.vertex_in_direction(base_point,dir[i],radius)
+			if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
+				return lmove_ns(npc,vid,self.st)
+			end
+			radius = radius - 1
+		end
+	end
+end
+
+function action_fight_from_cover:execute()
+	--alun_utils.debug_write(alun_utils.sr("action_fight_from_cover:execute start"))
+	action_base.execute(self)
+	
+	local npc = self.object
+	local enemy = npc:best_enemy()
+	
+	-- ensure and enforce path type
+	if (npc:path_type() ~= game_object.level_path) then 
+		npc:set_path_type(game_object.level_path)
+	end
+	
+	local see = npc:see(enemy)
+	--local see_me = enemy:see(npc)
+	local ene_pos = see and alun_utils.safe_bone_pos(enemy,"bip01_spine") or npc:memory_position(enemy)
+	local dist = ene_pos:distance_to_sqr(npc:position())
+
+	local tg = time_global()
+	if (self.st.vid) then
+		local dir = enemy:position():sub(npc:position())
+		local bw = npc:best_weapon()
+		local stand = npc:body_state() ~= move.crouch
+		if (stand) then
+			--printf("stand=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
+			if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
+				stand = false
+			end	
+		else
+			--printf("crouch=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
+			if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+				stand = true 
+			end
+		end
+		
+		local new_state
+		
+		if (npc:level_vertex_id() == self.st.vid) then
+			if not (bw) then 
+				new_state = "sneak_run_no_wpn"
+			else
+				if (stand) then 
+					new_state = see and "assault_fire" or "assault"
+				else 
+					new_state = see and "sneak_fire" or "sneak_run"
+				end
+			end
+			
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = see and ene_pos or self.st.last_vid and level.vertex_position(self.st.last_vid) or ene_pos},{fast_set = true})
+	
+			if (self.st.__keep_point_until and tg < self.st.__keep_point_until) then
+				return
+			end
+			db.used_level_vertex_ids[self.st.vid] = nil
+			self.st.vid = nil
+		else
+			if not (bw) then 
+				new_state = "sneak_run_no_wpn"
+			else
+				if (stand) then 
+					new_state = see and "assault_fire" or "assault"
+				else 
+					new_state = see and "sneak_fire" or "sneak_run"
+				end
+			end
+			
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = see and ene_pos or self.st.last_vid and level.vertex_position(self.st.last_vid) or ene_pos},{fast_set = true})
+
+			lmove(npc,self.st.vid,self.st)
+			return
+		end 	
+	end
+	
+	if (dist < 30 and self:try_to_strafe(npc,enemy,ene_pos,dist)) then 
+		self.st.__keep_point_until = tg + math.random(5000,8000)
+	else
+		if (self:try_go_cover(npc,enemy,ene_pos,dist)) then 
+			self.st.__keep_point_until = tg + math.random(5000,8000)
+		else 
+			self:try_to_strafe(npc,enemy,ene_pos,dist)
+			--printf("try_to_strafe")
+		end
+	end 
+	--alun_utils.debug_write(alun_utils.sr("action_fight_from_cover:execute end 2"))
+end
+
+function action_fight_from_cover:finalize()
+    action_base.finalize(self)
+	if (self.st.vid) then 
+		db.used_level_vertex_ids[self.st.vid] = nil
+	end
+	self.st.__keep_target_until = nil
+end
+
+--------------------------------------------------------------------
+--------------------------------- BINDER ---------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"fight_from_cover",section,temp)
+end
+
+function add_to_binder(npc,ini,scheme,section,storage,temp)
+	local manager = npc:motivation_action_manager()
+	
+	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
+		manager:add_evaluator(evaid,property_evaluator_const(false))
+		temp.needs_configured = false
+		return 
+	end
+
+	manager:add_evaluator(evaid,evaluator_fight_from_cover(npc,"eva_fight_from_cover",storage))
+	
+	temp.action = action_fight_from_cover(npc,"act_fight_from_cover",storage)
+	
+	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action:add_precondition(world_property(stalker_ids.property_danger, false))
+	temp.action:add_precondition(world_property(evaid,true))
+	
+	temp.action:add_effect(world_property(evaid,false))
+	
+	manager:add_action(actid,temp.action)
+	
+	--xr_logic.subscribe_action_for_events(npc, storage, temp.action)
+end
+
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
+
+	if (_G.schemes["rx_ff"]) then 
+		temp.action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+	end
+	
+	if (_G.schemes["gl"]) then
+		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
+	end
+	
+	if (_G.schemes["facer"]) then
+		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
+		temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
+	end
+
+	local manager = npc:motivation_action_manager()
+	local action
+	local p = {stalker_ids.action_combat_planner, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
+		
+	for i=1,#p do
+		action = manager:action(p[i])
+		if (action) then
+			action:add_precondition(world_property(evaid,false))
+		else
+			printf("axr_fight_from_cover: no action id p[%s]",i)
+		end
+	end
+end 
+
+function disable_generic_scheme(npc,scheme,stype)
+	local st = db.storage[npc:id()][scheme]
+	if st then
+		st.enabled = false
+	end
+end
+
+function npc_add_precondition(action)
+	action:add_precondition(world_property(evaid,false))
+end

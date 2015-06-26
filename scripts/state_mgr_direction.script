@@ -111,9 +111,7 @@ end
 function act_state_mgr_direction_turn:turn()
 	self.st.point_obj_dir = look_object_type(self.object, self.st)
 
-	if self.st.look_object ~= nil and
-		 level.object_by_id(self.st.look_object) ~= nil
-	then
+	if (self.st.look_object) then
 		look_at_object(self.object, self.st)
 	elseif self.st.look_position ~= nil then
 
@@ -123,7 +121,12 @@ function act_state_mgr_direction_turn:turn()
 			self.object:set_sight(CSightParams.eSightTypeAnimationDirection, false,false)
 			return
 		end
-
+		
+		local weapon_state = state_lib.states[self.st.target_state].weapon
+		if (weapon_state and weapon_state == "fire" or weapon_state == "sniper_fire") then
+			self.object:set_sight(look.fire_point,self.st.look_position)
+			return
+		end
 
 		local dir = vector():sub(self.st.look_position, self.object:position())
 		if self.st.point_obj_dir == true then
@@ -131,7 +134,7 @@ function act_state_mgr_direction_turn:turn()
 		end
 		dir:normalize()
 		if utils.vector_cmp(dir, vector():set(0,0,0)) then
-			callstack()
+			--callstack()
 			printf("Before normalize direction [%s]", vec_to_str(vector():sub(self.st.look_position, self.object:position())))
 			--printf("You are trying to set wrong direction %s (look_pos = [%s] npc_pos = [%s])!!!", vec_to_str(dir), vec_to_str(self.st.look_position), vec_to_str(self.object:position()))
 			-- Затычка, если дирекшн плохой, то ставим текущий и меняем позицию куда смотреть(для эвалуатора)
@@ -144,11 +147,14 @@ function act_state_mgr_direction_turn:turn()
 end
 
 function look_at_object(npc, st)
-	st.point_obj_dir = look_object_type(npc, st)
-	if st.point_obj_dir == true then
-		npc:set_sight(level.object_by_id(st.look_object),true, false, false)
-	else
-		npc:set_sight(level.object_by_id(st.look_object),true, true)
+	local obj = level.object_by_id(st.look_object)
+	if (obj) then
+		st.point_obj_dir = look_object_type(npc, st)
+		if st.point_obj_dir == true then
+			npc:set_sight(obj,true, false, false)
+		else
+			npc:set_sight(obj,true, true)
+		end
 	end
 end
 

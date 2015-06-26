@@ -187,7 +187,7 @@ local function is_danger(npc,best_danger,script)
 		return danger_in_radius(npc,best_danger,bd_type)
 	end
 	
-	if (xr_combat_ignore.npc_in_safe_zone(npc)) then 
+	if (xr_combat_ignore.npc_in_safe_zone(npc) or npc:has_info("npcx_is_companion")) then 
 		return false 
 	end
 
@@ -302,11 +302,13 @@ local function eval_danger(self)
 		return false
 	end
 
+	--[[
 	local sim = alife()
 	local se_obj = sim:object(id)
 	if (se_obj and se_obj.m_smart_terrain_id ~= 65535) then
 		sim:object(se_obj.m_smart_terrain_id):set_alarm()
 	end
+	--]]
 
 	self.a.danger_time = danger_time
 	self.a.inertion = inertion
@@ -535,6 +537,8 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 	local dst = db.storage[bdo:id()]
 	local killer = dependent_object or dst and dst.death_by_id and (db.storage[dst.death_by_id] and db.storage[dst.death_by_id].object or level.object_by_id(dst.death_by_id))
 
+	-- force hostile to killer
+	--[[
 	if (st.stage >= 3 and killer and killer:id() == 0 and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
 		local squad = get_object_squad(npc)
 		if (squad) then
@@ -549,6 +553,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 		end
 		--printf("xr_danger.script_action_danger_corpse: forced enemies %s and %s",npc:name(), killer:name())
 	end
+	--]]
 
 	--printf("stage = %s",st.stage)
 	if (st.stage == 1) then

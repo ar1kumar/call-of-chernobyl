@@ -249,6 +249,9 @@ function is_enemy_actor(enemy, npc)
 end
 
 function is_enemy_actor_or_companion(enemy,npc)
+	if (IsMonster(enemy)) then 
+		return false 
+	end
 	if not (npc:relation(enemy) >= game_object.enemy) then
 		return false
 	end
@@ -2705,24 +2708,28 @@ function actor_goodwill_ge(actor,npc,p)
 	return false
 end
 
-function var_target_is_alive(actor,npc,p)
-	if (p[1]) then
-		local id = alun_utils.load_var(db.actor,p[1].."_giver_id")
-		local se_obj = id and alife():object(id)
-		if (se_obj) then 
-			if (se_obj:clsid() == clsid.online_offline_group_s) then
-				id = se_obj:commander_id()
-				local obj = db.storage[id] and db.storage[id].object
-				if (obj and obj:alive()) then
-					return true
-				end
-			elseif (se_obj:alive()) then 
+function task_giver_alive(actor,npc,p)
+	if not (p[1]) then 
+		return false 
+	end
+	local tm = task_manager.get_task_manager()
+	local task = tm.task_info[p[1]]
+	if not (task) then 
+		return false 
+	end 
+	local se_obj = task.giver_id and alife():object(task.giver_id)
+	if (se_obj) then
+		if (se_obj:clsid() == clsid.online_offline_group_s) then
+			id = se_obj:commander_id()
+			local obj = db.storage[id] and db.storage[id].object
+			if (obj and obj:alive()) then
 				return true
 			end
+		elseif (se_obj:alive()) then 
+			return true
 		end
-	end
-	return false
-end 
+	end	
+end
 
 -------------------------------------------------------------------------------------
 -- Special for Radar

@@ -75,6 +75,37 @@ local good_acts = {
 					[xr_actions_id.smartcover_action+2] = true
 					}
 
+local function can_cause_panic(npc,cls)
+	local rank = ranks.get_obj_rank_name(npc)
+	local cause_panic_clsids
+	if (rank == "novice") then
+		cause_panic_clsids = {
+			[clsid.bloodsucker_s] 			= true,
+			[clsid.pseudodog_s] 			= true,
+			[clsid.burer_s] 				= true,
+			[clsid.chimera_s] 				= true,
+			[clsid.controller_s] 			= true,
+			[clsid.fracture_s] 				= true,
+			[clsid.poltergeist_s] 			= true,
+			[clsid.gigant_s] 				= true,
+			[clsid.snork_s] 				= true,
+			[clsid.psy_dog_s] 				= true,
+			[clsid.psy_dog_phantom_s] 		= true
+		}
+	elseif (rank == "experienced") then 
+		cause_panic_clsids = {
+			[clsid.bloodsucker_s] 			= true,
+			[clsid.burer_s] 				= true,
+			[clsid.chimera_s] 				= true,
+			[clsid.controller_s] 			= true,
+			[clsid.poltergeist_s] 			= true,
+			[clsid.gigant_s] 				= true,
+		}
+	end
+	
+	return cause_panic_clsids and cause_panic_clsids[cls] == true
+end 
+
 local function find_valid_target(npc,st,bw)
 	--alun_utils.debug_write("axr_panic.find valid target")
 	if (st.overflowdetect) then
@@ -85,20 +116,11 @@ local function find_valid_target(npc,st,bw)
 	-- Evaluate current target
 	local tg = time_global()
 	local current_target = st.target_id and db.storage[st.target_id] and db.storage[st.target_id].object
-	if (current_target) then
-		local mem_time = npc:memory_time(current_target)
-		if (mem_time == nil or tg-mem_time > 12000 or current_target:alive() ~= true or xr_wounded.is_wounded(current_target) or not xr_combat_ignore.is_enemy(npc,current_target)) then
-			st.target_id = nil
-			current_target = nil
-		end
-	end
-	
-	-- Keep target for short duration to prevent over evaluating and to prevent constant target switching
-	if (current_target) then 
+	if (current_target and current_target:alive() and not xr_wounded.is_wounded(current_target) and xr_combat_ignore.is_enemy(npc,current_target)) then
 		if (st.__keep_target_until and tg < st.__keep_target_until) then 
 			return true
 		end
-	end 
+	end
 	
 	if not (st.index) then
 		st.index = 1
@@ -117,9 +139,9 @@ local function find_valid_target(npc,st,bw)
 		st.overflowdetect = true
 		for o in npc:memory_visible_objects() do
 			obj = o and o:object()
-			if (obj) then 
+			if (obj) then
 				cls = obj.clsid and obj:clsid()
-				if (cls) and ((IsStalker(nil,cls) or IsMonster(nil,cls)) and obj:alive() and npc:relation(obj) >= game_object.enemy) then
+				if (cls) and (IsStalker(nil,cls) or IsMonster(nil,cls)) and (obj:alive()) then
 					i = i + 1
 					table.insert(st.memory,obj:id())
 				end
@@ -142,53 +164,43 @@ local function find_valid_target(npc,st,bw)
 	local id = st.memory[st.index]
 	st.index = st.index + 1
 	
-	local target = id and (db.storage[id] and db.storage[id].object or level.object_by_id(id))
+	local target = id and (db.storage[id] and db.storage[id].object)
 	
 	-- Evaluate currently indexed target
-	if (target and target:alive() and not xr_wounded.is_wounded(target) and npc:memory_time(target) and tg-npc:memory_time(target) <= 12000) then
-		if (xr_combat_ignore.is_enemy(npc,target) == true) then 
+	if (target and target:alive() and npc:relation(target) >= game_object.enemy and not xr_wounded.is_wounded(target)) then
+		if (xr_combat_ignore.is_enemy(npc,target) == true) then
+			-- focus on actor if panicked_to_actor is true, which is forced by some events like surrender
 			local cls = target:clsid()
 			if (cls == clsid.script_actor and db.storage[npc:id()].panicked_to_actor) then 
+				-- focus on best enemy if they are close by and not a panic source
+				local be = npc:best_enemy()
+				if (be and be:alive() and not xr_wounded.is_wounded(be) and not can_cause_panic(npc,be:clsid()) and npc:position():distance_to_sqr(be:position()) <= 30) then 
+					st.target_id = be:id()
+					st.__keep_target_until = tg + 8000
+					return true
+				end
+			
 				if (st.target_id ~= 0) then
 					xr_sound.set_sound_play(npc:id(),"panic_human")
 				end
-				st.__keep_target_until = tg + 10000
+				st.__keep_target_until = tg + 5000
 				st.target_id = target:id()
 				return true
 			end
 		
-			local rank = ranks.get_obj_rank_name(npc)
-			local cause_panic_clsids
-			if (rank == "novice") then
-				cause_panic_clsids = {
-					[clsid.bloodsucker_s] 			= true,
-					--[clsid.pseudodog_s] 			= true,
-					[clsid.burer_s] 				= true,
-					[clsid.chimera_s] 				= true,
-					[clsid.controller_s] 			= true,
-					--[clsid.fracture_s] 				= true,
-					[clsid.poltergeist_s] 			= true,
-					[clsid.gigant_s] 				= true,
-					[clsid.snork_s] 				= true,
-					[clsid.psy_dog_s] 				= true,
-					[clsid.psy_dog_phantom_s] 		= true
-				}
-			elseif (rank == "experienced") then 
-				cause_panic_clsids = {
-					--[clsid.bloodsucker_s] 			= true,
-					--[clsid.burer_s] 				= true,
-					--[clsid.chimera_s] 				= true,
-					[clsid.controller_s] 			= true,
-					[clsid.poltergeist_s] 			= true,
-					[clsid.gigant_s] 				= true,
-				}
-			end
+			if (can_cause_panic(npc,cls)) then
+				-- focus on best enemy if they are close by and not a panic source
+				local be = npc:best_enemy()
+				if (be and be:alive() and not xr_wounded.is_wounded(be) and not can_cause_panic(npc,be:clsid()) and npc:position():distance_to_sqr(be:position()) <= 30) then 
+					st.target_id = be:id()
+					st.__keep_target_until = tg + 8000
+					return true
+				end
 			
-			if (cause_panic_clsids and cause_panic_clsids[cls] == true) then
 				if (st.target_id ~= target:id()) then
 					xr_sound.set_sound_play(npc:id(),"panic_monster")
 				end
-				st.__keep_target_until = tg + 10000
+				st.__keep_target_until = tg + 5000
 				st.target_id = target:id()
 				return true 
 			end
@@ -219,10 +231,6 @@ function evaluator_stalker_panic:evaluate()
 		return false 
 	end
 	
-	if (xr_conditions.surge_started()) then 
-		return false 
-	end
-
 	if (xr_wounded.is_wounded(npc)) then 
 		return false 
 	end 
@@ -231,10 +239,6 @@ function evaluator_stalker_panic:evaluate()
 	if (st and st.help_wounded and st.help_wounded.selected_id ~= nil) then 
 		return false 
 	end
-	
-	--if (npc:has_info("npcx_beh_ignore_combat")) then 
-		--return false 
-	--end
 
 	if (find_valid_target(npc,self.st)) then 
 		return true 
@@ -250,7 +254,6 @@ end
 class "action_stalker_panic" (action_base)
 function action_stalker_panic:__init (npc,name,storage) super (nil,name)
 	self.st = storage
-	self.st.__node_stage = 1
 end
 function action_stalker_panic:initialize()
 	action_base.initialize(self)
@@ -262,10 +265,6 @@ end
 
 function action_stalker_panic:try_go_cover(npc,enemy,ene_pos,dist)
 	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:try_go_cover"))
-	if (not IsHelicopter(enemy)) and (npc:see(enemy) or time_global() - npc:memory_time(enemy) <= 5000) then 
-		return 
-	end 
-	
 	local vid = alun_utils.find_close_cover(npc,npc:position(),ene_pos,8,db.used_level_vertex_ids)
 	if (validate(npc,vid) and level.vertex_position(vid):distance_to_sqr(npc:position()) < dist) then
 		return lmove(npc,vid,self.st)
@@ -279,16 +278,17 @@ function action_stalker_panic:try_to_strafe(npc,enemy,ene_pos,dist)
 	dir[1] = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),-90)
 	dir[2] = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),90)
 	local vid
-	local radius = 5
+	local radius
 	local base_point = npc:level_vertex_id()
 	
 	for i=1,2 do
-		while (radius <= 15) do
+		radius = 5
+		while (radius > 1) do
 			vid = level.vertex_in_direction(base_point,dir[i],radius)
 			if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
 				return lmove_ns(npc,vid,self.st)
 			end
-			radius = radius + 1
+			radius = radius - 1
 		end
 	end
 end
@@ -368,7 +368,7 @@ function action_stalker_panic:execute()
 	action_base.execute(self)
 	
 	local npc = self.object
-	local enemy = self.st.target_id and (db.storage[self.st.target_id] and db.storage[self.st.target_id].object or level.object_by_id(self.st.target_id))
+	local enemy = self.st.target_id and (db.storage[self.st.target_id] and db.storage[self.st.target_id].object)
 	
 	if not (enemy) then
 		self.st.target_id = nil
@@ -380,59 +380,70 @@ function action_stalker_panic:execute()
 		return
 	end
 	
+	--printf("enemy = %s",enemy and enemy:name())
+	
 	-- ensure and enforce path type
 	if (npc:path_type() ~= game_object.level_path) then 
 		npc:set_path_type(game_object.level_path)
 	end
 	
-	local ene_pos = npc:memory_position(enemy) or enemy:position()
 	local see = npc:see(enemy)
+	local ene_pos = see and alun_utils.safe_bone_pos(enemy,"bip01_spine") or npc:memory_position(enemy)
+	local dist = ene_pos:distance_to_sqr(npc:position())
 	
 	local tg = time_global()
 	if (self.st.vid) then
+		local dir = enemy:position():sub(npc:position())
+		local bw = npc:best_weapon()
+		local stand = false
+		local c = level.high_cover_in_direction(npc:level_vertex_id(),dir)
+		if (npc:body_state() == move.crouch) then 
+			if (c > 0.5) then 
+				stand = true 
+			end
+		end
+		
+		local new_state
+		
 		if (npc:level_vertex_id() == self.st.vid) then
-			local anim = state_mgr.get_state(npc)
-			if (anim ~= "hide_na" or anim ~= "sneak_fire") then
-				if (math.random(100) < 50) then
-					state_mgr.set_state(npc,"sneak_fire",nil,nil,{look_position = ene_pos})
-				else
-					state_mgr.set_state(npc,"hide_na",nil,nil,{look_position = ene_pos})
+			if not (bw) then 
+				new_state = "sneak_run_no_wpn"
+			else
+				if (stand) then 
+					new_state = see and "assault_fire" or "assault"
+				else 
+					new_state = see and "sneak_fire" or "sneak_run"
 				end
 			end
+			
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = see and ene_pos or self.st.last_vid and level.vertex_position(self.st.last_vid) or ene_pos},{fast_set = true})
+	
 			if (self.st.__keep_point_until and tg < self.st.__keep_point_until) then
 				return
 			end
 			db.used_level_vertex_ids[self.st.vid] = nil
 			self.st.vid = nil
 		else
-		
+			if not (bw) then 
+				new_state = "sneak_run_no_wpn"
+			else
+				if (stand) then 
+					new_state = see and "assault_fire" or "assault"
+				else 
+					new_state = see and "sneak_fire" or "sneak_run"
+				end
+			end
+			
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = see and ene_pos or self.st.last_vid and level.vertex_position(self.st.last_vid) or ene_pos},{fast_set = true})
+
 			lmove(npc,self.st.vid,self.st)
 			return
 		end 	
 	end
 	
-	self.st.__keep_point_until = tg + math.random(5000,8000)
-	 
-	local dist = ene_pos:distance_to_sqr(npc:position())
-	
-	if (math.random(100) < 50 and see) then
-		local new_vid = self:try_go_backward(npc)
-		if (new_vid) then
-			state_mgr.set_state(npc,"assault_fire",nil,nil,{look_position = ene_pos})
-			--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:execute end 1"))
-			return
-		end
-	end
-
-	local new_vid = self:try_go_cover_backward(npc,ene_pos) or self:try_to_strafe(npc,enemy,ene_pos,dist) or self:try_go_cover(npc,enemy,ene_pos,dist)
+	local new_vid = dist < 30 and self:try_go_cover_backward(npc,ene_pos) or self:try_go_cover(npc,enemy,ene_pos,dist)
 	if (new_vid) then
-		--if (math.random(100) < 50) then
-		--	state_mgr.set_state(npc,"assault")
-		--else 
-			state_mgr.set_state(npc,"assault",nil,nil,{look_position = ene_pos})
-		--end
-	else 
-		state_mgr.set_state(npc,"sneak_fire",nil,nil,{look_position = ene_pos})
+		self.st.__keep_point_until = tg + math.random(5000,8000)
 	end 
 	
 	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:execute end 2"))
@@ -443,6 +454,7 @@ function action_stalker_panic:finalize()
 	if (self.st.vid) then 
 		db.used_level_vertex_ids[self.st.vid] = nil
 	end
+	self.st.target_id = nil
 	self.st.__keep_target_until = nil
 	db.storage[self.object:id()].panicked = nil
 end
@@ -474,7 +486,7 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	
 	manager:add_action(actid,temp.action)
 	
-	xr_logic.subscribe_action_for_events(npc, storage, temp.action)
+	--xr_logic.subscribe_action_for_events(npc, storage, temp.action)
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)
@@ -493,7 +505,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	local manager = npc:motivation_action_manager()
 	local action
-	local p = {xr_actions_id.state_mgr + 2,xr_actions_id.alife}
+	local p = {xr_actions_id.state_mgr + 1, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
 	
 	for i=1,#p do
 		action = manager:action(p[i])

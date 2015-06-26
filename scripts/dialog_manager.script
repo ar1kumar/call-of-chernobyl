@@ -564,7 +564,7 @@ function is_highest_priority_phrase(PT_subtable, PRT_subtable, npc, phrase_id)
 -- if there is a subtable for this npc
 		local id = phrase_id
 		local pr = PRT_subtable[npc_id][phrase_id]
-		if pr < 0 then
+		if pr == nil or pr < 0 then
 			return false
 		end
 		for phr_id, priority in pairs(PRT_subtable[npc_id]) do

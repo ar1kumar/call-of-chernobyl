@@ -29,7 +29,6 @@
 			<phrase id="1111">
 				<text>hostage_companion_task_1_actor_reply</text>
 				<give_info>hostage_companion_task_1_hostage_rescued</give_info>
-				<action>dialogs.action_increase_hostage_task_stage</action>
 			</phrase>
         </phrase_list>
     </dialog>
@@ -99,9 +98,10 @@
         </phrase_list>
     </dialog>
 	<dialog id="friendly_companion_dialog">
-	<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
-	<precondition>dialogs_axr_companion.is_actor_friend</precondition>
-	<precondition>dialogs_axr_companion.is_room_in_actor_squad</precondition>
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+		<precondition>dialogs_axr_companion.is_actor_friend</precondition>
+		<precondition>dialogs_axr_companion.is_room_in_actor_squad</precondition>
+		<precondition>dialogs_axr_companion.is_not_hostage_task_giver</precondition>
         <phrase_list>
             <phrase id="0">
                 <text>axr_phrase_friend_companion_ask_join</text>
@@ -109,6 +109,22 @@
             </phrase>
             <phrase id="1">
                 <text>axr_phrase_friend_companion_answer_join</text>
+				<action>dialogs_axr_companion.become_actor_companion</action>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<!-- For occasion when npc gives player hostage rescue task and player asks them to join -->
+	<dialog id="friendly_companion_dialog_hostage_version">
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+		<precondition>dialogs_axr_companion.is_room_in_actor_squad</precondition>
+		<precondition>dialogs_axr_companion.is_hostage_task_giver</precondition>
+        <phrase_list>
+            <phrase id="0">
+                <text>axr_phrase_friend_companion_ask_join_hostage</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>axr_phrase_friend_companion_answer_join_hostage</text>
 				<action>dialogs_axr_companion.become_actor_companion</action>
             </phrase>
         </phrase_list>

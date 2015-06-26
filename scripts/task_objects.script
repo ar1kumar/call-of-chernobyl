@@ -116,6 +116,7 @@ function CGeneralTask:__init(id)
 			self.current_descr = m_data.task_objects[self.id].current_descr
 			self.current_target = m_data.task_objects[self.id].current_target
 			self.stage = m_data.task_objects[self.id].stage
+			self.task_giver_id =  m_data.task_objects[self.id].task_giver_id
 			m_data.task_objects[self.id] = nil
 		end		
 	end 
@@ -385,6 +386,7 @@ function CGeneralTask:save(packet)
 	alun_utils.w_stpk(packet,"stringZ",self.current_title,"CGeneralTask:current title")
 	alun_utils.w_stpk(packet,"stringZ",self.current_descr,"CGeneralTask:current descr")
 	alun_utils.w_stpk(packet,"stringZ",tostring(self.current_target),"CGeneralTask:current target")
+	alun_utils.w_stpk(packet,"stringZ",tostring(self.task_giver_id),"CGeneralTask:task giver id")
 	alun_utils.w_stpk(packet,"u8",self.stage,"CGeneralTask:current stage")
 	--set_save_marker(packet, "save", true, "CGeneralTask")
 end
@@ -414,12 +416,10 @@ function CGeneralTask:load(packet)
 	self.current_title = packet:r_stringZ()
 	self.current_descr = packet:r_stringZ()
 	self.current_target = packet:r_stringZ()
+	self.task_giver_id = packet:r_stringZ()
 	self.stage = packet:r_u8()
-	if self.current_target == "nil" then
-		self.current_target = nil
-	else
-		self.current_target = tonumber(self.current_target)
-	end
+	self.current_target = self.current_target == "nil" and nil or tonumber(self.current_target)
+	self.task_giver_id = self.task_giver_id == "nil" and nil or tonumber(self.task_giver_id)
 	--set_save_marker(packet, "load", true, "CGeneralTask")
 end
 
@@ -439,4 +439,5 @@ function CGeneralTask:save_state(m_data)
 	m_data.task_objects[self.id].current_descr = self.current_descr
 	m_data.task_objects[self.id].current_target = self.current_target
 	m_data.task_objects[self.id].stage = self.stage
+	m_data.task_objects[self.id].task_giver_id = self.task_giver_id
 end 

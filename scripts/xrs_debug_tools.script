@@ -334,6 +334,7 @@ local function on_game_load()
 	actions_by_stalker_ids[188115] = "axr_stalker_panic"
 	actions_by_stalker_ids[188116] = "axr_radio_in_heli"
 	actions_by_stalker_ids[188117] = "axr_npc_vs_heli"
+	actions_by_stalker_ids[188118] = "axr_fight_from_cover"
 	actions_by_stalker_ids[90005] = "gather_items"
 	
 	-- HUD DISPLAYS
@@ -822,7 +823,7 @@ function stalker_data_hud_show(hud)
 		end
 		hud:add_msg("Out Rest.",stalker_data.base_out_restrictors)
 		hud:add_msg("In Rest.",stalker_data.base_in_restrictors)
-		hud:add_msg("is_npc_indoors",obj:is_npc_indoors())
+		hud:add_msg("is_npc_indoors",obj:is_npc_indoors(0.05))
 	end
 	hud:display()
 end
@@ -1062,7 +1063,7 @@ function position_hud_show(hud)
 	end
 	
 	hud:add_msg("","------ MISC. ------")
-	hud:add_msg("is_actor_indoors",db.actor:is_actor_indoors())
+	hud:add_msg("is_actor_indoors",db.actor:is_actor_indoors(0.05))
 	__tmr_pos_hud = not __tmr_pos_hud and time_global()+5000 or __tmr_pos_hud
 	if (time_global() > __tmr_pos_hud) then
 		__tmr_pos_hud = nil
@@ -1327,6 +1328,7 @@ function enemy_hud_show(hud)
 
 			if (be) then
 				hud:add_msg("Best Enemy",be and be:name())
+				hud:add_msg("Can See",near:see(be))
 			end
 
 			local ene = st.enemy_id and level.object_by_id(st.enemy_id)
@@ -1339,13 +1341,6 @@ function enemy_hud_show(hud)
 			end
 			
 			local tg = time_global()
-			
-			local new_enemy = st.new_combat and st.new_combat.target_id and db.storage[st.new_combat.target_id] and db.storage[st.new_combat.target_id].object 
-			if (new_enemy) then 
-				hud:add_msg("AXRNewCombat Enemy",new_enemy:name())
-				hud:add_msg("Memory Time",tg - near:memory_time(new_enemy))
-			end
-
 			local pcw = st.post_combat_wait and st.post_combat_wait.timer and st.post_combat_wait.timer > 0 and st.post_combat_wait.timer-tg
 			if (pcw and pcw > 0) then
 				hud:add_msg("Post Combat Idle",pcw)

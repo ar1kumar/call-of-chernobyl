@@ -500,10 +500,10 @@ function get_communities_list()
 end
 
 function execute_script_on_squad(obj,script_to_execute,...)
-	local squad = get_object_squad(obj)
+	local squad = obj:clsid() == clsid.online_offline_group_s and obj or get_object_squad(obj)
 
 	if not ( squad ) then
-		script_to_execute(obj,...)
+		--script_to_execute(obj,...)
 		return
 	end
 
@@ -518,10 +518,10 @@ end
 
 
 function execute_script_on_squad_not_commander(obj,script_to_execute,...)
-	local squad = get_object_squad(obj)
+	local squad = obj:clsid() == clsid.online_offline_group_s and obj or get_object_squad(obj)
 
 	if not ( squad ) then
-		script_to_execute(obj,...)
+		--script_to_execute(obj,...)
 		return
 	end
 

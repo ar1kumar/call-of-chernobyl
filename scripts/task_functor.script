@@ -94,7 +94,7 @@ function general_fetch_task(task_id,field,p)
 		local tm = task_manager.get_task_manager()
 		local task_info = tm.task_info
 		if (task_info[task_id] and task_info[task_id].stage == 1) then
-			local id = alun_utils.load_var(db.actor,task_id.."_target_id") or alun_utils.load_var(db.actor,task_id.."_giver_id")
+			local id = alun_utils.load_var(db.actor,task_id.."_target_id") or task_info[task_id].giver_id
 			if (id) then 
 				return id 
 			end
@@ -265,8 +265,8 @@ function simulation_task_target(task_id,field,p)
 		if (task) then 
 			if (task.stage == 0) or (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
 				return squad and squad.id
-			elseif (task.stage >= 1) then
-				local id = alun_utils.load_var(db.actor,task_id.."_giver_id")
+			elseif (task.stage >= 1 or db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then
+				local id = task.giver_id
 				if (id) then 
 					return id 
 				end

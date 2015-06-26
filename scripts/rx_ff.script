@@ -243,7 +243,11 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	end
 	if (_G.schemes["facer"]) then
 		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
+		temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
 	end
+	--if (_G.schemes["fight_from_cover"]) then 
+	--	temp.action:add_precondition(world_property(axr_fight_from_cover.evaid,false))
+	--end
 	
 	local manager = npc:motivation_action_manager()
 	local action

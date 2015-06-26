@@ -241,11 +241,16 @@ end
 
 function is_actor_friend(actor,npc)
 	local npc = dialogs.who_is_npc(actor,npc)
-	if (not axr_companions.allow_story_squads and get_object_story_id(npc:id())) then
-		return false
+
+	if not (axr_companions.allow_simulation_squads_as_companions) then 
+		return false 
 	end
 
-	return axr_companions.ask_anyone_to_be_companion or npc:relation(db.actor) == game_object.friend
+	if not (axr_companions.allow_only_friends_as_companions) then 
+		return true 
+	end 
+	
+	return npc:relation(db.actor) == game_object.friend
 end
 
 function set_squad_relation_by_chance(npc,actor)
@@ -292,6 +297,26 @@ function become_actor_companion(actor,npc)
 	end
 end
 
+function is_hostage_task_giver(a,b)
+	local npc = dialogs.who_is_npc(a,b)
+	local t = {"simulation_task_3", "simulation_task_4", "simulation_task_5"}
+	local id = npc:id()
+	local se_obj = alife():object(id)
+	local tm = task_manager.get_task_manager()
+	local task_info = tm.task_info
+	local task
+	for k,task_id in pairs(t) do
+		task = task_info[task_id]
+		if (task and task.giver_id == se_obj.group_id or task.giver_id == id) then 
+			return true 
+		end
+	end
+	return false
+end 
+
+function is_not_hostage_task_giver(a,b)
+	return not is_hostage_task_giver(a,b)
+end
 --[[
 	Companion Dialog Preconditions
 --]]
@@ -412,6 +437,16 @@ end
 --[[
 	Companion Dialog Actions
 --]]
+function set_companion_no_teleport(actor,npc)
+	local npc = dialogs.who_is_npc(actor,npc)
+	alun_utils.execute_script_on_squad(npc,axr_companions.set_companion_no_teleport)
+end 
+
+function set_companion_allow_teleport(actor,npc)
+	local npc = dialogs.who_is_npc(actor,npc)
+	alun_utils.execute_script_on_squad(npc,axr_companions.set_companion_allow_teleport)
+end 
+
 function set_companion_to_stealth_substate(actor,npc)
 	local npc = dialogs.who_is_npc(actor,npc)
 	alun_utils.execute_script_on_squad(npc,axr_companions.set_companion_to_stealth_substate)

@@ -364,37 +364,6 @@ function act_state_mgr_end:weapon_update()
 			self.st.callback = nil
 		end
 	end
-
-	local wpn = self.object:best_weapon()
-	if (not wpn or not IsWeapon(wpn)) then
-		return
-	end
-	
-	local t = state_lib.states[self.st.target_state].weapon
-
-	if (t == "unstrapped") then
-		self.object:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
-		return
-	end
-
-	if (t == "sniper_fire" or t == "fire") then
-		local o = self.st.look_object and level.object_by_id(self.st.look_object)
-		local pos = o and o:alive() and self.object:see(o) and o:position() or self.st.look_position
-		if (pos) then
-			if not (self.object:active_item()) then 
-				return 
-			end
-			if (t == "sniper_fire") then
-				local aim = self.object:position():distance_to(pos)*40 or 1500
-				self.object:set_item(object.fire1, wpn, 1, aim <= 1500 and 1500 or aim)
-				--self.object:set_sight(look.fire_point,alun_utils.safe_bone_pos(look_object,"bip01_neck"))
-			else
-				self.object:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.object, o, state_lib.states[self.st.target_state]))
-			end
-		else
-			self.object:set_item(object.idle, wpn)
-		end
-	end
 end
 function act_state_mgr_end:finalize()
 	action_base.finalize(self)
@@ -563,6 +532,36 @@ function state_manager:update()
 		
 		lid = id
 		id = self.planner:current_action_id()
+	end
+	
+	local wpn = self.npc:best_weapon()
+	if (not wpn or not IsWeapon(wpn)) then
+		return
+	end
+	
+	local t = state_lib.states[self.target_state].weapon
+
+	if (t == "unstrapped") then
+		self.npc:set_item(state_mgr_weapon.get_idle_state(self.target_state), wpn)
+		return
+	end
+
+	if (t == "sniper_fire" or t == "fire") then
+		local o = self.look_object and level.object_by_id(self.look_object)
+		local pos = o and o:alive() and self.npc:see(o) and alun_utils.safe_bone_pos(o,"bip01_neck") or self.look_position
+		if (pos) then 
+			if not (self.npc:active_item()) then 
+				return 
+			end
+			if (t == "sniper_fire") then
+				local aim = self.npc:position():distance_to(pos)*40 or 1500
+				self.npc:set_item(object.fire1, wpn, 1, aim <= 1500 and 1500 or aim)
+			else
+				self.npc:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.npc, o, state_lib.states[self.target_state]))
+			end
+		else
+			self.npc:set_item(object.idle, wpn)
+		end
 	end
 end
 

@@ -9,6 +9,7 @@ class "se_stalker"	(cse_alife_human_stalker)
 --------------------
 function se_stalker:__init (section) super (section)
 	db.offline_objects[self.id] = db.offline_objects[self.id] and empty_table(db.offline_objects[self.id]) or {}
+	self.death_droped = false
 end
 --------------------
 function se_stalker:can_switch_offline()

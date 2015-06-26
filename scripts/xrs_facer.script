@@ -96,15 +96,17 @@ function evaluator_facer:evaluate()
 	local target = self.st.target and level.object_by_id(self.st.target)
 	local be = npc:best_enemy()
 	if not target then
-		self.st.target = alun_utils.save_var(npc,"facer_target",nil)
+		self.st.target = nil 
+		alun_utils.save_var(npc,"facer_target",nil)
 	end
 	if target and (not target:alive() and npc:animation_count() == 0) then
-		self.st.target = alun_utils.save_var(npc,"facer_target",nil)
+		self.st.target = nil 
+		alun_utils.save_var(npc,"facer_target",nil)
 		target = nil
 	end
 	local spos = npc:position()
 	if target then
-		if npc:relation(target) >= game_object.enemy or (not be and target.health > 0.3) then
+		if (IsStalker(target) and npc:relation(target) >= game_object.enemy or IsMonster(target)) or (not be and target.health > 0.3) then
 			local tpos = target:position()
 			if tpos:distance_to_sqr(spos) < 3.8 and spos.y - tpos.y < 0.8 then
 				return true
@@ -117,6 +119,8 @@ function evaluator_facer:evaluate()
 		end
 
 		if not (xr_combat_ignore.is_enemy(npc,be,db.storage[npc:id()].combat_ignore)) then
+			alun_utils.save_var(npc,"facer_target",nil)
+			self.st.target = nil 
 			return false
 		end
 
@@ -235,13 +239,16 @@ function action_facer:execute()
 			local power = vals.power > 0 and vals.power or 50
 			if cls == clsid.script_stalker then
 				power = power*vals.k_stalker
+				if npc:relation(target) ~= game_object.enemy then
+					power = power*vals.k_friend
+				end
 			elseif IsMonster(nil,cls) then
 				power = power*vals.k_mutant
 			elseif alun_utils.is_actor(nil,cls) then
 				power = power*vals.k_actor
-			end
-			if npc:relation(target) ~= game_object.enemy then
-				power = power*vals.k_friend
+				if npc:relation(target) ~= game_object.enemy then
+					power = power*vals.k_friend
+				end
 			end
 			local hi = hit()
 			hi:bone(bone)
@@ -292,7 +299,8 @@ function action_facer:cancel()
 	self.st.abtime = tg+vals.min_delay
 	self.end_time = nil
 	self.hit_time = nil
-	self.st.target = alun_utils.save_var(npc,"facer_target",nil)
+	self.st.target = nil
+	alun_utils.save_var(npc,"facer_target",nil)
 	if not xr_wounded.is_wounded(npc) then -- or state_mgr.get_state(npc) == "idle"
 		npc:clear_animations()
 	end
@@ -301,6 +309,8 @@ function action_facer:cancel()
 end
 function action_facer:finalize()
     action_base.finalize(self)
+	self.st.target = nil
+	alun_utils.save_var(self.object,"facer_target",nil)
 	--self:cancel()
 end
 
@@ -329,8 +339,9 @@ function evaluator_steal_up:evaluate()
 			return false
 		elseif dist < 3.3 then
 			return false
-		elseif dist > 80 then
-			self.st.target = alun_utils.save_var(npc,"facer_target",nil)
+		elseif dist > 40 then
+			self.st.target = nil 
+			alun_utils.save_var(npc,"facer_target",nil)
 			return false
 		end
 		if not target then
@@ -482,6 +493,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local manager = npc:motivation_action_manager()
 	local action
 	local p = {xr_actions_id.alife,stalker_ids.action_combat_planner,stalker_ids.action_danger_planner,xr_actions_id.stohe_meet_base+1}
+	--local p = {xr_actions_id.state_mgr + 1, xr_actions_id.state_mgr + 2, xr_actions_id.alife,xr_actions_id.stohe_meet_base+1}
 	
 	for i=1,#p do
 		action = manager:action(p[i])

@@ -83,12 +83,16 @@ function hostage_task(task,task_id)
 		if (xrs_kill_wounded) then 
 			xrs_kill_wounded.hostage_list[squad:commander_id()] = true
 		end
-	else
+		if (db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then 
+			task.stage = 1
+			alun_utils.execute_script_on_squad(squad,axr_companions.set_companion_allow_teleport)
+		end
+	elseif (task.stage == 1) then
 		if (xrs_kill_wounded) then 
 			xrs_kill_wounded.hostage_list[squad:commander_id()] = nil
 		end
 		
-		local id = alun_utils.load_var(db.actor,task_id.."_giver_id")
+		local id = task.giver_id
 		local se_obj = id and alife():object(id)
 		if (se_obj) then 
 			if (se_obj:clsid() == clsid.online_offline_group_s) then 

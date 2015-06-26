@@ -7,12 +7,13 @@
 -- How many jobs are checked per update per npc, for a job
 local STEP_SIZE 			= 5
 local STEP_SIZE_OFFLINE 	= 1
+local ALLOW_USE_MARSHAL = false
 
 ------------------------------------------
 local level,alife,game_graph,math,pairs,tostring,tonumber = level,alife,game_graph,math,pairs,tostring,tonumber
 ------------------------------------------
 
-local locations_ini			= ini_file("misc\\smart_terrain_masks.ltx")
+local locations_ini	= ini_file("misc\\smart_terrain_masks.ltx")
 nearest_to_actor_smart = {id = nil , dist = math.huge}
 
 local function job_avail_to_npc(npc_info, job, smart)
@@ -85,6 +86,10 @@ function se_smart_terrain:__init(section) super(section)
 	self.npc_info  = {}
 	self.arriving_npc  = {}
 	self.__campfire_check_time = game.get_game_time()
+	
+	if (USE_MARSHAL and ALLOW_USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 function se_smart_terrain:on_before_register()
 	cse_alife_smart_zone.on_before_register(self)
@@ -849,12 +854,42 @@ function se_smart_terrain:switch_to_desired_job(npc)
 end
 
 
+function se_smart_terrain:save_state(m_data)
+	if not (m_data.smart_terrains) then 
+		m_data.smart_terrains = {}
+	end
+	
+	if not (m_data.smart_terrains[self.id]) then 
+		m_data.smart_terrains[self.id] = {}
+	end
+	
+	m_data.smart_terrains[self.id].arriving_npc = {}
+	for id,v in pairs(self.arriving_npc) do 
+		table.insert(m_data.smart_terrains[self.id].arriving_npc,id)
+	end
+	
+	m_data.smart_terrains[self.id].npc_info = {}
+	for id,info in pairs(self.npc_info) do 
+		if not (m_data.smart_terrains[self.id].npc_info[id]) then 
+			m_data.smart_terrains[self.id].npc_info[id] = {}
+		end 
+		m_data.smart_terrains[self.id].npc_info[id].job_section = info.job and info.job.section
+		m_data.smart_terrains[self.id].npc_info[id].begin_job = info.begin_job
+		m_data.smart_terrains[self.id].npc_info[id].need_job = info.need_job
+	end
+	
+	m_data.smart_terrains[self.id].dead_time = self.dead_time
+	m_data.smart_terrains[self.id].already_spawned = self.already_spawned
+	m_data.smart_terrains[self.id].last_respawn_update = self.last_respawn_update
+end
 --*******************************************************
 -- СЕЙВ/ЛОАД
 --*******************************************************
 function se_smart_terrain:STATE_Write(packet)
 	cse_alife_smart_zone.STATE_Write(self, packet)
-
+	if (USE_MARSHAL and ALLOW_USE_MARSHAL) then 
+		return 
+	end
 	--set_save_marker(packet, "save", false, "se_smart_terrain")
 
 	-- Информацию о НПС, идущих в смарт
@@ -924,14 +959,34 @@ end
 function se_smart_terrain:STATE_Read(packet, size)
 	--alun_utils.debug_write(alun_utils.sr("%s:STATE_READ start",self:name()))
 	cse_alife_smart_zone.STATE_Read(self, packet, size)
-
+	
+	self:read_params()
+	self.need_init_npc = true
+	
+	if (USE_MARSHAL and ALLOW_USE_MARSHAL) then
+		if (m_data.smart_terrains and m_data.smart_terrains[self.id]) then
+			empty_table(self.arriving_npc)
+			for i,id in pairs(m_data.smart_terrains[self.id].arriving_npc) do 
+				self.arriving_npc[id] = false
+			end 
+			
+			empty_table(self.npc_info)
+			for id,v in pairs(m_data.smart_terrains[self.id].npc_info) do 
+				self.npc_info[id] = v
+			end 
+			
+			self.dead_time = m_data.smart_terrains[self.id].dead_time
+			self.already_spawned = m_data.smart_terrains[self.id].already_spawned
+			self.last_respawn_update = m_data.smart_terrains[self.id].last_respawn_update
+		end
+		return 
+	end
 	-- под LevelEditor не пытаться читать из пакета ничего
 	if editor() then
 		return
 	end
 
 	--set_save_marker(packet, "load", false, "se_smart_terrain")
-	self:read_params()
 
 	-- Информацию о НПС, идущих в смарт
 	local n = packet:r_u8()
@@ -970,8 +1025,6 @@ function se_smart_terrain:STATE_Read(packet, size)
 			self.dead_time[sec] = gt
 		end
 	end
-
-	self.need_init_npc = true
 
 	local respawn_point = packet:r_bool()
 	--printf("LOAD RESPAWN %s", self:name())

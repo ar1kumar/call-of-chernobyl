@@ -6,8 +6,9 @@ by Alundaio
 	This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 -]]
 
-ask_anyone_to_be_companion = false
-allow_story_squads = false
+-- SEE configs\ai_tweaks\axr_companions
+allow_only_friends_as_companions = true
+allow_simulation_squads_as_companions = false
 max_actor_squad_size = 0
 
 companion_squads = {}
@@ -20,6 +21,9 @@ local _draw_part
 -- Localized Functions
 ------------------------------------------
 local function on_fighting_actor(npc)
+	if not (IsStalker(npc)) then
+		return 
+	end
 	--alun_utils.debug_write(alun_utils.sr("axr_companions.on_fighting_actor"))
 	if (db.actor:has_info("axr_has_companion")) then
 		for i=1,max_actor_squad_size do
@@ -29,17 +33,14 @@ local function on_fighting_actor(npc)
 			end
 		end
 	end
-	
-	if (IsStalker(npc)) then
-		for id,squad in pairs(companion_squads) do 
-			xr_combat_ignore.safe_zone_npcs[id] = nil
-			if (squad and squad.commander_id) then
-				for k in squad:squad_members() do
-					local member = db.storage[k.id] and db.storage[k.id].object
-					if (member and member:alive()) then
-						member:set_relation(game_object.enemy,npc)
-						npc:set_relation(game_object.enemy,member)
-					end
+	for id,squad in pairs(companion_squads) do 
+		xr_combat_ignore.safe_zone_npcs[id] = nil
+		if (squad and squad.commander_id) then
+			for k in squad:squad_members() do
+				local member = db.storage[k.id] and db.storage[k.id].object
+				if (member and member:alive()) then
+					member:set_relation(game_object.enemy,npc)
+					npc:set_relation(game_object.enemy,member)
 				end
 			end
 		end
@@ -142,9 +143,8 @@ function on_game_start()
 	RegisterScriptCallback("on_level_changing",on_level_changing)
 	RegisterScriptCallback("actor_on_update",actor_on_update)
 
-	DisabledFactions = alun_utils.parse_list(ini,"main","disabled_factions",true)
-	ask_anyone_to_be_companion = alun_utils.read_from_ini(ini,"main","anyone_as_companion","bool",false)
-	allow_story_squads = alun_utils.read_from_ini(ini,"main","allow_story_squads","bool",false)
+	allow_only_friends_as_companions = alun_utils.read_from_ini(ini,"main","allow_only_friends_as_companions","bool",true)
+	allow_simulation_squads_as_companions = alun_utils.read_from_ini(ini,"main","allow_simulation_squads_as_companions","bool",false)
 	max_actor_squad_size = alun_utils.read_from_ini(ini,"main","max_actor_squad_size","float",3)
 end
 
@@ -270,11 +270,6 @@ function remove_from_actor_squad(npc)
 end
 
 function can_join_actor(npc)
-	local comm = character_community(npc)
-	if (DisabledFactions[comm]) then
-		return false
-	end
-
 	local squad = get_object_squad(npc)
 	if squad ~= nil and squad:commander_id() ~= npc:id() then
 		return false
@@ -286,6 +281,14 @@ function can_join_actor(npc)
 
 	return false
 end
+
+function set_companion_no_teleport(npc)
+	npc:give_info_portion("npcx_no_teleport")
+end 
+
+function set_companion_allow_teleport(npc)
+	npc:disable_info_portion("npcx_no_teleport")
+end 
 
 --NOTE combat_type is screwed up. It's also crap compared to engine combat
 function set_companion_combat_type_camper(npc)
@@ -305,11 +308,13 @@ end
 
 function set_companion_to_wait_state(npc)
 	npc:give_info_portion("npcx_beh_wait")
+	alun_utils.save_var(npc,"fight_from_point",npc:level_vertex_id())
 end
 
 function set_companion_to_follow_state(npc)
 	npc:disable_info_portion("npcx_beh_wait")
 	npc:disable_info_portion("npcx_beh_hide_in_cover")
+	alun_utils.save_var(npc,"fight_from_point",lvid)
 end
 
 function set_companion_to_attack_state(npc)
@@ -458,6 +463,7 @@ function move_to_point(begin)
 		_draw_part = particles_object("_samples_particles_\\flash_light")
 		--_draw_part = particles_object("static\\net_base_blue")
 	elseif (_draw_part) then
+		_current_move_mode = 1
 		SetHudMsg(game.translate_string("st_move_to_point"),8)
 		_draw_part:stop()
 		_draw_part = nil
@@ -466,11 +472,17 @@ function move_to_point(begin)
 			local lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
 			for id,squad in pairs(companion_squads) do 
 				if (squad and squad.commander_id) then
-					local st = db.storage[squad:commander_id()]
-					local member = st and st.object
-					if (member and member:alive()) then
-						if (st.beh) then 
-							st.beh.rally_lvid = lvid
+					for k in squad:squad_members() do
+						st = db.storage[k.id]
+						if (k.id == squad:commander_id()) then 
+							if (st and st.beh) then 
+								st.beh.rally_lvid = lvid
+							end
+						end
+						local member = st and st.object
+						if (member and member:alive()) then
+							set_companion_to_follow_state(member)
+							alun_utils.save_var(member,"fight_from_point",lvid)
 						end
 					end
 				end
