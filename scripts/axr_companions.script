@@ -9,7 +9,7 @@ by Alundaio
 -- SEE configs\ai_tweaks\axr_companions
 allow_only_friends_as_companions = true
 allow_simulation_squads_as_companions = false
-max_actor_squad_size = 0
+max_actor_squad_size = 0 -- used only for non task companions
 
 companion_squads = {}
 ------------------------------------------
@@ -93,13 +93,6 @@ local function squad_on_update(squad)
 	end
 end
 
-local function npc_on_net_spawn(npc,se_npc)
-	if (npc and npc:has_info("npcx_is_companion")) then
-		--alun_utils.debug_write(alun_utils.sr("axr_companions:npc_on_net_spawn:setup_companion_logic"))
-		setup_companion_logic(npc)
-	end
-end
-
 local function on_level_changing()
 	local squad
 	local sim = alife()
@@ -139,7 +132,6 @@ function on_game_start()
 	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 	RegisterScriptCallback("squad_on_unregister",squad_on_unregister)
 	RegisterScriptCallback("squad_can_switch_offline",squad_can_switch_offline)
-	RegisterScriptCallback("npc_on_net_spawn",npc_on_net_spawn)
 	RegisterScriptCallback("on_level_changing",on_level_changing)
 	RegisterScriptCallback("actor_on_update",actor_on_update)
 
@@ -151,7 +143,15 @@ end
 function companion_squad_can_teleport(squad)
 	local id = squad:commander_id()
 	local sim = alife()
-	if (id) and (sim:has_info(id,"npcx_beh_patrol_mode") or sim:has_info(id,"npcx_beh_wait") or sim:has_info(id,"npcx_no_teleport")) then
+	local se_obj = sim:object(id)
+	if (se_obj) then
+		local as = se_obj:get_alife_storage()
+		if (as and as.companion_cannot_teleport) then 
+			return false 
+		end
+	end 
+	
+	if (id) and (sim:has_info(id,"npcx_beh_patrol_mode") or sim:has_info(id,"npcx_beh_wait")) then
 		return false
 	end
 	return true
@@ -179,19 +179,42 @@ function list_actor_squad_by_id()
 	return t
 end 
 
-function setup_companion_logic(npc)
-	local ltx = ini_file("scripts\\beh_companion.ltx")
-	local ltx_name = "scripts\\beh_companion.ltx"
-
-	xr_logic.configure_schemes(npc, ltx, ltx_name, modules.stype_stalker, "logic", "")
-
-	local sect = xr_logic.determine_section_to_activate(npc, ltx, "logic", db.actor)
-	if utils.get_scheme_by_section("logic") == "nil" then
-		printf("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
+function setup_companion_logic(npc,st,loaded,as)
+	npc:give_info_portion("npcx_is_companion")
+	if (as.companion_cannot_dismiss) then 
+		npc:give_info_portion("npcx_beh_cannot_dismiss")
 	end
+		
+	local ltx_name = "scripts\\beh_companion.ltx"
+	local ltx = ini_file(ltx_name)
+	
+	if not (loaded) then
+		local id = npc:id()
+		local sim = alife()
+		local se_npc = sim:object(id)
+		local unreg_id = se_npc.m_smart_terrain_id
+		if (unreg_id ~= 65535) then
+			local unreg = sim:object(unreg_id)
+			if (unreg) then
+				unreg:unregister_npc(se_npc)
+			end
+		end
+		--axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
 
-	--printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
-	xr_logic.activate_by_section(npc, ltx, sect, "", false)
+		xr_logic.configure_schemes(npc, ltx, ltx_name, modules.stype_stalker, "logic", "")
+
+		local sect = xr_logic.determine_section_to_activate(npc, ltx, "logic", db.actor)
+		if utils.get_scheme_by_section("logic") == "nil" then
+			printf("section=%s, don't use section 'nil'!", sect)
+		end
+
+		--printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
+		xr_logic.activate_by_section(npc, ltx, sect, "", false)
+		return
+	end
+	
+	xr_logic.configure_schemes(npc, ltx, ltx_filename, modules.stype_stalker, st.loaded_section_logic, st.loaded_gulag_name)
+	xr_logic.activate_by_section(npc, ltx, st.loaded_active_section, st.loaded_gulag_name, true)
 end 
 
 function add_special_task_npc_to_actor_squad(npc)
@@ -234,16 +257,14 @@ function add_to_actor_squad(npc)
 
 	local sim = alife()
 	local se_npc = sim:object(id)
-	local unreg_id = se_npc:smart_terrain_id()
-	if (unreg_id ~= 65535) then
-		local unreg = sim:object(unreg_id)
-		if (unreg) then
-			unreg:unregister_npc(se_npc)
-		end
+
+	as = se_npc:get_alife_storage()
+	if (as) then
+		as.companion = true
+		setup_companion_logic(npc,db.storage[id],false,as)
 	end
 
-	npc:give_info_portion("npcx_is_companion")
-	axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
+	--axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
 	--alun_utils.debug_write("Inserted %s into actor squad",npc:name())
 end
 
@@ -253,7 +274,17 @@ function remove_from_actor_squad(npc)
 		squad.scripted_target = nil
 	end 
 	
+	local se_obj = alife():object(npc:id())
+	as = se_obj and se_obj:get_alife_storage()
+	if (as) then
+		as.companion = nil
+		as.companion_cannot_dismiss = nil
+		as.companion_cannot_teleport = nil
+	end
+			
 	npc:disable_info_portion("npcx_is_companion")
+	npc:disable_info_portion("npcx_beh_cannot_dismiss")
+	
 	axr_logic.restore_scheme_and_logic(npc)
 
 	local count = 0
@@ -282,12 +313,20 @@ function can_join_actor(npc)
 	return false
 end
 
-function set_companion_no_teleport(npc)
-	npc:give_info_portion("npcx_no_teleport")
+function set_companion_allow_teleport(npc)
+	local se_obj = alife():object(npc:id())
+	if (se_obj and se_obj.get_alife_storage) then 
+		local as = se_obj:get_alife_storage()
+		as.companion_cannot_teleport = nil
+	end
 end 
 
-function set_companion_allow_teleport(npc)
-	npc:disable_info_portion("npcx_no_teleport")
+function set_companion_disable_teleport(npc)
+	local se_obj = alife():object(npc:id())
+	if (se_obj and se_obj.get_alife_storage) then 
+		local as = se_obj:get_alife_storage()
+		as.companion_cannot_teleport = true
+	end
 end 
 
 --NOTE combat_type is screwed up. It's also crap compared to engine combat

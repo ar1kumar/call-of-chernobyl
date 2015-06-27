@@ -38,7 +38,7 @@ end
 --------------------------------------------------------------------------------
 
 --' Выдача квеста игроку
-function CRandomTask:give_task(task_id,giver_id)
+function CRandomTask:give_task(task_id,task_giver_id)
 	--printf("CRandomTask:give_task() task_id[%s]", tostring(task_id))
 
 	if not task_ini:section_exist(task_id) then
@@ -48,7 +48,7 @@ function CRandomTask:give_task(task_id,giver_id)
 
 	self.task_info[task_id]:give_task()
 	
-	self.task_info[task_id].giver_id = giver_id
+	self.task_info[task_id].task_giver_id = task_giver_id
 end
 
 function CRandomTask:set_task_completed(task_id)

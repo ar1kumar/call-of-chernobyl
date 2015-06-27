@@ -150,6 +150,20 @@ function actor_on_item_take(binder,item)
 end
 
 -------------------
+-- actor_on_item_take_from_box
+-------------------
+function actor_on_item_take_from_box(binder,box,item)
+	SendScriptCallback("actor_on_item_take_from_box",box,item)
+end
+
+-------------------
+--
+-------------------
+function actor_on_item_drop(binder,item)
+	SendScriptCallback("actor_on_item_drop",item)
+end 
+
+-------------------
 -- actor_on_item_use(item)
 -------------------
 function actor_on_item_use(binder,item)

@@ -72,8 +72,10 @@ disable = dm_ordered_task_dialog, dm_traveler_dialog, dm_actor_become_guide_to_c
 ;            		 active sections
 ;===============================================
 [beh@base]:beh@general
-on_info1 = {=check_squad_name(ecolog_companion_task_1)} beh@ecolog_companion_task_1, {=check_squad_name(ecolog_companion_task_2)} beh@ecolog_companion_task_2, {=check_squad_name(yan_ecolog_semenov_squad)} beh@yan_ecolog_semenov_task_1, {=check_squad_name(bandit_companion_task_1)} beh@bandit_companion_task_1
-on_info2 = {=check_squad_name(hostage_companion_task_1)} beh@hostage_1
+on_info1 = {=check_squad_name(ecolog_companion_task_1)} beh@ecolog_companion_task_1, {=check_squad_name(ecolog_companion_task_2)} beh@ecolog_companion_task_2, {=check_squad_name(yan_ecolog_semenov_squad)} beh@yan_ecolog_semenov_task_1
+on_info2 = {=check_squad_name(bandit_companion_task_1)} beh@bandit_companion_task_1
+on_info3 = {=check_squad_name(hostage_companion_task_1)} beh@hostage_1
+on_info4 = beh@general       ;IMPORTANT: not a special task squad so use general section; Make sure it's always the last LINE in this section
 
 [meet@ecolog_companion_task_1]:meet
 meet_dialog	= {=is_wounded} axr_companion_medkit, {=squad_in_zone(ecolog_companion_task_1:mar_smart_terrain_base_sr_no_assault)} ecolog_companion_task_1_dialog, nil

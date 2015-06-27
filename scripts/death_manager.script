@@ -113,7 +113,7 @@ function drop_manager:__init(npc)
 end
 function drop_manager:create_release_item()
 	--' Спрашиваем у серверного объекта генерились ли предметы
-	-- Alundaio [ Need to avoid using packet death_droped for se_stalker, fixes a bug where stalkers sometimes drop everything ]
+	-- Alundaio
 	local death_dropped = xr_logic.pstor_retrieve(self.npc,"death_dropped",false)
 	if (death_dropped) then
 		return

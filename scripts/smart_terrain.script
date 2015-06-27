@@ -1245,7 +1245,7 @@ function se_smart_terrain:update()
 			self.check_time = tg+3000 + math.max(500, 0.025*dist_to_actor)
 		end
 		
-		if (self.__campfire_check_time == nil or game.get_game_time():diffSec(self.__campfire_check_time) > 300) then
+		if (self.__campfire_check_time == nil or game.get_game_time():diffSec(self.__campfire_check_time) > 600) then
 			--if (is_only_monsters_on_jobs(self.npc_info)) then
 				bind_campfire.turn_off_campfires_by_smart_name(self:name())
 				self.__campfire_check_time = game.get_game_time()

@@ -29,6 +29,12 @@ no_weap_zones 		= {}
 spawned_vertex_by_id= {}
 dynamic_ltx			= {}
 vehicle				= nil
+-- use with MARSHAL and alife_storage_manager
+m_data = { se_stalker = {} }
+
+function on_alife_storage_manager_load(d)
+	m_data.se_stalker = d.se_stalker
+end 
 
 function add_enemy(obj)
 	table.insert(heli_enemies,obj:id())

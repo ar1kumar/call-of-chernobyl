@@ -8,8 +8,10 @@
 class "se_stalker"	(cse_alife_human_stalker)
 --------------------
 function se_stalker:__init (section) super (section)
-	db.offline_objects[self.id] = db.offline_objects[self.id] and empty_table(db.offline_objects[self.id]) or {}
-	self.death_droped = false
+	db.offline_objects[self.id] = empty_table(db.offline_objects[self.id])
+	if (USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 --------------------
 function se_stalker:can_switch_offline()
@@ -34,6 +36,7 @@ end
 function se_stalker:switch_offline()
 	cse_alife_human_stalker.switch_offline(self)
 end
+
 --------------------
 function se_stalker:STATE_Write(packet)
 	cse_alife_human_stalker.STATE_Write (self, packet)
@@ -43,7 +46,6 @@ function se_stalker:STATE_Write(packet)
 		packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].level_vertex_id))
 	end
 	packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].active_section))
-	packet:w_bool(self.death_droped or false)
 end
 --------------------
 function se_stalker:STATE_Read(packet, size)
@@ -62,9 +64,28 @@ function se_stalker:STATE_Read(packet, size)
 			db.offline_objects[self.id].level_vertex_id = tonumber(old_lvid)
 		end
 	end
-	self.death_droped = packet:r_bool() or nil
 	--alun_utils.debug_write("se_stalker:STATE_Read "..self:name().." END\n")
 end
+
+function se_stalker:get_alife_storage()
+	if not (db.m_data.se_stalker[self.id]) then 
+		db.m_data.se_stalker[self.id] = {}
+	end
+	return db.m_data.se_stalker[self.id]
+end 
+
+function se_stalker:save_state(m_data)
+	if not (m_data.se_stalker) then 
+		m_data.se_stalker = {}
+	end
+	
+	if (db.m_data.se_stalker[self.id] == nil or empty(db.m_data.se_stalker[self.id])) then 
+		return 
+	end
+	
+	m_data.se_stalker[self.id] = db.m_data.se_stalker[self.id]
+end
+
 --------------------
 function se_stalker:on_before_register()
 end
@@ -105,6 +126,7 @@ function se_stalker:on_unregister()
 		end
 	end
 	db.offline_objects[self.id] = nil
+	db.m_data.se_stalker[self.id] = nil
 	unregister_story_object_by_id(self.id)
 	cse_alife_human_stalker.on_unregister(self)
 end

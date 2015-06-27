@@ -142,8 +142,15 @@ function motivator_binder:net_spawn(sobject)
 	if (force_set_position) then
 		self.object:set_npc_position(force_set_position)
 	end
-	
-	smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_stalker, self.loaded)
+
+	local as = sobject:get_alife_storage()
+	if (as.companion) then
+		axr_companions.setup_companion_logic(self.object,self.st,self.loaded,as)
+	else
+		self.object:disable_info_portion("npcx_is_companion")
+		self.object:disable_info_portion("npcx_beh_cannot_dismiss")
+		smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_stalker, self.loaded)
+	end
 
 	if character_community(self.object) ~= "zombied" then
 		post_combat_idle.add_post_combat_idle(self.object)

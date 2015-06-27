@@ -92,7 +92,7 @@ function hostage_task(task,task_id)
 			xrs_kill_wounded.hostage_list[squad:commander_id()] = nil
 		end
 		
-		local id = task.giver_id
+		local id = task.task_giver_id
 		local se_obj = id and alife():object(id)
 		if (se_obj) then 
 			if (se_obj:clsid() == clsid.online_offline_group_s) then 
@@ -100,10 +100,10 @@ function hostage_task(task,task_id)
 			end 
 			
 			if not (se_obj:alive()) then 
-				return "complete"
+				return "complete" -- complete task even though giver is dead, you still rescued hostage
 			end
 		else 
-			return "complete"
+			return "complete" -- complete task even though giver doesn't exist
 		end 
 	end
 end 

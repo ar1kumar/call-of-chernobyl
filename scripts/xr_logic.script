@@ -193,7 +193,7 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 
 	if db.storage[npc_id].stype == modules.stype_stalker then
 		-- чтобы избежать дальнейшего движения по пути при установке рестрикторов
-		npc:inactualize_patrol_path()
+		npc:inactualize_patrol_path() -- Alundaio: Necessary to clear path data or npc can get stuck on generic schemes
 		npc:set_path_type(game_object.level_path)
 		utils.send_to_nearest_accessible_vertex(npc, npc:level_vertex_id(),"xr_logic")
 
@@ -842,19 +842,8 @@ function cfg_get_condlist(ini, section, field, npc)
 	return t
 end
 
-function add_condition(lst, at, cond)
-	if cond then
-		lst[at] = cond
-		return at + 1
-	end
-	return at
-end
-
-
 function cfg_get_switch_conditions(ini, section, npc)
-	local l = {}
-	local t
-	local n = 1
+	local lst = {}
 	if not ini:section_exist(tostring(section)) then
 		--printf("cfg get switch cond: section %s does not exist!",section)
 		return
@@ -865,18 +854,9 @@ function cfg_get_switch_conditions(ini, section, npc)
 		for line_number = 0, line_count - 1 do
 			local result, id, value  = ini:r_line(section,line_number,"","")
 			if string.find( id, "^"..cond.."%d*$" ) ~= nil then
-				c = func(ini, section, id, npc)
-				n = add_condition(l, n, c)
+				lst[#lst+1] = func(ini, section, id, npc)
 			end
 		end
-	--[[	local c = func(ini, section, cond, npc)
-		while c ~= nil do
-			n = add_condition(l, n, c, npc)
-
-			i = i + 1
-
-			c = func(ini, section, cond..i, npc)
-		end]]--
 	end
 
 	add_conditions( cfg_get_number_and_condlist, "on_actor_dist_le"      )
@@ -893,7 +873,7 @@ function cfg_get_switch_conditions(ini, section, npc)
 	add_conditions( cfg_get_condlist           , "on_actor_outside"      )
 	add_conditions( cfg_get_npc_and_zone       , "on_npc_in_zone"        )
 	add_conditions( cfg_get_npc_and_zone       , "on_npc_not_in_zone"    )
-	return l
+	return lst
 end
 
 function cfg_get_overrides(ini, section, npc)

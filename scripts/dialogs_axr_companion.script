@@ -283,6 +283,7 @@ function become_actor_companion(actor,npc)
 
 	if not (squad) then
 		axr_companions.add_to_actor_squad(npc)
+		npc:switch_offline()
 		return
 	end
 	
@@ -307,7 +308,7 @@ function is_hostage_task_giver(a,b)
 	local task
 	for k,task_id in pairs(t) do
 		task = task_info[task_id]
-		if (task) and (task.giver_id == se_obj.group_id or task.giver_id == id) then 
+		if (task) and (task.task_giver_id == se_obj.group_id or task.task_giver_id == id) then 
 			return true 
 		end
 	end
@@ -437,15 +438,6 @@ end
 --[[
 	Companion Dialog Actions
 --]]
-function set_companion_no_teleport(actor,npc)
-	local npc = dialogs.who_is_npc(actor,npc)
-	alun_utils.execute_script_on_squad(npc,axr_companions.set_companion_no_teleport)
-end 
-
-function set_companion_allow_teleport(actor,npc)
-	local npc = dialogs.who_is_npc(actor,npc)
-	alun_utils.execute_script_on_squad(npc,axr_companions.set_companion_allow_teleport)
-end 
 
 function set_companion_to_stealth_substate(actor,npc)
 	local npc = dialogs.who_is_npc(actor,npc)

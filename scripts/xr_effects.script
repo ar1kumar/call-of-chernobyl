@@ -2,44 +2,7 @@
 -- Общие функции
 -- ----------------------------------------------------------------------------------------------------
 -- TODO: Remove all unused COP story functions
------------------------------------------------------------
--- Private
------------------------------------------------------------
-local function add_special_task_squad(id,restrict_to_level)
-	local squad = id and alife():object(id)
-	if not (squad) then
-		return true
-	end
-	
-	if not (squad.online) then 
-		return false
-	end 
-	
-	for k in squad:squad_members() do
-		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id))
-		if not (npc) then
-			-- wait till full squad online
-			return false 
-		end
-		
-		if (restrict_to_level) then 
-			npc:give_info_portion("npcx_no_teleport")
-		end
-		
-		--npc:give_info_portion("npcx_is_companion")
-		npc:give_info_portion("npcx_beh_cannot_dismiss")
-		--axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
-		--axr_companions.setup_companion_logic(npc)
-		
-		axr_companions.add_special_task_npc_to_actor_squad(npc)
-	end
-	
-	--alun_utils.switch_offline(squad.id)
-	
-	squad:switch_offline()
 
-	return true
-end 
 ---------------------------------------------------------------------------------------------------------------
 -- Initialize a task to find a faction stayed at a smart anywhere on actor current level. ID of smart is tracked in pstor by a given var name
 -- param 1 - var name
@@ -112,6 +75,13 @@ function remove_task_companion(actor,npc,p)
 			axr_logic.restore_scheme_and_logic(npc)
 			npc:disable_info_portion("npcx_is_companion")
 			npc:disable_info_portion("npcx_beh_cannot_dismiss")
+			
+			as = k.object and k.object:get_alife_storage()
+			if (as) then
+				as.companion = nil 
+				as.companion_cannot_dismiss = nil
+				as.companion_cannot_teleport = nil
+			end
 		end
 	end
 end 
@@ -122,10 +92,14 @@ function add_task_companion(actor,npc,p)
 		return 
 	end
 	for k in squad:squad_members() do
-		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id))
+		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object)
 		if (npc) then
-			axr_companions.add_special_task_npc_to_actor_squad(npc)
-			npc:give_info_portion("npcx_beh_cannot_dismiss")
+			as = k.object and k.object:get_alife_storage()
+			if (as) then
+				as.companion = true
+				as.companion_cannot_dismiss = true
+				axr_companions.setup_companion_logic(npc,db.storage[k.id],false,as)
+			end
 		end
 	end
 end
@@ -250,31 +224,24 @@ function setup_companion_task(actor,npc,p)
 	local sim = alife()
 	local squad = sim:create(p[1],smart.position,smart.m_level_vertex_id,smart.m_game_vertex_id)
 	
-	sim:set_switch_online(squad.id,true)
-	sim:set_switch_offline(squad.id,false)
-			
 	squad:create_npc(smart)
 	squad:set_squad_relation()
-	local se_obj
-	
+	local se_obj,as
 	for k in squad:squad_members() do
 		se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
-			if (sim.give_info) then
-				sim:give_info(k.id,"npcx_is_companion")
-				sim:give_info(k.id,"npcx_beh_cannot_dismiss")
-				if (p[4] == "true") then 
-					sim:give_info(k.id,"npcx_no_teleport")
-				end
+			as = se_obj:get_alife_storage()
+			if (as) then
+				as.companion = true 
+				as.companion_cannot_dismiss = true 
+				as.companion_cannot_teleport = p[4] == "true"
 			end
-			sim:set_switch_online(k.id,true)
-			sim:set_switch_offline(k.id,false)
 		end
 	end
 
 	--alun_utils.save_var(db.actor,p[3] or "task_companion_slot_1",squad.id)
-	CreateTimeEvent(0,"add_special_task_squad",5,add_special_task_squad,squad.id,p[4] == "true")
+	--CreateTimeEvent(0,"add_special_task_squad",5,add_special_task_squad,squad.id,p[4] == "true")
 end
 
 -- setup for special escort to anomaly task

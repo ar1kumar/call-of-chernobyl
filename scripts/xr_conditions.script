@@ -2714,21 +2714,18 @@ function task_giver_alive(actor,npc,p)
 	end
 	local tm = task_manager.get_task_manager()
 	local task = tm.task_info[p[1]]
-	if not (task) then 
-		return false 
-	end 
-	local se_obj = task.giver_id and alife():object(task.giver_id)
+	if not (task) then
+		return true 
+	end
+	local se_obj = task.task_giver_id and alife():object(task.task_giver_id)
 	if (se_obj) then
 		if (se_obj:clsid() == clsid.online_offline_group_s) then
-			id = se_obj:commander_id()
-			local obj = db.storage[id] and db.storage[id].object
-			if (obj and obj:alive()) then
-				return true
-			end
+			return true -- if squad exist then atleast 1 npc should be alive
 		elseif (se_obj:alive()) then 
 			return true
 		end
-	end	
+	end
+	return false
 end
 
 -------------------------------------------------------------------------------------

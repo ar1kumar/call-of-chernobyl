@@ -147,17 +147,20 @@ end
 
 function npc_give_last_task_id(a,b)
 	if (last_task_id) then
-		task_manager.get_task_manager():give_task(last_task_id)
+		local npc = who_is_npc(a,b)
+		local se_obj = npc and alife():object(npc:id())
+		local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
+		task_manager.get_task_manager():give_task(last_task_id,giver_id)
 		last_task_id = nil
 	end
 end
 
 function npc_sim_give_last_task_id(a,b)
 	if (last_task_id) then
-		local npc = who_is_npc(a, b)
-		local squad = get_object_squad(npc)
-		local id = squad and squad.id or npc:id()
-		task_manager.get_task_manager():give_task(last_task_id,id)
+		local npc = who_is_npc(a,b)
+		local se_obj = npc and alife():object(npc:id())
+		local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
+		task_manager.get_task_manager():give_task(last_task_id,giver_id)
 		last_task_id = nil
 	end
 end

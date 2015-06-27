@@ -84,7 +84,7 @@ local ev_queue = {}
 function CreateTimeEvent(ev_id,act_id,timer,f,...)
 	if not (ev_queue[ev_id]) then
 		ev_queue[ev_id] = {}
-		ev_queue[ev_id].size = 0
+		ev_queue[ev_id].__size = 0
 	end
 
 	if not (ev_queue[ev_id][act_id]) then
@@ -93,7 +93,7 @@ function CreateTimeEvent(ev_id,act_id,timer,f,...)
 		ev_queue[ev_id][act_id].timer = timer
 		ev_queue[ev_id][act_id].f = f
 		ev_queue[ev_id][act_id].p = {...}
-		ev_queue[ev_id].size = ev_queue[ev_id].size + 1
+		ev_queue[ev_id].__size = ev_queue[ev_id].__size + 1
 	end
 end
 function ProcessEventQueue(force)
@@ -102,18 +102,18 @@ function ProcessEventQueue(force)
 
 		for action_id,act in pairs(actions) do
 			--alun_utils.debug_write(alun_utils.sr("event_queue: event_id=%s action_id=%s",event_id,action_id))
-			if (action_id ~= "size") then
+			if (action_id ~= "__size") then
 				gt = act.game_time
 				if (gt == nil) or (force) or (game.get_game_time():diffSec(gt) >= act.timer) then
 					if (act.f(unpack(act.p)) == true) then
 						ev_queue[event_id][action_id] = nil
-						ev_queue[event_id].size = ev_queue[event_id].size - 1
+						ev_queue[event_id].__size = ev_queue[event_id].__size - 1
 					end
 				end
 			end
 		end
 
-		if (ev_queue[event_id].size == 0) then
+		if (ev_queue[event_id].__size == 0) then
 			ev_queue[event_id] = nil
 		end
 	end
@@ -142,21 +142,15 @@ if (marshal) then
 	getmetatable(game.CTime()).__persist = game_CTime___persist
 end
 --------------------------------------------------------------------
-function empty	(container)
-	if (type(container) == "function") then
-		for i in container do
-			return	(false)
-		end
-		return		(true)
+function empty(t)
+	if not (t) then 
+		return true 
+	end 
+	
+	for i,j in pairs(t) do
+		return false
 	end
-	assert			(type(container) == "table")
-	if (container[1] ~= nil) then
-		return		(false)
-	end
-	for i,j in pairs(container) do
-		return		(false)
-	end
-	return			(true)
+	return true
 end
 
 
