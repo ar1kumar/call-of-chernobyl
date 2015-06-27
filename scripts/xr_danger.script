@@ -36,13 +36,6 @@ local bd_types = {
 -----------------------------------------------------------------------------
 -- 																PUBLIC
 -----------------------------------------------------------------------------
-
-function is_danger_scripted(npc)
-	local id = npc:id()
-	local st = db.storage[id]
-	return st and st.danger_flag_scripted == true
-end
-
 function set_script_danger(npc,time,who_id,pos)
 	local id = npc:id()
 	if not (script_danger[id]) then
@@ -58,7 +51,7 @@ end
 function has_danger(npc)
 	local id = npc:id()
 	local st = db.storage[id]
-	return st and (st.danger_flag == true or st.danger_flag_scripted == true) or false
+	return st and st.danger_flag == true
 end
 -----------------------------------------------------------------------------
 -- 																PRIVATE
@@ -239,11 +232,9 @@ end
 local function check_script_danger(id)
 	if (script_danger[id]) then
 		if (time_global() < script_danger[id].danger_time + script_danger[id].danger_inertion) then
-			db.storage[id].danger_flag_scripted = true
 			return true
 		else
 			script_danger[id] = nil
-			db.storage[id].danger_flag_scripted = nil
 		end
 	end
 	return false
@@ -319,9 +310,6 @@ end
 
 function evaluator_danger:evaluate()
 	--alun_utils.debug_write("eva_danger")
-	if not (self.object:alive()) then 
-		return false 
-	end 
 	local danger = eval_danger(self) or false
 	db.storage[self.object:id()].danger_flag = danger
 	return danger
@@ -690,13 +678,14 @@ function action_danger:execute()
 	
 	--alun_utils.debug_write("BEFORE scripted_danger_action_planner",true)
 	local npc = self.object
-	if (check_script_danger(npc:id())) then
-		script_action_danger_scripted(npc,self.a)
-		return
-	end
 
 	local best_danger = npc:best_danger()
 	if not (best_danger) then
+		return
+	end
+	
+	if (check_script_danger(npc:id())) then
+		script_action_danger_scripted(npc,self.a)
 		return
 	end
 	
@@ -742,38 +731,42 @@ function evaluator_check_danger:__init(name, storage) super (nil, name)
 end
 function evaluator_check_danger:evaluate()
 	--alun_utils.debug_write("eva_check_danger")
+	
 	if (self.a.disable) then
 		return false
 	end
 
+	if not (self.object:alive()) then 
+		return false 
+	end 
+	
+	if (self.object:best_enemy()) then 
+		return false 
+	end
+	
+	if (xr_wounded.is_wounded(self.object)) then 
+		return false 
+	end 
+	
 	if (character_community(self.object) == "zombied") then
 		return false
 	end
 
 	local id = self.object:id()
-	if (script_danger[id]) then
-		if (time_global() > script_danger[id].danger_time + script_danger[id].danger_inertion) then
-			script_danger[id] = nil
-		end
+	if (check_script_danger(id)) then
+		return true 
 	end
 
 	local bd = self.object:best_danger()
 	if not (bd) then
 		return false
 	end
-
-	local be = self.object:best_enemy()
 	
-	if not (db.storage[id].danger_flag) then
-		db.storage[id].danger_flag_scripted = not be and script_danger[id] ~= nil and true
-		return db.storage[id].danger_flag_scripted or false
+	if (script_danger[id]) then 
+		return true 
 	end
 
 	local bd_type = bd:type()
-	if (bd_type ~= danger_object.grenade and be) then
-		return false
-	end 
-	
 	if not (bd_type == danger_object.attacked or bd_type == danger_object.entity_corpse or bd_type == danger_object.grenade) then
 		return false
 	end
