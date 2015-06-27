@@ -103,6 +103,11 @@ end
 function evaluator_npc_vs_heli:evaluate()
 	--alun_utils.debug_write("eva_npc_vs_heli")
 	local npc = self.object
+
+	if not (npc:alive()) then 
+		return false 
+	end 
+	
 	if good_acts[alun_utils.get_current_action_id(npc)] then
 		return false
 	end
@@ -535,6 +540,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	if (_G.schemes["gl"]) then
 		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
 	end
+	
 	if (_G.schemes["facer"]) then
 		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
 		temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))

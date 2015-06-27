@@ -348,6 +348,11 @@ end
 
 function evaluator_corpse:evaluate()
 	--alun_utils.debug_write("eva_corpse")
+	
+	if not (self.object:alive()) then 
+		return false 
+	end 
+	
 	if (xr_gather_items.is_under_gather_items(self.object) == true) then
 		return false
 	end

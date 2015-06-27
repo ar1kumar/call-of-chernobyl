@@ -32,6 +32,9 @@ function evaluator_check_combat:__init(name, storage) super (nil, name)
 	self.st = storage
 end
 function evaluator_check_combat:evaluate()
+	if not (self.object:alive()) then 
+		return false 
+	end 
 	local st = self.st
 	if st.enabled and self.object:best_enemy() then
 		local actor = db.actor

@@ -283,7 +283,7 @@ function evaluator_patrol_end:__init(name, storage) super (nil, name)
 	self.st = storage
 end
 function evaluator_patrol_end:evaluate()
-		return not xr_logic.is_active(self.object, self.st)
+	return not xr_logic.is_active(self.object, self.st)
 end
 
 class "evaluator_patrol_comm" (property_evaluator)
@@ -291,7 +291,7 @@ function evaluator_patrol_comm:__init(name, storage) super (nil, name)
 	self.st = storage
 end
 function evaluator_patrol_comm:evaluate()
-		return patrols[self.st.patrol_key]:is_commander(self.object:id())
+	return patrols[self.st.patrol_key]:is_commander(self.object:id())
 end
 
 --'-------------------------------------------------------------------------------------------------------------------

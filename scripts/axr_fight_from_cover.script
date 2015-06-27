@@ -90,6 +90,11 @@ end
 function evaluator_fight_from_cover:evaluate()
 	--alun_utils.debug_write("eva_fight_from_cover")
 	local npc = self.object
+	
+	if not (npc:alive()) then 
+		return false 
+	end 
+	
 	if good_acts[alun_utils.get_current_action_id(npc)] then
 		return false
 	end
@@ -180,7 +185,7 @@ function action_fight_from_cover:try_to_strafe(npc,enemy,ene_pos,dist)
 	local base_point = npc:level_vertex_id()
 	
 	for i=1,2 do
-		radius = 3
+		radius = 4
 		while (radius > 1) do
 			vid = level.vertex_in_direction(base_point,dir[i],radius)
 			if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
@@ -231,10 +236,11 @@ function action_fight_from_cover:execute()
 			if not (bw) then 
 				new_state = "sneak_run_no_wpn"
 			else
+				local is_sniper = alun_utils.isSniper(bw)
 				if (stand) then 
-					new_state = see and "assault_fire" or "assault"
-				else 
-					new_state = see and "sneak_fire" or "sneak_run"
+					new_state = see and (is_sniper and "threat_sniper_fire" or "threat_fire") or "threat_na"
+				else
+					new_state = see and (is_sniper and "hide_sniper_fire" or "sneak_fire") or "sneak_run"
 				end
 			end
 			
@@ -249,10 +255,11 @@ function action_fight_from_cover:execute()
 			if not (bw) then 
 				new_state = "sneak_run_no_wpn"
 			else
+				local is_sniper = alun_utils.isSniper(bw)
 				if (stand) then 
-					new_state = see and "assault_fire" or "assault"
-				else 
-					new_state = see and "sneak_fire" or "sneak_run"
+					new_state = see and (is_sniper and "threat_sniper_fire" or "assault_fire") or "assault"
+				else
+					new_state = see and (is_sniper and "hide_sniper_fire" or "sneak_fire") or "sneak_run"
 				end
 			end
 			

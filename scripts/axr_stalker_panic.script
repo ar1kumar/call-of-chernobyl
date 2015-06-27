@@ -223,6 +223,11 @@ end
 function evaluator_stalker_panic:evaluate()
 	--alun_utils.debug_write("eva_panic")
 	local npc = self.object
+	
+	if not (npc:alive()) then 
+		return false 
+	end 
+	
 	if good_acts[alun_utils.get_current_action_id(npc)] then
 		return false
 	end

@@ -15,6 +15,9 @@ function evaluator_wound:__init(name, storage) super(nil, name)
 	self.a = storage
 end
 function evaluator_wound:evaluate ()
+	if not (self.object:alive()) then 
+		return false 
+	end 
 	if self.object:in_smart_cover() then return false end
 
 	if self.a.wounded_set ~= true then return false end

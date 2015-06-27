@@ -135,6 +135,9 @@ end
 function evaluator_launch_grenade:evaluate()
 	--alun_utils.debug_write("eva_launch_grenade")
 	local npc = self.object
+	if not (npc:alive()) then 
+		return false 
+	end 
 	local tg = time_global()
 	if good_acts[alun_utils.get_current_action_id(npc)] then
 		self.st.launch = nil
@@ -360,6 +363,9 @@ end
 function evaluator_reload_gl:evaluate()
 	--alun_utils.debug_write("eva_reload_gl")
 	local npc = self.object
+	if not (npc:alive()) then 
+		return false 
+	end 
 	if self.st.charged then
 		return false
 	end

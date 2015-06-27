@@ -32,6 +32,10 @@ function evaluator_contact:__init(name, storage) super (nil, name)
 end
 function evaluator_contact:evaluate()
 	--alun_utils.debug_write("eva_contact")
+	if not (self.object:alive()) then 
+		return false 
+	end 
+	
 	if self.a.meet_set ~= true then return false end
 
 --	if self.a.meet_only_at_path == true and not db.storage[self.object:id()].move_mgr:arrived_to_first_waypoint() then

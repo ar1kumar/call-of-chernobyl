@@ -15,14 +15,70 @@ local good_acts = {
 					[xr_actions_id.smartcover_action] = true,
 					[xr_actions_id.smartcover_action+2] = true
 					}
-					
+				
+local function validate(npc,vid)
+	if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
+		return db.used_level_vertex_ids[vid] == nil or db.used_level_vertex_ids[vid] == npc:id()
+	end 
+	return false
+end 
+
+local function lmove(npc,vid,st)
+	if (vid == nil or vid >= 4294967295) then 
+		return 
+	end
+	
+	if (db.used_level_vertex_ids[vid] == npc:id()) then
+		npc:set_dest_level_vertex_id(vid)
+		return vid 
+	end
+	
+	if (st.vid) then 
+		db.used_level_vertex_ids[st.vid] = nil
+	end
+	
+	if not (npc:accessible(vid)) then
+		local vtemp = vector()
+		vid, vtemp = npc:accessible_nearest(vid and level.vertex_position(vid) or npc:position(), vtemp )
+	end
+
+	db.used_level_vertex_ids[vid] = npc:id()
+	st.vid = vid
+	
+	npc:set_dest_level_vertex_id(vid)
+	return vid
+end
+
+local function lmove_ns(npc,vid,st)
+	if (vid == nil or vid >= 4294967295) then 
+		return 
+	end
+	
+	if (db.used_level_vertex_ids[vid] == npc:id()) then
+		npc:set_dest_level_vertex_id(vid)
+		return vid 
+	end
+	
+	if (st.vid) then 
+		db.used_level_vertex_ids[st.vid] = nil
+	end
+	
+	if not (npc:accessible(vid)) then
+		local vtemp = vector()
+		vid, vtemp = npc:accessible_nearest(vid and level.vertex_position(vid) or npc:position(), vtemp )
+	end
+
+	st.vid = vid
+	
+	npc:set_dest_level_vertex_id(vid)
+	return vid
+end				
 -----------------------------------------------------------------------------------------
 --								EVALUATOR RADIO IN HELI
 -----------------------------------------------------------------------------------------
 class "evaluator_radio_in_heli" (property_evaluator)
 function evaluator_radio_in_heli:__init(npc,name,storage) super (nil, name)
 	self.st = storage
-	self.st.stage = 1
 end
 
 function evaluator_radio_in_heli:evaluate()
@@ -30,6 +86,14 @@ function evaluator_radio_in_heli:evaluate()
 	local npc = self.object
 	
 	if not (npc:alive()) then 
+		return false 
+	end
+	
+	if not (character_community(npc) == "army") then 
+		return false 
+	end
+	
+	if (xr_wounded.is_wounded(npc)) then 
 		return false 
 	end
 	
@@ -81,23 +145,7 @@ function evaluator_radio_in_heli:evaluate()
 		end
 	end
 	
-	if (xr_wounded.is_wounded(npc)) then 
-		return false 
-	end
-
-	if (self.st.stage == 1) then 
-		local vid = alun_utils.find_close_cover(npc,npc:position(),be:position())
-		--printf("vid=%s",vid)
-		if (vid) then
-			self.st.vid = utils.send_to_nearest_accessible_vertex(npc,vid)
-			self.st.stage = 2
-			return true
-		end
-	elseif (self.st.stage == 2) then
-		return true
-	end 
-	
-	return false
+	return true
 end
 
 -----------------------------------------------------------------------------------------
@@ -114,20 +162,28 @@ function action_radio_in_heli:initialize()
 	npc:set_desired_direction()
 end
 
+function action_radio_in_heli:try_go_cover(npc,enemy,ene_pos)
+	--alun_utils.debug_write(alun_utils.sr("action_radio_in_heli:try_go_cover"))
+	local lvid = alun_utils.load_var(npc,"fight_from_point")
+	local pos  = lvid and level.vertex_position(lvid) or npc:position()
+	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,5,db.used_level_vertex_ids)
+	if (validate(npc,vid)) then
+		return lmove(npc,vid,self.st)
+	end
+end
+
 function action_radio_in_heli:execute()
 	action_base.execute(self)
 
 	--alun_utils.debug_write("act_radio_in_heli")
-	if (self.st.vid == nil) then
-		self.st.stage = 1
-		return
-	end
 	
 	local npc = self.object
+	local be = npc:best_enemy()
+	if (self.st.vid == nil and be) then
+		self:try_go_cover(npc,be,be:position())
+	end
 	
-	if (npc:level_vertex_id() ~= self.st.vid) then 
-		self.st.vid = utils.send_to_nearest_accessible_vertex(npc,self.st.vid)
-	else 
+	if (self.st.vid = nil or npc:level_vertex_id() == self.st.vid or npc:position():distance_to_sqr(level.vertex_position(self.st.vid)) <= 3) then
 		local tg = time_global()
 		self.st.state = not self.st.state and random_choice("guard_rac","hide_rac") or self.st.state
 		state_mgr.set_state(npc,self.st.state)
@@ -136,7 +192,6 @@ function action_radio_in_heli:execute()
 		if (self.st.__timer and tg < self.st.__timer) then 
 			return
 		end
-		self.st.stage = 1
 		
 		local squad = get_object_squad(npc)
 		if (squad) then
@@ -149,12 +204,13 @@ function action_radio_in_heli:execute()
 				alun_utils.save_var(db.actor,"heli_enemy_flag",true)
 			end
 		end
+	else 
+		self.st.vid = utils.send_to_nearest_accessible_vertex(npc,self.st.vid)
 	end
 end
 
 function action_radio_in_heli:finalize()
     action_base.finalize(self)
-	self.st.stage = 1
 end
 
 ---------------------------------------------------------
@@ -165,39 +221,50 @@ end
 
 function add_to_binder(npc,ini,scheme,section,storage,temp)
 	local manager = npc:motivation_action_manager()
-
-	if (npc:section() == "actor_visual_stalker" or allowed_communities[character_community(npc)] == nil) then
+	
+	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
 		temp.needs_configured = false
 		return 
 	end
+
 	manager:add_evaluator(evaid,evaluator_radio_in_heli(npc,"eva_radio_in_heli",storage))
 	
 	temp.action = action_radio_in_heli(npc,"act_radio_in_heli",storage)
+	
+	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action:add_precondition(world_property(stalker_ids.property_danger, false))
 	temp.action:add_precondition(world_property(evaid,true))
+	
 	temp.action:add_effect(world_property(evaid,false))
+	
 	manager:add_action(actid,temp.action)
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)
-	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
 	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
 
+	--[[
 	if (_G.schemes["rx_ff"]) then 
 		temp.action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
 	end
+	--]]
+	
 	if (_G.schemes["gl"]) then
 		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
 	end
+	
+	--[[
 	if (_G.schemes["facer"]) then
 		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
 		temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
 	end
+	--]]
 
 	local manager = npc:motivation_action_manager()
 	local action	
-	local p = {stalker_ids.action_combat_planner,xr_actions_id.state_mgr + 2,xr_actions_id.alife}
+	local p = {stalker_ids.action_combat_planner, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
 
 	for i=1,#p do
 		action = manager:action(p[i])

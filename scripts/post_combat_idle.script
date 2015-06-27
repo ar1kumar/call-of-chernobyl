@@ -11,6 +11,11 @@ end
 function evaluator_combat_enemy:evaluate()
 	--alun_utils.debug_write("post_combat_idle: eva_combat_enemy")
 	local npc = self.object
+	
+	if not (npc:alive()) then 
+		return false 
+	end 
+	
 	local best_enemy = npc:best_enemy()
 
 	if (best_enemy and self.st.timer) then

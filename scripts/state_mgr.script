@@ -247,7 +247,7 @@ end
 
 function act_state_mgr_to_idle:execute()
 	--callstack()
-	----alun_utils.debug_write(alun_utils.sr("act_state_mgr_to_idle:execute %s",self.object:name()))
+	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_to_idle:execute %s",self.object:name()))
 	action_base.execute(self)
 	if (self.st.target_state ~= "idle") and (self.object:best_enemy() or self.object:best_danger()) then
 		self.object:clear_animations()
@@ -274,7 +274,7 @@ function eva_state_mgr_end:__init(name, st) super (nil, name)
 end
 
 function eva_state_mgr_end:evaluate()
-	----alun_utils.debug_write("",true)
+	--alun_utils.debug_write("",true)
 	if not (self.object) then 
 		callstack()
 		return false
@@ -351,7 +351,7 @@ function act_state_mgr_end:execute()
 	self:weapon_update()
 end
 function act_state_mgr_end:weapon_update()
-	----alun_utils.debug_write(alun_utils.sr("act_state_mgr_end:weapon_update %s",self.object:name()))
+	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_end:weapon_update %s",self.object:name()))
 	if self.st.callback and self.st.callback.timeout then
 		if self.st.callback.begin == nil then
 			self.st.callback.begin = time_global()
@@ -486,7 +486,7 @@ function state_manager:update()
 		end
 	end
 
-	----alun_utils.debug_write("\n-----STATE MANAGER UPDATE----",true)
+	--alun_utils.debug_write("\n-----STATE MANAGER UPDATE----",true)
 	
 	--printf("state_manager:update() %s",self.npc:name())
 	self.planner:update()
@@ -520,14 +520,14 @@ function state_manager:update()
 	local gid = self.planner:current_action_id()
 	--]]
 	
-	----alun_utils.debug_write(alun_utils.sr("goap_action = %s current_action = %s",gid,(id and xrs_debug_tools.actions_by_stalker_ids[id] or id)))
+	--alun_utils.debug_write(alun_utils.sr("goap_action = %s current_action = %s",gid,(id and xrs_debug_tools.actions_by_stalker_ids[id] or id)))
 	-- END DEBUG PLANNER
 	
 	local lid
 	local id = self.planner:current_action_id()
 
 	while id and id ~= lid and id ~= state_mgr_goap.operators["end"] and id ~= state_mgr_goap.operators["locked"] do
-		----alun_utils.debug_write("current_action_id = "..(xrs_debug_tools.actions_by_stalker_ids[id] or id),true)
+		--alun_utils.debug_write("current_action_id = "..(xrs_debug_tools.actions_by_stalker_ids[id] or id),true)
 		self.planner:update()
 		
 		lid = id

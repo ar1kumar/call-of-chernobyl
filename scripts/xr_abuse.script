@@ -14,6 +14,9 @@ function evaluator_abuse:__init(name, storage) super (nil, name)
 	self.a = storage
 end
 function evaluator_abuse:evaluate()
+	if not (self.object:alive()) then 
+		return false 
+	end 
 	return self.a.abuse_manager:update() or false
 end
 

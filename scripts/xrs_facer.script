@@ -86,6 +86,9 @@ end
 function evaluator_facer:evaluate()
 	--alun_utils.debug_write("eva_facer")
 	local npc,tg = self.object,time_global()
+	if not (npc:alive()) then 
+		return false 
+	end 
 	if self.st.abtime > tg then
 		return false
 	end

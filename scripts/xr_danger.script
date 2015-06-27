@@ -319,6 +319,9 @@ end
 
 function evaluator_danger:evaluate()
 	--alun_utils.debug_write("eva_danger")
+	if not (self.object:alive()) then 
+		return false 
+	end 
 	local danger = eval_danger(self) or false
 	db.storage[self.object:id()].danger_flag = danger
 	return danger

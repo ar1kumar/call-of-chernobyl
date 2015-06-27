@@ -115,6 +115,10 @@ end
 function evaluator_dont_shoot:evaluate()
 	--alun_utils.debug_write("eva_dont_shoot")
 	local npc = self.object
+	if not (npc:alive()) then 
+		return false 
+	end 
+	
 	local be = npc:best_enemy()
 	if (be == nil or not be:alive()) then
 		return set_flag(npc,false)
