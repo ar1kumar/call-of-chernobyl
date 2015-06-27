@@ -355,11 +355,13 @@ function CSurgeManager:init_surge_covers()
 end
 
 function CSurgeManager:calculate_best_surge_cover()
+--[[
 	self.actor_in_cover = db.actor:is_actor_indoors(0.05)
 	if (self.actor_in_cover) then 
 		self.best_cover = nil
 		return
-	end 
+	end
+--]]
 	
 	local near,near_dist,dist
 	for name,condlist in pairs(self.covers) do
@@ -1720,11 +1722,13 @@ function can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)
 	if not (simulation_objects.is_on_the_same_level(sim:actor(), squad)) then 
 		return false 
 	end
-	if (axr_companions.companion_squads[squad.id]) then 
+	if (axr_companions.companion_squads[squad.id]) then
+		--[[
 		local commander = db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object 
 		if (commander and commander:is_npc_indoors(0.05)) then 
 			return false
 		end
+		--]]
 	else -- Intentionally allow story squads that are companions to die by surge if they are outdoors and if actor doesn't care for them
 		if(get_object_story_id(squad.id)) then
 			return false
