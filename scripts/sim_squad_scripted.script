@@ -133,19 +133,18 @@ function sim_squad_scripted:update()
 
 	if not (self.first_update) then
 		self.first_update = true
-		
+		local sim = alife()
+		local se_actor = sim:actor()
 		local se_obj = self:commander_id() and alife():object(self:commander_id())
 		local skip = false
 		if (se_obj and se_obj.get_alife_storage) then 
 			local as = se_obj:get_alife_storage()
-			if (as) and (as.companion or as.do_not_deactivate) then 
+			if (as.companion or as.do_not_deactivate) then 
 				skip = true 
 			end
 		end
 		
 		if (skip ~= true and DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
-			local sim = alife()
-			local se_actor = sim:actor()
 			local gg = game_graph()
 
 			--printf("m_game_vertex_id=%s actor.m_game_vertex_id=%s",self.m_game_vertex_id,se_actor.m_game_vertex_id)

@@ -35,6 +35,10 @@ local function on_pstor_load_all(obj,packet)
 	end 
 	
 	m_data.pstor_all[id] = nil
+	
+	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	collectgarbage("collect")
+	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 function on_game_start()

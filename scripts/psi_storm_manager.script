@@ -416,7 +416,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 			for kk,vv in pairs(squad_npcs) do
 				local obj = alife():object(kk)
 				if(obj and not(get_object_story_id(obj.id))) then
-					if(surge_manager.check_squad_smart_props(squad.id)) then
+					if (surge_manager.check_squad_smart_props(squad.id)) then
 						local cl_obj = level.object_by_id(obj.id)
 						if cl_obj ~= nil then
 							if distance_2d(pos, cl_obj:position())<self.max_distance_npc_hit then
@@ -440,7 +440,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 							end
 						end
 					else
-						if(surge_manager.SurgeManager:pos_in_cover(obj.position)) then
+						if not (surge_manager.SurgeManager:pos_in_cover(obj.position)) then
 							local cl_obj = level.object_by_id(obj.id)
 							if cl_obj ~= nil then
 								if distance_2d(pos, cl_obj:position())<self.max_distance_npc_hit then

@@ -112,6 +112,10 @@ function teleport_squad(squad,gvid,lvid,pos)
 
 	sim:teleport_object(squad.id,gvid,lvid,pos)
 	for k in squad:squad_members() do
+		if (db.offline_objects[k.id]) then 
+			db.offline_objects[k.id].level_vertex_id = nil
+		end
+		db.spawned_vertex_by_id[k.id] = nil
 		sim:teleport_object(k.id,gvid,lvid,pos)
 	end
 end

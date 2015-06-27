@@ -97,10 +97,18 @@ local function on_level_changing()
 	local squad
 	local sim = alife()
 	local se_actor = sim:actor()
+	local se_obj
+	
+	local gg = game_graph()
+	local gvid = se_actor.m_game_vertex_id
+	local vert = gg:vertex(gvid)
+	local lvid = vert:level_vertex_id()
+	local pos = vert:level_point()
+	
 	for id,v in pairs(companion_squads) do 
 		squad = sim:object(id)
 		if (squad and companion_squad_can_teleport(squad)) then 
-			alun_utils.teleport_squad(squad,se_actor.m_game_vertex_id,se_actor.m_level_vertex_id,se_actor.position)
+			alun_utils.teleport_squad(squad,gvid,lvid,pos)
 		end
 	end
 end

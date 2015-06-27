@@ -30,8 +30,8 @@ local earthquake_cam_eff 	= 2
 local sleep_cam_eff 		= 3
 local sleep_fade_pp_eff		= 4
 
-local START_MIN_SURGE_TIME 	= 2*60*60
-local START_MAX_SURGE_TIME 	= 4*60*60
+local START_MIN_SURGE_TIME 	= 4*60*60
+local START_MAX_SURGE_TIME 	= 8*60*60
 local MIN_SURGE_TIME 		= 12*60*60
 local MAX_SURGE_TIME 		= 24*60*60
 local prev_sec 				= -1
@@ -355,7 +355,7 @@ function CSurgeManager:init_surge_covers()
 end
 
 function CSurgeManager:calculate_best_surge_cover()
-	self.actor_in_cover = db.actor:is_actor_indoors()
+	self.actor_in_cover = db.actor:is_actor_indoors(0.05)
 	if (self.actor_in_cover) then 
 		self.best_cover = nil
 		return
@@ -1140,7 +1140,7 @@ function CSurgeManager:kill_obj_at_pos(pos)
 							end
 						end
 					else
-						if(self:pos_in_cover(obj.position)) then
+						if not (self:pos_in_cover(obj.position)) then
 							if obj.position.z>pos then
 								if (fate=="turntozombie") then
 									self:turn_to_zombie(obj)
@@ -1181,7 +1181,7 @@ function CSurgeManager:get_objects_to_kill()
 					if(check_squad_smart_props(squad.id)) then
 						table.insert(self.objects_to_kill, obj)
 					else
-						if(self:pos_in_cover(obj.position)) then
+						if not (self:pos_in_cover(obj.position)) then
 							table.insert(self.objects_to_kill, obj)
 						end
 					end
@@ -1368,7 +1368,7 @@ function CSurgeManager:kill_all_unhided()
 							self:delay_kill(obj.id)
 						end
 					else
-						if(self:pos_in_cover(obj.position)) then
+						if not (self:pos_in_cover(obj.position)) then
 							--printf("Releasing npc [%s] from squad [%s] because of surge!",obj:name(), squad:name())
 							if (fate=="turntozombie") then
 								self:turn_to_zombie(obj)
@@ -1434,7 +1434,7 @@ function CSurgeManager:kill_all_unhided_after_actor_death()
 			for kk,vv in pairs(squad_npcs) do
 				local obj = alife():object(kk)
 				if obj then
-					if(self:pos_in_cover(obj.position)) then
+					if not (self:pos_in_cover(obj.position)) then
 						local fate = atmosfear and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_blowout_fate",0,"killonwave") or "killonwave"
 						--printf("Releasing npc [%s] from squad [%s] after actors death because of surge!",obj:name(), squad:name())
 						if (fate=="turntozombie") then
@@ -1727,7 +1727,7 @@ function can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)
 		end
 	else -- Intentionally allow story squads that are companions to die by surge if they are outdoors and if actor doesn't care for them
 		if(get_object_story_id(squad.id)) then
-				return false
+			return false
 		end	
 	end
 	return true
