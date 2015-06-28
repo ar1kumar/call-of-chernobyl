@@ -2,7 +2,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.0.5 RC"
+GAME_VERSION = "1.0.52 RC"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -572,9 +572,9 @@ function IsWeapon(object, id)
 		return weapon_classes[id] == true 
 	end
 	if (object) then 
-		if (object.is_weapon_magazined) then 
-			return object:is_weapon_magazined()
-		end 
+		--if (object.is_weapon_magazined) then 
+			--return object:is_weapon_magazined()
+		--end 
 		id = get_clsid(object)
 		return id and weapon_classes[id] == true
 	end 
@@ -828,9 +828,9 @@ function start_game_callback()
 	sr_light.clean_up ()
 	pda.add_quick_slot_items_on_game_start()
 	
-	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	collectgarbage("collect")
-	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	--collectgarbage("collect")
+	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 --' Lсталость

@@ -139,7 +139,7 @@ function sim_squad_scripted:update()
 		local skip = false
 		if (se_obj and se_obj.get_alife_storage) then 
 			local as = se_obj:get_alife_storage()
-			if (as.companion or as.do_not_deactivate) then 
+			if (as) and (as.companion or as.do_not_deactivate) then 
 				skip = true 
 			end
 		end

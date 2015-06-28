@@ -94,7 +94,7 @@ function add_task_companion(actor,npc,p)
 	for k in squad:squad_members() do
 		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object)
 		if (npc) then
-			as = k.object and k.object:get_alife_storage()
+			as = k.object and k.object:get_alife_storage(true)
 			if (as) then
 				as.companion = true
 				as.companion_cannot_dismiss = true
@@ -231,7 +231,7 @@ function setup_companion_task(actor,npc,p)
 		se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
-			as = se_obj:get_alife_storage()
+			as = se_obj:get_alife_storage(true)
 			if (as) then
 				as.companion = true 
 				as.companion_cannot_dismiss = true 

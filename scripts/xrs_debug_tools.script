@@ -672,7 +672,7 @@ function monster_hud_show(hud)
 		local be = near:best_enemy()
 		hud:add_msg("Best Enemy",be and be:name())
 		
-		if (st.overrides and st.overrides.combat_ignore and be) then
+		if (st.overrides and st.overrides.combat_ignore) then
 			hud:add_msg("CombatIgnoreCond",xr_logic.pick_section_from_condlist(be, near, st.overrides.combat_ignore.condlist))
 		end
 		

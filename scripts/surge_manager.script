@@ -182,6 +182,7 @@ function CSurgeManager:start(manual)
 		self.body_tears = empty_table(self.body_tears)
 		self.hitFactor=0
 		level.set_time_factor(10)
+		self.zombie_count = 0
 	end
 end
 
@@ -324,7 +325,7 @@ function CSurgeManager:end_surge(manual)
 	if not (self.time_forwarded) then
 		self:respawn_artefacts_and_replace_anomaly_zone()
 	end
-	
+
 	xr_statistic.inc_surges_counter()
 end
 
@@ -1223,11 +1224,11 @@ end
 
 function make_dead(id)
 	local obj = id and level.object_by_id(id)
-	if (obj) then
+	if (obj and obj:alive()) then
 		obj:kill(obj)
 	else
 		local se_obj = id and alife():object(id)
-		if (se_obj) then
+		if (se_obj and se_obj:alive()) then
 			se_obj:kill()
 		end
 	end
@@ -1238,7 +1239,7 @@ end
 function make_zombied(id)
 	local sim = alife()
 	local se_obj = id and sim:object(id)
-	if not (se_obj) then
+	if not (se_obj and se_obj:alive()) then
 		return true
 	end
 
@@ -1273,7 +1274,7 @@ end
 function make_explode(id)
 	local sim = alife()
 	local se_obj = id and sim:object(id)
-	if not (se_obj) then
+	if not (se_obj and se_obj:alive()) then
 		return true
 	end
 	

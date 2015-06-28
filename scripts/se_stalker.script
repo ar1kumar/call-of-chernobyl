@@ -9,9 +9,6 @@ class "se_stalker"	(cse_alife_human_stalker)
 --------------------
 function se_stalker:__init (section) super (section)
 	db.offline_objects[self.id] = empty_table(db.offline_objects[self.id])
-	if (USE_MARSHAL) then 
-		RegisterScriptCallback("save_state",self.save_state,self)
-	end
 end
 --------------------
 function se_stalker:can_switch_offline()
@@ -67,24 +64,17 @@ function se_stalker:STATE_Read(packet, size)
 	--alun_utils.debug_write("se_stalker:STATE_Read "..self:name().." END\n")
 end
 
-function se_stalker:get_alife_storage()
-	if not (db.m_data.se_stalker[self.id]) then 
-		db.m_data.se_stalker[self.id] = {}
+function se_stalker:get_alife_storage(create_if_dont_exist)
+	local m_data = alife_storage_manager.get_state()
+	if (create_if_dont_exist) then
+		if not (m_data.se_stalker[self.id]) then
+			m_data.se_stalker[self.id] = {}
+		end
+		return m_data.se_stalker[self.id]
+	else 
+		return m_data.se_stalker[self.id]
 	end
-	return db.m_data.se_stalker[self.id]
 end 
-
-function se_stalker:save_state(m_data)
-	if not (m_data.se_stalker) then 
-		m_data.se_stalker = {}
-	end
-	
-	if (db.m_data.se_stalker[self.id] == nil or empty(db.m_data.se_stalker[self.id])) then 
-		return 
-	end
-	
-	m_data.se_stalker[self.id] = db.m_data.se_stalker[self.id]
-end
 
 --------------------
 function se_stalker:on_before_register()
@@ -126,7 +116,7 @@ function se_stalker:on_unregister()
 		end
 	end
 	db.offline_objects[self.id] = nil
-	db.m_data.se_stalker[self.id] = nil
+	alife_storage_manager.get_state().se_stalker[self.id] = nil
 	unregister_story_object_by_id(self.id)
 	cse_alife_human_stalker.on_unregister(self)
 end

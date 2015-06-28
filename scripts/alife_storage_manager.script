@@ -17,6 +17,8 @@
 	by: Alundaio
 --]]
 local m_data = {}
+m_data.se_stalker = {}
+
 local function on_pstor_load_all(obj,packet)
 	local id = obj:id()
 	if not (m_data and m_data.pstor_all and m_data.pstor_all[id]) then 
@@ -82,8 +84,15 @@ function CALifeStorageManager_save(fname)
 		
 		ProcessEventQueueState(m_data,true)
 		
+		-- clean out se_stalker table of empty tables
+		for k,v in pairs(m_data.se_stalker) do 
+			if (empty(v)) then 
+				v = nil 
+			end
+		end
+		
 		-- for debugging save state
-		--alun_utils.print_table(m_data,"m_data_on_save ("..path..")")
+		alun_utils.print_table(m_data,"m_data_on_save ("..path..")")
 		
 		local data = marshal.encode(m_data)
 		if (data) then
@@ -91,8 +100,6 @@ function CALifeStorageManager_save(fname)
 			savegame:write(data)
 			savegame:close()
 		end
-		
-		empty_table(m_data)
 	end	
 end 
 
@@ -121,13 +128,15 @@ function CALifeStorageManager_load(fname)
 	ProcessEventQueueState(m_data,false)
 	
 	-- For debugging save state
-	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
+	alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
 
 	SendScriptCallback("load_state",m_data)
-	
-	db.on_alife_storage_manager_load(m_data)
 end
 
 function get_state()
 	return m_data
+end
+
+function decode(t)
+	return marshal.decode(t)
 end

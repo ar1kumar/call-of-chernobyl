@@ -266,7 +266,7 @@ function add_to_actor_squad(npc)
 	local sim = alife()
 	local se_npc = sim:object(id)
 
-	as = se_npc:get_alife_storage()
+	as = se_npc:get_alife_storage(true)
 	if (as) then
 		as.companion = true
 		setup_companion_logic(npc,db.storage[id],false,as)
@@ -325,15 +325,19 @@ function set_companion_allow_teleport(npc)
 	local se_obj = alife():object(npc:id())
 	if (se_obj and se_obj.get_alife_storage) then 
 		local as = se_obj:get_alife_storage()
-		as.companion_cannot_teleport = nil
+		if (as) then
+			as.companion_cannot_teleport = nil
+		end
 	end
 end 
 
 function set_companion_disable_teleport(npc)
 	local se_obj = alife():object(npc:id())
 	if (se_obj and se_obj.get_alife_storage) then 
-		local as = se_obj:get_alife_storage()
-		as.companion_cannot_teleport = true
+		local as = se_obj:get_alife_storage(true)
+		if (as) then
+			as.companion_cannot_teleport = true
+		end
 	end
 end 
 

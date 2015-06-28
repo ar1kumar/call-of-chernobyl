@@ -144,7 +144,7 @@ function motivator_binder:net_spawn(sobject)
 	end
 
 	local as = sobject:get_alife_storage()
-	if (as.companion) then
+	if (as and as.companion) then
 		axr_companions.setup_companion_logic(self.object,self.st,self.loaded,as)
 	else
 		self.object:disable_info_portion("npcx_is_companion")
