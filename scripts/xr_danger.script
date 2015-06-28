@@ -191,9 +191,13 @@ local function is_danger(npc,best_danger,script)
 				return false
 			end
 
-			local killer = db.storage[corpse_st.death_by_id] and db.storage[corpse_st.death_by_id].object or level.object_by_id(corpse_st.death_by_id)
+			local killer = db.storage[corpse_st.death_by_id] and db.storage[corpse_st.death_by_id].object
 			if not (killer and killer:alive() and npc:relation(killer) > 0 and character_community(killer) ~= character_community(npc)) then
 				return false
+			end
+			
+			if (xr_combat_ignore.ignore_enemy_by_overrides(npc,killer)) then 
+				return false 
 			end
 
 			if (game.get_game_time():diffSec(corpse_st.death_time) > 12000) then
@@ -529,8 +533,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 	local killer = dependent_object or dst and dst.death_by_id and (db.storage[dst.death_by_id] and db.storage[dst.death_by_id].object or level.object_by_id(dst.death_by_id))
 
 	-- force hostile to killer
-	--[[
-	if (st.stage >= 3 and killer and killer:id() == 0 and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
+	if (st.stage >= 4 and killer and killer:id() == 0 and killer:alive() and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
 		local squad = get_object_squad(npc)
 		if (squad) then
 			for k in squad:squad_members() do
@@ -544,7 +547,6 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 		end
 		--printf("xr_danger.script_action_danger_corpse: forced enemies %s and %s",npc:name(), killer:name())
 	end
-	--]]
 
 	--printf("stage = %s",st.stage)
 	if (st.stage == 1) then
@@ -626,7 +628,14 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 		if (st.dtimer and time_global() < st.dtimer) then
 			return
 		end
-		st.stage = 1
+		st.lvid = nil
+		st.stage = 6
+	elseif (st.stage == 6) then
+		local new_vid = alun_utils.try_go_cover(npc,dst and dst.killer_last_known_position or bdo and bdo:position() or npc:position())
+		if (new_vid) then 
+			st.lvid = utils.send_to_nearest_accessible_vertex(npc,st.lvid)
+			state_mgr.set_state(npc,"hide_na",nil,nil,{look_position = dst and dst.killer_last_known_position or dst.object and dst.object:position()})
+		end
 	end
 end
 
@@ -767,8 +776,12 @@ function evaluator_check_danger:evaluate()
 	end
 
 	local bd_type = bd:type()
-	if not (bd_type == danger_object.attacked or bd_type == danger_object.entity_corpse or bd_type == danger_object.grenade) then
+	if not (bd_type == danger_object.attacked or (bd_type == danger_object.entity_corpse and not self.object:has_info("npcx_is_companion")) or bd_type == danger_object.grenade) then
 		return false
+	end
+	
+	if not (db.storage[id].danger_flag) then 
+		return false 
 	end
 
 	return true

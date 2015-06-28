@@ -246,7 +246,7 @@ function is_enemy(obj,enemy,no_memory)
 	end
 
 	-- Store Pure enemy (Enemy without overrides)
-	if (obj_is_stalker ~= true or obj:relation(enemy) >= game_object.enemy) then
+	if (obj:relation(enemy) >= game_object.enemy) then
 		st.enemy_id = ene_id
 	end
 
