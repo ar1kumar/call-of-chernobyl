@@ -166,15 +166,15 @@ local function actor_on_before_death()
 	end
 	
 	local fs = getFS()
-	local flist = fs:file_list_open_ex("$game_saves$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*.dat")
+	local flist = fs:file_list_open_ex("$game_saves$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*.scoc")
 	local f_cnt = flist:Size()
 
 	for	it=0, f_cnt-1 	do
 		local file = flist:GetAt(it)
-		local file_name = string.sub(file:NameFull(), 0, (string.len(file:NameFull()) - string.len(".dat")))
+		local file_name = string.sub(file:NameFull(), 0, (string.len(file:NameFull()) - string.len(".scoc")))
 
 		printf("file_name = %s",file_name)
-		local f = io.open(fs:update_path('$game_saves$', '')..file_name..".dat","rb")
+		local f = io.open(fs:update_path('$game_saves$', '')..file_name..".scoc","rb")
 		if (f) then 
 			local data = f:read("*all")
 			f:close()
