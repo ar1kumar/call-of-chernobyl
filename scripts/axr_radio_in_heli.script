@@ -183,7 +183,7 @@ function action_radio_in_heli:execute()
 		self:try_go_cover(npc,be,be:position())
 	end
 	
-	if (self.st.vid = nil or npc:level_vertex_id() == self.st.vid or npc:position():distance_to_sqr(level.vertex_position(self.st.vid)) <= 3) then
+	if (self.st.vid == nil or npc:level_vertex_id() == self.st.vid or npc:position():distance_to_sqr(level.vertex_position(self.st.vid)) <= 3) then
 		local tg = time_global()
 		self.st.state = not self.st.state and random_choice("guard_rac","hide_rac") or self.st.state
 		state_mgr.set_state(npc,self.st.state)
