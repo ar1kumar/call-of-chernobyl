@@ -1,12 +1,14 @@
 [smart_terrain]
 squad_id = 29
 max_population = 1
-respawn_only_smart = true
+;respawn_only_smart = true
 respawn_params = respawn@pri_sim_6
+respawn_idle = 30000
 
 [respawn@pri_sim_6]
 merc_sim_squad
 hostile_killer
+spawn_merc
 
 [merc_sim_squad]
 spawn_squads = merc_sim_squad_advanced, merc_sim_squad_advanced, merc_sim_squad_veteran
@@ -15,3 +17,7 @@ spawn_num =  {+pri_a28_actor_in_zone_stay} 2, 0
 [hostile_killer]
 spawn_squads = simulation_hostile_killer
 spawn_num =  {+pri_a28_actor_in_zone_stay} 2, 0
+
+[spawn_merc]
+spawn_squads = merc_sim_squad_advanced, merc_sim_squad_advanced, merc_sim_squad_veteran
+spawn_num =  2
