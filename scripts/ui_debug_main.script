@@ -809,7 +809,7 @@ function debug_ui:InitCallBacks()
 	--
 	
 	-- level jump tab
-	self:AddCallback("list_levels_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.JumpToLevel,	self)
+	self:AddCallback("list_levels_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.JumpLevel,	self)
 end
 
 function debug_ui:OnConsoleInput()
@@ -878,14 +878,8 @@ end
 function debug_ui:OnBtnTeleport()
 	local pos = xrs_debug_tools.LastCameraPos
 	if (pos) then
-		--[[
-		if (db.vehicle) then 
-			db.vehicle:force_set_position(pos)
-		else 
-			db.actor:set_actor_position(pos)
-		end
-		--]]
-		if (db.vehicle) then 
+		local car = db.actor:get_attached_vehicle()
+		if (car) then 
 			db.actor:detach_vehicle()
 		end 
 		db.actor:set_actor_position(pos)
@@ -1300,7 +1294,7 @@ function debug_ui:FillLevelList()
 	end
 end 
 
-function debug_ui:JumpToLevel()
+function debug_ui:JumpLevel()
 	local item
 	item = self.levels_list:GetSelectedItem()
 	if not(item) then
@@ -1308,9 +1302,9 @@ function debug_ui:JumpToLevel()
 		return
 	end
 	
-	alun_utils.jump_to_level(item.name)
-	
 	self:OnQuit()
+	
+	_G.JumpToLevel(item.name)
 end 
 
 function debug_ui:OnSelectSectionList()
@@ -1791,7 +1785,7 @@ function debug_ui:OnEditorSave()
 		end
 	end
 
-	local sp = alun_utils.fspath("$game_config$")
+	local sp = getFS():update_path('$game_config$', '')
 	sp = string.sub(sp,0,string.len(sp)-1)
 	lua_extensions.recurse_subdirectories_and_execute(sp,{"ltx"},on_execute)
 	
@@ -1809,10 +1803,6 @@ end
 
 
 -- SPAWNER UI
---[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
---]]
 class "debug_ui_spawner" (CUIWindow)
 function debug_ui_spawner:__init(owner, binds) super()
 	self.owner = owner
@@ -1898,10 +1888,6 @@ function debug_ui_spawner:InitControls(x, y, xml, owner)
 end
 
 -- HUD UI
---[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
---]]
 class "debug_ui_hud" (CUIWindow)
 function debug_ui_hud:__init(owner, binds) super()
 	self.owner = owner
@@ -1922,10 +1908,6 @@ function debug_ui_hud:InitControls(x, y, xml, owner)
 end
 
 -- object UI
---[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
---]]
 class "debug_ui_object" (CUIWindow)
 function debug_ui_object:__init(owner, binds) super()
 	self.owner = owner
@@ -1971,10 +1953,6 @@ function debug_ui_object:InitControls(x, y, xml, owner)
 end
 
 -- ADVANCED UI
---[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
---]]
 class "debug_ui_advanced" (CUIWindow)
 function debug_ui_advanced:__init(owner, binds) super()
 	self.owner = owner
@@ -2310,7 +2288,7 @@ function debug_ui_attach:OnAttachSave(section)
 		end
 	end
 
-	local sp = alun_utils.fspath("$game_config$")
+	local sp = getFS():update_path('$game_config$', '')
 	sp = string.sub(sp,0,string.len(sp)-1)
 	lua_extensions.recurse_subdirectories_and_execute(sp,{"ltx"},on_execute)
 	

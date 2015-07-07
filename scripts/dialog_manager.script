@@ -225,7 +225,7 @@ end
 
 -- Parse ini file and store all phrases and their parameters into phrase table
 function fill_phrase_table()
-	local ini = alun_utils.cfg_file(alun_utils.fspath("$game_config$").."misc\\dialog_manager.ltx")
+	local ini = alun_utils.cfg_file(getFS():update_path('$game_config$', '').."misc\\dialog_manager.ltx")
 	local category, val, temp_table
 	for section,t in pairs(ini.root) do
 		val = ini.root[section]["category"]

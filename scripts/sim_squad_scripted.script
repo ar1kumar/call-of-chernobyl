@@ -32,7 +32,7 @@ function sim_squad_scripted:__init(section) super (section)
 	self.current_action 	= nil
 	self.current_target_id	= nil
 	self.assigned_target_id	= nil
-	self.sound_manager 		= sound_manager.get_sound_manager("squad_"..self:section_name() )
+	--self.sound_manager 		= sound_manager.get_sound_manager("squad_"..self:section_name() ) -- What is this used for?
 	self.idle_time			= math.random(STAY_POINT_IDLE_MIN,STAY_POINT_IDLE_MAX)
 	self:init_squad()
 	self:set_squad_behaviour()
@@ -190,7 +190,7 @@ function sim_squad_scripted:update()
 	self.dtimer = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
 	--
 
-	self.sound_manager:update()
+	--self.sound_manager:update()
 	self:check_invulnerability()
 	simulation_objects.get_sim_obj_registry():update_avaliability(self)
 
@@ -436,7 +436,6 @@ function sim_squad_scripted:remove_squad()
 		se_obj = sim:object(id)
 		if se_obj then
 			self:unregister_member(id)
-			--CreateTimeEvent(id,"safe_release",1,alun_utils.release_object,id)
 			sim:release(se_obj,true)
 		end
 	end
@@ -449,13 +448,12 @@ function sim_squad_scripted:remove_npc(npc_id)
 	local npc = sim:object(npc_id)
 	self:on_npc_death(npc)
 	sim:release(npc, true)
-	--CreateTimeEvent(npc_id,"safe_release",1,alun_utils.release_object,npc_id)
 end
 
 function sim_squad_scripted:on_npc_death(npc,killer)
 	--alun_utils.debug_write(alun_utils.sr("%s:on_npc_death %s",self:name(),npc and npc:name()))
 	--printf("Squad %s. Killed member %s", tostring(self.id), npc.id)
-	self.sound_manager:unregister_npc(npc.id)
+	--self.sound_manager:unregister_npc(npc.id)
 	self:unregister_member(npc.id)
 	-- Alundaio
 	SendScriptCallback("squad_on_npc_death",self,npc,killer)
@@ -587,7 +585,7 @@ function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_i
 	local obj = sim:create(spawn_section,spawn_position,lv_id,gv_id)
 
 	self:register_member(obj.id)
-	self.sound_manager:register_npc(obj.id)
+	--self.sound_manager:register_npc(obj.id)
 
 	local actor = sim:actor()
 	if (simulation_objects.is_on_the_same_level(obj, actor) and spawn_position:distance_to_sqr(actor.position) <= sim:switch_distance()^2) then
@@ -961,7 +959,7 @@ function sim_squad_scripted:show()
 		end
 	end
 
-    if (DEV_DEBUG and axr_main.config:GetValue("debug","enable_hud",1,false) == true) then
+    if (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
 		spot = "storyline_task_location"
 	end
 	if(spot~="") then
@@ -983,7 +981,7 @@ function sim_squad_scripted:show()
 end
 
 function sim_squad_scripted:get_squad_props()
-	if (DEV_DEBUG and axr_main.config:GetValue("debug","enable_hud",1,false) == true) then
+	if (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
 		local assigned_target = self.assigned_target_id and alife():object(self.assigned_target_id)
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
 

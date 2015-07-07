@@ -108,25 +108,10 @@ local function on_level_changing()
 	for id,v in pairs(companion_squads) do 
 		squad = sim:object(id)
 		if (squad and companion_squad_can_teleport(squad)) then 
-			alun_utils.teleport_squad(squad,gvid,lvid,pos)
+			TeleportSquad(squad,pos,lvid,gvid)
 		end
 	end
 end
-
-local function actor_on_update()
-	if (_draw_part) then 
-		local r = level.get_target_dist and level.get_target_dist()
-		if (r) then
-			local lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
-			local pos = level.vertex_position(lvid)
-			--if not(_draw_part:playing()) then
-				_draw_part:play_at_pos(vector():set(pos.x,pos.y-0.5,pos.z))
-			--else 
-			--	_draw_part:move_to(pos,pos)
-			--end
-		end
-	end
-end 
 
 ---------------------------------
 -- Register Callbacks
@@ -141,7 +126,6 @@ function on_game_start()
 	RegisterScriptCallback("squad_on_unregister",squad_on_unregister)
 	RegisterScriptCallback("squad_can_switch_offline",squad_can_switch_offline)
 	RegisterScriptCallback("on_level_changing",on_level_changing)
-	RegisterScriptCallback("actor_on_update",actor_on_update)
 
 	allow_only_friends_as_companions = alun_utils.read_from_ini(ini,"main","allow_only_friends_as_companions","bool",true)
 	allow_simulation_squads_as_companions = alun_utils.read_from_ini(ini,"main","allow_simulation_squads_as_companions","bool",false)
@@ -341,7 +325,6 @@ function set_companion_disable_teleport(npc)
 	end
 end 
 
---NOTE combat_type is screwed up. It's also crap compared to engine combat
 function set_companion_combat_type_camper(npc)
 	npc:disable_info_portion("npcx_beh_combat_tactics_monolith")
 	npc:give_info_portion("npcx_beh_combat_tactics_camper")
@@ -365,7 +348,7 @@ end
 function set_companion_to_follow_state(npc)
 	npc:disable_info_portion("npcx_beh_wait")
 	npc:disable_info_portion("npcx_beh_hide_in_cover")
-	alun_utils.save_var(npc,"fight_from_point",lvid)
+	alun_utils.save_var(npc,"fight_from_point",nil)
 end
 
 function set_companion_to_attack_state(npc)
@@ -497,7 +480,13 @@ function cycle_companions_move_mode()
 		for id,squad in pairs(companion_squads) do 
 			if (squad and squad.commander_id) then
 				for k in squad:squad_members() do
-					local member = db.storage[k.id] and db.storage[k.id].object
+					st = db.storage[k.id]
+					if (k.id == squad:commander_id()) then 
+						if (st and st.beh) then 
+							st.beh.rally_lvid = nil
+						end
+					end
+					local member = st and st.object
 					if (member and member:alive()) then
 						f(member)
 					end
@@ -507,33 +496,51 @@ function cycle_companions_move_mode()
 	end
 end 
 
-function move_to_point(begin)
-	if (begin) then 
+function move_to_point(p)
+	local lvid
+	if (p==1) then 
 		SetHudMsg(game.translate_string("Hold then release"),8)
 		--_draw_part = particles_object("weapons\\light_signal")
 		_draw_part = particles_object("_samples_particles_\\flash_light")
 		--_draw_part = particles_object("static\\net_base_blue")
-	elseif (_draw_part) then
-		_current_move_mode = 1
-		SetHudMsg(game.translate_string("st_move_to_point"),8)
-		_draw_part:stop()
-		_draw_part = nil
+	elseif (p==2) then
+		if (_draw_part) then 
+			local r = level.get_target_dist and level.get_target_dist()
+			if (r) then
+				lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
+				local pos = level.vertex_position(lvid)
+				--if not(_draw_part:playing()) then
+					_draw_part:play_at_pos(vector():set(pos.x,pos.y-0.5,pos.z))
+				--else 
+				--	_draw_part:move_to(pos,pos)
+				--end
+			end
+		end	
+	else
+		if (_draw_part) then
+			_draw_part:stop()
+			_draw_part = nil
+		end
 		local r = level.get_target_dist and level.get_target_dist()
 		if (r) then
-			local lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
-			for id,squad in pairs(companion_squads) do 
-				if (squad and squad.commander_id) then
-					for k in squad:squad_members() do
-						st = db.storage[k.id]
-						if (k.id == squad:commander_id()) then 
-							if (st and st.beh) then 
-								st.beh.rally_lvid = lvid
+			lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
+			if (lvid) then
+				_current_move_mode = 1
+				SetHudMsg(game.translate_string("st_move_to_point"),8)
+				for id,squad in pairs(companion_squads) do 
+					if (squad and squad.commander_id) then
+						for k in squad:squad_members() do
+							st = db.storage[k.id]
+							local member = st and st.object
+							if (member and member:alive()) then
+								set_companion_to_follow_state(member)
+								alun_utils.save_var(member,"fight_from_point",lvid)
 							end
-						end
-						local member = st and st.object
-						if (member and member:alive()) then
-							set_companion_to_follow_state(member)
-							alun_utils.save_var(member,"fight_from_point",lvid)
+							if (k.id == squad:commander_id()) then 
+								if (st and st.beh) then 
+									st.beh.rally_lvid = lvid
+								end
+							end
 						end
 					end
 				end

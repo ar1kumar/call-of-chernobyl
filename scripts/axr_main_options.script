@@ -1,16 +1,24 @@
 -- Extensions to Game Options
 
+
+-- simply add new line and a ui_mm_<name> to create a new option
+local check_box_options = {
+	["debug_hud"] 			= {default=false,debug_only=true}, 
+	["radio_mod"] 			= {default=true,debug_only=false}, 
+	["mechanic_feature"] 	= {default=false,debug_only=false}
+}
+	
 function main_menu_on_init(menu)
 	-- axr option default config
 	local need_save
-	if not (axr_main.config:KeyExist("debug","enable_hud")) then
-		axr_main.config:SetValue("debug","enable_hud",false)
-		need_save = true
-	end
-	if not (axr_main.config:KeyExist("features","enable_radio")) then
-		axr_main.config:SetValue("features","enable_radio",true)
-		need_save = true
-	end
+	
+	for k,v in pairs(check_box_options) do
+		if not (axr_main.config:KeyExist("mm_options","enable_"..k)) then
+			axr_main.config:SetValue("mm_options","enable_"..k,v.default)
+			need_save = true
+		end	
+	end 
+
 	if (need_save) then
 		axr_main.config:Save()
 	end
@@ -18,34 +26,50 @@ end
 
 function opt_menu_on_init(menu)
 	local xml = menu.xml
-	
-	if (DEV_DEBUG) then
-		xml:InitStatic("tab_gameplay:cap_check_debug_hud", menu.dlg_gameplay)
-		menu.ck_debug_hud = xml:InitCheck("tab_gameplay:check_debug_hud",	menu.dlg_gameplay)
-		menu:Register(menu.ck_debug_hud,"ck_debug_hud")
-	end
-
-	xml:InitStatic("tab_gameplay:cap_check_radio_mod", menu.dlg_gameplay)
-	menu.ck_radio_mod = xml:InitCheck("tab_gameplay:check_radio_mod",	menu.dlg_gameplay)
-	menu:Register(menu.ck_radio_mod,"ck_radio_mod")
-
-	--[[ Eh...too crash prone 
-	xml:InitStatic("tab_gameplay:cap_check_spawn_antifreeze", menu.dlg_gameplay)
-	menu.ck_spawn_antifreeze = xml:InitCheck("tab_gameplay:check_spawn_antifreeze",	menu.dlg_gameplay)
-	--]]
+	local pos
+	local y = 0
+	for k,v in pairs(check_box_options) do
+		if (v.debug_only ~= true or DEV_DEBUG) then
+			if not (menu.axr_options_caption) then 
+				menu.axr_options_caption = {}
+			end
+			if not (menu.axr_options_check) then 
+				menu.axr_options_check = {}
+			end
+			-- caption
+			menu.axr_options_caption[k] = xml:InitStatic("tab_gameplay:cap_check_axr", menu.dlg_gameplay)
+			pos = menu.axr_options_caption[k]:GetWndPos()
+			pos.y = pos.y + y
+			menu.axr_options_caption[k]:SetWndPos(pos)
+			menu.axr_options_caption[k]:TextControl():SetText(game.translate_string("ui_mm_"..k))
+			
+			-- checkbox
+			menu.axr_options_check[k] = xml:InitCheck("tab_gameplay:check_axr",	menu.dlg_gameplay)
+			pos = menu.axr_options_check[k]:GetWndPos()
+			pos.y = pos.y + y
+			menu.axr_options_check[k]:SetWndPos(pos)
+			menu:Register(menu.axr_options_check[k],"ck_"..k)
+			y = y + 30
+		end
+	end 
 end 
 
 function opt_menu_on_accept(menu,optMgr,console)
-	if (DEV_DEBUG) then
-		axr_main.config:SetValue("debug","enable_hud",menu.ck_debug_hud:GetCheck())
-	end
-	axr_main.config:SetValue("features","enable_radio",menu.ck_radio_mod:GetCheck())
+
+	for k,v in pairs(check_box_options) do
+		if (menu.axr_options_check and menu.axr_options_check[k]) then
+			axr_main.config:SetValue("mm_options","enable_"..k,menu.axr_options_check[k]:GetCheck())
+		end
+	end 
+
 	axr_main.config:Save()
 end
 
 function opt_menu_on_set_values(menu,optMgr)
-	if (DEV_DEBUG) then
-		menu.ck_debug_hud:SetCheck(axr_main.config:GetValue("debug","enable_hud",1,false))
-	end
-	menu.ck_radio_mod:SetCheck(axr_main.config:GetValue("features","enable_radio",1,false))
+
+	for k,v in pairs(check_box_options) do
+		if (menu.axr_options_check and menu.axr_options_check[k]) then
+			menu.axr_options_check[k]:SetCheck(axr_main.config:GetValue("mm_options","enable_"..k,1,false))
+		end
+	end 
 end

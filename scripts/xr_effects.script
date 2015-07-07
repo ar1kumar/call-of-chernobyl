@@ -960,19 +960,20 @@ function teleport_npc_by_story_id(actor, npc, p)
 end
 
 function teleport_squad(actor, npc, p)
-	local squad_story_id = p[1]
-	local patrol_point = p[2]
-	local patrol_point_index = p[3] or 0
-	--printf("teleport squad [%s][%s][%s]",p[1],p[2],p[3])
-	if squad_story_id == nil or patrol_point == nil then
+	local squad = p[1] and get_story_squad(p[1])
+	if not (squad) then
+		printf("There is no squad with story id [%s]", p[1])
+	end
+	
+	local path = patrol(p[2])
+	if not (path) then
 		printf("Wrong parameters in 'teleport_squad' function!!!")
+		return 
 	end
-	local position = patrol(patrol_point):point(patrol_point_index)
-	local squad = get_story_squad(squad_story_id)
-	if squad == nil then
-		printf("There is no squad with story id [%s]", squad_story_id)
-	end
-	squad:set_squad_position(position)
+	
+	local idx = p[3] or 0
+	TeleportSquad(squad,path:point(idx),path:level_vertex_id(idx),path:game_vertex_id(idx))
+	--squad:set_squad_position(path:point(idx))
 end
 
 function jup_teleport_actor(actor, npc)
@@ -1375,12 +1376,10 @@ function remove_npc(actor, npc, p)
 		npc_id = get_story_object_id(p[1])
 	end
 	if npc_id ~= nil then
-		local sim = alife()
-		if (axr_main) then
-			CreateTimeEvent(npc_id,"safe_release",5,alun_utils.release_object,npc_id)
-			return
+		local se_obj = alife():object(npc_id)
+		if (se_obj) then
+			alife():release(se_obj, true)
 		end
-		sim:release(sim:object(npc_id), true)
 	end
 end
 
@@ -1907,13 +1906,7 @@ function destroy_object(actor, obj, p)
 		return
 	end
 
-
-	local sim = alife()
-	if (axr_main) then
-		CreateTimeEvent(sobj.id,"safe_release",1,alun_utils.release_object,sobj.id)
-		return
-	end
-	sim:release(sobj, true)
+	alife():release(sobj, true)
 end
 
 function give_actor(actor, npc, p)
@@ -2089,7 +2082,7 @@ function create_squad(actor, obj, p)
 		end
 	end
 
-	squad:update()
+	--squad:update()
 	return squad
 end
 
@@ -4130,9 +4123,7 @@ function make_a_wish(actor,npc,p)
 			local gvid = spawn_path:game_vertex_id(0)
 			local gg = game_graph()
 			if (gvid and gg:valid_vertex_id(gvid)) then
-				local cvertex = gg:vertex(gvid)
-				local lvl = alife():level_name(cvertex:level_id())
-				alun_utils.jump_to_level(lvl,gvid,lvid,pos)
+				ChangeLevel(pos,lvid,gvid,vector():set(0,0,0))
 			end
 		end
 		return 

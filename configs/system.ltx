@@ -107,11 +107,11 @@ specific_characters_files                = character_desc_general, character_des
 
 
 [inventory]
-take_dist                                = 2
+take_dist                                = 2						; not used at all
 max_weight                               = 50
 max_ruck                                 = 56
 max_belt                                 = 5	                                       ;16
-slots_count                              = 17	                                       ; count +1 (zero) (Alundaio: OpenXray adds 5 more slots for a total of 17; 13 is used for custom script animation)
+slots_count                              = 12	                                       ; count +1 (zero) (Alundaio: Not used in Open X-Ray, slot count is taken from LAST_SLOT+1 enum)
 
 slot_persistent_1                        = true	                                       ;knife
 slot_active_1                            = true
@@ -151,19 +151,6 @@ slot_active_12                           = false
 
 slot_persistent_13                       = false	                                    ;script animation
 slot_active_13                           = true
-
-slot_persistent_14                       = false	                                    ;custom unused
-slot_active_14                           = false
-
-slot_persistent_15                       = false	                                    ;custom unused
-slot_active_15                           = false
-
-slot_persistent_16                       = false                                    ;custom unused
-slot_active_16                           = false
-
-slot_persistent_17                       = false	                                    ;custom unused
-slot_active_17                           = false
-
 
 ;if run into issues with hanging_lamp, you will need to rename class to O_HLAMP in system.ltx for [lights_hanging_lamp] and [lights_signal_light].
 [lights_hanging_lamp]
@@ -231,25 +218,7 @@ disp_scale                               = 0.08	                                
 [hud_hitmark]
 hit_mark_texture                         = ui\ui_hud_hit_mark	                                       ; ui\ui_empty
 grenade_mark_texture                     = ui\ui_hud_grenade_mark
-;ui\ui_hud_hit_mark
-;ui\ui_hud_hit_mark_01
-;ui\ui_hud_hit_mark_02
-;ui\ui_hud_hit_mark_03
-;ui\ui_hud_hit_mark_04
-;ui\ui_hud_hit_mark_05
-;ui\ui_hud_hit_mark_06
-;ui\ui_hud_hit_mark_07
-;ui\ui_hud_hit_mark_08
-;ui\ui_hud_hit_mark_09
-;ui\ui_hud_hit_mark_10
-;ui\ui_hud_hit_mark_11
-;ui\ui_hud_hit_mark_12
-;ui\ui_hud_hit_mark_13
-;ui\ui_hud_hit_mark_14
-;ui\ui_hud_hit_mark_15
-;ui\ui_hud_hit_mark_16
-;ui\ui_hud_hit_mark_17
-;ui\ui_hud_hit_mark_18
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; inventory items
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -328,7 +297,7 @@ lim_pitch                                = -0.7, 1
 lim_yaw                                  = 0, 0
 lim_zoom                                 = 1, 5
 rot_speed                                = 2, 2, 2
-offset                                   = 0.4,0.2,-1.1
+offset                                   = 0.9,0.2,-1.1
 autoaim_speed_y                          = 0.5, 3.14	                                       ;min,max speed
 autoaim_speed_x                          = 0.5, 3.14
 
@@ -734,105 +703,88 @@ swing_fast_rot2                          = .5	                                  
 swing_fast_speed                         = 0.5	                                       ;1
 
 ;Vehicles
-[veh_niva]
+[veh_niva]:m_car
 $spawn                                   = "veh_niva"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_niva\veh_niva_u_01.ogf
 
-[veh_uaz_01]
+[veh_uaz_01]:m_car
 $spawn                                   = "veh_uaz_01"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_uaz\veh_uaz_u_01.ogf
 
-[veh_uaz_02]
+[veh_uaz_02]:m_car
 $spawn                                   = "veh_uaz_02"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_uaz\veh_uaz_u_02.ogf
 
-[veh_uaz_buhanka]
+[veh_uaz_buhanka]:m_car
 $spawn                                   = "veh_uaz_buhanka"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_uaz_buhanka\veh_uaz_buhanka_u_01.ogf
 
-[veh_zaz]
+[veh_zaz]:m_car
 $spawn                                   = "veh_zaz"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_zaz\veh_zaz_u_01.ogf
 
-[veh_zaz_968]
+[veh_zaz_968]:m_car
 $spawn                                   = "veh_zaz_968"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_zaz_968\veh_zaz_968_u_01.ogf
 
-[veh_moskvich]
+[veh_moskvich]:m_car
 $spawn                                   = "veh_moskvich"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_moskvich\veh_moskvitch_u_01.ogf
 
-[veh_tr13]
+[veh_tr13]:m_car
 $spawn                                   = "veh_tr13"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_tr13\veh_tr13_u_01.ogf
 
-[veh_zil_130]
+[veh_zil_130]:m_car
 $spawn                                   = "veh_zil_130"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_zil_130\veh_zil_u_01.ogf
 
-[veh_zil_131]
+[veh_zil_131]:m_car
 $spawn                                   = "veh_zil_131"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_zil_131\veh_zil_131_u_01.ogf
 
-[veh_kamaz_fura]
+[veh_kamaz_fura]:m_car
 $spawn                                   = "veh_kamaz_fura"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_kamaz\veh_kamaz_fura_u_01.ogf
 
-[veh_kamaz]
+[veh_kamaz]:m_car
 $spawn                                   = "veh_kamaz"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_kamaz\veh_kamaz_u_01.ogf
 
-[veh_laz]
+[veh_laz]:m_car
 $spawn                                   = "veh_laz"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_laz\veh_laz_u_01.ogf
 
-[veh_kavz]
+[veh_kavz]:m_car
 $spawn                                   = "veh_kavz"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_kavz\veh_kavz_u_01.ogf
 
-[veh_gaz]
+[veh_gaz]:m_car
 $spawn                                   = "veh_gaz"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_gaz66\veh_gaz_u_01.ogf
 
-[veh_btr]
+[veh_btr]:m_car
 $spawn                                   = "veh_btr"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_btr\veh_btr_u_01.ogf
 
-[veh_hl2baggi]
+[veh_hl2baggi]:m_car
 $spawn                                   = "veh_hl2baggi"
-class                                    = SCRPTCAR
 cform                                    = skeleton
 visual                                   = dynamics\vehicles\veh_baggi\veh_baggi_u_01.ogf
 

@@ -43,6 +43,7 @@ function se_stalker:STATE_Write(packet)
 		packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].level_vertex_id))
 	end
 	packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].active_section))
+	packet:w_bool(false) -- self.death_droped
 end
 --------------------
 function se_stalker:STATE_Read(packet, size)
@@ -61,6 +62,7 @@ function se_stalker:STATE_Read(packet, size)
 			db.offline_objects[self.id].level_vertex_id = tonumber(old_lvid)
 		end
 	end
+	packet:r_bool() -- self.death_droped = packet:r_bool()
 	--alun_utils.debug_write("se_stalker:STATE_Read "..self:name().." END\n")
 end
 

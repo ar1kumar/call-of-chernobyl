@@ -1,13 +1,9 @@
 ---------------------------------------------------------------------------------------------
---' funtions for upgerade items ----------------------------------------------------
+--' funtions for upgrade items ----------------------------------------------------
 --' Made by Distemper ----------------------------------------------------------------
 --' 03.08 --------------------------------------------------------------------------------
--- Alundaio (ScarabParamit -- Repair Cost Factor)
--- For Misery 2.0
---[[
-Copyright (C) 2012 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
---]]
+-- Altered by Alundaio to allow npc to keep items for an amount of time
+
 
 cur_hint = nil
 local issue_condlist = true
@@ -21,72 +17,26 @@ local check_items
 local weapon_upgrades = {}
 local effect_funct
 
-local npc_mechanics = {
-["zat_a2_stalker_mechanic"] = true,
-["jup_b217_stalker_tech"] = true,
-["jup_b6_scientist_tech"] = true,
-["pri_a22_army_signaller"] = true,
-["red_forester_tech"] = true,
-["mar_base_stalker_tech"] = true,
-["bar_visitors_stalker_mechanic"] = true
-}
-
-function npc_on_save(npc,packet)
-	local sec = npc:section()
-	if not (npc_mechanics[sec]) then
-		return
-	end
-
-	if not (RepairItemList[sec]) then
-		packet:w_u8(0)
-		return
-	end
-
-	local c = 0
-	for id,t in pairs(RepairItemList[sec]) do
-		c = c + 1
-	end
-
-	alun_utils.w_stpk(packet,"u8",c,"inventory_upgrades:"..sec..":RepairItemListSize")
-
-	for id,t in pairs(RepairItemList[sec]) do
-		alun_utils.w_stpk(packet,"u16",id,"inventory_upgrades:"..sec..":RepairTime")
-		alun_utils.w_stpk(packet,"u16",t.rt,"inventory_upgrades:"..sec..":RepairTime")
-		alun_utils.w_stpk(packet,"CTime",t.gt,"inventory_upgrades:"..sec..":CurrentGameTime")
-		--printf("sec=%s id=%s c=%s",sec,id,c)
-	end
+local function save_state(m_data)
+	m_data.RepairItemList = RepairItemList
 end
 
-function npc_on_load(npc,packet)
-	local sec = npc:section()
-	if not (npc_mechanics[sec]) then
-		return
-	end
-
-	local c = packet:r_u8()
-	if (c == 0 or c == 255) then
-		return
-	end
-
-	RepairItemList[sec] = {}
-
-	local id
-	for i=1, c do
-		id = packet:r_u16()
-		RepairItemList[sec][id] = {}
-		RepairItemList[sec][id].rt = packet:r_u16()
-		RepairItemList[sec][id].gt = utils.r_CTime(packet,"inventory_upgrades")
-		--printf("sec=%s id=%s",sec,id)
-	end
+local function load_state(m_data)
+	RepairItemList = m_data.RepairItemList or RepairItemList
+	m_data.RepairItemList = nil
+	printf("load_state ")
 end
+
+function on_game_start()
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",save_state)
+		RegisterScriptCallback("load_state",load_state)
+	end
+end 
 
 ----------- Dialog Func--------------------
 
 function lend_item_for_repair(itm,mechanic_name,rt)
-	if not (npc_mechanics[mechanic_name]) then
-		return
-	end
-
 	local npc = get_story_object(mechanic_name)
 	if (npc) then
 		db.actor:transfer_item(itm,npc)
@@ -107,18 +57,12 @@ function lend_item_for_repair(itm,mechanic_name,rt)
 		RepairItemList[mechanic_name][itm:id()] = {gt = game.get_game_time(), rt = rt}
 
 		local hud = get_hud()
-		hud:HideActorMenu()
+		--hud:HideActorMenu()
+		hud:UpdateActorMenu()
 	end
 end
 
 function has_repair_info(a,b)
-	if (check_items and not effect_funct) then
-		check_items = nil
-		--printf("check_items nil")
-		for k in pairs (weapon_upgrades) do
-			weapon_upgrades[k] = nil
-		end
-	end
 	local npc = dialogs.who_is_npc(a,b)
 	if (has_alife_info(npc:section().."_is_repairing")) then
 		return true
@@ -272,7 +216,7 @@ end
 ----------- End Dialog Func--------------------
 
 function precondition_functor_a( param1, section )
-	local ret
+	local ret = 0
 	if(param_ini:line_exist(mechanic_name.."_upgr", section)) then
 		local param = param_ini:r_string(mechanic_name.."_upgr", section)
 		if(param) then
@@ -287,9 +231,9 @@ function precondition_functor_a( param1, section )
 			end
 		end
 	end
-
-	if not (db.actor) then
-		return ret or 0
+	
+	if not (db.actor) then -- needed
+		return ret 
 	end
 
 	local price = math.floor(char_ini:r_u32(section, "cost")*cur_price_percent)
@@ -298,64 +242,7 @@ function precondition_functor_a( param1, section )
 		ret = 2
 	end
 
-	if (axr_main and axr_main.config:GetValue("debug","enable_repair_feature",1,false) ~= true) then
-		return ret or 0
-	end
-
-	if not (alun_utils.read_from_ini(nil,"mechanic_repair","upgrade_queue_enable","bool",false)) then
-		return ret or 0
-	end
-
-	if (ret ~= 0 and not check_items) then
-		check_items = true
-		last_section = section
-		--printf("check_items true")
-	end
-
-	if (check_items) then
-		local item,se_itm
-		local sim = alife()
-		local data
-		local rt = alun_utils.read_from_ini(nil,"mechanic_repair","upgrade_queue_time","float",1500)
-		local function itr(actor,itm)
-			if (itm) then
-				se_itm = sim:object(itm:id())
-				if (se_itm) then
-					data = stpk_utils.get_weapon_data(se_itm)
-
-					if (data) then
-						if not (effect_funct) then
-							weapon_upgrades[se_itm.id] = data.upgrades
-						else
-							if (#weapon_upgrades[se_itm.id] ~= #data.upgrades) then
-								lend_item_for_repair(itm,mechanic_name,rt)
-							else
-								for i=1,#data.upgrades do
-									if (data.upgrades[i] ~= weapon_upgrades[se_itm.id][i]) then
-										lend_item_for_repair(itm,mechanic_name,rt)
-										break
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-
-		db.actor:iterate_inventory(itr,db.actor)
-	end
-
-	if (effect_funct) then
-		check_items = nil
-		--printf("check_items nil")
-		for k in pairs (weapon_upgrades) do
-			weapon_upgrades[k] = nil
-		end
-	end
-
-	effect_funct = nil
-	return ret or 0
+	return ret
 end
 
 function effect_functor_a( param2, section, loading ) --( string, string, int )
@@ -364,13 +251,12 @@ function effect_functor_a( param2, section, loading ) --( string, string, int )
 		db.actor:give_money(math.floor(money*-1*cur_price_percent))
 		effect_funct = true
 	end
-	--printf("param2 = %s, section = %s, loading = %s",param2,section,loading)
 end
 
 function get_upgrade_cost(section)
 	if db.actor then
 		local price = math.floor(char_ini:r_u32(section, "cost")*cur_price_percent)
-				return game.translate_string("st_upgr_cost")..": "..price
+		return game.translate_string("st_upgr_cost")..": "..price
 	end
 	return " "
 end
@@ -495,9 +381,6 @@ function issue_property( param1, name )
 	end
 end
 
- --- Papa ScarabParamit say's: This is logarytmic pattern for repair, change 'repair_cost_factor' to ajust cost =) ---
- --- repair_cost_factor = 5 by default ---
-
 local function how_much_repair( item_name, item_condition )
 	local ltx = system_ini()
 	local cost = ltx:r_u32(item_name, "cost")
@@ -531,15 +414,28 @@ function question_repair_item( item_name, item_condition, can, mechanic ) --( st
 	return game.translate_string("st_upgr_cost").." "..price.." RU. "..game.translate_string("ui_inv_repair").."?"
 end
 
+function effect_upgrade_item(item,upgrade_section) -- Alundaio: called from engine (UIInventoryUpgradeWnd.cpp)
+	if (axr_main.config:GetValue("mm_options","enable_mechanic_feature",1,false) ~= true) then 
+		return
+	end
+	
+	if not (USE_MARSHAL and alun_utils.read_from_ini(nil,"mechanic_repair","upgrade_queue_enable","bool",false)) then
+		return
+	end
+	
+	local rt = alun_utils.read_from_ini(nil,"mechanic_repair","upgrade_queue_time","float",1500)
+	lend_item_for_repair(item,mechanic_name,rt)
+end 
+
 function effect_repair_item( item_name, item_condition)
 	local price = how_much_repair( item_name, item_condition )
 	db.actor:give_money(-price)
 
-	if (axr_main and axr_main.config:GetValue("debug","enable_repair_feature",1,false) ~= true) then
+	if (axr_main.config:GetValue("mm_options","enable_mechanic_feature",1,false) ~= true) then 
 		return
 	end
-
-	if not (alun_utils.read_from_ini(nil,"mechanic_repair","repair_queue_enable","bool",false)) then
+	
+	if not (USE_MARSHAL and alun_utils.read_from_ini(nil,"mechanic_repair","repair_queue_enable","bool",false)) then
 		return
 	end
 
@@ -570,6 +466,7 @@ function can_upgrade_item( item_name, mechanic )
 		return false
 	end
 	--]]
+	--printf("can_upgrade_item")
 	return true
 end
 

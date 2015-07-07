@@ -78,31 +78,31 @@ function msg_box_ui:OnMsgOk()
 	local p = pos and alun_utils.str_explode(pos,",")
 	pos = p and vector():set(tonumber(p[1]),tonumber(p[2]),tonumber(p[3]))
 
-	if (alun_utils.read_from_ini(ini,self.name,"allow_vehicle","bool",false)) then
+	if (alun_utils.read_from_ini(ini,self.name,"allow_vehicle","bool",true)) then
 		-- allow vehicles to teleport too
-		if (db.vehicle) then
-			db.vehicle:force_set_position(pos or point and point:point(0))
-		else 
+		local car = db.actor:get_attached_vehicle()
+		if (car) then
+			car:force_set_position(pos or point and point:point(0))
+		else
 			db.actor:set_actor_position(pos or point and point:point(0))
 		end
 	else
 		-- If not wanting vehicles to teleport
-		if (db.vehicle) then 
+		local car = db.actor:get_attached_vehicle()
+		if (car) then 
 			db.actor:detach_vehicle()
 			
 			local cpos = alun_utils.read_from_ini(ini,self.name,"reject","string",nil)
 			local cpath = cpos == nil and alun_utils.read_from_ini(ini,self.name,"reject_path","string",nil)
 			local cpoint = cpath and patrol(cpath)
-
-			if not (cpos or cpoint) then
-				return
-			end
-
+			
 			local cp = cpos and alun_utils.str_explode(cpos,",")
 			cpos = cp and vector():set(tonumber(cp[1]),tonumber(cp[2]),tonumber(cp[3]))
-		
-			db.vehicle:force_set_position(cpos or cpoint and cpoint:point(0) or db.actor:position())
-		end 
+
+			if (cpos or cpoint) then
+				TeleportObject(car:id(),cpos or cpoint and cpoint:point(0),cpoint and cpoint:level_vertex_id(0),cpoint and cpoint:game_vertex_id(0))
+			end
+		end
 		db.actor:set_actor_position(pos or point and point:point(0) or db.actor:position())
 	end
 

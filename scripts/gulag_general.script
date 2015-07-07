@@ -1309,7 +1309,7 @@ function load_job(smart)
 	ids = 0
 
 	if not (beh_ini) then
-		if (file_exists(alun_utils.fspath("$game_config$").."beh_gulag_jobs.ltx")) then
+		if (file_exists(getFS():update_path('$game_config$', '').."beh_gulag_jobs.ltx")) then
 			beh_ini = alun_utils.cfg_file(getFS():update_path('$game_config$', "beh_gulag_jobs.ltx"))
 		end
 	end

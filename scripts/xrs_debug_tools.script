@@ -208,7 +208,7 @@ local function actor_on_update()
 	NEAREST_STALKER = alun_utils.get_nearest_stalker("cam",500)
 
 	--local disable_draw = alun_utils.load_var(db.actor,"disable_debug_draw",nil)
-	local disable_draw = axr_main and axr_main.config and axr_main.config:GetValue("debug","enable_hud",1,false) == false
+	local disable_draw = axr_main and axr_main.config and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == false
 	if (disable_draw) then
 		hud_display_top:clear()
 		hud_display_left:clear()
@@ -240,8 +240,8 @@ local function on_game_load()
 		local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 		if (levels[i]) then 
 			alun_utils.save_var(db.actor,"debug_warpall",i)
-			alun_utils.jump_to_level(levels[i])
 			get_console():execute("flush")
+			JumpToLevel(levels[i])
 		else
 			alun_utils.save_var(db.actor,"debug_warpall",nil)
 		end
@@ -352,8 +352,8 @@ local function on_level_changing()
 	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 	if (levels[i]) then 
 		alun_utils.save_var(db.actor,"debug_warpall",i)
-		alun_utils.jump_to_level(i)
 		get_console():execute("flush")
+		JumpToLevel(i)
 	else
 		alun_utils.save_var(db.actor,"debug_warpall",nil)
 	end
@@ -823,7 +823,8 @@ function stalker_data_hud_show(hud)
 		end
 		hud:add_msg("Out Rest.",stalker_data.base_out_restrictors)
 		hud:add_msg("In Rest.",stalker_data.base_in_restrictors)
-		hud:add_msg("is_npc_indoors",obj:is_npc_indoors(0.05))
+		hud:add_msg("luminocity_hemi",obj.get_luminocity_hemi and obj:get_luminocity_hemi())
+		hud:add_msg("luminocity",obj.get_luminocity_hemi and obj:get_luminocity())
 	end
 	hud:display()
 end
@@ -1028,7 +1029,6 @@ function position_hud_show(hud)
 	local se_actor = not cam and alife():object(db.actor:id())
 
 	hud:set_header("-[Actor Info]-")
-	hud:add_msg("Precache Frame",device().precache_frame)
 	hud:add_msg("Lvid",lvid)
 	hud:add_msg("Gvid",gvid)
 	hud:add_msg("Pos",string.format("%0.4f, %0.4f, %0.4f", pos.x, pos.y, pos.z))
@@ -1063,7 +1063,8 @@ function position_hud_show(hud)
 	end
 	
 	hud:add_msg("","------ MISC. ------")
-	hud:add_msg("is_actor_indoors",db.actor:is_actor_indoors(0.05))
+	hud:add_msg("luminocity_hemi",db.actor.get_luminocity_hemi and db.actor:get_luminocity_hemi())
+	hud:add_msg("luminocity",db.actor.get_luminocity_hemi and db.actor:get_luminocity())
 	__tmr_pos_hud = not __tmr_pos_hud and time_global()+5000 or __tmr_pos_hud
 	if (time_global() > __tmr_pos_hud) then
 		__tmr_pos_hud = nil

@@ -119,7 +119,7 @@ function cmd.char_desc(me,txt,owner,p)
 	
 	local xml,node,id,char_node,p
 	for i=1,#f do 
-		xml = alun_utils.XmlParser:loadFile(alun_utils.fspath("$game_config$").."gameplay\\"..f[i]..".xml")
+		xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\"..f[i]..".xml")
 		if (xml) then
 			for index,node in pairs(xml.ChildNodes) do
 				if (type(node) == "table") then
@@ -724,7 +724,7 @@ function cmd.squad(me,txt,owner,p)
 		end
 
 		if (squad and target) then
-			alun_utils.teleport_squad(squad,target.m_game_vertex_id,target.m_level_vertex_id,target.position)
+			TeleportSquad(squad,target.position,target.m_level_vertex_id,target.m_game_vertex_id)
 			return "squad := %s teleported to %s.",squad:name(),target:name()
 		end
 	elseif (string.find(wrd,"assign")) then
@@ -849,7 +849,7 @@ function cmd.teleport(me,txt,owner,p)
 			end 
 			
 			if (squad and alife().teleport_object) then 
-				alun_utils.teleport_squad(who,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+				TeleportSquad(squad,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 				success = true
 			end
 		end
@@ -1438,7 +1438,13 @@ function cmd.level(me,txt,owner,p)
 
 		return
 	end
+	
+	local level_name = level.name()
+	if (JumpToLevel(wrd)) then 
+		return "level:= level changer successfully created at your position from"..level_name.." to "..wrd.." (Spawning at first found gvid)"
+	end
 
+	--[[ depreciated
 	local levels = { 	["zaton_jupiter"] = {467.306884765625,55.5276184082031,12.9044094085693},
 						["zaton_pripyat"] = {467.206878662109,55.5276184082031,3.20440793037415},
 						["jupiter_zaton"] = {-7.12386798858643,14.484338760376,154.085464477539},
@@ -1509,6 +1515,7 @@ function cmd.level(me,txt,owner,p)
 		create_lc(gvid,vertex)
 		return "level:= level changer successfully created at your position from"..level_name.." to "..wrd.." (Spawning at first found gvid)"
 	end
+	--]]
 
 	return "level:= there is no level changer between "..level_name.." and "..wrd
 end
@@ -1517,7 +1524,7 @@ function cmd.warpall(me,txt,owner,p)
 	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 	if (levels[1]) then
 		alun_utils.save_var(db.actor,"debug_warpall",1)
-		alun_utils.jump_to_level(levels[1])
+		_G.JumpToLevel(levels[1])
 	end
 	return "warpall := warping to every single level then flushing log"
 end
@@ -1837,7 +1844,7 @@ function cmd.antifreeze(me,txt,owner,p)
 		end
 		local cls = se_obj:clsid()
 		if (cls == clsid.online_offline_group_s) then
-			alun_utils.teleport_squad(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())
+			TeleportSquad(se_obj,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 		elseif (IsStalker(nil,cls) or IsMonster(nil,cls)) then 
 			if (alife().teleport_object) then 
 				alife():teleport_object(se_obj,db.actor:game_vertex_id(),db.actor:level_vertex_id(),db.actor:position())

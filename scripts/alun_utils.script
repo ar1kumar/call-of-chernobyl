@@ -5,121 +5,6 @@
 
 -- TODO: replace read_from_ini with type specific functions to remove code smell
 
-function change_level(pos,lvid,gvid,angle)
---[[
-		NET_Packet	p;
-		p.w_begin	(M_CHANGE_LEVEL); -- M_CHANGE_LEVEL == 13
-		p.w			(&m_game_vertex_id,sizeof(m_game_vertex_id));
-		p.w			(&m_level_vertex_id,sizeof(m_level_vertex_id));
-		p.w_vec3	(m_position);
-		p.w_vec3	(m_angles);
-		Level().Send(p,net_flags(TRUE));
---]]
-	if not (level.send) then return end
-	local p = net_packet()
-	p:w_begin(13)
-	p:w_u16(gvid)
-	p:w_u32(lvid)
-	p:w_vec3(pos)
-	p:w_vec3(angle)
-	level.send(p,true)
-end 
-
-function jump_to_level(new_level,specific_gvid,specific_lvid,specific_pos)
-	local level_name = level.name()
-	if (level_name == new_level) then 
-		return 
-	end 
-	
-	local sim = alife()
-	local gg = game_graph()
-	local lvl,data,cvertex
-	local function create_lc(gvid,vertex)
-		local se_obj = sim:create("level_changer",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
-		if (se_obj) then
-			bind_stalker_ext.REMOVE_ME_LC = se_obj.id
-			data = stpk_utils.get_level_changer_data(se_obj) or {}
-			if (data) then
-				data.dest_game_vertex_id = gvid
-				data.dest_level_vertex_id = specific_lvid or vertex:level_vertex_id()
-				data.dest_position = specific_pos or specific_lvid and level.vertex_position(specific_lvid) or vertex:level_point()
-				data.dest_direction = vector():set(0,0,0)
-				data.dest_level_name = new_level
-				
-				data.silent_mode = 1
-				
-				data.shapes[1] = {}
-				data.shapes[1].shtype = 1
-				data.shapes[1].v1 = vector():set(3,0,0)
-				data.shapes[1].v2 = vector():set(0,2,0)
-				data.shapes[1].v3 = vector():set(0,0,3)
-				data.shapes[1].offset = vector():set(0,0,0)
-
-				data.restrictor_type = 3
-
-				stpk_utils.set_level_changer_data(data,se_obj)
-			end
-		end
-	end
-	
-	--printf("jump_to_level: level=%s gvid=%s lvid=%s valid_gvid=%s",new_level,specific_gvid,specific_lvid,gg:valid_vertex_id(specific_gvid))
-	
-	if (specific_gvid and gg:valid_vertex_id(specific_gvid)) then
-		cvertex = gg:vertex(specific_gvid)
-		create_lc(specific_gvid,cvertex)
-		return
-	end 
-	
-	for gvid=0, 4860 do
-		if gg:valid_vertex_id(gvid) then
-			cvertex = gg:vertex(gvid)
-			lvl = sim:level_name(cvertex:level_id())
-			if (lvl == new_level) then
-				create_lc(gvid,cvertex)
-				return
-			end
-		else
-			break
-		end
-	end
-end 
-
-function release_object(id)
-	local sim = alife()
-	local se_obj = id and sim:object(id)
-	if not (se_obj) then
-		return true
-	end
-
-	if (se_obj.online) then
-		switch_offline(se_obj.id)
-		return false
-	end
-
-    if not (se_obj.marked_for_release) then
-	   sim:release(se_obj,true)
-       se_obj.marked_for_release = true
-	end
-
-	return true
-end
-
-function teleport_squad(squad,gvid,lvid,pos)
-	local sim = alife()
-	if not (sim.teleport_object) then 
-		return 
-	end 
-
-	sim:teleport_object(squad.id,gvid,lvid,pos)
-	for k in squad:squad_members() do
-		if (db.offline_objects[k.id]) then 
-			db.offline_objects[k.id].level_vertex_id = nil
-		end
-		db.spawned_vertex_by_id[k.id] = nil
-		sim:teleport_object(k.id,gvid,lvid,pos)
-	end
-end
-
 function get_inv_name(section)
 	return game.translate_string(read_from_ini(nil,section,"inv_name","string",""))
 end 
@@ -2079,8 +1964,8 @@ function try_go_position(npc,pos,old_vid)
 	end 
 end 
 
-function try_go_cover(npc,pos,old_vid)
-	local vid = alun_utils.find_close_cover(npc,npc:position(),pos,8)
+function try_go_cover(npc,pos,old_vid,r)
+	local vid = alun_utils.find_close_cover(npc,npc:position(),pos,r or 5)
 	return validate(npc,vid) and alun_utils.lmove(npc,vid,old_vid)
 end 
 
@@ -2442,47 +2327,37 @@ end
 --/ Sandbox ( http://www.amk-team.ru/forum/index.php?showtopic=6458#entry258260 )
 --/----------------------------------------------------------------------------
 function sandbox(file_name, function_name, ...)
-  local status, result = pcall(sandbox_exec, file_name, function_name, ...)
-  if status == false then
-		elog("(%s:sandbox) call failed, result = [%s]", self_name, result)
+	local status, result = pcall(sandbox_exec, file_name, function_name, ...)
+	if status == false then
+		printf("(%s:sandbox) call failed, result = [%s]", self_name, result)
 		return
-  else
-    return result
-  end
+	else
+		return result
+	end
 end
 
 --/ execute script in sandbox
 function sandbox_exec(file_name, function_name, ...)
-  if file_name then
-		if not _G[file_name] then dlog("script %s is not found", file_name) return end -- script does not exist
-		-- dlog("full script name = %s", getFS():update_path('$game_scripts$', '')..file_name..'.script')
-    local result = assert(loadfile(getFS():update_path('$game_scripts$', '')..file_name..'.script'))
-    if type(result) == "function" then
-      if function_name then
-        result()
-        local f = loadstring("return "..function_name)
-        f(...)
-      else
-        result()
-      end
-    else
-			elog("(%s:sandbox) exec failed. function is not available: result = [%s]", self_name, type(result))
-      return
-    end
-  else
-    local file_path = getFS():update_path('$game_scripts', default_sandbox_file..'.script')
-    local result = assert(loadfile(file_path))
-    if type(result) == "function" then
-      if function_name then
-        result()
-        local f = loadstring("return "..function_name)
-        f(...)
-      else
-        result()
-      end
-    else
-      elog("(%s:sandbox) exec failed. function is not available: result = [%s]", self_name, type(result))
-      return
-    end
-  end
+	if not (file_name) then 
+		return
+	end 
+	
+	if not _G[file_name] then 
+		printf("script %s is not found", file_name) 
+		return
+	end 
+	
+	local result = assert(loadfile(getFS():update_path('$game_scripts$', '')..file_name..'.script'))
+	if type(result) == "function" then
+		if function_name then
+			result()
+			local f = loadstring("return "..function_name)
+			f(...)
+		else
+			result()
+		end
+	else
+		printf("(%s:sandbox) exec failed. function is not available: result = [%s]", self_name, type(result))
+		return
+	end
 end

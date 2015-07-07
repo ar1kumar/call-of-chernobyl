@@ -3,7 +3,7 @@ local alife, game_graph, pairs = alife, game_graph, pairs
 
 local sim_objects_registry = nil
 local props_ini = ini_file("misc\\simulation_objects_props.ltx")
-config = alun_utils.cfg_file(alun_utils.fspath("$game_config$").."ai_tweaks\\simulation_objects.ltx")
+config = alun_utils.cfg_file(getFS():update_path('$game_config$', '').."ai_tweaks\\simulation_objects.ltx")
 
 local ALLOW_NPC_LEVEL_TRANSITION = true
 

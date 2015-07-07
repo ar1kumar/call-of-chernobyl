@@ -7,7 +7,7 @@ by Alundaio
 --]]
 
 -- axr_options.ini
-config = alun_utils.cfg_file(alun_utils.fspath("$game_data$").."axr_options.ini")
+config = alun_utils.cfg_file(getFS():update_path('$game_data$', '').."axr_options.ini")
 -------------------------------------------------------------------------------------------------
 
 
@@ -34,7 +34,7 @@ local script_modules = {
 	"axr_companions",
 	"xr_eat_medkit",
 	"axr_trade_manager",
-	--"actor_effects",
+	"inventory_upgrades",
 	"axr_task_manager"
 }
 	
@@ -111,6 +111,7 @@ local intercepts = {
 	on_level_changing			= {},
 	on_key_press				= {},
 	on_key_release				= {},
+	on_key_hold					= {},
 	actor_on_before_death		= {},
 	on_game_load				= {},
 	actor_on_net_destroy		= {},
@@ -175,14 +176,11 @@ function callback_set(name,func,userdata)
 	end
 end
 
-function callback_unset(name,func,userdata)
+function callback_unset(name,func_or_userdata)
 	if not (intercepts[name]) then
 		return
 	end
-	intercepts[name][func] = nil
-	if (userdata) then 
-		intercepts[name][userdata] = nil
-	end
+	intercepts[name][func_or_userdata] = nil
 end
 
 function make_callback(name,...)

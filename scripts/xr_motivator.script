@@ -166,15 +166,6 @@ function motivator_binder:net_spawn(sobject)
 	return true
 end
 function motivator_binder:on_item_take(item)
-	local wpn = self.object:active_item()
-	if (wpn and wpn:is_weapon_magazined()) then
-		if (item) then 
-			if (item:is_scope() or item:is_silencer() or item:is_grenade_launcher()) then 
-				wpn:weapon_addon_attach(item)
-			end 
-		end
-	end
-			
 	-- Alundaio
 	SendScriptCallback("npc_on_item_take",self.object,item)
 	-- End Alundaio
@@ -387,6 +378,8 @@ function motivator_binder:update(delta)
 		return
 	end 
 	
+	xr_meet.process_npc_usability(object)
+	
 	if not (object:best_enemy()) then
 		xr_combat_ignore.fighting_with_actor_npcs[id] = nil
 	end
@@ -403,16 +396,7 @@ function motivator_binder:update(delta)
 		self.squad:update()
 	end
 	
-	-- create a 200 milisecond delay
-	local tg = time_global()
-	if (self.last_update and tg < self.last_update) then
-		--alun_utils.debug_write("motivator_bind:update %s END 2",self.object and self.object:name())
-		return
-	end
-	self.last_update = tg + math.random(200,350)
-
 	sr_light.check_light(object)
-	xr_meet.process_npc_usability(object)
 	stalker_generic.update_invulnerability(object)
 	xr_sound.update(id)
 	
@@ -465,36 +449,34 @@ function motivator_binder:net_save_relevant()
 end
 
 function motivator_binder:save(packet)
+	object_binder.save(self, packet)
+	
 	--alun_utils.debug_write("\n-------motivator save start------ "..self.object:name(),true)
 	set_save_marker(packet, "save", false, "motivator_binder")
-	object_binder.save(self, packet)
+	
 	xr_logic.save_obj(self.object, packet)
 	trade_manager.save(self.object, packet)
 
 	xr_sound.save_npc(packet, self.object:id())
 	dialog_manager.save_npc(packet, self.object:id())
 
-	--Alundaio
-	inventory_upgrades.npc_on_save(self.object,packet)
-	--Alundaio
 	set_save_marker(packet, "save", true, "motivator_binder")
 	--alun_utils.debug_write("\nmotivator save end------ "..self.object:name(),true)
 end
 
 function motivator_binder:load(reader)
 	--alun_utils.debug_write("\nmotivator load start "..self.object:name(),true)
+	object_binder.load(self, reader)
+	
 	self.loaded = true
 	set_save_marker(reader, "load", false, "motivator_binder")
-	object_binder.load(self, reader)
+	
 	xr_logic.load_obj(self.object, reader)
 	trade_manager.load(self.object, reader)
 
 	xr_sound.load_npc(reader, self.object:id())
 	dialog_manager.load_npc(reader, self.object:id())
 	
-	--Alundaio
-	inventory_upgrades.npc_on_load(self.object,reader)
-	--Alundaio
 	set_save_marker(reader, "load", true, "motivator_binder")
 	--alun_utils.debug_write("\nmotivator load END "..self.object:name())
 end
@@ -511,9 +493,9 @@ function motivator_binder:hear_callback(npc, who_id, sound_type, sound_position,
 end
 
 function AddToMotivator(npc)
-	if alife() then
+	--if alife() then
 		npc:bind_object(this.motivator_binder(npc))
-	end
+	--end
 end
 
 -- Ёвалюаторы, которые имеют высший приоритет, и, соответственно, перебивают остальные скрипты собой

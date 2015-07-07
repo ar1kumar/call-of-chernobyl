@@ -2,7 +2,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.0.52 RC"
+GAME_VERSION = "1.0.6 RC"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -25,12 +25,12 @@ USE_MARSHAL = marshal ~= nil
 -------------------------------------------------------------------------------------------------------
 -- 											SCRIPTED CALLBACKS
 -------------------------------------------------------------------------------------------------------
-function RegisterScriptCallback(name,func,...)
-	axr_main.callback_set(name,func,...)
+function RegisterScriptCallback(name,func,userdata)
+	axr_main.callback_set(name,func,userdata)
 end 
 
-function UnregisterScriptCallback(name,func)
-	axr_main.callback_unset(name,func)
+function UnregisterScriptCallback(name,func,userdata)
+	axr_main.callback_unset(name,func,userdata)
 end
 
 -- Call this from a script to create a new callback to functions that register for it with RegisterScriptCallback
@@ -125,6 +125,87 @@ function ProcessEventQueueState(m_data,save)
 		ev_queue = m_data.event_queue or ev_queue
 	end
 end
+
+function ChangeLevel(pos,lvid,gvid,angle)
+-- IMPORTANT: You must realize that when you send this event it will happen immediately
+-- if done in lua code it will not execute the rest of the block, level changes immediately happen!
+--[[
+		NET_Packet	p;
+		p.w_begin	(M_CHANGE_LEVEL); -- M_CHANGE_LEVEL == 13
+		p.w			(&m_game_vertex_id,sizeof(m_game_vertex_id));
+		p.w			(&m_level_vertex_id,sizeof(m_level_vertex_id));
+		p.w_vec3	(m_position);
+		p.w_vec3	(m_angles);
+		Level().Send(p,net_flags(TRUE));
+--]]
+	-- requires OpenXRay
+	local p = net_packet()
+	p:w_begin(13)
+	p:w_u16(gvid)
+	p:w_u32(lvid)
+	p:w_vec3(pos)
+	p:w_vec3(angle)
+	level.send(p,true)
+end
+
+function JumpToLevel(new_level)
+	-- requires OpenXray
+	local level_name = level.name()
+	if (level_name == new_level) then 
+		return false
+	end
+	
+	local sim,gg = alife(),game_graph()
+	
+	-- first try to find a smart_terrain on specified level
+	if (SIMBOARD) then
+		for name,smart in pairs(SIMBOARD.smarts_by_names) do
+			cvertex = smart and gg:vertex(smart.m_game_vertex_id)
+			if (cvertex and sim:level_name(cvertex:level_id()) == new_level) then
+				ChangeLevel(cvertex:level_point(),cvertex:level_vertex_id(),smart.m_game_vertex_id,vector():set(0,0,0))
+				return true
+			end
+		end
+	end
+	
+	-- in case level has no smarts then just teleport to first found gvid for level
+	for gvid=0, 4860 do
+		if gg:valid_vertex_id(gvid) then
+			cvertex = gg:vertex(gvid)
+			lvl = sim:level_name(cvertex:level_id())
+			if (lvl == new_level) then
+				ChangeLevel(cvertex:level_point(),cvertex:level_vertex_id(),gvid,vector():set(0,0,0))
+				return true
+			end
+		else
+			break
+		end
+	end
+	return false
+end
+
+function TeleportObject(id,pos,lvid,gvid)
+	-- Requires OpenXray
+	if (db.offline_objects[id]) then 
+		db.offline_objects[id].level_vertex_id = nil
+	end
+	db.spawned_vertex_by_id[id] = nil
+	alife():teleport_object(id,gvid,lvid,pos)
+end
+
+function TeleportSquad(squad,pos,lvid,gvid)
+	-- Requires OpenXray
+	local sim = alife()
+	sim:teleport_object(squad.id,gvid,lvid,pos)
+	for k in squad:squad_members() do
+		if (db.offline_objects[k.id]) then 
+			db.offline_objects[k.id].level_vertex_id = nil
+		end
+		db.spawned_vertex_by_id[k.id] = nil
+		sim:teleport_object(k.id,gvid,lvid,pos)
+	end
+end 
+
 --------------------------------------------------------------------
 -- Serialization of userdata for Marshal Library
 --------------------------------------------------------------------
@@ -189,6 +270,9 @@ function printf(fmt,...)
 		local function sr(a)
 			i = i + 1
 			if (type(p[i]) == 'userdata') then
+				if (p[i].x and p[i].y) then 
+					return vec_to_str(p[i])
+				end
 				return 'userdata'
 			end
 			return tostring(p[i])
@@ -586,12 +670,10 @@ function IsArtefact(object, id)
 		return artefact_classes[id] == true
 	end
 	if (object) then
-		if (object.is_artefact) then 
-			return object:is_artefact()
-		end
+		id = get_clsid(object)
+		return id and artefact_classes[id] == true
 	end
-	id = get_clsid(object)
-	return id and artefact_classes[id] == true
+	return false
 end
 
 
@@ -828,9 +910,9 @@ function start_game_callback()
 	sr_light.clean_up ()
 	pda.add_quick_slot_items_on_game_start()
 	
-	--printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	--collectgarbage("collect")
-	--printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	collectgarbage("collect")
+	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 --' Lсталость
@@ -876,7 +958,7 @@ function give_info (info)
 end
 function disable_info (info)
 	if has_alife_info(info) then
-		printf("*INFO*: disabled npc='single_player' id='%s'", info)
+		--printf("*INFO*: disabled npc='single_player' id='%s'", info)
 		db.actor:disable_info_portion(info)
 		--if (xrs_debug_tools and xrs_debug_tools.actor_info) then
 		--	xrs_debug_tools.actor_info[info] = nil
@@ -1081,7 +1163,43 @@ function show_all_ui(show)
 	end
 end
 
-function get_dbstorage(id)
-	local st = db.storage[id]
-	return st and st.object and st
-end
+------------------------------------------------------------------------------------------------------
+-- ENGINE EXPORTS!!!
+------------------------------------------------------------------------------------------------------
+function CALifeUpdateManager__on_before_change_level(packet)
+--[[
+	C++:
+	net_packet.r					(&graph().actor()->m_tGraphID,sizeof(graph().actor()->m_tGraphID));
+	net_packet.r					(&graph().actor()->m_tNodeID,sizeof(graph().actor()->m_tNodeID));
+	net_packet.r_vec3				(graph().actor()->o_Position);
+	net_packet.r_vec3				(graph().actor()->o_Angle);
+--]]
+-- Here you can do stuff when level changes BEFORE save is called, even change destination!. Packet is constructed as stated above
+	
+	-- READ PACKET
+	local pos,angle = vector(),vector()
+	local gvid = packet:r_u16()
+	local lvid = packet:r_u32()
+	packet:r_vec3(pos)
+	packet:r_vec3(angle)
+	
+	--printf("CALifeUpdateManager__on_before_change_level pos=%s gvid=%s lvid=%s angle=%s",pos,gvid,lvid,angle)
+	
+	-- fix for car in 1.6
+	local car = db.actor and db.actor:get_attached_vehicle()
+	if (car) then 
+		TeleportObject(car:id(),pos,lvid,gvid)
+	end
+	
+	-- REPACK it for engine method to read as normal
+	--[[
+	packet:w_begin(13)
+	packet:w_u16(gvid)
+	packet:w_u32(lvid)
+	packet:w_vec3(pos)
+	packet:w_vec3(angle)
+	--]]
+	
+	-- reset read pointer
+	packet:r_seek(2)
+end 

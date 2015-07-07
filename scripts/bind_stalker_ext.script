@@ -17,30 +17,6 @@ end
 -- actor_on_net_spawn
 -------------------
 function actor_on_net_spawn()
-	-- persistent car
-	-- Issue: car won't spawn in good location
-	-- CoC didn't have vehicles in mind during development. If you want vehicle to transition levels correctly
-	-- You will need to create waypoints on every level for the vehicle to spawn in a good location and use car:force_set_position(patrol("wp_car_spawn_"..level_name):point(0))
-	-- Then attach actor to the vehicle on game load (or first update)
-
-	--[[
-	local m_data = alife_storage_manager.get_state()
-	if (m_data.vehicle_data and m_data.vehicle_data.section) then
-		local function attach_veh(id)
-			local car = id and level.object_by_id(id)
-			if not (db.actor and car) then 
-				return false
-			end 
-			db.actor:attach_vehicle(car)
-			return true
-		end
-		
-		local se_car = alife():create(m_data.vehicle_data.section,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
-		CreateTimeEvent(0,"attach_vehicle",1,attach_veh,se_car.id)
-		m_data.vehicle_data = nil
-	end
-	--]]
-	
 	SendScriptCallback("on_game_load",binder)
 end
 
@@ -208,44 +184,8 @@ function actor_on_save(binder,packet)
 	if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
 		--printf("DEBUG: actor changing level")
 		SendScriptCallback("on_level_changing")
-		
-		-- if not using persistent car
-		if (db.vehicle) then 
-			db.actor:detach_vehicle()
-		end
-		
-		-- persistent car
-		--[[
-		local car = db.actor:get_attached_vehicle()
-		if (car) then 
-			--printf("DEBUG: Store car")
-			-- force a detach
-			db.actor:detach_vehicle()
-			
-			local m_data = alife_storage_manager.get_state()
-			if not (m_data.vehicle_data) then
-				m_data.vehicle_data = {}
-			end 
-			
-			-- TODO: store all values for car, like health, gas etc.
-			m_data.vehicle_data.section = car:section()
-			
-			-- destroy car
-			local se_car = sim:object(car:id())
-			sim:release(se_car,true)
-		end
-		--]]
 	end
 
-	if (this.REMOVE_ME_LC) then
-		local sim = alife()
-		local se_obj = sim:object(this.REMOVE_ME_LC)
-		if (se_obj) then
-			--printf("removing temp level_changer %s",se_obj:name())
-			sim:release(se_obj,true)
-		end
-	end
-	
 	if (coc_treasure_manager) then
 		coc_treasure_manager.save(packet)
 	end
@@ -280,6 +220,13 @@ function on_key_release(binder,key)
 end
 
 ---------------------------------------------
+-- on_key_hold
+---------------------------------------------
+function on_key_hold(binder,key)
+	SendScriptCallback("on_key_hold",key)
+end
+
+---------------------------------------------
 -- on_actor_before_death
 ---------------------------------------------
 function actor_on_before_death(binder,whoID)
@@ -287,7 +234,8 @@ function actor_on_before_death(binder,whoID)
 	--db.actor:set_health_ex(1)
 	
 	-- This is necessary to avoid engine crash when player dies with holder
-	if (db.vehicle and db.actor.detach_vehicle) then 
+	local car = db.actor and db.actor:get_attached_vehicle()
+	if (car) then 
 		db.actor:detach_vehicle()
 	end
 	
@@ -300,7 +248,6 @@ end
 -- on_attach_vehicle
 ---------------------------------------------
 function actor_on_attach_vehicle(binder,obj)
-	db.vehicle = obj
 	SendScriptCallback("actor_on_attach_vehicle",obj)
 end
 
@@ -308,7 +255,6 @@ end
 -- on_detach_vehicle
 ---------------------------------------------
 function actor_on_detach_vehicle(binder,obj)
-	db.vehicle = nil
 	SendScriptCallback("actor_on_detach_vehicle",obj)
 end
 

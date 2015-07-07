@@ -21,26 +21,15 @@ m_data.se_stalker = {}
 
 local function on_pstor_load_all(obj,packet)
 	local id = obj:id()
-	if not (m_data and m_data.pstor_all and m_data.pstor_all[id]) then 
-		return
+	if (m_data.pstor_all and m_data.pstor_all[id]) then 
+		db.storage[id].pstor = m_data.pstor_all[id]
+		m_data.pstor_all[id] = nil
 	end 
-	
-	db.storage[id].pstor = m_data.pstor_all[id]
-	
+
 	if (m_data.pstor_ctime and m_data.pstor_ctime[id]) then
-		if not (db.storage[id].pstor_ctime) then 
-			db.storage[id].pstor_ctime = {}
-		end 
-		for k,t in pairs(m_data.pstor_ctime[id]) do 
-			db.storage[id].pstor_ctime[k] = CTime_from_table(t)
-		end
+		db.storage[id].pstor_ctime = m_data.pstor_ctime[id]
+		m_data.pstor_ctime[id] = nil
 	end 
-	
-	m_data.pstor_all[id] = nil
-	
-	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	collectgarbage("collect")
-	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 function on_game_start()

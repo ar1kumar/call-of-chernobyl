@@ -1,38 +1,52 @@
--- Handler for scripted keybinds 
+-- Handler for scripted keybinds
 
-local function on_key_press(key)
-	-- Order ALL Companions to cycle between Aggressive, Passive and Assist modes
-	if (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_cycle_combat_mode",0,"")]) then 
+
+-- keybind_name = default
+-- To add new keybinds, simplay add name here and default keypress. Then make an action.<name> function for it. Param passed is true if pressed or false if released
+local keybinds = {
+					["companion_cycle_combat_mode"] = "DIK_NUMPAD1",
+					["companion_cycle_move_mode"] 	= "DIK_NUMPAD2",
+					["companion_move_to_point"] 	= "DIK_NUMPAD3",
+					["debug_demo_record"]			= "DIK_NUMPAD0",
+					["debug_select_object"] 		= "DIK_NUMPAD9",
+					["debug_attachment_ui"] 		= "DIK_INSERT",
+					["debug_test"] 					= "DIK_NUMPADENTER",
+					["debug_reload_game"]			= "DIK_END"
+}
+local action = {}
+------------------------------------------------------------------
+-- Keypress actions
+------------------------------------------------------------------
+function action.companion_cycle_combat_mode(p)
+	if (p==1) then 
 		axr_companions.cycle_companions_combat_mode()
-	-- Order ALL Companions to Wait or Follow
-	elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_cycle_move_mode",0,"")]) then 
+	end
+end
+
+function action.companion_cycle_move_mode(p)
+	if (p==1) then 
 		axr_companions.cycle_companions_move_mode()
-	-- Order ALL Companions to move to point at cursor
-	elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_move_to_point",0,"")]) then 
-		axr_companions.move_to_point(true)
-	-- Quick access to demo_record
-	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_demo_record",0,"")]) then 
+	end
+end
+
+function action.companion_move_to_point(p)
+	axr_companions.move_to_point(p)
+end
+
+function action.debug_demo_record(p)
+	if not (DEV_DEBUG) then 
+		return 
+	end
+	if (p==1) then
 		get_console():execute("demo_record t")
-	-- Teleport to last demo_record camera position
-	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_test",0,"")]) then
-		-- depreciated, added through engine by pressing enter while in demo_record
-		--[[
-		if (xrs_debug_tools.LastCameraPos) then
-			if (db.vehicle and db.actor.detach_vehicle) then 
-				db.vehicle:force_set_position(xrs_debug_tools.LastCameraPos)
-			else 
-				db.actor:set_actor_position(xrs_debug_tools.LastCameraPos,true)
-			end
-		end
-		--]]
-	-- Select Object on key press and teleports it on key release!
-	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_select_object",0,"")]) then
-		DEBUG_NPC = level.get_target_obj and level.get_target_obj()
-		if (DEBUG_NPC) then 
-			SetHudMsg(alun_utils.sr("%s Hold then release key to new position",DEBUG_NPC:name()),8)
-		end
-	-- In-game Attachment Editor. Allows you to attach an item to an NPC then edit the offsets in real-time
-	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_attachment_ui",0,"")]) then 
+	end
+end
+
+function action.debug_attachment_ui(p)
+	if not (DEV_DEBUG) then 
+		return 
+	end
+	if (p==1) then
 		if not (this.debug_ui_attach) then 
 			this.debug_ui_attach = ui_debug_main.debug_ui_attach()
 		end 
@@ -40,76 +54,114 @@ local function on_key_press(key)
 		if (this.debug_ui_attach) then 
 			if not (this.debug_ui_attach:IsShown()) then 
 				this.debug_ui_attach:ShowDialog(true)
-			else 
+			else
 				this.debug_ui_attach:HideDialog()
 			end
 		end
 	end
-end
+end 
 
-local function on_key_release(key)
-	if (key == DIK_keys[axr_main.config:GetValue("global_keybinds","companion_move_to_point",0,"")]) then 
-		axr_companions.move_to_point(false)
-	elseif (DEV_DEBUG and key == DIK_keys[axr_main.config:GetValue("global_keybinds","debug_select_object",0,"")]) then
+function action.debug_select_object(p)
+	if not (DEV_DEBUG) then 
+		return 
+	end
+	if (p==1) then 
+		DEBUG_NPC = level.get_target_obj and level.get_target_obj()
+		if (DEBUG_NPC) then 
+			SetHudMsg(alun_utils.sr("%s Hold then release key to new position",DEBUG_NPC:name()),8)
+		end
+	elseif (p==0) then
 		if (DEBUG_NPC) then
 			local r = level.get_target_dist and level.get_target_dist()
 			if (r) then
 				if (IsStalker(DEBUG_NPC) or IsMonster(DEBUG_NPC)) then
-					local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,level.get_target_dist)
+					local lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
 					if (lvid) then 
 						DEBUG_NPC:set_npc_position(level.vertex_position(lvid))
 					end
 				else
-					if (DEBUG_NPC.force_set_position) then
-						local pos = utils.vector_copy_by_val(device().cam_pos)
-						pos:add(device().cam_dir:mul(r))
-						--local lvid = level.vertex_in_direction(db.actor:level_vertex_id(),device().cam_dir,r)
-						--if (lvid) then
-							DEBUG_NPC:force_set_position(pos) --level.vertex_position(lvid))
-						--end
+					local pos = utils.vector_copy_by_val(device().cam_pos)
+					pos:add(device().cam_dir:mul(r))
+					
+					local lvid = level.vertex_id(pos)
+					if (lvid < 4294967295) then
+						TeleportObject(DEBUG_NPC:id(),pos,lvid,db.actor:game_vertex_id())
+					else 
+						SetHudMsg("Position not on AI Map",4)
 					end
 				end
 			end
 			SetHudMsg("",1)
+		end	
+	end 
+end
+
+function action.debug_test(p)
+	if not (DEV_DEBUG) then 
+		return 
+	end 
+	if (p==1) then 
+		DEBUG_NPC = level.get_target_obj and level.get_target_obj()
+		if (DEBUG_NPC) then
+			printf("hi")
+			DEBUG_NPC:scale_bone("bip01_head",vector():set(2,2,2),true)
 		end
 	end
+end
+
+function action.debug_reload_game(p)
+	-- Reloads game files in-game so that application does not need restart
+	if not (DEV_DEBUG) then 
+		return 
+	end 
+	if (p==0) then
+		local fs = getFS()
+		fs:rescan_path('$game_config$')
+		fs:rescan_path('$game_scripts$')
+		local p = net_packet()
+		p:w_begin(15) -- reload game
+		level.send(p,true)
+	end
+end
+-------------------------------------------
+-- callbacks
+-------------------------------------------
+local function on_key_release(key)
+	for k,v in pairs(keybinds) do 
+		if (action[k] and key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then 
+			action[k](0)
+		end
+	end 
+end
+
+local function on_key_press(key)
+	for k,v in pairs(keybinds) do 
+		if (action[k] and key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then 
+			action[k](1)
+		end
+	end 
+end
+
+local function on_key_hold(key)
+	for k,v in pairs(keybinds) do 
+		if (action[k] and key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then 
+			action[k](2)
+		end
+	end 
 end
 
 function on_game_start()
 	RegisterScriptCallback("on_key_press",on_key_press)
 	RegisterScriptCallback("on_key_release",on_key_release)
+	RegisterScriptCallback("on_key_hold",on_key_hold)
 	
 	local need_save
-	if not (axr_main.config:KeyExist("global_keybinds","companion_cycle_combat_mode")) then
-		axr_main.config:SetValue("global_keybinds","companion_cycle_combat_mode","DIK_NUMPAD1")
-		need_save = true
-	end
-	if not (axr_main.config:KeyExist("global_keybinds","companion_cycle_move_mode")) then
-		axr_main.config:SetValue("global_keybinds","companion_cycle_move_mode","DIK_NUMPAD2")
-		need_save = true
-	end
-	if not (axr_main.config:KeyExist("global_keybinds","companion_move_to_point")) then
-		axr_main.config:SetValue("global_keybinds","companion_move_to_point","DIK_NUMPAD3")
-		need_save = true
-	end
-	
-	-- For debug
-	if not (axr_main.config:KeyExist("global_keybinds","debug_demo_record")) then
-		axr_main.config:SetValue("global_keybinds","debug_demo_record","DIK_NUMPAD0")
-		need_save = true
-	end
-	if not (axr_main.config:KeyExist("global_keybinds","debug_test")) then
-		axr_main.config:SetValue("global_keybinds","debug_test","DIK_NUMPADENTER")
-		need_save = true
-	end
-	if not (axr_main.config:KeyExist("global_keybinds","debug_select_object")) then
-		axr_main.config:SetValue("global_keybinds","debug_select_object","DIK_NUMPAD9")
-		need_save = true
-	end
-	if not (axr_main.config:KeyExist("global_keybinds","debug_attachment_ui")) then
-		axr_main.config:SetValue("global_keybinds","debug_attachment_ui","DIK_INSERT")
-		need_save = true
-	end
+	for k,v in pairs(keybinds) do 
+		if not (axr_main.config:KeyExist("global_keybinds",k)) then 
+			axr_main.config:SetValue("global_keybinds",k,v)
+			need_save = true
+		end
+	end 
 	
 	if (need_save) then
 		axr_main.config:Save()

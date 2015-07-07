@@ -1407,8 +1407,8 @@ function parse_cse_alife_trader_abstract_properties_packet(ret,stpk)
 	ret.rank = stpk:r_s32()
 	ret.reputation = stpk:r_s32()
 	ret.character_name = stpk:r_stringZ()
-	ret.cse_alife_trader_abstract__unk1_u8 = stpk:r_u8()
-	ret.cse_alife_trader_abstract__unk2_u8 = stpk:r_u8()
+	ret.dead_body_can_take = stpk:r_u8()
+	ret.dead_body_closed = stpk:r_u8()
 	return ret
 end
 
@@ -1421,8 +1421,8 @@ function fill_cse_alife_trader_abstract_properties_packet(ret,stpk)
 	stpk:w_s32(ret.rank)
 	stpk:w_s32(ret.reputation)
 	stpk:w_stringZ(ret.character_name)
-	stpk:w_u8(ret.cse_alife_trader_abstract__unk1_u8)
-	stpk:w_u8(ret.cse_alife_trader_abstract__unk2_u8)
+	stpk:w_u8(ret.dead_body_can_take)
+	stpk:w_u8(ret.dead_body_closed)
 end
 
 -- cse_alife_human_abstract_properties

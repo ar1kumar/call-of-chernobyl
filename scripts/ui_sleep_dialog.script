@@ -138,9 +138,6 @@ function sleep_dialog:OnButtonSleep()
 	_G.amb_vol = get_console():get_float("snd_volume_eff")
 	get_console():execute("snd_volume_music 0")
 	get_console():execute("snd_volume_eff 0")
-	if (itms_manager.sleep_actor_safe) then
-		surge_manager.resurrect_skip_message()
-	end
 	if sleep_control.forced then
 		level.add_cam_effector("camera_effects\\surge_02.anm", 10, false, "ui_sleep_dialog.dream_callback")
 	else
@@ -157,14 +154,12 @@ function sleep_dialog:OnButtonCancel()
 	db.actor:give_info_portion("tutorial_sleep")
 	disable_info("actor_is_sleeping")
 	disable_info("sleep_active")
-	if (itms_manager) then itms_manager.sleep_actor_not_safe = nil end
 end
 
 function sleep_dialog:OnMessageBoxOk()
 	db.actor:give_info_portion("tutorial_sleep")
 	disable_info("actor_is_sleeping")
 	disable_info("sleep_active")
-	if (itms_manager) then itms_manager.sleep_actor_safe = nil end
 end
 
 --------------------------------------------------------------------------------
@@ -174,47 +169,21 @@ function dream_callback()
 	else
 		level.add_cam_effector("camera_effects\\sleep.anm", 10, false, "ui_sleep_dialog.dream_callback2")
 	end
-	local in_cover = surge_manager.actor_in_cover()
+	
 	local hours = sleep_control.forced or sleep_control.time_track:GetIValue()
-	local mins = 0
-	if not in_cover then
-		local sm = surge_manager.SurgeManager
-		local sde = game.get_game_time():diffSec(sm.last_surge_time)
-		local stime = sde+hours*3600+600-sm._delta
-		if stime > 0 then
-			hours = hours-math.ceil(stime/3600)
-		end
-		if hours <= 0 then
-			hours = 0
-			mins = math.random(5,15)
-		end
+	printf("dream_callback hours=%s",hours)
+	level.change_game_time(0,hours,0)
+	
+	surge_manager.SurgeManager.time_forwarded = true
+	if (psi_storm_manager) then
+		psi_storm_manager.PsiStormManager.time_forwarded = true
 	end
-	level.change_game_time(0,hours,mins)
+		
+	if(surge_manager.is_started() and level_weathers.get_weather_manager().weather_fx) then
+		level.stop_weather_fx()
+	end
 	level_weathers.get_weather_manager():forced_weather_change()
-
-	-- I disabled sleep_actor_safe, no longer in use
-	if (itms_manager.sleep_actor_safe) then
-		surge_manager.SurgeManager.time_forwarded = true
-		if (psi_storm_manager) then
-			psi_storm_manager.PsiStormManager.time_forwarded = true
-		end
-		if(surge_manager.is_started() and level_weathers.get_weather_manager().weather_fx) then
-			level.stop_weather_fx()
---			level_weathers.get_weather_manager():select_weather(true)
-			level_weathers.get_weather_manager():forced_weather_change()
-		end
-	else
-		surge_manager.SurgeManager.skip_message = true
-		if (math.random() < 0.025 * hours) then
-			sleep_control.force_surge = true
-		end
-	end
-	sleep_control.forced = nil
 	db.actor.power = 1
-    printf("dream_callback: time forwarded on [%d]", hours)
-	if postproces_mod then
-		postproces_mod.sleep_callback(hours,mins)
-	end
 end
 
 function dream_callback2()
@@ -226,11 +195,6 @@ function dream_callback2()
 	db.actor:give_info_portion("tutorial_sleep")
 	disable_info("actor_is_sleeping")
 	disable_info("sleep_active")
-	if (itms_manager) then itms_manager.sleep_actor_safe = nil end
-	if (sleep_control.force_surge) then
-		surge_manager.start_surge(true)
-		sleep_control.force_surge = nil
-	end
 end
 
 function sleep()

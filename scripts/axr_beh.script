@@ -198,49 +198,25 @@ end
 function action_beh:execute()
 	action_base.execute(self)
 
-	self:set_desired_distance()
-	self:set_desired_behavior()
-	self:set_desired_animation()
-
-	if not (self.st.behavior) then
-		return
-	end
-
-	if not ( self:set_desired_target() ) then
-		return
-	end
-	
-	if (self.st.last_behavior ~= self.st.behavior) then
-		self.st.last_behavior = self.st.behavior
-		self.st.rally_lvid = nil
-	end
-
-	if (self.st.target == "waypoint") then
-		return self:beh_path()
-	elseif (self.st.target == "cover" or self.st.target == "cover_near_actor" or self.st.target == "task_target_anomaly" or self.st.target == "scan_area" or self.st.target == "task_target_hostage") then 
-		return self:beh_cover()
-	elseif (self.st.behavior == "beh_move") then
-		return self:beh_move()
-	elseif (self.st.behavior == "beh_wait") then
-		return self:beh_wait()
-	end
-end
-
-function action_beh:set_desired_distance()
-	local keep_distance = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.keep_distance)
+	local keep_distance 		= xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.keep_distance)
 	self.st.desired_distance	= tonumber(xr_logic.pick_section_from_condlist(db.actor, self.object, self.st[keep_distance.."_desired_dist"]))
-end
-
-function action_beh:set_desired_behavior()
-	self.st.behavior = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.behavior_state,"behavior_state")
-end
-
-function action_beh:set_desired_animation()
+	
+	self.st.behavior 			= xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.behavior_state,"behavior_state") or "beh_wait"
+	
 	self.st.wait_animation 		= xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.wait_cond)
 	self.st.walk_animation 		= xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.walk_cond)
 	self.st.jog_animation 		= xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.jog_cond)
 	self.st.run_animation 		= xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.run_cond)
 	self.st.delay_animation 	= xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.delay_cond)
+
+	if (self.st.last_behavior ~= self.st.behavior) then
+		self.st.last_behavior = self.st.behavior
+		self.st.rally_lvid = nil
+	end
+
+	if (self:set_desired_target() and self[self.st.behavior]) then 
+		self[self.st.behavior](self)
+	end
 end
 
 function action_beh:set_desired_target()
@@ -314,21 +290,26 @@ function action_beh:set_desired_target()
 			t.object = db.actor
 			db.used_level_vertex_ids[vid] = self.object:id()
 			t.__keep_until = time_global() + 3000
+			self.st.behavior = "beh_cover"
 		end
-	elseif (target == "cover") then
-		local vid = alun_utils.find_close_cover(self.object,self.object:position(),db.actor:position()) or self.object:level_vertex_id()
-		if (vid) then 
+	elseif (target == "cover_wait") then
+		local vid = alun_utils.try_go_cover(self.object,self.object,self.st.desired_target and self.st.desired_target.level_vertex_id or nil,3) or self.object:level_vertex_id()
+		if (vid) then
+			db.used_level_vertex_ids[vid] = self.object:id()
 			t.level_vertex_id = vid
 			t.position = level.vertex_position(vid)
 			t.direction = self.object:position():sub(t.position)
-			t.object = nil
+			local dist = db.actor:position():distance_to_sqr(self.object:position())
+			t.object = dist <= 5 and db.actor or nil
+			t.__keep_until = -1
+			self.st.behavior = "beh_cover"
 		end
 	elseif (target == "task_target_anomaly") then
 		local name = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
 		if (name) then 
 			local anomaly = db.anomaly_by_name[name]
 			if (anomaly and anomaly.object) then
-				local vid = alun_utils.try_go_cover(self.object,anomaly.object:position())
+				local vid = alun_utils.try_go_cover(self.object,anomaly.object:position(),self.st.desired_target and self.st.desired_target.level_vertex_id or nil)
 				if (vid) then
 					db.used_level_vertex_ids[vid] = self.object:id()
 					t.level_vertex_id = vid
@@ -336,11 +317,12 @@ function action_beh:set_desired_target()
 					t.direction = self.object:position():sub(t.position)
 					t.object = anomaly.object
 					t.__keep_until = time_global() + 8000
+					self.st.behavior = "beh_cover"
 				end
 			end
 		end
 	elseif (target == "task_target_hostage") then
-		local vid = alun_utils.try_go_cover(self.object,self.object)
+		local vid = alun_utils.try_go_cover(self.object,self.object,self.st.desired_target and self.st.desired_target.level_vertex_id or nil,3) or self.object:level_vertex_id()
 		if (vid) then
 			db.used_level_vertex_ids[vid] = self.object:id()
 			t.level_vertex_id = vid
@@ -348,9 +330,11 @@ function action_beh:set_desired_target()
 			t.direction = self.object:position():sub(t.position)
 			--t.object = db.actor
 			t.__keep_until = -1
+			self.st.behavior = "beh_cover"
 		end
 	elseif (target == "waypoint") then
 		t = self:get_current_waypoint()
+		self.st.behavior = "beh_path"
 	elseif (target == "commander") then
 		local squad = get_object_squad(self.object)
 		if not(squad:commander_id() == self.object:id()) then
@@ -375,6 +359,8 @@ function action_beh:set_desired_target()
 		if (id) then
 			set_position_data(id)
 		end
+	elseif (target == "scan_area") then 
+		self.st.behavior = "beh_cover"
 	end
 
 	if not (t.level_vertex_id) then
@@ -409,16 +395,7 @@ function action_beh:beh_wait()
 
 	if (new_state and new_state ~= state) then
 		local target = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.goto_target)
-		local lobj
-		if (target and target ~= "") then
-			if (target ~= "enemy") then
-				lobj = get_story_object(target)
-			else
-				local st = db.storage[self.object:id()]
-				local be = self.object:best_enemy() or st and st.enemy_id and level.object_by_id(st.enemy_id)
-				lobj = be and be:alive() and self.object:see(be) and be
-			end
-		end
+		local lobj = target and target ~= "" and get_story_object(target)
 		state_mgr.set_state(self.object, new_state,nil, nil, {look_object = lobj })
 	end
 end
