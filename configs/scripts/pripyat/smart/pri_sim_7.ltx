@@ -2,10 +2,16 @@
 squad_id = 30
 max_population = 1
 respawn_params = respawn@pri_sim_7
+respawn_idle = 30000
 
 [respawn@pri_sim_7]
 merc_sim_squad
+spawn_merc
 
 [merc_sim_squad]
 spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_veteran
 spawn_num =  {+pri_a28_actor_in_zone_stay} 1, 0
+
+[spawn_merc]
+spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_veteran
+spawn_num =  1
