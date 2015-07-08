@@ -163,7 +163,7 @@ function action_radio_in_heli:initialize()
 end
 
 function action_radio_in_heli:try_go_cover(npc,enemy,ene_pos)
-	--alun_utils.debug_write(alun_utils.sr("action_radio_in_heli:try_go_cover"))
+	--alun_utils.debug_write(strformat("action_radio_in_heli:try_go_cover"))
 	local lvid = alun_utils.load_var(npc,"fight_from_point")
 	local pos  = lvid and level.vertex_position(lvid) or npc:position()
 	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,5,db.used_level_vertex_ids)

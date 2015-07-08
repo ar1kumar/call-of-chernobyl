@@ -78,7 +78,7 @@ function npc_sound:is_playing(npc_id)
 	return obj:active_sound_count() ~= 0 or (self.pda_snd_obj and self.pda_snd_obj:playing())
 end
 function npc_sound:init_npc(npc)
-	--alun_utils.debug_write(alun_utils.sr("npc_sound:init_npc %s",npc and npc:name()))
+	--alun_utils.debug_write(strformat("npc_sound:init_npc %s",npc and npc:name()))
 	local npc_id = npc:id()
 	self.sound_path[npc_id] = {}
 

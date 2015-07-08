@@ -119,7 +119,7 @@ function simulation_board:__init()
 end
 
 function simulation_board:register_smart(obj)
-	--alun_utils.debug_write(alun_utils.sr("simulation_board:register_smart %s",obj and obj:name()))
+	--alun_utils.debug_write(strformat("simulation_board:register_smart %s",obj and obj:name()))
 	if self.smarts[obj.id] ~= nil then
 		printf("Smart already exist in list [%s]", obj:name())
 		return
@@ -131,7 +131,7 @@ function simulation_board:register_smart(obj)
 end
 
 function simulation_board:unregister_smart(obj)
-	--alun_utils.debug_write(alun_utils.sr("simulation_board:unregister_smart %s",obj and obj:name()))
+	--alun_utils.debug_write(strformat("simulation_board:unregister_smart %s",obj and obj:name()))
 	self.smarts[obj.id] = nil
 	self.smarts_by_names[obj:name()] = nil
 end
@@ -151,7 +151,7 @@ end
 
 -- Инициализация смарта
 function simulation_board:init_smart(obj)
-	--alun_utils.debug_write(alun_utils.sr("simulation_board:init_smart %s",obj and obj:name()))
+	--alun_utils.debug_write(strformat("simulation_board:init_smart %s",obj and obj:name()))
 	if self.tmp_assigned_squad[obj.id] ~= nil then
 		for k,v in pairs(self.tmp_assigned_squad[obj.id]) do
 			self:assign_squad_to_smart(v, obj.id)
@@ -162,7 +162,7 @@ end
 
 --' Создание нового отряда
 function simulation_board:create_squad(spawn_smart, sq_id)
-	--alun_utils.debug_write(alun_utils.sr("simulation_board:create_squad spawn_smart=%s sq_id=%s",spawn_smart and spawn_smart:name(),sq_id))
+	--alun_utils.debug_write(strformat("simulation_board:create_squad spawn_smart=%s sq_id=%s",spawn_smart and spawn_smart:name(),sq_id))
 	local squad_id = tostring(sq_id)
 	if not (system_ini():section_exist(squad_id)) then
 		printf("squad section does not exist: %s",squad_id)
@@ -190,7 +190,7 @@ end
 --' Удалить отряд
 
 function simulation_board:remove_squad(squad)
-	--alun_utils.debug_write(alun_utils.sr("simulation_board:remove_squad %s",squad and squad:name()))
+	--alun_utils.debug_write(strformat("simulation_board:remove_squad %s",squad and squad:name()))
 
 	self:assign_squad_to_smart(squad, nil)
 
@@ -202,7 +202,7 @@ function simulation_board:remove_squad(squad)
 end
 --' Назначение отряда в смарт.
 function simulation_board:assign_squad_to_smart(squad, smart_id)
-	--alun_utils.debug_write(alun_utils.sr("simulation_board:assign_squad_to_smart %s smart_id=%s",squad and squad:name(),smart_id))
+	--alun_utils.debug_write(strformat("simulation_board:assign_squad_to_smart %s smart_id=%s",squad and squad:name(),smart_id))
 
 	if (smart_id and self.smarts[smart_id] == nil) then
 		if self.tmp_assigned_squad[smart_id] == nil then
@@ -242,7 +242,7 @@ end
 
 -- установить squad и group в соответствии с работой
 function simulation_board:setup_squad_and_group(obj)
-	--alun_utils.debug_write(alun_utils.sr("simulation_board:setup_squad_and_group %s",obj and obj:name()))
+	--alun_utils.debug_write(strformat("simulation_board:setup_squad_and_group %s",obj and obj:name()))
 	local sim = alife()
 	if not (sim) then 
 		return 
@@ -283,6 +283,8 @@ function simulation_board:fill_start_position()
 		return
 	end
 	self.start_position_filled = true
+	
+	--alun_utils.debug_write(strformat("simulation_board:fill_start_position"))
 
 	local gg = game_graph()
 	local sim = alife()

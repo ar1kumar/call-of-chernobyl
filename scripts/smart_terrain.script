@@ -98,7 +98,7 @@ function se_smart_terrain:on_before_register()
 end
 
 function se_smart_terrain:on_register()
-	--alun_utils.debug_write(alun_utils.sr("%s:ON_REGISTER start",self:name()))
+	--alun_utils.debug_write(strformat("%s:ON_REGISTER start",self:name()))
 	cse_alife_smart_zone.on_register(self)
 
 	local sim = alife()
@@ -112,7 +112,7 @@ function se_smart_terrain:on_register()
 			if not (string.find(simulation_objects.config:GetValue(actor_level,"target_maps",0,""),self.smart_level)) then
 				SIMBOARD.smarts[self.id] = nil
 				self.disabled = true
-				--alun_utils.debug_write(alun_utils.sr("%s:ON_REGISTER END (DISABLED)",self:name()))
+				--alun_utils.debug_write(strformat("%s:ON_REGISTER END (DISABLED)",self:name()))
 				return
 			end
 		end
@@ -137,7 +137,7 @@ function se_smart_terrain:on_register()
 	self:register_delayed_npc()
 
 	self.check_time = time_global()
-	--alun_utils.debug_write(alun_utils.sr("%s:ON_REGISTER END",self:name()))
+	--alun_utils.debug_write(strformat("%s:ON_REGISTER END",self:name()))
 end
 
 function se_smart_terrain:on_unregister()
@@ -277,7 +277,7 @@ function se_smart_terrain:read_params()
 end
 
 function se_smart_terrain:fill_npc_info(obj)
-	--alun_utils.debug_write(alun_utils.sr("%s:fill_npc_info %s",self:name(),obj and obj:name()))
+	--alun_utils.debug_write(strformat("%s:fill_npc_info %s",self:name(),obj and obj:name()))
 	local cls = obj.clsid and obj:clsid()
 	if not (cls) then 
 		return printf("fill_npc_info invalid clsid for %s",obj and obj:name())
@@ -300,7 +300,7 @@ end
 function se_smart_terrain:register_delayed_npc()
 	if (self.npc_to_register) then
 		for k,v in pairs(self.npc_to_register) do
-			--alun_utils.debug_write(alun_utils.sr("%s:register_delayed_npc %s",self:name(),v and v:name()))
+			--alun_utils.debug_write(strformat("%s:register_delayed_npc %s",self:name(),v and v:name()))
 			self:register_npc(v)
 		end
 		self.npc_to_register = nil
@@ -308,7 +308,7 @@ function se_smart_terrain:register_delayed_npc()
 end
 
 function se_smart_terrain:register_npc(obj)
-	--alun_utils.debug_write(alun_utils.sr("%s:register_npc %s",self:name(),obj and obj:name()))
+	--alun_utils.debug_write(strformat("%s:register_npc %s",self:name(),obj and obj:name()))
 	-- ensure registration is clean
 	if (self.arriving_npc[obj.id] or self.npc_info[obj.id]) then
 		--self.arriving_npc[obj.id] = nil
@@ -352,7 +352,7 @@ function se_smart_terrain:register_npc(obj)
 end
 
 function se_smart_terrain:unregister_npc(obj)
-	--alun_utils.debug_write(alun_utils.sr("%s:unregister_npc %s",self:name(),obj and obj:name()))
+	--alun_utils.debug_write(strformat("%s:unregister_npc %s",self:name(),obj and obj:name()))
 	
 	self.arriving_npc[obj.id] = nil
 	
@@ -382,7 +382,7 @@ function se_smart_terrain:unregister_npc(obj)
 end
 
 function se_smart_terrain:clear_dead(obj)
-	--alun_utils.debug_write(alun_utils.sr("%s:clear_dead %s",self:name(),obj and obj:name()))
+	--alun_utils.debug_write(strformat("%s:clear_dead %s",self:name(),obj and obj:name()))
 	
 	self.arriving_npc[obj.id] = nil
 	
@@ -396,7 +396,7 @@ function se_smart_terrain:clear_dead(obj)
 end
 
 function se_smart_terrain:task(obj)
-	--alun_utils.debug_write(alun_utils.sr("%s:task %s",self:name(),obj and obj:name()))
+	--alun_utils.debug_write(strformat("%s:task %s",self:name(),obj and obj:name()))
 	if (self.disabled) then
 		return self.smart_alife_task
 	end
@@ -428,7 +428,7 @@ function se_smart_terrain:load_jobs()
 		return
 	end
 	
-	--alun_utils.debug_write(alun_utils.sr("%s:load_jobs %s  Before",self:name(),obj and obj:name()))
+	--alun_utils.debug_write(strformat("%s:load_jobs %s  Before",self:name(),obj and obj:name()))
 
 	-- load job data from dynamic ltx from gulag_general.script
 	gulag_general.load_job(self)
@@ -436,7 +436,7 @@ function se_smart_terrain:load_jobs()
 		printf("CRITICAL ERROR: %s does not have a dynamic ltx!",self:name())
 		return
 	end
-	--alun_utils.debug_write(alun_utils.sr("%s:load_jobs %s  After",self:name(),obj and obj:name()))
+	--alun_utils.debug_write(strformat("%s:load_jobs %s  After",self:name(),obj and obj:name()))
 	
 	-- Setup Alife Tasks for smart's gulag jobs
 	local job,active_section,section,ltx, path_field, path_name, smartcover, smartcover_name, prefix_name, job_type
@@ -519,7 +519,7 @@ function se_smart_terrain:load_jobs()
 end
 
 function se_smart_terrain:clear_job(id,rem)
-	--alun_utils.debug_write(alun_utils.sr("%s:clear_job %s",self:name(),id))
+	--alun_utils.debug_write(strformat("%s:clear_job %s",self:name(),id))
 	if (self.npc_info[id]) then 
 		if (self.npc_info[id].job) then 
 			self.npc_by_job_section[self.npc_info[id].job.section] = nil
@@ -577,7 +577,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 		return
 	end
 
-	--alun_utils.debug_write(alun_utils.sr("%s:select_npc_job %s",self:name()))
+	--alun_utils.debug_write(strformat("%s:select_npc_job %s",self:name()))
 	
 	if not (npc_info and npc_info.se_obj and npc_info.stype) then 
 		return printf("%s no npc_info!",self:name())
@@ -957,7 +957,7 @@ function se_smart_terrain:STATE_Write(packet)
 end
 
 function se_smart_terrain:STATE_Read(packet, size)
-	--alun_utils.debug_write(alun_utils.sr("%s:STATE_READ start",self:name()))
+	--alun_utils.debug_write(strformat("%s:STATE_READ start",self:name()))
 	cse_alife_smart_zone.STATE_Read(self, packet, size)
 	
 	self:read_params()
@@ -1049,7 +1049,7 @@ function se_smart_terrain:STATE_Read(packet, size)
 	end
 
 	--set_save_marker(packet, "load", true, "se_smart_terrain")
-	--alun_utils.debug_write(alun_utils.sr("%s:STATE_READ end",self:name()))
+	--alun_utils.debug_write(strformat("%s:STATE_READ end",self:name()))
 end
 
 -- Setup NPC jobs from loaded savegames. Use unique ids generated
@@ -1212,7 +1212,7 @@ function se_smart_terrain:update()
 		return
 	end
 	
-	--alun_utils.debug_write(alun_utils.sr("%s:update ",self:name()))
+	--alun_utils.debug_write(strformat("%s:update ",self:name()))
 	
 	if self.respawn_params ~= nil then
 		self:try_respawn()
@@ -1314,7 +1314,7 @@ end
 
 -- called in xr_motivator and bind_monster net_spawn()
 function setup_gulag_and_logic_on_spawn(obj, st, se_obj, stype, loaded)
-	--alun_utils.debug_write(alun_utils.sr("smart_terrain.setup_gulag_and_logic_on_spawn %s",obj and obj:name()))
+	--alun_utils.debug_write(strformat("smart_terrain.setup_gulag_and_logic_on_spawn %s",obj and obj:name()))
 	local sim = alife()
 	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and sim:object(se_obj.m_smart_terrain_id)
 	local npc_info = smart and smart.npc_info and smart.npc_info[se_obj.id]
@@ -1369,7 +1369,7 @@ function se_smart_terrain:on_after_reach(squad)
 end
 
 function se_smart_terrain:on_reach_target(squad)
-	--alun_utils.debug_write(alun_utils.sr("%s:on_reach_target %s",self:name(),squad and squad:name()))
+	--alun_utils.debug_write(strformat("%s:on_reach_target %s",self:name(),squad and squad:name()))
 	squad:set_location_types(self:name())
 	SIMBOARD:assign_squad_to_smart(squad, self.id)
 	for k in squad:squad_members() do
@@ -1403,7 +1403,7 @@ function surge_stats()
 end
 
 function se_smart_terrain:target_precondition(squad, ignore_population)
-	--alun_utils.debug_write(alun_utils.sr("%s:target_precondition",squad and squad:name()))
+	--alun_utils.debug_write(strformat("%s:target_precondition",squad and squad:name()))
 	if self.respawn_only_smart == true then
 		return false
 	end
@@ -1475,7 +1475,7 @@ function se_smart_terrain:try_respawn()
 	if (has_alife_info("actor_made_wish_for_peace")) then 
 		return 
 	end
-	--alun_utils.debug_write(alun_utils.sr("%s:try_respawn",self:name()))
+	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
 	
 	if (self.is_on_actor_level and not has_alife_info("actor_is_sleeping")) then
 		local sim = alife()

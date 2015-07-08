@@ -80,7 +80,10 @@ function sleep_dialog:TestAndShow()
 	if (sleep_control.ph_sleepbag_id and sleep_control.item_section) then
 		local sim = alife()
 		sim:create(sleep_control.item_section,db.actor:position(),0,0,0)
-		sim:release(sim:object(sleep_control.ph_sleepbag_id))
+		local se_bag = sim:object(sleep_control.ph_sleepbag_id)
+		if (se_bag) then
+			sim:release(se_bag,true)
+		end
 		sleep_control.ph_sleepbag_id = nil
 	end
 

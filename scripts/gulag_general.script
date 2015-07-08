@@ -372,7 +372,7 @@ use_camp = {!npc_community(zombied)} true, false
 anim = {!npc_community(zombied)} sit_ass, guard
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,gname)
+			job_ltx = strformat(job_ltx,name,name,name,gname)
 
 			if (smart.def_restr) then
 				job_ltx = job_ltx .."out_restr = "..smart.def_restr.."\n"
@@ -408,7 +408,7 @@ use_attack_direction = false
 anim = {!npc_community(zombied)} sit_ass, guard
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,gname)
+			job_ltx = strformat(job_ltx,name,name,name,gname)
 
 			if (smart.def_restr) then
 				job_ltx = job_ltx .."out_restr = "..smart.def_restr.."\n"
@@ -443,7 +443,7 @@ path_walk = surge_%s_walk
 def_state_standing = guard
 def_state_moving = {=dist_to_job_point_ge(25)} sprint, {=dist_to_job_point_ge(5)} run, patrol
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i)
+			job_ltx = strformat(job_ltx,name,name,name,i)
 
 			if (level.patrol_path_exists(gname.."_surge_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = surge_"..i.."_look\n"
@@ -482,7 +482,7 @@ active = sleeper@%s
 [sleeper@%s]
 path_main = sleep_%s
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i)
+			job_ltx = strformat(job_ltx,name,name,name,i)
 
 			if (smart.safe_restr and xr_gulag.job_in_restrictor(smart, smart.safe_restr, name)) then
 				job_ltx = job_ltx .. "invulnerable = {=npc_in_zone("..smart.safe_restr..")} true\n"
@@ -522,7 +522,7 @@ path_walk = collector_%s_walk
 def_state_standing = guard
 def_state_moving = patrol
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i)
+			job_ltx = strformat(job_ltx,name,name,name,i)
 
 			if (level.patrol_path_exists(gname.."_collector_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = collector_"..i.."_look\n"
@@ -566,7 +566,7 @@ path_walk = walker_%s_walk
 def_state_standing = guard
 def_state_moving = patrol
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i)
+			job_ltx = strformat(job_ltx,name,name,name,i)
 
 			if (level.patrol_path_exists(gname.."_walker_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = walker_"..i.."_look\n"
@@ -619,7 +619,7 @@ formation = back
 path_walk = patrol_%s_walk
 ]]
 --on_signal = end| %=search_gulag_job%
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i)
+			job_ltx = strformat(job_ltx,name,name,name,i)
 
 			if (level.patrol_path_exists(gname.."_patrol_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = patrol_"..i.."_look\n"
@@ -659,7 +659,7 @@ active = animpoint@%s
 meet = meet@generic_animpoint
 cover_name = %s
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,name)
+			job_ltx = strformat(job_ltx,name,name,name,name)
 
 			if (smart.safe_restr and xr_gulag.job_in_restrictor(smart, smart.safe_restr, name)) then
 				job_ltx = job_ltx .. "invulnerable = {=npc_in_zone("..smart.safe_restr..")} true\n"
@@ -693,7 +693,7 @@ active = animpoint@%s
 meet = meet@generic_animpoint
 cover_name = %s
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,name)
+			job_ltx = strformat(job_ltx,name,name,name,name)
 
 			if (smart.safe_restr and xr_gulag.job_in_restrictor(smart, smart.safe_restr, name)) then
 				job_ltx = job_ltx .. "invulnerable = {=npc_in_zone("..smart.safe_restr..")} true\n"
@@ -731,7 +731,7 @@ active = walker@%s
 meet = meet@generic_lager
 path_walk = guard_%s_walk
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i)
+			job_ltx = strformat(job_ltx,name,name,name,i)
 
 			if (level.patrol_path_exists(gname.."_guard_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = guard_"..i.."_look\n"
@@ -759,7 +759,7 @@ path_walk = guard_%s_walk
 def_state_standing = wait_na
 on_info2 = {=dist_to_obj_on_job_le(logic@follower_%s:5)} remark@%s
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,i,name,name,name,name)
+			job_ltx = strformat(job_ltx,name,i,name,name,name,name)
 
 			if (level.patrol_path_exists(gname.."_guard_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = guard_"..i.."_look\n"
@@ -785,7 +785,7 @@ anim = wait_na
 target = logic@follower_%s
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name)
+			job_ltx = strformat(job_ltx,name,name)
 
 			if (smart.def_restr) then
 				job_ltx = job_ltx .."out_restr = "..smart.def_restr.."\n"
@@ -803,7 +803,7 @@ path_walk = guard_%s_walk
 on_info = {=dist_to_obj_on_job_le(logic@%s:3)} remark@follower_%s
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i,name,name)
+			job_ltx = strformat(job_ltx,name,name,name,i,name,name)
 
 			if (level.patrol_path_exists(gname.."_guard_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = guard_"..i.."_look\n"
@@ -827,7 +827,7 @@ anim = wait_na
 target = logic@%s
 on_timer = %s | %=switch_to_desired_job%
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,guard_timeout)
+			job_ltx = strformat(job_ltx,name,name,guard_timeout)
 
 			if (smart.def_restr) then
 				job_ltx = job_ltx .."out_restr = "..smart.def_restr.."\n"
@@ -869,7 +869,7 @@ def_state_campering = %s
 def_state_campering_fire = %s_fire
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i,state,state)
+			job_ltx = strformat(job_ltx,name,name,name,i,state,state)
 
 			if (level.patrol_path_exists(gname.."_sniper_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = sniper_"..i.."_look\n"
@@ -930,7 +930,7 @@ def_state_moving = rush
 def_state_campering = %s
 def_state_campering_fire = %s_fire
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,radius,i,state,state)
+			job_ltx = strformat(job_ltx,name,name,name,radius,i,state,state)
 
 			if (level.patrol_path_exists(gname.."_camper_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = camper_"..i.."_look\n"
@@ -978,7 +978,7 @@ active = beh@%s
 meet = meet@generic_lager
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name,name)
+			job_ltx = strformat(job_ltx,name,name,name)
 
 			for key,val in pairs (beh_ini.root[name]) do
 				job_ltx = job_ltx .. key .. " = " .. val .. "\n"
@@ -1004,7 +1004,7 @@ active = beh@%s
 meet = meet@generic_lager
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name,name)
+			job_ltx = strformat(job_ltx,name,name,name)
 
 			for key,val in pairs (beh_ini.root[name]) do
 				job_ltx = job_ltx .. key .. " = " .. val .. "\n"
@@ -1030,7 +1030,7 @@ active = beh@%s
 meet = meet@generic_lager
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name,name)
+			job_ltx = strformat(job_ltx,name,name,name)
 
 			for key,val in pairs (beh_ini.root[name]) do
 				job_ltx = job_ltx .. key .. " = " .. val .. "\n"
@@ -1061,7 +1061,7 @@ home_mid_radius = 20
 home_max_radius = 70
 ]]
 
-			job_ltx = alun_utils.sr(job_ltx,name,name,name)
+			job_ltx = strformat(job_ltx,name,name,name)
 
 			if (smart.def_restr) then
 				job_ltx = job_ltx .."out_restr = "..smart.def_restr.."\n"
@@ -1094,7 +1094,7 @@ fire_trail        = false
 immortal     	  = false
 mute 			  = false
 ]]
-			job_ltx = alun_utils.sr(job_ltx,name,name,name,i)
+			job_ltx = strformat(job_ltx,name,name,name,i)
 
 			if (level.patrol_path_exists(gname.."_heli_"..i.."_fly_look")) then
 				job_ltx = job_ltx.."path_look = heli_"..i.."_fly_look\n"
@@ -1138,7 +1138,7 @@ fire_trail        = false
 immortal     	  = true
 mute 			  = true	
 ]]
-		job_ltx = alun_utils.sr(job_ltx,level_name.."_heli_hide")
+		job_ltx = strformat(job_ltx,level_name.."_heli_hide")
 		ltx = ltx.."\n\n"..job_ltx
 	end 
 	
@@ -1167,7 +1167,7 @@ show_health       = false
 fire_trail        = false
 on_info			  = {=dist_to_point_le(%s:0:3)} heli_move@hide
 ]]
-				job_ltx = alun_utils.sr(job_ltx,name,name,name,level_name.."_goto_hide",level_name.."_goto_hide",level_name.."_heli_hide")
+				job_ltx = strformat(job_ltx,name,name,name,level_name.."_goto_hide",level_name.."_goto_hide",level_name.."_heli_hide")
 
 				if (level.patrol_path_exists(gname.."_heli_"..i.."_hide_look")) then
 					job_ltx = job_ltx.."path_look = heli_"..i.."_hide_look\n"
@@ -1219,7 +1219,7 @@ fire_trail        = false
 immortal     	  = false
 mute 			  = false
 ]]
-		job_ltx = alun_utils.sr(job_ltx,name,name,name)
+		job_ltx = strformat(job_ltx,name,name,name)
 
 		if (level.patrol_path_exists(gname.."_heli_"..i.."_point_look")) then
 			job_ltx = job_ltx.."path_look = heli_"..i.."_point_look\n"

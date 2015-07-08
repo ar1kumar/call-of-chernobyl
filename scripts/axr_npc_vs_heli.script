@@ -223,7 +223,7 @@ function action_npc_vs_heli:set_fire_type(enemy,dist)
 end
 
 function action_npc_vs_heli:set_item(npc,enemy,ene_pos,see,dist)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:set_item"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:set_item"))
 	local bw = self:find_suitable_weapon(npc,enemy)
 	if not (bw) then 
 		return 
@@ -267,7 +267,7 @@ function action_npc_vs_heli:set_item(npc,enemy,ene_pos,see,dist)
 end
 
 function action_npc_vs_heli:try_go_cover_reload(npc,enemy,ene_pos)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:try_go_cover_reload"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:try_go_cover_reload"))
 	local bw = self:find_suitable_weapon(npc,enemy)
 	
 	if (bw:section() == "knife") then 
@@ -284,7 +284,7 @@ function action_npc_vs_heli:try_go_cover_reload(npc,enemy,ene_pos)
 end
 
 function action_npc_vs_heli:try_go_cover(npc,enemy,ene_pos,dist)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:try_go_cover"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:try_go_cover"))
 	if (not IsHelicopter(enemy)) and (npc:see(enemy) or time_global() - npc:memory_time(enemy) <= 5000) then 
 		return 
 	end 
@@ -296,7 +296,7 @@ function action_npc_vs_heli:try_go_cover(npc,enemy,ene_pos,dist)
 end
 
 function action_npc_vs_heli:try_go_enemy_position(npc,enemy,ene_pos)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:try_go_enemy_position"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:try_go_enemy_position"))
 	--alun_utils.debug_nearest(npc,"try_go_enemy_position")
 	local vid = level.vertex_id(ene_pos)
 	if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then
@@ -305,7 +305,7 @@ function action_npc_vs_heli:try_go_enemy_position(npc,enemy,ene_pos)
 end
 
 function action_npc_vs_heli:try_go_cover_forward(npc,ene_pos)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:try_go_cover_forward"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:try_go_cover_forward"))
 	--alun_utils.debug_nearest(npc,"try_go_cover_forward")
 	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math_random(-25,25))
 	local vid
@@ -343,7 +343,7 @@ function action_npc_vs_heli:try_go_cover_forward(npc,ene_pos)
 end
 
 function action_npc_vs_heli:set_body_state(npc,bod)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:set_body_state"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:set_body_state"))
 	local tg = time_global()
 	self.st.__keep_body_state_until = not self.st.__keep_body_state_until and tg+2000 or self.st.__keep_body_state_until
 	if (self.st.__keep_body_state_until and tg < self.st.__keep_body_state_until) then 
@@ -354,7 +354,7 @@ function action_npc_vs_heli:set_body_state(npc,bod)
 end
 
 function action_npc_vs_heli:set_movement_type(npc,mov)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:set_movement_type"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:set_movement_type"))
 	
 	local tg = time_global()
 	self.st.__keep_movement_type_until = not self.st.__keep_movement_type_until and tg+2000 or self.st.__keep_movement_type_until
@@ -366,7 +366,7 @@ function action_npc_vs_heli:set_movement_type(npc,mov)
 end
 
 function action_npc_vs_heli:find_suitable_weapon(npc,enemy)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:find_suitable_weapon"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:find_suitable_weapon"))
 	local bw = self.st.bw or npc:best_weapon()
 	if not (bw and alun_utils.isLauncher(bw)) then
 		local rpg = npc:object("wpn_rpg7")
@@ -379,7 +379,7 @@ function action_npc_vs_heli:find_suitable_weapon(npc,enemy)
 end 
 
 function action_npc_vs_heli:heli_combat_execute(npc,enemy,ene_pos,see,dist)
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:heli_combat_execute"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:heli_combat_execute"))
 
 	local bw = self:find_suitable_weapon(npc,enemy)
 	local can_fight = db.storage[npc:id()].heli_enemy_flag == true and (alun_utils.isLauncher(bw) or alun_utils.isRifle(bw)) or false
@@ -457,7 +457,7 @@ function action_npc_vs_heli:heli_combat_execute(npc,enemy,ene_pos,see,dist)
 end
 
 function action_npc_vs_heli:execute()
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:execute start"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:execute start"))
 	action_base.execute(self)
 	
 	local npc = self.object
@@ -485,7 +485,7 @@ function action_npc_vs_heli:execute()
 
 	self:heli_combat_execute(npc,enemy,ene_pos,see,dist)
 	
-	--alun_utils.debug_write(alun_utils.sr("action_npc_vs_heli:execute end"))
+	--alun_utils.debug_write(strformat("action_npc_vs_heli:execute end"))
 end
 
 function action_npc_vs_heli:finalize()

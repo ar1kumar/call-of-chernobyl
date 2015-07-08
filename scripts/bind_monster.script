@@ -48,7 +48,7 @@ function generic_object_binder:use_kick(obj, who)
 end 
 
 function generic_object_binder:update(delta)
-	--alun_utils.debug_write(alun_utils.sr("%s:update  loaded=%s",self.object and self.object:name(),self.loaded))
+	--alun_utils.debug_write(strformat("%s:update  loaded=%s",self.object and self.object:name(),self.loaded))
 	object_binder.update(self, delta)
 	
 	local object_alive = self.object:alive()
@@ -134,30 +134,30 @@ function generic_object_binder:update(delta)
 end
 
 function generic_object_binder:extrapolate_callback()
-	--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback START",self.object and self.object:name()))
+	--alun_utils.debug_write(strformat("%s:extrapolate_callback START",self.object and self.object:name()))
 	-- Проверяем, что объект еще в онлайне
 	local st = 	db.storage[self.object:id()]
 	if (st == nil or st.object == nil) then
-		--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
+		--alun_utils.debug_write(strformat("%s:extrapolate_callback end",self.object and self.object:name()))
 		return
 	end
 
 	local cur_pt = self.object:get_current_point_index()
 	if self.object:get_script()	== false then
-		--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
+		--alun_utils.debug_write(strformat("%s:extrapolate_callback end",self.object and self.object:name()))
 		return false
 	end
 
 	local patrol_path = self.object:patrol()
 	if not level.patrol_path_exists(patrol_path) then
-		--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
+		--alun_utils.debug_write(strformat("%s:extrapolate_callback end",self.object and self.object:name()))
 		return false
 	end
 	if patrol(patrol_path):flags(cur_pt):get() == 0 then
-		--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
+		--alun_utils.debug_write(strformat("%s:extrapolate_callback end",self.object and self.object:name()))
 		return true
 	end
-	--alun_utils.debug_write(alun_utils.sr("%s:extrapolate_callback end",self.object and self.object:name()))
+	--alun_utils.debug_write(strformat("%s:extrapolate_callback end",self.object and self.object:name()))
 	return false
 end
 
@@ -168,7 +168,7 @@ function generic_object_binder:waypoint_callback(obj, action_type, index)
 end
 
 function generic_object_binder:death_callback(victim, who)
-	--alun_utils.debug_write(alun_utils.sr("%s:death_callback killer=%s",self.object and self.object:name(),who and who:name()))
+	--alun_utils.debug_write(strformat("%s:death_callback killer=%s",self.object and self.object:name(),who and who:name()))
 	local id = self.object:id()
 	xr_combat_ignore.fighting_with_actor_npcs[id] = nil
 
@@ -339,9 +339,9 @@ end
 
 function generic_object_binder:reload(section)
 	--printf("start generic_object_binder:reload(): self.object:name()='%s' section=%s", self.object:name(),section)
-	--alun_utils.debug_write(alun_utils.sr("--------%s:reload START",self.object and self.object:name()))
+	--alun_utils.debug_write(strformat("--------%s:reload START",self.object and self.object:name()))
 	object_binder.reload(self, section)
-	--alun_utils.debug_write(alun_utils.sr("--------%s:reload END",self.object and self.object:name()))
+	--alun_utils.debug_write(strformat("--------%s:reload END",self.object and self.object:name()))
 	--printf("end generic_object_binder:reload(): self.object:name()='%s' section=%s", self.object:name(),section)
 end
 

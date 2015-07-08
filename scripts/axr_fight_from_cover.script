@@ -150,7 +150,7 @@ function action_fight_from_cover:initialize()
 end
 
 function action_fight_from_cover:try_go_cover(npc,enemy,ene_pos,dist)
-	--alun_utils.debug_write(alun_utils.sr("action_fight_from_cover:try_go_cover"))
+	--alun_utils.debug_write(strformat("action_fight_from_cover:try_go_cover"))
 	local lvid = alun_utils.load_var(npc,"fight_from_point")
 	local pos  = lvid and level.vertex_position(lvid) or npc:position()
 	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,5,db.used_level_vertex_ids)
@@ -160,7 +160,7 @@ function action_fight_from_cover:try_go_cover(npc,enemy,ene_pos,dist)
 end
 
 function action_fight_from_cover:try_go_backward(npc)
-	--alun_utils.debug_write(alun_utils.sr("action_fight_from_cover:try_go_backward"))
+	--alun_utils.debug_write(strformat("action_fight_from_cover:try_go_backward"))
 	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math_random(160,200))
 	local vid
 	local radius = 8
@@ -175,7 +175,7 @@ function action_fight_from_cover:try_go_backward(npc)
 end
 
 function action_fight_from_cover:try_to_strafe(npc,enemy,ene_pos,dist)
-	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:try_to_strafe"))
+	--alun_utils.debug_write(strformat("action_stalker_panic:try_to_strafe"))
 	--alun_utils.debug_nearest(npc,"try_to_strafe")
 	local dir = {}
 	dir[1] = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math.random(-87,-93))
@@ -197,11 +197,14 @@ function action_fight_from_cover:try_to_strafe(npc,enemy,ene_pos,dist)
 end
 
 function action_fight_from_cover:execute()
-	--alun_utils.debug_write(alun_utils.sr("action_fight_from_cover:execute start"))
+	--alun_utils.debug_write(strformat("action_fight_from_cover:execute start"))
 	action_base.execute(self)
 	
 	local npc = self.object
 	local enemy = npc:best_enemy()
+	if not (enemy) then
+		return 
+	end
 	
 	-- ensure and enforce path type
 	if (npc:path_type() ~= game_object.level_path) then 
@@ -237,7 +240,7 @@ function action_fight_from_cover:execute()
 				new_state = "sneak_run_no_wpn"
 			else
 				local is_sniper = alun_utils.isSniper(bw)
-				if (stand) then 
+				if (is_sniper == nil and stand) then 
 					new_state = see and (is_sniper and "threat_sniper_fire" or "threat_fire") or "threat_na"
 				else
 					new_state = see and (is_sniper and "hide_sniper_fire" or "sneak_fire") or "sneak_run"
@@ -280,7 +283,7 @@ function action_fight_from_cover:execute()
 			--printf("try_to_strafe")
 		end
 	end 
-	--alun_utils.debug_write(alun_utils.sr("action_fight_from_cover:execute end 2"))
+	--alun_utils.debug_write(strformat("action_fight_from_cover:execute end 2"))
 end
 
 function action_fight_from_cover:finalize()

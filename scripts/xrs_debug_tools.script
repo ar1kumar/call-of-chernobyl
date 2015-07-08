@@ -443,7 +443,7 @@ function simboard_hud_show(hud)
 	
 	hud:add_msg("-----Totals-----")
 	for k,v in pairs(populations) do 
-		hud:add_msg(k,alun_utils.sr("%s of %s",v.population,v.max_population))
+		hud:add_msg(k,strformat("%s of %s",v.population,v.max_population))
 	end
 	
 	populations = {}
@@ -466,7 +466,7 @@ function simboard_hud_show(hud)
 	
 	hud:add_msg("-----Linked Levels Only-----")
 	for k,v in pairs(populations) do 
-		hud:add_msg(k,alun_utils.sr("%s of %s",v.population,v.max_population))
+		hud:add_msg(k,strformat("%s of %s",v.population,v.max_population))
 	end
 	
 	hud:set_header("-[Simboard Info]-")
@@ -687,10 +687,10 @@ function monster_hud_show(hud)
 		local npc_info = smart and smart.npc_info[near:id()]
 		if (npc_info) then 
 			if (npc_info.job) then
-				local jobinfo = alun_utils.sr("section=%s prior=%s exclusive=%s itr=%s",npc_info.job.section,gulag_general.get_job_prior(npc_info.job),npc_info.job.exclusive,npc_info.current_index)
+				local jobinfo = strformat("section=%s prior=%s exclusive=%s itr=%s",npc_info.job.section,gulag_general.get_job_prior(npc_info.job),npc_info.job.exclusive,npc_info.current_index)
 				hud:add_msg("Job",jobinfo)
 			else 
-				local jobinfo = alun_utils.sr("no job itr=%s",npc_info.current_index)
+				local jobinfo = strformat("no job itr=%s",npc_info.current_index)
 				hud:add_msg("Job",jobinfo)
 			end
 		else 
@@ -1055,7 +1055,7 @@ function position_hud_show(hud)
 				for id,binder in pairs(campfires) do
 					camp = binder.object
 					if (camp and binder.campfire) then
-						hud:add_msg(camp:name(), alun_utils.sr("id=%s is_on=%s selected=%s",id,binder.campfire:is_on(),axr_turn_on_campfire.already_selected[id]) )
+						hud:add_msg(camp:name(), strformat("id=%s is_on=%s selected=%s",id,binder.campfire:is_on(),axr_turn_on_campfire.already_selected[id]) )
 					end
 				end
 			end
@@ -1093,14 +1093,14 @@ function gulag_info_hud_show(hud)
 				for i=1,#smart.heli_jobs do
 					job = smart.heli_jobs[i]
 					sec = string.gsub(job.section,"logic@","")
-					hud:add_msg("["..i.."]",alun_utils.sr("'%s' | %s",sec,smart.npc_by_job_section[job.section] or "empty"))
+					hud:add_msg("["..i.."]",strformat("'%s' | %s",sec,smart.npc_by_job_section[job.section] or "empty"))
 				end
 			end 
 			
 			for i=1,#smart.stalker_jobs do
 				job = smart.stalker_jobs[i]
 				sec = string.gsub(job.section,"logic@","")
-				hud:add_msg("["..i.."]",alun_utils.sr("'%s' | %s",sec,smart.npc_by_job_section[job.section] or "empty"))
+				hud:add_msg("["..i.."]",strformat("'%s' | %s",sec,smart.npc_by_job_section[job.section] or "empty"))
 			end
 		end
 	end
@@ -1145,10 +1145,10 @@ function squad_info_hud_show(hud)
 				local npc_info = smart and smart.npc_info[near:id()]
 				if (npc_info) then 
 					if (npc_info.job) then
-						local jobinfo = alun_utils.sr("section=%s prior=%s exclusive=%s itr=%s",npc_info.job.section,gulag_general.get_job_prior(npc_info.job),npc_info.job.exclusive,npc_info.current_index)
+						local jobinfo = strformat("section=%s prior=%s exclusive=%s itr=%s",npc_info.job.section,gulag_general.get_job_prior(npc_info.job),npc_info.job.exclusive,npc_info.current_index)
 						hud:add_msg("Job",jobinfo)
 					else 
-						local jobinfo = alun_utils.sr("no job itr=%s",npc_info.current_index)
+						local jobinfo = strformat("no job itr=%s",npc_info.current_index)
 						hud:add_msg("Job",jobinfo)
 					end
 				else 
@@ -1184,6 +1184,7 @@ function stalker_info_hud_show(hud)
 		hud:add_msg("Health",math.floor(near.health*100))
 		hud:add_msg("FOV",near:fov())
 		hud:add_msg("Range",near:range())
+		hud:add_msg("rx_dont_shoot",st.rx_dont_shoot)
 		local sight_type = near:sight_params()
 		hud:add_msg("Sight Type",sight_type and sight_type.m_sight_type)
 		local smrt = sobj.m_smart_terrain_id and sobj.m_smart_terrain_id ~= 65535 and alife():object(sobj.m_smart_terrain_id)
@@ -1568,7 +1569,7 @@ function weapon_hud_show(hud)
         eMagEmpty,			--= 9
         eSwitch				--= 10
 		}
-		hud:add_msg("State",alun_utils.sr("%s (%s)",states[wpn:get_state()],wpn:get_state()))
+		hud:add_msg("State",strformat("%s (%s)",states[wpn:get_state()],wpn:get_state()))
 	end
 
 	hud:set_header("-[Weapon Info]-")
@@ -1588,7 +1589,7 @@ function corpse_hud_show(hud)
 				if (xr_corpse_detection.has_valuable_loot and xr_corpse_detection.has_valuable_loot(obj)) then
 					hud:add_msg("",obj:name().."  HasLoot = "..tostring(xr_corpse_detection.has_valuable_loot(obj)))--  DeathTime = "..time_global()-obj:death_time())
 				else
-					hud:add_msg("",alun_utils.sr("%s death_time = %s",obj:name(),time_global()-obj:death_time()))
+					hud:add_msg("",strformat("%s death_time = %s",obj:name(),time_global()-obj:death_time()))
 				end
 			end
 			count = count + 1
@@ -1607,18 +1608,18 @@ function task_hud_show(hud)
 		local smart_id = alun_utils.load_var(db.actor,k.."_id")
 		local smart = smart_id and alife():object(smart_id)
 		
-		local str = alun_utils.sr("status=%s",v.status)
+		local str = strformat("status=%s",v.status)
 		
 		if (v.stage and v.stage > 0) then 
-			str = str .. alun_utils.sr(" stage=%s",v.stage)
+			str = str .. strformat(" stage=%s",v.stage)
 		end 
 		
 		if (smart) then 
-			str = str .. alun_utils.sr(" smart=%s",smart:name())
+			str = str .. strformat(" smart=%s",smart:name())
 		end
 		
 		if (o) then 
-			str = str .. alun_utils.sr(" target=%s",o:name())
+			str = str .. strformat(" target=%s",o:name())
 		end 
 		
 		hud:add_msg(k,str)

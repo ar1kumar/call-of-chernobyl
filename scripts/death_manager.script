@@ -172,7 +172,10 @@ function keep_item(npc, item)
 	-- release all animation objects
 	if (section == "medkit_script" or section == "guitar_a" or section == "harmonica_a" or section == "wpn_binoc" or section == "anim_binoc" or section == "anim_knife" 
 		or section == "device_torch" or section == "device_pda" or section == "hand_radio" or section == "hand_radio_r") then
-		alife():release(alife():object(item:id()), true)
+		local se_item = alife():object(item:id())
+		if (se_item) then
+			alife():release(se_item, true)
+		end
 		return 
 	end
 	
@@ -189,7 +192,10 @@ function keep_item(npc, item)
 	if xr_corpse_detection.lootable_table and xr_corpse_detection.lootable_table[section] == true and ammo_sections[section] == nil then
 		return
 	end
-	alife():release(alife():object(item:id()), true)
+	local se_item = alife():object(item:id())
+	if (se_item) then
+		alife():release(se_item, true)
+	end
 end
 
 function set_weapon_drop_condition(item)

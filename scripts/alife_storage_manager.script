@@ -49,6 +49,8 @@ function CALifeStorageManager_save(fname)
 	local savegame = io.open(path,"wb")
 	if (savegame) then
 		m_data.GAME_VERSION = GAME_VERSION
+		
+		--alun_utils.debug_write(strformat("CALifeStorageManager_save %s GAME_VERSION=%s",savegame,m_data.GAME_VERSION))
 
 		SendScriptCallback("save_state",m_data)
 
@@ -99,6 +101,8 @@ function CALifeStorageManager_load(fname)
 	end 
 	
 	local path = fname:sub(0,-6) .. ".scoc"
+	
+	--alun_utils.debug_write(strformat("CALifeStorageManager_load %s",path))
 	
 	local savegame = io.open(path,"rb")
 	if not (savegame) then

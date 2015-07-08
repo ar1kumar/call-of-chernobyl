@@ -24,7 +24,7 @@ local function on_fighting_actor(npc)
 	if not (IsStalker(npc)) then
 		return 
 	end
-	--alun_utils.debug_write(alun_utils.sr("axr_companions.on_fighting_actor"))
+	--alun_utils.debug_write(strformat("axr_companions.on_fighting_actor"))
 	if (db.actor:has_info("axr_has_companion")) then
 		for i=1,max_actor_squad_size do
 			local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
@@ -48,7 +48,7 @@ local function on_fighting_actor(npc)
 end
 
 local function squad_on_npc_death(squad,se_npc)
-	--alun_utils.debug_write(alun_utils.sr("axr_companions.squad_on_npc_death"))
+	--alun_utils.debug_write(strformat("axr_companions.squad_on_npc_death"))
 	if (se_npc and alife():has_info(se_npc.id,"npcx_is_companion") ) then
 		for i=1,max_actor_squad_size do
 			local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
@@ -77,7 +77,7 @@ local function squad_can_switch_offline(squad)
 end
 
 local function squad_on_update(squad)
-	--alun_utils.debug_write(alun_utils.sr("axr_companions.squad_on_update - heli_enemy_flag"))
+	--alun_utils.debug_write(strformat("axr_companions.squad_on_update - heli_enemy_flag"))
 	local id = squad:commander_id()
 	local sim = alife()
 	if (id and sim:has_info(id,"npcx_is_companion")) then

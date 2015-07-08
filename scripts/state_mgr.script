@@ -247,7 +247,7 @@ end
 
 function act_state_mgr_to_idle:execute()
 	--callstack()
-	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_to_idle:execute %s",self.object:name()))
+	--alun_utils.debug_write(strformat("act_state_mgr_to_idle:execute %s",self.object:name()))
 	action_base.execute(self)
 	if (self.st.target_state ~= "idle") and (self.object:best_enemy() or self.object:best_danger()) then
 		self.object:clear_animations()
@@ -351,7 +351,7 @@ function act_state_mgr_end:execute()
 	self:weapon_update()
 end
 function act_state_mgr_end:weapon_update()
-	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_end:weapon_update %s",self.object:name()))
+	--alun_utils.debug_write(strformat("act_state_mgr_end:weapon_update %s",self.object:name()))
 	if self.st.callback and self.st.callback.timeout then
 		if self.st.callback.begin == nil then
 			self.st.callback.begin = time_global()
@@ -532,7 +532,7 @@ function state_manager:update()
 	local gid = self.planner:current_action_id()
 	--]]
 	
-	--alun_utils.debug_write(alun_utils.sr("goap_action = %s current_action = %s",gid,(id and xrs_debug_tools.actions_by_stalker_ids[id] or id)))
+	--alun_utils.debug_write(strformat("goap_action = %s current_action = %s",gid,(id and xrs_debug_tools.actions_by_stalker_ids[id] or id)))
 	-- END DEBUG PLANNER
 	
 	local lid

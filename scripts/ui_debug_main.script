@@ -1397,7 +1397,7 @@ function debug_ui:OnEditorTriggerAddonSectionSelection()
 	local section = item.sect:GetText()	
 	local ini = system_ini()
 	if  not (ini:section_exist(section)) then
-		self:SendOutput(alun_utils.sr("UIEditor: Section %s does not exist",section))
+		self:SendOutput(strformat("UIEditor: Section %s does not exist",section))
 		return 
 	end 
 	
@@ -1468,7 +1468,7 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	local section = item.sect:GetText()	
 	local ini = system_ini()
 	if  not (ini:section_exist(section)) then
-		self:SendOutput(alun_utils.sr("UIEditor: Section %s does not exist",section))
+		self:SendOutput(strformat("UIEditor: Section %s does not exist",section))
 		return 
 	end 
 	
@@ -1725,7 +1725,7 @@ function debug_ui:OnEditorSave()
 	local section = item.sect:GetText()	
 	local ini = system_ini()
 	if  not (ini:section_exist(section)) then
-		self:SendOutput(alun_utils.sr("UIEditorSave: Section %s does not exist",section))
+		self:SendOutput(strformat("UIEditorSave: Section %s does not exist",section))
 		return 
 	end
 	

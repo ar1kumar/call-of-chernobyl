@@ -56,7 +56,7 @@ function act_state_mgr_animation_start:__init(name, st) super (nil, name)
 end
 function act_state_mgr_animation_start:initialize()
 	action_base.initialize(self)
-	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_animation_start:initialize %s anim=%s",self.object:name(),state_lib.states[self.st.target_state].animation))
+	--alun_utils.debug_write(strformat("act_state_mgr_animation_start:initialize %s anim=%s",self.object:name(),state_lib.states[self.st.target_state].animation))
 	self.st.animation:set_state(state_lib.states[self.st.target_state].animation)
 	self.st.animation:set_control()
 end
@@ -75,7 +75,7 @@ function act_state_mgr_animation_stop:__init(name, st) super (nil, name)
 end
 function act_state_mgr_animation_stop:initialize()
 	action_base.initialize(self)
-	--alun_utils.debug_write(alun_utils.sr("act_state_mgr_animation_stop:initialize %s fast_set=%s",self.object:name(),self.st.fast_set or state_lib.states[self.st.target_state].fast_set))
+	--alun_utils.debug_write(strformat("act_state_mgr_animation_stop:initialize %s fast_set=%s",self.object:name(),self.st.fast_set or state_lib.states[self.st.target_state].fast_set))
 	self.st.animation:set_state(nil, self.st.fast_set or state_lib.states[self.st.target_state].fast_set)
 	self.st.animation:set_control()
 end
@@ -141,7 +141,7 @@ function animation:set_state(new_state, fast_set)
 	--printf("[%s] [%s] set new animation [%s], current_state [%s]", self.npc:name(), self.name, tostring(new_state), tostring(self.states.current_state))
 --	print_table(self.states)
 
-	--alun_utils.debug_write(alun_utils.sr("animation:set_state %s state=%s fast_set=%s",self.npc:name(),new_state,fast_set))
+	--alun_utils.debug_write(strformat("animation:set_state %s state=%s fast_set=%s",self.npc:name(),new_state,fast_set))
 
 	-- Быстрый выход, если понадобится.
 	if (fast_set == true) then

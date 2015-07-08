@@ -42,8 +42,10 @@ function action_zombie_shoot:initialize()
 	self.object:set_detail_path_type    ( move.line )
 	self.last_state = nil
 	local be  = self.object:best_enemy()
-	self.enemy_last_seen_pos = be:position()
-	self.enemy_last_seen_vid = be:level_vertex_id()
+	if (be) then
+		self.enemy_last_seen_pos = be:position()
+		self.enemy_last_seen_vid = be:level_vertex_id()
+	end
 	self.last_vid   = nil
 	self.valid_path = false
 	self.turn_time  = 0
@@ -70,6 +72,9 @@ function action_zombie_shoot:execute()
 	action_base.execute( self )
 
 	local be  = self.object:best_enemy()
+	if not (be) then 
+		return 
+	end
 	local see = self.object:see( be )
 
 	--' ≈сли видим врага - то запоминаем его позицию и ноду

@@ -30,6 +30,8 @@ local function npc_on_item_take(npc,item)
 	if (npc:alive() ~= true or item == nil) then
 		return
 	end
+	
+	--alun_utils.debug_write(strformat("xr_gather_items:npc_on_item_take %s item=%s",npc:name(),item:name()))
 
 	Items[item:id()] = nil
 	
@@ -131,7 +133,7 @@ function gather_item(npc)
 	st.vid = nil
 	st.vid_pos = nil
 
-	local itm = selected_id and level.object_by_id(selected_id)
+	local itm = selected_id and selected_id ~= 0 and selected_id ~=65535 and level.object_by_id(selected_id)
 	local loot_table = UseCorpseLootTable ~= true and LootTable or xr_corpse_detection.lootable_table
 	if (itm == nil or loot_table[itm:section()] == nil) then
 		printf("nooooo!  itm=%s lootable=%s",itm and itm:name(), itm and loot_table[itm:section()])
@@ -140,6 +142,9 @@ function gather_item(npc)
 
 	local itm_id = itm:id()
 	local se_itm = alife():object(selected_id)
+	if not (se_itm) then 
+		return 
+	end
 
 	if (se_itm and IsArtefact(nil,se_itm:clsid())) then
 		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[itm_id]
@@ -155,7 +160,7 @@ function gather_item(npc)
 		return
 	end
 
-	local se_new = alife():create(itm:section(),npc:position(),0,0,id)
+	alife():create(itm:section(),npc:position(),0,0,id)
 	alife():release(se_itm)
 end
 

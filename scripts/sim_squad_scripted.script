@@ -288,7 +288,7 @@ end
 
 -- This update is called for all squads with a scripted smart_terrain target
 function sim_squad_scripted:specific_update(script_target_id)
-	--alun_utils.debug_write(alun_utils.sr("%s:specific_update",self:name()))
+	--alun_utils.debug_write(strformat("%s:specific_update",self:name()))
 	local sim = alife()
 	local se_target = sim:object(script_target_id)
 	if not (se_target) then
@@ -332,7 +332,7 @@ end
 
 -- This update is called for all squads with no scripted assigned target
 function sim_squad_scripted:generic_update()
-	--alun_utils.debug_write(alun_utils.sr("%s:generic_update",self:name()))
+	--alun_utils.debug_write(strformat("%s:generic_update",self:name()))
 	self.assigned_target_id = get_help_target_id(self) or self.assigned_target_id or self.current_target_id
 
 	if (self.current_action) then
@@ -403,28 +403,10 @@ end
 --***********************************************************************************************
 --*										MEMBERS_CONTROL											*
 --***********************************************************************************************
-local function release_object(id)
-	local sim = alife()
-	local se_obj = id and sim:object(id)
-	if not (se_obj) then
-		return true
-	end
-
-	if (se_obj.online) then
-		--se_obj:switch_offline()
-		sim:set_switch_online(se_obj.id,false)
-		sim:set_switch_offline(se_obj.id,true)
-		return false
-	end
-
-	sim:release(se_obj,true)
-
-	return true
-end
 
 --' Удаление персонажей отряда
 function sim_squad_scripted:remove_squad()
-	--alun_utils.debug_write(alun_utils.sr("%s:remove_squad %s",self:name()))
+	--alun_utils.debug_write(strformat("%s:remove_squad %s",self:name()))
 	local squad_npcs = {}
 	for k in self:squad_members() do
 		squad_npcs[k.id] = true
@@ -443,15 +425,17 @@ function sim_squad_scripted:remove_squad()
 end
 
 function sim_squad_scripted:remove_npc(npc_id)
-	--alun_utils.debug_write(alun_utils.sr("%s:remove_npc %s",self:name(),npc_id))
+	--alun_utils.debug_write(strformat("%s:remove_npc %s",self:name(),npc_id))
 	local sim = alife()
 	local npc = sim:object(npc_id)
-	self:on_npc_death(npc)
-	sim:release(npc, true)
+	if (npc) then
+		self:on_npc_death(npc)
+		sim:release(npc, true)
+	end
 end
 
 function sim_squad_scripted:on_npc_death(npc,killer)
-	--alun_utils.debug_write(alun_utils.sr("%s:on_npc_death %s",self:name(),npc and npc:name()))
+	--alun_utils.debug_write(strformat("%s:on_npc_death %s",self:name(),npc and npc:name()))
 	--printf("Squad %s. Killed member %s", tostring(self.id), npc.id)
 	--self.sound_manager:unregister_npc(npc.id)
 	self:unregister_member(npc.id)
@@ -489,7 +473,7 @@ function sim_squad_scripted:assign_squad_member_to_smart(member_id, smart, old_s
 end
 
 function sim_squad_scripted:assign_smart(smart,old_smart_id)
-	--alun_utils.debug_write(alun_utils.sr("%s:assign_smart %s",self:name(),smart and smart:name()))
+	--alun_utils.debug_write(strformat("%s:assign_smart %s",self:name(),smart and smart:name()))
 	local old_smart = old_smart_id and old_smart_id ~= 65535 and alife():object(old_smart_id)
 	if (smart == nil and old_smart == nil) then 
 		return 
@@ -810,7 +794,7 @@ function sim_squad_scripted:STATE_Write(packet)
 	set_save_marker(packet, "save", true, "sim_squad_scripted")
 end
 function sim_squad_scripted:STATE_Read(packet, size)
-	--alun_utils.debug_write( alun_utils.sr("\n%s:STATE_Read start",self:name()) )
+	--alun_utils.debug_write( strformat("\n%s:STATE_Read start",self:name()) )
 	cse_alife_online_offline_group.STATE_Read (self, packet, size)
 	set_save_marker(packet, "load", false, "sim_squad_scripted")
 
@@ -842,19 +826,19 @@ function sim_squad_scripted:STATE_Read(packet, size)
 	end
 	self:init_squad_on_load()
 	set_save_marker(packet, "load", true, "sim_squad_scripted")
-	--alun_utils.debug_write( alun_utils.sr("%s:STATE_Read end",self:name()) )
+	--alun_utils.debug_write( strformat("%s:STATE_Read end",self:name()) )
 end
 --***********************************************************************************************
 --*										SERVER_OBJECT											*
 --***********************************************************************************************
 
 function sim_squad_scripted:on_register()
-	--alun_utils.debug_write( alun_utils.sr("%s:on_register start",self:name()) )
+	--alun_utils.debug_write( strformat("%s:on_register start",self:name()) )
 	cse_alife_online_offline_group.on_register( self )
 	story_objects.check_spawn_ini_for_story_id(self)
 	sim_board.get_sim_board().squads[self.id] = self
 	simulation_objects.get_sim_obj_registry():register(self)
-	--alun_utils.debug_write( alun_utils.sr("%s:on_register end",self:name()) )
+	--alun_utils.debug_write( strformat("%s:on_register end",self:name()) )
 end
 function sim_squad_scripted:on_unregister()
 	cse_alife_online_offline_group.on_unregister( self )
@@ -988,7 +972,7 @@ function sim_squad_scripted:get_squad_props()
 		local t = self.disabled and "disabled\\n\\n" or ""
 
 		t = t .. "%s\\n\\n%s\\n\\n current_target=%s\\nassigned_target=%s\\n\\n"
-		t = alun_utils.sr(t,self.disabled and "[disabled]" or "",self:name(),self.current_target_id == 0 and "actor" or current_target and current_target:name(),self.assigned_target_id == 0 and "actor" or assigned_target and assigned_target:name())
+		t = strformat(t,self.disabled and "[disabled]" or "",self:name(),self.current_target_id == 0 and "actor" or current_target and current_target:name(),self.assigned_target_id == 0 and "actor" or assigned_target and assigned_target:name())
 
 		if (self.current_action) then
 			if (self.current_action == 0) then 

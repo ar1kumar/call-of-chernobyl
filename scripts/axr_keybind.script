@@ -68,7 +68,7 @@ function action.debug_select_object(p)
 	if (p==1) then 
 		DEBUG_NPC = level.get_target_obj and level.get_target_obj()
 		if (DEBUG_NPC) then 
-			SetHudMsg(alun_utils.sr("%s Hold then release key to new position",DEBUG_NPC:name()),8)
+			SetHudMsg(strformat("%s Hold then release key to new position",DEBUG_NPC:name()),8)
 		end
 	elseif (p==0) then
 		if (DEBUG_NPC) then

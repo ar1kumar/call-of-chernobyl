@@ -324,12 +324,12 @@ function action_process_enemy:trader_enemy_callback(obj,enemy)
 end
 
 function action_process_enemy:enemy_callback(npc, enemy)
-	--alun_utils.debug_write(alun_utils.sr("action_process_enemy:enemy_callback"))
+	--alun_utils.debug_write(strformat("action_process_enemy:enemy_callback"))
 	local id = npc:id()
 	local ene_id = enemy:id()
 	
 	if (is_enemy(npc,enemy)) then
-		--alun_utils.debug_write(alun_utils.sr("action_process_enemy:enemy_callback is_enemy true"))
+		--alun_utils.debug_write(strformat("action_process_enemy:enemy_callback is_enemy true"))
 		-- keep track of actor enemies
 		if (ene_id == 0 and not fighting_with_actor_npcs[id]) then
 			fighting_with_actor_npcs[id] = true
@@ -359,7 +359,7 @@ function action_process_enemy:enemy_callback(npc, enemy)
 		st.enemy_id = nil
 	end
 	
-	--alun_utils.debug_write(alun_utils.sr("action_process_enemy:enemy_callback is_enemy false"))
+	--alun_utils.debug_write(strformat("action_process_enemy:enemy_callback is_enemy false"))
 	
 	return false	
 end

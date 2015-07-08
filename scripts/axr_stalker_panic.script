@@ -269,7 +269,7 @@ function action_stalker_panic:initialize()
 end
 
 function action_stalker_panic:try_go_cover(npc,enemy,ene_pos,dist)
-	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:try_go_cover"))
+	--alun_utils.debug_write(strformat("action_stalker_panic:try_go_cover"))
 	local vid = alun_utils.find_close_cover(npc,npc:position(),ene_pos,8,db.used_level_vertex_ids)
 	if (validate(npc,vid) and level.vertex_position(vid):distance_to_sqr(npc:position()) < dist) then
 		return lmove(npc,vid,self.st)
@@ -277,7 +277,7 @@ function action_stalker_panic:try_go_cover(npc,enemy,ene_pos,dist)
 end
 
 function action_stalker_panic:try_to_strafe(npc,enemy,ene_pos,dist)
-	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:try_to_strafe"))
+	--alun_utils.debug_write(strformat("action_stalker_panic:try_to_strafe"))
 	--alun_utils.debug_nearest(npc,"try_to_strafe")
 	local dir = {}
 	dir[1] = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),-90)
@@ -299,7 +299,7 @@ function action_stalker_panic:try_to_strafe(npc,enemy,ene_pos,dist)
 end
 
 function action_stalker_panic:try_to_strafe_behind_enemy(npc,enemy,ene_pos,dist)
-	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:try_to_strafe_behind_enemy"))
+	--alun_utils.debug_write(strformat("action_stalker_panic:try_to_strafe_behind_enemy"))
 	--alun_utils.debug_nearest(npc,"try_to_strafe_behind_enemy")
 	local dir = vector_rotate_y(utils.vector_copy_by_val(enemy:direction()),180)
 	local vid
@@ -315,7 +315,7 @@ function action_stalker_panic:try_to_strafe_behind_enemy(npc,enemy,ene_pos,dist)
 end
 
 function action_stalker_panic:try_go_backward(npc)
-	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:try_go_backward"))
+	--alun_utils.debug_write(strformat("action_stalker_panic:try_go_backward"))
 	--alun_utils.debug_nearest(npc,"try_go_backward")
 	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math_random(160,200))
 	local vid
@@ -331,7 +331,7 @@ function action_stalker_panic:try_go_backward(npc)
 end
 
 function action_stalker_panic:try_go_cover_backward(npc,ene_pos)
-	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:try_go_cover_backward"))
+	--alun_utils.debug_write(strformat("action_stalker_panic:try_go_cover_backward"))
 	--alun_utils.debug_nearest(npc,"try_go_cover_backward")
 	local dir = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math_random(160,200))
 	local vid
@@ -369,7 +369,7 @@ function action_stalker_panic:try_go_cover_backward(npc,ene_pos)
 end
 
 function action_stalker_panic:execute()
-	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:execute start"))
+	--alun_utils.debug_write(strformat("action_stalker_panic:execute start"))
 	action_base.execute(self)
 	
 	local npc = self.object
@@ -451,7 +451,7 @@ function action_stalker_panic:execute()
 		self.st.__keep_point_until = tg + math.random(5000,8000)
 	end 
 	
-	--alun_utils.debug_write(alun_utils.sr("action_stalker_panic:execute end 2"))
+	--alun_utils.debug_write(strformat("action_stalker_panic:execute end 2"))
 end
 
 function action_stalker_panic:finalize()

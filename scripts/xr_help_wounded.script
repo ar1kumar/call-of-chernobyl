@@ -322,8 +322,10 @@ function action_help_wounded:finalize()
 	st.nearest_id = nil
 	st.index = 1
 
-	if (self.object:object("medkit_script")) then
-		alife():release( alife():object(self.object:object("medkit_script"):id()) , true )
+	local medkit = self.object:object("medkit_script")
+	local se_obj = medkit and alife():object(medkit:id())
+	if (se_obj) then
+		alife():release(se_obj,true)
 	end
 	action_base.finalize(self)
 end

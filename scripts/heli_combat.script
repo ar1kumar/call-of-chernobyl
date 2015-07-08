@@ -82,7 +82,7 @@ function heli_combat:__init( object, heliObject )
 end
 
 function heli_combat:is_enemy(obj)
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:is_enemy",obj and obj:name()))
+	--alun_utils.debug_write(strformat("heli_combat:is_enemy",obj and obj:name()))
 	if (obj:alive() ~= true) then 
 		return false 
 	end
@@ -121,7 +121,7 @@ function heli_combat:is_enemy(obj)
 end 
 
 function heli_combat:set_enemy(target)
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:set_enemy",target and target:name()))
+	--alun_utils.debug_write(strformat("heli_combat:set_enemy",target and target:name()))
 	local tg = time_global()
 	self.st.enemy_id = target:id()
 	self.__keep_target_until = tg + 10000
@@ -132,7 +132,7 @@ function heli_combat:set_enemy(target)
 end
 
 function heli_combat:find_valid_target()
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:find_valid_target"))
+	--alun_utils.debug_write(strformat("heli_combat:find_valid_target"))
 	-- Evaluate current target
 	local tg = time_global()
 	local current_target = self.st.enemy_id and db.storage[self.st.enemy_id] and db.storage[self.st.enemy_id].object
@@ -289,7 +289,7 @@ function heli_combat:set_enemy_from_custom_data(combat_enemy)
 end
 
 function heli_combat:set_combat_type(new_combat_type)
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:set_combat_type"))
+	--alun_utils.debug_write(strformat("heli_combat:set_combat_type"))
 	if (self.change_combat_type_allowed and new_combat_type ~= self.combat_type) then
 		self.flyby_initialized  = false
 		self.round_initialized  = false
@@ -321,7 +321,7 @@ function heli_combat:initialize()
 end
 
 function heli_combat:save( packet )
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:save"))
+	--alun_utils.debug_write(strformat("heli_combat:save"))
 --	packet:w_bool( self.retreat_already )
 
 --	printf( "heli_combat:save level_changing=%s", tostring( utils.level_changing() ) )
@@ -354,7 +354,7 @@ function heli_combat:save( packet )
 end
 
 function heli_combat:load( packet )
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:load"))
+	--alun_utils.debug_write(strformat("heli_combat:load"))
 --	self.retreat_already = packet:r_bool()
 	self.initialized     = packet:r_bool()
 
@@ -408,7 +408,7 @@ function heli_combat:update_custom_data_settings()
 end
 
 function heli_combat:forget_enemy()
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:forget_enemy"))
+	--alun_utils.debug_write(strformat("heli_combat:forget_enemy"))
 	self.st.enemy_id = nil
 	self.enemy = nil
 	self.heliObject:LookAtPoint(vector(), false)
@@ -417,7 +417,7 @@ function heli_combat:forget_enemy()
 end
 
 function heli_combat:update_combat_type( see_enemy )
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:update_combat_type"))
+	--alun_utils.debug_write(strformat("heli_combat:update_combat_type"))
 	if (self.attack_before_retreat ~= true and bind_heli.get_heli_health( self.heliObject, self.st ) < self.flame_start_health) then
 		self.attack_before_retreat = true
 		--self.heliObject.m_use_rocket_on_attack = true
@@ -463,20 +463,20 @@ function heli_combat:update()
 		return false
 	end
 	
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:update start"))
+	--alun_utils.debug_write(strformat("heli_combat:update start"))
 	
 	-- job is exclusive, use custom data logic for combat
 	local smart = xr_gulag.get_npc_smart(self.object)
 	local npc_info = smart and smart.npc_info[self.object:id()]
 	if (npc_info and npc_info.job and npc_info.job.exclusive) then 
-		--alun_utils.debug_write(alun_utils.sr("heli_combat:update end 4"))
+		--alun_utils.debug_write(strformat("heli_combat:update end 4"))
 		return false
 	end
 	
 	if not (self.enemy_from_custom_data) then
 		if not (self:find_valid_target()) then
 			self:forget_enemy()
-			--alun_utils.debug_write(alun_utils.sr("heli_combat:update end 3"))
+			--alun_utils.debug_write(strformat("heli_combat:update end 3"))
 			return false
 		end
 	end
@@ -484,7 +484,7 @@ function heli_combat:update()
 	self.enemy = self.st.enemy_id and db.storage[self.st.enemy_id] and db.storage[self.st.enemy_id].object
 	if not (self.enemy) then
 		self:forget_enemy()
-		--alun_utils.debug_write(alun_utils.sr("heli_combat:update end 2"))
+		--alun_utils.debug_write(strformat("heli_combat:update end 2"))
 		return false 
 	end
 	
@@ -517,7 +517,7 @@ function heli_combat:update()
 		self:retreat_update()
 	end
 	
-	--alun_utils.debug_write(alun_utils.sr("heli_combat:update end 1"))
+	--alun_utils.debug_write(strformat("heli_combat:update end 1"))
 	
 	return true
 end
