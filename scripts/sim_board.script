@@ -244,19 +244,6 @@ end
 function simulation_board:setup_squad_and_group(obj)
 	--alun_utils.debug_write(strformat("simulation_board:setup_squad_and_group %s",obj and obj:name()))
 	local sim = alife()
-	if not (sim) then 
-		return 
-	end
-	
-	local gg = game_graph()
-	local group = 0 
-	if (gg and gg:valid_vertex_id(obj.m_game_vertex_id)) then 
-		group = gg:vertex(obj.m_game_vertex_id):level_id()
-	else 
-		printf("Error: obj does not have a valid graph id")
-	end 
-	
-	change_team_squad_group(obj, obj.team, obj.squad, group)
 
 	--' Сквад берем из смарта.
 	local squad = sim:object(obj.group_id)
@@ -264,17 +251,20 @@ function simulation_board:setup_squad_and_group(obj)
 		change_team_squad_group(obj, obj.team, 0, obj.group)
 		return
 	end
-
+	
+	local gg = game_graph()
+	local group = gg and gg:vertex(squad.m_game_vertex_id):level_id() or obj.group
+	
 	local smart = squad.assigned_target_id and sim:object(squad.assigned_target_id) or squad.smart_id and sim:object(squad.smart_id)
 	if smart == nil then
-		change_team_squad_group(obj, obj.team, 0, obj.group)
+		change_team_squad_group(obj, obj.team, obj.squad, group)
 		return
 	end
 	local obj_sq = 0
 	if smart:clsid() == clsid.smart_terrain then
 		obj_sq = smart.squad_id
 	end
-	change_team_squad_group(obj, obj.team, obj_sq, obj.group)
+	change_team_squad_group(obj, obj.team, obj_sq, group)
 end
 
 --' Заполнение стартового расположения
