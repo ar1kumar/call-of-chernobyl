@@ -244,7 +244,7 @@ function action_fight_from_cover:execute()
 				end
 			end
 			
-			state_mgr.set_state(npc,new_state,nil,nil,{look_position = see and ene_pos or self.st.last_vid and level.vertex_position(self.st.last_vid) or ene_pos},{fast_set = true})
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 	
 			if (self.st.__keep_point_until and tg < self.st.__keep_point_until) then
 				return
@@ -263,7 +263,7 @@ function action_fight_from_cover:execute()
 				end
 			end
 			
-			state_mgr.set_state(npc,new_state,nil,nil,{look_position = see and ene_pos or self.st.last_vid and level.vertex_position(self.st.last_vid) or ene_pos},{fast_set = true})
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 
 			lmove(npc,self.st.vid,self.st)
 			return

@@ -1175,6 +1175,13 @@ function CALifeUpdateManager__on_before_change_level(packet)
 	net_packet.r_vec3				(graph().actor()->o_Angle);
 --]]
 -- Here you can do stuff when level changes BEFORE save is called, even change destination!. Packet is constructed as stated above
+
+	-- Release dead bodies on level change
+	local rbm = release_body_manager.get_release_body_manager()
+	if (rbm) then
+		rbm:clear(true)
+		printf("ALL CLEAR")
+	end
 	
 	-- READ PACKET
 	local pos,angle = vector(),vector()

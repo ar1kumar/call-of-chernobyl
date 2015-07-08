@@ -421,7 +421,7 @@ function action_stalker_panic:execute()
 				end
 			end
 			
-			state_mgr.set_state(npc,new_state,nil,nil,{look_position = see and ene_pos or self.st.last_vid and level.vertex_position(self.st.last_vid) or ene_pos},{fast_set = true})
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 	
 			if (self.st.__keep_point_until and tg < self.st.__keep_point_until) then
 				return
@@ -439,7 +439,7 @@ function action_stalker_panic:execute()
 				end
 			end
 			
-			state_mgr.set_state(npc,new_state,nil,nil,{look_position = see and ene_pos or self.st.last_vid and level.vertex_position(self.st.last_vid) or ene_pos},{fast_set = true})
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 
 			lmove(npc,self.st.vid,self.st)
 			return
@@ -460,7 +460,6 @@ function action_stalker_panic:finalize()
 		db.used_level_vertex_ids[self.st.vid] = nil
 	end
 	self.st.target_id = nil
-	self.st.__keep_target_until = nil
 	db.storage[self.object:id()].panicked = nil
 end
 
