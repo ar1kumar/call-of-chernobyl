@@ -1185,7 +1185,7 @@ function CALifeUpdateManager__on_before_change_level(packet)
 	
 	--printf("CALifeUpdateManager__on_before_change_level pos=%s gvid=%s lvid=%s angle=%s",pos,gvid,lvid,angle)
 	
-	-- fix for car in 1.6
+	-- fix for car in 1.6 (TODO*kinda For some reason after loading a game ALL physic objects will not be teleported by TeleportObject need to investigate as to why, possibly something to do with object flags)
 	local car = db.actor and db.actor:get_attached_vehicle()
 	if (car) then 
 		TeleportObject(car:id(),pos,lvid,gvid)

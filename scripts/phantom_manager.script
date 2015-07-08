@@ -31,30 +31,25 @@ function dynamic_phantom_count(sec)
 	return phantom_registry[sec] or 0
 end
 
-----------------------------------------------------------------------------------------
-function respawn(id,sec)
-	if not (id) then 
-		return true 
+local function monster_on_update(npc,st)
+	if not (npc and npc:alive()) then 
+		return 
 	end
-	local npc = level.object_by_id(id)
-	if not(npc and npc:alive()) then 
-		return true 
+	local tg = time_global()
+	if (st.__phantom_check and tg < st.__phantom_check) then
+		return 
+	end
+	st.__phantom_check = tg + 5000
+	
+	local phantom_section = alun_utils.read_from_ini(nil,npc:section(),"spawn_phantom","string")
+	if not (phantom_section) then
+		return 
 	end
 	
-	spawn_dynamic_phantom(sec,npc:position(),npc:level_vertex_id())
-	
-	return true
-end 
-
-function try_respawn(id)
-	if not (id) then 
-		return true 
-	end
-	
-	local npc = level.object_by_id(id)
-	if not(npc and npc:alive()) then 
-		return true 
-	end
+	local can_spawn = sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state == 1 or alun_utils.read_from_ini(nil,npc:section(),"can_spawn_phantom","bool")
+	if not (can_spawn) then 
+		return
+	end 
 	
 	if not (xr_combat_ignore.fighting_with_actor_npcs[npc:id()]) then 
 		return false 
@@ -65,31 +60,21 @@ function try_respawn(id)
 	end
 	
 	local sec = alun_utils.read_from_ini(nil,npc:section(),"spawn_phantom","string")
-
-	if (dynamic_phantom_count(sec) >= 4) then 
+	if (phantom_manager.dynamic_phantom_count(sec) >= 4) then 
 		return false
 	end
 	
-	CreateTimeEvent(id,"dynamic_phantom_respawn",30,respawn,id,sec)
-	
-	return false
-end 
-
-function monster_on_net_spawn(npc)
-	local phantom_section = alun_utils.read_from_ini(nil,npc:section(),"spawn_phantom","string")
-	if not (phantom_section) then
+	if (st.__phantom_check2 and tg < st.__phantom_check2) then
 		return 
 	end
-	local can_spawn = sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state == 1 or alun_utils.read_from_ini(nil,npc:section(),"can_spawn_phantom","bool")
-	if not (can_spawn) then 
-		return
-	end 
-	CreateTimeEvent(npc:id(),"dynamic_phantom_try_respawn",5,try_respawn,npc:id())
-end
+	st.__phantom_check2 = tg + 10000
+	
+	phantom_manager.spawn_dynamic_phantom(sec,npc:position(),npc:level_vertex_id())
+end 
 
 function on_game_start()
 	if (level.spawn_item) then
-		RegisterScriptCallback("monster_on_net_spawn",monster_on_net_spawn)
+		RegisterScriptCallback("monster_on_update",monster_on_update)
 	end
 end 
 

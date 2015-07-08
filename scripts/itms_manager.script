@@ -99,7 +99,7 @@ function actor_on_update()
 			if (has_alife_info("enable_device_torch")) then
 				db.actor:disable_info_portion("enable_device_torch")
 				alife():create("device_torch_dummy",db.actor:position(),0,0,0)
-				SetHudMsg("Head lamp disconnected from UPD",25)
+				SetHudMsg("Head lamp disconnected from UPD",5)
 			end
 
 			if (torch and not torch:torch_enabled()) then
@@ -165,7 +165,7 @@ function monster_on_actor_use_callback(obj,who)
 
 	local st = db.storage[obj:id()]
 	if (st and st.death_time and game.get_game_time():diffSec(st.death_time) > MutantLootDecayTime) then
-		SetHudMsg("Body is badly decayed",25)
+		SetHudMsg("Body is badly decayed",4)
 	else
 		if (MutantLootEnableUI and ui_mutant_loot) then
 			ui_mutant_loot.loot_ui(get_hud(),obj:id(),obj:section(),obj:clsid())
@@ -199,7 +199,7 @@ function actor_on_item_use(obj)
 			end
 
 			if (in_base) then
-				SetHudMsg("Not safe to place it here",25)
+				SetHudMsg("Not safe to place it here",4)
 				alife():create("itm_backpack",db.actor:position(),0,0,0)
 				return
 			end
@@ -222,7 +222,7 @@ function actor_on_item_use(obj)
 		end
 
 		if (BackPackStashEnableTip) then
-			SetHudMsg("Stash created",25)
+			SetHudMsg("Stash created",4)
 		end
 		return
 	end
@@ -249,7 +249,7 @@ function actor_on_item_use(obj)
 	if (ActorBackPackEnable and obj:section() == "itm_actor_backpack") then
 		local id = ActorBackPackForced and xr_logic.pstor_retrieve(db.actor,"actor_inv_backpack_id",nil)
 		if (id) then
-			SetHudMsg("I've already left my rucksack somewhere",30)
+			SetHudMsg("I've already left my rucksack somewhere",4)
 			alife():create("itm_actor_backpack",db.actor:position(),0,0,0)
 			return
 		end
@@ -280,7 +280,7 @@ function actor_on_item_use(obj)
 			if not (torch) then
 				alife():create("device_torch",db.actor:position(),0,0,0)
 			end
-			SetHudMsg("Equipped headlamp",25)
+			SetHudMsg("Equipped headlamp",4)
 		end
 	end
 end

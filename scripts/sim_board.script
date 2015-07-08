@@ -244,9 +244,18 @@ end
 function simulation_board:setup_squad_and_group(obj)
 	--alun_utils.debug_write(alun_utils.sr("simulation_board:setup_squad_and_group %s",obj and obj:name()))
 	local sim = alife()
+	if not (sim) then 
+		return 
+	end
+	
 	local gg = game_graph()
-	local group = gg:vertex(obj.m_game_vertex_id):level_id()
-	group = group and group + 1 or 0
+	local group = 0 
+	if (gg and gg:valid_vertex_id(obj.m_game_vertex_id)) then 
+		group = gg:vertex(obj.m_game_vertex_id):level_id()
+	else 
+		printf("Error: obj does not have a valid graph id")
+	end 
+	
 	change_team_squad_group(obj, obj.team, obj.squad, group)
 
 	--' Сквад берем из смарта.
