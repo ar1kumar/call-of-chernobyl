@@ -22,17 +22,3 @@ function ecolog_companion_task_1_give_reward(a,b)
 	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"killer", 10})
 end
 
----------- mar_base_stalker_barmen_task
-
-function mar_base_stalker_barmen_task_1_complete(a,b)
-	dialogs.relocate_money(db.actor,math.random(1000,2500),"in")
-	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"csky", 10})
-end
-
-function mar_base_stalker_barmen_task_2_complete(a,b)
-	dialogs.relocate_money(db.actor,math.random(1000,1500),"in")
-	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"csky", 10})
-	if (math.random() <= 0.5) then
-		coc_treasure_manager.create_random_stash()
-	end
-end

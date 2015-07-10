@@ -27,7 +27,6 @@ local function under_faction_control_target_id(task_id)
 	return smart_id
 end
 
--- used by axr_main also, to exclude squad ids for deletion
 function get_squad_id_by_task_var(var_name,no_check_online)
 	local npc_id = db.actor and alun_utils.load_var(db.actor,var_name)
 	if not (npc_id) then 
@@ -107,6 +106,20 @@ function general_fetch_task(task_id,field,p)
 	end
 end 
 
+function general_under_faction_control(task_id,field,p)
+	if not (db.actor) then 
+		return 
+	end
+	
+	local tm = task_manager.get_task_manager()
+	local task = tm.task_info[task_id]	
+	if (task and task.stage == 1 and task.task_giver_id) then 
+		return task.task_giver_id
+	end
+	
+	return under_faction_control_target_id(task_id)
+end
+
 -- Yantar
 function yan_ecolog_semenov_task_target(task_id,field,p)
 	if (task_id == "yan_ecolog_semenov_task_1") then
@@ -129,6 +142,12 @@ function mar_base_stalker_barmen_task_target(task_id,field,p)
 		return 
 	end
 	
+	local tm = task_manager.get_task_manager()
+	local task = tm.task_info[task_id]	
+	if (task and task.stage == 1 and task.task_giver_id) then 
+		return task.task_giver_id
+	end
+		
 	if (task_id == "mar_base_stalker_barmen_task_1") then
 		return under_faction_control_target_id(task_id)
 	elseif (task_id == "mar_base_stalker_barmen_task_2") then 
@@ -171,7 +190,12 @@ function esc_2_12_stalker_wolf_task_target(task_id,field,p)
 	if not (db.actor) then 
 		return 
 	end
-	if (task_id == "esc_2_12_stalker_wolf_task_1") then 
+	if (task_id == "esc_2_12_stalker_wolf_task_1") then
+		local tm = task_manager.get_task_manager()
+		local task = tm.task_info[task_id]	
+		if (task and task.stage == 1 and task.task_giver_id) then 
+			return task.task_giver_id
+		end
 		return under_faction_control_target_id(task_id)
 	end
 end
@@ -191,28 +215,16 @@ function val_smart_terrain_7_4_bandit_trader_stalker_task_target(task_id,field,p
 		return 
 	end
 	
-	if (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_1") then
-		return under_faction_control_target_id(task_id)
-	elseif (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_2") then 
-		return under_faction_control_target_id(task_id)
-	elseif (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_3") then 
+	if (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_3") then 
 		local squad = get_story_squad("bandit_companion_task_1")
-		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
+		if (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
 			return squad.id
 		end
 	end
 end
 
 -- soc pripyat
-function pri_monolith_monolith_trader_stalker_task_target(task_id,field,p)
-	if not (db.actor) then 
-		return 
-	end
-	
-	if (task_id == "pri_monolith_monolith_trader_stalker_task_1") then 
-		return under_faction_control_target_id(task_id)
-	end
-end
+
 
 -- Jupiter
 function jup_b220_trapper_task_target(task_id,field,p)
@@ -220,6 +232,11 @@ function jup_b220_trapper_task_target(task_id,field,p)
 		return 
 	end
 	if (task_id == "jup_b220_trapper_task_1") then 
+		local tm = task_manager.get_task_manager()
+		local task = tm.task_info[task_id]	
+		if (task and task.stage == 1 and task.task_giver_id) then 
+			return task.task_giver_id
+		end
 		return under_faction_control_target_id(task_id)
 	end
 end

@@ -172,20 +172,9 @@ function action_verso:execute()
 		return 
 	end 
 
-	local pos
-	if not (npc:see(be)) then
-		local friend = self.st.friend_id and db.storage[self.st.friend_id] and db.storage[self.st.friend_id].object 
-		pos = friend and alun_utils.safe_bone_pos(friend) or be and alun_utils.safe_bone_pos(be)
-		if (math.abs(npc:position().y - pos.y) > 3.0) then 
-			pos = vector():set(pos.x,npc:position().y+1,pos.z)
-		end
-	else 
-		pos = alun_utils.safe_bone_pos(be)
-	end
-	
+	local friend = self.st.friend_id and db.storage[self.st.friend_id] and db.storage[self.st.friend_id].object 
 	if not (self.st.vertex_id) then
 		local be_pos = be:position()
-		local friend = self.st.friend_id and db.storage[self.st.friend_id] and db.storage[self.st.friend_id].object 
 		self.st.vertex_id = alun_utils.try_to_strafe(npc) or alun_utils.try_go_aside_object(npc,friend,be_pos) or alun_utils.try_go_position(npc,be_pos)
 	end
 	
@@ -194,11 +183,11 @@ function action_verso:execute()
 			db.used_level_vertex_ids[self.st.vertex_id] = nil
 			self.st.vertex_id = nil
 		end
-		state_mgr.set_state(npc,"threat_na",nil,nil,{look_position = pos})
+		state_mgr.set_state(npc,"threat_na",nil,nil,{look_object = npc:see(be) and be or friend})
 		return 
 	end
 
-	state_mgr.set_state(npc,"assault",nil,nil,{look_position = pos})
+	state_mgr.set_state(npc,"assault",nil,nil,{look_object = npc:see(be) and be or friend})
 end
 
 function action_verso:finalize()
@@ -218,11 +207,10 @@ end
 function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 
-	-- Evaluators
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evid_dont_shoot,property_evaluator_const(false))
 		temp.needs_configured = false
-		return
+		return 
 	end
 
 	manager:add_evaluator(evid_dont_shoot,evaluator_dont_shoot(npc,"eva_dont_shoot",st))

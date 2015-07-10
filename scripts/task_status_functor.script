@@ -62,9 +62,16 @@ function check_smart_under_faction_control(task,task_id)
 	end
 	--]]
 	
-	task.check_smart_under_faction_control = "complete"
-	
 	return "complete"	
+end
+
+function check_smart_under_faction_control_staged(task,task_id)
+	local status = check_smart_under_faction_control(task,task_id)
+	if (status == "fail") then 
+		return "fail"
+	elseif (status == "complete" and task.stage == 0) then
+		task.stage = 1
+	end
 end
 
 function hostage_task(task,task_id)

@@ -10,6 +10,7 @@ end
 class "actor_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:__init (obj) super(obj)
+	--alun_utils.debug_write("actor init start")
 	self.bCheckStart = false
 	self.last_level_name = "nil"
 	self.deimos_intensity = nil
@@ -20,11 +21,14 @@ function actor_binder:__init (obj) super(obj)
 	bind_stalker_ext.actor_on_init(self)
 	
 	self.weather_manager = level_weathers.get_weather_manager()
+	--alun_utils.debug_write("actor init end")
 end
 
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
 	--printf("actor net spawn")
+	--alun_utils.debug_write("actor net spawn start")
+	
 	level.show_indicators()
 	self.bCheckStart = true
 	self.weapon_hide = false -- спрятано или нет оружие при разговоре.
@@ -51,20 +55,20 @@ function actor_binder:net_spawn(data)
 	bind_stalker_ext.actor_on_net_spawn(self)
 	self.weather_manager:reset()
 	
+	--alun_utils.debug_write("actor net spawn end")
+	
 	return true
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_destroy()
+	--alun_utils.debug_write("actor net destroy start")
+	
 	xr_sound.stop_sounds_by_id(self.object:id())
-	local board_factions = SIMBOARD.players
-	if(board_factions) then
-		for k,v in pairs (board_factions) do
-			xr_sound.stop_sounds_by_id(v.id)
-		end
-	end
+
 	if(actor_stats.remove_from_ranking~=nil)then
 		actor_stats.remove_from_ranking(self.object:id())
 	end
+	
 	level.show_weapon(true)
 	db.del_actor(self.object)
 	db.delete_enemy(self.object)
@@ -115,10 +119,15 @@ function actor_binder:net_destroy()
 	bind_stalker_ext.actor_on_net_destroy(self)
 
 	object_binder.net_destroy(self)
+	
+	--alun_utils.debug_write("actor net destroy end")
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:reinit()
 	object_binder.reinit(self)
+	
+	--alun_utils.debug_write("actor reinit")
+	
 	local npc_id = self.object:id()
 	db.storage[npc_id] = empty_table(db.storage[npc_id])
 	self.st = db.storage[npc_id]
@@ -263,7 +272,7 @@ function actor_binder:update(delta)
 	
 	local tg = time_global()
 	if (self.last_update and tg < self.last_update) then
-		--printf("actor update end")
+		--alun_utils.debug_write("actor update END")
 		return
 	end
 	self.last_update = tg + 3000
@@ -271,7 +280,6 @@ function actor_binder:update(delta)
 	pda.fill_sleep_zones()
 	treasure_manager.get_treasure_manager():update()
 	
-	--printf("actor update end")
 	--alun_utils.debug_write("actor update END")
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -338,6 +346,7 @@ end
 
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:load(reader)
+	--alun_utils.debug_write("actor_binder:load start")
 	set_save_marker(reader, "load", false, "actor_binder")
 	object_binder.load(self, reader)
 
@@ -348,10 +357,6 @@ function actor_binder:load(reader)
 				[3] = "gd_master"
 				}
 	local dif = game_difficulty_by_num[reader:r_u8()]
-	if not (dif) then
-		set_save_marker(reader, "load", true, "actor_binder")
-		return 
-	end
 	get_console():execute("g_game_difficulty "..dif)
 	self.st.disable_input_time = utils.r_CTime(reader,"bind_stalker")
 
@@ -390,4 +395,6 @@ function actor_binder:load(reader)
 	bind_stalker_ext.actor_on_load(self,reader)
 
 	set_save_marker(reader, "load", true, "actor_binder")
+	
+	--alun_utils.debug_write("actor_binder:load end")
 end

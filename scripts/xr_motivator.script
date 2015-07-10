@@ -31,9 +31,7 @@ function motivator_binder:reinit()
 	object_binder.reinit(self)
 
 	local id = self.object:id()
-	db.storage[id] = db.storage[id] or {}
-	db.storage[id].followers = db.storage[id].followers or {}
-
+	db.storage[id] = {}
 	self.st = db.storage[id]
 
 	self.st.state_mgr = state_mgr.bind_manager(self.object)
@@ -379,9 +377,15 @@ function motivator_binder:update(delta)
 	end 
 	
 	xr_meet.process_npc_usability(object)
+	sr_light.check_light(object)
 	
 	if not (object:best_enemy()) then
 		xr_combat_ignore.fighting_with_actor_npcs[id] = nil
+	end
+	
+	self.squad = self.squad or get_object_squad(object)
+	if (self.squad and self.squad:commander_id() == id) then 
+		self.squad:update()
 	end
 	
 	if (self.st.state_mgr) then 
@@ -391,12 +395,13 @@ function motivator_binder:update(delta)
 		end
 	end
 	
-	self.squad = self.squad or get_object_squad(object)
-	if (self.squad and self.squad:commander_id() == id) then 
-		self.squad:update()
+	local tg = time_global()
+	if (self.__tmr and tg < self.__tmr) then
+		--alun_utils.debug_write("motivator_bind:update %s END 2",self.object and self.object:name())
+		return 
 	end
+	self.__tmr = tg+500
 	
-	sr_light.check_light(object)
 	stalker_generic.update_invulnerability(object)
 	xr_sound.update(id)
 	
@@ -437,7 +442,7 @@ function motivator_binder:update(delta)
 	SendScriptCallback("npc_on_update",object,db.storage[id])
 	-- End [Alundaio]
 	
-	--alun_utils.debug_write("motivator_bind:update %s END AFTER AXR_MAIN",self.object and self.object:name())
+	--alun_utils.debug_write("motivator_bind:update %s END 3 AFTER AXR_MAIN",self.object and self.object:name())
 end
 
 function motivator_binder:reload(section)
@@ -493,21 +498,7 @@ function motivator_binder:hear_callback(npc, who_id, sound_type, sound_position,
 end
 
 function AddToMotivator(npc)
-	--if alife() then
+	if alife() then
 		npc:bind_object(this.motivator_binder(npc))
-	--end
-end
-
--- Ёвалюаторы, которые имеют высший приоритет, и, соответственно, перебивают остальные скрипты собой
-function addCommonPrecondition(action)
-	local wp = world_property
-	action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1, false))
-	action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base + 0, false))
-	action:add_precondition(wp(xr_evaluators_id.abuse_base, false))
-	action:add_precondition(wp(xr_evaluators_id.wounded_exist, false))
-	action:add_precondition(wp(xr_evaluators_id.corpse_exist, false))
-	action:add_precondition(wp(stalker_ids.property_items, false))
-	-- start [Alundaio]
-	SendScriptCallback("npc_add_precondition",action)
-	-- end [Alundaio]
+	end
 end

@@ -822,7 +822,7 @@ end
 
 function add_to_binder(npc,ini,scheme,section,storage,temp)
 	local manager = npc:motivation_action_manager()
-
+	
 	if (gl_sets.forbiddens.factions[npc:character_community()] or gl_sets.forbiddens.npcs[npc:name()]) then
 		manager:add_evaluator(evid_gl_fire,property_evaluator_const(false))
 		manager:add_evaluator(evid_gl_reload,property_evaluator_const(false))
@@ -864,7 +864,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	if (_G.schemes["facer"]) then
 		temp.action[evid_gl_reload]:add_precondition(world_property(xrs_facer.evid_facer,false))
-		temp.action[evid_gl_reload]:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
+		--temp.action[evid_gl_reload]:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
 	end
 
 	local manager = npc:motivation_action_manager()

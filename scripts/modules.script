@@ -17,7 +17,6 @@ stype_trader	    = 5
 -- Загрузка модулей сталкеров:
 ----------------------------------------------------------------------
 LoadScheme("xr_danger",						"danger",			stype_stalker)
-LoadScheme("xr_gather_items",					"gather_items",		stype_stalker)
 LoadScheme("xr_abuse",							"abuse",			stype_stalker)
 LoadScheme("xr_walker",						"walker",			stype_stalker)
 LoadScheme("xr_remark",						"remark",			stype_stalker)
@@ -25,8 +24,6 @@ LoadScheme("xr_cover",							"cover",			stype_stalker)
 LoadScheme("xr_sleeper",						"sleeper",			stype_stalker)
 LoadScheme("xr_camper",						"camper",			stype_stalker)
 LoadScheme("xr_meet",							"meet",				stype_stalker)
-LoadScheme("xr_help_wounded",					"help_wounded",		stype_stalker)
-LoadScheme("xr_corpse_detection",				"corpse_detection",	stype_stalker)
 LoadScheme("xr_combat",						"combat",			stype_stalker)
 LoadScheme("xr_death",							"death",			stype_stalker)
 LoadScheme("xr_hit",							"hit",				stype_stalker,stype_mobile,stype_heli)
@@ -90,6 +87,11 @@ LoadScheme("sr_deimos",						"sr_deimos",		stype_restrictor)
 
 -- Alundaio
 LoadScheme("axr_beh",				"beh",						stype_stalker)
+LoadScheme("xr_campfire_point",		"campfire_point",			stype_stalker)
+-- Generic
+LoadScheme("xr_gather_items",					"gather_items",		stype_stalker)
+LoadScheme("xr_help_wounded",					"help_wounded",		stype_stalker)
+LoadScheme("xr_corpse_detection",				"corpse_detection",	stype_stalker)
 LoadScheme("axr_stalker_panic",		"stalker_panic",			stype_stalker)
 LoadScheme("axr_npc_vs_heli",		"npc_vs_heli",				stype_stalker)
 LoadScheme("axr_fight_from_cover",	"fight_from_cover",			stype_stalker)
@@ -99,11 +101,9 @@ LoadScheme("rx_ff",					"rx_ff",					stype_stalker)
 --LoadScheme("rx_gl",				"gl",						stype_stalker) --known to cause issues enable at your own risk
 LoadScheme("xrs_facer",				"facer",					stype_stalker)
 LoadScheme("xrs_kill_wounded", 		"kill_wounded",				stype_stalker)
-LoadScheme("xr_campfire_point",		"campfire_point",			stype_stalker)
+
 
 function on_game_start()
-	RegisterScriptCallback("npc_add_precondition",npc_add_precondition)
-	
 	for scheme,filename in pairs(_G.schemes) do 
 		if (_G[filename] and _G[filename].on_game_start) then 
 			_G[filename].on_game_start()
@@ -136,7 +136,11 @@ configure_actions is where properties of other generic schemes may be safely add
 --]]
 local temp = {}
 function enable_generic_schemes(npc,ini,section,stype)
-
+	if not (npc) then 
+		abort("CRITICAL ERROR: enable_generic_schemes NPC IS NIL!")
+		return
+	end 
+	
 	local filename
 	for scheme,v in pairs(_G.schemes_by_stype[stype]) do
 		filename = _G.schemes[scheme]
@@ -152,7 +156,7 @@ function enable_generic_schemes(npc,ini,section,stype)
 		if (temp[scheme] and temp[scheme].needs_configured) then
 			filename = _G.schemes[scheme]
 			if (filename and _G[filename] and _G[filename].configure_actions) then
-				--printf("DEBUG: configure_actions npc=%s scheme=%s",npc and npc:name(),scheme)
+				--alun_utils.debug_write(strformat("DEBUG: configure_actions npc=%s scheme=%s",npc and npc:name(),scheme))
 				
 				if not (db.storage[id][scheme]) then 
 					printf("ERROR: storage for db.storage[%s][%s] not setup!",id,scheme)
@@ -180,6 +184,11 @@ function enable_generic_schemes(npc,ini,section,stype)
 end
 
 function reset_generic_schemes(npc,scheme,section)
+	if not (npc) then 
+		abort("CRITICAL ERROR: reset_generic_schemes NPC IS NIL!")
+		return
+	end 
+	--alun_utils.debug_write(strformat("DEBUG: reset_generic_scheme npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section))
 	local st = db.storage[npc:id()]
 	if not (st) then 
 		printf("ERROR: reset_generic_schemes: storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
@@ -235,6 +244,11 @@ function reset_generic_schemes(npc,scheme,section)
 end 
 
 function disable_generic_schemes(npc, stype)
+	if not (npc) then 
+		abort("CRITICAL ERROR: disable_generic_schemes NPC IS NIL!")
+		return
+	end 
+	--alun_utils.debug_write(strformat("DEBUG: disable_generic_schemes npc=%s stype=%s",npc and npc:name(),stype))
 	local st = db.storage[npc:id()]
 	if not (st) then 
 		printf("ERROR: disable_generic_schemes : storage is nil! npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
@@ -257,10 +271,19 @@ function disable_generic_schemes(npc, stype)
 	end
 end
 
-function npc_add_precondition(action)
+function add_common_precondition(scheme,action)
+	--alun_utils.debug_write(strformat("DEBUG: modules: add_common_precondition %s",scheme))
+	local wp = world_property
+	action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1, false))
+	action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base + 0, false))
+	action:add_precondition(wp(xr_evaluators_id.abuse_base, false))
+	action:add_precondition(wp(xr_evaluators_id.wounded_exist, false))
+	action:add_precondition(wp(xr_evaluators_id.corpse_exist, false))
+	action:add_precondition(wp(stalker_ids.property_items, false))
 	for scheme,filename in pairs(_G.schemes) do 
 		if (_G[filename] and _G[filename].npc_add_precondition) then 
 			_G[filename].npc_add_precondition(action)
 		end			
 	end
 end
+

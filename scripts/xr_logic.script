@@ -1,6 +1,11 @@
 function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_name)
 	--printf("DEBUG: enable_scripts: npc:name()=%s", npc:name())
 	
+	if not (npc) then 
+		abort("configure_schemes: NPC IS NIL!")
+		return
+	end 
+	
 	local npc_id = npc:id()
 	local st     = db.storage[npc_id]
 
@@ -230,10 +235,12 @@ function assign_storage_and_bind(npc,ini,scheme,section,temp)
 		end
 		
 		--printf("DEBUG: add_to_binder npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section)
+		--alun_utils.debug_write(strformat("BEFORE: add_to_binder npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section))
 		_G[schemes[scheme]].add_to_binder(npc, ini, scheme, section, db.storage[id][scheme], temp)
+		--alun_utils.debug_write(strformat("AFTER: add_to_binder npc=%s scheme=%s section=%s",npc and npc:name(),scheme,section))
 	end
 
-	db.storage[id][scheme].scheme = scheme
+	--db.storage[id][scheme].scheme = scheme
 	db.storage[id][scheme].section = section
 	db.storage[id][scheme].ini = ini
 
@@ -334,6 +341,7 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 					break
 				end
 			elseif infop.func then
+				--alun_utils.debug_write(strformat("xr_logic: pick_section_from_condlist xr_conditions.%s",infop.func))
 				--printf("_bp: infop.func = %s", infop.func)
 				if not xr_conditions[infop.func] then
 					printf("pick_section_from_condlist: function '%s' is not defined in xr_conditions.script",infop.func)
@@ -397,6 +405,7 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 					printf("TRYING TO SET INFOS THEN ACTOR IS NIL")
 				end
 				if infop.func then
+					--alun_utils.debug_write(strformat("xr_logic: pick_section_from_condlist xr_effects.%s",infop.func))
 					if not xr_effects[infop.func] then
 						printf("object '%s': pick_section_from_condlist: function '%s' is not defined in xr_effects.script",npc and npc:name(),infop.func)
 					end
@@ -490,7 +499,7 @@ function try_switch_to_another_section(npc, st, actor)
 	local npc_id = npc:id()
 
 	if not actor then
-		printf("try_switch_to_another_section(): error in implementation of scheme '%s': actor is nil", st.scheme)
+		--printf("try_switch_to_another_section(): error in implementation of scheme '%s': actor is nil", st.scheme)
 		return
 	end
 

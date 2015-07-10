@@ -17,8 +17,6 @@ local prev_sec 				= -1
 local prev_game_sec 		= -1
 local diff_sec 				= -1
 local diff_game_sec			= -1
-local min_psi_storm_time 	= 12*60*60
-local max_psi_storm_time 	= 24*60*60
 local artifact_chance 		= 0.05
 
 local function actor_on_update(binder,delta)
@@ -66,6 +64,11 @@ function CPsiStormManager:initialize()
 		self.task_given = nil
 	end 
 	
+	if not (self._delta) then 
+		local freq = atmosfear_options and atmosfear_options.config and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",2,24) or 24
+		self._delta = math.random(math.floor(freq/2)*3600, freq*3600)
+	end
+	
 	self.vortex_index=0
 	self.vortex_period_min=8
 	self.vortex_period_max=16
@@ -80,11 +83,6 @@ function CPsiStormManager:initialize()
 	self.psi_storm_task_sect 	= ""
 	
 	self.time_forwarded = false
-	
-	local freq = atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",2,24)
-	min_psi_storm_time=math.floor(freq/2)*3600
-	max_psi_storm_time=freq*3600
-	self._delta = math.random(min_psi_storm_time, max_psi_storm_time)
 end
 
 function CPsiStormManager:start(manual)
@@ -92,6 +90,7 @@ function CPsiStormManager:start(manual)
 		printf("CPsiStormManager: Not loaded!")
 		return 
 	end 
+	
 	self.game_time_factor=level.get_time_factor()
 
 	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
@@ -128,10 +127,9 @@ function CPsiStormManager:new_psi_storm_time(reset)
 		self.last_psi_storm_time 	= game.get_game_time()
 	end
 	self.last_psi_storm_time 	= game.get_game_time()
-	local freq = atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",2,24)
-	min_psi_storm_time		= math.floor(freq/2)*3600
-	max_psi_storm_time		= freq*3600
-	self._delta 			= math.random(min_psi_storm_time, max_psi_storm_time)
+	
+	local freq = atmosfear_options and atmosfear_options.config and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",2,24) or 24
+	self._delta = math.random(math.floor(freq/2)*3600, freq*3600)
 
 	local g_time = game.get_game_time()
 	local psi_storm_start = math.floor(self._delta - g_time:diffSec(self.last_psi_storm_time))

@@ -524,8 +524,9 @@ end
 
 function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
-	local wp = world_property
 	
+	local wp = world_property
+
 	manager:remove_evaluator(stalker_ids.property_items)
 	manager:add_evaluator(stalker_ids.property_items,evaluator_gather_items("gather_items",st,npc))
 	--manager:add_evaluator(stalker_ids.property_items, property_evaluator_const(false))

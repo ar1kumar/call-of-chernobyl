@@ -48,11 +48,13 @@ storyline = false
 title = pri_monolith_monolith_trader_stalker_task_1_name
 descr = pri_monolith_monolith_trader_stalker_task_1_text
 job_descr = pri_monolith_monolith_trader_stalker_task_1_about
+task_complete_descr = pri_monolith_monolith_trader_stalker_task_1_finish
 repeat_timeout = 86400
-target_functor = pri_monolith_monolith_trader_stalker_task_target
-status_functor = check_smart_under_faction_control
+target_functor = general_under_faction_control
+status_functor = check_smart_under_faction_control_staged
 status_functor_params = stalker,army,freedom,dolg,killer,csky,bandit
-on_init = %=find_smart_under_faction_control_ex(pri_monolith_monolith_trader_stalker_task_1_id:stalker:army:freedom:dolg:killer:csky:bandit) -pri_monolith_monolith_trader_stalker_task_1_complete%
-precondition = {-pri_monolith_monolith_trader_stalker_task_1_complete =all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:7200:false:stalker:army:freedom:dolg:killer:csky:bandit)} true, false
-on_complete = %+pri_monolith_monolith_trader_stalker_task_1_complete =pstor_reset(pri_monolith_monolith_trader_stalker_task_1_id) =pstor_reset(pri_monolith_monolith_trader_stalker_task_1_target_id)%
+stage_complete = 1
+on_init = %=find_smart_under_faction_control_ex(pri_monolith_monolith_trader_stalker_task_1_id:stalker:army:freedom:dolg:killer:csky:bandit)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:7200:false:stalker:army:freedom:dolg:killer:csky:bandit)} true, false
+on_complete = %=complete_task_inc_goodwill(5:monolith) =reward_money(3000) =inc_task_stage(pri_monolith_monolith_trader_stalker_task_1) =pstor_reset(pri_monolith_monolith_trader_stalker_task_1_id) =pstor_reset(pri_monolith_monolith_trader_stalker_task_1_target_id)%
 on_fail = %=pstor_reset(pri_monolith_monolith_trader_stalker_task_1_id) =pstor_reset(pri_monolith_monolith_trader_stalker_task_1_target_id)%

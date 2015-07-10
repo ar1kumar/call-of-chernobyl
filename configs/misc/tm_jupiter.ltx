@@ -40,14 +40,15 @@ storyline = false
 title = jup_b220_trapper_task_1_name
 descr = jup_b220_trapper_task_1_text
 job_descr = jup_b220_trapper_task_1_about
-target_functor = jup_b220_trapper_task_target
-status_functor = check_smart_under_faction_control
+task_complete_descr = jup_b220_trapper_task_1_finish
+target_functor = general_under_faction_control
+status_functor = check_smart_under_faction_control_staged
 status_functor_params = monster
-on_init = %=find_smart_under_faction_control(jup_b220_trapper_task_1_id:monster) -jup_b220_trapper_task_1_complete%
-precondition = {-jup_b220_trapper_task_1_complete =all_avail_smart_stayed_squad_count_ge_by_faction(1:7200:false:monster)} true, false
+stage_complete = 1
+on_init = %=find_smart_under_faction_control(jup_b220_trapper_task_1_id:monster)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:7200:false:monster)} true, false
 repeat_timeout = 7200
-precondition = {-jup_b220_trapper_task_1_complete} true, false
-on_complete = %+jup_b220_trapper_task_1_complete =pstor_reset(jup_b220_trapper_task_1_id) =pstor_reset(jup_b220_trapper_task_1_target_id)%
+on_complete = %=complete_task_inc_goodwill(5:stalker) =reward_money(1000) =reward_stash(true) =pstor_reset(jup_b220_trapper_task_1_id) =pstor_reset(jup_b220_trapper_task_1_target_id)%
 on_fail = %=pstor_reset(jup_b220_trapper_task_1_id) =pstor_reset(jup_b220_trapper_task_1_target_id)%
 
 [jup_b217_stalker_tech_task_1]

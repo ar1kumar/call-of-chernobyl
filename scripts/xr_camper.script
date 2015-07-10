@@ -639,7 +639,7 @@ function add_to_binder(object, ini, scheme, section, storage)
 	manager:add_action (operators["patrol"], action)
 	xr_logic.subscribe_action_for_events(object, storage, action)
 	
-	--xr_motivator.addCommonPrecondition(action)
+	--modules.add_common_precondition(scheme,action)
 
 	action = manager:action (xr_actions_id.alife)
 	action:add_precondition	(world_property(properties["end"],			true))

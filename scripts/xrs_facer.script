@@ -80,7 +80,6 @@ function evaluator_facer:__init(npc,name,storage) super (nil,name)
 	self.st = storage
 	self.st.check_time = time_global()+math.random(facer_sets.check_prd,5000)
 	self.st.abtime = time_global()
-	self.st.target = alun_utils.load_var(npc,"facer_target",nil)
 end
 
 function evaluator_facer:evaluate()
@@ -89,21 +88,23 @@ function evaluator_facer:evaluate()
 	if not (npc:alive()) then 
 		return false 
 	end 
+	
+	if (xr_wounded.is_wounded(npc)) then 
+		return false 
+	end
+	
 	if self.st.abtime > tg then
 		return false
 	end
-	if xr_wounded.is_wounded(npc) then
-		self.st.target = nil
-		return false
-	end
-	local target = self.st.target and level.object_by_id(self.st.target)
+	
+	local target_id = alun_utils.load_var(npc,"facer_target",nil)
+	local target = target_id and db.storage[target_id] and db.storage[target_id].object
+	
 	local be = npc:best_enemy()
 	if not target then
-		self.st.target = nil 
 		alun_utils.save_var(npc,"facer_target",nil)
 	end
 	if target and (not target:alive() and npc:animation_count() == 0) then
-		self.st.target = nil 
 		alun_utils.save_var(npc,"facer_target",nil)
 		target = nil
 	end
@@ -123,13 +124,12 @@ function evaluator_facer:evaluate()
 
 		if not (xr_combat_ignore.is_enemy(npc,be,db.storage[npc:id()].combat_ignore)) then
 			alun_utils.save_var(npc,"facer_target",nil)
-			self.st.target = nil 
 			return false
 		end
 
 		local epos = be:alive() and be:position()
 		if epos:distance_to_sqr(spos) < 3.8 and spos.y - epos.y < 0.8 then
-			self.st.target = alun_utils.save_var(npc,"facer_target",be:id())
+			alun_utils.save_var(npc,"facer_target",be:id())
 			self.st.check_time = tg+facer_sets.check_prd
 			return true
 		end
@@ -144,14 +144,13 @@ function hit_callback(obj,amount,dir,who,bone_index)
 
 	if not(db.storage[obj:id()].facer) then return end
 	if (who and check_enemy(who,obj)) then
-		local target = db.storage[obj:id()].facer.target and level.object_by_id(db.storage[obj:id()].facer.target)
+		local target_id = alun_utils.load_var(obj,"facer_target",nil)
+		local target = target_id and db.storage[target_id] and db.storage[target_id].object
 		if (not target or obj:relation(target) ~= game_object.enemy or target:position():distance_to_sqr(obj:position()) > 4) then
-			db.storage[obj:id()].facer.target = alun_utils.save_var(obj,"facer_target",who:id())
-			 db.storage[obj:id()].facer.check_time = time_global()+facer_sets.check_prd
-		--printf("ev_facer[%s]:hit %s(by %s)",who:character_name(),amount,who:name())
+			alun_utils.save_var(obj,"facer_target",who:id())
+			db.storage[obj:id()].facer.check_time = time_global()+facer_sets.check_prd
 		end
 	end
-
 end
 
 
@@ -177,8 +176,11 @@ end
 
 function action_facer:execute()
 	action_base.execute(self)
+	--alun_utils.debug_write("action_facer")
 	local npc,wpn,tg = self.object,self.object:active_item(),time_global()
-	local target = self.st.target and level.object_by_id(self.st.target)
+	
+	local target_id = alun_utils.load_var(npc,"facer_target",nil)
+	local target = target_id and db.storage[target_id] and db.storage[target_id].object
 
 	if not (target) then
 		self:cancel()
@@ -292,6 +294,7 @@ function action_facer:execute()
 	end
 end
 function action_facer:cancel()
+	--alun_utils.debug_write("action_facer:cancel")
 	local npc,tg = self.object,time_global()
 	local vals = facer_sets.ranks[self.rank] or facer_sets.ranks["default"]
 	local mind = vals.min_delay
@@ -302,7 +305,6 @@ function action_facer:cancel()
 	self.st.abtime = tg+vals.min_delay
 	self.end_time = nil
 	self.hit_time = nil
-	self.st.target = nil
 	alun_utils.save_var(npc,"facer_target",nil)
 	if not xr_wounded.is_wounded(npc) then -- or state_mgr.get_state(npc) == "idle"
 		npc:clear_animations()
@@ -312,7 +314,6 @@ function action_facer:cancel()
 end
 function action_facer:finalize()
     action_base.finalize(self)
-	self.st.target = nil
 	alun_utils.save_var(self.object,"facer_target",nil)
 	--self:cancel()
 end
@@ -325,42 +326,56 @@ end
 function evaluator_steal_up:evaluate()
 	--alun_utils.debug_write("eva_steal_up")
 	local npc,tg = self.object,time_global()
+
+	if not (npc:alive()) then 
+		return false 
+	end 
+	
+	if (xr_wounded.is_wounded(npc)) then 
+		return false 
+	end 
+	
 	local be = npc:best_enemy()
-	local target = self.st.target and level.object_by_id(self.st.target)
+	if not (be) then 
+		return false 
+	end
+	
+	local target_id = alun_utils.load_var(npc,"facer_target",nil)
+	local target = target_id and db.storage[target_id] and db.storage[target_id].object
 
 	if not (target) then
 		return false
 	end
 
-	if npc:active_item() or not be then
+	if npc:active_item() then
 		return false
-	elseif target or be then
-		local spos,tpos = npc:position(),(target or be):position()
-		local dist = tpos:distance_to_sqr(spos)
-		local wpn = npc:best_weapon()
-		if wpn or npc.health < 0.33 then
-			return false
-		elseif dist < 3.3 then
-			return false
-		elseif dist > 40 then
-			self.st.target = nil 
-			alun_utils.save_var(npc,"facer_target",nil)
-			return false
-		end
-		if not target then
-			if npc:see(be) and not be:see(npc) then
-				--printf("1[%s]:set target %s",npc:character_name(),be:name())
-				self.st.target = alun_utils.save_var(npc,"facer_target",be:id())
-				target = be
-			end
-			return false
-		end
-		local vid = target:level_vertex_id()
-		if (vid < 4294967295 and npc:accessible(vid) and level.vertex_position(vid):distance_to_sqr(tpos) < 3) then
---			printf("1[%s]:return true",npc:character_name())
-			return true
-		end
+	end 
+	
+	local spos,tpos = npc:position(), target:position()
+	local dist = tpos:distance_to_sqr(spos)
+	local wpn = npc:best_weapon()
+	if wpn or npc.health < 0.33 then
+		return false
+	elseif dist < 3.3 then
+		return false
+	elseif dist > 40 then
+		alun_utils.save_var(npc,"facer_target",nil)
+		return false
 	end
+	
+	if not target then
+		if npc:see(be) and not be:see(npc) then
+			alun_utils.save_var(npc,"facer_target",be:id())
+			target = be
+		end
+		return false
+	end
+	
+	local vid = target:level_vertex_id()
+	if (vid < 4294967295 and npc:accessible(vid) and level.vertex_position(vid):distance_to_sqr(tpos) < 3) then
+		return true
+	end
+
 	return false
 end
 
@@ -382,7 +397,8 @@ end
 function action_steal_up:execute()
 	action_base.execute(self)
 	local npc,tg = self.object,time_global()
-	local target = self.st.target and level.object_by_id(self.st.target)
+	local target_id = alun_utils.load_var(npc,"facer_target",nil)
+	local target = target_id and db.storage[target_id] and db.storage[target_id].object
 	if not target then
 		--printf("to_close[%s]:not target",npc:character_name())
 		return
@@ -455,7 +471,7 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 		manager:add_evaluator(evid_steal_up_facer,property_evaluator_const(false))
 		temp.needs_configured = false
 		return 
-	end 
+	end
 	
 	temp.action = {}
 	

@@ -129,6 +129,15 @@ function ProcessEventQueueState(m_data,save)
 	end
 end
 
+function SetSwitchDistance(dist)
+	if (alife()) then
+		local p = net_packet()
+		p:w_begin(18)
+		p:w_float(dist or 2.0)
+		level.send(p,true,true)
+	end
+end 
+
 function ChangeLevel(pos,lvid,gvid,angle)
 -- IMPORTANT: You must realize that when you send this event it will happen immediately
 -- if done in lua code it will not execute the rest of the block, level changes immediately happen!

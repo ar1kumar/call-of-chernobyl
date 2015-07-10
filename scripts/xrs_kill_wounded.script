@@ -248,8 +248,8 @@ function eva_kill_wounded:evaluate()
 			return false
 		end
 
-		npc:set_desired_position()
-		npc:set_desired_direction()
+		--npc:set_desired_position()
+		--npc:set_desired_direction()
 		npc:set_path_type(game_object.level_path)
 
 		st.vertex_id = utils.send_to_nearest_accessible_vertex(npc,st.vertex_id,"kill_wounded")
@@ -268,7 +268,7 @@ function act_kill_wounded:__init( name, storage )  super ( nil, name )
 end
 
 function act_kill_wounded:initialize()
-	state_mgr.set_state(self.object,"idle")
+	--state_mgr.set_state(self.object,"idle")
 	action_base.initialize(self)
 end
 
@@ -310,12 +310,12 @@ function act_kill_wounded:execute()
 	local tg = time_global()
 
 	if (st.timer and tg > st.timer) then
-		if (npc:active_item()) then
+		if (npc:active_item() and npc:see(vo)) then
 			npc:set_item(object.fire1,st.weapon,1,1)
 			local look_pos = vo:bone_position("bip01_neck")
 			npc:set_sight(look.fire_point,look_pos)
-			st.hangtime = tg + 2000
 		end
+		st.hangtime = st.hangtime or tg + 3000
 		if (st.hangtime and tg > st.hangtime) then
 			local h = hit()
 			h.type = hit.fire_wound
@@ -346,8 +346,8 @@ function act_kill_wounded:execute()
 		npc:set_body_state(st.state_walk)
 
 		local look_pos = vo:bone_position("bip01_head")
-		npc:set_sight(look.fire_point,look_pos)
 		npc:set_item(object.aim1,st.weapon)
+		npc:set_sight(look.fire_point,look_pos)
 	end
 
 	if (st.stop_short and dist <= math.random(MinDistance,MaxDistance)) then
@@ -419,6 +419,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local action
 	local p = {
 				xr_danger.actid,
+				stalker_ids.action_combat_planner,
 				xr_actions_id.stohe_meet_base+1,
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife

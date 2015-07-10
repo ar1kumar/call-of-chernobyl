@@ -30,10 +30,6 @@ local earthquake_cam_eff 	= 2
 local sleep_cam_eff 		= 3
 local sleep_fade_pp_eff		= 4
 
-local START_MIN_SURGE_TIME 	= 4*60*60
-local START_MAX_SURGE_TIME 	= 8*60*60
-local MIN_SURGE_TIME 		= 12*60*60
-local MAX_SURGE_TIME 		= 24*60*60
 local prev_sec 				= -1
 local prev_game_sec 		= -1
 local currentPPEfactor = 0.001
@@ -87,7 +83,9 @@ function CSurgeManager:initialize()
 		self.levels_respawn[level] = false
 	end
 	--]]
-
+	
+	--alun_utils.debug_write("CSurgeManager:initialize() start")
+	
 	self.aspectRatio = 1
 	if(device().width/device().height>(1024/768+0.01)) then
 		self.aspectRatio = 0.8
@@ -107,7 +105,6 @@ function CSurgeManager:initialize()
 		end
 	end
 	
-	
 	if not (self._state_loaded) then -- because state_load called too early, we wait till actor_on_load to truly init and we do not want to overwrite loaded values
 		self.loaded = false
 		self.last_surge_time = game.get_game_time()
@@ -116,13 +113,16 @@ function CSurgeManager:initialize()
 		self.finished = true
 		self.game_time_factor=level.get_time_factor()
 		self.task_given = nil
-	end 
+	end
+	
+	if not (self._delta) then
+		local freq = atmosfear_options and atmosfear_options.config and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_blowout_freq",2,24) or 24
+		self._delta = math_random(math.floor(freq/2)*3600, freq*3600)
+	end
 	
 	self.hitFactor = 0
 	self.surge_time = 222
 	
-	self._delta = math_random(START_MIN_SURGE_TIME, START_MAX_SURGE_TIME) -- global minutes, время между выбросами
-
 	self:init_surge_covers()
 
 	local ini = self.ini
@@ -140,6 +140,8 @@ function CSurgeManager:initialize()
 
 	self.surge_message = ""
 	self.surge_task_sect = ""
+	
+	--alun_utils.debug_write("CSurgeManager:initialize() end")
 end
 
 function CSurgeManager:start(manual)
@@ -147,6 +149,8 @@ function CSurgeManager:start(manual)
 		printf("CSurgeManager: Not loaded!")
 		return 
 	end 
+	
+	--alun_utils.debug_write("CSurgeManager:start()")
 	
 	self.game_time_factor=level.get_time_factor()
 
@@ -188,17 +192,18 @@ end
 
 function CSurgeManager:new_surge_time(reset)
 	if reset then
-		self.last_surge_time 	= game.get_game_time()
+		self.last_surge_time = game.get_game_time()
 	end
-	local freq = atmosfear and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_blowout_freq",2,24) or 24
-	MIN_SURGE_TIME			=	math.floor(freq/2)*3600
-	MAX_SURGE_TIME			=	freq*3600
-	self._delta 			= math_random(MIN_SURGE_TIME, MAX_SURGE_TIME)
+	
+	--alun_utils.debug_write("CSurgeManager:new_surge_time()")
+	
+	local freq = atmosfear_options and atmosfear_options.config and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_blowout_freq",2,24) or 24
+	self._delta = math_random(math.floor(freq/2)*3600, freq*3600)
 
 	local g_time = game.get_game_time()
 	local psi_manager= psi_storm_manager and psi_storm_manager.PsiStormManager
-	local psi_storm_start = psi_storm_manager and math.floor(psi_manager._delta - g_time:diffSec(psi_manager.last_psi_storm_time)) or 0
-	local psi_storm_end = psi_storm_manager and math.floor(psi_manager._delta+3600 - g_time:diffSec(psi_manager.last_psi_storm_time)) or 0
+	local psi_storm_start = psi_manager and math.floor(psi_manager._delta - g_time:diffSec(psi_manager.last_psi_storm_time)) or 0
+	local psi_storm_end = psi_manager and math.floor(psi_manager._delta+3600 - g_time:diffSec(psi_manager.last_psi_storm_time)) or 0
 	local surge_start = math.floor(self._delta - g_time:diffSec(self.last_surge_time))
 	local surge_end = math.floor(self._delta+3600 - g_time:diffSec(self.last_surge_time))
 	if ((surge_end > psi_storm_start) and (surge_end < psi_storm_end)) then
@@ -399,6 +404,9 @@ function CSurgeManager:update()
 	if not (self.loaded) then
 		return
 	end
+	
+	--alun_utils.debug_write("CSurgeManager:update()")
+
 	if not(self.started) then
 		local g_time = game.get_game_time()
 		if(self.time_forwarded) then

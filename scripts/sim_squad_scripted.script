@@ -128,9 +128,6 @@ end
 
 function sim_squad_scripted:update()
 	cse_alife_online_offline_group.update(self)
-
-	self:refresh()
-
 	if not (self.first_update) then
 		self.first_update = true
 		local sim = alife()
@@ -171,8 +168,15 @@ function sim_squad_scripted:update()
 		end
 	end
 
+	self:refresh()
+	
 	if (self.disabled) then
 		return
+	end
+	
+	if self.need_to_reset_location_masks then
+		self:set_location_types()
+		self.need_to_reset_location_masks = false
 	end
 	
 	-- Delta
@@ -199,11 +203,6 @@ function sim_squad_scripted:update()
 		self:specific_update(script_target_id)
 	else
 		self:generic_update()
-	end
-	
-	if self.need_to_reset_location_masks then
-		self:set_location_types()
-		self.need_to_reset_location_masks = false
 	end
 end
 
