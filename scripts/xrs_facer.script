@@ -495,19 +495,10 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action[actid_facer]:add_precondition(world_property(stalker_ids.property_alive,true))
 	temp.action[actid_facer]:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action[actid_facer]:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
-	if axr_knife then
-		temp.action[actid_facer]:add_precondition(world_property(axr_knife.evid_knife,false))
-	end
-	if xrs_grenade and xrs_grenade.evid_aaa_grenade then
-		temp.action[actid_facer]:add_precondition(world_property(xrs_grenade.evid_aaa_grenade,false))
-	end
-	
+
 	temp.action[actid_steal_up_facer]:add_precondition(world_property(stalker_ids.property_alive,true))
 	temp.action[actid_steal_up_facer]:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action[actid_steal_up_facer]:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
-	if axr_knife then
-		temp.action[actid_steal_up_facer]:add_precondition(world_property(axr_knife.evid_knife,false))
-	end
 	
 	local manager = npc:motivation_action_manager()
 	local action

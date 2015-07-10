@@ -117,6 +117,7 @@ function action.debug_reload_game(p)
 		local fs = getFS()
 		fs:rescan_path('$game_config$')
 		fs:rescan_path('$game_scripts$')
+		reload_system_ini()
 		local p = net_packet()
 		p:w_begin(15) -- reload game
 		level.send(p,true)
