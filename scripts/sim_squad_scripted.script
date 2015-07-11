@@ -336,6 +336,7 @@ function sim_squad_scripted:generic_update()
 
 	if (self.current_action) then
 		-- Forces a reset on current action when a surge starts so squads go to highest prior target
+		--[[ commented as it conflicts with tasks that depend on squad alife
 		if (xr_conditions.surge_started()) then
 			if not (self.surge_reset_action) then
 				self.surge_reset_action = true
@@ -344,6 +345,7 @@ function sim_squad_scripted:generic_update()
 		else
 			self.surge_reset_action = nil
 		end
+		--]]
 		
 		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
 

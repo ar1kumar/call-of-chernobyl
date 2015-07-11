@@ -202,7 +202,7 @@ end
 
 function esc_m_trader_task_target(task_id,field,p)
 	if (task_id == "esc_m_trader_task_1") then
-		return get_squad_id_by_task_var("esc_m_trader_bounty_target_id") --add to axr_main remove_non_story_squads to ensure squad never removed
+		return get_squad_id_by_task_var("esc_m_trader_bounty_target_id")
 	elseif (task_id == "esc_m_trader_task_2") then 
 		local smart = SIMBOARD.smarts_by_names["esc_smart_terrain_7_11"]
 		return smart and smart.id or nil
