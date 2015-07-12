@@ -1690,7 +1690,7 @@ function get_task_descr()
 end
 
 function get_task_target()
-	if (SurgeManager.actor_in_cover) then
+	if not (SurgeManager.actor_in_cover) then
 		return nil
 	end
 	return SurgeManager.best_cover and SurgeManager.best_cover:id()
