@@ -400,11 +400,19 @@ function action_stalker_panic:execute()
 	if (self.st.vid) then
 		local dir = enemy:position():sub(npc:position())
 		local bw = npc:best_weapon()
-		local stand = false
-		local c = level.high_cover_in_direction(npc:level_vertex_id(),dir)
-		if (npc:body_state() == move.crouch) then 
-			if (c > 0.5) then 
-				stand = true 
+		
+		if (self.st.__keep_body_state_until==nil or tg > self.st.__keep_body_state_until) then
+			self.st.__keep_body_state_until = tg+5000
+			if (npc:body_state() ~= move.crouch) then
+				--printf("stand=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
+					self.stand = false
+				end	
+			else
+				--printf("crouch=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+					self.stand = true 
+				end
 			end
 		end
 		
@@ -414,7 +422,7 @@ function action_stalker_panic:execute()
 			if not (bw) then 
 				new_state = "sneak_run_no_wpn"
 			else
-				if (stand) then 
+				if (self.stand) then 
 					new_state = see and "assault_fire" or "assault"
 				else 
 					new_state = see and "sneak_fire" or "sneak_run"
@@ -432,7 +440,7 @@ function action_stalker_panic:execute()
 			if not (bw) then 
 				new_state = "sneak_run_no_wpn"
 			else
-				if (stand) then 
+				if (self.stand) then 
 					new_state = see and "assault_fire" or "assault"
 				else 
 					new_state = see and "sneak_fire" or "sneak_run"
@@ -459,7 +467,6 @@ function action_stalker_panic:finalize()
 	if (self.st.vid) then 
 		db.used_level_vertex_ids[self.st.vid] = nil
 	end
-	self.st.target_id = nil
 	db.storage[self.object:id()].panicked = nil
 end
 

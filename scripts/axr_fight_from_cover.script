@@ -220,16 +220,19 @@ function action_fight_from_cover:execute()
 	if (self.st.vid) then
 		local dir = enemy:position():sub(npc:position())
 		local bw = npc:best_weapon()
-		local stand = npc:body_state() ~= move.crouch
-		if (stand) then
-			--printf("stand=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
-			if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
-				stand = false
-			end	
-		else
-			--printf("crouch=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
-			if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
-				stand = true 
+		
+		if (self.st.__keep_body_state_until==nil or tg > self.st.__keep_body_state_until) then
+			self.st.__keep_body_state_until = tg+5000
+			if (npc:body_state() ~= move.crouch) then
+				--printf("stand=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
+					self.stand = false
+				end	
+			else
+				--printf("crouch=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+					self.stand = true 
+				end
 			end
 		end
 		
@@ -240,7 +243,7 @@ function action_fight_from_cover:execute()
 				new_state = "sneak_run_no_wpn"
 			else
 				local is_sniper = alun_utils.isSniper(bw)
-				if (is_sniper == nil and stand) then 
+				if (is_sniper == nil and self.stand) then 
 					new_state = see and (is_sniper and "threat_sniper_fire" or "threat_fire") or "threat_na"
 				else
 					new_state = see and (is_sniper and "hide_sniper_fire" or "sneak_fire") or "sneak_run"
@@ -259,7 +262,7 @@ function action_fight_from_cover:execute()
 				new_state = "sneak_run_no_wpn"
 			else
 				local is_sniper = alun_utils.isSniper(bw)
-				if (stand) then 
+				if (self.stand) then 
 					new_state = see and (is_sniper and "threat_sniper_fire" or "assault_fire") or "assault"
 				else
 					new_state = see and (is_sniper and "hide_sniper_fire" or "sneak_fire") or "sneak_run"

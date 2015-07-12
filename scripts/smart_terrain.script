@@ -94,7 +94,6 @@ end
 function se_smart_terrain:on_before_register()
 	cse_alife_smart_zone.on_before_register(self)
 	sim_board.get_sim_board():register_smart(self)
-	self.smart_level = alife():level_name(game_graph():vertex(self.m_game_vertex_id):level_id())
 end
 
 function se_smart_terrain:on_register()
@@ -104,6 +103,8 @@ function se_smart_terrain:on_register()
 	local sim = alife()
 	local gg = game_graph()
 	local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
+	
+	self.smart_level = alife():level_name(game_graph():vertex(self.m_game_vertex_id):level_id())
 	self.is_on_actor_level = actor_level == self.smart_level
 
 	-- Disable any smart terrain that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
@@ -1475,19 +1476,19 @@ function se_smart_terrain:try_respawn()
 	if (has_alife_info("actor_made_wish_for_peace")) then 
 		return 
 	end
+	
+	if (nearest_to_actor_smart.id == self.id) then 
+		printf("try_respawn is_on_actor_level=%s",self.is_on_actor_level)
+	end 
+	
 	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
 	
-	if (self.is_on_actor_level and not has_alife_info("actor_is_sleeping")) then
+	if (self.is_on_actor_level) then
 		local sim = alife()
 		local se_actor = sim:actor()
-		local dist_to_actor = se_actor.position:distance_to_sqr(self.position)
+		local dist_to_actor = se_actor and se_actor.position:distance_to_sqr(self.position) or 10000
 		if (dist_to_actor < self.respawn_radius) then
 			return
-		elseif (dist_to_actor <= 10000) then
-			-- make sure actor's back is turned; less chance to see squad spawn in
-			if not (alun_utils.angle_diff(device().cam_dir, device().cam_pos:sub(self.position))<90) then 
-				return 
-			end
 		end
 	elseif (self.respawn_only_level) then
 		return
