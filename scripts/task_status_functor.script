@@ -66,6 +66,9 @@ function check_smart_under_faction_control(task,task_id)
 end
 
 function check_smart_under_faction_control_staged(task,task_id)
+	if (task.stage == 1) then -- already completed
+		return 
+	end
 	local status = check_smart_under_faction_control(task,task_id)
 	if (status == "fail") then 
 		return "fail"
