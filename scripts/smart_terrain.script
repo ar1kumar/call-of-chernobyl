@@ -1485,7 +1485,7 @@ function se_smart_terrain:try_respawn()
 			return
 		elseif (dist_to_actor <= 10000) then
 			-- make sure actor's back is turned; less chance to see squad spawn in
-			if not (alun_utils.angle_diff(db.actor:direction(), db.actor:position():sub(self.position))<90 and self.position:distance_to(db.actor:position()) > 2.5) then 
+			if not (alun_utils.angle_diff(device().cam_dir, device().cam_pos:sub(self.position))<90) then 
 				return 
 			end
 		end
