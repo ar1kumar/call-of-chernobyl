@@ -579,13 +579,24 @@ function state_manager:update()
 end
 
 function set_state(npc, state_name, callback, timeout, target, extra)
-	if db.storage[npc:id()].state_mgr then
-		db.storage[npc:id()].state_mgr:set_state(state_name, callback, timeout, target, extra)
+	local id = npc:id()
+	local st = db.storage[id]
+	if not (st) then 
+		return 
+	end
+	if st.state_mgr then
+		st.state_mgr:set_state(state_name, callback, timeout, target, extra)
 	end
 end
+
 function get_state(npc)
-	if db.storage[npc:id()].state_mgr then
-		return db.storage[npc:id()].state_mgr:get_state()
+	local id = npc:id()
+	local st = db.storage[id]
+	if not (st) then 
+		return 
+	end
+	if st.state_mgr then
+		return st.state_mgr:get_state()
 	end
 	return nil
 end
