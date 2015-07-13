@@ -7,31 +7,23 @@ se_helicopters = {}
 
 class "se_heli" (cse_alife_helicopter)
 function se_heli:__init (section) super (section)
-	local ltx = system_ini()
-	self.player_id = utils.cfg_get_string(ltx,section, "player_id", self, false, "")
-	self.community = utils.cfg_get_string(ltx,section, "faction", self, false, "")
+
 end
 
 function se_heli:on_register()
 	cse_alife_helicopter.on_register(self)
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-	table.insert(se_helicopters,self)
+	se_helicopters[self.id] = self
+	local ltx = system_ini()
+	self.player_id = utils.cfg_get_string(ltx,self:section_name(), "player_id", self, false, "") or "heli"
+	self.community = utils.cfg_get_string(ltx,self:section_name(), "faction", self, false, "") or "heli"
 end
 
 function se_heli:on_unregister()
 	unregister_story_object_by_id(self.id)
-	
-	local remove_me
-	for i=1,#se_helicopters do 
-		if (self.id == se_helicopters[i]) then 
-			remove_me = i
-		end
-	end
-	
-	if (remove_me) then 
-		table.remove(se_helicopters,remove_me)
-	end
+		
+	se_helicopters[self.id] = nil
 
 	--printf("unregister heli %s",self.respawn_point_id)
 	if (self.respawn_point_id and self.respawn_point_prop_section) then

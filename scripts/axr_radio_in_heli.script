@@ -7,15 +7,6 @@ actid = 188116
 evaid = 188116
 --------------------------------------
 
-local allowed_communities = { 
-								["army"] = true,
-								["monolith"] = true
-							}
-local good_acts = {
-					[xr_actions_id.smartcover_action] = true,
-					[xr_actions_id.smartcover_action+2] = true
-					}
-				
 local function validate(npc,vid)
 	if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
 		return db.used_level_vertex_ids[vid] == nil or db.used_level_vertex_ids[vid] == npc:id()
@@ -89,7 +80,7 @@ function evaluator_radio_in_heli:evaluate()
 		return false 
 	end
 	
-	if not (character_community(npc) == "army") then 
+	if (empty(db.heli)) then 
 		return false 
 	end
 	
@@ -97,18 +88,9 @@ function evaluator_radio_in_heli:evaluate()
 		return false 
 	end
 	
-	if (empty(db.heli)) then 
-		return false 
-	end
-	
 	local st = db.storage[npc:id()]
 	if (st and st.help_wounded and st.help_wounded.selected_id ~= nil) then 
 		return false 
-	end
-	
-	local mgr = npc:motivation_action_manager()
-	if (mgr and mgr:initialized() and good_acts[mgr:current_action_id()])then
-		return false
 	end
 	
 	local squad = get_object_squad(npc)
@@ -133,19 +115,23 @@ function evaluator_radio_in_heli:evaluate()
 		return false 
 	end
 	
-	if (squad.radio_for_help) then
-		local be_id = be:id()
-		if (be_id == 0) then 
-			alun_utils.save_var(db.actor,"heli_enemy_flag",true)
-		else
-			db.storage[be:id()].heli_enemy_flag = true
+	local comm = character_community(npc)
+	for id,o in pairs(db.heli) do 
+		if (se_heli.se_helicopters[id] and se_heli.se_helicopters[id].community == comm) then
+			if (be:id() == 0) then 
+				alun_utils.save_var(db.actor,"heli_enemy_flag",true)
+			else 
+				if (db.storage[be:id()]) then 
+					db.storage[be:id()].heli_enemy_flag = true
+				end
+			end
+			if (se_heli.se_helicopters[id].help_id == nil) then
+				return true
+			end
 		end
-		if (time_global() < squad.radio_for_help) then 
-			return false
-		end
-	end
-	
-	return true
+	end 
+
+	return false
 end
 
 -----------------------------------------------------------------------------------------
@@ -164,8 +150,7 @@ end
 
 function action_radio_in_heli:try_go_cover(npc,enemy,ene_pos)
 	--alun_utils.debug_write(strformat("action_radio_in_heli:try_go_cover"))
-	local lvid = alun_utils.load_var(npc,"fight_from_point")
-	local pos  = lvid and level.vertex_position(lvid) or npc:position()
+	local pos  = npc:position()
 	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,5,db.used_level_vertex_ids)
 	if (validate(npc,vid)) then
 		return lmove(npc,vid,self.st)
@@ -179,7 +164,11 @@ function action_radio_in_heli:execute()
 	
 	local npc = self.object
 	local be = npc:best_enemy()
-	if (self.st.vid == nil and be) then
+	if not (be) then 
+		return 
+	end 
+	
+	if (self.st.vid == nil) then
 		self:try_go_cover(npc,be,be:position())
 	end
 	
@@ -188,20 +177,31 @@ function action_radio_in_heli:execute()
 		self.st.state = not self.st.state and random_choice("guard_rac","hide_rac") or self.st.state
 		state_mgr.set_state(npc,self.st.state)
 		
-		self.st.__timer = not self.st.__timer and tg+5000 or self.st.__timer
-		if (self.st.__timer and tg < self.st.__timer) then 
-			return
-		end
-		
 		local squad = get_object_squad(npc)
 		if (squad) then
 			xr_sound.set_sound_play(npc:id(),"backup")
-			squad.radio_for_help = tg+30000
-			for id,heli in pairs(db.heli) do
-				heli_alife.force_target_destination(id,squad.id)
+			
+			local comm = character_community(npc)
+			for id,o in pairs(db.heli) do 
+				if (se_heli.se_helicopters[id]) then 
+					if (se_heli.se_helicopters[id].help_id == nil and se_heli.se_helicopters[id].community == comm) then
+						heli_alife.force_target_destination(id,squad.id)
+					end
+				end
 			end
-			if (xr_combat_ignore.fighting_with_actor_npcs[npc:id()]) then 
+
+			if (xr_combat_ignore.fighting_with_actor_npcs[npc:id()]) then
 				alun_utils.save_var(db.actor,"heli_enemy_flag",true)
+			end 
+
+			local function set_heli_flag(obj)
+				if (db.storage[obj:id()]) then 
+					db.storage[obj:id()].heli_enemy_flag = true
+				end
+			end 
+
+			if (be:id() ~= 0) then 
+				alun_utils.execute_script_on_squad(be,set_heli_flag)
 			end
 		end
 	else 

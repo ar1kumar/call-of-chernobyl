@@ -113,6 +113,8 @@ function heli_binder:net_spawn( sobject )
 	db.add_heli(self.object)
 	
 	self.st.heliObject = self.object:get_helicopter()
+	
+	self.sobject = not self.sobject and alife():object(self.object:id()) or self.sobject
 
 	return true
 end

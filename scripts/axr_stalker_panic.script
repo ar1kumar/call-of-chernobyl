@@ -197,8 +197,9 @@ local function find_valid_target(npc,st,bw)
 					return true
 				end
 			
-				if (st.target_id ~= target:id()) then
+				if (st.target_id ~= target:id() and not st.__played_sound) then
 					xr_sound.set_sound_play(npc:id(),"panic_monster")
+					st.__played_sound = true
 				end
 				st.__keep_target_until = tg + 5000
 				st.target_id = target:id()
