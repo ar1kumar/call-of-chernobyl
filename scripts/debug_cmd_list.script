@@ -459,10 +459,10 @@ local function parse_waypoint(pathname, wpflags, wpname, owner, tRet)
 end
 
 function cmd.waypoint(me,txt,owner,p)
-	local wrd = check_and_set_help(me,txt,owner,"[checkall | checklevel]")
+	local wrd = check_and_set_help(me,txt,owner,"[checkall | checklevel | checkindex]")
 	if not (wrd) then return end
 
-	if not (wrd == "checkall" or wrd == "checklevel") then
+	if not (wrd == "checkall" or wrd == "checklevel" or wrd == "checkindex") then
 		return "waypoint:= invalid argument. Type waypoint help for a list of subcommands"
 	end
 
@@ -474,6 +474,8 @@ function cmd.waypoint(me,txt,owner,p)
 	local path_jobs = {"surge","collector","walker","patrol","guard","sniper","camper","sleep"}
 
 	local smart,gname,name,ptr,cnt,i,vec
+	local b = {}
+	local last_index
 
 	local sim = alife()
 	local actor_level = wrd == "checklevel" and sim:level_name(game_graph():vertex(sim:actor().m_game_vertex_id):level_id()) or "nil"
@@ -482,52 +484,73 @@ function cmd.waypoint(me,txt,owner,p)
 	local gg = game_graph()
 	
 	local t = {}
-	for i=1,65534 do
-		smart = sim:object(i)
-		if (smart and smart:clsid() == clsid.smart_terrain) and (wrd == "checkall" or actor_level == smart.smart_level) then
+	for id=1,65534 do
+		smart = sim:object(id)
+		if (smart and smart:clsid() == clsid.smart_terrain) then
 			gname = smart:name()
-			for index,job in ipairs(path_jobs) do
-				i = 1
-				while level.patrol_path_exists(job == "sleep" and gname.."_"..job.."_"..i or gname.."_"..job.."_"..i.."_walk") do
-					name = job == "sleep" and gname.."_"..job.."_"..i or gname.."_"..job.."_"..i.."_walk"
-					ptr = patrol(name)
-					if (ptr) then
-						checked = true
-						cnt = ptr:count()
-						for n=0,cnt-1 do
-						
-							if not (gg:valid_vertex_id(ptr:game_vertex_id(n))) then
-								t[#t+1] = strformat("path %s p%s:%s does not have valid game_vertex_id",name,n,ptr:name(n))
-								printf("path %s p%s:%s does not have valid game_vertex_id",name,n,ptr:name(n))
-							end
-							
-							if (actor_level ~= "nil") then 
-								if not (alun_utils.accessible(npc,ptr:level_vertex_id(n))) then
-									t[#t+1] = strformat("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
-									printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
-								end
-							else 
-								if (ptr:level_vertex_id(n) >= 4294967295) then 
-									t[#t+1] = strformat("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
-									printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
-								end
-							end
-							parse_waypoint(name,ptr:flags(n),ptr:name(n),owner,t)
+			if (wrd == "checkindex") then
+				checked = true
+				for index,job in ipairs(path_jobs) do
+					b=empty_table(b)
+					last_index = 0
+					for add=1,20 do
+						name = job == "sleep" and gname.."_"..job.."_"..add or gname.."_"..job.."_"..add.."_walk"
+						ptr = patrol(name)
+						if (ptr) then
+							b[add] = name
+							last_index = add
+						end						
+					end
+					for add=1,last_index do 
+						if b[add] == nil then 
+							t[#t+1] = strformat("path %s does not exist!",job == "sleep" and gname.."_"..job.."_"..add or gname.."_"..job.."_"..add.."_walk")
 						end
 					end
-					-- Validate look waypoint also
-					name = gname.."_"..job.."_"..i.."_look"
-					if (level.patrol_path_exists(name)) then 
+				end			
+			elseif (wrd == "checkall" or actor_level == smart.smart_level) then	
+				for index,job in ipairs(path_jobs) do
+					i = 1
+					while level.patrol_path_exists(job == "sleep" and gname.."_"..job.."_"..i or gname.."_"..job.."_"..i.."_walk") do
+						name = job == "sleep" and gname.."_"..job.."_"..i or gname.."_"..job.."_"..i.."_walk"
 						ptr = patrol(name)
-						if (ptr) then 
+						if (ptr) then
 							checked = true
 							cnt = ptr:count()
 							for n=0,cnt-1 do
+							
+								if not (gg:valid_vertex_id(ptr:game_vertex_id(n))) then
+									t[#t+1] = strformat("path %s p%s:%s does not have valid game_vertex_id",name,n,ptr:name(n))
+									printf("path %s p%s:%s does not have valid game_vertex_id",name,n,ptr:name(n))
+								end
+								
+								if (actor_level ~= "nil") then 
+									if not (alun_utils.accessible(npc,ptr:level_vertex_id(n))) then
+										t[#t+1] = strformat("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+										printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+									end
+								else 
+									if (ptr:level_vertex_id(n) >= 4294967295) then 
+										t[#t+1] = strformat("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+										printf("path %s p%s:%s does not have valid level_vertex_id",name,n,ptr:name(n))
+									end
+								end
 								parse_waypoint(name,ptr:flags(n),ptr:name(n),owner,t)
 							end
 						end
+						-- Validate look waypoint also
+						name = gname.."_"..job.."_"..i.."_look"
+						if (level.patrol_path_exists(name)) then 
+							ptr = patrol(name)
+							if (ptr) then 
+								checked = true
+								cnt = ptr:count()
+								for n=0,cnt-1 do
+									parse_waypoint(name,ptr:flags(n),ptr:name(n),owner,t)
+								end
+							end
+						end
+						i = i + 1
 					end
-					i = i + 1
 				end
 			end
 		end
@@ -551,7 +574,7 @@ function cmd.waypoint(me,txt,owner,p)
 			local page_count = math.ceil(#t/sz)
 
 			if (page > page_count) then
-				return "waypoint:= Invaild page"
+				return "waypoint:= Invalid page"
 			end
 
 			table.sort(t)
