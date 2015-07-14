@@ -129,7 +129,7 @@ local function try_to_reach_target(heli,se_heli,heliObject,se_target)
 			if (se_target:clsid() == clsid.smart_terrain) then 
 				heliObject:SetDestPosition(vector():set(se_target.position.x,se_target.position.y+70,se_target.position.z))
 			else
-				local center_pos   = utils.vector_copy_by_val(se_target.position)
+				local center_pos   = vector():set(se_target.position)
 				center_pos.y = center_pos.y + 60
 				heliObject:SetMaxVelocity(vel)
 				heliObject:GoPatrolByRoundPath(center_pos,50,true)
@@ -143,7 +143,7 @@ end
 --												PUBLIC
 --------------------------------------------------------------------------------------------------------------
 function force_target_destination(id,target_id)
-	alun_utils.debug_write("heli_alife: force_target_destination")
+	--alun_utils.debug_write("heli_alife: force_target_destination")
 	local sim = alife()
 	local se_heli = sim:object(id)
 	if not (se_heli) then 
@@ -291,22 +291,26 @@ function update_heli_movement(heli,se_heli,heliObject,se_target)
 	if not (st) then 
 		return 
 	end
-	if not (st.change_speed_time == nil or st.change_speed_time < tg) then
+	
+	if (st.change_speed_time and tg < st.change_speed_time) then
 		return 
 	end
+	st.change_speed_time = tg + 15000
 	
-	st.change_speed_time = tg + math.random(8000, 12000)
-	st.speed_is_0 = st.speed_is_0 and false or true
-		
-	st.center_pos = utils.vector_copy_by_val(se_target.position)
-	st.center_pos.y = level.get_bounding_volume().max.y
+	local pos = se_target.position
+	if (se_target:clsid() == clsid.online_offline_group_s) then
+		local npc = db.storage[se_target:commander_id()] and db.storage[se_target:commander_id()].object
+		if (npc) then 
+			pos = npc:position()
+		end
+	end
 
-	local v = st.speed_is_0 and 0 or 8
-	heliObject:SetMaxVelocity(v)
-	heliObject:SetSpeedInDestPoint(v)
+	local center_pos = vector():set(pos)
+	center_pos.y = level.get_bounding_volume().max.y
+	heliObject:GoPatrolByRoundPath(center_pos, 70,  random_choice(true,false))
+	heliObject:LookAtPoint(center_pos, true)
+	heliObject:SetMaxVelocity(12)
+	heliObject:SetSpeedInDestPoint(12)	
 
-	heliObject:GoPatrolByRoundPath(st.center_pos,70,random_choice(true,false))
-	heliObject:LookAtPoint(se_target.position, true)
-	
 	--alun_utils.debug_write("heli_alife: update_heli_movement end")
 end
