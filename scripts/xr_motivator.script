@@ -2,7 +2,7 @@ class "motivator_binder" (object_binder)
 function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
 	self.last_update = 0
-
+	self.opened_doors = {}
 	self.first_update = false
 	self.upd_stage = 1
 end
@@ -15,7 +15,9 @@ function motivator_binder:extrapolate_callback(cur_pt)
 	
 	if self.st.active_section then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "extrapolate_callback")
-		self.st.move_mgr:extrapolate_callback(self.object)
+		if (self.st.move_mgr) then
+			self.st.move_mgr:extrapolate_callback(self.object)
+		end
 	end
 
 	local ptr = self.object:patrol() and patrol(self.object:patrol())
@@ -35,9 +37,7 @@ function motivator_binder:reinit()
 	self.st = db.storage[id]
 
 	self.st.state_mgr = state_mgr.bind_manager(self.object)
-
-	self.st.move_mgr = move_mgr.move_mgr(self.object)
-	self.st.move_mgr:initialize()
+		
 	--alun_utils.debug_write(self.object:name()..":motivator_reinit() end")
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -88,15 +88,17 @@ function motivator_binder:net_spawn(sobject)
 	
 		return true
 	end
-
-	db.add_enemy(self.object)
 	
+	self.st.move_mgr = move_mgr.move_mgr(self.object)
+	self.st.move_mgr:initialize()
+
 	self.object:set_patrol_extrapolate_callback(motivator_binder.extrapolate_callback, self)
 	self.object:set_callback(callback.hit, motivator_binder.hit_callback, self)
 	self.object:set_callback(callback.death, motivator_binder.death_callback, self)
 	self.object:set_callback(callback.sound, motivator_binder.hear_callback, self)
 	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
-
+		
+	db.add_enemy(self.object)
 
 	local relation = db.goodwill.relations and db.goodwill.relations[id]
 	if (relation and db.actor) then
@@ -177,7 +179,7 @@ end
 
 function motivator_binder:on_item_drop(item)
 	-- Alundaio
-	SendScriptCallback("npc_on_item_drope",self.object,item)
+	SendScriptCallback("npc_on_item_drop",self.object,item)
 	-- End Alundaio
 end
 function motivator_binder:net_destroy()
@@ -223,6 +225,7 @@ function motivator_binder:net_destroy()
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
+	--alun_utils.debug_write(alun_utils.sr("motivator_binder:hit_callback %s",obj and obj:name()))
 	if (amount <= 0) then
 		return
 	end
@@ -270,22 +273,27 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 end
 
 function motivator_binder:death_callback(victim, who)
-	if not (self.object) then 
-		error(strformat("CRITICAL ERROR: motivator_binder:death_callback : Game Object is nil and binder is not! %s",self.name),2)
+	--alun_utils.debug_write(alun_utils.sr("motivator_binder:death_callback %s",victim and victim:name()))
+	if (self.object == nil and victim == nil) then
+		callstack()
+		abort(strformat("CRITICAL ERROR: motivator_binder:death_callback : Game Object is nil and binder is not! %s",self.name),2)
+		return
 	end
+	
+	trade_manager.on_npc_death(victim)
 	
 	self:hit_callback(victim, 1, vector():set(0,0,0), who, "from_death_callback")
 
-	local id = self.object:id()
+	local id = victim:id()
 	xr_combat_ignore.fighting_with_actor_npcs[id] = nil
 
-	death_manager.drop_manager(self.object):create_release_item()
+	death_manager.drop_manager(victim):create_release_item()
 
-	stalker_generic.remove_level_spot(self.object, self.st)
+	stalker_generic.remove_level_spot(victim, self.st)
 
 	if who:id() == db.actor:id() then
 		xr_statistic.inc_killed_stalkers_counter()
-		xr_statistic.set_best_monster(self.object)
+		xr_statistic.set_best_monster(victim)
 	end
 	
 	if (IsStalker(who) and who:alive()) then
@@ -296,50 +304,55 @@ function motivator_binder:death_callback(victim, who)
 		xr_logic.pstor_store(who,"s_kill_count",count)
 	end
 
-	local known_info = utils.cfg_get_string(self.st.ini,self.st.section_logic , "known_info", self.object, false, "", nil)
+	local known_info = utils.cfg_get_string(self.st.ini,self.st.section_logic , "known_info", victim, false, "", nil)
 	if (known_info) then
-		xr_info.loadInfo(self.object, self.st.ini, known_info)
+		xr_info.loadInfo(victim, self.st.ini, known_info)
 	end
 
 	if (self.st.state_mgr) then
 		self.st.state_mgr.animation:set_state(nil, true)
-		self.st.state_mgr = nil
+		--self.st.state_mgr = nil
 	end
 
 	if self.st.reach_task then
-		xr_logic.issue_event(self.object, self.st.reach_task, "death_callback", victim, who)
+		xr_logic.issue_event(victim, self.st.reach_task, "death_callback", victim, who)
 	end
 	if self.st.death then
-		xr_logic.issue_event(self.object, self.st.death, "death_callback", victim, who)
+		xr_logic.issue_event(victim, self.st.death, "death_callback", victim, who)
 	end
 	if self.st.active_section then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "death_callback", victim, who)
+		xr_logic.issue_event(victim, self.st[self.st.active_scheme], "death_callback", victim, who)
 	end
 
-	sr_light.check_light(self.object)
+	sr_light.check_light(victim)
 
-	db.delete_enemy(self.object)
+	db.delete_enemy(victim)
 
 	if (actor_stats.remove_from_ranking) then
-		local community = character_community(self.object)
+		local community = character_community(victim)
 		if (community ~= "zombied" and community ~= "monolith") then
-			actor_stats.remove_from_ranking(self.object:id())
+			actor_stats.remove_from_ranking(victim:id())
 		end
 	end
-	release_body_manager.get_release_body_manager():moving_dead_body(self.object)
-	-- Start [Alundaio]
-	SendScriptCallback("npc_on_death_callback",self.object,who)
-	db.storage[id].death_time = game.get_game_time()
-	db.storage[id].death_by_id = who:id()
-	-- End [Alundaio]
+	release_body_manager.get_release_body_manager():moving_dead_body(victim)
 	
-	self.object:set_callback(callback.hit)
-	self.object:set_callback(callback.death)
-	self.object:set_callback(callback.sound)
+	if (who) and (IsStalker(who) or IsMonster(who)) then
+		-- Start [Alundaio]
+		SendScriptCallback("npc_on_death_callback",victim,who)
+		db.storage[id].death_time = game.get_game_time()
+		db.storage[id].death_by_id = who:id()
+		-- End [Alundaio]
+	end
+	
+	victim:set_callback(callback.hit)
+	victim:set_callback(callback.death)
+	victim:set_callback(callback.sound)
+	victim:set_patrol_extrapolate_callback(nil)
 end
 
 function motivator_binder:use_callback(obj, who)
-	if not self.object:alive() then
+	--alun_utils.debug_write(alun_utils.sr("motivator_binder:use_callback %s",obj and obj:name()))
+	if not obj:alive() then
 		return
 	end
 	dialog_manager.use_npc = obj
@@ -348,7 +361,7 @@ function motivator_binder:use_callback(obj, who)
 	dialog_manager.disabled_phrases[obj:id()] = nil
 	dialog_manager.RandomVal = math.random(1,3)
 	if self.st.active_section then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "use_callback", obj, who)
+		xr_logic.issue_event(obj, self.st[self.st.active_scheme], "use_callback", obj, who)
 	end
 	-- start [Alundaio]
 	SendScriptCallback("npc_on_use",obj,who)
@@ -401,6 +414,10 @@ function motivator_binder:update(delta)
 		return 
 	end
 	self.__tmr = tg+500
+	
+	-- DOOR
+	ph_door.try_to_open_door(self.object, self.opened_doors)
+	ph_door.try_to_close_door(self.object, self.opened_doors)
 	
 	stalker_generic.update_invulnerability(object)
 	xr_sound.update(id)
@@ -487,6 +504,7 @@ function motivator_binder:load(reader)
 end
 
 function motivator_binder:hear_callback(npc, who_id, sound_type, sound_position, sound_power)
+	--alun_utils.debug_write(alun_utils.sr("motivator_binder:hear_callback %s",npc and npc:name()))
 	if not (npc:alive()) then
 		return
 	end
