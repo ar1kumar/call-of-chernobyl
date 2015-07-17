@@ -258,22 +258,24 @@ function action_door:use_callback(door, actor)
 		return
 	end
 
-	--[[
-	if (actor and actor:id() ~= 0) then
-		local angle = self.joint:get_axis_angle(90)
+--	local angle = self.joint:get_axis_angle(90)
 
-		if angle - self.low_limits > self.hi_limits - angle then
-			self:open_door(false)
-			printf("open")
-		else
-			self:close_door(false)
-			printf("close")
-		end
-	end
-	--]]
+--	if angle - self.low_limits > self.hi_limits - angle then
+--		self:open_door(false)
+--	else
+--		self:close_door(false)
+--	end
 end
 function action_door:hit_callback(obj, amount, local_direction, who, bone_index)
-	--printf("DOOR: hit_callback: obj='%s', amount=%d, who='%s', bone='%s'", obj and obj:name(), amount, who and who:name(), bone_index)
+	local who_name
+	if who then
+		who_name = who:name()
+	else
+		who_name = "nil"
+	end
+
+	--printf("DOOR: hit_callback: obj='%s', amount=%d, who='%s', bone='%s'", obj:name(), amount, who_name, bone_index)
+	print_table(self.st.hit_on_bone)
 	if self.st.hit_on_bone[bone_index] ~= nil then
 		local section = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.hit_on_bone[bone_index].state)
 		xr_logic.switch_to_section(obj, self.st.ini, section)
@@ -288,9 +290,7 @@ end
 function add_to_binder(npc, ini, scheme, section, storage)
 	--printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
 
-	npc:register_door_for_npc()
-	
-	db.level_doors[npc:id()] = npc:position()
+	npc:register_door_for_npc	( )
 
 	local new_action = action_door(npc, storage)
 
@@ -340,38 +340,43 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 end
 
 
-function try_to_open_door(npc,opened_doors)
+-- Вызывается на апдейте НПС
+-- пробегается по всем дверям и пытается открыть те, которые находятся рядом с НПС
+-- возвращает список дверей, которую открыл данный НПС
+function try_to_open_door(npc)
+	if true then return {} end
+	local opened_doors = {}
 	local npc_position = npc:position()
 	for id,position in pairs(db.level_doors) do
-		if (db.storage[id].ph_door and npc_position:distance_to_sqr(position) <= 5) then
-			local action = db.storage[id].ph_door.door_action					
-			if action.st.not_for_npc == false and action.st.closed == true then
-				action:use_callback()
-				opened_doors[id] = true
-			end
+		if npc_position:distance_to_sqr(position) <= 9 then
+			if db.storage[id].ph_door ~= nil then
+				local action = db.storage[id].ph_door.door_action					
+				if action.st.not_for_npc == false and action.st.closed == true then
+					--printf("OPEN DOOR")
+					action:use_callback()
+					opened_doors[id] = true
+				end
+			end			
 		end
 	end
+	return opened_doors	
 end
 
 function try_to_close_door(npc, doors)
+	if true then return {} end
 	local npc_position = npc:position()
 	local closed_doors = {}
 	for id, v in pairs(doors) do
-		if (db.storage[id].ph_door) then 
-			if (npc_position:distance_to_sqr(db.level_doors[id]) > 5) then
+		if npc_position:distance_to_sqr(db.level_doors[id]) > 9 then
+			if db.storage[id].ph_door ~= nil then
 				local action = db.storage[id].ph_door.door_action					
 				if action.st.not_for_npc == false and action.st.closed ~= true then
+					--printf("CLOSE DOOR")
 					action:use_callback()
 					closed_doors[id] = true
-				else 
-					closed_doors[id] = true
 				end
-			end
-		else 
-			closed_doors[id] = true
+			end			
 		end
 	end
-	for id,v in pairs(closed_doors) do
-		doors[id] = nil
-	end	
+	return closed_doors
 end
