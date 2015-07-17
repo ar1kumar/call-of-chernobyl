@@ -25,7 +25,7 @@ local function npc_on_item_take(npc,item)
 
 	local sec = item:section()
 
-	local bw = npc:best_weapon()
+	local bw = npc:best_weapon() or npc:active_item()
 	if (bw and bw:id() == item:id()) then
 		return
 	end

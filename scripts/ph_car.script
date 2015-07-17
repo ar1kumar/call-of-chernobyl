@@ -474,7 +474,7 @@ function action_car:go_to_walkpoint(pt)
 	else
 		-- ѕоворачиватьс€ нужно, но в какую сторону?
 		local rotate_left = utils.angle_left_xz(self.object:direction(), 
-		                                        utils.vector_copy_by_val(self.path_walk:point(pt)
+		                                       vector():set(self.path_walk:point(pt)
 		                                                                ):sub(self.object:position()))
 		printf("car <move>: must rotate: left? %s. speed = %f, time = %f", utils.to_str(rotate_left), self.speed, self.fc_upd_avg)
 		if rotate_left then
@@ -875,7 +875,7 @@ end
 function angle_xz(npc, target_pos)
 	local dir1 = npc:direction()
 	dir1.y = 0
-	local dir2 = utils.vector_copy_by_val(target_pos):sub(npc:position())
+	local dir2 = vector():set(target_pos):sub(npc:position())
 	dir2.y = 0
 	local dp = dir1:dotproduct(dir2)
 	if dp < 0 then
@@ -885,7 +885,7 @@ function angle_xz(npc, target_pos)
 end
 
 function get_katet(npc, target_pos)
-	local p = utils.vector_copy_by_val(target_pos):sub(npc:position())
+	local p = vector():set(target_pos):sub(npc:position())
 	local q = npc:direction()
 	local k = p.x * q.x + p.y * q.y
 	if k ~= 0 then

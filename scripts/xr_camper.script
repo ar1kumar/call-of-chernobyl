@@ -27,6 +27,7 @@ function evaluator_close_combat:__init(name, storage) super (nil, name)
 	self.close_combat = false
 end
 function evaluator_close_combat:evaluate()
+	--alun_utils.debug_write("evalutor_close_combat")
 	if not xr_logic.is_active(self.object, self.a) then
 		return true
 	end
@@ -38,8 +39,12 @@ function evaluator_close_combat:evaluate()
 	if self.mgr == nil then
 		self.mgr = self.object:motivation_action_manager()
 	end
-	if not self.mgr:evaluator(stalker_ids.property_enemy):evaluate() then
+	if not (self.mgr and self.mgr:evaluator(stalker_ids.property_enemy):evaluate()) then
 		return false
+	end
+	
+	if (self.mgr:current_action_id() == xrs_kill_wounded.actid) then 
+		return false 
 	end
 	
 	if (db.storage[self.object:id()].danger_flag) then 
@@ -68,7 +73,6 @@ function action_patrol:initialize()
 	action_base.initialize(self)
 	self.object:set_desired_position()
 	self.object:set_desired_direction()
-
 	self:reset_scheme()
 	self.enemy_position = nil
 end
@@ -709,7 +713,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.enemy_disp = 7/57.2957 -- Угол в пределах которого снайпер ведет поиск потерянного врага.
 
 	st.scandelta = 500
-	st.timedelta = 10000
+	st.timedelta = 30000
 	st.time_scan_delta = st.timedelta/st.scandelta
 
 	st.path_end 		= xr_logic.parse_condlist(npc, section, "path_end", 	utils.cfg_get_string(ini, section, "path_end", npc, false, "", "nil" ))

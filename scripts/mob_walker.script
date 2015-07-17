@@ -257,7 +257,7 @@ function mob_walker:look_at_waypoint(pt)
 		return
 	end
 
-	local look_pt = utils.vector_copy_by_val(self.patrol_look:point(pt)):sub(self.object:position())
+	local look_pt = vector():set(self.patrol_look:point(pt)):sub(self.object:position())
 	look_pt:normalize()
 	--self.object:set_sight(look.direction, look_pt, 0)
 

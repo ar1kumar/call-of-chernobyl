@@ -2,7 +2,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.0.7 RC"
+GAME_VERSION = "1.0.71 RC"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -21,6 +21,38 @@ require("lua_extensions")
 marshal = require "marshal"
 USE_MARSHAL = marshal ~= nil
 
+----------------------------------------------------------------------
+mus_vol = 0
+amb_vol = 0
+b_discard_settings_shown = false
+----------------------------------------------------------------------
+
+function start_game_callback()
+	printf("start_game_callback")
+	if (USE_MARSHAL) then 
+		printf("using marshal library")
+	end 
+	-- Alundaio
+	if (axr_main) then axr_main.on_game_start() end
+	-- End Alundaio
+
+	SIMBOARD = nil
+	sim_board.get_sim_board()
+
+	smart_names.init_smart_names_table()
+	task_manager.clear_task_manager()
+	sound_theme.load_sound()
+	--xr_sound.start_game_callback()
+	dialog_manager.fill_phrase_table()
+
+	sim_objects.clear()
+	sr_light.clean_up ()
+	pda.add_quick_slot_items_on_game_start()
+	
+	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+	collectgarbage("collect")
+	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+end
 
 -------------------------------------------------------------------------------------------------------
 -- 											SCRIPTED CALLBACKS
@@ -222,7 +254,6 @@ end
 -- Serialization of userdata for Marshal Library
 --------------------------------------------------------------------
 if (marshal) then
-	--game.CTime.__size = 4 * 9 -- guess based on ctime.h tm; most likely wrong
 	function game_CTime___persist(self)
 		local Y, M, D, h, m, s, ms = 0,0,0,0,0,0,0
 		Y, M, D, h, m, s, ms = self:get(Y, M, D, h, m, s, ms)
@@ -263,7 +294,6 @@ end
 -- Used by modules.script for generic module management
 schemes = {}
 schemes_by_stype = {}
-
 function LoadScheme(filename, scheme, ...)
 	if not (_G[filename]) then
 		printf("ERROR: Trying to load scheme that does not exist! %s",filename)
@@ -280,11 +310,6 @@ function LoadScheme(filename, scheme, ...)
 	end
 end
 
-----------------------------------------------------------------------
-mus_vol = 0
-amb_vol = 0
-b_discard_settings_shown = false
-----------------------------------------------------------------------
 function printf(fmt,...)
 	if not (fmt) then return end
 	local fmt = tostring(fmt)
@@ -418,16 +443,11 @@ function distance_between_safe(obj1, obj2)
 	return obj1:position():distance_to(obj2:position())
 end
 
-local aa = nil
 --' іроверка на инфопоршнv, даже если игрока не су	ествует
 function has_alife_info(info_id)
-	if aa == nil then
-		return false
-	end
-	return aa:has_info(0, info_id)
+	local sim = alife()
+	return sim:has_info(0, info_id)
 end
-
-
 
 function reset_action (npc, script_name)
 	if npc:get_script () then
@@ -635,73 +655,221 @@ function store_table(table, subs)
 end
 
 -------------------------------------------------------------------------------------------
-local monster_classes = {}
-local stalker_classes = {}
-local weapon_classes = {}
-local artefact_classes = {}
+-- 										CLASS TESTING
+-------------------------------------------------------------------------------------------
+local monster_classes
+local weapon_classes
+local artefact_classes
 
-function IsMonster(object, id)
-	if (id) then 
-		return monster_classes[id] == true 
-	end 
-	if (object) then 
-		if (object.is_monster) then 
-			return object:is_monster()
-		end
-		id = get_clsid(object)
-		return id and monster_classes[id] == true 
+function IsOutfit(o,c)
+	if not c then
+		c = o and o:clsid()
 	end
-	return false
+	return c and c == clsid.equ_stalker_s
 end
 
-function IsStalker(object, id)
-	if (id) then 
-		return stalker_classes[id] == true
+function IsExplosive(o,c)
+	if not c then
+		c = o and o:clsid()
 	end
-	if (object) then 
-		if (object.is_stalker) then 
-			return object:is_stalker()
-		end 
-		if (object.is_actor) then 
-			return object:is_actor()
-		end 
-		id = get_clsid(object)
-		return id and stalker_classes[id] == true
-	end 
-	return false
+	return c and c == clsid.obj_explosive_s
 end
 
-function IsHelicopter(object, id)
-	id = id or get_clsid(object)
-	return id and (id == clsid.helicopter or id == clsid.car or id == clsid.script_heli) or false
+function IsPistol(o,c)
+	if not (c) then
+		c = o and o:clsid()
+	end
+	local pistol = {
+					[clsid.wpn_pm_s] = true,
+					[clsid.wpn_walther_s] = true,
+					[clsid.wpn_usp45_s] = true,
+					[clsid.wpn_hpsa_s] = true,
+					[clsid.wpn_lr300_s] = true
+	}
+	return c and pistol[c] or false
 end
 
-function IsWeapon(object, id)
-	if (id) then 
-		return weapon_classes[id] == true 
+function IsSniper(o,c)
+	if not (c) then
+		c = o and o:clsid()
 	end
-	if (object) then 
-		--if (object.is_weapon_magazined) then 
-			--return object:is_weapon_magazined()
-		--end 
-		id = get_clsid(object)
-		return id and weapon_classes[id] == true
-	end 
-	return false
+	local sniper = {
+				[clsid.wpn_svu_s] = true,
+				[clsid.wpn_svd_s] = true,
+				[clsid.wpn_vintorez_s] = true
+	}
+	return c and sniper[c] or false
 end
 
-function IsArtefact(object, id)
-	if (id) then 
-		return artefact_classes[id] == true
+function IsLauncher(o,c)
+	if not (c) then 
+		c = o and o:clsid()
 	end
-	if (object) then
-		id = get_clsid(object)
-		return id and artefact_classes[id] == true
-	end
-	return false
+	local launcher = {
+					[clsid.wpn_rg6_s] = true,
+					[clsid.wpn_rpg7_s] = true
+	}
+	return c and launcher[c] or false
 end
 
+function IsShotgun(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	local shotgun = {
+				[clsid.wpn_bm16_s] = true,
+				[clsid.wpn_shotgun_s] = true,
+				[clsid.wpn_auto_shotgun_s] = true
+	}
+	return c and shotgun[c] or false
+end
 
+function IsRifle(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	local rifle = {
+				[clsid.wpn_ak74_s] = true,
+				[clsid.wpn_groza_s] = true,
+				[clsid.wpn_val_s] = true
+	}
+	return c and rifle[c] or false
+end
+
+function IsMonster(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	if not (monster_classes) then 
+		monster_classes = {
+		[clsid.bloodsucker_s] 			= true,
+		[clsid.boar_s] 					= true,
+		[clsid.dog_s] 					= true,
+		[clsid.flesh_s] 				= true,
+		[clsid.pseudodog_s] 			= true,
+		[clsid.burer_s] 				= true,
+		[clsid.cat_s] 					= true,
+		[clsid.rat] 					= true,
+		[clsid.rat_s]					= true,
+		[clsid.chimera_s] 				= true,
+		[clsid.controller_s] 			= true,
+		[clsid.fracture_s] 				= true,
+		[clsid.poltergeist_s] 			= true,
+		[clsid.gigant_s] 				= true,
+		[clsid.zombie_s] 				= true,
+		[clsid.snork_s] 				= true,
+		[clsid.tushkano_s] 				= true,
+		[clsid.psy_dog_s] 				= true,
+		[clsid.psy_dog_phantom_s] 		= true
+		}
+	end
+	return c and monster_classes[c] or false
+end
+
+function IsStalker(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	return c and (c == clsid.script_stalker or c == clsid.script_actor) or false
+end
+
+function IsHelicopter(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	return c and (c == clsid.helicopter or c == clsid.car or c == clsid.script_heli) or false
+end
+
+function IsWeapon(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	if not (weapon_classes) then 
+		weapon_classes = {
+				--[clsid.wpn_grenade_f1_s] 		= true,
+				--[clsid.wpn_grenade_rgd5_s] 		= true,
+				--[clsid.wpn_grenade_launcher] 	= true,
+				--[clsid.wpn_grenade_fake] 		= true,
+				[clsid.wpn_vintorez_s] 			= true,
+				[clsid.wpn_ak74_s] 				= true,
+				[clsid.wpn_lr300_s] 			= true,
+				[clsid.wpn_hpsa_s] 				= true,
+				[clsid.wpn_pm_s] 				= true,
+				[clsid.wpn_shotgun_s] 			= true,
+				[clsid.wpn_auto_shotgun_s]		= true,
+				[clsid.wpn_bm16_s] 				= true,
+				[clsid.wpn_svd_s] 				= true,
+				[clsid.wpn_svu_s] 				= true,
+				[clsid.wpn_rg6_s] 				= true,
+				[clsid.wpn_rpg7_s] 				= true,
+				[clsid.wpn_val_s] 				= true,
+				[clsid.wpn_walther_s] 			= true,
+				[clsid.wpn_usp45_s] 			= true,
+				[clsid.wpn_groza_s] 			= true,
+				[clsid.wpn_knife_s] 			= true
+		}
+	end
+	return c and weapon_classes[c] or false
+end
+
+function IsArtefact(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	if not (artefact_classes) then 
+		artefact_classes = {
+		[clsid.art_bast_artefact] 		= true,
+		[clsid.art_black_drops] 		= true,
+		[clsid.art_dummy] 				= true,
+		[clsid.art_electric_ball] 		= true,
+		[clsid.art_faded_ball] 			= true,
+		[clsid.art_galantine] 			= true,
+		[clsid.art_gravi] 				= true,
+		[clsid.art_gravi_black] 		= true,
+		[clsid.art_mercury_ball] 		= true,
+		[clsid.art_needles] 			= true,
+		[clsid.art_rusty_hair] 			= true,
+		[clsid.art_thorn] 				= true,
+		[clsid.art_zuda] 				= true,
+		[clsid.artefact] 				= true,
+		[clsid.artefact_s] 				= true
+		}
+	end
+	return c and artefact_classes[c] or false
+end
+
+-------------------------------------------------------------
+-- 					SQUAD BEHAVIOR TESTING
+-------------------------------------------------------------
+is_squad_monster = {
+		["monster_predatory_day"] 	= true,
+		["monster_predatory_night"] = true,
+		["monster_vegetarian"] 		= true,
+		["monster_zombied_day"] 	= true,
+		["monster_zombied_night"] 	= true,
+		["monster_special"] 		= true,
+		["monster"]					= true
+}
+
+squad_community_by_behaviour = {
+		["stalker"]							= "stalker",
+		["bandit"]							= "bandit",
+        ["csky"]							= "csky",
+		["dolg"]							= "dolg",
+		["freedom"]							= "freedom",
+		["army"]							= "army",
+		["ecolog"]							= "ecolog",
+		["killer"]							= "killer",
+		["zombied"]							= "zombied",
+		["monolith"]						= "monolith",
+		["monster"]							= "monster",
+		["monster_predatory_day"]			= "monster",
+		["monster_predatory_night"]			= "monster",
+		["monster_vegetarian"]				= "monster",
+		["monster_zombied_day"]				= "monster",
+		["monster_zombied_night"]			= "monster",
+		["monster_special"]					= "monster"
+}
 -------------------------------------------------------------------------------------------
 function get_object_community(obj)
 	if type(obj.id) == "function" then
@@ -782,16 +950,6 @@ function abort(msg, ...)
 	--]]
 end
 
-function atexit(error_object, from_error, from_pcall)
-	local f = io.stdout
-	f:write('\n=== atexit ===\n')
-	f:write('  error_object: ', type(error_object),   '\n')
-	f:write('  from_error:   ', tostring(from_error), '\n')
-	f:write('  from_pcall:   ', tostring(from_pcall), '\n')
-	f:write('  tostring(error_object):  \'', tostring(error_object) , '\'\n')
-	f:write('=== /atexit ===\n')
-	f:flush()
-end
 
 function set_inactivate_input_time(delta)
 	db.storage[db.actor:id()].disable_input_time = game.get_game_time()
@@ -813,133 +971,6 @@ function npc_in_actor_frustrum(npc)
 	local yaw = yaw_degree3d(actor_dir, npc_dir)
 	--printf("YAW %s", tostring(yaw))
 	return yaw < 35
-end
-
-function start_game_callback()
-	aa = alife()
-
-	printf("start_game_callback")
-	if (USE_MARSHAL) then 
-		printf("using marshal library")
-	end 
-	-- Alundaio
-	if (axr_main) then axr_main.on_game_start() end
-	-- End Alundaio
-
-	is_squad_monster =
-	{
-		["monster_predatory_day"] 	= true,
-		["monster_predatory_night"] = true,
-		["monster_vegetarian"] 		= true,
-		["monster_zombied_day"] 	= true,
-		["monster_zombied_night"] 	= true,
-		["monster_special"] 		= true,
-		["monster"]					= true
-	}
-
-	squad_community_by_behaviour = {
-		["stalker"]							= "stalker",
-		["bandit"]							= "bandit",
-        ["csky"]							= "csky",
-		["dolg"]							= "dolg",
-		["freedom"]							= "freedom",
-		["army"]							= "army",
-		["ecolog"]							= "ecolog",
-		["killer"]							= "killer",
-		["zombied"]							= "zombied",
-		["monolith"]						= "monolith",
-		["monster"]							= "monster",
-		["monster_predatory_day"]			= "monster",
-		["monster_predatory_night"]			= "monster",
-		["monster_vegetarian"]				= "monster",
-		["monster_zombied_day"]				= "monster",
-		["monster_zombied_night"]			= "monster",
-		["monster_special"]					= "monster"
-	}
-
-
-	monster_classes = {
-		[clsid.bloodsucker_s] 			= true,
-		[clsid.boar_s] 					= true,
-		[clsid.dog_s] 					= true,
-		[clsid.flesh_s] 				= true,
-		[clsid.pseudodog_s] 			= true,
-		[clsid.burer_s] 				= true,
-		[clsid.cat_s] 					= true,
-		[clsid.rat] 					= true,
-		[clsid.rat_s]					= true,
-		[clsid.chimera_s] 				= true,
-		[clsid.controller_s] 			= true,
-		[clsid.fracture_s] 				= true,
-		[clsid.poltergeist_s] 			= true,
-		[clsid.gigant_s] 				= true,
-		[clsid.zombie_s] 				= true,
-		[clsid.snork_s] 				= true,
-		[clsid.tushkano_s] 				= true,
-		[clsid.psy_dog_s] 				= true,
-		[clsid.psy_dog_phantom_s] 		= true}
-
-	stalker_classes = {
-		[clsid.script_actor] 			= true,
-		[clsid.script_stalker] 			= true}
-
-	weapon_classes = {
-		[clsid.wpn_vintorez_s] 			= true,
-		[clsid.wpn_ak74_s] 				= true,
-		[clsid.wpn_lr300_s] 			= true,
-		[clsid.wpn_hpsa_s] 				= true,
-		[clsid.wpn_pm_s] 				= true,
-		[clsid.wpn_shotgun_s] 			= true,
-		[clsid.wpn_auto_shotgun_s]		= true,
-		[clsid.wpn_bm16_s] 				= true,
-		[clsid.wpn_svd_s] 				= true,
-		[clsid.wpn_svu_s] 				= true,
-		[clsid.wpn_rg6_s] 				= true,
-		[clsid.wpn_rpg7_s] 				= true,
-		[clsid.wpn_val_s] 				= true,
-		[clsid.wpn_walther_s] 			= true,
-		[clsid.wpn_usp45_s] 			= true,
-		[clsid.wpn_groza_s] 			= true,
-		[clsid.wpn_knife_s] 			= true,
-		[clsid.wpn_grenade_f1_s] 		= true,
-		[clsid.wpn_grenade_rgd5_s] 		= true,
-		[clsid.wpn_grenade_launcher] 	= true,
-		[clsid.wpn_grenade_fake] 		= true}
-
-	artefact_classes = {
-		[clsid.art_bast_artefact] 		= true,
-		[clsid.art_black_drops] 		= true,
-		[clsid.art_dummy] 				= true,
-		[clsid.art_electric_ball] 		= true,
-		[clsid.art_faded_ball] 			= true,
-		[clsid.art_galantine] 			= true,
-		[clsid.art_gravi] 				= true,
-		[clsid.art_gravi_black] 		= true,
-		[clsid.art_mercury_ball] 		= true,
-		[clsid.art_needles] 			= true,
-		[clsid.art_rusty_hair] 			= true,
-		[clsid.art_thorn] 				= true,
-		[clsid.art_zuda] 				= true,
-		[clsid.artefact] 				= true,
-		[clsid.artefact_s] 				= true}
-		
-	empty_table(db.storage)
-	SIMBOARD = nil
-	sim_board.get_sim_board()
-
-	smart_names.init_smart_names_table()
-	task_manager.clear_task_manager()
-	sound_theme.load_sound()
-	--xr_sound.start_game_callback()
-	dialog_manager.fill_phrase_table()
-
-	sim_objects.clear()
-	sr_light.clean_up ()
-	pda.add_quick_slot_items_on_game_start()
-	
-	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	collectgarbage("collect")
-	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 --' Lсталость
@@ -1147,7 +1178,7 @@ end
 function get_object_squad(object,caller)
 	if object == nil then return abort("You are trying to get squad_object from NIL object!!! %s",caller) end
 	local obj_id = type(object.id ) == "function" and object:id() or object.id
-	local sim = aa or alife()
+	local sim = alife()
 	local se_obj = sim:object(obj_id)
 	if se_obj and se_obj.group_id ~= 65535 then
 		return sim:object(se_obj.group_id)

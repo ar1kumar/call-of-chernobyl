@@ -84,12 +84,12 @@ function arena_zone_binder:net_destroy()
 	object_binder.net_destroy(self)
 end
 function arena_zone_binder:purge_items()
-	local alife = alife()
+	local sim = alife()
 	for k,v in pairs(self.saved_obj) do
-		local obj = alife:object(k)
+		local obj = sim:object(k)
 		if (obj) then
 			printf("release object %s, id %s", obj:name(), k)
-			alife:release(obj, true)
+			sim:release(obj, true)
 		end
 	end	
 end

@@ -196,7 +196,7 @@ function create_random_stash(no_spot,hint,bonus_items)
 		sec = spawned_item[i]
 		if (sec ~= "" and ini:section_exist(sec)) then
 			se_obj = sim:create(sec,se_box.position,0,0,id)
-			if (alun_utils.item_is_fa(se_obj)) then
+			if (IsWeapon(nil,se_obj:clsid())) then
 				--printf("coc_treasure_manager: item is fa")
 				data = stpk_utils.get_weapon_data(se_obj)
 				if (data) then

@@ -1,11 +1,10 @@
 local trade_manager = {}
 
 function trade_init(npc, cfg)
---'	printf("TRADE INIT[%s]", npc:name())
---'	if trade_manager[npc:id()] == nil then
-		trade_manager[npc:id()] = {}
---'	end
-
+	if not (utils.valid_pathname(cfg)) then 
+		return 
+	end
+	trade_manager[npc:id()] = {}
 	trade_manager[npc:id()].cfg_ltx = cfg
 	trade_manager[npc:id()].config = ini_file(cfg)
 
@@ -38,6 +37,10 @@ end
 
 
 function update(npc)
+	if not (npc:alive()) then 
+		return 
+	end
+	
 	local tt = trade_manager[npc:id()]
 
 	if tt == nil then
@@ -97,19 +100,23 @@ function update(npc)
 	end
 end
 
+function on_npc_death(npc)
+	if (npc) then
+		trade_manager[npc:id()] = nil
+	end
+end
 
 function save(obj, packet)
 	local tt = trade_manager[obj:id()]
-	set_save_marker(packet, "save", false, "trade_manager")
-	--' Сохраняем присутствует ли инициализированная торговля в принципе.
 	if tt == nil then
-		--printf("TRADE SAVE [%s]: ignored", obj:name())
 		packet:w_bool(false)
 		return
 	else
 		packet:w_bool(true)
 	end
 
+	set_save_marker(packet, "save", false, "trade_manager")
+	
 	packet:w_stringZ(tt.cfg_ltx)
 
 	--printf("TRADE SAVE [%s]: current_buy_condition = %s", obj:name(), tostring(tt.current_buy_condition))
@@ -150,21 +157,27 @@ function save(obj, packet)
 end
 
 function load(obj, packet)
-	set_save_marker(packet, "load", false, "trade_manager")
 	local a = packet:r_bool()
 	if a == false then
-		--printf("TRADE LOAD [%s]: ignored", obj:name())
 		return
 	end
 
+	set_save_marker(packet, "load", false, "trade_manager")
+	
 	trade_manager[obj:id()] = {}
 
 	local tt = trade_manager[obj:id()]
 
 	tt.cfg_ltx = packet:r_stringZ()
+	if not (utils.valid_pathname(tt.cfg_ltx)) then 
+		-- save most likely corrupt
+		trade_manager[obj:id()] = nil
+		set_save_marker(packet, "load", true, "trade_manager")
+		return
+	else 
+		tt.config = ini_file(tt.cfg_ltx)
+	end 
 	--printf("TRADE LOAD [%s]: cfg_ltx = %s", obj:name(), tostring(tt.cfg_ltx))
-
-	tt.config = ini_file(tt.cfg_ltx)
 
 	a = packet:r_stringZ()
 	--printf("TRADE LOAD [%s]: current_buy_condition = %s", obj:name(), tostring(a))
@@ -196,6 +209,10 @@ function load(obj, packet)
 	a = packet:r_s32()
 	if a ~= -1 then
 		tt.resuply_time = cur_tm + a
+	end
+	
+	if not (obj:alive()) then 
+		trade_manager[obj:id()] = nil
 	end
 	set_save_marker(packet, "load", true, "trade_manager")
 end

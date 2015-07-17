@@ -94,8 +94,6 @@ local function npc_on_hear_callback(npc,who_id,s_type,dist,sound_power,sound_pos
 		return
 	end
 	
-	
-
 	if (s_type == "WPN_hit" or s_type == "MST_attack" or s_type == "MST_damage") and dist < 900 then
 		local who = who_id and (db.storage[who_id] and db.storage[who_id].object)
 		if not (who) then
@@ -121,7 +119,7 @@ local function npc_on_death_callback(npc,who)
 		--alun_utils.save_var(npc,"death_by_id",who:id())
 		local st = db.storage[npc:id()]
 		if (st) then
-			st.killer_last_known_position = utils.vector_copy_by_val(who:position())
+			st.killer_last_known_position = vector():set(who:position())
 		end
 	end
 end
@@ -131,7 +129,7 @@ local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
 		return
 	end 
 	
-	set_script_danger(npc,7000,who_id,who and utils.vector_copy_by_val(who:position()))
+	set_script_danger(npc,7000,who_id,who and vector():set(who:position()))
 end
 
 local function get_rand_vertex(npc,vo)
@@ -192,7 +190,7 @@ local function is_danger(npc,best_danger,script)
 			end
 
 			local killer = db.storage[corpse_st.death_by_id] and db.storage[corpse_st.death_by_id].object
-			if not (killer and killer:alive() and npc:relation(killer) > 0 and character_community(killer) ~= character_community(npc)) then
+			if not (killer and (IsMonster(killer) or IsStalker(killer)) and killer:alive() and npc:relation(killer) > 0 and character_community(killer) ~= character_community(npc)) then
 				return false
 			end
 			
@@ -216,7 +214,7 @@ local function is_danger(npc,best_danger,script)
 		best_danger_object = best_danger:dependent_object()
 	end
 
-	if not (best_danger_object and npc:relation(best_danger_object) >= 2) then
+	if not (best_danger_object and (IsMonster(best_danger_object) or IsStalker(best_danger_object)) and npc:relation(best_danger_object) >= 2) then
 		return false
 	end
 
@@ -355,7 +353,7 @@ local function script_action_danger_scripted(npc,st)
 				local wpn = npc:best_weapon()
 				if (wpn) then
 					local relation = npc:relation(bdo)
-					local look_pos = utils.vector_copy_by_val(bdo:position())
+					local look_pos = vector():set(bdo:position())
 
 					look_pos.y = relation >= 2 and look_pos.y + 1 or look_pos.y - (math_random(25,35)/100)
 					npc:set_sight(look.fire_point,look_pos)
@@ -384,7 +382,7 @@ local function script_action_danger_scripted(npc,st)
 		end
 
 		if not (new_vid) then
-			local dir = bdo_pos and utils.vector_copy_by_val(npc:position()):sub(bdo_pos) or npc:direction()
+			local dir = bdo_pos and vector():set(npc:position()):sub(bdo_pos) or npc:direction()
 			dir = vector_rotate_y(dir,math_random(-20,20))
 		
 			local node = position_node(5)
@@ -447,7 +445,7 @@ local function script_action_danger_grenade(npc,st,bd,best_danger_object,depende
 				local wpn = npc:best_weapon()
 				if (wpn) then
 					local relation = npc:relation(be)
-					local look_pos = utils.vector_copy_by_val(be:position())
+					local look_pos = vector():set(be:position())
 
 					look_pos.y = relation >= 2 and look_pos.y + 1 or look_pos.y - (math_random(25,35)/100)
 					npc:set_sight(look.fire_point,look_pos)
@@ -479,7 +477,7 @@ local function script_action_danger_grenade(npc,st,bd,best_danger_object,depende
 	end
 
 	if (st.stage == 1) then
-		local dir = bdo_pos and utils.vector_copy_by_val(npc:position()):sub(bdo_pos) or npc:direction()
+		local dir = bdo_pos and vector():set(npc:position()):sub(bdo_pos) or npc:direction()
 		dir = vector_rotate_y(dir,math_random(-20,20))
 
 		local new_vid = npc:vertex_in_direction(npc:level_vertex_id(),dir,math_random(20,35))
@@ -575,7 +573,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 				state_mgr.set_state(npc,"search")
 				st.dtimer = time_global() + math_random(3000,5000)
 			else
-				state_mgr.set_state(npc,"threat_danger",nil,nil,{look_position = dst and dst.killer_last_known_position})
+				state_mgr.set_state(npc,"raid",nil,nil,{look_position = dst and dst.killer_last_known_position})
 			end
 
 			st.stage = 3
@@ -597,7 +595,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 		end
 
 		if not (new_vid) then
-			local dir = dst and dst.killer_last_known_position and utils.vector_copy_by_val(dst.killer_last_known_position):sub(npc:position()) or killer and utils.vector_copy_by_val(killer:position()):sub(npc:position()) or npc:direction()
+			local dir = dst and dst.killer_last_known_position and vector():set(dst.killer_last_known_position):sub(npc:position()) or killer and vector():set(killer:position()):sub(npc:position()) or npc:direction()
 			local node = position_node(3)
 			node = node:select_best_vertex_id(npc,dir,npc:level_vertex_id(),10,dist_to_killer/2)
 
@@ -648,10 +646,10 @@ local function script_action_danger_attacked(npc,st,bd,best_danger_object,depend
 	if (st.stage == 1) then
 
 		if not (st.last_pos) then
-			st.last_pos = bdo and utils.vector_copy_by_val(bdo:position())
+			st.last_pos = bdo and vector():set(bdo:position())
 		end
 
-		local dir = st.last_pos and utils.vector_copy_by_val(st.last_pos):sub(npc:position()) or utils.vector_copy_by_val(npc:direction())
+		local dir = st.last_pos and vector():set(st.last_pos):sub(npc:position()) or vector():set(npc:direction())
 		local dist_to_bdo = st.last_pos and npc:position():distance_to_sqr(st.last_pos) or 30
 
 		local target_vertex_id = random_choice(alun_utils.try_to_strafe(npc),alun_utils.try_go_backward(npc,6),alun_utils.try_go_cover(npc,st.last_pos or npc:position()))

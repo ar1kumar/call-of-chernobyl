@@ -57,8 +57,8 @@ function lend_item_for_repair(itm,mechanic_name,rt)
 		RepairItemList[mechanic_name][itm:id()] = {gt = game.get_game_time(), rt = rt}
 
 		local hud = get_hud()
-		--hud:HideActorMenu()
-		hud:UpdateActorMenu()
+		hud:HideActorMenu()
+		--hud:UpdateActorMenu()
 	end
 end
 
@@ -168,6 +168,7 @@ function dm_repair_not_done(a,b)
 
 		local inv_name = game.translate_string(alun_utils.read_from_ini(nil,itm_sec,"inv_name","string",""))
 
+		-- TODO: replace with translatable strings
 		local text = { "Your %s will be ready in %s minutes. Come back then.",
 						"Soon your %s will be ready. Come back in %s minutes.",
 						"Urgh, piss off. I'm not drunk yet.",

@@ -120,6 +120,17 @@ end
 
 
 function actor_has_fetch_item(task,task_id)
+	local id = task.task_giver_id
+	local se_obj = id and alife():object(id)
+	if (se_obj) then 
+		if not (se_obj:clsid() == clsid.online_offline_group_s) then 
+			if not (se_obj:alive()) then 
+				return "fail" -- complete task even though giver is dead, you still rescued hostage
+			end
+		end 
+	else 
+		return "fail"
+	end
 	local section = db.actor and alun_utils.load_var(db.actor,task_id.."_fetch")
 	local item = section and db.actor:object(section)
 	if (item ~= nil) then 

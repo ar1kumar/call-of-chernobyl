@@ -110,18 +110,23 @@ end
 -- actor_on_item_take(item)
 -------------------
 function actor_on_item_take(binder,item)
-	if IsArtefact(item) then
-		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
-		if anomal_zone ~= nil then
-			anomal_zone:on_artefact_take(item)
-		else
-			bind_anomaly_zone.artefact_ways_by_id[item:id()] = nil
-		end
-		local artefact = item:get_artefact()
-		artefact:FollowByPath("NULL",0,vector():set(500,500,500))
-		xr_statistic.inc_founded_artefacts_counter(item:id())
+	if(device().precache_frame > 1) then -- game is paused or loading
+		return
 	end
-	treasure_manager.get_treasure_manager():on_item_take(item:id())
+	if IsArtefact(item) then
+		local artefact = item:get_artefact()
+		if (artefact) then
+			local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
+			if anomal_zone ~= nil then
+				anomal_zone:on_artefact_take(item)
+			else
+				bind_anomaly_zone.artefact_ways_by_id[item:id()] = nil
+			end
+			artefact:FollowByPath("NULL",0,vector():set(500,500,500))
+			xr_statistic.inc_founded_artefacts_counter(item:id())
+		end
+	end
+	--treasure_manager.get_treasure_manager():on_item_take(item:id()) -- disabled for coc
 	SendScriptCallback("actor_on_item_take",item)
 end
 
@@ -189,6 +194,7 @@ function actor_on_save(binder,packet)
 	if (coc_treasure_manager) then
 		coc_treasure_manager.save(packet)
 	end
+	
 	surge_manager.actor_on_save(binder,packet)
 	psi_storm_manager.actor_on_save(binder,packet)
 end

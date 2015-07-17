@@ -320,8 +320,8 @@ function CPsiStormManager:vortex()
 	local distance=math.random(0,self.vortex_distance_max)
 	local pos_x=math.cos(angle_rad)*distance
 	local pos_z=math.sin(angle_rad)*distance
-	local particle_pos=vector():set(actor_pos.x+pos_x, actor_pos.y+20, actor_pos.z+pos_z)
-	local sound_pos=vector():set(actor_pos.x+pos_x, actor_pos.y+60, actor_pos.z+pos_z)
+	local particle_pos= vector():set(actor_pos.x+pos_x, actor_pos.y+20, actor_pos.z+pos_z)
+	local sound_pos= vector():set(actor_pos.x+pos_x, actor_pos.y+60, actor_pos.z+pos_z)
 	self.vortexes[self.vortex_index]={effect=effect, particle_pos=particle_pos,sound=sound, sound_pos=sound_pos, start_time=diff_sec, hit=false}
 	--particle
 	self.vortexes[self.vortex_index].effect:play_at_pos(self.vortexes[self.vortex_index].particle_pos)

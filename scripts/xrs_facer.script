@@ -143,7 +143,7 @@ function hit_callback(obj,amount,dir,who,bone_index)
 	end
 
 	if not(db.storage[obj:id()].facer) then return end
-	if (who and check_enemy(who,obj)) then
+	if (who and IsStalker(who) and IsMonster(who) and who:alive() and check_enemy(who,obj)) then
 		local target_id = alun_utils.load_var(obj,"facer_target",nil)
 		local target = target_id and db.storage[target_id] and db.storage[target_id].object
 		if (not target or obj:relation(target) ~= game_object.enemy or target:position():distance_to_sqr(obj:position()) > 4) then
@@ -424,7 +424,7 @@ function check_enemy(enemy,obj)
 	local rank = ranks.get_obj_rank_name(obj)
 	local vals = facer_sets.ranks[rank] or facer_sets.ranks["default"]
 
-	if (vals.enable_vs_actor) and (enemy:id() == db.actor:id() or cls == clsid.actor or cls == clsid.spectator) then
+	if (vals.enable_vs_actor and enemy:id() == 0) then
 		return true
 	end
 

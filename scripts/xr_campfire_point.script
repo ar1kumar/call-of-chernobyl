@@ -26,7 +26,7 @@ local assoc_tbl = 	{
 
 -----------------------------Private-----------------
 local function get_rand_vertex(npc,vo,minD,maxD)
-	local dir = utils.vector_copy_by_val(npc:position()):sub(vo:position())
+	local dir = vector():set(npc:position()):sub(vo:position())
 	dir = vector_rotate_y(dir,mrand(360))
 	return vo:vertex_in_direction(vo:level_vertex_id(),dir,mrand(minD,maxD))
 end
@@ -84,7 +84,7 @@ function action_point_campfire:activate_scheme()
 			end
 			for id,binder in pairs(fires) do
 				if (binder.object) then 
-					local dir = utils.vector_copy_by_val(binder.object:direction())
+					local dir = vector():set(binder.object:direction())
 					local pos = binder.object:position()
 					t[#t+1] = pos
 					for i=1,6 do

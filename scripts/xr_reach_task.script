@@ -86,7 +86,7 @@ function PatrolManager:add_npc(npc)
 	--' если мужик первый или считается лидером, то установим, как лидера
 	if npc:id() == get_object_squad(npc):commander_id() then
 		self.commander_id = npc:id ()
-		printf ("[XR_REACH_TASK] ASSIGNED NPC %s AS PATROL COMMANDER", npc:name ())
+		--printf ("[XR_REACH_TASK] ASSIGNED NPC %s AS PATROL COMMANDER", npc:name ())
 	end
 	--printf ("[XR_REACH_TASK] NPC %s added to patrol manager %s", npc:name (), self.target_name)
 	self:reset_positions ()

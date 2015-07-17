@@ -30,7 +30,7 @@ local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
 	if not (id) then 
 		return 
 	end
-	if (id == 0 or who:has_info("npcx_is_companion")) then
+	if (id == 0 or IsStalker(who) and who:has_info("npcx_is_companion")) then
 		local npc_id = npc:id()
 		if (db.storage[npc_id]) then 
 			db.storage[npc_id].tagged_by_actor = true

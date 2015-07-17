@@ -7,7 +7,10 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 	end 
 	
 	local npc_id = npc:id()
-	local st     = db.storage[npc_id]
+	local st = db.storage[npc_id]
+	if not (st) then 
+		return 
+	end
 
 	-- если какая-то схема была до этого активна, деактивировать её
 	if st.active_section then
@@ -70,9 +73,11 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 	
 	-- Инициализация торговли
 	if (stype == modules.stype_trader or stype == modules.stype_stalker) then
-		local trade_ini = utils.cfg_get_string(actual_ini, section_logic, "trade", npc, false, "", "misc\\trade\\trade_generic.ltx")
-		trade_manager.trade_init(npc, trade_ini)
-		spawner.spawn_items(npc, st)
+		if (npc:alive()) then
+			local trade_ini = utils.cfg_get_string(actual_ini, section_logic, "trade", npc, false, "", "misc\\trade\\trade_generic.ltx")
+			trade_manager.trade_init(npc, trade_ini)
+			spawner.spawn_items(npc, st)
+		end
 	end
 
 	return st.ini
@@ -1083,12 +1088,13 @@ function load_ctime(obj, varname)
 end
 
 function pstor_save_all(obj, packet)
+	local npc_id = obj:id()
 	if (USE_MARSHAL) then
+		db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 		SendScriptCallback("on_pstor_save_all",obj,packet)
 		return
 	end
 
-	local npc_id = obj:id()
 	local pstor = db.storage[npc_id].pstor
 	if not pstor then
 		pstor = {}
@@ -1140,13 +1146,13 @@ function pstor_save_all(obj, packet)
 end
 
 function pstor_load_all(obj, reader)
+	local npc_id = obj:id()
 	if (USE_MARSHAL) then
+		db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 		SendScriptCallback("on_pstor_load_all",obj,reader)
 		return
 	end
 
-	local npc_id = obj:id()
-	
 	db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 	
 	if (reader:r_elapsed() <= 0) then 
@@ -1211,9 +1217,13 @@ function save_obj(obj, packet)
 end
 
 function load_obj(obj, reader)
-	set_save_marker(reader, "load", false, "object"..obj:name())
+	set_save_marker(reader, "load", false, "object "..obj:name())
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]
+	if not (st) then 
+		error(alun_utils.sr("load_obj st is nil for %s",obj and obj:id()))
+	end 
+	
 	local job_ini = reader:r_stringZ()
 	if job_ini == "" then
 		job_ini = nil
@@ -1249,7 +1259,7 @@ function load_obj(obj, reader)
 	db.storage[npc_id].activation_game_time = utils.r_CTime(reader)
 	
 	pstor_load_all(obj, reader)
-	set_save_marker(reader, "load", true, "object"..obj:name())
+	set_save_marker(reader, "load", true, "object "..obj:name())
 end
 
 function get_customdata_or_ini_file(npc, filename)

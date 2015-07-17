@@ -1350,6 +1350,7 @@ function se_smart_terrain:am_i_reached(squad)
 		return false
 	end
 	
+	-- TODO: Maybe consider to return true if squad:get_script_target() is true
 	if (is_squad_monster[squad.player_id] and squad:get_script_target() == nil) then 
 		return squad.position:distance_to_sqr(self.position) <= 625
 	end
@@ -1424,12 +1425,6 @@ function se_smart_terrain:target_precondition(squad, ignore_population)
 	if (self.props[squad.player_id] == nil or self.props.all > 0 or self.props[squad.player_id] > 0) then
 		
 		local is_monster = is_squad_monster[squad.player_id]
-		
-		-- actor check if loud
-		if (sim_board.general_actor_precondition(squad,self,200,is_monster)) then 
-			return false 
-		end
-		
 		if (is_monster ~= true and squad.player_id ~= "zombied") then
 			-- surge
 			if (xr_conditions.surge_started()) then

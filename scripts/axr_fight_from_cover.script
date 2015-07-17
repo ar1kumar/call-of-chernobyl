@@ -72,11 +72,6 @@ local function lmove_ns(npc,vid,st)
 	return vid
 end
 
-local good_acts = {
-					[xr_actions_id.smartcover_action] = true,
-					[xr_actions_id.smartcover_action+2] = true
-					}
-
 --------------------------------------------------------------------------------------
 --												EVALUATOR FIGHT FROM COVER
 --------------------------------------------------------------------------------------
@@ -95,10 +90,6 @@ function evaluator_fight_from_cover:evaluate()
 		return false 
 	end 
 	
-	if good_acts[alun_utils.get_current_action_id(npc)] then
-		return false
-	end
-	
 	if (db.storage[npc:id()].active_scheme == "camper") then 
 		return false 
 	end
@@ -108,27 +99,22 @@ function evaluator_fight_from_cover:evaluate()
 	end 
 	
 	local st = db.storage[npc:id()]
-	if (st and st.help_wounded and st.help_wounded.selected_id ~= nil) then 
+	if (st) and (st.rx_dont_shoot or st.help_wounded and st.help_wounded.selected_id ~= nil) then 
 		return false 
 	end
 	
-	local bw = npc:best_weapon()
-	if not (bw and alun_utils.isSniper(bw)) then
-		if not (alun_utils.load_var(npc,"fight_from_point")) then 
-			return false 
-		end
+	local bd = npc:best_danger()
+	if (bd and bd:type() == danger_object.grenade and db.storage[npc:id()].danger_flag) then
+		return false
+	end 
+	
+	if not (alun_utils.load_var(npc,"fight_from_point") or IsSniper(npc:best_weapon())) then
+		return false 
 	end
 	
 	local be = npc:best_enemy()
 	if (be and be:alive() and not xr_wounded.is_wounded(be)) then
-		if (_G.schemes["facer"]) then
-			local mgr = npc:motivation_action_manager()
-			if (mgr and mgr:initialized()) then
-				return not mgr:evaluator(xrs_facer.evid_steal_up_facer):evaluate()
-			end
-		else
-			return true
-		end
+		return true
 	end
 
 	return false
@@ -149,12 +135,12 @@ function action_fight_from_cover:initialize()
 	npc:set_desired_direction()
 end
 
-function action_fight_from_cover:try_go_cover(npc,enemy,ene_pos,dist)
+function action_fight_from_cover:try_go_cover(npc,ene_pos)
 	--alun_utils.debug_write(strformat("action_fight_from_cover:try_go_cover"))
 	local lvid = alun_utils.load_var(npc,"fight_from_point")
 	local pos  = lvid and level.vertex_position(lvid) or npc:position()
-	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,5,db.used_level_vertex_ids)
-	if (validate(npc,vid)) then -- and level.vertex_position(vid):distance_to_sqr(npc:position()) < dist) then
+	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,lvid and 1 or 5,1,lvid and 10 or 20)
+	if (validate(npc,vid)) then
 		return lmove(npc,vid,self.st)
 	end
 end
@@ -174,8 +160,7 @@ function action_fight_from_cover:try_go_backward(npc)
 	end
 end
 
-function action_fight_from_cover:try_to_strafe(npc,enemy,ene_pos,dist)
-	--alun_utils.debug_write(strformat("action_stalker_panic:try_to_strafe"))
+function action_fight_from_cover:try_to_strafe(npc)
 	--alun_utils.debug_nearest(npc,"try_to_strafe")
 	local dir = {}
 	dir[1] = vector_rotate_y(utils.vector_copy_by_val(npc:direction()),math.random(-87,-93))
@@ -213,15 +198,14 @@ function action_fight_from_cover:execute()
 	
 	local see = npc:see(enemy)
 	--local see_me = enemy:see(npc)
-	local ene_pos = see and alun_utils.safe_bone_pos(enemy,"bip01_spine") or npc:memory_position(enemy)
-	local dist = ene_pos:distance_to_sqr(npc:position())
+	local ene_pos = see and alun_utils.safe_bone_pos(enemy,"bip01_neck") or npc:memory_position(enemy) or nil
 
 	local tg = time_global()
 	if (self.st.vid) then
-		local dir = enemy:position():sub(npc:position())
-		local bw = npc:best_weapon()
+		local bw = npc:active_item() and npc:best_weapon()
 		
 		if (self.st.__keep_body_state_until==nil or tg > self.st.__keep_body_state_until) then
+			local dir = ene_pos and vector():sub(ene_pos,npc:position()) or npc:direction()
 			self.st.__keep_body_state_until = tg+5000
 			if (npc:body_state() ~= move.crouch) then
 				--printf("stand=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
@@ -242,50 +226,67 @@ function action_fight_from_cover:execute()
 			if not (bw) then 
 				new_state = "sneak_run_no_wpn"
 			else
-				local is_sniper = alun_utils.isSniper(bw)
+				local is_sniper = IsSniper(bw)
 				if (is_sniper == nil and self.stand) then 
-					new_state = see and (is_sniper and "threat_sniper_fire" or "threat_fire") or "threat_na"
+					new_state = see and (is_sniper and "threat_sniper_fire" or "threat_fire") or "threat"
 				else
 					new_state = see and (is_sniper and "hide_sniper_fire" or "sneak_fire") or "sneak_run"
 				end
 			end
 			
-			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
+			if (see) then
+				local dir = ene_pos and vector():sub(ene_pos,npc:bone_position("bip01_r_finger02")) or nil
+				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy,look_dir = dir},{fast_set = true})
+			else
+				state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
+			end
 	
+			self.st.__keep_point_until = self.st.__keep_point_until or tg + math.random(3000,8000)
 			if (self.st.__keep_point_until and tg < self.st.__keep_point_until) then
 				return
 			end
+			self.st.__keep_point_until = nil 
+			
 			db.used_level_vertex_ids[self.st.vid] = nil
 			self.st.vid = nil
 		else
 			if not (bw) then 
 				new_state = "sneak_run_no_wpn"
 			else
-				local is_sniper = alun_utils.isSniper(bw)
-				if (self.stand) then 
-					new_state = see and (is_sniper and "threat_sniper_fire" or "assault_fire") or "assault"
-				else
-					new_state = see and (is_sniper and "hide_sniper_fire" or "sneak_fire") or "sneak_run"
+				local dist = npc:position():distance_to_sqr(enemy:position())
+				if (dist < 400) then
+					local is_sniper = IsSniper(bw)
+					if (self.stand) then 
+						new_state = see and (is_sniper and "threat_sniper_fire" or "assault_fire") or "assault"
+					else
+						new_state = see and (is_sniper and "hide_sniper_fire" or "sneak_fire") or "sneak_run"
+					end
+				else 
+					if (self.stand) then
+						new_state = "assault"
+					else 
+						new_state = "sneak_run"
+					end
 				end
 			end
 			
-			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
+			if (see) then
+				local dir = ene_pos and vector():sub(ene_pos,npc:bone_position("bip01_r_finger02")) or nil
+				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy, look_dir = dir},{fast_set = true})
+			else 
+				state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
+			end
 
 			lmove(npc,self.st.vid,self.st)
 			return
 		end 	
 	end
 	
-	if (dist < 30 and self:try_to_strafe(npc,enemy,ene_pos,dist)) then 
-		self.st.__keep_point_until = tg + math.random(5000,8000)
-	else
-		if (self:try_go_cover(npc,enemy,ene_pos,dist)) then 
-			self.st.__keep_point_until = tg + math.random(5000,8000)
-		else 
-			self:try_to_strafe(npc,enemy,ene_pos,dist)
-			--printf("try_to_strafe")
-		end
-	end 
+	if (self:try_go_cover(npc,ene_pos or enemy:position())) then 
+
+	else 
+		self:try_to_strafe(npc)
+	end
 	--alun_utils.debug_write(strformat("action_fight_from_cover:execute end 2"))
 end
 
@@ -312,9 +313,9 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 		return 
 	end
 
-	manager:add_evaluator(evaid,evaluator_fight_from_cover(npc,"eva_ffc",storage))
+	manager:add_evaluator(evaid,evaluator_fight_from_cover(npc,"eva_fight_from_cover",storage))
 	
-	temp.action = action_fight_from_cover(npc,"act_ffc",storage)
+	temp.action = action_fight_from_cover(npc,"act_fight_from_cover",storage)
 	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
 	temp.action:add_precondition(world_property(stalker_ids.property_danger, false))
 	temp.action:add_precondition(world_property(evaid,true))
@@ -339,12 +340,12 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	
 	if (_G.schemes["facer"]) then
 		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
-		--temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
+		temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
 	end
 
 	local manager = npc:motivation_action_manager()
 	local action
-	local p = {stalker_ids.action_combat_planner, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
+	local p = {xr_danger.actid, stalker_ids.action_combat_planner, stalker_ids.action_danger_planner, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
 		
 	for i=1,#p do
 		action = manager:action(p[i])

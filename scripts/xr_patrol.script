@@ -1,8 +1,6 @@
 ----------------------------------------------------------------------------------------------------------------------
 --	Схема патруль. Мужики в патруле
 ----------------------------------------------------------------------------------------------------------------------
-function printf()
-end
 
 local key = nil
 local data = nil
@@ -84,7 +82,7 @@ function PatrolManager:add_npc(npc, leader)
 
 	--' Проверка на то что в патруле не больше 7 сталкеров (иначе будет вылетать дальше)
 	if self.npc_count == 7 then
-		printf("[XR_PATROL] attempt to add more then 7 npc. [%s]", npc:name())
+		--printf("[XR_PATROL] attempt to add more then 7 npc. [%s]", npc:name())
 		return
 	end
 
@@ -95,10 +93,10 @@ function PatrolManager:add_npc(npc, leader)
 		--' если мужик первый или считается лидером, то установим, как лидера
 		if self.npc_count == 1 or leader == true then
 			 self.commander_id = npc:id ()
-			 printf ("[XR_PATROL] ASSIGNED NPC %s AS PATROL COMMANDER", npc:name ())
+			 --printf ("[XR_PATROL] ASSIGNED NPC %s AS PATROL COMMANDER", npc:name ())
 		end
 
-		printf ("[XR_PATROL] NPC %s added to patrol manager %s", npc:name (), self.path_name)
+		--printf ("[XR_PATROL] NPC %s added to patrol manager %s", npc:name (), self.path_name)
 		self:reset_positions ()
 end
 --' Удаление персонажа
@@ -107,7 +105,7 @@ function PatrolManager:remove_npc(npc)
 		if self.npc_list[npc:id()] == nil then
 		return
 	end
-		printf ("[XR_PATROL] NPC %s removed from patrol manager %s", npc:name(), self.path_name)
+		--printf ("[XR_PATROL] NPC %s removed from patrol manager %s", npc:name(), self.path_name)
 		self.npc_list[npc:id ()] = nil
 		self.npc_count = self.npc_count - 1
 
@@ -127,7 +125,7 @@ function PatrolManager:reset_positions()
 				end
 				-- пересчитаем позиции
 				if self.commander_id ~= self.npc_list[key].soldier:id () then
-			 --printf("key[%s] index[%s]", tostring(key), tostring(index))
+			 ----printf("key[%s] index[%s]", tostring(key), tostring(index))
 					 self.npc_list[key].dir = form_[index].dir
 					 self.npc_list[key].dist = form_[index].dist
 				 self.npc_list[key].vertex_id = -1
@@ -151,18 +149,20 @@ end
 --' Получить командира патруля
 function PatrolManager:get_commander(npc)
 		if npc == nil then
-			 abort ("Invalid NPC on call PatrolManager:get_npc_command in PatrolManager[%s]", self.path_name)
+			abort ("Invalid NPC on call PatrolManager:get_npc_command in PatrolManager[%s]", self.path_name)
 		end
 
 		--закешируем айдишник непися
 		local npc_id = npc:id ()
 		--проверка непися на присутсвие в списке
 		if self.npc_list[npc:id ()] == nil then
-			 abort ("NPC with name %s can't present in PatrolManager[%s]", npc:name (), self.path_name)
+			abort ("NPC with name %s can't present in PatrolManager[%s]", npc:name (), self.path_name)
+			return
 		end
 		--проверка, чтобы командир не вздумал задавать глупых вопросов
 		if npc:id () == self.commander_id then
-			 abort ("Patrol commander called function PatrolManager:get_npc_command in PatrolManager[%s]", self.path_name)
+			abort ("Patrol commander called function PatrolManager:get_npc_command in PatrolManager[%s]", self.path_name)
+			return
 		end
 		--получим данные командира
 		local commander = self.npc_list[self.commander_id].soldier
@@ -174,18 +174,19 @@ end
 --' Получить параметры действия NPC
 function PatrolManager:get_npc_command(npc)
 		if npc == nil then
-			 printf("Invalid NPC on call PatrolManager:get_npc_command in PatrolManager[%s]", self.path_name)
+			printf("Invalid NPC on call PatrolManager:get_npc_command in PatrolManager[%s]", self.path_name)
+			return
 		end
 
 		--'закешируем айдишник непися
 		local npc_id = npc:id ()
 		--'проверка непися на присутсвие в списке
 		if self.npc_list[npc:id ()] == nil then
-			 printf("NPC with name %s can't present in PatrolManager[%s]", npc:name (), self.path_name)
+			 --printf("NPC with name %s can't present in PatrolManager[%s]", npc:name (), self.path_name)
 		end
 		--'проверка, чтобы командир не вздумал задавать глупых вопросов
 		if npc:id() == self.commander_id then
-			 printf("Patrol commander called function PatrolManager:get_npc_command in PatrolManager[%s]", self.path_name)
+			 --printf("Patrol commander called function PatrolManager:get_npc_command in PatrolManager[%s]", self.path_name)
 		end
 		--'получим данные командира
 		local commander = self.npc_list[self.commander_id].soldier
@@ -312,7 +313,7 @@ function action_commander:initialize()
 end
 function action_commander:activate_scheme()
 	self.st.signals = {}
-	printf ("[XR_PATROL] SET PATROL PATH : %s", self.st.path_walk)
+	--printf ("[XR_PATROL] SET PATROL PATH : %s", self.st.path_walk)
 	if self.st.path_walk_info == nil then
 		self.st.path_walk_info = utils.path_parse_waypoints(self.st.path_walk)
 	end
@@ -354,13 +355,13 @@ function action_commander:execute()
 
 		self.old_state = new_state
 	end
-	--printf("FORMATION %s", self.st.formation)
+	----printf("FORMATION %s", self.st.formation)
 		patrols[self.st.patrol_key]:set_command(self.object, new_state, self.st.formation)
 end
 ----------------------
 function action_commander:finalize()
 		if self.object:alive () == true then
-			 --printf ("ACTION_COMMANDER:FINALIZE CALLED")
+			 ----printf ("ACTION_COMMANDER:FINALIZE CALLED")
 		 patrols[self.st.patrol_key]:set_command(self.object, "guard", self.st.formation)
 		 self.move_mgr:finalize()
 	end
@@ -387,7 +388,7 @@ function action_commander:formation_callback(mode, number, index)
 		elseif number == 2 then
 			 self.st.formation = "back"
 		end
-		printf("FORMATION CALLBACK. %s", self.st.formation)
+		--printf("FORMATION CALLBACK. %s", self.st.formation)
 end
 
 
@@ -411,7 +412,7 @@ function action_patrol:initialize()
 end
 function action_patrol:activate_scheme()
 	self.st.signals = {}
-	printf ("[XR_PATROL] SET SOLDIER PATROL PATH : %s", self.st.path_walk)
+	--printf ("[XR_PATROL] SET SOLDIER PATROL PATH : %s", self.st.path_walk)
 	if self.st.path_walk_info == nil then
 		self.st.path_walk_info = utils.path_parse_waypoints(self.st.path_walk)
 	end
@@ -438,7 +439,7 @@ function action_patrol:execute()
 
 		self.l_vid = utils.send_to_nearest_accessible_vertex(self.object, self.l_vid)
 	local desired_direction = self.dir
-	printf("desired_direction = %s", vec_to_str(desired_direction))
+	--printf("desired_direction = %s", vec_to_str(desired_direction))
 	if desired_direction ~= nil and not utils.vector_cmp(desired_direction, vector():set(0,0,0)) then
 		desired_direction:normalize()
 		self.object:set_desired_direction(desired_direction)
@@ -523,7 +524,7 @@ end
 
 -- включение патруля
 function set_scheme(npc, ini, scheme, section, gulag_name)
-		printf ("XR_PATROL CALLED 'set_scheme' FOR NPC %s", npc:name ())
+		--printf ("XR_PATROL CALLED 'set_scheme' FOR NPC %s", npc:name ())
 	local st = xr_logic.assign_storage_and_bind (npc, ini, scheme, section)
 
 	st.logic = xr_logic.cfg_get_switch_conditions (ini, section, npc)
@@ -533,7 +534,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.path_look 	= utils.cfg_get_string(ini, section, "path_look", npc, false, gulag_name)
 
 	if st.path_walk == st.path_look then
-		printf("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
+		--printf("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
 	end
 
 	st.formation 	= utils.cfg_get_string(ini, section, "formation", npc, false, "")

@@ -148,10 +148,10 @@ function action_radio_in_heli:initialize()
 	npc:set_desired_direction()
 end
 
-function action_radio_in_heli:try_go_cover(npc,enemy,ene_pos)
+function action_radio_in_heli:try_go_cover(npc,ene_pos)
 	--alun_utils.debug_write(strformat("action_radio_in_heli:try_go_cover"))
 	local pos  = npc:position()
-	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,5,db.used_level_vertex_ids)
+	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,1)
 	if (validate(npc,vid)) then
 		return lmove(npc,vid,self.st)
 	end
@@ -168,8 +168,13 @@ function action_radio_in_heli:execute()
 		return 
 	end 
 	
+	-- ensure and enforce path type
+	if (npc:path_type() ~= game_object.level_path) then 
+		npc:set_path_type(game_object.level_path)
+	end
+	
 	if (self.st.vid == nil) then
-		self:try_go_cover(npc,be,be:position())
+		self:try_go_cover(npc,be:position())
 	end
 	
 	if (self.st.vid == nil or npc:level_vertex_id() == self.st.vid or npc:position():distance_to_sqr(level.vertex_position(self.st.vid)) <= 3) then

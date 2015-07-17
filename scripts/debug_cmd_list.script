@@ -323,7 +323,7 @@ end
 function cmd.attach(me,txt,owner,p)
 	local wpn = db.actor:active_item()
 	if (wpn) then
-		local firearm = alun_utils.item_is_fa(wpn)
+		local firearm = IsWeapon(wpn)
 		if (firearm) then
 			if (wpn.weapon_addon_attach) then
 				local addons = {
@@ -365,7 +365,7 @@ end
 function cmd.detach(me,txt,owner,p)
 	local wpn = db.actor:active_item()
 	if (wpn) then
-		local firearm = alun_utils.item_is_fa(wpn)
+		local firearm = IsWeapon(wpn)
 		if (firearm and wpn.weapon_addon_detach) then
 			local addons = {
 				"wpn_addon_scope",
@@ -621,7 +621,7 @@ function cmd.psi_storm(me,txt,owner,p)
 		sm:start(true)
 		return "psi_storm:= started"
 	elseif (wrd == "stop") then
-		sm:end_surge(true)
+		sm:finish(true)
 		return "psi_storm:= ended"
 	else
 		return "psi_storm:= wrong argument passed."
@@ -905,8 +905,15 @@ function cmd.wound(me,txt,owner,p)
 	end
 
 	if (vo) then
-		vo.health = 0.05
-		return "wound:= %s has been hit for %s.",vo:name(),h.power
+		local h = hit()
+		h.power = vo.health+0.05
+		h.direction = vector()
+		h.bone = "bip01_spine"
+		h.draftsman = vo
+		h.impulse = 6000
+		h.type = hit.wound
+		vo:hit(h)
+		return "wound:= %s has been wounded.",vo:name()
 	end
 end
 

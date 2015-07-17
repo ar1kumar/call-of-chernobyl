@@ -193,6 +193,7 @@ function action_beh:initialize()
 	action_base.initialize(self)
 	self.keep_state_until = time_global()
 	self.st.approved_actions = {}
+	self.object:set_sight(look.direction, self.object:direction() , 0)
 end
 
 function action_beh:execute()
@@ -517,7 +518,7 @@ function action_beh:beh_path()
 		--printf("lvid = %s",self.st.desired_target.level_vertex_id)
 		self.st.assist_point = utils.send_to_nearest_accessible_vertex( self.object, self.st.desired_target.level_vertex_id, "axr_beh")
 		--self.object:set_desired_position(self.st.desired_target.position)
-		local pos = utils.vector_copy_by_val(self.object:position())
+		local pos = vector():set(self.object:position())
 		pos = vector():set(pos.x,self.st.desired_target.position.y,pos.z)
 		self.dist_to_assist_pt = pos:distance_to(self.st.desired_target.position)
 		self:set_state()

@@ -761,7 +761,7 @@ function CSurgeManager:update()
 			local fate = atmosfear and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_blowout_fate",0,"killonwave") or "killonwave"
 			for k,wave in pairs(self.blowout_waves) do
 				if wave.effect:playing() then
-					local wave_pos=vector():set(actor_pos.x, actor_pos.y/2, wave.inited_pos.z-(diff_game_sec-wave.inited_time)*3)
+					local wave_pos= vector():set(actor_pos.x, actor_pos.y/2, wave.inited_pos.z-(diff_game_sec-wave.inited_time)*3)
 					wave.effect:move_to(wave_pos,vector():set(0,0,0))
 					local wavevoltemp=(250-math.abs(actor_pos.z-wave_pos.z))/250
 					if (wavevoltemp>wavevol) then
@@ -946,7 +946,7 @@ function CSurgeManager:start_wave(num,inited_time)
 	end
 	local actor_pos=db.actor:position()
 	local effect=particles_object("crommcruac\\blowout_wave_blend")
-	local inited_pos=vector():set(actor_pos.x, actor_pos.y/2, actor_pos.z+250)
+	local inited_pos= vector():set(actor_pos.x, actor_pos.y/2, actor_pos.z+250)
 	self.blowout_waves[num]={effect=effect,inited_time=inited_time,inited_pos=inited_pos}
 	self.blowout_waves[num].effect:play_at_pos(inited_pos)
 	if not(self.wave_sound) then
@@ -1005,11 +1005,11 @@ function CSurgeManager:play_siren_sound()
 		snd_obj:stop()
 	end
 	if(level.name()=="zaton") then
-		snd_position=vector():set(115,8,184)
+		snd_position= vector():set(115,8,184)
 	elseif(level.name()=="jupiter") then
-		snd_position=vector():set(-50,16,198)
+		snd_position= vector():set(-50,16,198)
 	else
-		snd_position=vector():set(147,15,-187)
+		snd_position= vector():set(147,15,-187)
 	end
 	if snd_obj ~= nil then
 		snd_obj:play_at_pos(db.actor, snd_position)

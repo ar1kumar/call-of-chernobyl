@@ -17,27 +17,24 @@ function eva_state_mgr_weapon:evaluate()
 	end
 	
 	local bestweapon = self.object:best_weapon()
-	if not (bestweapon) then 
+	if not (bestweapon) then
 		return false 
-	end 
-	
-	--if not (alun_utils.item_is_fa(bestweapon)) then
-		--return false
-	--end
-		
-	if (weapon == "strapped") then
-		if (state_mgr_weapon.strappable_weapon(bestweapon)) then 
-			if (self.object:weapon_strapped() and self.object:is_weapon_going_to_be_strapped(bestweapon)) then 
-				return true
-			end
-		end
 	end 
 	
 	if not (activeitem and activeitem:id() == bestweapon:id()) then 
 		return false 
 	end
 	
-	if (activeitem) and (weapon == "unstrapped" or weapon == "fire" or weapon == "sniper_fire") then
+	if (weapon == "strapped") then
+		if (state_mgr_weapon.strappable_weapon(bestweapon)) then 
+			if (self.object:weapon_strapped() and self.object:is_weapon_going_to_be_strapped(bestweapon)) then 
+				return true
+			end
+		end
+		return false
+	end
+	
+	if (weapon == "unstrapped" or weapon == "fire" or weapon == "sniper_fire") then
 		if (not self.object:is_weapon_going_to_be_strapped(bestweapon) and self.object:weapon_unstrapped()) then 
 			return true 
 		end
@@ -50,30 +47,38 @@ class "eva_state_mgr_weapon_locked" (property_evaluator)
 function eva_state_mgr_weapon_locked:__init(name, st) super (nil, name)
 	self.st = st
 end
-function eva_state_mgr_weapon_locked:evaluate()
-	local weapon_strapped = self.object:weapon_strapped()
-	local weapon_unstrapped = self.object:weapon_unstrapped()
 
-	if not (weapon_unstrapped or weapon_strapped) then
-		return true
+function weapon_locked(npc)
+	local bw = npc:best_weapon()
+	if not (bw) then
+		return false
+	end
+	
+	if not (IsWeapon(bw)) then 
+		return false 
+	end
+	
+	local s = bw:get_state()
+	if (s == 5 or s == 6) then 
+		return true -- gun is firing!
 	end
 
-	local bestweapon = self.object:best_weapon()
-	if not (bestweapon) then
+	local weapon_strapped = npc:weapon_strapped()
+	local weapon_unstrapped = npc:weapon_unstrapped()
+
+	if not (weapon_unstrapped or weapon_strapped) then
 		return false
 	end
 
-	local is_weapon_going_to_be_strapped = self.object:is_weapon_going_to_be_strapped(bestweapon)
-	
-	if is_weapon_going_to_be_strapped and not weapon_strapped then
+	if (npc:is_weapon_going_to_be_strapped(bw)) and (not weapon_strapped or weapon_unstrapped) then
 		return true
 	end
 
-	if not is_weapon_going_to_be_strapped and not weapon_unstrapped and self.object:active_item() ~= nil then
-		return true
-	end
+	return false
+end
 
-	return false 
+function eva_state_mgr_weapon_locked:evaluate()
+	return weapon_locked(self.object)
 end
 
 --' Необходимо ли повесить оружие на спину
@@ -124,7 +129,7 @@ end
 function eva_state_mgr_weapon_unstrapped_now:evaluate()
 	local active_item = self.object:active_item()
 	local best_weapon = self.object:best_weapon()
-	return  active_item and best_weapon and	active_item:id() == best_weapon:id() and (not self.object:is_weapon_going_to_be_strapped(best_weapon) and self.object:weapon_unstrapped())
+	return active_item and best_weapon and active_item:id() == best_weapon:id() and (not self.object:is_weapon_going_to_be_strapped(best_weapon) and self.object:weapon_unstrapped())
 end
 
 
@@ -302,7 +307,7 @@ local state_queue_params = {
 	bloodsucker_panic    = {30, 100, 0}
 }
 
-function get_queue_params(npc, target, st)
+function get_queue_params(npc, st)
 	local a = state_queue_params[st.animation]
 	if a ~= nil then
 		if a[3] ~= nil then
@@ -324,7 +329,7 @@ function get_queue_params(npc, target, st)
 	if db.storage[npc:id()].old_aim_time ~= nil then
 		local bw = npc:best_weapon()
 		if (bw) then
-			npc:aim_time(npc:best_weapon(), db.storage[npc:id()].old_aim_time)
+			npc:aim_time(bw, db.storage[npc:id()].old_aim_time)
 		end
 			db.storage[npc:id()].old_aim_time = nil
 	end

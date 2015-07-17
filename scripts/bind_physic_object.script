@@ -75,11 +75,6 @@ function generic_physics_binder:net_spawn(data)
 	if not object_binder.net_spawn(self, data) then
 		return false
 	end
-
-	if self.object:section() == "physic_door" then
-		db.level_doors[self.object:id()] = self.object:position()
-	end
-
 	if(self.object:spawn_ini()) then
 		--  CoC uses axr_treasure_manager.script instead to generate loot
 		--if(self.object:spawn_ini():section_exist("drop_box")) then

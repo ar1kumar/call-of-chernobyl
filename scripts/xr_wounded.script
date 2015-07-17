@@ -118,6 +118,12 @@ function action_wounded:execute()
 		return
 	end
 
+	if self.a.use_medkit == true then
+		if (wound_manager:eat_medkit() == true) then 
+			return 
+		end
+	end
+	
 	local id = npc:id()
 	local po = db.storage[id].victim_surrender and level.object_by_id(db.storage[id].victim_surrender)
 	if (po and po:alive() and not alun_utils.load_var(npc,"victim_surrender",nil)) then
@@ -131,10 +137,6 @@ function action_wounded:execute()
 		xr_sound.set_sound_play(npc:id(), nil)
 	else
 		xr_sound.set_sound_play(npc:id(), wound_manager_sound)
-	end
-
-	if self.a.use_medkit == true then
-		wound_manager:eat_medkit()
 	end
 
 	if tostring(wound_manager_state) == "nil" then
@@ -245,7 +247,11 @@ function Cwound_manager:eat_medkit()
 		self.can_use_medkit = false
 		db.storage[self.npc:id()].wounded_already_selected = nil
 		self:update()
+		
+		state_mgr.set_state(self.npc,"hide_no_wpn",nil,nil,nil,{fast_set = true})
+		return true
 	end
+	return false
 end
 function Cwound_manager:process_fight(hp)
 	local key

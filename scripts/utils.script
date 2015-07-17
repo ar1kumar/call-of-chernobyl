@@ -514,7 +514,7 @@ function electro_art_enabled ()
 end
 
 function no_need_to_rotate(npc, target_pos)
-	local y = yaw(npc:direction(), utils.vector_copy_by_val(target_pos):sub(npc:position()))
+	local y = yaw(npc:direction(),vector():set(target_pos):sub(npc:position()))
 
 	return y < 0.3
 end
@@ -522,7 +522,7 @@ end
 function no_need_to_rotate_xz(npc, target_pos)
 	local dir1 = npc:direction()
 	dir1.y = 0
-	local dir2 = utils.vector_copy_by_val(target_pos):sub(npc:position())
+	local dir2 = vector():set(target_pos):sub(npc:position())
 	dir2.y = 0
 	local y = yaw(dir1, dir2)
 
@@ -870,4 +870,8 @@ end
 
 function is_widescreen()
 	return (device().width/device().height>1024/768+0.01)
+end
+
+function valid_pathname(str)
+	return str:find('^[%//%\\%.%-%w_]+$') ~= nil
 end

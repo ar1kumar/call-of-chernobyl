@@ -10,7 +10,7 @@
 combat_action_ids = {	[stalker_ids.action_combat_planner] = true,
 						[stalker_ids.action_danger_planner] = true,
 						[stalker_ids.action_anomaly_planner] = true,
-						[xrs_kill_wounded.actid] = true
+						--[xrs_kill_wounded.actid] = true
 						--[xr_danger.actid] = true
 }
 
@@ -23,7 +23,7 @@ no_idle_alife_ids = {	[xr_actions_id.stohe_meet_base + 1] = true
 -- Should be faster than mgr.planner:action(id):evaluate() right?
 
 local function eval_movement(mgr,npc)
-	return state_lib.states[mgr.target_state].movement == nil or state_lib.states[mgr.target_state].movement == npc:target_movement_type() --and not npc:is_body_turning()
+	return state_lib.states[mgr.target_state].movement == nil or state_lib.states[mgr.target_state].movement == npc:target_movement_type() and not npc:is_body_turning()
 end
 
 local function eval_animstate_locked(mgr)
@@ -69,48 +69,6 @@ local function eval_smart_cover_locked(mgr,npc)
 	local in_smart_cover = npc:in_smart_cover()
 	return (in_smart_cover and state_descr.cover_name == nil) or (not in_smart_cover and state_descr.cover_name ~= nil)
 end
-
-local function eval_weapon(mgr,npc)
-	local weapon = state_lib.states[mgr.target_state].weapon
-	if not (weapon) then
-		return true
-	end
-	
-	local activeitem = npc:active_item()
-	if (activeitem == nil) and (weapon == "none" or weapon == "drop" or weapon == "strapped") then 
-		return true
-	end
-	
-	local bestweapon = npc:best_weapon()
-	if not (bestweapon) then 
-		return false 
-	end 
-	
-	--if not (alun_utils.item_is_fa(bestweapon)) then
-		--return false
-	--end
-		
-	if (weapon == "strapped") then
-		if (state_mgr_weapon.strappable_weapon(bestweapon)) then 
-			if (npc:weapon_strapped() and npc:is_weapon_going_to_be_strapped(bestweapon)) then 
-				return true
-			end
-		end
-	end 
-	
-	if not (activeitem and activeitem:id() == bestweapon:id()) then 
-		return false 
-	end
-	
-	if (activeitem) and (weapon == "unstrapped" or weapon == "fire" or weapon == "sniper_fire") then
-		if (not npc:is_weapon_going_to_be_strapped(bestweapon) and npc:weapon_unstrapped()) then 
-			return true 
-		end
-	end
-
-	return false
-end
-
 
 --' Эвалуатор, который синхронизирует менеджер.
 --' Мы уже в безраличном состоянии idle или нет
@@ -168,12 +126,12 @@ function evaluator_state_mgr_idle_alife:evaluate()
 	
 	--callstack()
 
-	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
-	if not (self.st.mgr and self.st.mgr:initialized()) then
+	local mgr = self.object:motivation_action_manager()
+	if not (mgr and mgr:initialized()) then
 		return false
 	end
 
-	local cid = self.st.mgr:current_action_id()
+	local cid = mgr:current_action_id()
 	if (no_idle_alife_ids[cid] == true) then
 		return false
 	end
@@ -207,7 +165,6 @@ function evaluator_state_mgr_idle_items:evaluate()
 	if not self.object:alive() then
 		return true
 	end
-
 
 	if (no_idle_alife_ids[cid] == true) then
 		return false
@@ -249,13 +206,12 @@ function act_state_mgr_to_idle:execute()
 	--callstack()
 	--alun_utils.debug_write(strformat("act_state_mgr_to_idle:execute %s",self.object:name()))
 	action_base.execute(self)
-	if (self.st.target_state ~= "idle") and (self.object:best_enemy() or self.object:best_danger()) then
+	if (self.st.target_state ~= "idle") then
 		self.object:clear_animations()
 		self.st:set_state("idle", nil, nil, nil, {fast_set = true})
 		self.st.animation:set_state(nil, true)
 		self.st.animation:set_control()
 	end
-	self.st:set_state("idle")
 end
 
 function act_state_mgr_to_idle:finalize()
@@ -274,18 +230,18 @@ function eva_state_mgr_end:__init(name, st) super (nil, name)
 end
 
 function eva_state_mgr_end:evaluate()
-	--alun_utils.debug_write("",true)
+	----alun_utils.debug_write("",true)
 	if not (self.object) then 
 		callstack()
 		return false
 	end
 	--callstack()
-	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
-	if not (self.st.mgr and self.st.mgr:initialized()) then
+	local mgr = self.object:motivation_action_manager()
+	if not (mgr and mgr:initialized()) then
 		return false
 	end
 
-	local cid = self.st.mgr:current_action_id()
+	local cid = mgr:current_action_id()
 	if (combat_action_ids[cid] ~= true) then
 		self.st.combat = false
 	end
@@ -302,19 +258,14 @@ function eva_state_mgr_locked:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_locked:evaluate()
-	if not (self.object) then 
-		callstack()
+	local t = state_lib.states[self.st.target_state].weapon
+	if (t and t == "drop") then 
 		return false
-	end
-
-	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
-	if not (self.st.planner:initialized() and self.st.mgr and self.st.mgr:initialized()) then
-		return false
-	end
+	end 
 	
-	--if (eval_weapon(self.st,self.object)) then 
-		--return true
-	--end
+	if (state_mgr_weapon.weapon_locked(self.object)) then 
+		return true
+	end
 	
 	if (self.object:is_body_turning()) then 
 		return true
@@ -348,9 +299,6 @@ function act_state_mgr_end:initialize()
 end
 function act_state_mgr_end:execute()
 	action_base.execute(self)
-	self:weapon_update()
-end
-function act_state_mgr_end:weapon_update()
 	--alun_utils.debug_write(strformat("act_state_mgr_end:weapon_update %s",self.object:name()))
 	if self.st.callback and self.st.callback.timeout then
 		if self.st.callback.begin == nil then
@@ -365,17 +313,30 @@ function act_state_mgr_end:weapon_update()
 		end
 	end
 	
+	local t = state_lib.states[self.st.target_state].weapon
 	local wpn = self.object:best_weapon()
-	if (not wpn or not IsWeapon(wpn)) then
+
+	if not IsWeapon(wpn) then
 		return
 	end
 	
-	local t = state_lib.states[self.st.target_state].weapon
-	if (t == "unstrapped") then
-		self.object:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
-		return
+	if (t == "sniper_fire" or t == "fire") then
+		local o = self.st.look_object and db.storage[self.st.look_object] and db.storage[self.st.look_object].object
+		if (o == nil or o:alive()) then
+			if (t == "sniper_fire") then
+				local aim = math.random(500,1500)
+				self.st.npc:set_item(object.fire1, wpn, 1, aim)
+			else
+				self.st.npc:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.st.npc, state_lib.states[self.st.target_state]))
+			end
+		else -- object is dead 
+			self.st.npc:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
+		end
+	elseif (t == "unstrapped") then 
+		self.st.npc:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
 	end
 end
+
 function act_state_mgr_end:finalize()
 	action_base.finalize(self)
 end
@@ -414,14 +375,15 @@ function state_manager:__init(npc)
 	self.pos_direction_applied = false
 end
 function state_manager:set_state(state_name, callback, timeout, target, extra)
+	--alun_utils.debug_write("state_manager:set_state "..state_name)
 	if state_lib.states[state_name] == nil then
 		printf("ERROR: ILLEGAL SET STATE CALLED!!! %s for %s", tostring(state_name), self.npc:name())
 		return
 	end
 
-	self.look_position = target and target.look_position
-	self.look_object = target and target.look_object and type(target.look_object) == "number" and target.look_object or target and target.look_object and target.look_object.id and target.look_object:id()
-	self.look_sight = target and target.look_sight
+	self.look_position = target and target.look_position or nil
+	self.look_object = target and target.look_object and (type(target.look_object) == "number" and target.look_object or target.look_object.id and target.look_object:id()) or nil
+	self.look_dir = target and target.look_dir or nil
 
 	local switched = false
 	local last_state = self.target_state
@@ -545,37 +507,7 @@ function state_manager:update()
 		lid = id
 		id = self.planner:current_action_id()
 	end
-	
 	--alun_utils.debug_write("--------------state_mgr:update end------------------")
-	
-	local wpn = self.npc:active_item() and self.npc:best_weapon()
-	if not (wpn and IsWeapon(wpn)) then
-		return
-	end
-	
-	if not (self.npc:weapon_unstrapped()) then 
-		return
-	end
-
-	local t = state_lib.states[self.target_state].weapon
-	
-	if (t == "sniper_fire" or t == "fire") then
-		local o = self.look_object and db.storage[self.look_object] and db.storage[self.look_object].object --level.object_by_id(self.look_object)
-		local pos = o and o:alive() and self.npc:see(o) and alun_utils.safe_bone_pos(o,"bip01_neck") or self.look_position
-		if (pos) then 
-			if not (self.npc:active_item()) then 
-				return 
-			end
-			if (t == "sniper_fire") then
-				local aim = self.npc:position():distance_to(pos)*40 or 1500
-				self.npc:set_item(object.fire1, wpn, 1, aim <= 1500 and 1500 or aim)
-			else
-				self.npc:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.npc, o, state_lib.states[self.target_state]))
-			end
-		else
-			self.npc:set_item(object.idle, wpn)
-		end
-	end
 end
 
 function set_state(npc, state_name, callback, timeout, target, extra)
@@ -671,37 +603,6 @@ function bind_manager(object)
 	return state_manager
 end
 
-function weapon_locked(npc)
-	local bestweapon = npc:best_weapon()
-
-	if bestweapon == nil then
-		return false
-	end
-
-	if npc:active_item() == nil then
-		return false
-	end
-
-	local weapon_strapped = npc:weapon_strapped()
-	local weapon_unstrapped = npc:weapon_unstrapped()
-
-	if not (weapon_unstrapped or weapon_strapped) then
-		return true
-	end
-
-	local weapon_going_to_be_strapped = npc:is_weapon_going_to_be_strapped(bestweapon)
-
-	if weapon_going_to_be_strapped and not weapon_strapped then
-		return true
-	end
-
-	if not weapon_going_to_be_strapped and not weapon_unstrapped then
-		return true
-	end
-
-	return false
-end
-
 function is_npc_in_combat(npc)
 	local mgr = npc:motivation_action_manager()
 
@@ -710,5 +611,5 @@ function is_npc_in_combat(npc)
 	end
 
 	local current_action_id = mgr:current_action_id()
-	return current_action_id == stalker_ids.action_combat_planner or current_action_id == xrs_kill_wounded.actid
+	return current_action_id == stalker_ids.action_combat_planner
 end

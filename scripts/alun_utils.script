@@ -581,57 +581,7 @@ function get_current_action_id(npc)
 	return mgr:current_action_id()
 end
 
-function item_is_fa(o,c)
-	if not c then
-		c = o and o:clsid()
-	end
-	local t = {
-	[clsid.wpn_pm_s] = true,
-	[clsid.wpn_walther_s] = true,
-	[clsid.wpn_usp45_s] = true,
-	[clsid.wpn_hpsa_s] = true,
-	[clsid.wpn_bm16_s] = true,
-	[clsid.wpn_shotgun_s] = true,
-	[clsid.wpn_auto_shotgun_s] = true,
-	[clsid.wpn_ak74_s] = true,
-	[clsid.wpn_lr300_s] = true,
-	[clsid.wpn_groza_s] = true,
-	[clsid.wpn_val_s] = true,
-	[clsid.wpn_vintorez_s] = true,
-	[clsid.wpn_svu_s] = true,
-	[clsid.wpn_svd_s] = true,
-	[clsid.wpn_rg6_s] = true,
-	[clsid.wpn_rpg7_s] = true,
-	[clsid.wpn_knife_s] = true}
-	if c and t[c] then
-		return true
-	end
-	return false
-end
 
-function item_is_outfit(o,c)
-	if not c then
-		c = o and o:clsid()
-	end
-	local t = {
-	[clsid.equ_stalker_s] = true}
-	if c and t[c] then
-		return true
-	end
-	return false
-end
-
-function item_is_explosive(o,c)
-	if not c then
-		c = o and o:clsid()
-	end
-	local t = {
-	[clsid.obj_explosive_s] = true}
-	if c and t[c] then
-		return true
-	end
-	return false
-end
 
 function is_actor(object,c)
 	if not (c) then
@@ -661,10 +611,11 @@ function safe_bone_pos(npc,bone)
 	local pos
 	if (IsStalker(npc)) then
 		pos = npc:bone_position(bone or "bip01_spine")
+		pos = pos and vector():set(pos) or nil
 	end
 
 	if not (pos) then
-		pos = utils.vector_copy_by_val(npc:position())
+		pos = vector():set(npc:position())
 		pos.y = pos.y + 0.5
 	end
 
@@ -962,8 +913,8 @@ function in_los(npc,friend,be)
 	local be_dist = npc:position():distance_to(be:position())
 
 	if (friend_dist < be_dist) then
-		local dir_friend = utils.vector_copy_by_val(friend_pos):sub(pos)
-		local vec_be,vec_who = utils.vector_copy_by_val(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
+		local dir_friend = vector():set(friend_pos):sub(pos)
+		local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
 		local mywho = friend_dist < 1.5 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1.3)
 		if (mywho == 1) then
 			return true
@@ -998,7 +949,7 @@ function in_crosshair()
 			for id,st in pairs(db.storage) do
 				npc = st.object
 				if (npc and (IsStalker(npc) or IsMonster(npc)) and npc:alive()) then
-					local c = utils.vector_copy_by_val(npc:position())
+					local c = vector():set(npc:position())
 					local p = db.actor:position()
 					local d = device().cam_dir
 
@@ -1139,80 +1090,6 @@ function addon_attached(wpn,addon,flag)
 		return ft[addon][flag or get_addon_flag(wpn,true)] == true
 	end
 	return false
-end
-
---******************
--- Storage from Rulix
---******************
-
-function get_storage(id,name)
-	if not id then
-		return
-	end
-	local st = db.storage[id]
-	if not st then
-		local obj = level.object_by_id(id)
-		local name = "uk"
-		if obj then
-			name = obj:character_name()
-		end
-		--printf("get_storage[%s:%s]:not npc storage! (%s)",id,name,tostring(name))
-		return {}
-	end
-	if not st.ai_tweaks then
-		st.ai_tweaks = {}
-	end
-	if not name then
-		return st.ai_tweaks
-	end
-	if not st.ai_tweaks[name] then
-		st.ai_tweaks[name] = {}
-	end
-	return st.ai_tweaks[name]
-end
-
-weapon_types_clslist = {
-pistol = {[clsid.wpn_pm_s] = true,[clsid.wpn_walther_s] = true,[clsid.wpn_usp45_s] = true,[clsid.wpn_hpsa_s] = true,[clsid.wpn_lr300_s] = true},
-sniper = {[clsid.wpn_svu_s] = true,[clsid.wpn_svd_s] = true,[clsid.wpn_vintorez_s] = true},
-launcher = {[clsid.wpn_rg6_s] = true,[clsid.wpn_rpg7_s] = true},
-shotgun = {[clsid.wpn_shotgun_s] = true,[clsid.wpn_auto_shotgun_s] = true},
-rifle = {[clsid.wpn_ak74_s] = true,[clsid.wpn_groza_s] = true,[clsid.wpn_val_s] = true},
-double_barreled = {[clsid.wpn_bm16_s] = true},
-knife = {[clsid.wpn_knife_s] = true}}
-
-function isPistol(wpn,cls)
-	if not (cls) then
-		cls = wpn:clsid()
-	end
-	return weapon_types_clslist.pistol[cls]
-end
-
-function isSniper(wpn,cls)
-	if not (cls) then
-		cls = wpn:clsid()
-	end
-	return weapon_types_clslist.sniper[cls]
-end
-
-function isLauncher(wpn,cls)
-	if not (cls) then
-		cls = wpn:clsid()
-	end
-	return weapon_types_clslist.launcher[cls]
-end
-
-function isShotgun(wpn,cls)
-	if not (cls) then
-		cls = wpn:clsid()
-	end
-	return weapon_types_clslist.shotgun[cls] or weapon_types_clslist.double_barreled[cls]
-end
-
-function isRifle(wpn,cls)
-	if not (cls) then
-		cls = wpn:clsid()
-	end
-	return weapon_types_clslist.rifle[cls]
 end
 
 --***************************************
@@ -1861,15 +1738,15 @@ local function validate(npc,vid)
 end
 
 -- find nearest cover
-function find_close_cover(npc,base_position,pos,cover_dist)
+function find_close_cover(npc,base_position,pos,cover_dist,mn,mx)
 	local cover
 	cover_dist = not cover_dist and 5 or cover_dist
 	while not cover and cover_dist < 30 do
-		cover = npc:best_cover(base_position,pos,cover_dist,1,30)
+		cover = npc:best_cover(base_position,pos,cover_dist,mn or 1,mx or 60)
 		if (cover) and not (validate(npc,cover:level_vertex_id())) then 
 			cover = nil 
 		end
-		cover_dist = cover_dist + 2
+		cover_dist = cover_dist + 1
 	end
 	
 	return cover and valid_vertex(npc,cover:level_vertex_id())
@@ -1926,7 +1803,7 @@ function try_go_aside_object(npc,friend,pos,old_vid)
 	end
 
 	--alun_utils.debug_nearest(npc,"try_to_strafe")
-	local _dir = utils.vector_copy_by_val(mypos):sub(pos)
+	local _dir = vector():set(mypos):sub(pos)
 	local dir = {}
 	dir[1] = vector_rotate_y(utils.vector_copy_by_val(_dir),-90)
 	dir[2] = vector_rotate_y(utils.vector_copy_by_val(_dir),90)
@@ -2020,8 +1897,8 @@ function in_los(npc,be,friend)
 	local be_dist = npc:position():distance_to(be:position())
 
 	if (friend_dist < be_dist) then
-		local dir_friend = utils.vector_copy_by_val(friend_pos):sub(pos)
-		local vec_be,vec_who = utils.vector_copy_by_val(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
+		local dir_friend = vector():set(friend_pos):sub(pos)
+		local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
 		local mywho = friend_dist < 1.5 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1.3)
 		if (mywho == 1) then
 			return true
@@ -2067,8 +1944,8 @@ function friends_on_fire_line(npc,be,st)
 			local be_dist = npc:position():distance_to(be:position())
 
 			if (friend_dist < be_dist) then
-				local dir_friend = utils.vector_copy_by_val(friend_pos):sub(pos)
-				local vec_be,vec_who = utils.vector_copy_by_val(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
+				local dir_friend = vector():set(friend_pos):sub(pos)
+				local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
 				local mywho = friend_dist < 1.5 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1.3)
 				if (mywho == 1) then
 					st.friend_id = id
@@ -2283,11 +2160,11 @@ function BezierPath:CalculateBezierPoint(t,p0,p1,p2,p3)
 	local uuu = uu*u 
 	local ttt = tt*t
 	
-	local p = utils.vector_copy_by_val(p0):mul(uuu)
+	local p = vector():set(p0):mul(uuu)
 	
-	p:add( utils.vector_copy_by_val(p1):mul(uu*t) )
-	p:add( utils.vector_copy_by_val(p2):mul(tt*u) )
-	p:add( utils.vector_copy_by_val(p3):mul(ttt) )
+	p:add(vector():set(p1):mul(uu*t) )
+	p:add(vector():set(p2):mul(tt*u) )
+	p:add(vector():set(p3):mul(ttt) )
 	
 	return p
 end

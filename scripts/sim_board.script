@@ -8,28 +8,6 @@ local level,alife,game_graph,math,pairs,tostring,tonumber,tsort,tinsert = level,
 -----------------------------------------------------------------------------------
 --						Public
 -----------------------------------------------------------------------------------
--- Only target actor if he is "loud" see axr_main actor_on_update for implementation
-function general_actor_precondition(squad,target,dist,is_monster)
-	if (is_monster ~= true and squad.current_action and squad.current_action == 1) then
-		return false
-	end
-
-	if (squad.relationship == "friend" or squad.relationship == "neutral") then
-		return false
-	end
-
-	if not (squad.relationship) then
-		if(relation_registry.community_relation(squad:get_squad_community(), get_object_community(target)) > -1000) then
-			return false
-		end
-	end
-
-	if (db.storage[0] and db.storage[0].loud and db.storage[0].loud_gvid) then
-		return utils.graph_distance(squad.m_game_vertex_id,db.storage[0].loud_gvid) <= (dist or 200)
-	end
-	return false
-end
-
 function general_squad_precondition(squad,target)
 	-- duty and freedom target eachother
 	if (squad.player_id == "dolg") then 

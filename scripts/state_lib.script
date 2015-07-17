@@ -160,6 +160,7 @@ states = {
 				animation = nil
 			},
 	sneak_fire = {	weapon = "fire",
+				--direction = look.fire_point,
 				movement = move.walk,
 				mental = anim.danger,
 				bodystate = move.crouch,
@@ -181,6 +182,7 @@ states = {
 				animation = nil
 			},
 	assault_fire = {	weapon = "fire",
+				--direction = look.fire_point,
 				movement = move.run,
 				mental = anim.danger,
 				bodystate = move.standing,
@@ -246,6 +248,7 @@ states = {
 				animation = nil
 			},
 	threat = {	weapon = "unstrapped",
+				--direction = look.fire_point,
 				movement = move.stand,
 				mental = anim.danger,
 				bodystate = move.standing,
@@ -283,6 +286,7 @@ states = {
 				fast_set = true
 			},
 	threat_fire = {	weapon = "fire",
+				--direction = look.fire_point,
 				movement = move.stand,
 				mental = anim.danger,
 				bodystate = move.standing,
@@ -290,6 +294,7 @@ states = {
 				animation = nil
 			},
 	threat_sniper_fire = {	weapon = "sniper_fire",
+				--direction = look.fire_point,
 				movement = move.stand,
 				mental = anim.danger,
 				bodystate = move.standing,
@@ -318,6 +323,7 @@ states = {
 				animation = nil
 			},
 	hide_sniper_fire = {	weapon = "sniper_fire",
+				--direction = look.fire_point,
 				movement = move.stand,
 				mental = anim.danger,
 				bodystate = move.crouch,
@@ -409,7 +415,7 @@ states = {
 				animstate = nil,
 				animation = "salut_free"
 			},
-	prisoner = {weapon = "strapped",
+	prisoner = {weapon = "drop",
 				movement = nil,
 				mental = anim.danger,
 				bodystate = move.standing,
@@ -952,6 +958,7 @@ states = {
 			animation = "prone_idle"
 			},
 	prone_sniper_fire = {
+			direction = look.fire_point,
 			weapon = "sniper_fire",
 			movement = move.run,
 			mental = anim.danger,

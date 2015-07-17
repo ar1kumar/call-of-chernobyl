@@ -70,11 +70,6 @@ local function lmove_ns(npc,vid,st)
 	return vid
 end
 
-local good_acts = {
-					[xr_actions_id.smartcover_action] = true,
-					[xr_actions_id.smartcover_action+2] = true
-					}
-
 local function can_cause_panic(npc,cls)
 	local rank = ranks.get_obj_rank_name(npc)
 	local cause_panic_clsids
@@ -229,10 +224,6 @@ function evaluator_stalker_panic:evaluate()
 		return false 
 	end 
 	
-	if good_acts[alun_utils.get_current_action_id(npc)] then
-		return false
-	end
-	
 	if (db.storage[npc:id()].active_scheme == "camper") then 
 		return false 
 	end
@@ -245,6 +236,11 @@ function evaluator_stalker_panic:evaluate()
 	if (st and st.help_wounded and st.help_wounded.selected_id ~= nil) then 
 		return false 
 	end
+	
+	local bd = npc:best_danger()
+	if (bd and bd:type() == danger_object.grenade and db.storage[npc:id()].danger_flag) then
+		return false
+	end 
 
 	if (find_valid_target(npc,self.st)) then 
 		return true 
@@ -269,15 +265,15 @@ function action_stalker_panic:initialize()
 	db.storage[npc:id()].panicked = true
 end
 
-function action_stalker_panic:try_go_cover(npc,enemy,ene_pos,dist)
+function action_stalker_panic:try_go_cover(npc,ene_pos)
 	--alun_utils.debug_write(strformat("action_stalker_panic:try_go_cover"))
-	local vid = alun_utils.find_close_cover(npc,npc:position(),ene_pos,8,db.used_level_vertex_ids)
-	if (validate(npc,vid) and level.vertex_position(vid):distance_to_sqr(npc:position()) < dist) then
+	local vid = alun_utils.find_close_cover(npc,npc:position(),ene_pos,5,1,90)
+	if (validate(npc,vid)) then
 		return lmove(npc,vid,self.st)
 	end
 end
 
-function action_stalker_panic:try_to_strafe(npc,enemy,ene_pos,dist)
+function action_stalker_panic:try_to_strafe(npc)
 	--alun_utils.debug_write(strformat("action_stalker_panic:try_to_strafe"))
 	--alun_utils.debug_nearest(npc,"try_to_strafe")
 	local dir = {}
@@ -394,16 +390,17 @@ function action_stalker_panic:execute()
 	end
 	
 	local see = npc:see(enemy)
-	local ene_pos = see and alun_utils.safe_bone_pos(enemy,"bip01_spine") or npc:memory_position(enemy)
+	local ene_pos = see and alun_utils.safe_bone_pos(enemy,"bip01_spine") or vector():set(npc:memory_position(enemy)) or nil
+	ene_pos.y = ene_pos.y+0.2
 	local dist = ene_pos:distance_to_sqr(npc:position())
 	
 	local tg = time_global()
 	if (self.st.vid) then
-		local dir = enemy:position():sub(npc:position())
-		local bw = npc:best_weapon()
+		local bw = npc:active_item()
 		
 		if (self.st.__keep_body_state_until==nil or tg > self.st.__keep_body_state_until) then
 			self.st.__keep_body_state_until = tg+5000
+			local dir = ene_pos and vector():sub(ene_pos,npc:position()) or npc:direction()
 			if (npc:body_state() ~= move.crouch) then
 				--printf("stand=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir))
 				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
@@ -418,7 +415,7 @@ function action_stalker_panic:execute()
 		end
 		
 		local new_state
-		
+		-- intentionally use look_position because it's inaccurate
 		if (npc:level_vertex_id() == self.st.vid) then
 			if not (bw) then 
 				new_state = "sneak_run_no_wpn"
@@ -432,9 +429,12 @@ function action_stalker_panic:execute()
 			
 			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 	
+			self.st.__keep_point_until = self.st.__keep_point_until or tg + math.random(3000,8000)
 			if (self.st.__keep_point_until and tg < self.st.__keep_point_until) then
 				return
 			end
+			self.st.__keep_point_until = nil 
+			
 			db.used_level_vertex_ids[self.st.vid] = nil
 			self.st.vid = nil
 		else
@@ -455,9 +455,9 @@ function action_stalker_panic:execute()
 		end 	
 	end
 	
-	local new_vid = dist < 30 and self:try_go_cover_backward(npc,ene_pos) or self:try_go_cover(npc,enemy,ene_pos,dist)
+	local new_vid = dist < 30 and self:try_go_cover_backward(npc,ene_pos) or self:try_go_cover(npc,ene_pos)
 	if (new_vid) then
-		self.st.__keep_point_until = tg + math.random(5000,8000)
+
 	end 
 	
 	--alun_utils.debug_write(strformat("action_stalker_panic:execute end 2"))
@@ -513,11 +513,12 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	end
 	if (_G.schemes["facer"]) then
 		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
+		temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
 	end
 
 	local manager = npc:motivation_action_manager()
 	local action
-	local p = {xr_actions_id.state_mgr + 1, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
+	local p = {xr_danger.actid, stalker_ids.action_combat_planner, stalker_ids.action_danger_planner, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
 	
 	for i=1,#p do
 		action = manager:action(p[i])

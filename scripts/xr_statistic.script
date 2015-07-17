@@ -280,6 +280,9 @@ function load(package)
 end
 
 function wealthy_functor()
+	if not (db.actor) then 
+		return false 
+	end
 	if db.actor:money() >= 1000000 and not has_alife_info("actor_wealthy") then
 		db.actor:give_info_portion("actor_wealthy")
 		news_manager.send_tip(db.actor, "st_ach_wealthy", nil, "wealthy", nil, nil)
@@ -288,6 +291,9 @@ function wealthy_functor()
 end
 
 function marked_by_zone_functor()
+	if not (db.actor) then 
+		return false 
+	end
 	if has_alife_info("actor_marked_by_zone_3_times") then
 		return true
 	end
@@ -306,6 +312,9 @@ end
 
 -- TODO: revamp to use with information brokers
 function information_dealer_functor()
+	if not (db.actor) then 
+		return false 
+	end
 	if has_alife_info("actor_information_dealer") then
 		return true
 	end

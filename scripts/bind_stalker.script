@@ -319,6 +319,10 @@ function actor_binder:load(reader)
 				[3] = "gd_master"
 				}
 	local dif = game_difficulty_by_num[reader:r_u8()]
+	if not (dif) then
+		abort("actor_binder:load save corrupted!")
+		return 
+	end
 	get_console():execute("g_game_difficulty "..dif)
 	self.st.disable_input_time = utils.r_CTime(reader,"bind_stalker")
 

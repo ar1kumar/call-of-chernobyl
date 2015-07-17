@@ -53,7 +53,7 @@ function repair_ui:FillList()
 
 	local function fill_list(actor,obj)
 		if (obj) and (self.repair_only and self.repair_only[obj:section()]) or (self.repair_refuse == nil) or (self.repair_refuse[obj:section()] == nil) then
-			if (self.repair_type == "weapon" and alun_utils.item_is_fa(obj) or ( (self.repair_type == "outfit") and (alun_utils.item_is_outfit(obj) or obj:clsid() == 69))) then
+			if (self.repair_type == "weapon" and IsWeapon(obj) or ( (self.repair_type == "outfit") and (IsOutfit(obj) or obj:clsid() == 69))) then
 				local con = obj:condition()
 				if (con and con >= self.min_condition and con <= self.max_condition) then
 					self:AddItemToList(obj,self.list_box,con)

@@ -80,7 +80,7 @@ function action.debug_select_object(p)
 						DEBUG_NPC:set_npc_position(level.vertex_position(lvid))
 					end
 				else
-					local pos = utils.vector_copy_by_val(device().cam_pos)
+					local pos = vector():set(device().cam_pos)
 					pos:add(device().cam_dir:mul(r))
 					
 					local lvid = level.vertex_id(pos)

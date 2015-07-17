@@ -208,7 +208,7 @@ function animpoint:position_riched()
 	end 
 	
 	if (dist <= self.st.reach_distance+2) then
-		local dir = utils.vector_copy_by_val(self.smart_direction:normalize())
+		local dir = vector():set(self.smart_direction:normalize())
 		npc:set_desired_direction(dir)
 		local v1 = -math.deg(math.atan2(dir.x, dir.z))
 		local v2 = -math.deg(math.atan2(npc:direction().x, npc:direction().z))

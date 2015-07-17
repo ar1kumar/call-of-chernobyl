@@ -322,6 +322,7 @@ local function on_game_load()
 	actions_by_stalker_ids[453] = "action_animpoint"
 	actions_by_stalker_ids[454] = "action_reach_animpoint"
 	actions_by_stalker_ids[xr_actions_id.stohe_camper_base + 1] = "camper_patrol"
+	actions_by_stalker_ids[xr_actions_id.sidor_act_patrol + 1] = "action_commander"
 	--alundaio schemes
 	actions_by_stalker_ids[17000] = "xr_campfire_point"
 	actions_by_stalker_ids[18803] = "rx_ff"
@@ -846,6 +847,21 @@ function planner_hud_show(hud)
 		local manager = obj.motivation_action_manager and obj:motivation_action_manager()
 		if (manager and manager:initialized()) then
 			hud:add_msg("Name",obj:name())
+			
+			local s = obj:sight_params()
+			if (s) then 
+				local t = {
+					[0] = "look.cur_dir",
+					[5] = "look.danger",
+					[2] = "look.direction",
+					[10] = "look.fire_point",
+					[1] = "look.path_dir",
+					[3] = "look.point",
+					[6] = "look.search"
+					}
+	
+				hud:add_msg("Sight Type",s.m_sight_type and t[s.m_sight_type] or m_object and m_object:name())
+			end
 
 			local actid = manager:current_action_id()
 			local name = "script"
@@ -884,120 +900,25 @@ function planner_hud_show(hud)
 			
 			local st = db.storage[obj:id()]
 			if (st) then
-				local function eval_movement(mgr,npc)
-					return state_lib.states[mgr.target_state].movement == nil or state_lib.states[mgr.target_state].movement == npc:target_movement_type() --and not npc:is_body_turning()
-				end
-
-				local function eval_animstate_locked(mgr)
-					return mgr.animstate.states.anim_marker ~= nil and mgr.animstate.states.anim_marker ~= 3
-				end
-
-				local function eval_animation_locked(mgr)
-					return mgr.animation.states.anim_marker ~= nil
-				end
-
-				local function eval_animation(mgr,npc)
-					return state_lib.states[mgr.target_state].animation == mgr.animation.states.current_state
-				end
-
-				local function eval_animstate(mgr,npc)
-					return state_lib.states[mgr.target_state].animstate == mgr.animstate.states.current_state
-				end
-
-				local function eval_smart_cover(mgr,npc)
-					if mgr.target_state ~= "smartcover" then
-						return true
-					end
-
-					local st = db.storage[npc:id()]
-
-					local state_descr = st and st["smartcover"]
-					local dest_smart_cover_name = state_descr and npc:get_dest_smart_cover_name()
-
-					if not dest_smart_cover_name then
-						return true
-					end
-
-					return dest_smart_cover_name == (state_descr.cover_name or "")
-				end
-
-				local function eval_smart_cover_locked(mgr,npc)
-					local st = db.storage[npc:id()]
-					local state_descr = st and st["smartcover"]
-					if state_descr == nil then
-						return false
-					end
-
-					local in_smart_cover = npc:in_smart_cover()
-					return (in_smart_cover and state_descr.cover_name == nil) or (not in_smart_cover and state_descr.cover_name ~= nil)
-				end
-
-				local function eval_weapon(mgr,npc)
-					local weapon = state_lib.states[mgr.target_state].weapon
-					if not (weapon) then
-						return true
-					end
-
-					local activeitem = npc:active_item()
-					if (activeitem == nil) and (weapon == "none" or weapon == "drop") then 
-						return true
-					end
-					
-					local bestweapon = npc:best_weapon()
-					if not (bestweapon) then 
-						return false 
-					end 
-					
-					--if not (alun_utils.item_is_fa(bestweapon)) then
-						--return false
-					--end
-						
-					if (weapon == "strapped") then
-						if (state_mgr_weapon.strappable_weapon(bestweapon)) then 
-							if (npc:weapon_strapped() and npc:is_weapon_going_to_be_strapped(bestweapon)) then 
-								return true
-							end
-						--elseif not(activeitem) then 
-							--return true
-						end
-					end 
-					
-					if not (activeitem and activeitem:id() == bestweapon:id()) then 
-						return false 
-					end
-					
-					if (activeitem) and (weapon == "unstrapped" or weapon == "fire" or weapon == "sniper_fire") then
-						if (not npc:is_weapon_going_to_be_strapped(bestweapon) and npc:weapon_unstrapped()) then 
-							return true 
-						end
-					end
-
-					return false
-				end
-
-				local function eval_locked(mgr, npc)
-					if (eval_weapon(mgr,npc)) then 
-						return false
-					end
-
-					return npc:is_body_turning() --(npc:is_body_turning() and (mgr.target_state == "zat_b20_noah_jump" or mgr.mgr:current_action_id() == xr_actions_id.animpoint_action + 1)) or false
-				end 
-				
 				local sm = st.state_mgr
-				if (sm) then
+				if (sm and sm.planner and sm.planner:initialized()) then
 					hud:add_msg("alife",sm.alife)
 					hud:add_msg("combat",sm.combat)
-					hud:add_msg("locked",eval_locked(sm,obj))
-					hud:add_msg("locked_external",sm.alife or sm.combat)
-					hud:add_msg("Weapon Locked",post_combat_idle.weapon_locked(obj))
-					hud:add_msg("Animstate Locked",eval_animstate_locked(sm,obj))
-					hud:add_msg("Animation Locked",eval_animation_locked(sm,obj))
-					hud:add_msg("Smartcover Locked",eval_smart_cover_locked(sm,obj))
-					hud:add_msg("Movement",eval_movement(sm,obj))
-					hud:add_msg("Animstate",eval_animstate(sm,obj))
-					hud:add_msg("Animation",eval_animation(sm,obj))
-					hud:add_msg("Smartcover",eval_smart_cover(sm,obj))
-					hud:add_msg("Weapon",eval_weapon(sm,obj))
+					hud:add_msg("locked",sm.planner:evaluator(state_mgr_goap.properties["locked"]):evaluate())
+					hud:add_msg("locked_external",sm.planner:evaluator(state_mgr_goap.properties["locked_external"]):evaluate())
+					hud:add_msg("Weapon Locked",sm.planner:evaluator(state_mgr_goap.properties["weapon_locked"]):evaluate())
+					hud:add_msg("Animstate Locked",sm.planner:evaluator(state_mgr_goap.properties["animstate_locked"]):evaluate())
+					hud:add_msg("Animation Locked",sm.planner:evaluator(state_mgr_goap.properties["animation_locked"]):evaluate())
+					hud:add_msg("Smartcover Locked",sm.planner:evaluator(state_mgr_goap.properties["in_smartcover"]):evaluate())
+					hud:add_msg("End",sm.planner:evaluator(state_mgr_goap.properties["end"]):evaluate())
+					hud:add_msg("Weapon",sm.planner:evaluator(state_mgr_goap.properties["weapon"]):evaluate())
+					hud:add_msg("Movement",sm.planner:evaluator(state_mgr_goap.properties["movement"]):evaluate())
+					hud:add_msg("Mental",sm.planner:evaluator(state_mgr_goap.properties["mental"]):evaluate())
+					hud:add_msg("BodyState",sm.planner:evaluator(state_mgr_goap.properties["bodystate"]):evaluate())
+					hud:add_msg("Direction",sm.planner:evaluator(state_mgr_goap.properties["direction"]):evaluate())
+					hud:add_msg("Animstate",sm.planner:evaluator(state_mgr_goap.properties["animstate"]):evaluate())
+					hud:add_msg("Animation",sm.planner:evaluator(state_mgr_goap.properties["animation"]):evaluate()) 
+					hud:add_msg("Smartcover",sm.planner:evaluator(state_mgr_goap.properties["smartcover"]):evaluate())
 					hud:add_msg("Animstate Marker",sm.animstate.states.anim_marker)
 					hud:add_msg("Animation Marker",sm.animation.states.anim_marker)
 				end
@@ -1532,7 +1453,7 @@ function weapon_hud_show(hud)
 	if (wpn) then
 		local sobj = alife():object(wpn:id())
 		local id = wpn:id()
-		local data = sobj and alun_utils.item_is_fa(wpn) and stpk_utils.get_weapon_data(sobj)
+		local data = sobj and IsWeapon(wpn) and stpk_utils.get_weapon_data(sobj)
 		local sec = wpn:section()
 		hud:add_msg("Weapon",sec)
 		local owner = sobj and sobj.parent_id ~= 65535 and level.object_by_id(sobj.parent_id)

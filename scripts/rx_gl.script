@@ -207,7 +207,7 @@ function action_launch_grenade:initialize()
 	
 	local vid = alun_utils.get_vertex(self.st.target,math.random(3,5))
 	self.target_point = vid and level.vertex_position(vid) or self.st.target:position()
-	self.direction = utils.vector_copy_by_val(self.target_point):sub(npc:position()):add(vector():set(0,1,0))
+	self.direction = vector():set(self.target_point):sub(npc:position()):add(vector():set(0,1,0))
 	self.test_end = time_global()+5000
 	if rx_wmgr then
 		rx_wmgr.get_wm(npc):disable(10000)
@@ -501,7 +501,7 @@ end
 
 
 function launch(obj,target,typ)
-	local dir = utils.vector_copy_by_val(target):sub(obj:position())
+	local dir = vector():set(target):sub(obj:position())
 	local dist_xz = obj:position():distance_to_xz(target)
 	local lvel = 76
 	local add = vector():set(0,0,0)
@@ -569,7 +569,7 @@ function check_weapon(wpn)
 		return false
 	end
 	local sec = wpn:section()
-	if alun_utils.item_is_fa(wpn) and gl_sets.forbiddens.weapons[sec] ~= true then
+	if IsWeapon(wpn) and gl_sets.forbiddens.weapons[sec] ~= true then
 		if alun_utils.addon_attached(wpn,"gl") then
 			if not gl_sets.weapons[sec] then
 				local particles = alun_utils.read_from_ini(nil,sec,"grenade_flame_particles","string","weapons\\generic_weapon01")
@@ -864,7 +864,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	if (_G.schemes["facer"]) then
 		temp.action[evid_gl_reload]:add_precondition(world_property(xrs_facer.evid_facer,false))
-		--temp.action[evid_gl_reload]:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
+		temp.action[evid_gl_reload]:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
 	end
 
 	local manager = npc:motivation_action_manager()

@@ -124,7 +124,7 @@ function heli_combat:set_enemy(target)
 	--alun_utils.debug_write(strformat("heli_combat:set_enemy",target and target:name()))
 	local tg = time_global()
 	self.st.enemy_id = target:id()
-	self.__keep_target_until = tg + 10000
+	self.__keep_target_until = tg + 30000
 	self.enemy_last_seen_time = tg
 	self.enemy_last_seen_pos  = vector():set(target:position())
 	self.initialized = false
@@ -500,7 +500,27 @@ function heli_combat:update()
 		--self.__keep_target_until = tg + 10000
 		self.enemy_last_seen_time = tg
 		self.enemy_last_seen_pos  = vector():set(self.enemy:position())
-		self.heliObject:SetEnemy(self.enemy)
+		if (self.combat_use_mgun) then
+			if (self.combat_type == combat_type_round) then 
+				if (self.round_begin_shoot_time == nil or tg > self.round_begin_shoot_time) then
+					self.heliObject.m_use_mgun_on_attack = not self.heliObject.m_use_mgun_on_attack
+					if (self.heliObject.m_use_mgun_on_attack) then 
+						self.round_begin_shoot_time = tg + math.random(4000,5000)
+					else 
+						self.round_begin_shoot_time = tg + math.random(1000,2000)
+					end
+				end
+				if (self.heliObject.m_use_mgun_on_attack and self.enemy) then 
+					self.heliObject:SetEnemy(self.enemy)
+				else 
+					self.heliObject:ClearEnemy()
+				end
+			else 
+				self.heliObject:SetEnemy(self.enemy)
+			end
+		else 
+			self.heliObject:ClearEnemy()
+		end 
 	else 
 		self.heliObject:ClearEnemy()
 	end
@@ -546,26 +566,22 @@ end
 ----------------------------------------------------------------------------------------------
 function heli_combat:round_update(see_enemy)
 	--alun_utils.debug_write("heli_combat:round_update")
+	local tg = time_global()
 	if not self.round_initialized then
 		self.change_combat_type_allowed = true
 		self.heliObject:SetMaxVelocity(self.round_velocity)
 		self.heliObject:SetSpeedInDestPoint(self.round_velocity)
 		self.heliObject:UseFireTrail( false )
 		self.round_initialized = true
+		
+		self.__keep_state_until = tg + 10000
 	end
 	
-	local tg = time_global()
-	if (self.combat_use_mgun) then
-		if (self.round_begin_shoot_time == nil or tg > self.round_begin_shoot_time) then
-			self.heliObject.m_use_mgun_on_attack = not self.heliObject.m_use_mgun_on_attack
-			self.round_begin_shoot_time = tg + math.random(2000,4000)
-		end
-		if (self.heliObject.m_use_mgun_on_attack and self.enemy) then 
-			self.heliObject:SetEnemy(self.enemy)
-		else 
-			self.heliObject:ClearEnemy()
-		end
-	end
+	if (self.__keep_state_until and tg < self.__keep_state_until) then 
+		self.change_combat_type_allowed = false
+	else 
+		self.change_combat_type_allowed = true
+	end 
 	
 	if (self.change_speed_time and tg < self.change_speed_time) then
 		return 
@@ -630,21 +646,26 @@ function heli_combat:flyby_update( see_enemy )
 		if (self.state == flyby_state_to_enemy and self.fly_target_pos and distance_2d( self.object:position(), self.fly_target_pos ) <= 30) then
 			self.flyby_states_for_one_pass = self.flyby_states_for_one_pass - 1
 			self.state = flyby_state_to_attack_dist
-			self.fly_target_pos = self:calc_position_in_radius(self.flyby_attack_dist)
+			self.fly_target_pos = self:calc_position_in_radius(50)
 			self.heliObject:SetDestPosition(self.fly_target_pos)
+			if (self.flyby_states_for_one_pass <= 0) then 
+				self.change_combat_type_allowed = true
+			else 
+				self.change_combat_type_allowed = false
+			end
 		elseif (self.state == flyby_state_to_attack_dist and self.fly_target_pos and distance_2d( self.object:position(), self.fly_target_pos ) <= 30) then
 			self.state = flyby_state_to_enemy
 			self.fly_target_pos = vector():set(self.enemy_last_seen_pos)
 			self.fly_target_pos.y = self.safe_altitude
 			self.heliObject:SetDestPosition(self.fly_target_pos)
+			if not (see_enemy) then 
+				self.change_combat_type_allowed = true
+			end
 		end
 	end
 
-	if (self.flyby_states_for_one_pass <= 0) then 
-		self.change_combat_type_allowed = true 
-	end
+	self.change_combat_type_allowed = self.change_combat_type_allowed or distance_2d( self.object:position(), self.enemy_last_seen_pos ) < self.search_attack_dist
 end
-
 ----------------------------------------------------------------------------------------------
 -- Фунциии для улетания за пределы уровня
 ----------------------------------------------------------------------------------------------

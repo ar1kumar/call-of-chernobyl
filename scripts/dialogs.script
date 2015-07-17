@@ -438,7 +438,7 @@ function surrender_victim_answers_1(a,b)
 	if (axr_dynamic_spawn or coc_treasure_manager) and (r <= 2) then
 
 		local function itr(npc,itm)
-			if (alun_utils.item_is_fa(itm)) then
+			if (IsWeapon(itm)) then
 				npc:transfer_item(itm,db.actor)
 			end
 		end
@@ -484,7 +484,7 @@ function surrender_victim_answers_2(a,b)
 	xr_wounded.unlock_medkit(npc)
 	--npc:set_relation(game_object.enemy,db.actor)
 	local function itr(npc,itm)
-		if (alun_utils.item_is_fa(itm)) then
+		if (IsWeapon(itm)) then
 			npc:transfer_item(itm,db.actor)
 		end
 	end
@@ -780,112 +780,6 @@ end
 -----------------------------------------------------------------------------------
 -- Community
 -----------------------------------------------------------------------------------
-function actor_in_dolg(actor, npc)
-	for k,v in pairs(SIMBOARD.players) do
-		if v.community_player == true and v.player_name == "dolg" then
-			return true
-		end
-	end
-	return false
-end
-
-function actor_not_in_dolg(actor, npc)
-	for k,v in pairs(SIMBOARD.players) do
-		if v.community_player == true and v.player_name == "dolg" then
-			return false
-		end
-	end
-	return true
-end
-
-function actor_set_dolg(actor, npc)
-	printf("ACTOR NOW IN [DOLG] COMMUNITY")
-	SIMBOARD:set_actor_community("dolg")
-	return true
-end
-
-
-function actor_in_freedom(actor, npc)
-	for k,v in pairs(SIMBOARD.players) do
-		if v.community_player == true and v.player_name == "freedom" then
-			return true
-		end
-	end
-	return false
-end
-
-function actor_not_in_freedom(actor, npc)
-	for k,v in pairs(SIMBOARD.players) do
-		if v.community_player == true and v.player_name == "freedom" then
-			return false
-		end
-	end
-	return true
-end
-
-function actor_set_freedom(actor, npc)
-	printf("ACTOR NOW IN [FREEDOM] COMMUNITY")
-	SIMBOARD:set_actor_community("freedom")
-	return true
-end
-
-
-function actor_in_bandit(actor, npc)
-	for k,v in pairs(SIMBOARD.players) do
-		if v.community_player == true and v.player_name == "bandit" then
-			return true
-		end
-	end
-	return false
-end
-
-function actor_not_in_bandit(actor, npc)
-	for k,v in pairs(SIMBOARD.players) do
-		if v.community_player == true and v.player_name == "bandit" then
-			return false
-		end
-	end
-	return true
-end
-
-function actor_set_bandit(actor, npc)
-	printf("ACTOR NOW IN [BANDIT] COMMUNITY")
-	SIMBOARD:set_actor_community("bandit")
-	return true
-end
-
-
-function actor_in_stalker(actor, npc)
-	for k,v in pairs(SIMBOARD.players) do
-		if v.community_player == true and v.player_name == "stalker" then
-			return true
-		end
-	end
-	return false
-end
-
-function actor_not_in_stalker(actor, npc)
-	for k,v in pairs(SIMBOARD.players) do
-		if v.community_player == true and v.player_name == "stalker" then
-			return false
-		end
-	end
-	return true
-end
-
-function actor_set_stalker(actor, npc)
-	printf("ACTOR NOW IN [STALKER] COMMUNITY")
-	SIMBOARD:set_actor_community("stalker")
-	return true
-end
-
-
-function actor_clear_community(actor, npc)
-	printf("ACTOR NOW IN [NEUTRAL] COMMUNITY")
-	SIMBOARD:set_actor_community("none")
-	return true
-end
-
 function npc_stalker(first_speaker, second_speaker)
 	local npc = who_is_npc(first_speaker, second_speaker)
 	return character_community(npc) == "stalker"

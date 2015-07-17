@@ -24,7 +24,7 @@ function action_hit:reset_scheme()
 	h.impulse   = self.st.impulse
 	h:bone(self.st.bone)
 	h.type      = hit.strike
-	h.direction = utils.vector_copy_by_val(p1):sub(p2)
+	h.direction = vector():set(p1):sub(p2)
 	h.draftsman = self.object
 	self.object:hit(h)
 	

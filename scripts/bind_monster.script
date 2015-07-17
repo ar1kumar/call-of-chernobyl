@@ -38,7 +38,7 @@ end
 function generic_object_binder:use_kick(obj, who)
 	local pos = who:position()
 	local h = hit()
-	h.power = 100
+	h.power = 1
 	h.direction = obj:position():sub(vector():set(pos.x,pos.y+0.3,pos.z))
 	h.bone = "bip01_spine"
 	h.draftsman = who

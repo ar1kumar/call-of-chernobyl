@@ -1341,7 +1341,7 @@ function debug_ui:OnButton_create_clicked()
 	if (item.spawn_at_look) then 
 		gvid = db.actor:game_vertex_id()
 		local r = level.get_target_dist and level.get_target_dist() or 3
-		pos = utils.vector_copy_by_val(db.actor:position())
+		pos = vector():set(db.actor:position())
 		pos:add(device().cam_dir:mul(r))
 		pos = vector():set(pos.x,db.actor:position().y,pos.z)
 		lvid = level.vertex_id(pos)

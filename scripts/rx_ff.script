@@ -39,12 +39,6 @@ local function get_vertex(npc,dir,st)
 	end
 end
 
-local good_acts = {
-					[xr_actions_id.smartcover_action] = true,
-					[xr_actions_id.smartcover_action+2] = true,
-					[xr_actions_id.wounded_exist] = true
-					}
-
 class "evaluator_dont_shoot" (property_evaluator)
 function evaluator_dont_shoot:__init(npc,name,storage) super (nil, name)
 	self.st = storage
@@ -66,8 +60,8 @@ function evaluator_dont_shoot:check_in_los(friend,be,be_pos)
 		local dir_aim = be_pos:sub(pos):normalize()
 
 		--if (friend_dist < be_dist) then
-			local dir_friend = utils.vector_copy_by_val(friend_pos):sub(pos):normalize()
-			local vec_be,vec_who = utils.vector_copy_by_val(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
+			local dir_friend = vector():set(friend_pos):sub(pos):normalize()
+			local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
 			local mywho = friend_dist < 1.6 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1)
 			if (mywho == 1) then
 				return true
@@ -120,7 +114,7 @@ function evaluator_dont_shoot:evaluate()
 	end 
 	
 	local be = npc:best_enemy()
-	if (be == nil or not be:alive()) then
+	if not (be and be:alive() and npc:see(be)) then
 		return set_flag(npc,false)
 	end
 
@@ -128,10 +122,6 @@ function evaluator_dont_shoot:evaluate()
 		return set_flag(npc,false)
 	end 
 
-	if good_acts[alun_utils.get_current_action_id(npc)] then
-		return set_flag(npc,false)
-	end
-	
 	if (self.st.__hold_until and validate(npc,self.st.vertex_id) and time_global() < self.st.__hold_until) then 
 		return set_flag(npc,true)
 	end
@@ -183,11 +173,11 @@ function action_verso:execute()
 			db.used_level_vertex_ids[self.st.vertex_id] = nil
 			self.st.vertex_id = nil
 		end
-		state_mgr.set_state(npc,"threat_na",nil,nil,{look_object = npc:see(be) and be or friend})
+		state_mgr.set_state(npc,"threat",nil,nil,{look_object = be})
 		return 
 	end
 
-	state_mgr.set_state(npc,"assault",nil,nil,{look_object = npc:see(be) and be or friend})
+	state_mgr.set_state(npc,"raid",nil,nil,{look_object = be})
 end
 
 function action_verso:finalize()

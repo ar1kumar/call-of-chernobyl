@@ -116,7 +116,7 @@ end
 
 function is_enemy(obj,enemy,no_memory)
 	--alun_utils.debug_write("eval_is_enemy")
-	if(device().precache_frame > 1) then
+	if(enemy:id() == 0 and device().precache_frame > 1) then
 		return false -- fix actor dying before game loads from enemies. Also fixes strange crash on game load when in combat sometimes.
 	end
 	
@@ -307,7 +307,7 @@ function ignore_enemy_by_overrides(obj,enemy,no_check_job)
 end
 
 function npc_in_safe_zone(npc)
-	if (npc:id() == db.actor:id()) then
+	if (npc:id() == 0) then
 		return false
 	end
 	local squad = get_object_squad(npc)
