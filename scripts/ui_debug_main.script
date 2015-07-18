@@ -22,11 +22,27 @@ id_to_spawn_table = {
 		[14] = "Weapons (Pistol)",
 		[15] = "Weapons (Rifle)",
 		[16] = "Vehicles",
-		[17] = "Anomaly"
+		[17] = "Anomaly",
+		[18] = "Phantom"
 }
 
 function get_spawn_table(name)
-	if (name == "Anomaly") then 
+	if (name == "Phantom") then 
+		return {
+			"m_phantom_bloodsucker",
+			"m_phantom_tushkano",
+			"m_phantom_controller",
+			"m_phantom_zombi",
+			"m_phantom_gigant",
+			"m_phantom_snork",
+			"m_phantom_boar",
+			"m_phantom_flesh",
+			"m_phantom_dog",
+			"m_phantom_pseudodog",
+			"m_phantom_chimera",
+			"m_phantom_cat"
+		}
+	elseif (name == "Anomaly") then 
 		return {
 				"zone_mine_gravitational_weak",
 				"zone_mine_thermal_weak",
@@ -1219,6 +1235,7 @@ function debug_ui:FillList(name)
 	local cant_spawn_actor = string.find(name,"NPC") or string.find(name,"Physic")
 	local is_veh = string.find(name,"Vehicles")
 	local is_anom = string.find(name,"Anomaly")
+	local is_phantom = string.find(name,"Phantom")
 	if (is_squad) then 
 	--	self.smarts_list:Show(true)
 	else
@@ -1248,6 +1265,10 @@ function debug_ui:FillList(name)
 				_itm.no_id = true
 				_itm.spawn_at_look = true
 				_itm.is_anom = true
+			elseif (is_phantom) then 
+				_itm.no_id = true
+				_itm.spawn_at_look = true 
+				_itm.use_level_spawn = true
 			end
 
 			self.spawn_list:AddExistingItem(_itm)
@@ -1353,6 +1374,14 @@ function debug_ui:OnButton_create_clicked()
 		pos = db.actor:position()
 		lvid = db.actor:level_vertex_id()
 		gvid = db.actor:game_vertex_id()
+	end
+	
+	if (item.use_level_spawn) then 
+		if (level.spawn_item) then
+			level.spawn_item(section,pos,lvid,65535,false)
+			self:SendOutput("UISpawner: Spawned")
+		end
+		return
 	end
 
 	local id = not item.no_id and self.check_to_actor:GetCheck() and 0

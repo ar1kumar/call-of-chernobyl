@@ -30,6 +30,10 @@ end
 -------------------
 -- actor_on_update
 -------------------
+function actor_on_first_update(binder,delta)
+	SendScriptCallback("actor_on_first_update",binder,delta)
+end
+
 actor_light = nil
 function actor_on_update(binder,delta)
 	local tg = time_global()

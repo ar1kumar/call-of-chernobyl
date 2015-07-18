@@ -41,6 +41,10 @@ local function monster_on_update(npc,st)
 	end
 	st.__phantom_check = tg + 5000
 	
+	if (has_alife_info("bar_deactivate_radar_done")) then 
+		return 
+	end 
+	
 	local phantom_section = alun_utils.read_from_ini(nil,npc:section(),"spawn_phantom","string")
 	if not (phantom_section) then
 		return 
