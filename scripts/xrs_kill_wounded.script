@@ -89,11 +89,19 @@ end
 local function get_rand_vertex(npc,vo)
 	local dir = vector():sub(npc:position(),vo:position())
 	dir = vector_rotate_y(dir,math.random(MinVectorRotateY,MaxVectorRotateY))
-	return vo:vertex_in_direction(vo:level_vertex_id(),dir,math.random(MinDistance,MaxDistance))
+	return vo:vertex_in_direction(vo:level_vertex_id(),dir,math.random(MinDistance+1,MaxDistance))
 end
 
 local function is_wounded(npc)
-	return xr_wounded.is_wounded(npc) or hostage_list[npc:id()] == true
+	if (hostage_list[npc:id()] == true) then 
+		return true 
+	end 
+	
+	if (npc:id() ~= 0 and IsStalker(npc) and npc:wounded()) then
+		return true 
+	end
+	
+	return false
 end
 
 local function get_hostage(npc)
@@ -107,12 +115,45 @@ local function get_hostage(npc)
 		end
 	end
 end
+
+local function validate(npc,vid)
+	if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
+		return db.used_level_vertex_ids[vid] == nil or db.used_level_vertex_ids[vid] == npc:id()
+	end 
+	return false
+end 
 -----------------------------------------------
 class "eva_kill_wounded" ( property_evaluator )
 function eva_kill_wounded:__init( name, storage ) super ( nil, name )
 	self.st = storage
 	self.st.force_false = 0
 end
+
+function eva_kill_wounded:find_target()
+	local npc = self.object 
+	local be = npc:best_enemy() or get_hostage(npc)
+
+	if (be and IsStalker(be) and be:alive() and is_wounded(be)) then 
+		if (self.st.selected_id == nil or self.st.selected_id ~= be:id()) then
+			self.st.selected_id = be:id()
+			self.st.vertex_id = nil
+			self.st.vertex_position = nil 
+			self.st.timer = nil
+			local bw = npc:best_weapon()
+			if (bw and npc:active_item() and npc:active_item():id() == bw:id()) then 
+				npc:set_item(object.idle,bw)
+			end
+			return true 
+		end
+		return true
+	end
+
+	self.st.selected_id = nil
+	self.st.vertex_id = nil
+	self.st.vertex_position = nil 
+	self.st.timer = nil
+	return false	
+end 
 
 function eva_kill_wounded:evaluate()
 	--alun_utils.debug_write("eva_kill_wounded")
@@ -135,37 +176,9 @@ function eva_kill_wounded:evaluate()
 		return false 
 	end
 	
-	if (self.st.force_false > 0) then 
-		self.st.force_false = self.st.force_false - 1
-		return false
-	end
-	
-	local be = npc:best_enemy() or get_hostage(npc)
-	if not (be and IsStalker(be) and be:alive() and is_wounded(be)) then
-		self.st.force_false = 5 -- forcing many return falses to reset when there is multiple enemy... hack
-		return false -- non-wounded enemy still exists
-	end
-	
-	if not (self.st.last_id) then 
-		self.st.last_id = be:id()
-		return true
-	end
-		
-	local vo = db.storage[self.st.last_id] and db.storage[self.st.last_id].object 
-	if not (vo and IsStalker(vo) and vo:alive() and is_wounded(vo)) then
-		self.st.last_id = nil
-		self.st.force_false = 5 -- forcing many return falses to reset when there is multiple enemy... hack
-		return false -- current target not valid
-	end	
-	
-	return true
+	return self:find_target()
 end
-local function validate(npc,vid)
-	if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
-		return db.used_level_vertex_ids[vid] == nil or db.used_level_vertex_ids[vid] == npc:id()
-	end 
-	return false
-end 
+
 
 --------------------------------------------------------------------------------------------------------------
 -- Action Kill Wounded
@@ -184,23 +197,14 @@ function act_kill_wounded:initialize()
 	
 	st.timer = nil
 
-	npc:set_desired_position()
-	npc:set_desired_direction()
 	npc:inactualize_patrol_path()
 	npc:set_path_type(game_object.level_path)
-	local bw = npc:best_weapon()
-	if (bw and IsWeapon(bw) and npc:weapon_unstrapped()) then 
-		npc:set_item(object.idle, bw)
-	end 
 end
 
 function act_kill_wounded:reset()
 	self.st.timer = nil
-	if (self.st.vertex_id) then
-		db.used_level_vertex_ids[self.st.vertex_id] = nil 
-		self.st.vertex_id = nil
-	end
-	self.st.last_id = nil
+	self.st.vertex_id = nil 
+	self.st.vertex_position = nil
 end 
 
 function act_kill_wounded:execute()
@@ -209,17 +213,9 @@ function act_kill_wounded:execute()
 	local npc = self.object 
 	local st = self.st
 	
-	local be = npc:best_enemy() or get_hostage(npc)
-	if not (be and IsStalker(be) and be:alive() and is_wounded(be)) then
-		self:reset()
-		self.st.force_false = 10
-		return
-	end
-	
-	local vo = self.st.last_id and db.storage[self.st.last_id] and db.storage[self.st.last_id].object --npc:best_enemy() or get_hostage(npc)
+	local vo = st.selected_id and db.storage[st.selected_id] and db.storage[st.selected_id].object
 	if not (vo and IsStalker(vo) and vo:alive() and is_wounded(vo)) then
-		self:reset()
-		self.st.force_false = 5
+		st.selected_id = nil
 		return
 	end
 	
@@ -227,36 +223,35 @@ function act_kill_wounded:execute()
 	if (npc:path_type() ~= game_object.level_path) then 
 		npc:set_path_type(game_object.level_path)
 	end
+
+	local dist = npc:position():distance_to(vo:position())
+	if (dist < MinDistance) then
+		self:reset()
+	end
 	
 	if not (st.vertex_id) then
-		local vid = get_rand_vertex(npc,vo) or vo:level_vertex_id()
-		if (validate(npc,vid)) then
+		local vid = get_rand_vertex(npc,vo)
+		if (validate(npc,vid) and level.vertex_position(vid):distance_to_sqr(vo:position()) >= MinDistance) then
 			st.vertex_id = vid
 			st.vertex_position = level.vertex_position(st.vertex_id)
 		end
 	end
 	
-	local dist = npc:position():distance_to(vo:position())
-	if (dist < MinDistance) then 
-		self:reset()
-		return
-	end
-
 	local dir = vector():sub(vo:bone_position("bip01_spine"),npc:bone_position("bip01_r_finger02"))
 	
 	local tg = time_global()
-	if (hostage_list[vo:id()] ~= true and st.timer and tg > st.timer) then
-		if (npc:see(vo)) then
-			state_mgr.set_state(npc,"threat_sniper_fire",nil,nil,{look_object = vo, look_dir = dir})
-		else 
-			self:reset()
+	if (st.timer and tg > st.timer) then
+		if (hostage_list[vo:id()] ~= true) then
+			if (npc:see(vo)) then
+				state_mgr.set_state(npc,"threat_sniper_fire",nil,nil,{look_object = vo, look_dir = dir})
+			end
 		end
 		--alun_utils.debug_write("act_kill_wounded:execute end 2")
 		return
 	end
 	
 	if (st.vertex_id) then
-		if (st.vertex_id == vo:level_vertex_id() or dist <= MinDistance+2) then
+		if (npc:level_vertex_id() == st.vertex_id) then
 			state_mgr.set_state(npc,"threat",nil,nil,{look_dir = dir})
 			if (db.used_level_vertex_ids[st.vertex_id]) then
 				db.used_level_vertex_ids[st.vertex_id] = nil
@@ -265,7 +260,7 @@ function act_kill_wounded:execute()
 			db.used_level_vertex_ids[st.vertex_id] = npc:id()
 			self:begin_kill_wounded(vo)
 		else
-			state_mgr.set_state(npc,"assault",nil,nil,{look_dir = dir},{fast_set = true})
+			state_mgr.set_state(npc,"assault",nil,nil,{look_position = vo:position()},{fast_set = true})
 			if (db.used_level_vertex_ids[st.vertex_id]) then
 				db.used_level_vertex_ids[st.vertex_id] = nil
 			end
@@ -369,6 +364,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 				--xr_danger.actid,
 				xr_actions_id.stohe_camper_base + 1,
 				stalker_ids.action_combat_planner,
+			--	stalker_ids.action_danger_planner,
 				xr_actions_id.stohe_meet_base+1,
 				xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,

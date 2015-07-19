@@ -163,7 +163,11 @@ function evaluator_wounded_exist:find_valid_target()
 		return false 
 	end 
 	
-	if (vo:alive() ~= true or not xr_wounded.is_wounded(vo) or db.storage[id].wounded_already_selected) then 
+	if not (vo:alive() and xr_wounded.is_wounded(vo)) then 
+		return false 
+	end
+	
+	if (db.storage[id].wounded_already_selected) then 
 		return false 
 	end
 	
