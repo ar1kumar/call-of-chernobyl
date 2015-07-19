@@ -111,7 +111,7 @@ local function find_valid_target(npc,st,bw)
 	-- Evaluate current target
 	local tg = time_global()
 	local current_target = st.target_id and db.storage[st.target_id] and db.storage[st.target_id].object
-	if (current_target and current_target:alive() and not xr_wounded.is_wounded(current_target) and xr_combat_ignore.is_enemy(npc,current_target)) then
+	if (current_target and current_target:alive() and not IsWounded(current_target) and xr_combat_ignore.is_enemy(npc,current_target)) then
 		if (st.__keep_target_until and tg < st.__keep_target_until) then 
 			return true
 		end
@@ -162,14 +162,14 @@ local function find_valid_target(npc,st,bw)
 	local target = id and (db.storage[id] and db.storage[id].object)
 	
 	-- Evaluate currently indexed target
-	if (target and target:alive() and npc:relation(target) >= game_object.enemy and not xr_wounded.is_wounded(target)) then
+	if (target and target:alive() and npc:relation(target) >= game_object.enemy and not IsWounded(target)) then
 		if (xr_combat_ignore.is_enemy(npc,target) == true) then
 			-- focus on actor if panicked_to_actor is true, which is forced by some events like surrender
 			local cls = target:clsid()
 			if (cls == clsid.script_actor and db.storage[npc:id()].panicked_to_actor) then 
 				-- focus on best enemy if they are close by and not a panic source
 				local be = npc:best_enemy()
-				if (be and be:alive() and not xr_wounded.is_wounded(be) and not can_cause_panic(npc,be:clsid()) and npc:position():distance_to_sqr(be:position()) <= 30) then 
+				if (be and be:alive() and not IsWounded(be) and not can_cause_panic(npc,be:clsid()) and npc:position():distance_to_sqr(be:position()) <= 30) then 
 					st.target_id = be:id()
 					st.__keep_target_until = tg + 8000
 					return true
@@ -186,7 +186,7 @@ local function find_valid_target(npc,st,bw)
 			if (can_cause_panic(npc,cls)) then
 				-- focus on best enemy if they are close by and not a panic source
 				local be = npc:best_enemy()
-				if (be and be:alive() and not xr_wounded.is_wounded(be) and not can_cause_panic(npc,be:clsid()) and npc:position():distance_to_sqr(be:position()) <= 30) then 
+				if (be and be:alive() and not IsWounded(be) and not can_cause_panic(npc,be:clsid()) and npc:position():distance_to_sqr(be:position()) <= 30) then 
 					st.target_id = be:id()
 					st.__keep_target_until = tg + 8000
 					return true
@@ -228,7 +228,7 @@ function evaluator_stalker_panic:evaluate()
 		return false 
 	end
 	
-	if (xr_wounded.is_wounded(npc)) then 
+	if (IsWounded(npc)) then 
 		return false 
 	end 
 	

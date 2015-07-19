@@ -74,7 +74,7 @@ local function find_valid_target(npc,st)
 		return false
 	end
 
-	if not (npc:see(target) and not xr_wounded.is_wounded(target)) then
+	if not (npc:see(target) and not IsWounded(target)) then
 		if not (st.index) then
 			st.index = 1
 		end
@@ -117,7 +117,7 @@ local function find_valid_target(npc,st)
 		target = id and (db.storage[id] and db.storage[id].object or level.object_by_id(id))
 	end
 
-	if (target and npc:see(target) and target:alive() and not xr_wounded.is_wounded(target)) then
+	if (target and npc:see(target) and target:alive() and not IsWounded(target)) then
 		local dist = npc:position():distance_to(target:position())
 		if (dist < gl_sets.max_dist and dist > gl_sets.min_dist) then
 			st.target = target
@@ -616,7 +616,7 @@ function check_ammo(npc)
 end
 
 function check_enemy(npc,be)
-	return be:alive() and npc:see(be) and not xr_wounded.is_wounded(be) -- and be:position():distance_to(level.vertex_position(be:level_vertex_id()))<2
+	return be:alive() and npc:see(be) and not IsWounded(be) -- and be:position():distance_to(level.vertex_position(be:level_vertex_id()))<2
 end
 
 function check_victims(npc,pos,radius,pre)

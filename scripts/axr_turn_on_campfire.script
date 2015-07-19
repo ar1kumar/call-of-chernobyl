@@ -141,7 +141,7 @@ end
 function eva_turn_on_campfire:evaluate()
 	--alun_utils.debug_write("eva_turn_on_campfire")
 	local npc = self.object
-	if (npc:alive() ~= true or xr_wounded.is_wounded(npc)) then
+	if (npc:alive() ~= true or IsWounded(npc)) then
 		return false
 	end
 

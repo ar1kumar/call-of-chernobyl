@@ -94,7 +94,7 @@ function evaluator_fight_from_cover:evaluate()
 		return false 
 	end
 	
-	if (xr_wounded.is_wounded(npc)) then 
+	if (IsWounded(npc)) then 
 		return false 
 	end 
 	
@@ -113,7 +113,10 @@ function evaluator_fight_from_cover:evaluate()
 	end
 	
 	local be = npc:best_enemy()
-	if (be and be:alive() and not xr_wounded.is_wounded(be)) then
+	if (be and be:alive()) then
+		if (IsWounded(be)) then 
+			return false 
+		end
 		return true
 	end
 

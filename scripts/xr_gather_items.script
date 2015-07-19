@@ -347,7 +347,7 @@ end
 function eva_gather_itm:evaluate()
 	--alun_utils.debug_write("eva_gather_itm")
 	local npc = self.object
-	if (npc:alive() ~= true or xr_wounded.is_wounded(npc)) then
+	if (npc:alive() ~= true or IsWounded(npc)) then
 		return false
 	end
 

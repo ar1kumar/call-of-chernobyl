@@ -900,7 +900,7 @@ end
 function in_los(npc,friend,be)
 
 	if (friend:id() ~= 0 and npc:target_body_state() ~= move.crouch and IsStalker(friend) and state_mgr.get_state(friend) ~= "prisoner") then
-		if (friend:target_body_state() == move.crouch or xr_wounded.is_wounded(friend)) then 
+		if (friend:target_body_state() == move.crouch or friend:wounded()) then 
 			return false 
 		end	
 	end
@@ -993,7 +993,7 @@ function npc_in_cover(npc)
 		st.wait = tg+300
 		local be = npc:best_enemy()
 		local enemies = {}
-		if be and not xr_wounded.is_wounded(be) then
+		if be and (not be:clsid() == clsid.script_stalker or not be:wounded()) then
 			enemies[1] = be
 		else
 --			rx_ai.printf("npc_in_cover[%s]:not be",npc:character_name())
@@ -1011,9 +1011,15 @@ function npc_in_cover(npc)
 		for o in npc:memory_visible_objects() do
 			local obj = o:object()
 			local id = obj:id()
-			if obj and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
+			if obj then
 --				rx_ai.printf("npc_in_cover[%s]:add enemy[%s]",npc:character_name(),obj:name())
-				table.insert(enemies,obj)
+				if (IsStalker(obj) and npc:relation(obj) == game_object.enemy and obj:alive()) then
+					if (obj:id() ~= 0 or not obj:wounded()) then 
+						table.insert(enemies,obj)
+					end
+				elseif (IsMonster(obj) and npc:relation(obj) == game_object.enemy and obj:alive()) then
+					table.insert(enemies,obj)
+				end
 				tt[id] = true
 			end
 		end
@@ -1021,9 +1027,14 @@ function npc_in_cover(npc)
 			local obj = o:object()
 			local id = obj:id()
 			if not tt[id] then
-				if obj and (IsStalker(obj) or IsMonster(obj) or obj:id() == 0) and obj:alive() and npc:relation(obj) == game_object.enemy and not xr_wounded.is_wounded(obj) then
---					rx_ai.printf("npc_in_cover[%s]:add enemy[%s]",npc:character_name(),obj:name())
-					table.insert(enemies,obj)
+				if obj then
+					if (IsStalker(obj) and npc:relation(obj) == game_object.enemy and obj:alive()) then
+						if (obj:id() ~= 0 or not obj:wounded()) then 
+							table.insert(enemies,obj)
+						end
+					elseif (IsMonster(obj) and npc:relation(obj) == game_object.enemy and obj:alive()) then
+						table.insert(enemies,obj)
+					end
 				end
 			end
 		end
@@ -1885,7 +1896,11 @@ end
 
 function in_los(npc,be,friend)
 
-	if (npc:target_body_state() ~= move.crouch and xr_wounded.is_wounded(friend)) then
+	if (npc:target_body_state() ~= move.crouch) then
+		return false 
+	end 
+	
+	if (IsWounded(friend)) then 
 		return false 
 	end
 

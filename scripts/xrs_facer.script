@@ -89,7 +89,7 @@ function evaluator_facer:evaluate()
 		return false 
 	end 
 	
-	if (xr_wounded.is_wounded(npc)) then 
+	if (IsWounded(npc)) then 
 		return false 
 	end
 	
@@ -306,7 +306,7 @@ function action_facer:cancel()
 	self.end_time = nil
 	self.hit_time = nil
 	alun_utils.save_var(npc,"facer_target",nil)
-	if not xr_wounded.is_wounded(npc) then -- or state_mgr.get_state(npc) == "idle"
+	if not IsWounded(npc) then -- or state_mgr.get_state(npc) == "idle"
 		npc:clear_animations()
 	end
 	npc:set_sight(look.direction,npc:direction())
@@ -331,7 +331,7 @@ function evaluator_steal_up:evaluate()
 		return false 
 	end 
 	
-	if (xr_wounded.is_wounded(npc)) then 
+	if (IsWounded(npc)) then 
 		return false 
 	end 
 	
@@ -416,7 +416,7 @@ function check_enemy(enemy,obj)
 		return false
 	end
 
-	if (xr_wounded.is_wounded(enemy)) then
+	if (IsWounded(enemy)) then
 		return false
 	end
 

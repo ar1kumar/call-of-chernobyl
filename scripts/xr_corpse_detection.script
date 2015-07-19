@@ -366,7 +366,7 @@ function evaluator_corpse:evaluate()
 	end
 
 	local npc = self.object
-	if (npc:alive() ~= true or xr_wounded.is_wounded(npc) or npc:best_enemy())then
+	if (npc:alive() ~= true or IsWounded(npc) or npc:best_enemy())then
 		return false
 	end
 
