@@ -816,7 +816,9 @@ function CSurgeManager:update()
 							else
 								if(xr_logic.pick_section_from_condlist(db.actor, nil, self.survive)~="true") then
 									if (atmosfear == nil) or not(atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_god_mode",1,false)) then
-										self:kill_actor_at_pos(wave_pos.z)
+										if not (get_console():get_bool("g_god")) then 
+											self:kill_actor_at_pos(wave_pos.z)
+										end
 									end
 								end
 							end
@@ -1404,6 +1406,10 @@ function CSurgeManager:kill_all_unhided()
 			end
 		end
 	end
+	
+	if (get_console():get_bool("g_god")) then 
+		return 
+	end 
 	
 	-- don't kill actor if he isn't only a valid level
 	local actor_level = sim:level_name(game_graph():vertex(sim:actor().m_game_vertex_id):level_id())

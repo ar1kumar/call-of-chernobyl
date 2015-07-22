@@ -971,7 +971,7 @@ end
 function npc_in_actor_frustrum(npc)
 	local actor_dir = device().cam_dir
 	--local actor_dir = db.actor:direction()
-	local npc_dir = npc:position():sub(db.actor:position())
+	local npc_dir = vector():sub(npc:position(),db.actor:position())
 	local yaw = yaw_degree3d(actor_dir, npc_dir)
 	--printf("YAW %s", tostring(yaw))
 	return yaw < 35

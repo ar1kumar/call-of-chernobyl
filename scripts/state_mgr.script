@@ -85,7 +85,7 @@ function evaluator_state_mgr_idle:evaluate()
 
 	local cid = self.st.mgr:current_action_id()
 
-	if (cid == xr_actions_id.wounded_exist or rx_ff and cid == rx_ff.actid_dont_shoot or cid == xrs_kill_wounded.actid) then
+	if (cid == xr_actions_id.wounded_exist or rx_ff and cid == rx_ff.actid_dont_shoot) then
 		return true
 	end
 
