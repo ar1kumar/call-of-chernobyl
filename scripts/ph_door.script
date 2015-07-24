@@ -309,6 +309,9 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.no_force  = utils.cfg_get_bool(ini, section, "no_force", npc, false, false)
 	
 	st.not_for_npc  = utils.cfg_get_bool(ini, section, "not_for_npc", npc, false, false)
+	if (npc:get_visual_name() == "dynamics\\door\\shkaf_work_01_door") then 
+		st.not_for_npc = true
+	end
 
 	st.show_tips = utils.cfg_get_bool(ini, section, "show_tips", npc, false, true)
 

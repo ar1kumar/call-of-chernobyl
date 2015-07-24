@@ -351,7 +351,7 @@ function eva_gather_itm:evaluate()
 		return false
 	end
 
-	if (npc:best_weapon() and IsWeapon(npc:best_weapon()) and npc:best_enemy()) then
+	if (IsWeapon(npc:best_weapon()) and npc:best_enemy()) then
 		return false
 	end
 	
@@ -561,6 +561,8 @@ end
 function configure_actions(npc,ini,scheme,section,stype,temp)
 	local wp = world_property
 
+	--temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
+	
 	temp.action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
 	temp.action:add_precondition( wp(xr_evaluators_id.stohe_meet_base + 1, false) )
 	temp.action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base, false) )
@@ -570,6 +572,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local action	
 	local p = {
 				stalker_ids.action_combat_planner,
+				xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife
 	}

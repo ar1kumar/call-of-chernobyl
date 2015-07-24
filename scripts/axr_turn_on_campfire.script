@@ -267,6 +267,7 @@ end
 function configure_actions(npc,ini,scheme,section,stype,temp)
 	local wp = world_property
 	
+	--temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
 	temp.action:add_precondition(wp(xr_gather_items.evaid, false))
 	temp.action:add_precondition(wp(stalker_ids.property_items, false))
 	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist,false))

@@ -2,7 +2,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.0.82 RC"
+GAME_VERSION = "1.0.83 RC"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -655,8 +655,12 @@ function store_table(table, subs)
 end
 ----------------------------------------
 function IsWounded(o)
-	c = o and o:clsid()
-	return c and c == clsid.script_stalker and o:wounded() or false
+	if not (o) then
+		printf("_G.IsWounded: object is nil")
+		return false
+	end
+	local c = o:clsid()
+	return c and c == clsid.script_stalker and o:wounded() == true or false
 end 
 -------------------------------------------------------------------------------------------
 -- 										CLASS TESTING

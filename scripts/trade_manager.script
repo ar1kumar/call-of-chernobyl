@@ -117,42 +117,13 @@ function save(obj, packet)
 
 	set_save_marker(packet, "save", false, "trade_manager")
 	
-	packet:w_stringZ(tt.cfg_ltx)
+	alun_utils.w_stpk(packet,"stringZ",tt.cfg_ltx,"trade_manager 1")
+	alun_utils.w_stpk(packet,"stringZ",tt.current_buy_condition or "","trade_manager 2")
+	alun_utils.w_stpk(packet,"stringZ",tt.current_sell_condition or "","trade_manager 3")
+	alun_utils.w_stpk(packet,"stringZ",tt.current_buy_supplies or "","trade_manager 4")
+	alun_utils.w_stpk(packet,"s32",tt.update_time and tt.update_time - time_global() or -1,"trade_manager 5")
+	alun_utils.w_stpk(packet,"s32",tt.resuply_time and tt.resuply_time - time_global() or -1,"trade_manager 6")
 
-	--printf("TRADE SAVE [%s]: current_buy_condition = %s", obj:name(), tostring(tt.current_buy_condition))
-	if tt.current_buy_condition == nil then
-		packet:w_stringZ("")
-	else
-		packet:w_stringZ(tt.current_buy_condition)
-	end
-
-	--printf("TRADE SAVE [%s]: current_sell_condition = %s", obj:name(), tostring(tt.current_sell_condition))
-	if tt.current_sell_condition == nil then
-		packet:w_stringZ("")
-	else
-		packet:w_stringZ(tt.current_sell_condition)
-	end
-
-	--printf("TRADE SAVE [%s]: current_buy_supplies = %s", obj:name(), tostring(tt.current_buy_supplies))
-	if tt.current_buy_supplies == nil then
-		packet:w_stringZ("")
-	else
-		packet:w_stringZ(tt.current_buy_supplies)
-	end
-
-	local cur_tm = time_global()
-
-	if tt.update_time == nil then
-		packet:w_s32(-1)
-	else
-	 	packet:w_s32(tt.update_time - cur_tm)
-	end
-
-	if tt.resuply_time == nil then
-		packet:w_s32(-1)
-	else
-	 	packet:w_s32(tt.resuply_time - cur_tm)
-	end
 	set_save_marker(packet, "save", true, "trade_manager")
 end
 

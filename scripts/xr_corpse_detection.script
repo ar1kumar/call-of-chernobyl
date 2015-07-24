@@ -375,15 +375,6 @@ function evaluator_corpse:evaluate()
 		return false 
 	end
 	
-	if (alun_utils.get_squad_commander_action(npc) == stalker_ids.action_combat_planner) then
-		return false
-	end
-
-	local state_mgr = db.storage[npc:id()].state_mgr
-	if (state_mgr and state_mgr.combat) then
-		return false
-	end
-
 	self.a.analse_mode = xr_logic.pick_section_from_condlist(db.actor, self.object, self.a.mutant_corpse_analysis)
 	self.a.enabled = xr_logic.pick_section_from_condlist(db.actor, self.object, self.a.corpse_detection_enabled)
 	if (self.a.analse_mode ~= "true" and self.a.enabled ~= "true") then

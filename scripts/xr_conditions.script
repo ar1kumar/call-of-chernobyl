@@ -22,15 +22,15 @@ function check_task_stage(actor,npc,p)
 	return false
 end 
 
-function bounty_by_id_exists(actor,npc,p)
-	local id = p[1] and alun_utils.load_var(db.actor,p[1])
-	if not (id) then 
-		return false 
+function is_bounty(actor,npc,p)
+	local id = npc:id()
+	for task_id,npc_id in pairs(axr_task_manager.bounties_by_id) do 
+		if (npc_id == id) then 
+			return true 
+		end
 	end
-	local sim = alife()
-	local se_obj = sim:object(id)
-	return se_obj and IsStalker(se_obj) or false
-end
+	return false
+end 
 
 function npc_not_actor(actor,npc,p)
 	return npc:id() ~= 0 or false
@@ -2535,13 +2535,14 @@ function smart_stayed_squad_count_ge_by_faction(actor,npc,p)
 
 	local count = 0
 	for k,squad in pairs(smrt.squads) do
-		if (squad and simulation_objects.is_on_the_same_level(squad, smart) and squad.current_target_id and squad.current_target_id == smart.id) then
+		if (squad and simulation_objects.is_on_the_same_level(squad, smart) and squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
 			if (p[4] == "true" or not squad:get_script_target()) then
 				if (p[3] == "nil" or squad.stay_time and game.get_game_time():diffSec(squad.stay_time) <= tonumber(p[3])) then
 					for i=5,#p do 
 						if (p[i] == "monster" and is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
 							count = count + 1
-							if (count >= tonumber(p[2])) then 
+							if (count >= tonumber(p[2])) then
+								squad.stay_time = game.get_game_time()
 								return true 
 							end
 							break

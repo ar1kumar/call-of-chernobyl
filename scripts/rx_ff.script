@@ -52,15 +52,15 @@ end
 
 function evaluator_dont_shoot:check_in_los(friend,be,be_pos)
 	if (friend and friend:alive() and self.object:relation(friend) < 2 and self.object:see(friend)) then
-		local pos = self.object:bone_position("bip01_l_finger02") --self.object:bone_position("bip01_spine")
+		local pos = self.object:bone_position("bip01_r_finger02") --self.object:bone_position("bip01_spine")
 		local friend_pos = alun_utils.safe_bone_pos(friend,"bip01_spine")
 		
 		local be_dist = pos:distance_to(be_pos)
 		local friend_dist = pos:distance_to(friend_pos)
-		local dir_aim = be_pos:sub(pos):normalize()
+		local dir_aim = vector():sub(be_pos,pos):normalize()
 
 		--if (friend_dist < be_dist) then
-			local dir_friend = vector():set(friend_pos):sub(pos):normalize()
+			local dir_friend = vector():sub(friend_pos,pos):normalize()
 			local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
 			local mywho = friend_dist < 1.6 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1)
 			if (mywho == 1) then
@@ -216,9 +216,9 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)
+
 	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
-	--temp.action:add_precondition(world_property(xr_evaluators_id.state_mgr+1,true))
+	--temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
 
 	if (_G.schemes["gl"]) then
 		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
@@ -234,8 +234,9 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local manager = npc:motivation_action_manager()
 	local action
 	local p = {
+				xr_actions_id.stohe_camper_base + 1,
 				stalker_ids.action_combat_planner,
-				--xr_actions_id.state_mgr + 1,
+				xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife
 	}

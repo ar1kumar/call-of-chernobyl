@@ -172,7 +172,7 @@ function eva_kill_wounded:evaluate()
 	end
 	
 	local st = db.storage[npc:id()]
-	if (st) and (st.rx_dont_shoot or st.help_wounded and st.help_wounded.selected_id ~= nil) then
+	if (st) and (st.rx_dont_shoot) then -- or st.help_wounded and st.help_wounded.selected_id ~= nil) then
 		return false 
 	end
 	
@@ -349,7 +349,8 @@ end
 function configure_actions(npc,ini,scheme,section,stype,temp)
 	local wp = world_property
 	
-	--temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
+	--temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
+	
 	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist,false))
 
@@ -362,13 +363,11 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	
 	local p = {
 				--xr_danger.actid,
-				xr_actions_id.stohe_camper_base + 1,
 				stalker_ids.action_combat_planner,
 			--	stalker_ids.action_danger_planner,
 				xr_actions_id.stohe_meet_base+1,
 				xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,
-				xr_actions_id.state_mgr + 3,
 				xr_actions_id.alife
 	}
 	for i=1,#p do

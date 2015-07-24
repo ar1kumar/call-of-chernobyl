@@ -41,16 +41,7 @@ end
 --------------------------------------------------
 -- Sidrovich
 --------------------------------------------------
-function esc_m_trader_task_1_complete(a,b)
-	dialogs.relocate_money_to_actor(a,b,math.random(8000,11000))
-	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"killer", 10})
-end 
 
-function esc_m_trader_task_2_complete(a,b)
-	dialogs.relocate_money_to_actor(a,b,math.random(3000,4000))
-	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"stalker", 10})
-	xr_effects.dec_faction_goodwill_to_actor(db.actor, nil, {"bandit", 10})
-end 
 --------------------------------------------------
 --				mar_base_owl_stalker_trader_task_1
 --------------------------------------------------

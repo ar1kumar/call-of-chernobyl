@@ -17,6 +17,11 @@ function evaluator_end:__init(name, storage) super (nil, name)
 	self.a = storage
 end
 function evaluator_end:evaluate()
+	local st = db.storage[self.object:id()]
+	if (st) and (st.rx_dont_shoot or st.help_wounded and st.help_wounded.selected_id ~= nil) then 
+		return true
+	end
+	
 	return not xr_logic.is_active(self.object, self.a)
 end
 
@@ -35,16 +40,17 @@ function evaluator_close_combat:evaluate()
 	if (IsWounded(self.object)) then 
 		return false 
 	end
-
+	
+	local st = db.storage[self.object:id()]
+	if (st) and (st.rx_dont_shoot or st.help_wounded and st.help_wounded.selected_id ~= nil) then 
+		return false 
+	end
+	
 	if self.mgr == nil then
 		self.mgr = self.object:motivation_action_manager()
 	end
 	if not (self.mgr and self.mgr:evaluator(stalker_ids.property_enemy):evaluate()) then
 		return false
-	end
-	
-	if (self.mgr:current_action_id() == xrs_kill_wounded.actid) then 
-		return false 
 	end
 	
 	if (db.storage[self.object:id()].danger_flag) then 
@@ -628,14 +634,15 @@ function add_to_binder(object, ini, scheme, section, storage)
 	action:add_precondition (world_property(stalker_ids.property_danger,false))
 	action:add_precondition	(world_property(stalker_ids.property_anomaly,false))
 	
+	-- Дубляж common_precondition без подбора вещей.
+	modules.add_common_precondition(scheme,action)
+	--action:add_precondition (world_property(xr_evaluators_id.stohe_meet_base + 1,false))
+	--action:add_precondition (world_property(xr_evaluators_id.sidor_wounded_base + 0,  false))
+	--action:add_precondition (world_property(xr_evaluators_id.abuse_base, false))
+	
 	if (_G.schemes["rx_ff"]) then 
 		action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
 	end
-	
-	-- Дубляж common_precondition без подбора вещей.
-	action:add_precondition (world_property(xr_evaluators_id.stohe_meet_base + 1,false))
-	action:add_precondition (world_property(xr_evaluators_id.sidor_wounded_base + 0,  false))
-	action:add_precondition (world_property(xr_evaluators_id.abuse_base, false))
 
 	action:add_effect (world_property(properties["end"],				true))
 	--action:add_effect (world_property(stalker_ids.property_enemy,		false)) -- Not sure this is needed as post condition may conflict with post_combat_idle
@@ -643,11 +650,17 @@ function add_to_binder(object, ini, scheme, section, storage)
 	manager:add_action (operators["patrol"], action)
 	xr_logic.subscribe_action_for_events(object, storage, action)
 	
-	--modules.add_common_precondition(scheme,action)
-
+	
 	action = manager:action (xr_actions_id.alife)
 	action:add_precondition	(world_property(properties["end"],			true))
+	
+	action = manager:action (xr_actions_id.state_mgr + 1)
+	action:add_precondition	(world_property(properties["end"],			true))
+	
+	action = manager:action (xr_actions_id.state_mgr + 2)
+	action:add_precondition	(world_property(properties["end"],			true))
 
+	--[[
 	action = manager:action (stalker_ids.action_gather_items)
 	action:add_precondition	(world_property(properties["end"],			true))
 	
@@ -666,6 +679,7 @@ function add_to_binder(object, ini, scheme, section, storage)
 		action = manager:action(axr_turn_on_campfire.actid)
 		action:add_precondition(world_property(properties["end"],			true))
 	end
+	--]]
 
 	action = manager:action (stalker_ids.action_combat_planner)
 	action:add_precondition (world_property(properties["close_combat"],	true))
@@ -712,8 +726,8 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.post_enemy_wait = 5000 -- время, которое мы ждем врага, смотря в его последнюю позицию.
 	st.enemy_disp = 7/57.2957 -- Угол в пределах которого снайпер ведет поиск потерянного врага.
 
-	st.scandelta = 500
-	st.timedelta = 30000
+	st.scandelta = 10
+	st.timedelta = 60000
 	st.time_scan_delta = st.timedelta/st.scandelta
 
 	st.path_end 		= xr_logic.parse_condlist(npc, section, "path_end", 	utils.cfg_get_string(ini, section, "path_end", npc, false, "", "nil" ))

@@ -229,8 +229,19 @@ function action_npc_vs_heli:execute()
 	local see = be and npc:see(be) or not be and heli:isVisible(npc)
 	local ene_pos = be and see and be:position() or be and npc:memory_position(be) or enemy:position()
 
+	local heli_ene_id = db.storage[enemy:id()] and db.storage[enemy:id()].enemy_id
+	local heli_ene
+	if (heli_ene_id) then 
+		heli_ene = db.storage[heli_ene_id] and db.storage[heli_ene_id].object
+	end
+	
 	local bw = npc:active_item()
 	local can_fight = bw and IsWeapon(bw) and (npc:has_info("npcx_is_companion") or be ~= nil or character_community(npc) == "monolith" or (IsSniper(bw) or IsLauncher(bw) or IsRifle(bw))) or false
+	
+	if (be == nil and can_fight) then 
+		can_fight = heli_ene and character_community(npc) == character_community(heli_ene) or db.storage[npc:id()].heli_enemy_flag == true
+	end
+	
 	local tg = time_global()
 	if (self.st.vid) then
 		if (can_fight) and (self.st.__keep_body_state_until==nil or tg > self.st.__keep_body_state_until) then
@@ -366,6 +377,7 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)
+	--temp.action:add_precondition(world_property(xr_evaluators_id.state_mgr + 1,true))
 	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
 	
@@ -384,7 +396,14 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	local manager = npc:motivation_action_manager()
 	local action
-	local p = {xr_danger.actid, stalker_ids.action_combat_planner, stalker_ids.action_danger_planner, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
+	local p = {
+				xr_danger.actid, 
+				stalker_ids.action_combat_planner, 
+				stalker_ids.action_danger_planner, 
+				xr_actions_id.state_mgr + 1,
+				xr_actions_id.state_mgr + 2,
+				xr_actions_id.alife
+	}
 		
 	for i=1,#p do
 		action = manager:action(p[i])

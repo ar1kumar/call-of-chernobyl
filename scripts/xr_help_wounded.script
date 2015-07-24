@@ -216,6 +216,10 @@ function evaluator_wounded_exist:evaluate()
 	if (IsWounded(npc)) then
 		return false
 	end
+	
+	if (xr_danger.has_danger(npc)) then
+		return false
+	end
 
 	local vis = npc:get_visual_name()
 	if not (HelpInCombat or HelpInCombatVisuals[vis]) then
@@ -371,6 +375,8 @@ end
 function configure_actions(npc,ini,scheme,section,stype,temp)
 	local wp = world_property
 	
+	--temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
+	
 	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base, false))
 	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist, true))
 	
@@ -382,13 +388,13 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 		action = manager:action(stalker_ids.action_combat_planner)
 		action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
 
-		--action = manager:action(xr_actions_id.state_mgr + 1)
-		--action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
+		action = manager:action(xr_actions_id.state_mgr + 1)
+		action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
 	end
 
 	local p = {
-				xr_actions_id.alife,
-				xr_actions_id.state_mgr + 2
+				xr_actions_id.state_mgr + 2,
+				xr_actions_id.alife
 	}
 	for i=1,#p do
 		action = manager:action(p[i])

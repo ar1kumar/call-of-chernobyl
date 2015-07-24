@@ -5,6 +5,7 @@
 ----------------------------------------------------------------------------------------------
 -- Status Functors
 ----------------------------------------------------------------------------------------------
+-- checks smart from pstor variable
 function check_smart_under_faction_control(task,task_id)
 	local smart_id = alun_utils.load_var(db.actor,task_id.."_id")
 	if not (smart_id) then 
@@ -34,10 +35,15 @@ function check_smart_under_faction_control(task,task_id)
 	end
 	task.__check_smart_time = tg+3000
 	
+	alun_utils.save_var(db.actor,task_id.."_target_id",nil)
+	
 	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
 		for id,squad in pairs(SIMBOARD.squads) do
 			if (squad) and simulation_objects.is_on_the_same_level(squad, smart) then
-				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id or squad.position:distance_to_sqr(smart.position) <= 2500) then
+				if not (squad.first_update) then 
+					return -- not all squads are loaded yet!
+				end
+				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
 					for i=1,#faction_list do
 						if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
 							alun_utils.save_var(db.actor,task_id.."_target_id",squad.id)
@@ -65,7 +71,70 @@ function check_smart_under_faction_control(task,task_id)
 	return "complete"	
 end
 
+-- to check a specific smart given as a param 
+function specific_check_smart_under_faction_control(task,task_id)
+	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
+	local smart = p[1] and SIMBOARD.smarts_by_names[p[1]]
+	if not (smart) then 
+		return "fail"
+	end 
+	
+	local smrt = SIMBOARD.smarts[smart.id]
+	if not (smrt) then 
+		return "fail"
+	end 
+	
+	--in case sim_avail is set true during the player's task
+	if not(smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then 
+		return "fail"
+	end
+	
+	local tg = time_global()
+	if (task.__check_smart_time and tg < task.__check_smart_time) then 
+		return
+	end
+	task.__check_smart_time = tg+3000
+	
+	alun_utils.save_var(db.actor,task_id.."_target_id",nil)
+	
+	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
+		for id,squad in pairs(SIMBOARD.squads) do
+			if (squad) and simulation_objects.is_on_the_same_level(squad, smart) then
+				if not (squad.first_update) then 
+					return -- not all squads are loaded yet!
+				end
+				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
+					for i=2,#p do
+						if (p[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == p[i]) then
+							alun_utils.save_var(db.actor,task_id.."_target_id",squad.id)
+							squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+							--printf("task_id = %s squad_id = %s",task_id,squad.id)
+							return
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	if not (smart.is_on_actor_level) then 
+		return "fail"
+	end
+
+	--[[
+	local last_target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
+	if (last_target_id and axr_task_manager.actor_tagged_squad_by_id[last_target_id] ~= true) then
+		return "fail"
+	end
+	--]]
+	
+	return "complete"	
+end
+
 function check_smart_under_faction_control_staged(task,task_id)
+	if not (db.actor) then 
+		return 
+	end
 	if (task.stage == 1) then -- already completed
 		return 
 	end
@@ -74,6 +143,22 @@ function check_smart_under_faction_control_staged(task,task_id)
 		return "fail"
 	elseif (status == "complete" and task.stage == 0) then
 		task.stage = 1
+	end
+end
+
+function check_specific_smart_under_faction_control_staged(task,task_id)
+	if not (db.actor) then 
+		return 
+	end
+	if (task.stage == 1) then -- already completed
+		return 
+	end
+	local status = specific_check_smart_under_faction_control(task,task_id)
+	if (status == "fail") then 
+		return "fail"
+	elseif (status == "complete" and task.stage == 0) then
+		task.stage = 1
+		printf("set %s on complete stage",task_id)
 	end
 end
 
@@ -118,6 +203,23 @@ function hostage_task(task,task_id)
 	end
 end 
 
+function bounty_task(task,task_id)
+	if (task.stage == 1) then 
+		return 
+	end
+	if (task.stage == 2) then
+		return "fail"
+	end
+	local id = axr_task_manager.bounties_by_id[task_id]
+	if not (id) then 
+		return "fail"
+	end
+	local se_obj = id and alife():object(id)
+	if not (se_obj) then 
+		return "fail"
+	end
+end 
+
 
 function actor_has_fetch_item(task,task_id)
 	local id = task.task_giver_id
@@ -125,7 +227,7 @@ function actor_has_fetch_item(task,task_id)
 	if (se_obj) then 
 		if not (se_obj:clsid() == clsid.online_offline_group_s) then 
 			if not (se_obj:alive()) then 
-				return "fail" -- complete task even though giver is dead, you still rescued hostage
+				return "fail"
 			end
 		end 
 	else 

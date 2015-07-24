@@ -9,9 +9,7 @@
 
 combat_action_ids = {	[stalker_ids.action_combat_planner] = true,
 						[stalker_ids.action_danger_planner] = true,
-						[stalker_ids.action_anomaly_planner] = true,
-						--[xrs_kill_wounded.actid] = true
-						--[xr_danger.actid] = true
+						[stalker_ids.action_anomaly_planner] = true
 }
 
 no_idle_alife_ids = {	[xr_actions_id.stohe_meet_base + 1] = true
@@ -84,16 +82,14 @@ function evaluator_state_mgr_idle:evaluate()
 	end
 
 	local cid = self.st.mgr:current_action_id()
-
-	if (cid == xr_actions_id.wounded_exist or rx_ff and cid == rx_ff.actid_dont_shoot) then
-		return true
-	end
-
-	if (cid == xr_danger.actid) then
-		--self.st.combat = true
-		return true
-	end
-
+	
+	--[[
+	if (no_idle_combat_ids[cid] == true) then
+		self.st.combat = false
+		return false 
+	end 
+	--]]
+	
 	if (combat_action_ids[cid] ~= true) then
 		self.st.combat = false
 	end
@@ -120,10 +116,6 @@ function evaluator_state_mgr_idle_alife:__init(name, state_manager) super (nil, 
 	self.st = state_manager
 end
 function evaluator_state_mgr_idle_alife:evaluate()
-	if not self.object:alive() then
-		return true
-	end
-	
 	--callstack()
 
 	local mgr = self.object:motivation_action_manager()
@@ -132,12 +124,12 @@ function evaluator_state_mgr_idle_alife:evaluate()
 	end
 
 	local cid = mgr:current_action_id()
-	if (no_idle_alife_ids[cid] == true) then
-		return false
-	end
-
 	if (cid ~= xr_actions_id.alife) then
 		self.st.alife = false
+	end
+	
+	if (no_idle_alife_ids[cid] == true) then
+		return false
 	end
 
 	if (self.st.alife == true) then
@@ -258,11 +250,6 @@ function eva_state_mgr_locked:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_locked:evaluate()
-	local t = state_lib.states[self.st.target_state].weapon
-	if (t and t == "drop") then 
-		return false
-	end 
-	
 	if (state_mgr_weapon.weapon_locked(self.object)) then 
 		return true
 	end
@@ -556,7 +543,7 @@ function bind_manager(object)
 	manager:add_evaluator(xr_evaluators_id.state_mgr + 2, 		evaluator_state_mgr_idle_alife("state_mgr_idle_alife", state_manager))
 
 	manager:add_evaluator(xr_evaluators_id.state_mgr + 4, 		evaluator_state_mgr_logic_active("state_mgr_logic_active", state_manager))
-	manager:add_evaluator(xr_evaluators_id.state_mgr + 5, 		evaluator_state_mgr_idle_items("state_mgr_idle_items", state_manager))
+	--manager:add_evaluator(xr_evaluators_id.state_mgr + 5, 		evaluator_state_mgr_idle_items("state_mgr_idle_items", state_manager))
 
 	local wp = world_property
 
@@ -565,17 +552,18 @@ function bind_manager(object)
 	action:add_effect 			(wp(xr_evaluators_id.state_mgr + 1,	true))
 	manager:add_action(xr_actions_id.state_mgr + 1, action)
 
+	--[[
 	action = this.act_state_mgr_to_idle("state_mgr_to_idle_items", state_manager)
 	action:add_precondition		(wp(xr_evaluators_id.state_mgr + 5,	false))
 	action:add_precondition		(wp(stalker_ids.property_items, true))
 	action:add_precondition		(wp(stalker_ids.property_enemy, false))
 	action:add_effect 			(wp(xr_evaluators_id.state_mgr + 5,	true))
 	manager:add_action(xr_actions_id.state_mgr + 3, action)
+	--]]
 
 	action = this.act_state_mgr_to_idle("state_mgr_to_idle_alife", state_manager)
 	action:add_precondition		(wp(stalker_ids.property_enemy,	false))
 	action:add_precondition		(wp(stalker_ids.property_danger,false))
-
 	action:add_precondition		(wp(xr_evaluators_id.state_mgr + 4, false))
 	action:add_precondition		(wp(xr_evaluators_id.state_mgr + 2,	false))
 	action:add_effect 			(wp(xr_evaluators_id.state_mgr + 2,	true))

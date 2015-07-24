@@ -247,6 +247,7 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)
+	--temp.action:add_precondition(world_property(xr_evaluators_id.state_mgr + 1,true))
 	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
 
@@ -269,7 +270,12 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	local manager = npc:motivation_action_manager()
 	local action	
-	local p = {stalker_ids.action_combat_planner, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
+	local p = {
+				stalker_ids.action_combat_planner, 
+				xr_actions_id.state_mgr + 1,
+				xr_actions_id.state_mgr + 2,
+				xr_actions_id.alife
+	}
 
 	for i=1,#p do
 		action = manager:action(p[i])

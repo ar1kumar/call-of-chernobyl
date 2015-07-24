@@ -199,6 +199,15 @@ end
 --' INVULNERABILITY
 --'--------------------------------------------------------------------------------------------------------------------
 function is_need_invulnerability(npc)
+	local id = npc:id()
+	
+	-- remove invulnerability on bounties
+	for task_id,npc_id in pairs(axr_task_manager.bounties_by_id) do 
+		if (npc_id == id) then 
+			return false
+		end
+	end
+
 	local npc_st = db.storage[npc:id()]
 	local invulnerability = utils.cfg_get_string(npc_st.ini, npc_st.active_section, "invulnerable", npc, false, "", nil)
 

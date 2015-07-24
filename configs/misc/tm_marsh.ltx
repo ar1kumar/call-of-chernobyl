@@ -48,7 +48,7 @@ target_functor = general_under_faction_control
 status_functor = check_smart_under_faction_control_staged
 status_functor_params = monster
 on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_1_id:monster)%
-precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:7200:false:monster)} true, false
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
 repeat_timeout = 7200
 stage_complete = 1
 on_complete = %=reward_money(1000) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_1) =complete_task_inc_goodwill(5:csky) =pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
@@ -67,7 +67,7 @@ target_functor = general_under_faction_control
 status_functor = check_smart_under_faction_control_staged
 status_functor_params = bandit
 on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_2_id:bandit)%
-precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:7200:false:bandit)} true, false
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:bandit)} true, false
 stage_complete = 1
 on_complete = %=reward_money(1500) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_2) =complete_task_inc_goodwill(5:csky) =pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
 on_fail = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%

@@ -1197,11 +1197,11 @@ function save_obj(obj, packet)
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]
 
-	packet:w_stringZ(st.job_ini or "")
-	packet:w_stringZ(st.ini_filename or "")
-	packet:w_stringZ(st.section_logic or "")
-	packet:w_stringZ(st.active_section or "")
-	packet:w_stringZ(st.gulag_name or "")
+	alun_utils.w_stpk(packet,"stringZ",st.job_ini or "","save_logic")
+	alun_utils.w_stpk(packet,"stringZ",st.ini_filename or "","save_logic")
+	alun_utils.w_stpk(packet,"stringZ",st.section_logic or "","save_logic")
+	alun_utils.w_stpk(packet,"stringZ",st.active_section or "","save_logic")
+	alun_utils.w_stpk(packet,"stringZ",st.gulag_name or "","save_logic")	
 
 	local activation_time = db.storage[npc_id].activation_time or 0
 

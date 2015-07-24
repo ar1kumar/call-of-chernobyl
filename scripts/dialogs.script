@@ -351,7 +351,13 @@ end
 -- Dynamic Surrender dialog
 function victim_is_bounty(a,b)
 	local npc = who_is_npc(a, b)
-	return alun_utils.load_var(db.actor,"esc_m_trader_bounty_target_id",-1) == npc:id() or alun_utils.load_var(db.actor,"zat_b7_bandit_boss_sultan_bounty_target_id",-1) == npc:id() or false
+	local id = npc:id()
+	for task_id,npc_id in pairs(axr_task_manager.bounties_by_id) do 
+		if (id == npc_id) then 
+			return true
+		end
+	end 
+	return false
 end 
 
 function npc_is_surrendered(a,b)
@@ -392,13 +398,18 @@ end
 
 function surrender_victim_answers_bounty(a,b)
 	local npc = dialogs.who_is_npc(a,b)
+	local id = npc:id()
 	
-	local prefix = ""
-	if (alun_utils.load_var(db.actor,"esc_m_trader_bounty_target_id",-1) == npc:id()) then 
-		prefix = "esc_m_trader"
-	elseif (alun_utils.load_var(db.actor,"zat_b7_bandit_boss_sultan_bounty_target_id",-1) == npc:id()) then 
-		prefix = "zat_b7_bandit_boss_sultan"
-	end
+	local prefix = "default"
+	for task_id,npc_id in pairs(axr_task_manager.bounties_by_id) do 
+		if (npc_id == id) then
+			if (task_id == "esc_m_trader_task_1") then 
+				prefix = "esc_m_trader"
+			elseif (task_id == "zat_b7_bandit_boss_sultan_task_1") then
+				prefix = "zat_b7_bandit_boss_sultan"
+			end
+		end
+	end 
 	
 	local r = math.random(1,10)
 	if (r == 1 or r == 2) then

@@ -2,27 +2,32 @@
 -- task manager extender
 -- by Alundaio
 
-actor_tagged_squad_by_id = {}
+--actor_tagged_squad_by_id = {}
+bounties_by_id = {}
 -----------------------------------------------------------------------------
 --								PRIVATE
 -----------------------------------------------------------------------------
 local function npc_on_death_callback(npc,who)
-	local npc_id = npc:id()
-	local id = alun_utils.load_var(db.actor,"esc_m_trader_bounty_target_id")
-	if (id and npc_id == id) then
-		--printf("esc_m_trader_bounty_target_id=%s tagged_by_actor=%s",npc_id,db.storage[id] and db.storage[id].tagged_by_actor)
-		if (db.storage[npc_id] and db.storage[npc_id].tagged_by_actor == true) or (who and (who:id() == 0 or who:has_info("npcx_is_companion"))) then
-			task_manager.get_task_manager():set_task_completed("esc_m_trader_task_1")
+	local id = npc:id()
+	
+	for task_id,npc_id in pairs(bounties_by_id) do 
+		if (npc_id == id) then 
+			if (db.storage[id] and db.storage[id].tagged_by_actor == true) or (who and (who:id() == 0 or who:has_info("npcx_is_companion"))) then
+				local tm = task_manager.get_task_manager()
+				local task = tm.task_info[task_id]
+				if (task and task.stage == 0) then 
+					task.stage = 1
+				end
+			else 
+				local tm = task_manager.get_task_manager()
+				local task = tm.task_info[task_id]
+				if (task and task.stage == 0) then 
+					task.stage = 2
+				end			
+			end
+			return
 		end
-		alun_utils.save_var(db.actor,"esc_m_trader_bounty_target_id",nil)
-	end
-	id = alun_utils.load_var(db.actor,"zat_b7_bandit_boss_sultan_bounty_target_id")
-	if (id and npc_id == id) then
-		if (db.storage[npc_id] and db.storage[npc_id].tagged_by_actor == true) or (who and (who:id() == 0 or who:has_info("npcx_is_companion"))) then
-			task_manager.get_task_manager():set_task_completed("zat_b7_bandit_boss_sultan_task_1")
-		end
-		alun_utils.save_var(db.actor,"zat_b7_bandit_boss_sultan_bounty_target_id",nil)
-	end
+	end 
 end 
 
 local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
@@ -51,6 +56,16 @@ local function actor_on_leave_dialog()
 	empty_table(skipped_tasks)
 end 
 
+local function save_state(m_data)
+	m_data.bounties_by_id = bounties_by_id
+end 
+
+local function load_state(m_data)
+	if (m_data.bounties_by_id) then 
+		bounties_by_id = m_data.bounties_by_id
+		m_data.bounties_by_id = nil
+	end
+end
 -----------------------------------------------------------------------------
 --								ON GAME START
 -----------------------------------------------------------------------------
@@ -59,8 +74,10 @@ function on_game_start()
 	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
 	RegisterScriptCallback("monster_on_death_callback",npc_on_death_callback)
 	RegisterScriptCallback("monster_on_hit_callback",npc_on_hit_callback)
-	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
+	--RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 	RegisterScriptCallback("actor_on_leave_dialog",actor_on_leave_dialog)
+	RegisterScriptCallback("save_state",save_state)
+	RegisterScriptCallback("load_state",load_state)
 end
 
 ------------------------------------------------------------------------------

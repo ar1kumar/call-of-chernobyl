@@ -319,6 +319,7 @@ function motivator_binder:death_callback(victim, who)
 	end
 
 	if (self.st.state_mgr) then
+		victim:clear_animations()
 		self.st.state_mgr.animation:set_state(nil, true)
 		self.st.state_mgr = nil
 	end
@@ -489,7 +490,6 @@ function motivator_binder:save(packet)
 	trade_manager.save(self.object, packet)
 
 	xr_sound.save_npc(packet, self.object:id())
-	dialog_manager.save_npc(packet, self.object:id())
 
 	set_save_marker(packet, "save", true, "motivator_binder")
 	--alun_utils.debug_write("\nmotivator save end------ "..self.object:name(),true)
@@ -506,7 +506,6 @@ function motivator_binder:load(reader)
 	trade_manager.load(self.object, reader)
 
 	xr_sound.load_npc(reader, self.object:id())
-	dialog_manager.load_npc(reader, self.object:id())
 	
 	set_save_marker(reader, "load", true, "motivator_binder")
 	--alun_utils.debug_write("\nmotivator load END "..self.object:name())

@@ -119,7 +119,7 @@ function dec_task_stage(actor,npc,p)
 	end
 end
 
---param 1 var to store bounty id
+--param 1 task_id
 --param 2+ factions that can be targetted; can be list
 function on_init_bounty_hunt(actor,npc,p)
 	local valid_targets = {}
@@ -135,7 +135,7 @@ function on_init_bounty_hunt(actor,npc,p)
 	for i=1,65534 do 
 		se_obj = sim:object(i)
 		-- find random sim stalker
-		if (se_obj and IsStalker(se_obj) and se_obj:alive() and sfind(se_obj:section_name(),"sim_default") and get_object_story_id(i) == nil) and (se_obj.group_id == nil or se_obj.group_id == 65535 or get_object_story_id(se_obj.group_id) == nil) then
+		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and sfind(se_obj:section_name(),"sim_default") and get_object_story_id(i) == nil) and (se_obj.group_id == nil or se_obj.group_id == 65535 or get_object_story_id(se_obj.group_id) == nil) then
 			comm = alife_character_community(se_obj)
 			if (faction_lookup[comm] == true) then 
 				table.insert(valid_targets,i)
@@ -152,7 +152,10 @@ function on_init_bounty_hunt(actor,npc,p)
 	if not(target_id) then 
 		return 
 	end
-	alun_utils.save_var(db.actor,p[1],target_id)
+	
+	axr_task_manager.bounties_by_id[p[1]] = target_id
+	
+	--alun_utils.save_var(db.actor,p[1],target_id)
 end 
 
 function fail_task_dec_goodwill(actor,npc,p)
@@ -1128,7 +1131,7 @@ function hit_npc(actor, npc, p)
 	h:bone(p[3])
 	h.power = p[4]
 	h.impulse = p[5]
-	printf("HIT EFFECT: (%s, %s,%d,%d) health(%s)", npc:name(), p[2], h.power, h.impulse, npc.health)
+	--printf("HIT EFFECT: (%s, %s,%d,%d) health(%s)", npc:name(), p[2], h.power, h.impulse, npc.health)
 	npc:hit(h)
 end
 
