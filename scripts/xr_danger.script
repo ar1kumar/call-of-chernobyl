@@ -831,18 +831,15 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	local manager = npc:motivation_action_manager()
 
 	manager:remove_evaluator(stalker_ids.property_danger)
-	manager:add_evaluator(stalker_ids.property_danger, this.evaluator_danger("danger", storage, npc))
-	--manager:add_evaluator(evaid,evaluator_check_danger("script_danger",storage,npc))
+	manager:add_evaluator(stalker_ids.property_danger,evaluator_danger("danger", storage, npc))
+	manager:add_evaluator(evaid,evaluator_check_danger("script_danger",storage,npc))
 	
 	local danger_action = manager:action(stalker_ids.action_danger_planner)		
 	local danger_action_planner = cast_planner(danger_action)
 
 	danger_action_planner:remove_evaluator(stalker_ids.property_danger)
-	danger_action_planner:add_evaluator(stalker_ids.property_danger, this.evaluator_danger("danger", storage, npc))
+	danger_action_planner:add_evaluator(stalker_ids.property_danger,evaluator_danger("danger", storage, npc))
 	
-	temp.needs_configured = false
-	--[[
-
 	local wp = world_property
 
 	danger_action:add_precondition( wp(evaid, false) )
@@ -855,7 +852,6 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	--temp.action:add_effect( wp(stalker_ids.property_danger, false) )
 	
 	manager:add_action(actid,temp.action)
-	--]]
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)

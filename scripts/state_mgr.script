@@ -545,7 +545,7 @@ function bind_manager(object)
 	manager:add_evaluator(xr_evaluators_id.state_mgr + 2, 		evaluator_state_mgr_idle_alife("state_mgr_idle_alife", state_manager))
 
 	manager:add_evaluator(xr_evaluators_id.state_mgr + 4, 		evaluator_state_mgr_logic_active("state_mgr_logic_active", state_manager))
-	--manager:add_evaluator(xr_evaluators_id.state_mgr + 5, 		evaluator_state_mgr_idle_items("state_mgr_idle_items", state_manager))
+	manager:add_evaluator(xr_evaluators_id.state_mgr + 5, 		evaluator_state_mgr_idle_items("state_mgr_idle_items", state_manager))
 
 	local wp = world_property
 
@@ -554,14 +554,12 @@ function bind_manager(object)
 	action:add_effect 			(wp(xr_evaluators_id.state_mgr + 1,	true))
 	manager:add_action(xr_actions_id.state_mgr + 1, action)
 
-	--[[
 	action = this.act_state_mgr_to_idle("state_mgr_to_idle_items", state_manager)
 	action:add_precondition		(wp(xr_evaluators_id.state_mgr + 5,	false))
 	action:add_precondition		(wp(stalker_ids.property_items, true))
 	action:add_precondition		(wp(stalker_ids.property_enemy, false))
 	action:add_effect 			(wp(xr_evaluators_id.state_mgr + 5,	true))
 	manager:add_action(xr_actions_id.state_mgr + 3, action)
-	--]]
 
 	action = this.act_state_mgr_to_idle("state_mgr_to_idle_alife", state_manager)
 	action:add_precondition		(wp(stalker_ids.property_enemy,	false))
