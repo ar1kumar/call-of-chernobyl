@@ -171,10 +171,12 @@ function eva_kill_wounded:evaluate()
 		return false 
 	end
 	
+	--[[
 	local st = db.storage[npc:id()]
 	if (st) and (st.rx_dont_shoot) then -- or st.help_wounded and st.help_wounded.selected_id ~= nil) then
 		return false 
 	end
+	--]]
 	
 	return self:find_target()
 end
@@ -229,6 +231,11 @@ function act_kill_wounded:execute()
 		self:reset()
 	end
 	
+	local dst = db.storage[npc:id()]
+	if (dst and dst.rx_dont_shoot) then 
+		st.vertex_id = npc:level_vertex_id()
+	end
+	
 	if not (st.vertex_id) then
 		local vid = get_rand_vertex(npc,vo)
 		if (validate(npc,vid) and level.vertex_position(vid):distance_to_sqr(vo:position()) >= MinDistance) then
@@ -251,7 +258,7 @@ function act_kill_wounded:execute()
 	end
 	
 	if (st.vertex_id) then
-		if (npc:level_vertex_id() == st.vertex_id) then
+		if (npc:level_vertex_id() == st.vertex_id or dist <= MinDistance+1) then
 			state_mgr.set_state(npc,"threat",nil,nil,{look_dir = dir})
 			if (db.used_level_vertex_ids[st.vertex_id]) then
 				db.used_level_vertex_ids[st.vertex_id] = nil
@@ -354,15 +361,18 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist,false))
 
+	--[[
 	if (_G.schemes["rx_ff"]) then
 		temp.action:add_precondition(wp(rx_ff.evid_dont_shoot,false))
 	end
+	--]]
 	
 	local manager = npc:motivation_action_manager()
 	local action
 	
 	local p = {
 				--xr_danger.actid,
+				xr_actions_id.stohe_camper_base + 1,
 				stalker_ids.action_combat_planner,
 			--	stalker_ids.action_danger_planner,
 				xr_actions_id.stohe_meet_base+1,
