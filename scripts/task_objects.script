@@ -171,7 +171,7 @@ function CGeneralTask:give_task()
 end
 --' ѕроверка текущего выполнени€ квеста
 function CGeneralTask:check_task(tm)
-	if (device().precache_frame > 1) then 
+	if (db.actor == nil or device().precache_frame > 1) then 
 		return
 	end
 	local global_time = time_global()

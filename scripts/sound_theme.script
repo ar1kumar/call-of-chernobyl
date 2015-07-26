@@ -328,10 +328,11 @@ function npc_sound:save(thread)
 		return
 	end
 --	set_save_marker(thread, "save", false, "npc_sound")
-		thread:w_stringZ(tostring(self.played_id))
+
+	alun_utils.w_stpk(thread,"stringZ",tostring(self.played_id),"npc_sound:save")
 
 	if self.group_snd then
-		thread:w_bool(self.can_play_group_sound)
+		alun_utils.w_stpk(thread,"bool",self.can_play_group_sound,"npc_sound:save")
 	end
 	--alun_utils.debug_write("npc_sound:save AFTER 2")
 --	set_save_marker(thread, "save", true, "npc_sound")
@@ -486,8 +487,8 @@ function actor_sound:play(npc, faction, point, msg)
 	self.snd_obj.volume = 0.8
 	self.snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
 	self.snd_obj.volume = 0.8
-	local snd_st, num_copy = string.gsub(snd, "\\", "_")
 --[[
+	local snd_st, num_copy = string.gsub(snd, "\\", "_")
 	if game.translate_string(snd_st) ~= snd_st then
 		local hud_demo = get_hud()
 		--printf("uraaaa!!!")
@@ -562,7 +563,7 @@ function actor_sound:stop()
 end
 function actor_sound:save(thread)
 --	set_save_marker(thread, "save", false, "actor_sound")
-		thread:w_stringZ(tostring(self.played_id))
+	alun_utils.w_stpk(thread,"stringZ",tostring(self.played_id),"actor_sound:save")
 --	set_save_marker(thread, "save", true, "actor_sound")
 end
 function actor_sound:load(thread)
@@ -747,7 +748,7 @@ function object_sound:stop()
 end
 function object_sound:save(thread)
 --	set_save_marker(thread, "save", false, "object_sound")
-		thread:w_stringZ(tostring(self.played_id))
+	alun_utils.w_stpk(thread,"stringZ",tostring(self.played_id),"object_sound:save")
 --    set_save_marker(thread, "save", true, "object_sound")
 end
 function object_sound:load(thread)

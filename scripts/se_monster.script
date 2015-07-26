@@ -115,6 +115,7 @@ function se_monster:on_death(killer)
 			--printf("sim_board squads")
 			--print_table(SIMBOARD.squads)
 			printf("There is no squad with ID [%s]", self.group_id)
+			return
 		end
 		squad:on_npc_death(self,killer)
 	end

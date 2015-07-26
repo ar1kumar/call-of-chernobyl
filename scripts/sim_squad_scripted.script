@@ -461,6 +461,7 @@ function sim_squad_scripted:assign_squad_member_to_smart(member_id, smart, old_s
 	local obj = sim:object(member_id)
 	if obj ~= nil then
 		--printf("    npc [%s] smart [%s]", obj:name(), tostring(obj.m_smart_terrain_id))
+		--alun_utils.debug_write(strformat("sim_squad_scripted:assign_squad_member_to_smart npc=%s smart=%s",obj and obj:name(),smart and smart:name()))
 		if obj.m_smart_terrain_id == self.smart_id then
 			return
 		end

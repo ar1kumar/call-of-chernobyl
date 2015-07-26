@@ -222,6 +222,9 @@ end
 
 
 function actor_has_fetch_item(task,task_id)
+	if not (db.actor) then 
+		return 
+	end
 	local id = task.task_giver_id
 	local se_obj = id and alife():object(id)
 	if (se_obj) then 

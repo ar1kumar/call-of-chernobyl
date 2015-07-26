@@ -237,6 +237,7 @@ function actor_in_silence_zone()
 end
 
 function start_theme()
+	--alun_utils.debug_write("xrs_dyn_music:start_theme start")
 	m_ambient_vol = 0
 	get_console():execute("snd_volume_music "..m_ambient_vol)
 
@@ -250,6 +251,7 @@ function start_theme()
 	theme:initialize(themes[cur_theme_number][cur_track_number], m_theme_volume)
 	next_track_start_time = theme:play() - TRACK_SWITCH_DELTA
 	theme:update(m_theme_volume)
+	--alun_utils.debug_write("xrs_dyn_music:start_theme end")
 end
 
 function clamp(val, min, max)

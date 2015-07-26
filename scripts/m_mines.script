@@ -13,8 +13,6 @@ local BLOW_RADIUS = 2.5
 local PRIMER_FACTOR = 5					-- Time to activate in human seconds
 local HOSTILE_TIME_FACTOR = 360			-- Amount of seconds before NPC forgets actor placed mine
 
-
-local game_time_factor
 local neutral_placed_mines = {}
 local actor_placed_mines = {}
 
@@ -26,19 +24,11 @@ local m_mine_table = 	{
 
 
 function add_actor_mine(m)
-	if not (game_time_factor) then
-		game_time_factor = level.get_time_factor()
-	end
-
 	table.insert(actor_placed_mines, m:id())
 	m_mine_table.recently_placed = m:id()
 end
 
 function add_neutral_mine(m)
-	if not (game_time_factor) then
-		game_time_factor = level.get_time_factor()
-	end
-
 	table.insert(neutral_placed_mines, m:id())
 end
 
@@ -66,7 +56,7 @@ local function evaluate_actor_mines(npc,st)
 	end
 
 	-- Mine is m_mine_table.priming; give actor time to move away
-	if (m_mine_table.priming[mid] and game.get_game_time():diffSec(m_mine_table.priming[mid]) < game_time_factor*PRIMER_FACTOR) then
+	if (m_mine_table.priming[mid] and game.get_game_time():diffSec(m_mine_table.priming[mid]) < level.get_time_factor()*PRIMER_FACTOR) then
 		st.__index_mine = st.__index_mine + 1
 		return
 	end
@@ -144,7 +134,7 @@ local function npc_on_update(npc,st)
 	local tg = time_global()
 
 	if (m_mine_table.turn_hostile[id]) then
-		if (game.get_game_time():diffSec(m_mine_table.turn_hostile[id]) > HOSTILE_TIME_FACTOR*game_time_factor) then
+		if (game.get_game_time():diffSec(m_mine_table.turn_hostile[id]) > HOSTILE_TIME_FACTOR*level.get_time_factor()) then
 			m_mine_table.turn_hostile[id] = nil
 		end
 	elseif (m_mine_table.recently_placed and npc:see(db.actor)) then
@@ -162,10 +152,11 @@ local function actor_on_update()
 	evaluate_actor_mines(db.actor,db.storage[0])
 	evaluate_neutral_mines(db.actor,db.storage[0])
 
+	local gtf = level.get_time_factor()
 	if (m_mine_table.recently_placed and m_mine_table.priming[m_mine_table.recently_placed]) then
 		local seconds = game.get_game_time():diffSec(m_mine_table.priming[m_mine_table.recently_placed])
-		if (seconds < game_time_factor*PRIMER_FACTOR) then
-			SetHudMsg(math.floor((game_time_factor*PRIMER_FACTOR-seconds)/game_time_factor),1)
+		if (seconds < gtf*PRIMER_FACTOR) then
+			SetHudMsg(math.floor((gtf*PRIMER_FACTOR-seconds)/gtf),1)
 		else
 			m_mine_table.priming[m_mine_table.recently_placed] = nil
 			m_mine_table.recently_placed = false

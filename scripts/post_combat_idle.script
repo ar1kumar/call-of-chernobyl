@@ -73,7 +73,7 @@ function action_post_combat_wait:__init(npc, storage, action_name) super(nil, ac
 end
 function action_post_combat_wait:initialize()
 	action_base.initialize(self)
-
+	--alun_utils.debug_write("action_post_combat_wait:init")
 	local bw = self.object:best_weapon()
 	if (bw and IsWeapon(bw)) then
 		self.object:set_item(object.idle, bw)

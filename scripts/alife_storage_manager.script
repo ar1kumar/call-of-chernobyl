@@ -41,7 +41,20 @@ function on_game_start()
 end
 
 -- called from engine!
+function CALifeStorageManager_before_save(fname)
+	if not (device():is_paused()) then -- possible threads can still be running if not paused
+		device():pause(true)
+		force_pause = true
+	end
+end 
+
+-- called from engine!
 function CALifeStorageManager_save(fname)
+	if (force_pause) then 
+		device():pause(false)
+		force_pause = nil
+	end
+
 	if not (USE_MARSHAL) then 
 		return 
 	end 

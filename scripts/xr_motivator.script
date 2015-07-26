@@ -234,7 +234,7 @@ function motivator_binder:net_destroy()
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
-	--alun_utils.debug_write(alun_utils.sr("motivator_binder:hit_callback %s",obj and obj:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:hit_callback %s",obj and obj:name()))
 	if (amount <= 0) then
 		return
 	end
@@ -282,7 +282,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 end
 
 function motivator_binder:death_callback(victim, who)
-	--alun_utils.debug_write(alun_utils.sr("motivator_binder:death_callback %s",victim and victim:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:death_callback %s",victim and victim:name()))
 	if (self.object == nil and victim == nil) then
 		callstack()
 		abort(strformat("CRITICAL ERROR: motivator_binder:death_callback : Game Object is nil and binder is not! %s",self.name),2)
@@ -361,7 +361,7 @@ function motivator_binder:death_callback(victim, who)
 end
 
 function motivator_binder:use_callback(obj, who)
-	--alun_utils.debug_write(alun_utils.sr("motivator_binder:use_callback %s",obj and obj:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:use_callback %s",obj and obj:name()))
 	if not obj:alive() then
 		return
 	end
@@ -512,7 +512,7 @@ function motivator_binder:load(reader)
 end
 
 function motivator_binder:hear_callback(npc, who_id, sound_type, sound_position, sound_power)
-	--alun_utils.debug_write(alun_utils.sr("motivator_binder:hear_callback %s",npc and npc:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:hear_callback %s",npc and npc:name()))
 	if not (npc:alive()) then
 		return
 	end

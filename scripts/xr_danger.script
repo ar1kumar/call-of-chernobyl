@@ -738,7 +738,6 @@ function evaluator_check_danger:__init(name, storage) super (nil, name)
 end
 function evaluator_check_danger:evaluate()
 	--alun_utils.debug_write("eva_check_danger")
-	
 	if (self.a.disable) then
 		return false
 	end
@@ -759,17 +758,13 @@ function evaluator_check_danger:evaluate()
 		return false
 	end
 
-	local id = self.object:id()
-	if (check_script_danger(id)) then
-		return true 
-	end
-
 	local bd = self.object:best_danger()
 	if not (bd) then
 		return false
 	end
 	
-	if (script_danger[id]) then 
+	local id = self.object:id()
+	if (check_script_danger(id)) then
 		return true 
 	end
 
@@ -781,7 +776,6 @@ function evaluator_check_danger:evaluate()
 	if not (db.storage[id].danger_flag) then 
 		return false 
 	end
-
 	return true
 end
 class "position_node"
@@ -837,14 +831,17 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	local manager = npc:motivation_action_manager()
 
 	manager:remove_evaluator(stalker_ids.property_danger)
-	manager:add_evaluator(stalker_ids.property_danger,evaluator_danger("danger", storage, npc))
-	manager:add_evaluator(evaid,evaluator_check_danger("script_danger",storage,npc))
-
-	local danger_action = manager:action(stalker_ids.action_danger_planner)
-	local danger_action_planner = cast_planner(danger_action)
+	manager:add_evaluator(stalker_ids.property_danger, this.evaluator_danger("danger", storage, npc))
+	--manager:add_evaluator(evaid,evaluator_check_danger("script_danger",storage,npc))
 	
+	local danger_action = manager:action(stalker_ids.action_danger_planner)		
+	local danger_action_planner = cast_planner(danger_action)
+
 	danger_action_planner:remove_evaluator(stalker_ids.property_danger)
-	danger_action_planner:add_evaluator(stalker_ids.property_danger,evaluator_danger("danger", storage, npc))
+	danger_action_planner:add_evaluator(stalker_ids.property_danger, this.evaluator_danger("danger", storage, npc))
+	
+	temp.needs_configured = false
+	--[[
 
 	local wp = world_property
 
@@ -858,6 +855,7 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	--temp.action:add_effect( wp(stalker_ids.property_danger, false) )
 	
 	manager:add_action(actid,temp.action)
+	--]]
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)
@@ -871,6 +869,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local action
 	local p = {
 				xr_actions_id.alife,
+				xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2
 	}
 	

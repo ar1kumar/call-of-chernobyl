@@ -82,14 +82,6 @@ function evaluator_state_mgr_idle:evaluate()
 	end
 
 	local cid = self.st.mgr:current_action_id()
-	
-	--[[
-	if (no_idle_combat_ids[cid] == true) then
-		self.st.combat = false
-		return false 
-	end 
-	--]]
-	
 	if (combat_action_ids[cid] ~= true) then
 		self.st.combat = false
 	end
@@ -222,7 +214,7 @@ function eva_state_mgr_end:__init(name, st) super (nil, name)
 end
 
 function eva_state_mgr_end:evaluate()
-	----alun_utils.debug_write("",true)
+	------alun_utils.debug_write("",true)
 	if not (self.object) then 
 		callstack()
 		return false

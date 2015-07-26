@@ -127,6 +127,8 @@ end
 --' скоростью.
 function move_mgr:reset(path_walk, path_walk_info, path_look, path_look_info, team, suggested_state, move_cb_info, no_validation, continue, use_default_sound)
 	--printf("move_mgr:reset() [%s]", self.object:name())
+	
+	--alun_utils.debug_write("move_mgr:reset")
 
 	if not (path_walk_info) then 
 		printf("ERROR: no path_walk_info  npc=%s path_walk=%s",npc and npc:name(),path_walk)
@@ -277,6 +279,8 @@ function move_mgr:continue()
 end
 
 function move_mgr:setup_movement_by_patrol_path()
+	--alun_utils.debug_write("move_mgr:setup_movement_by_patrol_path")
+	
 	if (self.__disable) then
 		return
 	end

@@ -212,6 +212,7 @@ function generic_object_binder:death_callback(victim, who)
 end
 
 function generic_object_binder:hit_callback(obj, amount, local_direction, who, bone_index)
+	--alun_utils.debug_write(strformat("generic_object_binder %s",obj and obj:name()))
 	if (amount <= 0) then
 		return
 	end

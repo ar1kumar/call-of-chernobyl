@@ -116,7 +116,7 @@ end
 
 function is_enemy(obj,enemy,no_memory)
 	--alun_utils.debug_write("eval_is_enemy")
-	if(enemy:id() == 0 and device().precache_frame > 1) then
+	if(device().precache_frame > 1) then
 		return false -- fix actor dying before game loads from enemies. Also fixes strange crash on game load when in combat sometimes.
 	end
 	

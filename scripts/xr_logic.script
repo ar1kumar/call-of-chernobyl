@@ -313,6 +313,7 @@ function check_action(npc, st, event_fn, p)
 end
 
 function pick_section_from_condlist(actor, npc, condlist, p)
+	--alun_utils.debug_write("pick_section_from_condlist start")
 	actor = actor or db.actor
 
 	local rval = nil -- math.random(100)
@@ -445,13 +446,16 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 				end
 			end
 			if cond.section == "never" then
+				--alun_utils.debug_write("pick_section_from_condlist end 1")
 				return nil
 			else
+				--alun_utils.debug_write("pick_section_from_condlist end 2")
 				return cond.section
 			end
 		end
 	end
 
+	--alun_utils.debug_write("pick_section_from_condlist end 3")
 	--printf("_bp: pick_section_from_condlist: nil")
 	return nil
 end
@@ -1221,7 +1225,7 @@ function load_obj(obj, reader)
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]
 	if not (st) then 
-		error(alun_utils.sr("load_obj st is nil for %s",obj and obj:id()))
+		error(strformat("load_obj st is nil for %s",obj and obj:id()))
 	end 
 	
 	local job_ini = reader:r_stringZ()
