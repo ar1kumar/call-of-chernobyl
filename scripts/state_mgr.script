@@ -82,6 +82,16 @@ function evaluator_state_mgr_idle:evaluate()
 	end
 
 	local cid = self.st.mgr:current_action_id()
+
+	if (cid == xr_actions_id.wounded_exist or rx_ff and cid == rx_ff.actid_dont_shoot) then
+		return true
+	end
+
+	if (cid == xr_danger.actid) then
+		--self.st.combat = true
+		return true
+	end
+
 	if (combat_action_ids[cid] ~= true) then
 		self.st.combat = false
 	end
@@ -214,7 +224,7 @@ function eva_state_mgr_end:__init(name, st) super (nil, name)
 end
 
 function eva_state_mgr_end:evaluate()
-	------alun_utils.debug_write("",true)
+
 	if not (self.object) then 
 		callstack()
 		return false
