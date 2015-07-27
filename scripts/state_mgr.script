@@ -75,23 +75,16 @@ function evaluator_state_mgr_idle:__init(name, state_manager) super (nil, name)
 	self.st = state_manager
 end
 function evaluator_state_mgr_idle:evaluate()
-
+	--alun_utils.debug_write("eva_state_mgr_idle")
+	if not self.object:alive() then
+		return true
+	end
 	self.st.mgr = self.st.mgr or self.object:motivation_action_manager()
 	if not (self.st.mgr and self.st.mgr:initialized()) then
 		return false
 	end
 
 	local cid = self.st.mgr:current_action_id()
-
-	if (cid == xr_actions_id.wounded_exist or rx_ff and cid == rx_ff.actid_dont_shoot) then
-		return true
-	end
-
-	if (cid == xr_danger.actid) then
-		--self.st.combat = true
-		return true
-	end
-
 	if (combat_action_ids[cid] ~= true) then
 		self.st.combat = false
 	end
@@ -118,8 +111,11 @@ function evaluator_state_mgr_idle_alife:__init(name, state_manager) super (nil, 
 	self.st = state_manager
 end
 function evaluator_state_mgr_idle_alife:evaluate()
-	--callstack()
-
+	--alun_utils.debug_write("eva_state_mgr_idle_alife")
+	if not self.object:alive() then
+		return true
+	end
+	
 	local mgr = self.object:motivation_action_manager()
 	if not (mgr and mgr:initialized()) then
 		return false
@@ -224,7 +220,7 @@ function eva_state_mgr_end:__init(name, st) super (nil, name)
 end
 
 function eva_state_mgr_end:evaluate()
-
+	--alun_utils.debug_write("eva_state_mgr_end")
 	if not (self.object) then 
 		callstack()
 		return false
@@ -252,6 +248,7 @@ function eva_state_mgr_locked:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_locked:evaluate()
+	--alun_utils.debug_write("eva_state_mgr_locked")
 	if (state_mgr_weapon.weapon_locked(self.object)) then 
 		return true
 	end

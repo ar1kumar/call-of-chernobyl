@@ -6,6 +6,7 @@ function eva_state_mgr_weapon:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_weapon:evaluate()
+	--alun_utils.debug_write("eva_state_mgr_weapon")
 	local weapon = state_lib.states[self.st.target_state].weapon
 	if not (weapon) then
 		return true
@@ -49,6 +50,7 @@ function eva_state_mgr_weapon_locked:__init(name, st) super (nil, name)
 end
 
 function weapon_locked(npc)
+	--alun_utils.debug_write("weapon_locked")
 	local bw = npc:best_weapon()
 	if not (bw) then
 		return false
