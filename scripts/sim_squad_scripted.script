@@ -431,7 +431,7 @@ function sim_squad_scripted:remove_squad()
 		end
 	end
 	self:hide()
-	sim:release(self,true) -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine instead?
+	--sim:release(self,true) -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine instead?
 end
 
 function sim_squad_scripted:remove_npc(npc_id)
@@ -459,7 +459,7 @@ function sim_squad_scripted:on_npc_death(npc,killer)
 		end
 		SIMBOARD:assign_squad_to_smart(self, nil)
 		self:hide()
-		alife():release(self,true)  -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine or perhaps reused instead?
+		--alife():release(self,true)  -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine or perhaps reused instead?
 		return
 	end
 	self:refresh()

@@ -353,10 +353,6 @@ function evaluator_corpse:evaluate()
 		return false 
 	end 
 	
-	if (xr_gather_items.is_under_gather_items(self.object) == true) then
-		return false
-	end
-
 	if (xr_danger.has_danger(self.object)) then
 		return false
 	end
@@ -366,7 +362,7 @@ function evaluator_corpse:evaluate()
 	end
 
 	local npc = self.object
-	if (npc:alive() ~= true or IsWounded(npc) or npc:best_enemy())then
+	if (IsWounded(npc) or npc:best_enemy())then
 		return false
 	end
 
@@ -528,9 +524,9 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1,false))
 	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action:add_precondition(wp(xr_evaluators_id.abuse_base, false))
-	temp.action:add_precondition(wp(axr_fight_from_cover.evaid, false))
-	temp.action:add_precondition(wp(axr_stalker_panic.evaid, false))
-	temp.action:add_precondition(wp(axr_npc_vs_heli.evaid, false))
+	--temp.action:add_precondition(wp(axr_fight_from_cover.evaid, false))
+	--temp.action:add_precondition(wp(axr_stalker_panic.evaid, false))
+	--temp.action:add_precondition(wp(axr_npc_vs_heli.evaid, false))
 	--temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,false))
 
 	local manager = npc:motivation_action_manager()

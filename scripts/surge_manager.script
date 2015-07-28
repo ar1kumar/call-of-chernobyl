@@ -1560,9 +1560,9 @@ function actor_on_load(binder,packet)
 	mgr.finished = packet:r_bool()
 	mgr.started = packet:r_bool()
 	printf("started = %s",mgr.started)
-	mgr.last_surge_time = utils.r_CTime(packet,"surge_manager")
+	mgr.last_surge_time = utils.r_CTime(packet,"surge_manager") or game.get_game_time()
 	if(mgr.started) then
-		mgr.inited_time = utils.r_CTime(packet,"surge_manager")
+		mgr.inited_time = utils.r_CTime(packet,"surge_manager") or game.get_game_time()
 
 		--[[
 		for level,value in pairs(mgr.levels_respawn) do

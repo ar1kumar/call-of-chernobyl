@@ -828,7 +828,9 @@ function add_to_binder(npc, ini, scheme, section, storage)
 	action:add_precondition( wp(stalker_ids.property_danger,false) )
 	action:add_precondition( wp(stalker_ids.property_anomaly,false) )
 
-	action:add_precondition( wp(xr_evaluators_id.corpse_exist, false) )
+	if (_G.schemes["corpse_detection"]) then
+		action:add_precondition( wp(xr_evaluators_id.corpse_exist, false) )
+	end
 	action:add_precondition( wp(xr_gather_items.evaid, false) )
 	action:add_precondition( wp(stalker_ids.property_items, false) )
 	action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )

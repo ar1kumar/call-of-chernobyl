@@ -738,8 +738,13 @@ function evaluator_check_danger:__init(name, storage) super (nil, name)
 end
 function evaluator_check_danger:evaluate()
 	--alun_utils.debug_write("eva_check_danger")
+	
 	if (self.a.disable) then
 		return false
+	end
+	
+	if not (IsStalker(self.object)) then 
+		return false 
 	end
 
 	if not (self.object:alive()) then 
@@ -764,18 +769,23 @@ function evaluator_check_danger:evaluate()
 	end
 	
 	local id = self.object:id()
+	if not (db.storage[id].danger_flag) then 
+		return false 
+	end
+	
 	if (check_script_danger(id)) then
 		return true 
 	end
 
 	local bd_type = bd:type()
-	if not (bd_type == danger_object.attacked or (bd_type == danger_object.entity_corpse and not self.object:has_info("npcx_is_companion")) or bd_type == danger_object.grenade) then
+	if (self.object:has_info("npcx_is_companion") and bd_type == danger_object.entity_corpse) then 
+		return false
+	end 
+	
+	if not (bd_type == danger_object.attacked or bd_type == danger_object.entity_corpse or bd_type == danger_object.grenade) then
 		return false
 	end
 	
-	if not (db.storage[id].danger_flag) then 
-		return false 
-	end
 	return true
 end
 class "position_node"
@@ -847,7 +857,7 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	temp.action = action_danger("danger", storage)
 	
 	temp.action:add_precondition( wp(evaid, true) )
-	--temp.action:add_precondition( wp(stalker_ids.property_danger, false) )
+	temp.action:add_precondition( wp(stalker_ids.property_danger, true) )
 	temp.action:add_effect( wp(evaid,false) )
 	--temp.action:add_effect( wp(stalker_ids.property_danger, false) )
 	
@@ -865,7 +875,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local action
 	local p = {
 				xr_actions_id.alife,
-				xr_actions_id.state_mgr + 1,
+				--xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2
 	}
 	

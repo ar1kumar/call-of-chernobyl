@@ -687,9 +687,11 @@ end
 
 local debug_file
 function debug_write(output,trace)
+	--[[
 	if (trace and debug and type(debug.traceback) == 'function') then
 		output = output .. debug.traceback('\n', 2)
 	end
+	--]]
 
 	if (log) then 
 		log(output)
@@ -908,11 +910,11 @@ function in_los(npc,friend,be)
 	local friend_pos = alun_utils.safe_bone_pos(friend,"bip01_spine")
 	local friend_dist = pos:distance_to(friend_pos)
 	local be_pos = alun_utils.safe_bone_pos(be,"bip01_spine")
-	local dir_aim = be_pos:sub(pos)
+	local dir_aim = vector():sub(be_pos,pos)
 	local be_dist = npc:position():distance_to(be:position())
 
 	if (friend_dist < be_dist) then
-		local dir_friend = vector():set(friend_pos):sub(pos)
+		local dir_friend = vector():sub(friend_pos,pos)
 		local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
 		local mywho = friend_dist < 1.5 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1.3)
 		if (mywho == 1) then
@@ -1040,7 +1042,8 @@ function npc_in_cover(npc)
 		for i,enemy in ipairs(enemies) do
 			local dist = npc:position():distance_to_sqr(enemy:position())
 			local seez = enemy:see(npc) or npc:see(enemy)
-			local dir,cover = enemy:position():sub(npc:position())
+			local dir = vector():sub(enemy:position(),npc:position())
+			local cover
 			if npc:body_state() == move.crouch then
 				 cover = level.low_cover_in_direction(npc:level_vertex_id(),dir)
 			else
@@ -1547,7 +1550,7 @@ function w_stpk(stpk,typ,n,info)
 			stpk:w_s16(0)
 		end
 
-	elseif (typ == "s32") then
+	elseif (typ == "s32") then										
 		if (n and type(n) == "number" and n >= -2147483648 and n <= 2147483647) then
 			stpk:w_s32(n)
 		else
@@ -1618,12 +1621,15 @@ function w_stpk(stpk,typ,n,info)
 		end
 
 	elseif (typ == "CTime") then
+		utils.w_CTime(stpk,n)
+		--[[
 		if (n and type(n) == "userdata" and n.timeToString) then
 			utils.w_CTime(stpk,n)
 		else
 			--printf("w_stpk:Debug: CTime is nil [%s]",info)
 			utils.w_CTime(stpk,nil)
 		end
+		--]]
 	else
 		isError = true
 	end
@@ -1813,7 +1819,7 @@ function try_go_aside_object(npc,friend,pos,old_vid)
 	end
 
 	--alun_utils.debug_nearest(npc,"try_to_strafe")
-	local _dir = vector():set(mypos):sub(pos)
+	local _dir = vector():sub(mypos,pos)
 	local dir = {}
 	dir[1] = vector_rotate_y(utils.vector_copy_by_val(_dir),-90)
 	dir[2] = vector_rotate_y(utils.vector_copy_by_val(_dir),90)
@@ -1907,11 +1913,11 @@ function in_los(npc,be,friend)
 	local pos = npc:bone_position("bip01_spine")
 	local friend_pos = alun_utils.safe_bone_pos(friend,"bip01_spine")
 	local friend_dist = pos:distance_to(friend_pos)
-	local dir_aim = be_pos:sub(pos)
+	local dir_aim = vector():sub(be_pos,pos)
 	local be_dist = npc:position():distance_to(be:position())
 
 	if (friend_dist < be_dist) then
-		local dir_friend = vector():set(friend_pos):sub(pos)
+		local dir_friend = vector():sub(friend_pos,pos)
 		local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
 		local mywho = friend_dist < 1.5 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1.3)
 		if (mywho == 1) then
@@ -1954,11 +1960,11 @@ function friends_on_fire_line(npc,be,st)
 			local friend_pos = alun_utils.safe_bone_pos(friend,"bip01_spine")
 			local friend_dist = pos:distance_to(friend_pos)
 			local be_pos = alun_utils.safe_bone_pos(be,"bip01_spine")
-			local dir_aim = be_pos:sub(pos)
+			local dir_aim = vector():sub(be_pos,pos)
 			local be_dist = npc:position():distance_to(be:position())
 
 			if (friend_dist < be_dist) then
-				local dir_friend = vector():set(friend_pos):sub(pos)
+				local dir_friend = vector():sub(friend_pos,pos)
 				local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
 				local mywho = friend_dist < 1.5 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1.3)
 				if (mywho == 1) then

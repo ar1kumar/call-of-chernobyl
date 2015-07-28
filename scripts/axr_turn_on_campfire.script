@@ -271,7 +271,9 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action:add_precondition(wp(xr_gather_items.evaid, false))
 	temp.action:add_precondition(wp(stalker_ids.property_items, false))
 	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist,false))
-	temp.action:add_precondition(wp(xr_evaluators_id.corpse_exist,false))
+	if (_G.schemes["corpse_detection"]) then
+		temp.action:add_precondition(wp(xr_evaluators_id.corpse_exist,false))
+	end
 	temp.action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1, false))
 	temp.action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base, false))
 	temp.action:add_precondition(wp(xr_evaluators_id.abuse_base, false))

@@ -117,79 +117,81 @@ function set_volume_sound_looped(npc_id, sound, level)
 	end
 end
 
-function actor_save(thread)
-	set_save_marker(thread, "save", false, "sound_actor_save")
+function actor_save(stpk)
+	set_save_marker(stpk, "save", false, "sound_actor_save")
 	for k,v in pairs(sound_theme.theme) do
-		v:save(thread)
+		v:save(stpk)
 	end
 	local n = 0
 	for k,v in pairs(sound_table) do
 		n = n + 1
 	end
-	alun_utils.w_stpk(thread,"u16",n,"sound table count")
+	alun_utils.w_stpk(stpk,"u16",n,"sound table count")
 	for k,v in pairs(sound_table) do
-		alun_utils.w_stpk(thread,"u16",k,"sound table:sound_id")
-		alun_utils.w_stpk(thread,"stringZ",v.section,"sound table:sound section")
+		alun_utils.w_stpk(stpk,"u16",k,"sound table:sound_id")
+		alun_utils.w_stpk(stpk,"stringZ",v.section,"sound table:sound section")
 	end
 	n = 0
 	for k,v in pairs(looped_sound) do
 		n = n + 1
 	end
-	alun_utils.w_stpk(thread,"u16",n,"looped sound count")
+	alun_utils.w_stpk(stpk,"u16",n,"looped sound count")
 	for k,v in pairs(looped_sound) do
-		alun_utils.w_stpk(thread,"u16",k,"sound table:looped sound_id")
+		alun_utils.w_stpk(stpk,"u16",k,"sound table:looped sound_id")
 		n = 0
 		for kk,vv in pairs(looped_sound[k]) do
 			n = n + 1
 		end
-		alun_utils.w_stpk(thread,"u16",n,"sound table:looped "..n)
+		alun_utils.w_stpk(stpk,"u16",n,"sound table:looped "..n)
 		for kk,vv in pairs(looped_sound[k]) do
-			alun_utils.w_stpk(thread,"stringZ",kk,"sound table:looped "..n.." section")
+			alun_utils.w_stpk(stpk,"stringZ",kk,"sound table:looped "..n.." section")
 		end
 	end
-	set_save_marker(thread, "save", true, "sound_actor_save")
+	set_save_marker(stpk, "save", true, "sound_actor_save")
 end
-function actor_load(thread)
-	set_save_marker(thread, "load", false, "sound_actor_save")
+function actor_load(stpk)
+	set_save_marker(stpk, "load", false, "sound_actor_save")
 	for k,v in pairs(sound_theme.theme) do
-		v:load(thread)
+		v:load(stpk)
 	end
 	sound_table = {}
-	local n = thread:r_u16()
+	local n = stpk:r_u16()
 	for i = 1,n do
-		local id = thread:r_u16()
-		local theme = thread:r_stringZ()
---		sound_table[id] = thread:r_stringZ()
+		local id = stpk:r_u16()
+		local theme = stpk:r_stringZ()
+--		sound_table[id] = stpk:r_stringZ()
 				sound_table[id] = sound_theme.theme[theme]
 	end
 	looped_sound = {}
-	n = thread:r_u16()
+	n = stpk:r_u16()
 	for i = 1,n do
-		local id = thread:r_u16()
+		local id = stpk:r_u16()
 		looped_sound[id] = {}
-		n = thread:r_u16()
+		n = stpk:r_u16()
 		for i = 1,n do
-			local sound = thread:r_stringZ()
---            looped_sound[id][sound] = thread:r_stringZ()
+			local sound = stpk:r_stringZ()
+--            looped_sound[id][sound] = stpk:r_stringZ()
 						looped_sound[id][sound] = sound_theme.theme[sound]
 		end
 	end
-	set_save_marker(thread, "load", true, "sound_actor_save")
+	set_save_marker(stpk, "load", true, "sound_actor_save")
 end
 
-function save_npc(thread, npc_id)
-	set_save_marker(thread, "save", false, "sound_npc_save")
+function save_npc(stpk, npc_id)
+	--alun_utils.debug_write("xr_sound:save_npc")
+	set_save_marker(stpk, "save", false, "sound_npc_save")
 	for k,v in pairs(sound_theme.theme) do
-		v:save_npc(thread, npc_id)
+		v:save_npc(stpk, npc_id)
 	end
-	set_save_marker(thread, "save", true, "sound_npc_save")
+	set_save_marker(stpk, "save", true, "sound_npc_save")
 end
-function load_npc(thread, npc_id)
-	set_save_marker(thread, "load", false, "sound_npc_save")
+function load_npc(stpk, npc_id)
+	--alun_utils.debug_write("xr_sound:load_npc")
+	set_save_marker(stpk, "load", false, "sound_npc_save")
 	for k,v in pairs(sound_theme.theme) do
-		v:load_npc(thread, npc_id)
+		v:load_npc(stpk, npc_id)
 	end
-	set_save_marker(thread, "load", true, "sound_npc_save")
+	set_save_marker(stpk, "load", true, "sound_npc_save")
 end
 
 function stop_all_sounds()

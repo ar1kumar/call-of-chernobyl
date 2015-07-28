@@ -42,16 +42,21 @@ function update(npc)
 	end
 	
 	local tt = trade_manager[npc:id()]
-
-	if tt == nil then
+	if (tt == nil or tt.config == nil) then
 		printf("TRADE [%s]:  tt is nil", npc:name())
 		return
 	end
 
-	if tt.update_time ~= nil and tt.update_time < time_global() then
+	local tg = time_global()
+	if tt.update_time ~= nil and tt.update_time < tg then
 		return
 	end
-	tt.update_time = time_global() + 3600000
+	
+	if (tg + 360000 < 2147483647) then 
+		tt.update_time = tg + 360000
+	else 
+		tt.update_time = 2147483646
+	end
 
 	local str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_condition)
 	if(str=="" or str==nil) then
@@ -90,13 +95,17 @@ function update(npc)
 		printf("Wrong section in buy_condition condlist for npc [%s]!", npc:name())
 	end
 	if tt.current_buy_supplies ~= str then
-		if tt.resuply_time ~= nil and tt.resuply_time < time_global() then
+		if tt.resuply_time ~= nil and tt.resuply_time < tg then
 			return
 		end
 		--'printf("TRADE [%s]: buy_supplies = %s", npc:name(), str)
 		npc:buy_supplies(tt.config, str)
 		tt.current_buy_supplies = str
-		tt.resuply_time = time_global() + 24*3600000
+		if (tg + 86400000 < 2147483647) then
+			tt.resuply_time = tg + 86400000
+		else 
+			tt.resuply_time = 2147483646
+		end
 	end
 end
 
@@ -108,22 +117,37 @@ end
 
 function save(obj, packet)
 	local tt = trade_manager[obj:id()]
-	if tt == nil then
+	if (tt == nil or not obj:alive()) then
 		packet:w_bool(false)
 		return
-	else
+	end 
+	if not (utils.valid_pathname(tt.cfg_ltx)) then 
+		printf("ERROR: trade_manager: Invalid pathname %s.",tt.cfg_ltx)
+		packet:w_bool(false)
+		return
+	else 
 		packet:w_bool(true)
 	end
-
-	set_save_marker(packet, "save", false, "trade_manager")
 	
-	alun_utils.w_stpk(packet,"stringZ",tt.cfg_ltx,"trade_manager 1")
-	alun_utils.w_stpk(packet,"stringZ",tt.current_buy_condition or "","trade_manager 2")
-	alun_utils.w_stpk(packet,"stringZ",tt.current_sell_condition or "","trade_manager 3")
-	alun_utils.w_stpk(packet,"stringZ",tt.current_buy_supplies or "","trade_manager 4")
-	alun_utils.w_stpk(packet,"s32",tt.update_time and tt.update_time - time_global() or -1,"trade_manager 5")
-	alun_utils.w_stpk(packet,"s32",tt.resuply_time and tt.resuply_time - time_global() or -1,"trade_manager 6")
+	set_save_marker(packet, "save", false, "trade_manager")
+		
+	packet:w_stringZ(tt.cfg_ltx)
+	packet:w_stringZ(tt.current_buy_condition or "")
+	packet:w_stringZ(tt.current_sell_condition or "")
+	packet:w_stringZ(tt.current_buy_supplies or "")
 
+	local cur_tm = time_global()
+	if tt.update_time == nil then
+		packet:w_s32(-1)
+	else
+	 	packet:w_s32(tt.update_time - cur_tm)
+	end
+
+	if tt.resuply_time == nil then
+		packet:w_s32(-1)
+	else
+	 	packet:w_s32(tt.resuply_time - cur_tm)
+	end
 	set_save_marker(packet, "save", true, "trade_manager")
 end
 
@@ -145,9 +169,9 @@ function load(obj, packet)
 		trade_manager[obj:id()] = nil
 		set_save_marker(packet, "load", true, "trade_manager")
 		return
-	else 
-		tt.config = ini_file(tt.cfg_ltx)
 	end 
+	
+	tt.config = ini_file(tt.cfg_ltx)
 	--printf("TRADE LOAD [%s]: cfg_ltx = %s", obj:name(), tostring(tt.cfg_ltx))
 
 	a = packet:r_stringZ()
@@ -189,10 +213,15 @@ function load(obj, packet)
 end
 ----------- NOT TO DELETE!!!!!!!!! called from engine
 function get_buy_discount(npc_id)
+	--alun_utils.debug_write("get_buy_discount")
 	if not (trade_manager[npc_id]) then
 		return 1
 	end
 
+	if not (trade_manager[npc_id].config) then 
+		return 1 
+	end 
+	
 	local str = utils.cfg_get_string(trade_manager[npc_id].config, "trader", "discounts", nil, false, "", "")
 	if(str=="") then
 		return 1
@@ -204,10 +233,15 @@ function get_buy_discount(npc_id)
 end
 ----------- NOT TO DELETE!!!!!!!!! called from engine
 function get_sell_discount(npc_id)
+	--alun_utils.debug_write("get_sell_discount")
 	if not (trade_manager[npc_id]) then
 		return 1
 	end
 
+	if not (trade_manager[npc_id].config) then 
+		return 1 
+	end 
+	
 	local str = utils.cfg_get_string(trade_manager[npc_id].config, "trader", "discounts", nil, false, "", "")
 	if(str=="") then
 		return 1

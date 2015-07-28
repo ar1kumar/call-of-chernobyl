@@ -167,6 +167,10 @@ function eva_kill_wounded:evaluate()
 		return false
 	end
 	
+	if (xr_danger.has_danger(npc)) then 
+		return false 
+	end 
+
 	if not (npc:best_weapon()) then 
 		return false 
 	end
@@ -346,9 +350,10 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	local wp = world_property
 	temp.action:add_precondition(wp(evaid,true) )
 	temp.action:add_precondition(wp(stalker_ids.property_alive,true))
-	--temp.action:add_precondition(wp(stalker_ids.property_enemy,true))
+	temp.action:add_precondition(wp(stalker_ids.property_enemy,true))
 	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
 	temp.action:add_effect(wp(evaid,false))
+	temp.action:add_effect(wp(stalker_ids.property_enemy,false))
 	
 	manager:add_action(actid,temp.action)
 end

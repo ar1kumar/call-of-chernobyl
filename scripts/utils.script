@@ -596,50 +596,40 @@ if not editor() then
 end
 
 -- запись CTime в пакет. если t=nil, то запишет один нулевой байт
-function w_CTime( p, t, caller )
-	--set_save_marker(p, "save", false, "CTIME")
-	if t == nil then
-		p:w_u8(255)
-		--set_save_marker(p, "save", true, "CTIME")
+function w_CTime(p, t, caller)
+	if (t == nil) then 
+		p:w_bool(false)
 		return
+	end 
+	
+	p:w_bool(true)
+	
+	if not (type(t) == "userdata" and t.timeToString) then
+		t = game.get_game_time()
 	end
+	
+	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
+	Y, M, D, h, m, s, ms = t:get( Y, M, D, h, m, s, ms )
 
-	if (CTime == nil) or (t ~= CTime_0) then
-		local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
-		Y, M, D, h, m, s, ms = t:get( Y, M, D, h, m, s, ms )
-
-		p:w_u8 ( Y - 2000 )
-		p:w_u8 ( M )
-		p:w_u8 ( D )
-		p:w_u8 ( h )
-		p:w_u8 ( m )
-		p:w_u8 ( s )
-		p:w_u16( ms )
-	else
-		p:w_u8 ( 0 )
-	end
-	--set_save_marker(p, "save", true, "CTIME")
+	p:w_u8 ( Y - 2000 )
+	p:w_u8 ( M )
+	p:w_u8 ( D )
+	p:w_u8 ( h )
+	p:w_u8 ( m )
+	p:w_u8 ( s )
+	p:w_u16( ms )
 end
 
 -- чтение CTime из пакета
-function r_CTime( p, caller )
-	--set_save_marker(p, "load", false, "CTIME")
-	local Y = p:r_u8()
-	if Y == 255 then
-		--set_save_marker(p, "load", true, "CTIME")
-		return nil
+function r_CTime(p, caller)
+	if (p:r_bool() == false) then 
+		return
 	end
-
-	if Y ~= 0 then
-		local t = game.CTime()
-		local M, D, h, m, s, ms = p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u16()
-		t:set( Y + 2000,  M, D, h, m, s, ms)
-		--set_save_marker(p, "load", true, "CTIME")
-		return t
-	else
-		--set_save_marker(p, "load", true, "CTIME")
-		return 0
-	end
+	
+	local t = game.CTime()
+	local Y, M, D, h, m, s, ms = p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u8(), p:r_u16()
+	t:set( Y + 2000,  M, D, h, m, s, ms)
+	return t
 end
 
 function CTime_to_table(ct)

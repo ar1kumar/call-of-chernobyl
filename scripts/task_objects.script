@@ -411,11 +411,11 @@ function CGeneralTask:load(packet)
 	self.status = status_by_id[packet:r_u8()]
 	if (self.status == "completed" or self.status == "fail") then
 		if (self.repeat_timeout) then 
-			self.timeout =	utils.r_CTime(packet)
+			self.timeout = utils.r_CTime(packet) or game.get_game_time()
 		end
 		return
 	end
-	self.inited_time = utils.r_CTime(packet)
+	self.inited_time = utils.r_CTime(packet) or game.get_game_time()
 	self.current_title = packet:r_stringZ()
 	self.current_descr = packet:r_stringZ()
 	self.current_target = packet:r_stringZ()

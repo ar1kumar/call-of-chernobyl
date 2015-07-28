@@ -14,7 +14,11 @@ function evaluator_combat_enemy:evaluate()
 	
 	if not (npc:alive()) then 
 		return false 
-	end 
+	end
+	
+	if (IsWounded(npc)) then 
+		return false 
+	end
 	
 	local best_enemy = npc:best_enemy()
 
@@ -36,6 +40,10 @@ function evaluator_combat_enemy:evaluate()
 
 	if not (self.st.timer) then
 		return best_enemy ~= nil
+	end
+	
+	if (xr_danger.has_danger(npc)) then 
+		return false 
 	end
 	
 	if (tg < self.st.timer) then
@@ -95,12 +103,14 @@ function action_post_combat_wait:execute()
 	
 	--alun_utils.debug_write("action_post_combat_wait:execute start")
 
-	if (self.anim_started) then 
+	if (self.anim_started) then
+		--alun_utils.debug_write("action_post_combat_wait:execute end 4")
 		return 
 	end 
 	
 	local npc = self.object
-	if (npc:in_smart_cover()) then 
+	if (npc:in_smart_cover()) then
+		--alun_utils.debug_write("action_post_combat_wait:execute end 5")
 		return 
 	end
 	
@@ -170,7 +180,7 @@ function action_post_combat_wait:execute()
 	
 	local dir = npc:direction()
 	npc:set_sight(look.direction,vector():set(-dir.x,-dir.y,-dir.z))
-	
+
 	--alun_utils.debug_write("action_post_combat_wait:execute end 3")
 end
 
@@ -209,7 +219,7 @@ function add_post_combat_idle(npc)
 	new_action:add_precondition(world_property(stalker_ids.property_enemy, true))
 	new_action:add_precondition(world_property(stalker_ids.property_pure_enemy, false))
 	new_action:add_precondition(world_property(stalker_ids.property_critically_wounded, false))
-	new_action:add_precondition(world_property(stalker_ids.property_danger_grenade, false))
+	--new_action:add_precondition(world_property(stalker_ids.property_danger_grenade, false))
 	new_action:add_effect(world_property(stalker_ids.property_enemy, false))
 	combat_action_planner:add_action(stalker_ids.action_post_combat_wait, new_action)
 end

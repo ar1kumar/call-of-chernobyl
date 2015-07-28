@@ -518,7 +518,7 @@ function save_state(m_data)
 	
 	m_data.PsiStormManager.finished = mgr.finished 
 	m_data.PsiStormManager.started = mgr.started
-	m_data.PsiStormManager.last_psi_storm_time = utils.CTime_to_table(mgr.last_psi_storm_time)
+	m_data.PsiStormManager.last_psi_storm_time = utils.CTime_to_table(mgr.last_psi_storm_time) or game.get_game_time()
 	if (mgr.started) then 
 		m_data.PsiStormManager.inited_time = utils.CTime_to_table(mgr.inited_time)
 		m_data.PsiStormManager.task_given = mgr.task_given
@@ -537,7 +537,7 @@ function load_state(m_data)
 	local mgr = PsiStormManager
 	mgr.finished = m_data.PsiStormManager.finished
 	mgr.started = m_data.PsiStormManager.started
-	mgr.last_psi_storm_time = utils.CTime_from_table(m_data.PsiStormManager.last_psi_storm_time)
+	mgr.last_psi_storm_time = utils.CTime_from_table(m_data.PsiStormManager.last_psi_storm_time) or game.get_game_time()
 	if (mgr.started) then 
 		mgr.inited_time = utils.CTime_from_table(m_data.PsiStormManager.inited_time)
 		mgr.task_given = m_data.PsiStormManager.task_given

@@ -355,7 +355,7 @@ function fill_primary_objects()
 	for k,v in pairs(primary_objects_tbl) do
 		local obj_id = get_story_object_id(v.target)
 		if(obj_id) then
-			level.map_add_object_spot(obj_id, "primary_object", v.hint)
+			level.map_add_object_spot_ser(obj_id, "primary_object", v.hint)
 		end
 	end
 	change_anomalies_names()
@@ -367,7 +367,7 @@ function fill_sleep_zones()
 		local obj_id = get_story_object_id(v.target)
 		if(obj_id and db.storage[obj_id] and db.storage[obj_id].object) then
 			if(db.storage[obj_id].object:position():distance_to(db.actor:position())<=150 and level.map_has_object_spot(obj_id, "ui_pda2_actor_sleep_location")==0) then
-				level.map_add_object_spot(obj_id, "ui_pda2_actor_sleep_location", v.hint)
+				level.map_add_object_spot_ser(obj_id, "ui_pda2_actor_sleep_location", v.hint)
 			elseif(db.storage[obj_id].object:position():distance_to(db.actor:position())>150 and level.map_has_object_spot(obj_id, "ui_pda2_actor_sleep_location")~=0) then
 				level.map_remove_object_spot(obj_id, "ui_pda2_actor_sleep_location")
 			end
@@ -388,6 +388,8 @@ function add_quick_slot_items_on_game_start()
 end
 
 function change_anomalies_names()
+	-- not used in CoC
+	--[[
 	if has_alife_info("jup_b32_scanner_reward") then
 		for k,v in pairs(change_objects_tbl) do
 			if has_alife_info(v.group) and not v.enabled then
@@ -422,4 +424,5 @@ function change_anomalies_names()
 			end
 		end
 	end
+	--]]
 end

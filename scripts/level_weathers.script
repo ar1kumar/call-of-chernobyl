@@ -81,6 +81,7 @@ end
 
 -- Вызывается после load(). Состояние погоды уже загружено.
 function WeatherManager:reset()
+	--alun_utils.debug_write("WeatherManager:reset")
 	local ini = ini_file("game.ltx")
 	local weather = utils.cfg_get_string(ini, level.name(), "weathers", db.actor, false, "", "[default]")
 	self.levelWeather = weather
@@ -291,6 +292,7 @@ end
 
 -- Обновляем погоду раз в час.
 function WeatherManager:update()
+	--alun_utils.debug_write("WeatherManager:update")
 	if(level.is_wfx_playing()) then
 		self.weather_fx = level.get_weather()
 	else
@@ -358,6 +360,8 @@ end
 
 function WeatherManager:select_weather(now)
 	--
+	--alun_utils.debug_write("WeatherManager:select_weather")
+	
 	local weather = xr_logic.pick_section_from_condlist(db.actor, db.actor, self.weather_list)
 	-- CC add period to name
 	if weather=="atmosfear" then

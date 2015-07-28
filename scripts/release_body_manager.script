@@ -41,6 +41,7 @@ end
 
 class "Crelease_body"
 function Crelease_body:__init()
+	self.release_objects_table = {}
 	self.keep_items_table = {}
 	self.size = 0
 
@@ -54,8 +55,6 @@ function Crelease_body:__init()
 		result, section, value  = snd_ini:r_line("keep_items", i, "", "")
 		self.keep_items_table[section] = true
 	end
-	
-	self.release_objects_table = {}
 end
 
 function Crelease_body:can_release(obj)

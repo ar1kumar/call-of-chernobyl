@@ -943,13 +943,7 @@ function se_smart_terrain:STATE_Write(packet)
 			alun_utils.w_stpk(packet,"stringZ",k,"already_spawned section")
 			alun_utils.w_stpk(packet,"u8",v.num,"already_spawned count")
 		end
-
-		if self.last_respawn_update ~= nil then
-			alun_utils.w_stpk(packet,"bool",true,"last_respawn_update")
-			alun_utils.w_stpk(packet,"CTime",self.last_respawn_update,"last_respawn_update CTime")
-		else
-			alun_utils.w_stpk(packet,"bool",false,"last_respawn_update")
-		end
+		alun_utils.w_stpk(packet,"CTime",self.last_respawn_update,"last_respawn_update CTime")
 	else
 		alun_utils.w_stpk(packet,"bool",false,"respawn_point")
 	end
@@ -1038,15 +1032,7 @@ function se_smart_terrain:STATE_Read(packet, size)
 				self.already_spawned[id].num = num
 			end
 		end
-
-		if self.script_version > 11 then
-			local exist = packet:r_bool()
-			if exist then
-				self.last_respawn_update = utils.r_CTime(packet)
-			else
-				self.last_respawn_update = nil
-			end
-		end
+		self.last_respawn_update = utils.r_CTime(packet)
 	end
 
 	--set_save_marker(packet, "load", true, "se_smart_terrain")

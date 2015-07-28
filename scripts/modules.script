@@ -278,7 +278,9 @@ function add_common_precondition(scheme,action)
 	action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base + 0, false))
 	action:add_precondition(wp(xr_evaluators_id.abuse_base, false))
 	action:add_precondition(wp(xr_evaluators_id.wounded_exist, false))
-	action:add_precondition(wp(xr_evaluators_id.corpse_exist, false))
+	if (_G.schemes["corpse_detection"]) then
+		action:add_precondition(wp(xr_evaluators_id.corpse_exist, false))
+	end
 	action:add_precondition(wp(stalker_ids.property_items, false))
 	for scheme,filename in pairs(_G.schemes) do 
 		if (_G[filename] and _G[filename].npc_add_precondition) then 

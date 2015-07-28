@@ -515,8 +515,10 @@ function add_to_binder(object, ini, scheme, section, storage)
 		action = manager:action (stalker_ids.action_gather_items)
 		action:add_precondition	(world_property(properties["end"],			true))
 
-		action = manager:action (operators["search_corpse"])
-		action:add_precondition	(world_property(properties["end"],			true))
+		if (_G.schemes["corpse_detection"]) then
+			action = manager:action (operators["search_corpse"])
+			action:add_precondition	(world_property(properties["end"],			true))
+		end
 
 		action = manager:action (operators["help_wounded"])
 		action:add_precondition	(world_property(properties["end"],			true))
