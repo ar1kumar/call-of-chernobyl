@@ -39,6 +39,7 @@ function sim_squad_scripted:__init(section) super (section)
 end
 
 function sim_squad_scripted:init_squad()
+	--alun_utils.debug_write("sim_squad_scripted:init_squad")
 	local sys_ini			= system_ini()
 	local settings_id 		= self:section_name()
 	
@@ -76,6 +77,7 @@ function sim_squad_scripted:init_squad_on_load()
 end
 
 function sim_squad_scripted:set_squad_behaviour()
+	--alun_utils.debug_write("sim_squad_scripted:set_squad_behaviour")
 	self.behaviour		= {}
 	local behaviour_section = utils.cfg_get_string(system_ini(), self:section_name(), "behaviour", self, false, "", self.player_id)
 	if not squad_behaviour_ini:section_exist(behaviour_section) then
@@ -90,6 +92,7 @@ function sim_squad_scripted:set_squad_behaviour()
 end
 
 function sim_squad_scripted:find_open_smart()
+	--alun_utils.debug_write("sim_squad_scripted:find_open_smart")
 	local actor = db.actor or alife():actor()
 	for name,smart in pairs(SIMBOARD.smarts_by_names) do
 		if (smart and not smart.disabled and smart.props and smart.props.territory > 0) and (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor , smart, smart.sim_avail,"find open smart") == "true" and smart:sim_available()) then
@@ -102,6 +105,7 @@ end
 --***********************************************************************************************
 
 function sim_squad_scripted:get_script_target()
+	--alun_utils.debug_write("sim_squad_scripted:get_script_target")
 	local new_target = self.scripted_target or xr_logic.pick_section_from_condlist(db.actor, self, self.action_condlist)
 	if (new_target == "actor") then
 		return 0 
@@ -127,6 +131,7 @@ function sim_squad_scripted:get_script_target()
 end
 
 function sim_squad_scripted:update()
+	--alun_utils.debug_write("sim_squad_scripted:update START")
 	cse_alife_online_offline_group.update(self)
 	if not (self.first_update) then
 		self.first_update = true
@@ -161,6 +166,7 @@ function sim_squad_scripted:update()
 						simulation_objects.get_sim_obj_registry():unregister(self)
 						self.disabled = true
 						--printf("%s disabled",self:name())
+						--alun_utils.debug_write("sim_squad_scripted:update END 3")
 						return
 					end
 				end
@@ -182,6 +188,7 @@ function sim_squad_scripted:update()
 	-- Delta
 	local tg = time_global()
 	if (self.dtimer and tg < self.dtimer) then
+		--alun_utils.debug_write("sim_squad_scripted:update END 1")
 		return
 	end
 	
@@ -204,6 +211,7 @@ function sim_squad_scripted:update()
 	else
 		self:generic_update()
 	end
+	--alun_utils.debug_write("sim_squad_scripted:update END 2")
 end
 
 --***********************************************************************************************
@@ -423,7 +431,7 @@ function sim_squad_scripted:remove_squad()
 		end
 	end
 	self:hide()
-	sim:release(self,true)
+	sim:release(self,true) -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine instead?
 end
 
 function sim_squad_scripted:remove_npc(npc_id)
@@ -451,7 +459,7 @@ function sim_squad_scripted:on_npc_death(npc,killer)
 		end
 		SIMBOARD:assign_squad_to_smart(self, nil)
 		self:hide()
-		alife():release(self,true)
+		alife():release(self,true)  -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine or perhaps reused instead?
 		return
 	end
 	self:refresh()
@@ -563,6 +571,7 @@ function sim_squad_scripted:set_location_types(new_smart_name)
 end
 
 function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_id, gv_id)
+	--alun_utils.debug_write("sim_squad_scripted:add_squad_member")
 	local spawn_sections_ltx = system_ini()
 	local custom_data = utils.cfg_get_string(spawn_sections_ltx, spawn_section, "custom_data", self, false, "", "default_custom_data.ltx")
 	if custom_data ~= "default_custom_data.ltx" then
@@ -586,6 +595,7 @@ function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_i
 end
 
 function sim_squad_scripted:create_npc(spawn_smart)
+	--alun_utils.debug_write("sim_squad_scripted:create_npc")
 	local ini = system_ini()
 	local settings_id = self:section_name()
 	local spawn_sections = utils.parse_names(utils.cfg_get_string(ini, settings_id, "npc", self, false, "", ""))
@@ -655,6 +665,7 @@ function sim_squad_scripted:create_npc(spawn_smart)
 end
 
 function sim_squad_scripted:set_squad_sympathy(sympathy)
+	--alun_utils.debug_write("sim_squad_scripted:set_squad_sympathy")
 	local symp = sympathy or self.sympathy
 	if(symp~=nil) then
 		local npc
@@ -684,6 +695,7 @@ local function set_relation(npc1, npc2, new_relation)
 	end
 end
 function sim_squad_scripted:set_squad_relation(relation)
+	--alun_utils.debug_write("sim_squad_scripted:set_squad_relation")
 	local rel = relation or self.relationship
 	if(rel ~= nil) then
 		local npc
@@ -701,6 +713,7 @@ end
 
 
 local function reset_animation(npc)
+	--alun_utils.debug_write("sim_squad_scripted:reset_animation")
 	local state_mgr = db.storage[npc:id()].state_mgr
 	if state_mgr == nil then
 		return
@@ -727,6 +740,7 @@ local function reset_animation(npc)
 end
 
 function sim_squad_scripted:set_squad_position(position)
+	--alun_utils.debug_write("sim_squad_scripted:set_squad_position")
 	if self.online == false then
 		self:force_change_position(position)
 	end
@@ -787,6 +801,7 @@ end
 --***********************************************************************************************
 
 function sim_squad_scripted:STATE_Write(packet)
+	--alun_utils.debug_write("sim_squad_scripted:STATE_Write")
 	cse_alife_online_offline_group.STATE_Write (self, packet)
 	set_save_marker(packet, "save", false, "sim_squad_scripted")
 
@@ -845,6 +860,7 @@ function sim_squad_scripted:on_register()
 	--alun_utils.debug_write( strformat("%s:on_register end",self:name()) )
 end
 function sim_squad_scripted:on_unregister()
+	--alun_utils.debug_write("sim_squad_scripted:on_unregister")
 	cse_alife_online_offline_group.on_unregister( self )
 	unregister_story_object_by_id(self.id)
 	SendScriptCallback("squad_on_unregister",self)
@@ -870,6 +886,7 @@ function sim_squad_scripted:can_switch_offline()
 	return cse_alife_online_offline_group.can_switch_offline(self)
 end
 function sim_squad_scripted:can_switch_online()
+	--alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
 	if (not self.online and is_squad_monster[self.player_id]) then
 		-- Check for exiled zones
 		local zone
@@ -1007,6 +1024,7 @@ function sim_squad_scripted:get_location()
 end
 
 local function get_current_task(squad)
+	--alun_utils.debug_write("sim_squad_scripted:get_current_task")
 	local smart = squad.assigned_target_id and alife():object(squad.assigned_target_id)
 	if (smart) then
 		if (smart.job_data and smart.arriving_npc and not smart.arriving_npc[squad:commander_id()]) then
@@ -1035,6 +1053,7 @@ function sim_squad_scripted:on_after_reach(squad)
 end
 
 function sim_squad_scripted:on_reach_target(squad)
+	--alun_utils.debug_write("sim_squad_scripted:on_reach_target")
 	squad:set_location_types()
  	for k in squad:squad_members() do
 		if db.offline_objects[k.id] ~= nil then

@@ -660,7 +660,7 @@ function IsWounded(o)
 		return false
 	end
 	local c = o:clsid()
-	return c and c == clsid.script_stalker and o:wounded() == true or false
+	return c and c == clsid.script_stalker and o:alive() and o:wounded() or false
 end 
 -------------------------------------------------------------------------------------------
 -- 										CLASS TESTING
@@ -951,7 +951,11 @@ function abort(msg, ...)
 		fmt = fmt .. debug.traceback('\n', 2)
 	end
 
-	get_console():execute("load ~#abort()#:"..fmt)
+	if (log) then 
+		log(fmt)
+	else
+		get_console():execute("load ~#abort()#:"..fmt)
+	end
 
 	--[[
 	error(fmt, 2)

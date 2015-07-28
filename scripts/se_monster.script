@@ -24,12 +24,8 @@ function se_monster:can_switch_online()
 	return cse_alife_monster_base.can_switch_online(self)
 end
 function se_monster:switch_online()
+	--alun_utils.debug_write(strformat("se_monster:switch_online %s",self:name()))
     cse_alife_monster_base.switch_online(self)
-	-- This is a good way to debug if certain mutant is causing issues
-	--if (dev_debug) then
-		--printf("se_monster:switch_online() [%s]",self:name())
-		--get_console():execute("flush")
-	--end
 end
 function se_monster:switch_offline()
 	cse_alife_monster_base.switch_offline(self)

@@ -26,7 +26,7 @@ function se_stalker:can_switch_online()
 end
 
 function se_stalker:switch_online()
-	--printf("se_stalker:switch_online() [%s]",self:name())
+	--alun_utils.debug_write(strformat("se_stalker:switch_online %s",self:name()))
 	cse_alife_human_stalker.switch_online(self)
 end
 
@@ -67,6 +67,7 @@ function se_stalker:STATE_Read(packet, size)
 end
 
 function se_stalker:get_alife_storage(create_if_dont_exist)
+	--alun_utils.debug_write("se_stalker:get_alife_storage")
 	local m_data = alife_storage_manager.get_state()
 	if (create_if_dont_exist) then
 		if not (m_data.se_stalker[self.id]) then
@@ -110,6 +111,7 @@ function se_stalker:on_register()
 end
 --------------------
 function se_stalker:on_unregister()
+	--alun_utils.debug_write("se_stalker:on_unregister()")
 	local strn_id = self:smart_terrain_id()
 	if strn_id ~= 65535 then
 		local smart = alife():object(strn_id)
@@ -131,6 +133,7 @@ function se_stalker:on_spawn()
 end
 --------------------
 function se_stalker:on_death(killer)
+	--alun_utils.debug_write(strformat("se_stalker:on_death %s killer=%s",self:name(),killer and killer:name()))
 	cse_alife_human_stalker.on_death(self, killer)
 
 	smart_terrain.on_death(self)

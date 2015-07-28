@@ -104,7 +104,7 @@ function evaluator_fight_from_cover:evaluate()
 	end
 	
 	local bd = npc:best_danger()
-	if (bd and bd:type() == danger_object.grenade and db.storage[npc:id()].danger_flag) then
+	if (bd and bd:type() == danger_object.grenade and st.danger_flag == true) then
 		return false
 	end 
 	
@@ -113,10 +113,7 @@ function evaluator_fight_from_cover:evaluate()
 	end
 	
 	local be = npc:best_enemy()
-	if (be and be:alive()) then
-		if (IsWounded(be)) then 
-			return false 
-		end
+	if (be and be:alive() and not IsWounded(be)) then
 		return true
 	end
 

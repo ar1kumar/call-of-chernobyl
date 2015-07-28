@@ -208,7 +208,7 @@ function is_need_invulnerability(npc)
 		end
 	end
 
-	local npc_st = db.storage[npc:id()]
+	local npc_st = db.storage[id]
 	local invulnerability = utils.cfg_get_string(npc_st.ini, npc_st.active_section, "invulnerable", npc, false, "", nil)
 
 	if invulnerability == nil then

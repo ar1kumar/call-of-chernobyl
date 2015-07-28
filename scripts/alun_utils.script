@@ -687,13 +687,12 @@ end
 
 local debug_file
 function debug_write(output,trace)
-	--if (trace and debug and type(debug.traceback) == 'function') then
-		--output = output .. debug.traceback('\n', 2)
-	--end
+	if (trace and debug and type(debug.traceback) == 'function') then
+		output = output .. debug.traceback('\n', 2)
+	end
 
 	if (log) then 
 		log(output)
-		return
 	end 
 end
 

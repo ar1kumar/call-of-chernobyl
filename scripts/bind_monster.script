@@ -319,6 +319,7 @@ function generic_object_binder:net_spawn(sobject)
 end
 
 function generic_object_binder:net_destroy()
+	--alun_utils.debug_write("generic_object_binder:net_destroy START")
 	self.object:set_callback(callback.death,nil)
 	self.object:set_callback(callback.patrol_path_in_point,nil)
 	self.object:set_callback(callback.hit,nil)
@@ -343,6 +344,7 @@ function generic_object_binder:net_destroy()
 	db.delete_enemy(self.object)
 	db.storage[self.object:id()] = nil
 	object_binder.net_destroy(self)
+	--alun_utils.debug_write("generic_object_binder:net_destroy END")
 end
 
 function generic_object_binder:reload(section)

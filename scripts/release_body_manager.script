@@ -41,7 +41,6 @@ end
 
 class "Crelease_body"
 function Crelease_body:__init()
-	self.release_objects_table = {}
 	self.keep_items_table = {}
 	self.size = 0
 
@@ -55,9 +54,12 @@ function Crelease_body:__init()
 		result, section, value  = snd_ini:r_line("keep_items", i, "", "")
 		self.keep_items_table[section] = true
 	end
+	
+	self.release_objects_table = {}
 end
 
 function Crelease_body:can_release(obj)
+	--alun_utils.debug_write("Crelease_body:can_release")
 	-- Monsters aren't special ever, so put them in
 	if (IsMonster(obj)) then
 		return true
@@ -79,6 +81,7 @@ function Crelease_body:can_release(obj)
 end
 
 function Crelease_body:add_corpse(obj)
+	--alun_utils.debug_write("Crelease_body:add_corpse")
 	local id = obj and obj:id()
 	if not (id) then
 		abort("Crelease_body: CRITICAL ERROR obj and id should never be nil!")

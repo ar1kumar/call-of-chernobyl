@@ -114,11 +114,11 @@ function simulation_board:unregister_smart(obj)
 	self.smarts_by_names[obj:name()] = nil
 end
 
-function simulation_board:start_sim()
+function simulation_board:start_sim() -- Doesn't seem to be used in 1.6
 	self.simulation_started = true
 end
 
-function simulation_board:stop_sim()
+function simulation_board:stop_sim() -- Doesn't seem to be used in 1.6
 	self.simulation_started = false
 end
 
@@ -173,10 +173,6 @@ function simulation_board:remove_squad(squad)
 	self:assign_squad_to_smart(squad, nil)
 
 	squad:remove_squad()
-
-	-- Alundaio (Delayed release squad from game)
-	--CreateTimeEvent(squad.id,"safe_release",1,alun_utils.safe_release,squad.id)
-	alife():release(squad,true)
 end
 --' Назначение отряда в смарт.
 function simulation_board:assign_squad_to_smart(squad, smart_id)
