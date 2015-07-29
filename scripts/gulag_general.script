@@ -840,7 +840,7 @@ on_timer = %s | %=switch_to_desired_job%
 end
 
 local function init_sniper_jobs(smart,stalker_jobs,gname)
-	local name, job_ltx, ptr, wp_prop
+	local name, job_ltx, ptr, wp_prop, radius
 	local state
 	local i = 1
 	while level.patrol_path_exists(gname.."_sniper_"..i.."_walk") do
@@ -850,13 +850,17 @@ local function init_sniper_jobs(smart,stalker_jobs,gname)
 		if (ltx) then
 			ptr = patrol(name)
 			wp_prop = utils.parse_waypoint_data(name, ptr:flags(0), ptr:name(0))
-			state = "hide"
+			state = "hide_na"
 			if wp_prop.state ~= nil then
 				if wp_prop.state == "stand" then
 					state = "threat"
 				end
 			end
-
+			radius = 5
+			if wp_prop.radius ~= nil then
+				 radius = wp_prop.radius
+			end
+			
 			job_ltx = [[
 [logic@%s]
 active = camper@%s
@@ -865,11 +869,12 @@ active = camper@%s
 meet = meet@generic_lager
 path_walk = sniper_%s_walk
 sniper = true
+radius = %s
 def_state_campering = %s
-def_state_campering_fire = %s_fire
+def_state_campering_fire = %s
 ]]
 
-			job_ltx = strformat(job_ltx,name,name,name,i,state,state)
+			job_ltx = strformat(job_ltx,name,name,name,i,radius,state,"hide_fire")
 
 			if (level.patrol_path_exists(gname.."_sniper_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = sniper_"..i.."_look\n"
@@ -909,8 +914,8 @@ local function init_camper_jobs(smart,stalker_jobs,gname)
 		if (ltx) then
 			ptr = patrol(name)
 			wp_prop = utils.parse_waypoint_data(name, ptr:flags(0), ptr:name(0))
-			state = "hide"
-			radius = 0
+			state = "hide_na"
+			radius = 10
 			if wp_prop.state ~= nil then
 				if wp_prop.state == "stand" then
 					state = "threat"
@@ -930,9 +935,9 @@ radius = %s
 path_walk = camper_%s_walk
 def_state_moving = rush
 def_state_campering = %s
-def_state_campering_fire = %s_fire
+def_state_campering_fire = %s
 ]]
-			job_ltx = strformat(job_ltx,name,name,name,radius,i,state,state)
+			job_ltx = strformat(job_ltx,name,name,name,radius,i,state,"hide_fire")
 
 			if (level.patrol_path_exists(gname.."_camper_"..i.."_look")) then
 				job_ltx = job_ltx.."path_look = camper_"..i.."_look\n"

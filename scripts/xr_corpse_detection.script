@@ -367,7 +367,7 @@ function evaluator_corpse:evaluate()
 	end
 
 	local st = db.storage[npc:id()]
-	if (st) and ((st.help_wounded and st.help_wounded.selected_id ~= nil) or (st.gather_items and st.gather_items.selected_id ~= nil)) then 
+	if (st) and ((st.active_scheme == "camper") or (st.help_wounded and st.help_wounded.selected_id ~= nil) or (st.gather_items and st.gather_items.selected_id ~= nil)) then 
 		return false 
 	end
 	

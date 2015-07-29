@@ -859,7 +859,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action[evid_gl_reload]:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	
 	if (_G.schemes["rx_ff"]) then 
-		temp.action[evid_gl_reload]:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+		temp.action[evid_gl_reload]:add_precondition(world_property(rx_ff.evaid,false))
 	end
 
 	if (_G.schemes["facer"]) then

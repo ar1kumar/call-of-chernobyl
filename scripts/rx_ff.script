@@ -5,8 +5,8 @@
 --]]
 
 --------------------------------------
-evid_dont_shoot = 18803
-actid_dont_shoot = evid_dont_shoot
+evaid = 18803
+actid = evaid
 --------------------------------------
 
 local STEP_SIZE = 10
@@ -198,21 +198,21 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 
 	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
-		manager:add_evaluator(evid_dont_shoot,property_evaluator_const(false))
+		manager:add_evaluator(evaid,property_evaluator_const(false))
 		temp.needs_configured = false
 		return 
 	end
 
-	manager:add_evaluator(evid_dont_shoot,evaluator_dont_shoot(npc,"eva_dont_shoot",st))
+	manager:add_evaluator(evaid,evaluator_dont_shoot(npc,"eva_dont_shoot",st))
 
 	temp.action = action_verso(npc,"act_dont_shoot",st)
 	
 	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
 	temp.action:add_precondition(world_property(stalker_ids.property_enemy,true))
-	temp.action:add_precondition(world_property(evid_dont_shoot,true))
-	temp.action:add_effect(world_property(evid_dont_shoot,false))	
+	temp.action:add_precondition(world_property(evaid,true))
+	temp.action:add_effect(world_property(evaid,false))	
 	
-	manager:add_action(actid_dont_shoot,temp.action)
+	manager:add_action(actid,temp.action)
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)
@@ -235,7 +235,6 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local manager = npc:motivation_action_manager()
 	local action
 	local p = {
-				xr_actions_id.stohe_camper_base + 1,
 				stalker_ids.action_combat_planner,
 				--xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,
@@ -244,7 +243,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	for i=1,#p do
 		action = manager:action(p[i])
 		if (action) then
-			action:add_precondition(world_property(evid_dont_shoot,false))
+			action:add_precondition(world_property(evaid,false))
 		else
 			printf("xr_corpse_detection: no action id p[%s]",i)
 		end
@@ -259,5 +258,5 @@ function disable_generic_scheme(npc,scheme,stype)
 end
 
 function npc_add_precondition(action)
-	action:add_precondition(world_property(evid_dont_shoot,false))
+	action:add_precondition(world_property(evaid,false))
 end

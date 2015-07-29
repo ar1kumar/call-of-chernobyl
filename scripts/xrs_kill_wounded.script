@@ -175,12 +175,10 @@ function eva_kill_wounded:evaluate()
 		return false 
 	end
 	
-	--[[
 	local st = db.storage[npc:id()]
-	if (st) and (st.rx_dont_shoot) then -- or st.help_wounded and st.help_wounded.selected_id ~= nil) then
+	if (st) and (st.active_scheme == "camper" or st.rx_dont_shoot) then -- or st.help_wounded and st.help_wounded.selected_id ~= nil) then
 		return false 
 	end
-	--]]
 	
 	return self:find_target()
 end
@@ -368,7 +366,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	--[[
 	if (_G.schemes["rx_ff"]) then
-		temp.action:add_precondition(wp(rx_ff.evid_dont_shoot,false))
+		temp.action:add_precondition(wp(rx_ff.evaid,false))
 	end
 	--]]
 	
@@ -377,7 +375,6 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	
 	local p = {
 				--xr_danger.actid,
-				xr_actions_id.stohe_camper_base + 1,
 				stalker_ids.action_combat_planner,
 			--	stalker_ids.action_danger_planner,
 				xr_actions_id.stohe_meet_base+1,

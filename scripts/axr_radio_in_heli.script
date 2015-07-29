@@ -89,7 +89,7 @@ function evaluator_radio_in_heli:evaluate()
 	end
 	
 	local st = db.storage[npc:id()]
-	if (st and st.help_wounded and st.help_wounded.selected_id ~= nil) then 
+	if (st) and (st.help_wounded and st.help_wounded.selected_id ~= nil or st.active_scheme == "camper") then 
 		return false 
 	end
 	
@@ -253,7 +253,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	--[[
 	if (_G.schemes["rx_ff"]) then 
-		temp.action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+		temp.action:add_precondition(world_property(rx_ff.evaid,false))
 	end
 	--]]
 	

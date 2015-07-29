@@ -32,7 +32,12 @@ function evaluator_wound:evaluate ()
 		return false
 	end
 
-	return tostring(xr_logic.pstor_retrieve(self.object, "wounded_state")) ~= "nil"
+	local state = xr_logic.pstor_retrieve(self.object, "wounded_state")
+	if (state == nil or state == "nil") then 
+		return false
+	end 
+	
+	return true
 end
 
 class "evaluator_can_fight" (property_evaluator)
@@ -105,7 +110,7 @@ function action_wounded:execute()
 	end
 
 	local wound_manager_state = xr_logic.pstor_retrieve(npc, "wounded_state")
-
+	
 	if wound_manager_state == "true" then
 		local h = hit()
 		h.power = 0
@@ -140,8 +145,8 @@ function action_wounded:execute()
 	end
 
 	if tostring(wound_manager_state) == "nil" then
-		print_table(self.a.hp_state)
-		print_table(self.a.hp_state_see)
+--		print_table(self.a.hp_state)
+--		print_table(self.a.hp_state_see)
 		printf("wrong wounded animation %s", self.object:name())
 	end
 
@@ -246,7 +251,7 @@ function Cwound_manager:eat_medkit()
 
 		self.can_use_medkit = false
 		db.storage[self.npc:id()].wounded_already_selected = nil
-		self:update()
+		--self:update()
 		
 		state_mgr.set_state(self.npc,"hide_no_wpn",nil,nil,nil,{fast_set = true})
 		return true
@@ -365,8 +370,8 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local manager = npc:motivation_action_manager()
 	local action = manager:action(xr_actions_id.alife)
 	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
-
-	action = manager:action(stalker_ids.action_gather_items)
+	
+	action = manager:action(xr_actions_id.state_mgr + 2)
 	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 
 	action = manager:action(stalker_ids.action_combat_planner)

@@ -103,10 +103,6 @@ function evaluator_npc_vs_heli:evaluate()
 		return false 
 	end 
 	
-	--if (db.storage[npc:id()].active_scheme == "camper") then 
-		--return false 
-	--end
-	
 	if not (npc:has_info("npcx_is_companion")) then
 		if (get_object_story_id(npc:id())) then 
 			return false 
@@ -122,7 +118,7 @@ function evaluator_npc_vs_heli:evaluate()
 	end 
 	
 	local st = db.storage[npc:id()]
-	if (st) and (st.rx_dont_shoot or st.help_wounded and st.help_wounded.selected_id ~= nil) then 
+	if (st) and (st.active_scheme == "camper" or st.rx_dont_shoot or st.help_wounded and st.help_wounded.selected_id ~= nil) then 
 		return false 
 	end
 	
@@ -381,7 +377,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
 	
 	if (_G.schemes["rx_ff"]) then 
-		temp.action:add_precondition(world_property(rx_ff.evid_dont_shoot,false))
+		temp.action:add_precondition(world_property(rx_ff.evaid,false))
 	end
 	
 	if (_G.schemes["gl"]) then
