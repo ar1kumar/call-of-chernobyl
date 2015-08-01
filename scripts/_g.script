@@ -2,7 +2,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.0.84 RC"
+GAME_VERSION = "1.0.86 RC"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -28,7 +28,7 @@ b_discard_settings_shown = false
 ----------------------------------------------------------------------
 
 function start_game_callback()
-	printf("start_game_callback")
+	printf("Call of Chernobyl version %s",GAME_VERSION)
 	if (USE_MARSHAL) then 
 		printf("using marshal library")
 	end 

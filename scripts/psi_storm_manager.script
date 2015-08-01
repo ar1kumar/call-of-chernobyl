@@ -265,13 +265,13 @@ function CPsiStormManager:update()
 				self.stages['beginning']=true
 			end
 			-- siren warning -----------------------------------------------------------------------------------------------------------------------------------------
-			if (diff_sec>=22) and (self.stages['siren']==nil) and (atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_warning",0,"siren")=="siren") then
+			if (diff_sec>=10) and (self.stages['siren']==nil) and (atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_warning",0,"siren")=="siren") then
 				self:launch_rockets()
 				surge_manager.SurgeManager:play_siren_sound()
 				self.stages['siren']=true
 			end
 			-- psi storm warning -----------------------------------------------------------------------------------------------------------------------------------------
-			if (diff_sec>=24) and not(self.task_given) then
+			if (diff_sec>=12) and not(self.task_given) then
 				if atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_task",0,"give")=="give" then
 					self:give_psi_storm_hide_task()
 				end
@@ -655,11 +655,5 @@ function get_task_descr()
 end
 
 function get_task_target()
-	--[[
-	if(surge_manager.actor_in_cover()) then
-		return nil
-	end
-	local m = surge_manager.SurgeManager
-	return m.best_cover and m.best_cover:id()
-	--]]
+	return surge_manager.get_task_target()
 end
