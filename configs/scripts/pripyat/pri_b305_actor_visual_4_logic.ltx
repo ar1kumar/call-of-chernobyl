@@ -12,7 +12,7 @@ on_info = {+pri_b305_strelok_introduse_done_end} walker@meet_strelok
 on_info2 = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
 meet = no_meet
 use_camp = false
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
@@ -27,7 +27,7 @@ on_info = {+pri_b305_strelok_introduse_done_end} walker@meet_strelok
 on_info2 = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
 meet = no_meet
 use_camp = false
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
@@ -44,7 +44,7 @@ on_signal2 = sound_end | remark@wait %+pri_b305_actor_ask_about_burning_antenn_d
 on_info = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
 meet = no_meet
 use_camp = false
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
@@ -61,7 +61,7 @@ on_signal = sound_end | walker@time %+pri_b305_actor_emission_starts_done_end%
 on_info = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
 meet = no_meet
 use_camp = false
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
@@ -77,7 +77,7 @@ on_game_timer = 40 | %=destroy_object -pri_b305_4_cam_actor%
 on_info = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
 meet = no_meet
 use_camp = false
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false

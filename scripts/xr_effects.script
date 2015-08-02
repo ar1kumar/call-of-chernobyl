@@ -4055,8 +4055,8 @@ function make_a_wish(actor,npc,p)
 	
 	action_list[3] = function()
 		local sim = alife()
-		local function remove_this_squad(p)
-			local squad = p[1] and sim:object(p[1])
+		local function remove_this_squad(id)
+			local squad = id and sim:object(id)
 			if not (squad) then
 				return true
 			end
@@ -4081,9 +4081,9 @@ function make_a_wish(actor,npc,p)
 	action_list[4] = function()
 		local sim = alife()
 		local sysini = system_ini()
-		local invalid_ids = {[5] = true, [6] = true , [7] = true, [9] = true, [10] = true, [11] = true}
+		local valid_ids = {[1] = true, [2] = true , [3] = true, [4] = true, [8] = true, [11] = true, [12] = true, [13] = true, [14] = true, [15] = true}
 		for k,v in pairs(ui_debug_main.id_to_spawn_table) do
-			if not (invalid_ids[k]) then
+			if (valid_ids[k]) then
 				local list = ui_debug_main.get_spawn_table(v)
 				for kk,vv in pairs(list) do 
 					if (sysini:section_exist(vv)) then
@@ -4093,7 +4093,7 @@ function make_a_wish(actor,npc,p)
 			end
 		end
 
-		local function remove_backpack(p)
+		local function remove_backpack(id)
 			local function itr(npc,itm)
 				if (itm:section() == "itm_actor_backpack" or itm:section() == "itm_backpack") then
 					local se_itm = alife():object(itm:id())

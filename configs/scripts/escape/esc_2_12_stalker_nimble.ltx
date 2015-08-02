@@ -11,7 +11,7 @@ avail_animations = animpoint_sit_ass
 use_camp = false
 ;reach_distance = 1.5
 meet = meet@base
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 on_info = {-esc_2_12_nimble_can_go !npc_talking} %+esc_2_12_nimble_can_go%, {+esc_2_12_nimble_can_go =npc_talking} %-esc_2_12_nimble_can_go%
@@ -36,7 +36,7 @@ allow_break 	= false
 meet_on_talking = false
 
 [sleeper@sleeper_1]
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 gather_items_enabled = false
 help_wounded_enabled = false

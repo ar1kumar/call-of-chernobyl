@@ -8,7 +8,7 @@ def_state_standing = wait_na
 def_state_moving = walk_noweap
 path_walk = taras_base_stay
 path_look = taras_base_look
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 meet = meet@recon_squad_ambush_dialog_1
@@ -24,7 +24,7 @@ use_camp = false
 target = story | actor
 anim = salut_free
 on_game_timer = 5 | walker@home_1
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 out_restr = pri_a16_sr_noweap
@@ -39,7 +39,7 @@ def_state_standing = wait_na
 def_state_moving = walk_noweap
 path_walk = taras_base_stay
 path_look = taras_base_look
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 meet = meet@recon_squad_ambush_dialog_2

@@ -12,7 +12,7 @@ meet = meet@leader_start
 def_state_standing = wait_na
 on_info = {-zat_b7_bandit_boss_sultan_intro =see_actor} walker@leader_start_hello
 on_info2 = {+zat_b7_task_fail} walker@leader_start
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 out_restr = zat_a2_sr_noweap
@@ -27,7 +27,7 @@ path_look = zat_b7_raider_leader_start_look
 meet = meet@leader_start
 def_state_standing = wait_na
 on_game_timer = 250 | {-zat_b7_task_fail -zat_b7_bandit_boss_sultan_intro =dist_to_actor_le(6) =dist_to_actor_ge(3) =see_actor} walker@leader_start_hello
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 out_restr = zat_a2_sr_noweap
@@ -43,7 +43,7 @@ def_state_standing = wait_na
 meet = meet@leader_start_hello
 on_game_timer = 50 | walker@leader_start
 on_info = {+zat_b7_task_fail} walker@leader_start
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 out_restr = zat_a2_sr_noweap

@@ -59,7 +59,7 @@ meet_dialog = zat_b14_stalker_start
 path_walk = zat_b14_stalker_1_sprint_1
 def_state_moving1 = run
 on_game_timer = 30 | walker@item_sprint_1
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 wounded = wounded
 meet = no_meet
 
@@ -67,7 +67,7 @@ meet = no_meet
 path_walk = zat_b14_stalker_1_sprint_1
 def_state_moving1 = sprint
 on_signal = path_end | walker@item_sprint_2
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 wounded = wounded
 meet = no_meet
 
@@ -75,7 +75,7 @@ meet = no_meet
 path_walk = zat_b14_stalker_1_sprint_2
 def_state_moving1 = sprint
 on_signal = path_end | walker@item_sprint_3
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 wounded = wounded
 meet = no_meet
 
@@ -83,7 +83,7 @@ meet = no_meet
 path_walk = zat_b14_stalker_1_sprint_3
 def_state_moving1 = sprint
 on_signal = path_end | walker@item_2
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 wounded = wounded
 meet = no_meet
 
@@ -93,7 +93,7 @@ path_look = zat_b14_stalker_1_look_3
 def_state_moving1 = sprint
 on_info = {=npc_in_zone(zat_a2_sr_noweap)} walker@item_3
 on_info2 = {=npc_in_zone(zat_a2_sr_noweap) =actor_in_zone(zat_a2_sr_noweap) =actor_enemy} walker@fight_2
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 wounded = wounded
 meet = no_meet
 out_restr = zat_a2_sr_noweap
@@ -105,7 +105,7 @@ def_state_moving1 = run
 on_info = {!npc_in_zone(zat_surge_hide_a2)} walker@item_2
 on_info2 ={=npc_in_zone(zat_surge_hide_a2)} walker@item_4 
 on_info3 = {=npc_in_zone(zat_a2_sr_noweap) !npc_in_zone(zat_surge_hide_a2) =actor_in_zone(zat_a2_sr_noweap) =actor_enemy} walker@fight_2
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 wounded = wounded
 meet = no_meet
 out_restr = zat_a2_sr_noweap
@@ -113,7 +113,7 @@ out_restr = zat_a2_sr_noweap
 [walker@item_4] ; Подходим к стойке
 path_walk = zat_b14_stalker_1_walk_4
 path_look = zat_b14_stalker_1_look_4
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 def_state_moving1 = walk
 on_info ={=npc_in_zone(zat_b14_bar_zone)} %+zat_b14_stalker_change_smart%
 meet = no_meet

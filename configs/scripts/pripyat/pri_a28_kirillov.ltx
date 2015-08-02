@@ -1,6 +1,6 @@
 ; Reference animpoints
 [animpoint@a28_def]
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 avail_animations = animpoint_sit_high_no_rnd
@@ -16,7 +16,7 @@ help_wounded_enabled = false
 corpse_detection_enabled = false
 
 [animpoint@a28_radio]
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 avail_animations = animpoint_sit_high_no_rnd
@@ -101,7 +101,7 @@ on_info = {+pri_a28_colonel_to_center_3_sound_end} animpoint@a28_wait_near_door
 ;--------------------------------------
 ; Gathering group before evacuation
 [animpoint@a28_wait_near_door]
-combat_ignore_cond = true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 invulnerable = {!actor_enemy} true, false
 avail_animations = animpoint_sit_high_no_rnd
