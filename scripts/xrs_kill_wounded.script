@@ -234,8 +234,11 @@ function act_kill_wounded:execute()
 	end
 	
 	local dst = db.storage[npc:id()]
-	if (dst and dst.rx_dont_shoot) then 
-		st.vertex_id = npc:level_vertex_id()
+	if (dst and dst.rx_dont_shoot) then
+		st.timer = nil
+		state_mgr.set_state(npc,"raid",nil,nil,{look_object = vo})
+		st.vertex_id = utils.send_to_nearest_accessible_vertex(npc,npc:level_vertex_id(),"kill_wounded")
+		return
 	end
 	
 	if not (st.vertex_id) then

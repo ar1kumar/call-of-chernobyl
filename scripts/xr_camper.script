@@ -154,12 +154,31 @@ function action_patrol:execute()
 	local mem_time = npc:memory_time(be) or nil
 
 	if (npc:see(be) and self:can_shoot()) then
+		if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
+			local dir = self.enemy_position and vector():sub(self.enemy_position,npc:position()) or npc:direction()
+			self.__keep_body_state_until = tg+3000
+			if (npc:body_state() ~= move.crouch) then
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
+					self.stand = false
+				end	
+			else
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+					self.stand = true 
+				end
+			end
+		end
+		
 		local dir = vector():sub(alun_utils.safe_bone_pos(be,"bip01_neck"),npc:bone_position("bip01_r_finger02"))
-		state_mgr.set_state(npc, self.a.suggested_state.campering_fire or self.a.sniper and "hide_sniper_fire" or "hide_fire", nil, nil, {look_object = be, look_dir = dir}, {fast_set = true})
+		if (self.stand) then 
+			state_mgr.set_state(npc,self.a.sniper and "threat_sniper_fire" or "threat_fire", nil, nil, {look_object = be}, {fast_set = true})
+		else 
+			state_mgr.set_state(npc,self.a.sniper and "hide_sniper_fire" or "hide_fire", nil, nil, {look_object = be}, {fast_set = true})
+		end
+		
 		--xr_sound.set_sound_play(self.object:id(), self.a.attack_sound)
 		return
 	end
-
+	
 	local memory_position = npc:memory_position(be)
 	if (memory_position) and (self.enemy_position == nil or not utils.vector_cmp(memory_position,self.enemy_position)) then 
 		self.enemy_position = vector():set(memory_position)
@@ -180,14 +199,36 @@ function action_patrol:execute()
 	end
 	
 	if (self:on_place()) then
+		if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
+			local dir = self.enemy_position and vector():sub(self.enemy_position,npc:position()) or npc:direction()
+			self.__keep_body_state_until = tg+3000
+			if (npc:body_state() ~= move.crouch) then
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
+					self.stand = false
+				end	
+			else
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+					self.stand = true 
+				end
+			end
+		end
+		
 		if (self.a.sniper) then 
 			if (mem_time and tg - mem_time < self.a.post_enemy_wait) then
-				state_mgr.set_state(npc, self.a.suggested_state.campering or "hide_na", nil, nil, {look_position = self.enemy_position})
+				if (self.stand) then 
+					state_mgr.set_state(npc, "threat_na", nil, nil, {look_position = self.enemy_position})
+				else 
+					state_mgr.set_state(npc, "hide_na", nil, nil, {look_position = self.enemy_position})
+				end
 			else
 				self:scan(-1)
 			end
 		else
-			state_mgr.set_state(npc, self.a.suggested_state.campering or "hide_na", nil, nil, {look_position = self.enemy_position})
+			if (self.stand) then 
+				state_mgr.set_state(npc, "threat_na", nil, nil, {look_position = self.enemy_position})
+			else 
+				state_mgr.set_state(npc, "hide_na", nil, nil, {look_position = self.enemy_position})
+			end
 		end
 		return
 	end
@@ -200,31 +241,47 @@ function action_patrol:execute()
 end
 
 function action_patrol:process_danger()
-	if xr_danger.has_danger(self.object) == false then
-		return false
-	end
 	local best_danger = self.object:best_danger()
 	if best_danger == nil then
 		return false
 	end
 	local best_danger_object = best_danger:object()
 	local bd_type = best_danger:type()
-	local passed_time = time_global() - best_danger:time()
-
+	local tg = time_global()
+	local passed_time = tg - best_danger:time()
+	
+	local urgent_danger = best_danger_object and (bd_type == danger_object.attacked or danger_object.enemy_sound) and passed_time < 3000
+	if not (urgent_danger) then 
+		if not (xr_danger.has_danger(self.object)) then
+			return false
+		end
+	end 
+	
 	if self.danger ~= true then
 		self.object:play_sound(stalker_ids.sound_alarm, 1, 0, 1, 0)
 	end
 
-	--[[
-	local urgent_danger = (best_danger_object ~= nil) and (bd_type == danger_object.attacked) and (time_global() - best_danger:time() < 5000)
-	if urgent_danger == true then
-		state_mgr.set_state(self.object, self.a.suggested_state.campering_fire or "hide_fire", nil, nil, {look_position = best_danger_object:position()})
-		return true
+	local bd_pos = urgent_danger and best_danger_object:position() or best_danger:position()
+	if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
+		local dir = bd_pos and vector():sub(bd_pos,self.object:position()) or self.object:direction()
+		self.__keep_body_state_until = tg+3000
+		if (self.object:body_state() ~= move.crouch) then
+			if (level.high_cover_in_direction(self.object:level_vertex_id(),dir) < 0.2) then 
+				self.stand = false
+			end	
+		else
+			if (level.high_cover_in_direction(self.object:level_vertex_id(),dir) >= 0.2) then 
+				self.stand = true 
+			end
+		end
 	end
-	--]]
 	
-	state_mgr.set_state(self.object, self.a.suggested_state.campering or "hide_na", nil, nil, {look_position = best_danger:position()})
-
+	if (self.stand) then 
+		state_mgr.set_state(self.object, "threat_na", nil, nil, {look_position = bd_pos})
+	else 
+		state_mgr.set_state(self.object, "hide_na", nil, nil, {look_position = bd_pos})
+	end
+	
 	return true
 end
 function action_patrol:scan(flag)
@@ -256,8 +313,30 @@ function action_patrol:scan(flag)
 		self.look_point = vector():set(self.look_position.x + self.a.cur_look_point * (self.dest_position.x - self.look_position.x)/self.a.scandelta,
 										 self.look_position.y + self.a.cur_look_point * (self.dest_position.y - self.look_position.y)/self.a.scandelta,
 										 self.look_position.z + self.a.cur_look_point * (self.dest_position.z - self.look_position.z)/self.a.scandelta)
-		state_mgr.set_state(self.object, self.a.suggested_state.campering == "threat_na" and "threat_na" or "hide_na", nil, nil, {look_position = self.look_point})
-
+										
+		
+		local npc = self.object
+		local tg = time_global()
+		if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
+			local dir = self.look_point and vector():sub(self.look_point,npc:position()) or npc:direction()
+			self.__keep_body_state_until = tg+3000
+			if (npc:body_state() ~= move.crouch) then
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
+					self.stand = false
+				end	
+			else
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+					self.stand = true 
+				end
+			end
+		end
+	
+		if (self.stand) then 
+			state_mgr.set_state(npc, "threat_na", nil, nil, {look_position = self.look_point})
+		else 
+			state_mgr.set_state(npc, "hide_na", nil, nil, {look_position = self.look_point})
+		end
+		
 		if self.a.cur_look_point >= self.a.scandelta then
 			self.a.cur_look_point = nil
 			self.a.last_look_point = self.next_point
@@ -326,7 +405,11 @@ function action_patrol:on_place()
 		return false
 	end
 end
-
+function action_patrol:hit_callback(obj, amount, local_direction, who, bone_index)
+	if (amount > 0 and who and (IsStalker(who) or IsMonster(who)) and who:alive()) then
+		obj:enable_memory_object(who,true)
+	end
+end
 ----------------------------------------------------------------------------------------------------------------------
 -- BINDER
 ----------------------------------------------------------------------------------------------------------------------
