@@ -126,23 +126,23 @@ function create_random_stash(no_spot,hint,bonus_items)
 	local max_roll = 1
 
 	if (rnd <= 15) then
-		max_roll = 9
+		max_roll = 10
 	elseif (rnd <= 30) then
-		max_roll = 8
+		max_roll = 9
 	elseif (rnd <= 60) then
-		max_roll = 7
+		max_roll = 8
 	elseif (rnd <= 100) then
-		max_roll = 6
+		max_roll = 7
 	elseif (rnd <= 240) then
-		max_roll = 5
+		max_roll = 6
 	elseif (rnd <= 380) then
-		max_roll = 4
+		max_roll = 5
 	elseif (rnd <= 560) then
-		max_roll = 3
+		max_roll = 4
 	elseif (rnd <= 720) then
-		max_roll = 2
+		max_roll = 3
 	else
-		max_roll = 1
+		max_roll = 2
 	end
 
 	-- setup possible loot table
@@ -153,9 +153,9 @@ function create_random_stash(no_spot,hint,bonus_items)
 	loot[3] = {"bandage","conserva","kolbasa","bread","energy_drink","vodka","drug_psy_blockade","drug_radioprotector","ammo_9x18_pmm"}
 
 	-- fairly common
-	loot[4] = {"bandage","conserva","kolbasa","bread","energy_drink","vodka","drug_booster","drug_coagulant","drug_anabiotic","grenade_f1","detector_simple","itm_pda_common","wpn_pm","wpn_pb","wpn_fort","wpn_hpsa","ammo_9x18_fmj","ammo_9x18_pmm","ammo_12x70_buck"}
-	loot[5] = {"bandage","conserva","kolbasa","bread","energy_drink","vodka","drug_booster","drug_coagulant","drug_anabiotic","grenade_rgd5","itm_backpack","itm_pda_common","wpn_pm","wpn_pb","wpn_fort","wpn_hpsa","ammo_9x18_fmj","ammo_9x18_pmm","ammo_12x70_buck","ammo_9x19_pbp"}
-	loot[6] = {"bandage","conserva","kolbasa","bread","energy_drink","vodka","drug_booster","drug_coagulant","drug_anabiotic","detector_advanced","itm_gunsmith_toolkit","itm_sleepbag","itm_pda_common","wpn_pm","wpn_pb","wpn_fort","ammo_9x18_fmj","ammo_9x18_pmm","ammo_12x70_buck","ammo_9x19_pbp"}
+	loot[4] = {"itm_sleepbag","bandage","conserva","kolbasa","bread","energy_drink","vodka","drug_booster","drug_coagulant","drug_anabiotic","grenade_f1","detector_simple","itm_pda_common","wpn_pm","wpn_pb","wpn_fort","wpn_hpsa","ammo_9x18_fmj","ammo_9x18_pmm","ammo_12x70_buck"}
+	loot[5] = {"itm_sleepbag","bandage","conserva","kolbasa","bread","energy_drink","vodka","drug_booster","drug_coagulant","drug_anabiotic","grenade_rgd5","itm_backpack","itm_pda_common","wpn_pm","wpn_pb","wpn_fort","wpn_hpsa","ammo_9x18_fmj","ammo_9x18_pmm","ammo_12x70_buck","ammo_9x19_pbp"}
+	loot[6] = {"itm_sleepbag","bandage","conserva","kolbasa","bread","energy_drink","vodka","drug_booster","drug_coagulant","drug_anabiotic","detector_advanced","itm_gunsmith_toolkit","itm_sleepbag","itm_pda_common","wpn_pm","wpn_pb","wpn_fort","ammo_9x18_fmj","ammo_9x18_pmm","ammo_12x70_buck","ammo_9x19_pbp"}
 
 	-- uncommon
 	loot[7] = {"itm_pda_uncommon","wpn_pm","wpn_pb","detector_elite","wpn_addon_scope","wpn_addon_silencer","ammo_9x18_fmj","ammo_9x18_pmm","ammo_9x19_pbp","ammo_9x19_fmj","ammo_og-7b","af_fireball","grenade_rgd5","grenade_f1","wpn_fort","wpn_hpsa","wpn_wincheaster1300","wpn_toz34","wpn_desert_eagle","wpn_beretta","wpn_walther","wpn_sig220","wpn_colt1911","itm_gunsmith_toolkit"}
@@ -179,6 +179,10 @@ function create_random_stash(no_spot,hint,bonus_items)
 		lottery = math.random(0,6)
 
 		rnd = math.random(max_roll+lottery)
+		if (rnd > 15) then 
+			rnd = 15 
+		end
+		
 		max_weight = max_weight - (rnd+1)
 
 		table.insert(spawned_item,loot[rnd][math.random(#loot[rnd])])
