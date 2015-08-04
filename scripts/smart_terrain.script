@@ -716,7 +716,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 		
 		-- If NPC has storage, it is online, so switch logic
 		if (st and st.object) then
-			xr_logic.switch_to_section(st.object, self.ltx, "nil")
+			--xr_logic.switch_to_section(st.object, self.ltx, "nil")
 			npc_info.begin_job = true
 			empty_table(db.offline_objects[npc_info.se_obj.id])
 			self:setup_logic(st.object)

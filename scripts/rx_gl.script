@@ -823,7 +823,7 @@ end
 function add_to_binder(npc,ini,scheme,section,storage,temp)
 	local manager = npc:motivation_action_manager()
 	
-	if (gl_sets.forbiddens.factions[npc:character_community()] or gl_sets.forbiddens.npcs[npc:name()]) then
+	if (not npc:alive()) or (gl_sets.forbiddens.factions[npc:character_community()] or gl_sets.forbiddens.npcs[npc:name()]) then
 		manager:add_evaluator(evid_gl_fire,property_evaluator_const(false))
 		manager:add_evaluator(evid_gl_reload,property_evaluator_const(false))
 		temp.needs_configured = false

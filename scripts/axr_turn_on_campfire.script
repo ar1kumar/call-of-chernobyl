@@ -243,7 +243,7 @@ end
 function add_to_binder(npc,char_ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 
-	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
+	if (not npc:alive()) or (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
 		temp.needs_configured = false
 		return 
@@ -268,8 +268,9 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local wp = world_property
 	
 	--temp.action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
-	temp.action:add_precondition(wp(xr_gather_items.evaid, false))
-	temp.action:add_precondition(wp(stalker_ids.property_items, false))
+	if (_G.schemes["gather_items"]) then
+		temp.action:add_precondition(wp(xr_gather_items.evaid, false))
+	end
 	temp.action:add_precondition(wp(xr_evaluators_id.wounded_exist,false))
 	if (_G.schemes["corpse_detection"]) then
 		temp.action:add_precondition(wp(xr_evaluators_id.corpse_exist,false))

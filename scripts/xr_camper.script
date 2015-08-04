@@ -454,66 +454,66 @@ function add_to_binder(object, ini, scheme, section, storage)
 	end
 
 
-		action:add_effect (world_property(properties["end"],				true))
-		action:add_effect (world_property(stalker_ids.property_enemy,		false))
-		action:add_effect (world_property(properties["state_mgr_logic_active"], false))
-		manager:add_action (operators["patrol"], action)
-		xr_logic.subscribe_action_for_events(object, storage, action)
+	action:add_effect (world_property(properties["end"],				true))
+	action:add_effect (world_property(stalker_ids.property_enemy,		false))
+	action:add_effect (world_property(properties["state_mgr_logic_active"], false))
+	manager:add_action (operators["patrol"], action)
+	xr_logic.subscribe_action_for_events(object, storage, action)
 
-		action = manager:action (xr_actions_id.alife)
-		action:add_precondition	(world_property(properties["end"],			true))
+	action = manager:action (xr_actions_id.alife)
+	action:add_precondition	(world_property(properties["end"],			true))
 
-		action = manager:action (stalker_ids.action_gather_items)
-		action:add_precondition	(world_property(properties["end"],			true))
+	action = manager:action (stalker_ids.action_gather_items)
+	action:add_precondition	(world_property(properties["end"],			true))
 
-		if (xr_gather_items.actid) then
-			action = manager:action (xr_gather_items.actid)
-			action:add_precondition	(world_property(properties["end"],true))
-		end
-		
-		if (_G.schemes["corpse_detection"]) then
-			action = manager:action (operators["search_corpse"])
-			action:add_precondition	(world_property(properties["end"],true))
-		end
-		
-		if (_G.schemes["npc_vs_heli"]) then 
-			action = manager:action(axr_npc_vs_heli.actid)
-			action:add_precondition(world_property(properties["end"],true))
-		end
-
-		if (_G.schemes["fight_from_cover"]) then 
-			action = manager:action(axr_fight_from_cover.actid)
-			action:add_precondition(world_property(properties["end"],true))
-		end
-		
-		if (_G.schemes["stalker_panic"]) then 
-			action = manager:action(axr_stalker_panic.actid)
-			action:add_precondition(world_property(properties["end"],true))
-		end
-		
-		if (_G.schemes["turn_on_campfire"]) then 
-			action = manager:action(axr_turn_on_campfire.actid)
-			action:add_precondition(world_property(properties["end"],true))
-		end
-		
-		if (_G.schemes["kill_wounded"]) then 
-			action = manager:action(xrs_kill_wounded.actid)
-			action:add_precondition(world_property(properties["end"],true))		
-		end
-		
-		action = manager:action (xr_actions_id.wounded_exist)
+	if (xr_gather_items.actid) then
+		action = manager:action (xr_gather_items.actid)
 		action:add_precondition	(world_property(properties["end"],true))
-		
-		if (xr_danger.actid) then
-			action = manager:action(xr_danger.actid)
-			action:add_precondition(world_property(properties["end"],true))
-		end
+	end
+	
+	if (_G.schemes["corpse_detection"]) then
+		action = manager:action (operators["search_corpse"])
+		action:add_precondition	(world_property(properties["end"],true))
+	end
+	
+	if (_G.schemes["npc_vs_heli"]) then 
+		action = manager:action(axr_npc_vs_heli.actid)
+		action:add_precondition(world_property(properties["end"],true))
+	end
 
-		action = manager:action (stalker_ids.action_combat_planner)
-		action:add_precondition (world_property(properties["close_combat"],	true))
-		action:add_effect (world_property(properties["close_combat"],	false))
-		action:add_effect (world_property(properties["state_mgr_logic_active"], false))
-		action:add_effect (world_property(properties["end"],				true))
+	if (_G.schemes["fight_from_cover"]) then 
+		action = manager:action(axr_fight_from_cover.actid)
+		action:add_precondition(world_property(properties["end"],true))
+	end
+	
+	if (_G.schemes["stalker_panic"]) then 
+		action = manager:action(axr_stalker_panic.actid)
+		action:add_precondition(world_property(properties["end"],true))
+	end
+	
+	if (_G.schemes["turn_on_campfire"]) then 
+		action = manager:action(axr_turn_on_campfire.actid)
+		action:add_precondition(world_property(properties["end"],true))
+	end
+	
+	if (_G.schemes["kill_wounded"]) then 
+		action = manager:action(xrs_kill_wounded.actid)
+		action:add_precondition(world_property(properties["end"],true))		
+	end
+	
+	action = manager:action (xr_actions_id.wounded_exist)
+	action:add_precondition	(world_property(properties["end"],true))
+	
+	if (xr_danger.actid) then
+		action = manager:action(xr_danger.actid)
+		action:add_precondition(world_property(properties["end"],true))
+	end
+
+	action = manager:action (stalker_ids.action_combat_planner)
+	action:add_precondition (world_property(properties["close_combat"],	true))
+	action:add_effect (world_property(properties["close_combat"],	false))
+	action:add_effect (world_property(properties["state_mgr_logic_active"], false))
+	action:add_effect (world_property(properties["end"],				true))
 end
 
 function set_scheme(npc, ini, scheme, section, gulag_name)

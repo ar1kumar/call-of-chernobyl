@@ -109,7 +109,7 @@ local function get_hostage(npc)
 	if (squad and squad:commander_id() == npc:id()) then
 		for id,v in pairs(hostage_list) do
 			local vo = db.storage[id] and db.storage[id].object or level.object_by_id(id)
-			if (vo and npc:position():distance_to_sqr(vo:position()) <= 900) then
+			if (vo and npc:position():distance_to_sqr(vo:position()) <= 900 and character_community(npc) ~= character_community(vo)) then
 				return vo
 			end
 		end
@@ -338,7 +338,7 @@ end
 function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 
-	if (Enable ~= true or character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
+	if (not npc:alive()) or (Enable ~= true or character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
 		temp.needs_configured = false
 		return 

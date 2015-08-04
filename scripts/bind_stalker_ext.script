@@ -17,6 +17,19 @@ end
 -- actor_on_net_spawn
 -------------------
 function actor_on_net_spawn()
+
+	-- Uncomment to remove all corpses at beginning of game in case they cause error
+	--[[
+	local sim = alife()
+	local se_obj
+	for i=1,65534 do 
+		se_obj = sim:object(i)
+		if (se_obj and se_obj:clsid() == clsid.script_stalker and not se_obj:alive()) then 
+			sim:release(se_obj,true)
+		end
+	end
+	--]]
+	
 	SendScriptCallback("on_game_load",binder)
 end
 

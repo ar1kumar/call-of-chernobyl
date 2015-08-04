@@ -16,18 +16,14 @@ stype_trader	    = 5
 ----------------------------------------------------------------------
 -- Загрузка модулей сталкеров:
 ----------------------------------------------------------------------
-LoadScheme("xr_danger",						"danger",			stype_stalker)
-LoadScheme("xr_abuse",							"abuse",			stype_stalker)
 LoadScheme("xr_walker",						"walker",			stype_stalker)
 LoadScheme("xr_remark",						"remark",			stype_stalker)
 LoadScheme("xr_cover",							"cover",			stype_stalker)
 LoadScheme("xr_sleeper",						"sleeper",			stype_stalker)
 LoadScheme("xr_camper",						"camper",			stype_stalker)
-LoadScheme("xr_meet",							"meet",				stype_stalker)
 LoadScheme("xr_combat",						"combat",			stype_stalker)
 LoadScheme("xr_death",							"death",			stype_stalker)
 LoadScheme("xr_hit",							"hit",				stype_stalker,stype_mobile,stype_heli)
-LoadScheme("xr_wounded",						"wounded",			stype_stalker)
 LoadScheme("xr_combat_ignore",					"combat_ignore",	stype_stalker,stype_mobile)
 LoadScheme("xr_combat_zombied",				"combat_zombied",	stype_stalker)
 LoadScheme("xr_patrol",						"patrol",			stype_stalker)
@@ -83,22 +79,27 @@ LoadScheme("sr_cutscene",						"sr_cutscene",		stype_restrictor)
 LoadScheme("sr_monster",						"sr_monster",		stype_restrictor)
 LoadScheme("sr_crow_spawner",					"sr_crow_spawner",	stype_restrictor)
 LoadScheme("sr_silence",						"sr_silence",		stype_restrictor)
-LoadScheme("sr_deimos",						"sr_deimos",		stype_restrictor)
+LoadScheme("sr_deimos",							"sr_deimos",		stype_restrictor)
 
--- Alundaio
+----------
 LoadScheme("axr_beh",				"beh",						stype_stalker)
 LoadScheme("xr_campfire_point",		"campfire_point",			stype_stalker)
--- Generic
-LoadScheme("xr_gather_items",					"gather_items",		stype_stalker)
-LoadScheme("xr_help_wounded",					"help_wounded",		stype_stalker)
-LoadScheme("xr_corpse_detection",				"corpse_detection",	stype_stalker)
+
+-- Generic Schemes
+LoadScheme("xr_meet",				"meet",						stype_stalker)
+LoadScheme("xr_wounded",			"wounded",					stype_stalker)
+LoadScheme("xr_danger",				"danger",					stype_stalker)
+LoadScheme("xr_abuse",				"abuse",					stype_stalker)
+LoadScheme("xr_gather_items",		"gather_items",				stype_stalker)
+LoadScheme("xr_help_wounded",		"help_wounded",				stype_stalker)
+LoadScheme("xr_corpse_detection",	"corpse_detection",			stype_stalker)
 --LoadScheme("axr_stalker_panic",		"stalker_panic",			stype_stalker) -- working but not ideal behavior so it's disabled
 LoadScheme("axr_npc_vs_heli",		"npc_vs_heli",				stype_stalker)
 LoadScheme("axr_fight_from_cover",	"fight_from_cover",			stype_stalker)
 LoadScheme("axr_radio_in_heli",		"radio_in_heli",			stype_stalker)
 LoadScheme("axr_turn_on_campfire",	"turn_on_campfire",			stype_stalker)
 LoadScheme("rx_ff",					"rx_ff",					stype_stalker)
---LoadScheme("rx_gl",				"gl",						stype_stalker) --known to cause issues enable at your own risk
+--LoadScheme("rx_gl",					"gl",						stype_stalker) --known to cause issues enable at your own risk
 LoadScheme("xrs_facer",				"facer",					stype_stalker)
 LoadScheme("xrs_kill_wounded", 		"kill_wounded",				stype_stalker)
 
@@ -275,13 +276,12 @@ function add_common_precondition(scheme,action)
 	--alun_utils.debug_write(strformat("DEBUG: modules: add_common_precondition %s",scheme))
 	local wp = world_property
 	action:add_precondition(wp(xr_evaluators_id.stohe_meet_base + 1, false))
-	action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base + 0, false))
+	action:add_precondition(wp(xr_evaluators_id.sidor_wounded_base, false))
 	action:add_precondition(wp(xr_evaluators_id.abuse_base, false))
 	action:add_precondition(wp(xr_evaluators_id.wounded_exist, false))
 	if (_G.schemes["corpse_detection"]) then
 		action:add_precondition(wp(xr_evaluators_id.corpse_exist, false))
 	end
-	action:add_precondition(wp(stalker_ids.property_items, false))
 	for scheme,filename in pairs(_G.schemes) do 
 		if (_G[filename] and _G[filename].npc_add_precondition) then 
 			_G[filename].npc_add_precondition(action)

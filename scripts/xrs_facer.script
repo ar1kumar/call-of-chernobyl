@@ -466,7 +466,7 @@ end
 function add_to_binder(npc,ini,scheme,section,storage,temp)
 	local manager = npc:motivation_action_manager()
 
-	if (facer_sets.forbiddens.factions and facer_sets.forbiddens.factions[npc:character_community()]) or (facer_sets.ranks and not facer_sets.ranks[ranks.get_obj_rank_name(npc)]) then
+	if (not npc:alive()) or (facer_sets.forbiddens.factions and facer_sets.forbiddens.factions[npc:character_community()]) or (facer_sets.ranks and not facer_sets.ranks[ranks.get_obj_rank_name(npc)]) then
 		manager:add_evaluator(evid_facer,property_evaluator_const(false))
 		manager:add_evaluator(evid_steal_up_facer,property_evaluator_const(false))
 		temp.needs_configured = false
@@ -504,11 +504,12 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local action
 	local p = {
 				xr_actions_id.alife,
+				xr_actions_id.state_mgr + 2,
 				stalker_ids.action_combat_planner,
 				stalker_ids.action_danger_planner,
 				xr_actions_id.stohe_meet_base+1
 	}
-	--local p = {xr_actions_id.state_mgr + 1, xr_actions_id.state_mgr + 2, xr_actions_id.alife,xr_actions_id.stohe_meet_base+1}
+	--local p = {xr_actions_id.state_mgr + 1, , xr_actions_id.alife,xr_actions_id.stohe_meet_base+1}
 	
 	for i=1,#p do
 		action = manager:action(p[i])

@@ -10,6 +10,8 @@
 combat_action_ids = {	[stalker_ids.action_combat_planner] = true,
 						[stalker_ids.action_danger_planner] = true,
 						[stalker_ids.action_anomaly_planner] = true,
+						[xrs_facer.actid_facer] = true,
+						[xrs_facer.actid_steal_up_facer] = true,
 						[xr_danger.actid] = true
 }
 
@@ -553,13 +555,14 @@ function bind_manager(object)
 	action:add_effect 			(wp(xr_evaluators_id.state_mgr + 1,	true))
 	manager:add_action(xr_actions_id.state_mgr + 1, action)
 
+	--[[
 	action = this.act_state_mgr_to_idle("state_mgr_to_idle_items", state_manager)
 	action:add_precondition		(wp(xr_evaluators_id.state_mgr + 5,	false))
-	action:add_precondition		(wp(stalker_ids.property_items, true))
 	action:add_precondition		(wp(stalker_ids.property_enemy, false))
 	action:add_precondition		(wp(stalker_ids.property_alive, true))
 	action:add_effect 			(wp(xr_evaluators_id.state_mgr + 5,	true))
 	manager:add_action(xr_actions_id.state_mgr + 3, action)
+	--]]
 
 	action = this.act_state_mgr_to_idle("state_mgr_to_idle_alife", state_manager)
 	action:add_precondition		(wp(stalker_ids.property_alive, true))
@@ -583,7 +586,6 @@ function bind_manager(object)
 
 	--action = manager:action(stalker_ids.action_anomaly_planner)
 	--action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
-	-- Doesn't work in CoP for whatever reason so may as well remove it
 	manager:remove_action(stalker_ids.action_anomaly_planner)
 
 	action = manager:action(stalker_ids.action_danger_planner)
