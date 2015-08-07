@@ -141,7 +141,9 @@ function action_patrol:execute()
 					end
 				end
 			else 
-				state_mgr.set_state(self.object, self.a.suggested_state.campering or "hide", nil, nil, {look_position = self.enemy_position})
+				self.move_mgr:continue()
+				self.move_mgr:update()
+				self.scantime = nil
 			end
 		else 
 			self.move_mgr:continue()
