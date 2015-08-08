@@ -227,7 +227,7 @@ function simulation_board:setup_squad_and_group(obj)
 	end
 	
 	local gg = game_graph()
-	local group = gg and gg:vertex(squad.m_game_vertex_id):level_id() or obj.group
+	local group = obj.group --gg and gg:vertex(squad.m_game_vertex_id):level_id() or obj.group
 	
 	local smart = squad.assigned_target_id and sim:object(squad.assigned_target_id) or squad.smart_id and sim:object(squad.smart_id)
 	if smart == nil then
