@@ -122,6 +122,8 @@ end
 --param 1 task_id
 --param 2+ factions that can be targetted; can be list
 function on_init_bounty_hunt(actor,npc,p)
+	axr_task_manager.bounties_by_id[p[1]] = nil 
+	
 	local valid_targets = {}
 	local sim = alife()
 	local se_obj,comm
