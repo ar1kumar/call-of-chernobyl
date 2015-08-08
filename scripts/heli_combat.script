@@ -408,6 +408,9 @@ end
 
 function heli_combat:forget_enemy()
 	--alun_utils.debug_write(strformat("heli_combat:forget_enemy"))
+	if (self.st.enemy_id and self.st.enemy_id == 0) then 
+		alun_utils.save_var(db.actor,"heli_enemy_flag",nil) -- for crybabies 
+	end
 	self.st.enemy_id = nil
 	self.enemy = nil
 	self.heliObject:LookAtPoint(vector(), false)
