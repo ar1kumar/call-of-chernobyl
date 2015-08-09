@@ -122,28 +122,7 @@ function create_random_stash(no_spot,hint,bonus_items)
 	math.random()
 	math.random()
 
-	local rnd = math.random(1,1000)
-	local max_roll = 1
-
-	if (rnd <= 15) then
-		max_roll = 10
-	elseif (rnd <= 30) then
-		max_roll = 9
-	elseif (rnd <= 60) then
-		max_roll = 8
-	elseif (rnd <= 100) then
-		max_roll = 7
-	elseif (rnd <= 240) then
-		max_roll = 6
-	elseif (rnd <= 380) then
-		max_roll = 5
-	elseif (rnd <= 560) then
-		max_roll = 4
-	elseif (rnd <= 720) then
-		max_roll = 3
-	else
-		max_roll = 2
-	end
+	local max_roll = math.random(1,6)
 
 	-- setup possible loot table
 	local loot = {}
@@ -170,13 +149,16 @@ function create_random_stash(no_spot,hint,bonus_items)
 	-- extremely rare
 	loot[13] = {"wpn_svu","wpn_svd","wpn_g36","wpn_fn2000","helm_m40","wpn_pkm","stalker_outfit","svoboda_novice_outfit","ecolog_guard_outfit","banditmerc_outfit","dolg_novice_outfit","cs_novice_outfit","ecolog_outfit_green","svoboda_light_outfit","wpn_sig550_luckygun","af_compass","itm_pda_rare"}
 	loot[14] = {"wpn_rg-6","wpn_rpg7","specops_outfit","military_outfit","scientific_outfit","svoboda_heavy_outfit","cs_heavy_outfit","dolg_outfit","itm_pda_rare"}
-	loot[15] = {"ammo_gauss","exo_outfit","dolg_heavy_outfit","itm_pda_rare"}
+	loot[15] = {"ammo_gauss","exo_outfit","dolg_heavy_outfit","itm_pda_rare","wpn_rg-6","wpn_rpg7","specops_outfit","military_outfit","scientific_outfit","svoboda_heavy_outfit","cs_heavy_outfit","dolg_outfit"}
 
 	local spawned_item = bonus_items or {}
 	local max_weight = (max_roll * math.random(1,100)/25)
 	local lottery = 0
 	repeat
 		lottery = math.random(0,6)
+		if (lottery == 6) then 
+			lottery = lottery + math.random(0,3)
+		end
 
 		rnd = math.random(max_roll+lottery)
 		if (rnd > 15) then 
