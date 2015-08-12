@@ -127,6 +127,11 @@ function has_completed_task_prerequisites(actor,npc,p)
 	local tm = task_manager.get_task_manager()
 	local info = tm.task_info
 	
+	
+	if (info[p[1]]) then -- HAS TASK ALREADY!
+		return false 
+	end
+	
 	prereq = alun_utils.str_explode(prereq,",")
 	
 	local task 

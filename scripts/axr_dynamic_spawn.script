@@ -6,8 +6,8 @@
 	Copyright (C) 2012 Alundaio
 	This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 --]]
-dynamic_story_id = nil
-secret_stashes = nil
+dynamic_story_id = {}
+secret_stashes = {}
 ini = nil
 
 function on_game_start()
@@ -87,6 +87,11 @@ function on_game_load()
 end
 
 function actor_on_item_take_from_box(box,obj)
+
+	if (coc_treasure_manager) then
+		return
+	end
+	
 	if not (secret_stashes) then
 		return
 	end
@@ -300,6 +305,7 @@ function interpret_spawn_data(sections)
 		["ZS_RADIO"] = "cse_alife_anomalous_zone",
 		["ZS_TORRD"] = "se_zone_torrid",
 		["ZS_BFUZZ"] = "se_zone_visual",
+    	["Z_RUSTYF"] = "cse_alife_anomalous_zone",
 
 		["Z_MBALD"]  = "cse_alife_anomalous_zone",
 		["Z_RADIO"]  = "cse_alife_anomalous_zone",
@@ -607,7 +613,7 @@ function dynamic.cse_alife_space_restrictor(se_obj,t,sec)
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
-	data.shape_count = t.shape_count and tonumber(t.shape_count) or 1
+	t.shape_count = t.shape_count and tonumber(t.shape_count) or 1
 
 	t.shape_type = t.shape_type and alun_utils.str_explode(t.shape_type,",")
 	t.center = t.center and alun_utils.str_explode(t.center,",")
@@ -617,14 +623,18 @@ function dynamic.cse_alife_space_restrictor(se_obj,t,sec)
 	t.v3 = t.v3 and alun_utils.str_explode(t.v3,":")
 	t.v4 = t.v4 and alun_utils.str_explode(t.v4,":")
 
-	for i=1,data.shape_count do
-		data.shape_type[i] = t.shape_type and t.shape_type[i] and tonumber(t.shape_type) or 1
-		data.center[i] = t.center and t.center[i] and alun_utils.string_to_vector(t.center[i]) or vector():set(0,0,0)
-		data.radius[i] = t.radius and t.radius[i] and tonumber(t.radius[i]) or 10
-		data.v1[i] = t.v1 and t.v1[i] and alun_utils.string_to_vector(t.v1[i]) or vector():set(5,0,0)
-		data.v2[i] = t.v2 and t.v2[i] and alun_utils.string_to_vector(t.v2[i]) or vector():set(0,2,0)
-		data.v3[i] = t.v3 and t.v3[i] and alun_utils.string_to_vector(t.v3[i]) or vector():set(0,0,5)
-		data.v4[i] = t.v4 and t.v4[i] and alun_utils.string_to_vector(t.v4[i]) or vector():set(0,0,0)
+	for i=1,t.shape_count do
+		data.shapes[i] = {}
+		data.shapes[i].shtype = t.shape_type and t.shape_type[i] and tonumber(t.shape_type) or 1
+		if (data.shapes[i].shtype == 0) then
+			data.shapes[i].offset = t.center and t.center[i] and alun_utils.string_to_vector(t.center[i]) or vector():set(0,0,0)
+			data.shapes[i].radius = t.radius and t.radius[i] and tonumber(t.radius[i]) or 10
+		else
+			data.shapes[i].v1 = t.v1 and t.v1[i] and alun_utils.string_to_vector(t.v1[i]) or vector():set(5,0,0)
+			data.shapes[i].v2 = t.v2 and t.v2[i] and alun_utils.string_to_vector(t.v2[i]) or vector():set(0,2,0)
+			data.shapes[i].v3 = t.v3 and t.v3[i] and alun_utils.string_to_vector(t.v3[i]) or vector():set(0,0,5)
+			data.shapes[i].offset = t.v4 and t.v4[i] and alun_utils.string_to_vector(t.v4[i]) or vector():set(0,0,0)
+		end
 	end
 
 	stpk_utils.set_space_restrictor_data(data,se_obj)
@@ -641,7 +651,7 @@ function dynamic.cse_alife_anomalous_zone(se_obj,t,sec)
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
-	data.shape_count = t.shape_count and tonumber(t.shape_count) or 1
+	t.shape_count = t.shape_count and tonumber(t.shape_count) or 1
 
 	t.shape_type = t.shape_type and alun_utils.str_explode(t.shape_type,",")
 	t.center = t.center and alun_utils.str_explode(t.center,",")
@@ -651,14 +661,18 @@ function dynamic.cse_alife_anomalous_zone(se_obj,t,sec)
 	t.v3 = t.v3 and alun_utils.str_explode(t.v3,":")
 	t.v4 = t.v4 and alun_utils.str_explode(t.v4,":")
 
-	for i=1,data.shape_count do
-		data.shape_type[i] = t.shape_type and t.shape_type[i] and tonumber(t.shape_type) or 1
-		data.center[i] = t.center and t.center[i] and alun_utils.string_to_vector(t.center[i]) or vector():set(0,0,0)
-		data.radius[i] = t.radius and t.radius[i] and tonumber(t.radius[i]) or 10
-		data.v1[i] = t.v1 and t.v1[i] and alun_utils.string_to_vector(t.v1[i]) or vector():set(5,0,0)
-		data.v2[i] = t.v2 and t.v2[i] and alun_utils.string_to_vector(t.v2[i]) or vector():set(0,2,0)
-		data.v3[i] = t.v3 and t.v3[i] and alun_utils.string_to_vector(t.v3[i]) or vector():set(0,0,5)
-		data.v4[i] = t.v4 and t.v4[i] and alun_utils.string_to_vector(t.v4[i]) or vector():set(0,0,0)
+	for i=1,t.shape_count do
+		data.shapes[i] = {}
+		data.shapes[i].shtype = t.shape_type and t.shape_type[i] and tonumber(t.shape_type) or 1
+		if (data.shapes[i].shtype == 0) then
+			data.shapes[i].offset = t.center and t.center[i] and alun_utils.string_to_vector(t.center[i]) or vector():set(0,0,0)
+			data.shapes[i].radius = t.radius and t.radius[i] and tonumber(t.radius[i]) or 10
+		else
+			data.shapes[i].v1 = t.v1 and t.v1[i] and alun_utils.string_to_vector(t.v1[i]) or vector():set(5,0,0)
+			data.shapes[i].v2 = t.v2 and t.v2[i] and alun_utils.string_to_vector(t.v2[i]) or vector():set(0,2,0)
+			data.shapes[i].v3 = t.v3 and t.v3[i] and alun_utils.string_to_vector(t.v3[i]) or vector():set(0,0,5)
+			data.shapes[i].offset = t.v4 and t.v4[i] and alun_utils.string_to_vector(t.v4[i]) or vector():set(0,0,0)
+		end
 	end
 
 	data.max_power = t.max_power and tonumber(t.maxpower) or 0
@@ -879,7 +893,7 @@ function dynamic.cse_alife_object_climable(se_obj,t)
 	data.custom_data = t.custom_data and "[logic]\n cfg = " .. t.custom_data or data.custom_data
 	data.object_flags = t.object_flags and tonumber(t.object_flags) or data.object_flags
 
-	data.shape_count = t.shape_count and tonumber(t.shape_count) or 1
+	t.shape_count = t.shape_count and tonumber(t.shape_count) or 1
 
 	t.shape_type = t.shape_type and alun_utils.str_explode(t.shape_type,",")
 	t.center = t.center and alun_utils.str_explode(t.center,",")
@@ -889,14 +903,18 @@ function dynamic.cse_alife_object_climable(se_obj,t)
 	t.v3 = t.v3 and alun_utils.str_explode(t.v3,":")
 	t.v4 = t.v4 and alun_utils.str_explode(t.v4,":")
 
-	for i=1,data.shape_count do
-		data.shape_type[i] = t.shape_type and t.shape_type[i] and tonumber(t.shape_type) or 1
-		data.center[i] = t.center and t.center[i] and alun_utils.string_to_vector(t.center[i]) or vector():set(0,0,0)
-		data.radius[i] = t.radius and t.radius[i] and tonumber(t.radius[i]) or 10
-		data.v1[i] = t.v1 and t.v1[i] and alun_utils.string_to_vector(t.v1[i]) or vector():set(5,0,0)
-		data.v2[i] = t.v2 and t.v2[i] and alun_utils.string_to_vector(t.v2[i]) or vector():set(0,2,0)
-		data.v3[i] = t.v3 and t.v3[i] and alun_utils.string_to_vector(t.v3[i]) or vector():set(0,0,5)
-		data.v4[i] = t.v4 and t.v4[i] and alun_utils.string_to_vector(t.v4[i]) or vector():set(0,0,0)
+	for i=1,t.shape_count do
+		data.shapes[i] = {}
+		data.shapes[i].shtype = t.shape_type and t.shape_type[i] and tonumber(t.shape_type) or 1
+		if (data.shapes[i].shtype == 0) then
+			data.shapes[i].offset = t.center and t.center[i] and alun_utils.string_to_vector(t.center[i]) or vector():set(0,0,0)
+			data.shapes[i].radius = t.radius and t.radius[i] and tonumber(t.radius[i]) or 10
+		else
+			data.shapes[i].v1 = t.v1 and t.v1[i] and alun_utils.string_to_vector(t.v1[i]) or vector():set(5,0,0)
+			data.shapes[i].v2 = t.v2 and t.v2[i] and alun_utils.string_to_vector(t.v2[i]) or vector():set(0,2,0)
+			data.shapes[i].v3 = t.v3 and t.v3[i] and alun_utils.string_to_vector(t.v3[i]) or vector():set(0,0,5)
+			data.shapes[i].offset = t.v4 and t.v4[i] and alun_utils.string_to_vector(t.v4[i]) or vector():set(0,0,0)
+		end
 	end
 
 	stpk_utils.set_climable_data(data,se_obj)

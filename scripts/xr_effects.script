@@ -184,7 +184,7 @@ function reward_money(actor,npc,p)
 end
 
 function reward_stash(actor,npc,p)
-	if (p[1] ~= "true" or math.random() <= 0.5) then
+	if (p and p[1] ~= "true") or (math.random() <= 0.5) then
 		coc_treasure_manager.create_random_stash()
 	end
 end

@@ -146,6 +146,10 @@ function npc_sim_set_finished_task_complete(a,b)
 end
 
 function npc_give_last_task_id(a,b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
+	while last_task_id and task_section ~= nil and task_section ~= last_task_id do 
+		task_section = axr_task_manager.get_first_available_task(npc,true,true)
+	end
 	if (last_task_id) then
 		local npc = who_is_npc(a,b)
 		local se_obj = npc and alife():object(npc:id())
@@ -156,6 +160,10 @@ function npc_give_last_task_id(a,b)
 end
 
 function npc_sim_give_last_task_id(a,b)
+	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
+	while last_task_id and task_section ~= nil and task_section ~= last_task_id do 
+		task_section = axr_task_manager.get_first_available_task(npc,true,true)
+	end
 	if (last_task_id) then
 		local npc = who_is_npc(a,b)
 		local se_obj = npc and alife():object(npc:id())

@@ -454,9 +454,11 @@ function cycle_companions_combat_mode()
 		for id,squad in pairs(companion_squads) do 
 			if (squad and squad.commander_id) then
 				for k in squad:squad_members() do
-					local member = db.storage[k.id] and db.storage[k.id].object
-					if (member and member:alive()) then
-						f(member)
+					if not (xrs_kill_wounded.hostage_list[k.id]) then
+						local member = db.storage[k.id] and db.storage[k.id].object
+						if (member and member:alive()) then
+							f(member)
+						end
 					end
 				end
 			end
@@ -480,15 +482,17 @@ function cycle_companions_move_mode()
 		for id,squad in pairs(companion_squads) do 
 			if (squad and squad.commander_id) then
 				for k in squad:squad_members() do
-					st = db.storage[k.id]
-					if (k.id == squad:commander_id()) then 
-						if (st and st.beh) then 
-							st.beh.rally_lvid = nil
+					if not (xrs_kill_wounded.hostage_list[k.id]) then
+						st = db.storage[k.id]
+						if (k.id == squad:commander_id()) then 
+							if (st and st.beh) then 
+								st.beh.rally_lvid = nil
+							end
 						end
-					end
-					local member = st and st.object
-					if (member and member:alive()) then
-						f(member)
+						local member = st and st.object
+						if (member and member:alive()) then
+							f(member)
+						end
 					end
 				end
 			end
@@ -536,7 +540,7 @@ function move_to_point(p)
 								set_companion_to_follow_state(member)
 								alun_utils.save_var(member,"fight_from_point",lvid)
 							end
-							if (k.id == squad:commander_id()) then 
+							if (k.id == squad:commander_id() and not xrs_kill_wounded.hostage_list[k.id]) then 
 								if (st and st.beh) then 
 									st.beh.rally_lvid = lvid
 								end

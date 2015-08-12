@@ -51,7 +51,7 @@ function se_monster:STATE_Read(packet, size)
 			db.offline_objects[self.id] = {}
 		end
 		db.offline_objects[self.id].active_section = packet:r_stringZ()
-		if db.offline_objects[self.id].active_section == "nil" then
+		if (db.offline_objects[self.id].active_section == "nil" or db.offline_objects[self.id].active_section == "") then
 			db.offline_objects[self.id].active_section = nil
 		end
 		if old_lvid ~= "nil" then

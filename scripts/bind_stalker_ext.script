@@ -24,7 +24,7 @@ function actor_on_net_spawn()
 	local se_obj
 	for i=1,65534 do 
 		se_obj = sim:object(i)
-		if (se_obj and se_obj:clsid() == clsid.script_stalker and not se_obj:alive()) then 
+		if (se_obj and (se_obj:clsid() == clsid.script_stalker or IsMonster(nil,se_obj:clsid())) and not se_obj:alive()) then 
 			sim:release(se_obj,true)
 		end
 	end

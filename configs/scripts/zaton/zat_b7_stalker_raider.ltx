@@ -122,7 +122,7 @@ on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} camper@leader_a
 on_info4 = {=squad_in_zone_all(zat_b7_stalkers_raiders:zat_b7_prepared_for_attack) !actor_enemy} %+zat_b7_stalker_raider_leader_on_position =play_sound(zat_b7_raiders_attack)%
 team = zat_b7_stalkers_raiders
 meet = no_meet
-combat_ignore_cond = {!actor_enemy} true, false
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 def_state_moving = sneak_run
 gather_items_enabled = false
 corpse_detection_enabled = false
@@ -247,7 +247,7 @@ on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} camper@attack_1
 on_info4 = {!actor_enemy} %=play_sound(zat_b7_raider_sneak_comments_1)%
 team = zat_b7_stalkers_raiders
 meet = no_meet
-combat_ignore_cond = {!actor_enemy} true, false
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 def_state_moving = sneak_run
 gather_items_enabled = false
 corpse_detection_enabled = false
@@ -304,7 +304,7 @@ on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} camper@attack_2
 on_game_timer = 15 | {!actor_enemy} %=play_sound(zat_b7_raider_sneak_comments_2)%
 team = zat_b7_stalkers_raiders
 meet = no_meet
-combat_ignore_cond = {!actor_enemy} true, false
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 def_state_moving = sneak_run
 gather_items_enabled = false
 corpse_detection_enabled = false
@@ -361,7 +361,7 @@ on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} camper@attack_3
 on_game_timer = 35 | {!actor_enemy} %=play_sound(zat_b7_raider_sneak_comments_3)%
 team = zat_b7_stalkers_raiders
 meet = no_meet
-combat_ignore_cond = {!actor_enemy} true, false
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 def_state_moving = sneak_run
 gather_items_enabled = false
 corpse_detection_enabled = false

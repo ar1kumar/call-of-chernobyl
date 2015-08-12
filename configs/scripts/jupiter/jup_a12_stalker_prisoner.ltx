@@ -63,7 +63,7 @@ wounded = wounded@no_wound
 [walker@stand_up]
 path_walk = stalker_prisoner_stand_up_walk
 path_look = stalker_prisoner_stand_up_look
-combat_ignore_cond = {!actor_enemy} true, false
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 meet = no_meet
 on_game_timer = 50 | %+jup_a12_stalker_prisoner_stood_up +pri_a12_stalker_prisoner_free +jup_a12_actor_is_ready%
@@ -81,7 +81,7 @@ on_info = {+jup_a12_stalker_prisoner_hide_end} walker@out_of_containers %+jup_a1
 on_info2 = {=actor_enemy} walker@quick_get_out_of_base
 on_info3 = {=dist_to_actor_ge(120)} %+jup_a12_stalker_prisoner_hide_end%
 on_info4 = %=play_sound(jup_a12_stalker_prisoner_thanks_actor)%
-combat_ignore_cond = {!actor_enemy} true, false
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 meet = meet@hide_until_walk_out_meet
 def_state_standing = hide_na
@@ -172,7 +172,7 @@ wounded = wounded@no_wound
 [walker@hide]
 path_walk = stalker_prisoner_battle_walk
 path_look = stalker_prisoner_battle_look
-combat_ignore_cond = {!actor_enemy} true, false
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
 def_state_moving = sprint
 def_state_standing = hide_na

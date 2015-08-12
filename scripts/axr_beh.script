@@ -332,6 +332,7 @@ function action_beh:set_desired_target()
 			--t.object = db.actor
 			t.__keep_until = -1
 			self.st.behavior = "beh_cover"
+			self.st.rally_lvid = nil
 		end
 	elseif (target == "waypoint") then
 		t = self:get_current_waypoint()
