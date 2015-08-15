@@ -119,6 +119,14 @@ function dec_task_stage(actor,npc,p)
 	end
 end
 
+function set_smart_faction(actor,npc,p)
+	local smart = p and p[1] and SIMBOARD.smarts_by_names[p[1]]
+	if not (smart) then 
+		return false 
+	end
+	smart.faction = p[2]
+end 
+
 --param 1 task_id
 --param 2+ factions that can be targetted; can be list
 function on_init_bounty_hunt(actor,npc,p)
