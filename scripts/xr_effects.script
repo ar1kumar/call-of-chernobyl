@@ -146,16 +146,19 @@ function on_init_bounty_hunt(actor,npc,p)
 	end
 	
 	local size = #valid_targets
-	if (size <= 0) then 
+	if (size <= 0) then
+		printf("on_init_bounty_hunt failed, no targets")
 		return 
 	end
 	
 	local target_id = valid_targets[math.random(size)]
-	if not(target_id) then 
+	if not(target_id) then
 		return 
 	end
 	
 	axr_task_manager.bounties_by_id[p[1]] = target_id
+	
+	printf("on_init_bounty_hunt %s",target_id)
 	
 	--alun_utils.save_var(db.actor,p[1],target_id)
 end 

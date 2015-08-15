@@ -95,15 +95,23 @@ function heli_combat:is_enemy(obj)
 		return false 
 	end
 	
-	if (self.sobject and self.sobject.community == character_community(obj)) then 
-		return false 
+	if (heli_alife.distance_2d_sqr(obj:position(),self.object:position()) > 90000) then
+		return false
 	end 
 	
-	if (obj:id() == db.actor:id()) then 
-		if (alun_utils.load_var(db.actor,"heli_enemy_flag",false) == true) then 
-			return true 
+	if (obj:id() == db.actor:id()) then
+		if (self.sobject and string.find(character_community(obj),self.sobject.community)) then 
+			return false 
+		end
+	
+		if (alun_utils.load_var(db.actor,"heli_enemy_flag",false) == true) then
+			return true
 		end
 		return self.actor_always_enemy or false
+	else 
+		if (self.sobject and self.sobject.community == character_community(obj)) then 
+			return false 
+		end 
 	end 
 	
 	if not (db.storage[obj:id()] and db.storage[obj:id()].heli_enemy_flag) then 
@@ -183,14 +191,13 @@ function heli_combat:find_valid_target()
 		return current_target ~= nil 
 	end
 	
-	if (current_target and target:id() == self.st.enemy_id) then 
+	if (current_target and id == self.st.enemy_id) then 
 		return true 
 	end 
 	
 	if (self.heliObject:isVisible(target)) then
-	
 		local target_pos = target:position()
-		if not (db.storage[target:id()].heli_enemy_flag) then
+		if (id == 0 and alun_utils.load_var(db.actor,"heli_enemy_flag",false)) or (id ~= 0 and db.storage[id].heli_enemy_flag) then
 			if (self.st.ini and self.st.active_section) then
 				local smart = xr_gulag.get_npc_smart(self.object)
 				if (smart) then
@@ -200,7 +207,7 @@ function heli_combat:find_valid_target()
 						if (radius) then 
 							local dist = heli_alife.distance_2d_sqr(target_pos,smart.position)
 							if (dist < radius) then
-								if (target:id() == 0) then 
+								if (id == 0) then 
 									alun_utils.save_var(db.actor,"heli_enemy_flag",true)
 								else
 									db.storage[target:id()].heli_enemy_flag = true
@@ -408,9 +415,6 @@ end
 
 function heli_combat:forget_enemy()
 	--alun_utils.debug_write(strformat("heli_combat:forget_enemy"))
-	if (self.st.enemy_id and self.st.enemy_id == 0) then 
-		alun_utils.save_var(db.actor,"heli_enemy_flag",nil) -- for crybabies 
-	end
 	self.st.enemy_id = nil
 	self.enemy = nil
 	self.heliObject:LookAtPoint(vector(), false)

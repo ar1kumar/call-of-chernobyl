@@ -205,18 +205,15 @@ end
 
 function bounty_task(task,task_id)
 	if (task.stage == 1) then
-		axr_task_manager.bounties_by_id[task_id] = nil -- needed incase player takes task again after completion and he didn't reload game otherwise task will fail instantly
-		return "complete"
-	end
-	if (task.stage == 2) then
-		return "fail"
-	end
-	local id = axr_task_manager.bounties_by_id[task_id]
-	if not (id) then 
-		return "fail"
-	end
-	local se_obj = id and alife():object(id)
-	if not (se_obj) then 
+		local id = axr_task_manager.bounties_by_id[task_id]
+		if not (id) then
+			return "fail"
+		end
+		local se_obj = id and alife():object(id)
+		if not (se_obj) then 
+			return "fail"
+		end
+	elseif (task.stage == 3) then 
 		return "fail"
 	end
 end 
