@@ -235,6 +235,24 @@ function faction_ui:OnFactionSelect(faction)
 	local gs = game.translate_string
 	local desc = gs("st_faction_"..faction.."_desc") .. "\\n \\n \\n"
 	
+	desc = desc .. "%c[0,245,245,220]Relations:\\n"
+	
+	local t = {"stalker","bandit","csky","ecolog","army","monolith","dolg","freedom","killer"}
+	for i=1,#t do 
+		if not (t[i] == faction) then 
+			local v = relation_registry.community_relation("actor_"..faction, t[i])
+			if (v >= 1000) then 
+				desc = desc .. "   %c[0,51,255,51]".. gs("st_faction_"..t[i]) .. "\\n"
+			elseif (v <= -1000) then 
+				desc = desc .. "   %c[0,255,0,0]" .. gs("st_faction_"..t[i]) .. "\\n"
+			else 
+				desc = desc .. "   %c[0,255,255,51]" .. gs("st_faction_"..t[i]) .. "\\n"
+			end
+		end
+	end
+	
+	desc = desc .. "\\n \\n"
+	
 	local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\character_desc_general.xml")
 	_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
 	if (_xml) then
