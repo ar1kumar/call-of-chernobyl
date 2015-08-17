@@ -165,6 +165,10 @@ function PsyAntenna:update_postprocess(pp)
 	return true
 end
 function PsyAntenna:update(dt)
+	if (db.actor == nil or device().precache_frame > 1) then
+		return 
+	end 
+	
 	self.eff_time					= self.eff_time + dt
 
 	local function update_intensity(intensity_base, intensity)
