@@ -158,18 +158,40 @@ bip01_r_toe0	 	 		= 0.01, -1, 0.01
 
 [critical_wound_head_section]
 	bip01_head
-	bip01_neck
 	eyelid_1
 	eye_left
 	eye_right
 	jaw_1
+	bip01_l_hand
+	bip01_l_finger0
+	bip01_l_finger01
+	bip01_l_finger02
+	bip01_l_finger1
+	bip01_l_finger11
+	bip01_l_finger12
+	bip01_l_finger2
+	bip01_l_finger21
+	bip01_l_finger22
+	bip01_r_hand
+	bip01_r_finger0
+	bip01_r_finger01
+	bip01_r_finger02
+	bip01_r_finger1
+	bip01_r_finger11
+	bip01_r_finger12
+	bip01_r_finger2
+	bip01_r_finger21
+	bip01_r_finger22
+	bip01_neck
+
+
 
 [critical_wound_torso_section]
 	bip01_pelvis
-	;bip01_tail
-	;bip01_spine
-	;bip01_spine1
-	;bip01_spine2
+	bip01_tail
+	bip01_spine
+	bip01_spine1
+	bip01_spine2
 
 [critical_wound_hand_left_section]
 	bip01_l_upperarm
@@ -184,14 +206,14 @@ bip01_r_toe0	 	 		= 0.01, -1, 0.01
 [critical_wound_leg_left_section]
 	bip01_l_thigh
 	bip01_l_calf
-	;bip01_l_foot
-	;bip01_l_toe0
+	bip01_l_foot
+	bip01_l_toe0
 
 [critical_wound_leg_right_section]
 	bip01_r_thigh
 	bip01_r_calf
-	;bip01_r_foot
-	;bip01_r_toe0
+	bip01_r_foot
+	bip01_r_toe0
 
 [critical_wound_body_parts_section]
 	head				= critical_wound_head_section
@@ -365,10 +387,10 @@ terrain					= 255,255,255,255,0,1
 ;terrain				= stalker_terrain
 
 ;---SOUND-------------------------------------------------------------
-sound_threshold					= 0.6	;Low value = easier to hear object
-self_sound_factor				= 0.1
+sound_threshold					= 0.09
+self_sound_factor				= 0.1	;1.0
 self_decrease_quant				= 250	; in milliseconds
-self_decrease_factor			= 0.5	; fading factor
+self_decrease_factor			= 0.94	; fading factor
 killer_clsids					= Z_MINCER,Z_GALANT,ZS_BFUZZ,ZS_MBALD,ZS_GALAN,ZS_MINCE
 sound_perceive_section			= stalker_sound_perceive
 
@@ -450,12 +472,12 @@ crouch_type						= 0 ; 0 - crouch a little, 1 - crouch full; -1 - random crouch
 
 ;---FIRE DISPERSIONS--------------------------------------------------
 disp_walk_stand					= 8
-disp_walk_crouch				= 7
-disp_run_stand					= 16
-disp_run_crouch					= 15
-disp_stand_stand				= 7
-disp_stand_crouch				= 5
-disp_stand_stand_zoom			= 1
+disp_walk_crouch				= 5
+disp_run_stand					= 15
+disp_run_crouch					= 12
+disp_stand_stand				= 5
+disp_stand_crouch				= 3
+disp_stand_stand_zoom			= 2
 disp_stand_crouch_zoom			= 1
 
 FireRandomMin 		 =     	1
@@ -489,7 +511,7 @@ ph_box1_center 				= 0.0, 0.6, 0.0
 ph_box1_size 				= 0.2, 0.6, 0.2
 
 ;---------------------------------------------------------------------
-ph_crash_speed_min			= 10
+ph_crash_speed_min			= 13
 ph_crash_speed_max			= 30
 ph_collision_damage_factor		= 0.1
 ;---------------------------------------------------------------------
@@ -502,8 +524,9 @@ ph_character_have_wounded_state = false; имеет ли персонаж состояние раненый
 ;--------------------------------------------------------------------------------------------------------------------
 ;--					АНИМАЦИИ ДЛЯ СМЕРТИ
 ;--------------------------------------------------------------------------------------------------------------------
+;cлучайные
+random_death_animations = norm_2_critical_hit_legs_right_0,norm_2_critical_hit_torso_0,norm_2_critical_hit_torso_1,norm_2_critical_hit_legs_left_0,norm_2_critical_hit_hend_left_0,norm_2_critical_hit_hend_right_0,norm_2_critical_hit_head_0
 
-;random_death_animations = ragdoll_burst_front_0,ragdoll_burst_front_1,ragdoll_burst_back_0,ragdoll_burst_left_0,ragdoll_burst_right_0 ;norm_2_reg_doll_0,norm_2_reg_doll_1,norm_2_reg_doll_2,norm_2_reg_doll_3,norm_2_reg_doll_4,norm_2_reg_doll_5
 
 
 ;front/back/left/right

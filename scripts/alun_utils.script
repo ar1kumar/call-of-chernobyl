@@ -1158,15 +1158,19 @@ function position_node:select_best_vertex_id(object,dir,lvid,distance)
 end
 
 -------------------------------------------- INI utils
+function get_path(str,sep)
+    sep=sep or'\\'
+    return str:match("(.*"..sep..")")
+end
 
 -- INI Reader
-function file_to_table(fname,dir,include)
+function file_to_table(fname,include)
 	local root = {}
 	local includes
 	local sec_includes
 	local sec, t,_root,key,val
 	for line in io.lines(fname) do
-		if not (line == "" or line == "\n") then
+		if (line ~= "" and line ~= "\n") then
 			if (include == true and startsWith(line, "#include")) then
 				t = str_explode(line,";")
 				t = str_explode(t[1],[["]])
@@ -1176,8 +1180,12 @@ function file_to_table(fname,dir,include)
 				end
 
 				table.insert(includes,t[2])
-				_root = file_to_table(dir..t[2],dir,include)
-				for k,v in pairs(_root) do root[k] = v end
+				_root = file_to_table(get_path(fname)..t[2],get_path(fname),include)
+				for k,v in pairs(_root) do
+					if not (root[k]) then
+						root[k] = v
+					end
+				end
 			elseif (startsWith(line, "[")) then
 				t = str_explode(line,";")
 				t = str_explode(t[1],":")
@@ -1186,16 +1194,19 @@ function file_to_table(fname,dir,include)
 				root[sec] = {}
 
 				if (include and t[2]) then
-					if not (sec_includes) then
-						sec_includes = {}
+					local a = str_explode(t[2],",")
+					for k,v in pairs(a) do
+						if (root[v]) then
+							for kk,vv in pairs(root[v]) do
+								root[sec][kk] = vv
+							end
+						end
 					end
-
-					sec_includes[sec] = str_explode(t[2],",")
 				end
-			elseif (not startsWith(line, ";")) then
+			elseif (not startsWith(line, ";") and not startsWith(line,"	") and not startsWith(line," ")) then
 				t = str_explode(line,";")
-				key = string.match(t[1],"(.-)=") or t[1]
-				if (key) then
+				key = trim(string.match(t[1],"(.-)=") or t[1])
+				if (key and key ~= "") then
 					key = trim(key)
 					val = string.match(t[1],"=(.+)")
 					if (val) then
@@ -1207,20 +1218,6 @@ function file_to_table(fname,dir,include)
 						root[sec][key] = val or ""
 					else
 						root[key] = val or ""
-					end
-				else
-					printf("file_to_table: Unable to process key in section %s. key=%s",sec,key)
-				end
-			end
-		end
-	end
-
-	if (sec_includes) then
-		for section,tbl in pairs(sec_includes) do
-			if (type(tbl) == "table") then
-				for i=1,#tbl do
-					for key,val in pairs(root[tbl[i]]) do
-						root[section][key] = val
 					end
 				end
 			end
@@ -1237,7 +1234,7 @@ function cfg_file:__init(fname,include)
 	cfg:close()
 	self.fname = fname
 	self.directory = fname:match("(.*\\)") or ""
-	self.root,self.includes = file_to_table(fname,self.directory,include)
+	self.root,self.includes = file_to_table(fname,include)
 end
 
 function cfg_file:GetValue(sec,key,typ,def)
