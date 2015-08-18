@@ -70,14 +70,10 @@ function check_nearest_smart_dist_le(actor,npc,p)
 		return false 
 	end 
 	
-	if (p[2] == nil) then 
+	local smart = p[2] and SIMBOARD.smarts_by_names[p[2]]
+	if (smart and smart_terrain.nearest_to_actor_smart.id and smart.id == smart_terrain.nearest_to_actor_smart.id) then 
 		return true 
-	end 
-	
-	local smrt = SIMBOARD.smarts[smart_terrain.nearest_to_actor_smart.id]
-	if (smrt and smrt.smrt:name() == p[2]) then 
-		return true 
-	end 
+	end
 	
 	return false
 end 
