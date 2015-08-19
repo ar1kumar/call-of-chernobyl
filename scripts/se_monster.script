@@ -33,12 +33,7 @@ end
 -----------------------
 function se_monster:STATE_Write(packet)
 	cse_alife_monster_base.STATE_Write (self, packet)
-	if self.online then
-		local npc = db.storage[self.id] and db.storage[self.id].object or level and level.object_by_id(self.id)
-		packet:w_stringZ(tostring(npc and npc:level_vertex_id()))
-	else
-		packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].level_vertex_id))
-	end
+	packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].level_vertex_id))
 	packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].active_section))
 end
 --------------------
@@ -46,16 +41,16 @@ function se_monster:STATE_Read(packet, size)
 	--alun_utils.debug_write("\nse_monster:STATE_Read "..self:name().." START")
 	cse_alife_monster_base.STATE_Read (self, packet, size)
 	if self.script_version > 10 then
-		local old_lvid = packet:r_stringZ()
 		if db.offline_objects[self.id] == nil then
 			db.offline_objects[self.id] = {}
+		end
+		local old_lvid = packet:r_stringZ()
+		if old_lvid ~= "nil" then
+			db.offline_objects[self.id].level_vertex_id = tonumber(old_lvid)
 		end
 		db.offline_objects[self.id].active_section = packet:r_stringZ()
 		if (db.offline_objects[self.id].active_section == "nil" or db.offline_objects[self.id].active_section == "") then
 			db.offline_objects[self.id].active_section = nil
-		end
-		if old_lvid ~= "nil" then
-			db.offline_objects[self.id].level_vertex_id = tonumber(old_lvid)
 		end
 	end
 	--alun_utils.debug_write("se_monster:STATE_Read "..self:name().." END\n")
