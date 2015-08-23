@@ -9,6 +9,16 @@
 -]]
 -- TODO: Remove all unused COP story functions
 
+
+-- used by tasks in precondition to randomly have it available to give the illusion to player that sim stalkers only sometimes have task
+function random_chance(actor,npc,p)
+	local r = p and p[1] and tonumber(p[1]) or 50
+	if (math.random(1,100) < r) then 
+		return true 
+	end 
+	return false
+end 
+
 -- checks if a task has stage of equal value
 -- param 1 - task_id
 -- param 2 - value

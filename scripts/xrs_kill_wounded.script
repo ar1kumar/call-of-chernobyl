@@ -109,7 +109,7 @@ local function get_hostage(npc)
 	if (squad and squad:commander_id() == npc:id()) then
 		for id,v in pairs(hostage_list) do
 			local vo = db.storage[id] and db.storage[id].object or level.object_by_id(id)
-			if (vo and npc:position():distance_to_sqr(vo:position()) <= 900 and character_community(npc) ~= character_community(vo)) then
+			if (vo and npc:position():distance_to_sqr(vo:position()) <= 900 and  npc:relation(vo) >= game_object.enemy) then
 				return vo
 			end
 		end
