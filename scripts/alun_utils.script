@@ -1171,7 +1171,7 @@ function file_to_table(fname,include)
 	local sec, t,_root,key,val
 	for line in io.lines(fname) do
 		if (line ~= "" and line ~= "\n") then
-			if (include == true and startsWith(line, "#include")) then
+			if (startsWith(line, "#include")) then
 				t = str_explode(line,";")
 				t = str_explode(t[1],[["]])
 
@@ -1180,10 +1180,12 @@ function file_to_table(fname,include)
 				end
 
 				table.insert(includes,t[2])
-				_root = file_to_table(get_path(fname)..t[2],get_path(fname),include)
-				for k,v in pairs(_root) do
-					if not (root[k]) then
-						root[k] = v
+				if (include == true) then
+					_root = file_to_table(get_path(fname)..t[2],include)
+					for k,v in pairs(_root) do
+						if not (root[k]) then
+							root[k] = v
+						end
 					end
 				end
 			elseif (startsWith(line, "[")) then
