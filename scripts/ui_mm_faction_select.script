@@ -187,6 +187,10 @@ function faction_ui:InitControls(f)
 	btn = xml:Init3tButton("main_dialog:btn_submit", self.dialog)
 	self:Register(btn,"btn_submit")
 	
+	-- randomizer
+	btn = xml:Init3tButton("main_dialog:btn_rand", self.dialog)
+	self:Register(btn,"btn_rand")
+	
 	-- character_name edit box
 	xml:InitStatic("main_dialog:cap_character_name", self.dialog)
 	self.character_name = xml:InitEditBox("main_dialog:input_character_name",self.dialog)
@@ -222,6 +226,7 @@ function faction_ui:InitControls(f)
 end 
 
 function faction_ui:InitCallBacks(f)
+	self:AddCallback("btn_rand", ui_events.BUTTON_CLICKED, self.OnRandomize, self)
 	self:AddCallback("btn_back", ui_events.BUTTON_CLICKED, self.OnQuit, self)
 	self:AddCallback("btn_submit", ui_events.BUTTON_CLICKED, self.OnStartGame, self)
 	self:AddCallback("list_factions", ui_events.LIST_ITEM_SELECT, self.OnSelectFactionList,		self)
@@ -229,6 +234,42 @@ function faction_ui:InitCallBacks(f)
 	for i=1,#f do 
 		self:AddCallback("btn_"..f[i].."_inactive_select", ui_events.BUTTON_CLICKED, self["OnFaction_"..f[i]], self)
 	end
+end
+
+function faction_ui:OnRandomize()
+	local faction = random_choice("stalker","bandit","csky","ecolog","army","monolith","dolg","freedom","killer")
+	self:OnFactionSelect(faction)
+	
+	local new_name = ""
+	
+	if (faction == "army") then 
+		new_name = random_choice("Private","Senior Private","Junior Sergeant","Sergeant","Senior Sergeant","Master Sergeant","Junior Lieutenant","Lieutenant","Senior Lieutenant","Captain") .. " "
+	end 
+	local t = {"Sanek","Shurik","Vadya","Vasyan","Vasek","Vityukha","Vetal","Vovan","Zhorka","Grishka","Grishko","Dimon","Lekha","Dimukha","Zheka","Fimka","Ilyukha","Kostyan","Mitka","Mikhal","Mikha","Mikhas","Kolyan","Tolyan","Pavlukha","Sashok","Stepka"
+					,"Stepukha","Timokha","Felka","Yuras","Yashka","Andryukha","Tokha","Arkasha","Temka","Boryan","Bodya","Andrey","Anton","Oleg","Roman","Aleksandr","Sergey","Anatoly","Yuri","Bohdan","Veniamin","Vitaly","Vladimir","Dmitry","Ivan"
+					,"Konstantin","Alexey","Sanya","Sanek","Arthur","Yashka","Yarik","Yara","Slava","Borya","Borka","Bohdan","Slavik","Vadim","Vadya","Vadik","Valik","Valera","Shurik","Vasya","Vaska","Vasko","Venya","Vitya","Vitka","Vitalik","Vlad"
+					,"Vova","Vovka","Lenya","Seva","Sevka","Gena","Genka","George","Gosha","Zhora","Mark","Gleb","Grisha","Alex","Grishka","Grishko","Danya","Kiryukha","Danko","Dennis","Dima","Dimka","Dmitro","Zhenya","Leshka","Zhenka","Egor","Egorka"
+					,"Fima","Vanya","Vanka","Igorek","Ilya","Kostya","Kostik","Tolik","Leva","Lenya","Lyonka","Max","Matvei","Mitya","Misha","Mishka","Nikita","Nik","Antonio","Kolya","Evgeniy","Pasha","Pashka","Petya","Petka","Semyon","Semen","Serega"
+					,"Rusik","Stepan","Stepa","Tima","Timka","Artem","Fedor","Fedya","Fedka","Filya","Filka","Edik","Yurka","Yurik","Yurko","Yasha"}
+	new_name = new_name .. t[math.random(1,#t)] .. " "
+	local r = random_choice(1,2,3,4,5)
+	if (r == 1) then
+		local t = {"Gray","Berserk","Rotten","Patty","Spy","Bison","Beaver","Bulldog","Ox","Sparrow","Woodpecker","Beast","Warlock","Humpback","Boar","Crucian","Canary","Bedbug","Nark","Moose","Rat","Boa","Loaf","Broken","Long John","Mayhem","Bolt","Razor","Drum","Junk","Screw","Dynamite","Trump","Shovel","Joint","Dead Duck","Cross","Tar","Sock","Crowbar","Panadol","Shiv","Piston","Nickel","Tails","Lethal","Percher","Grindstone","Ace","Chisel","Jackstraw","Shortstop","Crosstie","Stud","Jiggers","Fist","Bruise","Tadpole","Hacker","Khan","Koschei","Rambo","Tour Guide","Terminator","Chapai","Genghis","Banana","Loaf","Butterfingers","Papa","Spike","Homeboy","Gangrene","Glitch","Degree","Antelope","Fubar","Pariah","Aspic","Charcoal","Trump","Joint","Sock","Goblin","Moor","Reefer","Flop","Ravioli","Chili","Grater","Fatso","Biscuit","Ghoul","Miser","Broken","Tightwad","Squint","Fiend","Cripple","Kicker","Skew","Crooked","Shifter","Toupee","Fierce","Crony","Local","Slime","Champ","Monocle","Rascal","Deadbeat","Hotshot","Turd","Defunct","Psycho","Loudmouth","Torn","Grabber","Blind","Snot","Hipster","Met","Corpse","Slasher","Ears","Jester","Greyhound","Lame","Sturdy","Cranky","Connoisseur","Robust","Squire","Leech","Artist","Conman","Banker","Hobo","Baron","Peddler","Unorthodox","Tramp","Bosun","Pigmy","Bourbon","Bourgeois","Chauffeur","Thief","Shaven","Gangster","Messenger","Count","Tyrant","Savage","Strangler","Counselor","Player","Cheat","Godfather","Veteran","Coach","Bling-bling","Maniac","Undertaker","Butcher","Ninja","Executioner","Punk","Guerilla","Pacifist","Boulder","Pirate","Arsonist","Prince","Brigand","Kamikaze","Pimp","Tyrant","Hitman","Trombone","Chemist","Abdurakhmanov","Altynnik","Barsak","Kireev","Scherbin","Kovalchuk","Koev","Kozlov","Kolontarev","Kolontar","Kondratenko","Korkin","Korneev","Baul","Kravchenko","Krivda","Krivokhatsky","Kuznetsov","Kuzmich","Kuzyakin","Kulchitsky","Kuntsev","Kurvitz","Kucheruk","Bashakov","Kushnarev","Khaladze","Lavrik","Lavrov","Livshits","Lisichansky","Litvin","Lymarenko","Mazepa","Makarenko","Bashmakov","Maltsev","Mamaev","Merzlayev","Milchenko","Mironyuk","Mohrer","Kryga","Mostovoi","Muntyan","Mukhamedov","Beshevly","Myskov","Navrotsky","Nepritsky","Nikanorov","Nikeshin","Nikulin","Futzin","Nordiev","Nosan","Opolev","Binoev","Orlevich","Orlov","Petkevich","Petrenko"}
+		new_name = new_name .. t[math.random(1,#t)]
+	elseif (r == 2) then 
+		local t = {"Vorontsov","Vorokhaev","Vyushinsky","Anisiev","Galkin","Ganzyuk","Garkovenko","Garkusha","Georgov","Glebovsky","Gnatyuk","Goncharenko","Gordienko","Gorlevoy","Ardashev","Gorokhin","Goryunov","Grebenko","Gritzaenko","Gritzay","Gritzenkov","Grishachev","Grischuk","Gubar","Gunko","Babich","Gurevich","Denisenko","Dovgalyuk","Dombrik","Dotsenko","Drozdush","Dubenchuk","Dudorov","Duka","Dumko","Balan","Dunaev","Dyklov","Erofeev","Efremov","Zhabenko","Zhmyev","Zhurakovsky","Zabyagoda","Zagorodnyuk","Zamosenchuk","Baranov","Zarubin","Zakharin","Zvonnitsky","Zinoviev","Zozo","Zolotar","Zubarev","Zubkov","Ivanov","Ignatenko","Baranovsky","Izhenko","Ischuk","Kazakov","Kazantsev","Kandybabko","Kapuka","Kapustyanko","Katz","Kikabidze","Gatzula","Abdurakhmanov","Altynnik","Barsak","Kireev","Scherbin","Kovalchuk","Koev","Kozlov","Kolontarev","Kolontar","Kondratenko","Korkin","Korneev","Baul","Kravchenko","Krivda","Krivokhatsky","Kuznetsov","Kuzmich","Kuzyakin","Kulchistky","Kuntsev","Kurvitz","Kucheruk","Bashakov","Kushnarev","Khaladze","Lavrik","Lavrov","Livshits","Lisichansky","Litvin","Lymarenko","Mazepa","Makarenko","Bashmakov","Maltsev","Mamaev","Merzlayev","Milchenko","Mironyuk","Mohrer","Kryga","Mostovoi","Muntyan","Mukhamedov","Beshevly","Myskov","Navrotsky","Nepritsky","Nikanorov","Nikeshin","Nikulin","Futzin","Nordiev","Nosan","Opolev","Binoev","Orlevich","Orlov","Petkevich","Petrenko","Petrov","Plokhenko","Podyachev","Polyanin","Poplavsky","Popov","Blinov","Portnykh","Prasolov","Prokopenko","Proskurin","Protsenko","Prudov","Pustovar","Puchek","Rabinovich","Radkevich","Bobrov","Rezun","Rogoza","Rodnyansky","Rotan","Rublev","Rudik","Rusanov","Rychagirsky","Savchenko","Savchuk","Bogdanov","Sagitov","Sviridov","Sedykh","Sereda","Sidorenko","Sidorov","Siniy","Sinitzyn","Skameika","Slutsky","Boiko","Smelov","Smoly","Sorokin","Statzura","Stepchin","Stychinsky","Sykula","Tarnavsky","Tatarchuk","Timchuk","Andreychuk","Boichenko","Boldeskul","Bondarev","Borisov","Brich","Bronshtein","Buryak","Buturin","Byalo","Valentinov","Andruschenko","Vasiliev","Veselov","Vinogradov","Vovnenko","Volanchuk","Volodar","Voloshin","Vorontsov","Vorokhaev","Vyushinsky","Anisiev","Galkin","Ganzyuk","Garkovenko","Garkusha","Georgov","Glebovsky","Gnatyuk","Goncharenko","Gordienko","Gorlevoy","Ardashev","Gorokhin"}
+		new_name = new_name .. t[math.random(1,#t)]
+	elseif (r == 3) then 
+		local t = {"Zarubin","Zakharin","Zvonnitsky","Zinoviev","Zozo","Zolotar","Zubarev","Zubkov","Ivanov","Ignatenko","Baranovsky","Izhenko","Ischuk","Kazakov","Kazantsev","Kandybabko","Kapuka","Kapustyanko","Katz","Kikabidze","Gatzula","Abdurakhmanov","Altynnik","Barsak","Kireev","Scherbin","Kovalchuk","Koev","Kozlov","Kolontarev","Kolontar","Kondratenko","Korkin","Korneev","Baul","Kravchenko","Krivda","Krivokhatsky","Kuznetsov","Kuzmich","Kuzyakin","Kulchistky","Kuntsev","Kurvitz","Kucheruk","Bashakov","Kushnarev","Khaladze","Lavrik","Lavrov","Livshits","Lisichansky","Litvin","Lymarenko","Mazepa","Makarenko","Bashmakov","Maltsev","Mamaev","Merzlayev","Milchenko","Mironyuk","Mohrer","Kryga","Mostovoi","Muntyan","Mukhamedov","Beshevly","Myskov","Navrotsky","Nepritsky","Nikanorov","Nikeshin","Nikulin","Futzin","Nordiev","Nosan","Opolev","Binoev","Orlevich","Orlov","Petkevich","Petrenko","Petrov","Plokhenko","Podyachev","Polyanin","Poplavsky","Popov","Blinov","Portnykh","Prasolov","Prokopenko","Proskurin","Protsenko","Prudov","Pustovar","Puchek","Rabinovich","Radkevich","Bobrov","Rezun","Rogoza","Rodnyansky","Rotan","Rublev","Rudik","Rusanov","Rychagirsky","Savchenko","Savchuk","Bogdanov","Sagitov","Sviridov","Sedykh","Sereda","Sidorenko","Sidorov","Siniy","Sinitzyn","Skameika","Slutsky","Boiko","Smelov","Smoly","Sorokin","Statzura","Stepchin","Stychinsky","Sykula","Tarnavsky","Tatarchuk","Timchuk","Andreychuk","Boichenko","Boldeskul","Bondarev","Borisov","Brich","Bronshtein","Buryak","Buturin","Byalo","Valentinov","Andruschenko","Vasiliev","Veselov","Vinogradov","Vovnenko","Volanchuk","Volodar","Voloshin","Vorontsov","Vorokhaev","Vyushinsky","Anisiev","Galkin","Ganzyuk","Garkovenko","Garkusha","Georgov","Glebovsky","Gnatyuk","Goncharenko","Gordienko","Gorlevoy","Ardashev","Gorokhin","Goryunov","Grebenko","Gritzaenko","Gritzay","Gritzenkov","Grishachev","Grischuk","Gubar","Gunko","Babich","Gurevich","Denisenko","Dovgalyuk","Dombrik","Dotsenko","Drozdush","Dubenchuk","Dudorov","Duka","Dumko","Balan","Dunaev","Dyklov","Erofeev","Efremov","Zhabenko","Zhmyev","Zhurakovsky","Zabyagoda","Zagorodnyuk","Zamosenchuk","Baranov","Zarubin","Zakharin","Zvonnitsky","Zinoviev","Zozo","Zolotar","Zubarev","Zubkov","Ivanov","Ignatenko","Baranovsky","Izhenko","Ischuk","Kazakov","Kazantsev","Kandybabko","Kapuka"}
+		new_name = new_name .. t[math.random(1,#t)]
+	elseif (r == 4) then
+		local t = {"Petrov","Plokhenko","Podyachev","Polyanin","Poplavsky","Popov","Blinov","Portnykh","Prasolov","Prokopenko","Proskurin","Protsenko","Prudov","Pustovar","Puchek","Rabinovich","Radkevich","Bobrov","Rezun","Rogoza","Rodnyansky","Rotan","Rublev","Rudik","Rusanov","Rychagirsky","Savchenko","Savchuk","Bogdanov","Sagitov","Sviridov","Sedykh","Sereda","Sidorenko","Sidorov","Siniy","Sinitzyn","Skameika","Slutsky","Boiko","Smelov","Smoly","Sorokin","Statzura","Stepchin","Stychinsky","Sykula","Tarnavsky","Tatarchuk","Timchuk","Andreychuk","Boichenko","Boldeskul","Bondarev","Borisov","Brich","Bronshtein","Buryak","Buturin","Byalo","Valentinov","Andruschenko","Vasiliev","Veselov","Vinogradov","Vovnenko","Volanchuk","Volodar","Voloshin","Goryunov","Grebenko","Gritzaenko","Gritzay","Gritzenkov","Grishachev","Grischuk","Gubar","Gunko","Babich","Gurevich","Denisenko","Dovgalyuk","Dombrik","Dotsenko","Drozdush","Dubenchuk","Dudorov","Duka","Dumko","Balan","Dunaev","Dyklov","Erofeev","Efremov","Zhabenko","Zhmyev","Zhurakovsky","Zabyagoda","Zagorodnyuk","Zamosenchuk","Baranov"}
+		new_name = new_name .. t[math.random(1,#t)]
+	elseif (r == 5) then 
+		local t = {"Kapustyanko","Katz","Kikabidze","Gatzula","Sinaev","Feigelman","Ledentsov","Alferov","Antipin","Blinov","Bogomolov","Vasilevich","Geshkenbein","Dyakonov","Erokhin","Zaikin","Zakharov","Ivchenko","Kabanov","Larin","Manko","Mironov","Stepanenko","Oganesyan","Chernodub","Shilov","Chirikov","Belyavin","Fadeev","Steklov","Andreev","Spirin","Balitsky","Abdurakhmanov","Altynnik","Barsak","Kireev","Scherbin","Kovalchuk","Koev","Kozlov","Kolontarev","Kolontar","Kondratenko","Korkin","Korneev","Baul","Kravchenko","Krivda","Krivokhatsky","Kuznetsov","Kuzmich","Kuzyakin","Kulchistky","Kuntsev","Kurvitz","Kucheruk","Bashakov","Kushnarev","Khaladze","Lavrik","Lavrov","Livshits","Lisichansky","Litvin","Lymarenko","Mazepa","Makarenko","Bashmakov","Maltsev"}
+		new_name = new_name .. t[math.random(1,#t)]
+	end 
+	self.character_name:SetText(new_name)
 end
 
 function faction_ui:OnFactionSelect(faction)
