@@ -42,7 +42,11 @@ local function on_game_load()
 	
 	-- NEW FACTION
 	local faction = config:GetValue("temp","new_game_faction",3) or ""
-	if (faction and faction ~= "") then 
+	if (faction and faction ~= "") then
+		local supply_id = config:GetValue("temp","new_game_supplies",2) or 1
+		supply_id = supply_id > 0 and supply_id or 1
+		
+		config:SetValue("temp","new_game_supplies")
 		config:SetValue("temp","new_game_faction")
 		need_save = true
 		
@@ -79,6 +83,21 @@ local function on_game_load()
 						sec[2] = sec[2] and tonumber(sec[2]) or 1
 						for ii=1,sec[2] do
 							sim:create(sec[1],db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+						end
+					end
+				end
+				
+				supplies = alun_utils.XmlGetNodeValue(_xml,"loadout_"..supply_id)
+				if (supplies) then 
+					supplies = alun_utils.str_explode(supplies,"\\n")
+					for i=1,#supplies do
+						local p = alun_utils.str_explode(supplies[i],",")
+						local sec = alun_utils.str_explode(p[1],"=")
+						if (ini:section_exist(sec[1])) then
+							sec[2] = sec[2] and tonumber(sec[2]) or 1
+							for ii=1,sec[2] do
+								sim:create(sec[1],db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+							end
 						end
 					end
 				end
@@ -237,6 +256,8 @@ function faction_ui:InitCallBacks(f)
 end
 
 function faction_ui:OnRandomize()
+	self.supplies_id = math.random(1,10)
+	
 	local faction = random_choice("stalker","bandit","csky","ecolog","army","monolith","dolg","freedom","killer")
 	self:OnFactionSelect(faction)
 	
@@ -292,6 +313,8 @@ function faction_ui:OnFactionSelect(faction)
 		end
 	end
 	
+	self.supplies_id = self.supplies_id or 1
+	
 	desc = desc .. "\\n \\n"
 	
 	local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\character_desc_general.xml")
@@ -321,6 +344,23 @@ function faction_ui:OnFactionSelect(faction)
 					end
 				end
 			end
+			
+			supplies = alun_utils.XmlGetNodeValue(_xml,"loadout_"..tostring(self.supplies_id or 1))
+			if (supplies) then
+				supplies = alun_utils.str_explode(supplies,"\\n")
+				for i=1,#supplies do
+					local sec = alun_utils.str_explode(supplies[i],"=")
+					if (ini:section_exist(sec[1])) then
+						local itm_name = gs(alun_utils.read_from_ini(ini,sec[1],"inv_name","string",""))
+						sec[2] = sec[2] and tonumber(sec[2]) or 1
+						if (sec[2] > 1) then 
+							desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(sec[2]).."\\n"
+						else
+							desc = desc .. "   %c[0,188,210,238]".. itm_name .."\\n"
+						end
+					end
+				end
+			end			
 		end
 	end
 	
@@ -408,6 +448,9 @@ function faction_ui:OnStartGame()
 	if (self.selected_faction) then 
 		axr_main.config:SetValue("temp","new_game_faction",self.selected_faction)
 	end
+	
+	axr_main.config:SetValue("temp","new_game_supplies",tostring(self.supplies_id or 1))
+	
 	-- Store info in temp config so it can be read on next game load
 	axr_main.config:SetValue("temp","new_game_character_name",character_name)
 	axr_main.config:Save()
