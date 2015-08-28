@@ -7,6 +7,8 @@ bounties_by_id = {}
 -----------------------------------------------------------------------------
 --								PRIVATE
 -----------------------------------------------------------------------------
+
+--[[ due to unreliability this is all done in task_status_functor
 local function npc_on_death_callback(npc,who)
 	local id = npc:id()
 	
@@ -50,6 +52,7 @@ local function squad_on_npc_death(squad,se_npc,killer)
 		actor_tagged_squad_by_id[squad.id] = true
 	end
 end
+--]]
 
 local skipped_tasks = {}
 local function actor_on_leave_dialog()
@@ -70,10 +73,10 @@ end
 --								ON GAME START
 -----------------------------------------------------------------------------
 function on_game_start()
-	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
-	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
-	RegisterScriptCallback("monster_on_death_callback",npc_on_death_callback)
-	RegisterScriptCallback("monster_on_hit_callback",npc_on_hit_callback)
+	--RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
+	--RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
+	--RegisterScriptCallback("monster_on_death_callback",npc_on_death_callback)
+	--RegisterScriptCallback("monster_on_hit_callback",npc_on_hit_callback)
 	--RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 	RegisterScriptCallback("actor_on_leave_dialog",actor_on_leave_dialog)
 	RegisterScriptCallback("save_state",save_state)

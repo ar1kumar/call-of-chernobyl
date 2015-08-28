@@ -1279,3 +1279,34 @@ function CALifeUpdateManager__on_before_change_level(packet)
 	-- reset read pointer
 	packet:r_seek(2)
 end 
+
+----- TEST REMOVE ME 
+function test_functor1_use_item(itm)
+	printf("used1 item %s",itm and itm:section())
+end 
+
+function test_functor2_use_item(itm)
+	printf("used2 item %s",itm and itm:section())
+end
+
+-- 'Запуск динамического окна.
+function run_dynamic_element(folder,close_inv)
+   if close_inv==false then
+      folder:ShowDialog(true)
+   elseif close_inv==true then
+      folder:ShowDialog(true)
+      get_hud():HideActorMenu()
+      get_hud():HidePdaMenu()
+      level.show_weapon(false)
+   else
+      folder:ShowDialog(true)
+   end
+end
+
+-- 'Создание предмета в рюкзаке ГГ.
+function give_object_to_actor(obj,count)
+  if count==nil then count=1 end
+  for i=1, count do
+     alife():create(obj,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+  end
+end

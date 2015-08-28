@@ -194,7 +194,7 @@ function hostage_task(task,task_id)
 				return
 			end 
 			
-			if not (se_obj:alive()) then 
+			if not (IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then 
 				return "complete" -- complete task even though giver is dead, you still rescued hostage
 			end
 		else 
@@ -212,6 +212,12 @@ function bounty_task(task,task_id)
 		local se_obj = id and alife():object(id)
 		if not (se_obj) then 
 			return "fail"
+		end
+		if not (IsStalker(nil,se_obj:clsid())) then 
+			return "fail"
+		end
+		if not (se_obj:alive()) then 
+			task.stage = 2
 		end
 	elseif (task.stage == 3) then 
 		return "fail"

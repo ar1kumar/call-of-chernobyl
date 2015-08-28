@@ -19,12 +19,26 @@ local function on_game_load()
 	local need_save
 	
 	-- IRONMAN MODE
-	if (USE_MARSHAL and config:GetValue("temp","new_game_hardcore_mode",1) == true) then 
-		-- shitty way to make a uuid but should be good enough to track the same saves
-		math.randomseed(os.time())
-		alife_storage_manager.get_state().uuid = GAME_VERSION .. "_" .. tostring(math.random(100)) .. tostring(math.random()) .. tostring(math.random(1000))
-		config:SetValue("temp","new_game_hardcore_mode")
-		need_save = true
+	if (USE_MARSHAL) then
+		if (config:GetValue("temp","new_game_hardcore_mode",1) == true) then 
+			-- shitty way to make a uuid but should be good enough to track the same saves
+			math.randomseed(os.time())
+			alife_storage_manager.get_state().uuid = GAME_VERSION .. "_" .. tostring(math.random(100)) .. tostring(math.random()) .. tostring(math.random(1000))
+			config:SetValue("temp","new_game_hardcore_mode")
+			need_save = true
+		end
+		local con = get_console()
+		if (config:GetValue("temp","new_game_hardcore_aim_mode",1) == true) then 
+			con:execute("ai_aim_max_angle 20.0")
+			con:execute("ai_aim_min_angle 17.0")
+			con:execute("ai_aim_min_speed 2.00")
+			con:execute("ai_aim_predict_time 0.28")
+		else
+			con:execute("ai_aim_max_angle 0.7854")
+			con:execute("ai_aim_min_angle 0.19635")
+			con:execute("ai_aim_min_speed 0.24")
+			con:execute("ai_aim_predict_time 0.40")
+		end
 	end 
 	
 	-- NEW CHARACTER NAME
@@ -241,6 +255,9 @@ function faction_ui:InitControls(f)
 	if (USE_MARSHAL) then
 		xml:InitStatic("main_dialog:cap_check_hardcore",self.dialog)
 		self.ck_hardcore = xml:InitCheck("main_dialog:check_hardcore",	self.dialog)
+		
+		xml:InitStatic("main_dialog:cap_check_hardcore_aim",self.dialog)
+		self.ck_hardcore_aim = xml:InitCheck("main_dialog:check_hardcore_aim",	self.dialog)
 	end
 end 
 
@@ -443,6 +460,10 @@ function faction_ui:OnStartGame()
 	
 	if (self.ck_hardcore and self.ck_hardcore:GetCheck()) then 
 		axr_main.config:SetValue("temp","new_game_hardcore_mode",true)
+	end 
+	
+	if (self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck()) then 
+		axr_main.config:SetValue("temp","new_game_hardcore_aim_mode",true)
 	end 
 	
 	if (self.selected_faction) then 
