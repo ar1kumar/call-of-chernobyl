@@ -22,10 +22,12 @@ end
 -------------------------------------------------------------------
 class "repair_ui" (CUIScriptWnd)
 
-function repair_ui:__init(owner,section) super()
+function repair_ui:__init(owner,obj,section) super()
+	self.object = obj
 	self.owner = owner
 	self.section = section
 
+	self.use_condition = alun_utils.read_from_ini(nil,section,"use_condition",bool,false)
 	self.min_condition = alun_utils.read_from_ini(nil,section,"repair_min_condition","float",0)
 	self.max_condition = alun_utils.read_from_ini(nil,section,"repair_max_condition","float",0)
 	self.add_condition = alun_utils.read_from_ini(nil,section,"repair_add_condition","float",0)
@@ -303,7 +305,14 @@ function repair_ui:OnListItemDbClicked()
 end
 
 function repair_ui:OnButton_back_clicked()
-	alife():create(self.section,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+	if (self.use_condition and self.object) then 
+		local r = self.object:get_remaining_uses()
+		if (r+1 <= self.object:get_max_uses()) then
+			self.object:set_remaining_uses(self.object:get_remaining_uses()+1)
+		end
+	else
+		alife():create(self.section,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+	end
 	self:HideDialog()
 end
 
@@ -320,6 +329,13 @@ function repair_ui:OnKeyboard(dik, keyboard_action)
 end
 
 function repair_ui:OnButton_repair()
+	if (self.use_condition and self.object and self.object:get_remaining_uses() <= 0) then 
+		local se_obj = alife():object(self.object:id())
+		if (se_obj) then 
+			alife():release(se_obj,true)
+		end
+	end 
+	
 	local index = self.list_box:GetSelectedIndex()
 	if index == -1 then return end
 	local item  = self.list_box:GetItemByIndex(index)

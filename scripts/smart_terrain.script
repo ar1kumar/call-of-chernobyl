@@ -1131,7 +1131,7 @@ function se_smart_terrain:get_smart_props()
 
 		local board = SIMBOARD
 		local squad_count = board.smarts[self.id].population --smart_terrain_squad_count(board.smarts[self.id].squads)
-		props = self:name().."  ["..self.id.."]\\n"..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity = "..squad_count.." of "..tostring(self.max_population).."\\n"
+		props = self:name().."  ["..self.id.."]\\nfaction_control_enabled = "..tostring(self.faction_controlled).."\\ncontrolling_faction = ".. tostring(self.faction) .. "\\n"..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity = "..squad_count.." of "..tostring(self.max_population).."\\n"
 
 		if self.respawn_point ~= nil and self.already_spawned ~= nil then
 			props = props.."\\nalready_spawned :\n"

@@ -265,7 +265,7 @@ function actor_on_item_use(obj)
 	if (RepairModEnable and RepairTools[obj:section()]) then
 		local hud = get_hud()
 		--hud:HideActorMenu()
-		local ui = ui_itm_repair and ui_itm_repair.repair_ui(hud,obj:section())
+		local ui = ui_itm_repair and ui_itm_repair.repair_ui(hud,obj,obj:section())
 		if (ui) then
 			ui:ShowDialog(true)
 			ui:FillList()
