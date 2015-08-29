@@ -93,7 +93,7 @@ function specific_check_smart_under_faction_control(task,task_id)
 	if (task.__check_smart_time and tg < task.__check_smart_time) then 
 		return
 	end
-	task.__check_smart_time = tg+3000
+	task.__check_smart_time = tg+1500
 	
 	alun_utils.save_var(db.actor,task_id.."_target_id",nil)
 	
@@ -158,7 +158,7 @@ function check_specific_smart_under_faction_control_staged(task,task_id)
 		return "fail"
 	elseif (status == "complete" and task.stage == 0) then
 		task.stage = 1
-		printf("set %s on complete stage",task_id)
+		--printf("set %s on complete stage",task_id)
 	end
 end
 

@@ -187,6 +187,13 @@ function esc_m_trader_task_target(task_id,field,p,task)
 				return task.task_giver_id
 			end
 
+			local target_id = alun_utils.load_var(db.actor,"esc_m_trader_task_2_target_id")
+			local se_target = target_id and sim:object(target_id)
+
+			if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
+				return target_id
+			end 
+	
 			local smart = SIMBOARD.smarts_by_names["esc_smart_terrain_7_11"]
 			return smart and smart.id or nil
 		end
