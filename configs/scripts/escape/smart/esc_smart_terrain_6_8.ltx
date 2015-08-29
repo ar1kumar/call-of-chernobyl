@@ -4,14 +4,35 @@ max_population = 2
 respawn_params = respawn@esc_smart_terrain_6_8
 respawn_idle = 30000
 
-[respawn@esc_smart_terrain_6_8]
-spawn_military@novice
-spawn_military@advanced
+;=================================================================
+;            FACTION CONTROLLED SMART_TERRAIN
+;=================================================================
+; this smart is an example on how to use faction_controlled = true
+; when faction controll is enabled, the controlling faction is decided
+; by the last npc who entered the smart. If he is the only faction present it will shift
+; controll to his faction.
+;
+; default_faction is the starting faction for the smart.
+; 
+; If a respawn section has faction = community, then this respawn section will only work when 
+; the smart is controlled by this faction. In this example, bandits or army can spawn here if
+; one of these factions comes here. Otherwise this smart will not be a respawner.
+; 
+; Make sure you have props set up properly in simulation_object_props.ltx
 
-[spawn_military@novice]
-spawn_squads = army_sim_squad_novice
+faction_controlled = true 
+default_faction = army 
+
+[respawn@esc_smart_terrain_6_8]
+spawn_army
+spawn_bandit
+
+[spawn_bandit]
+faction = bandit
+spawn_squads = bandit_sim_squad_advanced
 spawn_num = 1
 
-[spawn_military@advanced]
+[spawn_army]
+faction = army
 spawn_squads = army_sim_squad_novice, army_sim_squad_advanced
 spawn_num = 1
