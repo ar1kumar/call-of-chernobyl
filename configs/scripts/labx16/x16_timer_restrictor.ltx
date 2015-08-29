@@ -2,6 +2,8 @@
 active = sr_idle
  
 [sr_idle]
+on_info = {!actor_has_item(good_psy_helmet)} nil
+on_info2 = {!actor_has_item(bad_psy_helmet)} nil
 on_actor_inside = {+yan_labx16_switcher_primary_off} nil, sr_timer@1 %=play_snd(characters_voice\scenario\radar\rad_hat_1)%
  
 [sr_timer@1]
