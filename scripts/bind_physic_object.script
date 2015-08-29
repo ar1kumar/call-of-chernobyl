@@ -77,9 +77,11 @@ function generic_physics_binder:net_spawn(data)
 	end
 	if(self.object:spawn_ini()) then
 		--  CoC uses axr_treasure_manager.script instead to generate loot
-		--if(self.object:spawn_ini():section_exist("drop_box")) then
-			--self.box_items = xr_box.ph_item_box(self.object)
-		--end
+		if(self.object:spawn_ini():section_exist("drop_box")) then
+			if (coc_treasure_manager.caches[self.object:id()] ~= nil) then
+				self.box_items = xr_box.ph_item_box(self.object)
+			end
+		end
 
 		if(self.object:spawn_ini():section_exist("level_spot")) then
 			if(self.object:spawn_ini():line_exist("level_spot", "actor_box")) then
@@ -173,7 +175,15 @@ function generic_physics_binder:death_callback(victim, who)
 		self.particle:stop()
 	end
 
-	--if self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true then
-		--self.box_items:spawn_items()
-	--end
+	if (self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true) then
+		if (self.box_items and coc_treasure_manager.caches[self.object:id()] == true) then
+			coc_treasure_manager.caches[self.object:id()] = nil
+			
+			self.box_items:spawn_items()
+			
+			level.map_remove_object_spot(self.object:id(), "treasure")
+			xr_statistic.inc_founded_secrets_counter()
+			news_manager.send_treasure(1)
+		end
+	end
 end

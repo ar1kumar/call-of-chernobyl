@@ -17,9 +17,14 @@ local function on_game_load()
 	local sim = alife()
 	for i=1, 65535 do
 		se_obj = sim:object(i)
-		if (se_obj and se_obj:clsid() == clsid.inventory_box_s) then
-			caches[se_obj.id] = false
-			caches_count = caches_count + 1
+		if (se_obj) then
+			if (se_obj:clsid() == clsid.inventory_box_s) then
+				caches[se_obj.id] = false
+				caches_count = caches_count + 1
+			elseif (se_obj:spawn_ini() and se_obj:spawn_ini():section_exist("drop_box")) then 
+				caches[se_obj.id] = false
+				caches_count = caches_count + 1			
+			end
 		end
 	end
 
@@ -83,13 +88,23 @@ function create_random_stash(no_spot,hint,bonus_items)
 	end
 
 	last_secret = true
+	
+	local sim = alife()
 
 	-- create a temporary table to use math.random
 	local t = {}
 	for id,v in pairs(caches) do
 		-- false means box is available
 		if (v == false) then
-			table.insert(t,id)
+			if (bonus_items) then 
+				-- this feature only works with inventory boxes
+				local se_box = id and sim:object(id)
+				if (se_box and se_box:clsid() == clsid.inventory_box_s) then 
+					table.insert(t,id)
+				end			
+			else
+				table.insert(t,id)
+			end
 		end
 	end
 
@@ -98,15 +113,30 @@ function create_random_stash(no_spot,hint,bonus_items)
 		return
 	end
 
-	local sim = alife()
 	local id = t[index]
 	local se_box = id and sim:object(id)
-
-	-- find box by id and make sure it still exists and is still an inventory_box_s
-	if (se_box == nil or se_box:clsid() ~= clsid.inventory_box_s) then
+	if not (se_box) then 
 		caches[id] = nil
 		caches_count = caches_count - 1
 		return
+	end 
+	
+	if (se_box:clsid() ~= clsid.inventory_box_s) then 
+		if (se_box:spawn_ini() and se_box:spawn_ini():section_exist("drop_box")) then 
+			-- create map spot
+			if (no_spot ~= true and level.map_has_object_spot(id,"treasure") == 0) then
+				level.map_add_object_spot_ser(id, "treasure", hint or "")
+				news_manager.send_treasure(0)
+			end
+			-- switch cache true, indicating it has treasure
+			caches[id] = true
+			-- This is handled by xr_box.script
+			return 
+		else -- invalid object
+			caches[id] = nil
+			caches_count = caches_count - 1
+			return
+		end
 	end
 
 	-- switch cache true, indicating it has treasure
