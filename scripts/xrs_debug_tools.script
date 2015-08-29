@@ -1006,6 +1006,10 @@ function gulag_info_hud_show(hud)
 	if (smart_terrain.nearest_to_actor_smart and smart_terrain.nearest_to_actor_smart.id) then
 		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
 		if (smart and smart.stalker_jobs) then
+			if (smart.faction_controlled) then
+				hud:add_msg("Is Faction Controlled",true)
+			end
+			hud:add_msg("Faction",smart.faction or "")
 			hud:add_msg("Nearest Smart",smart:name().." dist="..smart_terrain.nearest_to_actor_smart.dist)
 			hud:add_msg("Job Count",#smart.stalker_jobs)
 

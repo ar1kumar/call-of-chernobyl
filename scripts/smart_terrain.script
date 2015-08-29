@@ -356,10 +356,26 @@ function se_smart_terrain:register_npc(obj)
 		self.npc_info[obj.id] = self:fill_npc_info(obj)
 		self.dead_time = empty_table(self.dead_time)
 		self:select_npc_job(self.npc_info[obj.id])
+		
+		local comm = IsStalker(nil,obj:clsid()) and obj:community()
+		if (comm ~= "zombied" and self:only_faction_on_jobs(comm)) then 
+			self.faction = comm
+		end
 	else
 		self.arriving_npc[obj.id]  = obj
 	end
 end
+
+function se_smart_terrain:only_faction_on_jobs(faction)
+	for id,npc_info in pairs(self.npc_info) do
+		se_obj = npc_info.se_obj
+		local comm = se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:community()
+		if (comm and comm ~= zombied and comm ~= faction) then
+			return false
+		end 
+	end
+	return true
+end 
 
 function se_smart_terrain:unregister_npc(obj)
 	--alun_utils.debug_write(strformat("%s:unregister_npc %s",self:name(),obj and obj:name()))
