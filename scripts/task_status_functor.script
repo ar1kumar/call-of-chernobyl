@@ -170,7 +170,7 @@ function hostage_task(task,task_id)
 	end 
 	
 	local squad = get_story_squad(p[1])
-	if not (squad) then 
+	if not (squad and squad:clsid() == clsid.online_offline_group_s) then 
 		return
 	end
 

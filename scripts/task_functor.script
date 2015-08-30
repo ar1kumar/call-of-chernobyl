@@ -254,6 +254,9 @@ function simulation_task_target(task_id,field,p,task)
 	
 	if (task_id == "simulation_task_3" or task_id == "simulation_task_4" or task_id == "simulation_task_5") then
 		local squad = get_story_squad("hostage_companion_task_1")
+		if not (squad and squad:clsid() == clsid.online_offline_group_s) then 
+			return -- quest will auto-fail via section condition
+		end
 		
 		if (task) then 
 			if (task.stage == 0) or (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
@@ -266,7 +269,7 @@ function simulation_task_target(task_id,field,p,task)
 			end
 		end 
 
-		return squad and squad.id
+		return squad.id
 	end
 end
 

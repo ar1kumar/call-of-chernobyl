@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------
 -- Treasure randomizer
 -- by Alundaio
-
+-- IMPORTANT: Make sure this table doesn't get very large 
 caches = {}
 local caches_count = 0
 
@@ -28,8 +28,15 @@ local function on_game_load()
 		end
 	end
 
-	for i=1, math.floor(caches_count/2) do
+	for i=1, math.floor(caches_count/3) do
 		create_random_stash(true,"stash")
+	end
+	
+	-- remove all unused stashes from the list
+	for k,v in pairs(caches) do 
+		if (v == false) then 
+			caches[k] = nil
+		end
 	end
 end
 

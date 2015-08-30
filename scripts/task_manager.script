@@ -195,7 +195,7 @@ function save_state(m_data)
 	local tm = get_task_manager()
 	
 	for k,v in pairs(tm.task_info) do
-		table.insert(m_data.task_info,k)
+		m_data.task_info[k] = true
 		tm.task_info[k]:save_state(m_data)
 	end
 end 
@@ -207,10 +207,10 @@ function load_state(m_data)
 	
 	local tm = get_task_manager()
 	
-	for i=1,#m_data.task_info do 
-		local obj = task_objects.CGeneralTask(m_data.task_info[i])
+	for task_id,v in pairs(m_data.task_info) do 
+		local obj = task_objects.CGeneralTask(task_id)
 		obj:load_state(m_data)
-		tm.task_info[m_data.task_info[i]] = obj
+		tm.task_info[task_id] = obj
 	end
 	
 	m_data.task_info = nil

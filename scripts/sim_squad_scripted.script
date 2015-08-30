@@ -424,6 +424,10 @@ function sim_squad_scripted:remove_squad()
 	local sim = alife()
 	local se_obj, obj
 	for id,v in pairs(squad_npcs) do
+		obj = db.storage[id] and db.storage[id].object
+		if (obj and obj:is_talking()) then
+			obj:stop_talk()
+		end
 		se_obj = sim:object(id)
 		if se_obj then
 			self:unregister_member(id)
@@ -431,7 +435,7 @@ function sim_squad_scripted:remove_squad()
 		end
 	end
 	self:hide()
-	--sim:release(self,true) -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine instead?
+	sim:release(self,true) -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine instead?
 end
 
 function sim_squad_scripted:remove_npc(npc_id)

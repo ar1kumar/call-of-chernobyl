@@ -102,6 +102,25 @@ function action.debug_test(p)
 	end 
 	if (p==1) then 
 		
+		-- RELEASES TASK GIVER FOR ALL TASKS WITH task_giver_id; useful for testing how a task works when giver is dead
+		--[[
+		local debug_task_infos = task_manager.get_task_manager().task_info
+		local task_ini = task_manager.task_ini
+		for k,v in pairs(debug_task_infos) do
+			local squad = v.task_giver_id and alife():object(v.task_giver_id)
+			if (squad) then
+				if (squad:clsid() == clsid.online_offline_group_s) then
+					printf("%s removing squad task giver!",k)
+					SIMBOARD:assign_squad_to_smart(squad, nil)
+					squad:remove_squad()
+				elseif (IsStalker(squad)) then
+					printf("%s removing npc task giver!",k)
+					alife():release(squad,true)
+				end
+			end
+		end
+		--]]
+		
 		-- SET ALL ACTIVE TASKS TO COMPLETE STAGE
 		--[[
 		local debug_task_infos = task_manager.get_task_manager().task_info

@@ -231,14 +231,19 @@ end
 function is_task_giver_valid(task)
 	local id = task.task_giver_id
 	local se_obj = id and alife():object(id)
-	if (se_obj) then 
-		if not (se_obj:clsid() == clsid.online_offline_group_s or se_obj:clsid() == clsid.script_trader) then 
-			if not (IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then 
-				return false
-			end
-		end 
-	else 
+	if not (se_obj) then 
+		--printf("is_task_giver_valid se_obj nil id=%s   %s",id,task.id)
+		return false 
+	end 
+	
+	if (se_obj:clsid() == clsid.online_offline_group_s or se_obj:clsid() == clsid.script_trader) then 
+		return true 
+	end
+	
+	if not (IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
+		printf("is_task_giver_valid giver not alive %s",task.id)
 		return false
 	end
+
 	return true
 end

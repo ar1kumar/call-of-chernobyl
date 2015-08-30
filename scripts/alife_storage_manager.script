@@ -78,7 +78,9 @@ function CALifeStorageManager_save(fname)
 					if not (m_data.pstor_all) then
 						m_data.pstor_all = {}
 					end
-					m_data.pstor_all[id] = t.pstor
+					if not (empty(t.pstor)) then
+						m_data.pstor_all[id] = t.pstor
+					end
 				end
 		
 				-- serialization with game.CTime.__persist
@@ -86,7 +88,9 @@ function CALifeStorageManager_save(fname)
 					if not (m_data.pstor_ctime) then
 						m_data.pstor_ctime = {}
 					end
-					m_data.pstor_ctime[id] = t.pstor_ctime
+					if not (empty(t.pstor_ctime)) then
+						m_data.pstor_ctime[id] = t.pstor_ctime
+					end
 				end
 			end
 		end
