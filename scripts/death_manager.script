@@ -188,7 +188,7 @@ end
 --' Функция спавнит необходимое число предметов
 function create_items(npc, section, number, rnd)
 	--'printf("create %s of %s", tostring(number), tostring(section))
-	if ammo_sections[section] == true then
+	if _G.ammo_section[section] == true then
 		if number > 0 then
 			create_ammo(section,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id(),number)
 		end
