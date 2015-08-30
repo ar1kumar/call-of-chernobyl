@@ -101,6 +101,21 @@ function action.debug_test(p)
 		return 
 	end 
 	if (p==1) then 
+		
+		-- SET ALL ACTIVE TASKS TO COMPLETE STAGE
+		--[[
+		local debug_task_infos = task_manager.get_task_manager().task_info
+		local task_ini = task_manager.task_ini
+		for k,v in pairs(debug_task_infos) do
+			local stage = tonumber(utils.cfg_get_string(task_ini, k, "stage_complete", nil, false, "")) or 0
+			if (stage > 0 and stage ~= 255) then 
+				v.stage = stage
+			end
+		end
+		--]]
+	
+		-- test
+		--[[
 		local function spawn_in_front_quadrant(sec)
 			local base_point = db.actor:level_vertex_id()
 			local dist = math.random(15,25)
@@ -118,6 +133,8 @@ function action.debug_test(p)
 		end
 		
 		spawn_in_front_quadrant("wpn_pm")
+		--]]
+		
 	end
 end
 

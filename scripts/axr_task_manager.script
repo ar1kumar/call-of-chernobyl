@@ -8,7 +8,6 @@ bounties_by_id = {}
 --								PRIVATE
 -----------------------------------------------------------------------------
 
---[[ due to unreliability this is all done in task_status_functor
 local function npc_on_death_callback(npc,who)
 	local id = npc:id()
 	
@@ -45,6 +44,7 @@ local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
 	end
 end
 
+--[[
 local function squad_on_npc_death(squad,se_npc,killer)
 	local npc_id = se_npc and se_npc.id
 	local st = npc_id and db.storage[npc_id]
@@ -73,10 +73,10 @@ end
 --								ON GAME START
 -----------------------------------------------------------------------------
 function on_game_start()
-	--RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
-	--RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
+	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
+	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
 	--RegisterScriptCallback("monster_on_death_callback",npc_on_death_callback)
-	--RegisterScriptCallback("monster_on_hit_callback",npc_on_hit_callback)
+	RegisterScriptCallback("monster_on_hit_callback",npc_on_hit_callback)
 	--RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 	RegisterScriptCallback("actor_on_leave_dialog",actor_on_leave_dialog)
 	RegisterScriptCallback("save_state",save_state)
@@ -137,7 +137,7 @@ function get_first_finished_task(npc,is_sim)
 						return task_id
 					end 
 					local se_obj = alife():object(npc:id())
-					if (se_obj and se_obj.group_id == task_info[task_id].task_giver_id) then 
+					if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then 
 						return task_id
 					end 				
 				end
@@ -219,10 +219,26 @@ function npc_give_first_available_ordered_task(npc,is_sim)
 	if not (new_task) then 
 		return 
 	end 
-
-	task_manager.get_task_manager():give_task(new_task)
+	local se_obj = npc and alife():object(npc:id())
+	local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
+	task_manager.get_task_manager():give_task(new_task,giver_id)
 end
 
 function clear_skipped_tasks()
 	empty_table(skipped_tasks)
+end
+
+function is_task_giver_valid(task)
+	local id = task.task_giver_id
+	local se_obj = id and alife():object(id)
+	if (se_obj) then 
+		if not (se_obj:clsid() == clsid.online_offline_group_s or se_obj:clsid() == clsid.script_trader) then 
+			if not (IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then 
+				return false
+			end
+		end 
+	else 
+		return false
+	end
+	return true
 end

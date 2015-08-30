@@ -187,23 +187,17 @@ function hostage_task(task,task_id)
 			xrs_kill_wounded.hostage_list[squad:commander_id()] = nil
 		end
 		
-		local id = task.task_giver_id
-		local se_obj = id and alife():object(id)
-		if (se_obj) then 
-			if (se_obj:clsid() == clsid.online_offline_group_s) then 
-				return
-			end 
-			
-			if not (IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then 
-				return "complete" -- complete task even though giver is dead, you still rescued hostage
-			end
-		else 
-			return "complete" -- complete task even though giver doesn't exist
+		if not (axr_task_manager.is_task_giver_valid(task)) then 
+			return "complete" -- complete task even though giver is dead/missing/deleted
 		end 
 	end
 end 
 
 function bounty_task(task,task_id)
+	if not (axr_task_manager.is_task_giver_valid(task)) then 
+		return "fail"
+	end 
+	
 	if (task.stage == 1) then
 		local id = axr_task_manager.bounties_by_id[task_id]
 		if not (id) then
@@ -229,17 +223,9 @@ function actor_has_fetch_item(task,task_id)
 	if not (db.actor) then 
 		return 
 	end
-	local id = task.task_giver_id
-	local se_obj = id and alife():object(id)
-	if (se_obj) then 
-		if not (se_obj:clsid() == clsid.online_offline_group_s) then 
-			if not (se_obj:alive()) then 
-				return "fail"
-			end
-		end 
-	else 
+	if not (axr_task_manager.is_task_giver_valid(task)) then 
 		return "fail"
-	end
+	end 
 	local section = db.actor and alun_utils.load_var(db.actor,task_id.."_fetch")
 	local item = section and db.actor:object(section)
 	if (item ~= nil) then 

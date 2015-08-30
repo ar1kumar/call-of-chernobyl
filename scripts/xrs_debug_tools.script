@@ -37,7 +37,6 @@ local position_file = ""
 
 local keybinds
 actions_by_stalker_ids = nil
-debug_task_infos = nil
 
 local hud_display_top
 local hud_display_left
@@ -368,7 +367,6 @@ function on_game_start()
 	end 
 	
 	local ini = ini_file("debug\\xrs_debug_tools.ltx")
-	debug_task_infos = {}
 
 	RegisterScriptCallback("on_game_load",on_game_load)
 	RegisterScriptCallback("actor_on_update",actor_on_update)
@@ -1528,27 +1526,41 @@ end
 
 
 function task_hud_show(hud)
+	local debug_task_infos = task_manager.get_task_manager().task_info
+	
 	for k,v in pairs(debug_task_infos) do
+		hud:add_msg("======["..k.."]======","")
+		if (v.task_giver_id) then 
+			local se_obj = alife():object(v.task_giver_id)
+			if (se_obj) then 
+				hud:add_msg("Giver",se_obj:name())
+			end
+		end
+		
+		if (v.repeat_timeout and v.timeout) then 
+			hud:add_msg("Cooldown", v.repeat_timeout - game.get_game_time():diffSec(v.timeout))
+		end
+		
 		local id = alun_utils.load_var(db.actor,k.."_target_id")
 		local o = id and alife():object(id)
 		local smart_id = alun_utils.load_var(db.actor,k.."_id")
 		local smart = smart_id and alife():object(smart_id)
 		
-		local str = strformat("status=%s",v.status)
+		if (v.status ~= "selected") then
+			hud:add_msg("Status",v.status)
+		end
 		
 		if (v.stage and v.stage > 0) then 
-			str = str .. strformat(" stage=%s",v.stage)
+			hud:add_msg("Stage",v.stage)
 		end 
 		
 		if (smart) then 
-			str = str .. strformat(" smart=%s",smart:name())
+			hud:add_msg("Smart",smart:name())
 		end
 		
 		if (o) then 
-			str = str .. strformat(" target=%s",o:name())
+			hud:add_msg("Target",o:name())
 		end 
-		
-		hud:add_msg(k,str)
 	end
 
 	hud:set_header("-[Task Debugger]-")

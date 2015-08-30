@@ -32,7 +32,12 @@ end
 
 function actor_has_finished_ordered_task(a,b)
 	local npc = who_is_npc(a, b)
-	return axr_task_manager and axr_task_manager.get_first_finished_task(npc) ~= nil or false
+	local task = axr_task_manager and axr_task_manager.get_first_finished_task(npc)
+	if (task == nil or task.status == "fail" or task.status == "completed") then 
+		return false 
+	end 
+	
+	return true
 end
 
 function actor_has_not_finished_ordered_task(a,b)
@@ -183,7 +188,7 @@ end
 function npc_sim_give_first_available_task(a,b)
 	if (axr_task_manager) then
 		local npc = who_is_npc(a, b)
-		axr_task_manager.npc_give_first_available_ordered_task(npc,nil,true)
+		axr_task_manager.npc_give_first_available_ordered_task(npc,true)
 	end
 end
 

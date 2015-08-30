@@ -102,24 +102,6 @@ function CGeneralTask:__init(id)
 	
 	self.current_target = task_functor[self.target_functor](self.id, "target", self.target,self)
 	self.dont_send_update_news = utils.cfg_get_bool(task_ini, id, "dont_send_update_news", nil, false, false)
-	
-	if (USE_MARSHAL) then 
-		RegisterScriptCallback("save_state",self.save_state,self)
-		
-		-- load state
-		local m_data = alife_storage_manager.get_state()
-		if (m_data.task_objects and m_data.task_objects[self.id]) then
-			self.status = m_data.task_objects[self.id].status
-			self.timeout = m_data.task_objects[self.id].timeout
-			self.inited_time = m_data.task_objects[self.id].inited_time
-			self.current_title = m_data.task_objects[self.id].current_title
-			self.current_descr = m_data.task_objects[self.id].current_descr
-			self.current_target = m_data.task_objects[self.id].current_target
-			self.stage = m_data.task_objects[self.id].stage
-			self.task_giver_id =  m_data.task_objects[self.id].task_giver_id
-			m_data.task_objects[self.id] = nil
-		end		
-	end 
 end
 
 function CGeneralTask:get_title()
@@ -132,7 +114,7 @@ end
 
 --' Выдача квеста
 function CGeneralTask:give_task()
-	local t = CGameTask()
+	local t = db.actor and db.actor:get_task(self.id, true) or CGameTask()
 	t:set_id(tostring(self.id))
 	if(self.storyline) then
 		t:set_type(task.storyline)
@@ -183,13 +165,6 @@ function CGeneralTask:check_task(tm)
 		self.t = db.actor and db.actor:get_task(self.id, true)
 		return
 	end
-	
-	-- DEBUGGING!
-	if (DEV_DEBUG) then
-		if (xrs_debug_tools) then
-			xrs_debug_tools.debug_task_infos[self.id] = self
-		end
-	end 
 
 	self.check_time = global_time + 1000 + math.random() + (self.prior*100)
 
@@ -443,4 +418,24 @@ function CGeneralTask:save_state(m_data)
 	m_data.task_objects[self.id].current_target = self.current_target
 	m_data.task_objects[self.id].stage = self.stage
 	m_data.task_objects[self.id].task_giver_id = self.task_giver_id
+	
+	--printf("task_objects: %s save state",self.id)
+end 
+
+function CGeneralTask:load_state(m_data)
+	if not (m_data.task_objects and m_data.task_objects[self.id]) then 
+		return 
+	end 
+	
+	self.status = m_data.task_objects[self.id].status
+	self.timeout = m_data.task_objects[self.id].timeout
+	self.inited_time = m_data.task_objects[self.id].inited_time
+	self.current_title = m_data.task_objects[self.id].current_title
+	self.current_descr = m_data.task_objects[self.id].current_descr
+	self.current_target = m_data.task_objects[self.id].current_target
+	self.stage = m_data.task_objects[self.id].stage
+	self.task_giver_id =  m_data.task_objects[self.id].task_giver_id
+	m_data.task_objects[self.id] = nil
+	
+	--printf("task_objects: loaded persistent state %s  [status=%s]",self.id)
 end 

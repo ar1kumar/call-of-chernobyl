@@ -1,5 +1,5 @@
 function init(obj)
-	printf("_bp: init(): name='%s'", obj:name())
+	--printf("_bp: init(): name='%s'", obj:name())
 
 	db.storage[obj:id()] = db.storage[obj:id()] and empty_table(db.storage[obj:id()]) or {}
 	local new_binder = signal_light_binder(obj)

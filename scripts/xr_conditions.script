@@ -739,7 +739,7 @@ function killed_by(actor, npc, p)
 		for i, v in pairs(p) do
 			npc1 = get_story_object(v)
 			if npc1 and t.killer == npc1:id() then
-				printf("_bp: killed_by(%d)", v)
+				--printf("_bp: killed_by(%d)", v)
 				return true
 			end
 		end
@@ -821,7 +821,7 @@ function is_dead_all(actor, npc, p)
 			if npc1:alive() then
 				return false
 			else
-				printf("_bp: is_dead_all(%d) = true", v)
+				--printf("_bp: is_dead_all(%d) = true", v)
 				return true
 			end
 		end
@@ -838,7 +838,7 @@ function is_dead_one(actor, npc, p)
 	for i, v in pairs(p) do
 		npc1 = get_story_object(v)
 		if not npc1 or not npc1:alive() then
-			printf("_bp: is_dead_one(%d) = true", v)
+			--printf("_bp: is_dead_one(%d) = true", v)
 			return true
 		end
 	end

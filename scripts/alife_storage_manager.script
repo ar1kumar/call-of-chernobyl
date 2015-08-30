@@ -67,7 +67,11 @@ function CALifeStorageManager_save(fname)
 		--alun_utils.debug_write(strformat("CALifeStorageManager_save %s GAME_VERSION=%s",savegame,m_data.GAME_VERSION))
 
 		SendScriptCallback("save_state",m_data)
-
+		
+		-- custom calls
+		task_manager.save_state(m_data)
+		
+		-- save pstor
 		for id,t in pairs(db.storage) do
 			if (t and type(t) == "table") then
 				if (t.pstor) then
@@ -138,6 +142,9 @@ function CALifeStorageManager_load(fname)
 	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
 
 	SendScriptCallback("load_state",m_data)
+	
+	-- custom calls
+	task_manager.load_state(m_data)
 end
 
 function get_state()
