@@ -886,6 +886,14 @@ function sim_squad_scripted:can_switch_offline()
 			return false
 		end
 	end
+	
+	if (self.current_action == 1) then 
+		local current_target = self.current_target_id and alife():object(self.current_target_id)
+		if (current_target.faction_controlled and current_target:is_being_contested()) then
+			printf("forced online")
+			return false
+		end
+	end
 
 	return cse_alife_online_offline_group.can_switch_offline(self)
 end
