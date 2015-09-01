@@ -1162,10 +1162,10 @@ function se_smart_terrain:get_smart_props()
 		props = self:name().."  ["..self.id.."]\\n"
 		
 		if (self.faction_controlled) then 
-			props = props .. "faction_controlled = " .. tostring(self.faction_controlled) .. "\\n"
+			props = props .. "faction_controlled=" .. tostring(self.faction_controlled) .. "\\ncontested=" .. self:is_being_contested() .. "\\n"
 		end 
 		
-		props = props .. "controlling_faction = ".. tostring(self.faction) .. "\\n"..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity = "..squad_count.." of "..tostring(self.max_population).."\\n"
+		props = props .. "controlling_faction=".. tostring(self.faction) .. "\\ntype="..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity="..squad_count.." of "..tostring(self.max_population).."\\n"
 
 		if self.respawn_point ~= nil and self.already_spawned ~= nil then
 			props = props.."\\nalready_spawned :\n"
@@ -1245,6 +1245,20 @@ local function is_only_monsters_on_jobs(npc_info)
 		end
 	end
 	return true
+end
+
+function se_smart_terrain:is_being_contested()
+	local se_obj, comm
+	for k,v in pairs(self.npc_info) do 
+		if (v.se_obj and IsStalker(nil,v.se_obj:clsid())) then 
+			if (comm == nil) then 
+				comm = v.se_obj:community()
+			elseif (comm ~= v.se_obj:community()) then 
+				return true
+			end
+		end
+	end
+	return false
 end
 
 function se_smart_terrain:update()

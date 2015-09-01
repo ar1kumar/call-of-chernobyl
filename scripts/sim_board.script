@@ -10,6 +10,7 @@ local level,alife,game_graph,math,pairs,tostring,tonumber,tsort,tinsert = level,
 -----------------------------------------------------------------------------------
 function general_squad_precondition(squad,target)
 	-- duty and freedom target eachother
+	--[[
 	if (squad.player_id == "dolg") then 
 		if (target.player_id == "freedom" or is_squad_monster[target.player_id]) then 
 			return in_time_interval(8,19)
@@ -19,6 +20,7 @@ function general_squad_precondition(squad,target)
 			return in_time_interval(8,19)
 		end 
 	end
+	--]]
 	
 	-- if target squad is not monster
 	if (is_squad_monster[target.player_id] ~= true) then 
@@ -33,12 +35,42 @@ function general_squad_precondition(squad,target)
 		end
 	end 
 	return false
-end 
+end
 
 function general_base_precondition(squad,target)
-	local need_squads = squad.player_id == "army" and 1 or 0
+	local need_squads = 0
 	
-	if (SIMBOARD.smarts[target.id]) and (SIMBOARD.smarts[target.id].squads[squad.id] or SIMBOARD.smarts[target.id].population < target.max_population and SIMBOARD.smarts[target.id].population <= need_squads) then
+	if (squad.player_id == "dolg") then 
+		if (target.faction == "freedom") then
+			need_squads = 1
+		end
+	elseif (squad.player_id == "freedom") then 
+		if (target.faction == "dolg") then
+			need_squads = 1
+		end	
+	elseif (squad.player_id == "army") then 
+		if (target.faction_controlled and target.faction == "army") then 
+			need_squads = 2
+		else
+			need_squads = 1
+		end
+	elseif (squad.player_id == "monolith") then 
+		if (target.faction_controlled and target.faction ~= "monolith") then 
+			need_squads = 1
+		end
+	elseif (squad.player_id == "stalker" or squad.player_id == "csky") then 
+		need_squads = 2
+	elseif (squad.player_id == "bandit") then
+		if (target.faction_controlled and target.faction ~= "bandit") then 
+			need_squads = 2
+		end
+	end
+	
+	if need_squads > target.max_population then
+		need_squads = target.max_population
+	end
+	
+	if (SIMBOARD.smarts[target.id]) and (SIMBOARD.smarts[target.id].squads[squad.id] or SIMBOARD.smarts[target.id].population < target.max_population and SIMBOARD.smarts[target.id].population < need_squads) then
 		return true
 	end
 

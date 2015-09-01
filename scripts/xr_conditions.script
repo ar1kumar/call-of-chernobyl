@@ -2740,6 +2740,53 @@ function task_giver_alive(actor,npc,p)
 	return false
 end
 
+-- param1 - smart by name 
+-- param2 - community 
+-- param3 - if true, then it will check_npc_name for that faction (This is used for suitable in logic section)
+function smart_under_faction_control(actor,npc,p)
+	local board = SIMBOARD
+	local smart = p[1] and board and board.smarts_by_names[p[1]]
+	if not (smart) then
+		return false
+	end
+	
+	if not (smart.faction and smart.faction_controlled) then 
+		return false 
+	end
+	
+	if not (p[2] and smart.faction == p[2]) then 
+		return false 
+	end 
+	
+	if (p[3] and p[3] == "true") then
+		if npc:name() == nil then 
+			return false 
+		end
+
+		local f = {
+			["stalker"] = "stalker",
+			["bandit"] = "bandit",
+			["killer"] = "merc",
+			["dolg"] = "duty",
+			["freedom"] = "freedom",
+			["monolith"] = "monolith",
+			["ecolog"] = "ecolog",
+			["csky"] = "csky",
+			["army"] = "military"
+		}
+		if not (f[p[2]]) then 
+			return false 
+		end 
+		
+		if string.find( npc:name(), f[p[2]] ) then
+			return true
+		end
+	else
+		return true
+	end
+	
+	return false
+end 
 -------------------------------------------------------------------------------------
 -- Special for Radar
 -------------------------------------------------------------------------------------
