@@ -1248,16 +1248,23 @@ local function is_only_monsters_on_jobs(npc_info)
 end
 
 function se_smart_terrain:is_being_contested()
-	local se_obj, comm
+	local factions_present = {}
 	for k,v in pairs(self.npc_info) do 
-		if (v.se_obj and IsStalker(nil,v.se_obj:clsid())) then 
-			if (comm == nil) then 
-				comm = v.se_obj:community()
-			elseif (comm ~= v.se_obj:community()) then 
-				return true
+		if (v.se_obj and IsStalker(nil,v.se_obj:clsid())) then
+			factions_present[v.se_obj:community()] = true
+		end
+	end
+	
+	for f,v in pairs(factions_present) do 
+		for ff,vv in pairs(factions_present) do 
+			if (f ~= ff) then
+				if (game_relations.is_factions_enemies(f, ff)) then 
+					return true 
+				end
 			end
 		end
 	end
+	
 	return false
 end
 
@@ -1312,6 +1319,11 @@ function se_smart_terrain:update()
 			--end
 		end
 
+		if (self:is_being_contested()) then 
+			self.faction_war_in_progress = true
+		else 
+			self.faction_war_in_progress = false
+		end
 	else
 		-- check time
 		self.check_time = tg + 15000 + math.random(1000,5000)

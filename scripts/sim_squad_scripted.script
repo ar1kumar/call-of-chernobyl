@@ -889,8 +889,8 @@ function sim_squad_scripted:can_switch_offline()
 	
 	if (self.current_action == 1) then 
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
-		if (current_target.faction_controlled and current_target:is_being_contested()) then
-			printf("forced online")
+		if (current_target.faction_controlled and current_target.faction_war_in_progress == true) then
+			printf("forced online %s",current_target:name())
 			return false
 		end
 	end
@@ -967,7 +967,15 @@ function sim_squad_scripted:show()
 	end
 	local spot = ""
 
-	if not(is_squad_monster[self.player_id]) then
+	if (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
+		if (DEV_DEBUG_HOLD_ACTION_1) then 
+			if (self.assigned_target_id ~= nil and smart_terrain.nearest_to_actor_smart.id == self.assigned_target_id) then 
+				spot = "storyline_task_location"
+			end
+		else
+			spot = "storyline_task_location"
+		end
+	elseif not(is_squad_monster[self.player_id]) then
 		local relation = game_relations.get_squad_relation_to_actor_by_id(self.id)
 		if(relation=="friends") then
 			spot = "alife_presentation_squad_friend"
@@ -976,10 +984,7 @@ function sim_squad_scripted:show()
 		end
 	end
 
-    if (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
-		spot = "storyline_task_location"
-	end
-	if(spot~="") then
+	if (spot~="") then
 		if spot == self.spot_section then
 			level.map_change_spot_hint(self.current_spot_id, self.spot_section, self:get_squad_props())
 			return
@@ -991,7 +996,7 @@ function sim_squad_scripted:show()
 			level.map_add_object_spot(self.current_spot_id, spot, self:get_squad_props())
 		end
 		self.spot_section = spot
-	elseif(self.spot_section~=nil) then
+	elseif (self.spot_section~=nil) then
 		level.map_remove_object_spot(self.current_spot_id, self.spot_section)
 		self.spot_section = nil
 	end
