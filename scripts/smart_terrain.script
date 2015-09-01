@@ -383,11 +383,6 @@ function se_smart_terrain:register_npc(obj)
 		self.npc_info[obj.id] = self:fill_npc_info(obj)
 		self.dead_time = empty_table(self.dead_time)
 		self:select_npc_job(self.npc_info[obj.id])
-		
-		local comm = IsStalker(nil,obj:clsid()) and obj:community()
-		if (comm ~= "zombied" and self:only_faction_on_jobs(comm)) then 
-			self.faction = comm
-		end
 	else
 		self.arriving_npc[obj.id]  = obj
 	end
@@ -1162,7 +1157,7 @@ function se_smart_terrain:get_smart_props()
 		props = self:name().."  ["..self.id.."]\\n"
 		
 		if (self.faction_controlled) then 
-			props = props .. "faction_controlled=" .. tostring(self.faction_controlled) .. "\\ncontested=" .. tostring(self:is_being_contested()) .. "\\n"
+			props = props .. "faction_controlled=" .. tostring(self.faction_controlled) .. "\\nfaction_war_in_progress=" .. tostring(self:faction_war_in_progress) .. "\\n"
 		end 
 		
 		props = props .. "controlling_faction=".. tostring(self.faction) .. "\\ntype="..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity="..squad_count.." of "..tostring(self.max_population).."\\n"
@@ -1247,7 +1242,7 @@ local function is_only_monsters_on_jobs(npc_info)
 	return true
 end
 
-function se_smart_terrain:is_being_contested()
+function se_smart_terrain:check_smart_faction()
 	local factions_present = {}
 	for k,v in pairs(self.npc_info) do 
 		if (v.se_obj and IsStalker(nil,v.se_obj:clsid())) then
@@ -1255,17 +1250,31 @@ function se_smart_terrain:is_being_contested()
 		end
 	end
 	
+	-- determine faction
+	local current_faction
+	local size = 0
+	for f,v in pairs(factions_present) do 
+		size = size + 1
+		current_faction = f
+	end 
+	
+	if (size == 1) then 
+		self.faction = f
+	end
+	
+	-- check if factions are hostile to eachother
 	for f,v in pairs(factions_present) do 
 		for ff,vv in pairs(factions_present) do 
 			if (f ~= ff) then
 				if (game_relations.is_factions_enemies(f, ff)) then 
-					return true 
+					self.faction_war_in_progress = true
+					return
 				end
 			end
 		end
 	end
 	
-	return false
+	self.faction_war_in_progress = false
 end
 
 function se_smart_terrain:update()
@@ -1319,11 +1328,7 @@ function se_smart_terrain:update()
 			--end
 		end
 
-		if (self:is_being_contested()) then 
-			self.faction_war_in_progress = true
-		else 
-			self.faction_war_in_progress = false
-		end
+		self:check_smart_faction()
 	else
 		-- check time
 		self.check_time = tg + 15000 + math.random(1000,5000)
