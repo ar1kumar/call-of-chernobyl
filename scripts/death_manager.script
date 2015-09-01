@@ -1,6 +1,7 @@
 local item_by_community = {}
 local item_dependence = {}
 local always_keep_item = {}
+local item_by_story_id
 local death_ini = ini_file("misc\\death_generic.ltx")
 
 function init_drop_settings()
@@ -63,6 +64,16 @@ function init_drop_settings()
 			always_keep_item[id] = true
 		end
 	end
+	
+	-- Create a list of item sections that npc must keep
+	local n = death_ini:line_count("spawn_by_story_id")
+	for i=0,n-1 do
+		if not (item_by_story_id) then 
+			item_by_story_id = {}
+		end
+		local result, id, value	= death_ini:r_line("spawn_by_story_id",i,"","")
+		item_by_story_id[id] = value
+	end
 end
 
 class "drop_manager"
@@ -80,6 +91,17 @@ function drop_manager:create_release_item()
 	-- Alundaio
 
 	self.npc:iterate_inventory(keep_item, self.npc)
+	
+	-- spawn items by story id 
+	local sid = get_object_story_id(self.npc:id())
+	if (sid and item_by_story_id[sid]) then
+		local p = alun_utils.str_explode(item_by_story_id[sid],",")
+		if (p) then
+			for i,v in pairs(p) do
+				create_items(self.npc, v, 1, 100)
+			end
+		end
+	end
 
 	local ini = self.npc:spawn_ini()
 	if ini and ini:section_exist("dont_spawn_loot") then
@@ -187,6 +209,11 @@ end
 
 --' Функция спавнит необходимое число предметов
 function create_items(npc, section, number, rnd)
+	if not (system_ini():section_exist(section)) then 
+		printf("death_manager: ERROR: trying to spawn section that doesn't exist!")
+		return 
+	end 
+	
 	--'printf("create %s of %s", tostring(number), tostring(section))
 	if _G.ammo_section[section] == true then
 		if number > 0 then

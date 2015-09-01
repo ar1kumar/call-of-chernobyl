@@ -1,6 +1,7 @@
 [logic]
 active = beh@base
 post_combat_time = 0,0
+trade = misc\trade\trade_companion.ltx
 
 ;======================
 ; default logic
@@ -59,7 +60,7 @@ far_distance			= 0
 far_anim				= nil
 far_snd					= nil
 far_victim				= nil
-use 					= {=is_wounded} true, {!is_squad_commander} false, {=dist_to_actor_le(5)} true, false
+use 					= {=is_wounded} true, {=dist_to_actor_le(4)} true, false ;{=is_wounded} true, {!is_squad_commander} false, {=dist_to_actor_le(5)} true, false
 allow_break				= true
 use_text				= nil
 trade_enable 			= {=is_wounded} false, true

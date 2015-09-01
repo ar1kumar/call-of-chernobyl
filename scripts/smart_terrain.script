@@ -220,8 +220,12 @@ function se_smart_terrain:read_params()
 		printf("! SMART_TERRAIN [%s] has no terrain_mask section in smart_terrain_masks.ltx!!!",self:name())
 	end
 	
-	self.faction_controlled = utils.cfg_get_bool(ini, "smart_terrain", "faction_controlled", self, false, false)
-	
+	self.faction_controlled = utils.cfg_get_string(ini, "smart_terrain", "faction_controlled", self, false, "", nil)
+	local spawn_num = self.faction_controlled and utils.cfg_get_string(ini, smart_terrain, "faction_respawn_num", 	self, false, "", "1")
+	if (spawn_num) then 
+		self.faction_respawn_num = xr_logic.parse_condlist(nil, smart_terrain, "faction_respawn_num", spawn_num)
+	end
+				
 	self.respawn_only_smart = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_smart", self, false, false)
 	self.respawn_idle = utils.cfg_get_number(ini, "smart_terrain", "respawn_idle", 	self, false, 3000)
 	self.respawn_only_level = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_level", self, false, false)
@@ -230,7 +234,7 @@ function se_smart_terrain:read_params()
 	local respawn_params = utils.cfg_get_string(ini, "smart_terrain", "respawn_params", 		self, false, "", nil)
 	if not (respawn_params) then 
 		return 
-	end 
+	end
 	
 	if not ini:section_exist(respawn_params) then
 		printf("Wrong smart_terrain respawn_params section [%s](there is no section)", respawn_params)
@@ -260,13 +264,6 @@ function se_smart_terrain:read_params()
 				self.respawn_params[prop_name] 			= {}
 				self.already_spawned[prop_name]			= {}
 				self.respawn_params[prop_name].num		= spawn_num
-				if (self.faction_controlled) then
-					local f = utils.cfg_get_string(ini,prop_name,"faction",self,false,"",nil)
-					if not (f) then 
-						printf("smart_terrain: faction_controlled is true but faction now found for respawn param %s",prop_name)
-					end
-					self.respawn_params[prop_name].faction 	= f
-				end
 				self.already_spawned[prop_name].num	= 0
 				
 				local spawn_squads = utils.cfg_get_string(ini, prop_name, "spawn_squads", 	self, false, "", nil)
@@ -283,6 +280,36 @@ function se_smart_terrain:read_params()
 				end
 			end
 		end
+	end
+	
+	if (self.faction_controlled) then 
+		local p = alun_utils.str_explode(self.faction_controlled,",")
+		if (p) then
+			local squads_by_faction = {
+				["stalker"] = "stalker_sim_squad_novice, stalker_sim_squad_advanced, stalker_sim_squad_veteran",
+				["bandit"] = "bandit_sim_squad_novice, bandit_sim_squad_advanced, bandit_sim_squad_veteran",
+				["ecolog"] = "ecolog_sim_squad_novice, ecolog_sim_squad_advanced, ecolog_sim_squad_veteran",
+				["army"] = "army_sim_squad_novice, army_sim_squad_advanced, army_sim_squad_veteran",
+				["csky"] = "csky_sim_squad_novice, csky_sim_squad_advanced, csky_sim_squad_veteran",
+				["killer"] = "merc_sim_squad_novice, merc_sim_squad_advanced, merc_sim_squad_veteran",
+				["monolith"] = "monolith_sim_squad_novice, monolith_sim_squad_advanced, monolith_sim_squad_veteran",
+				["dolg"] = "duty_sim_squad_novice, duty_sim_squad_advanced, duty_sim_squad_veteran",
+				["freedom"] = "freedom_sim_squad_novice, freedom_sim_squad_advanced, freedom_sim_squad_veteran"
+			}
+			
+			for i,faction in pairs(p) do
+				local prop_name = "faction_controlled_"..faction
+				if (squads_by_faction[prop_name]) then
+					self.respawn_params[prop_name] = {}
+					self.already_spawned[prop_name]	= {}
+					self.respawn_params[prop_name].num = self.faction_respawn_num
+					self.already_spawned[prop_name].num	= 0
+					local spawn_squads = utils.parse_names(squads_by_faction[faction])
+					self.respawn_params[prop_name].squads = spawn_squads
+					self.respawn_params[prop_name].faction = faction
+				end
+			end
+		end	
 	end
 end
 
@@ -1131,7 +1158,14 @@ function se_smart_terrain:get_smart_props()
 
 		local board = SIMBOARD
 		local squad_count = board.smarts[self.id].population --smart_terrain_squad_count(board.smarts[self.id].squads)
-		props = self:name().."  ["..self.id.."]\\nfaction_control_enabled = "..tostring(self.faction_controlled).."\\ncontrolling_faction = ".. tostring(self.faction) .. "\\n"..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity = "..squad_count.." of "..tostring(self.max_population).."\\n"
+		
+		props = self:name().."  ["..self.id.."]\\n"
+		
+		if (self.faction_controlled) then 
+			props = props .. "faction_controlled = " .. tostring(self.faction_controlled) .. "\\n"
+		end 
+		
+		props = props .. "controlling_faction = ".. tostring(self.faction) .. "\\n"..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity = "..squad_count.." of "..tostring(self.max_population).."\\n"
 
 		if self.respawn_point ~= nil and self.already_spawned ~= nil then
 			props = props.."\\nalready_spawned :\n"
@@ -1518,15 +1552,13 @@ function se_smart_terrain:try_respawn()
 		
 		clear_table(available_sects)
 		
+		-- check self.faction
+		if not (self.faction) then 
+			self.faction = utils.cfg_get_string(self.ini, "smart_terrain", "default_faction",self, false,"")
+		end
+				
 		for k,v in pairs(self.respawn_params) do
-			if (self.faction_controlled) then
-				if not (self.faction) then 
-					self.faction = utils.cfg_get_string(self.ini, "smart_terrain", "default_faction",self, false,"")
-				end
-				if (self.faction == nil) or (v.faction == self.faction and tonumber(xr_logic.pick_section_from_condlist(db.actor, self,v.num)) > self.already_spawned[k].num) then
-					table.insert(available_sects,k)
-				end				
-			else
+			if (self.faction_controlled == nil) or (self.faction ~= nil and v.faction == self.faction) then 
 				if tonumber(xr_logic.pick_section_from_condlist(db.actor, self,v.num)) > self.already_spawned[k].num then
 					table.insert(available_sects,k)
 				end
@@ -1538,9 +1570,6 @@ function se_smart_terrain:try_respawn()
 			local sect_to_spawn_params = self.respawn_params[sect_to_spawn]
 			
 			if (sect_to_spawn_params.squads) then
-				if (self.faction_controlled) then
-					self.faction = sect_to_spawn_params.faction
-				end
 				local squad = has_alife_info("actor_made_wish_for_control") and SIMBOARD:create_squad(self, "simulation_controller_psy") or SIMBOARD:create_squad(self, sect_to_spawn_params.squads[math.random(1,#sect_to_spawn_params.squads)])
 				if (squad) then
 					squad.respawn_point_id = self.id
