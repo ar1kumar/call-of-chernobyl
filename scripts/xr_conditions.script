@@ -2787,6 +2787,15 @@ function smart_under_faction_control(actor,npc,p)
 	
 	return false
 end 
+
+function smart_under_faction_war(actor,npc,p)
+	local board = SIMBOARD
+	local smart = p[1] and board and board.smarts_by_names[p[1]]
+	if not (smart) then
+		return false
+	end
+	return smart.faction_war_in_progress == true
+end
 -------------------------------------------------------------------------------------
 -- Special for Radar
 -------------------------------------------------------------------------------------

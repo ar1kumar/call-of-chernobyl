@@ -93,7 +93,7 @@ function drop_manager:create_release_item()
 	self.npc:iterate_inventory(keep_item, self.npc)
 	
 	-- spawn items by story id 
-	local sid = get_object_story_id(self.npc:id())
+	local sid = item_by_story_id and get_object_story_id(self.npc:id())
 	if (sid and item_by_story_id[sid]) then
 		local p = alun_utils.str_explode(item_by_story_id[sid],",")
 		if (p) then
