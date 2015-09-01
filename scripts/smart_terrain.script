@@ -1162,7 +1162,7 @@ function se_smart_terrain:get_smart_props()
 		props = self:name().."  ["..self.id.."]\\n"
 		
 		if (self.faction_controlled) then 
-			props = props .. "faction_controlled=" .. tostring(self.faction_controlled) .. "\\ncontested=" .. self:is_being_contested() .. "\\n"
+			props = props .. "faction_controlled=" .. tostring(self.faction_controlled) .. "\\ncontested=" .. tostring(self:is_being_contested()) .. "\\n"
 		end 
 		
 		props = props .. "controlling_faction=".. tostring(self.faction) .. "\\ntype="..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity="..squad_count.." of "..tostring(self.max_population).."\\n"
