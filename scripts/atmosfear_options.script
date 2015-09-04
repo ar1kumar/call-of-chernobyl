@@ -8,7 +8,7 @@
 	-- removed fallout manager
 --------------------------------------------------------------------------------
 
-config = alun_utils.cfg_file(getFS():update_path('$game_data$', '').."atmosfear_options.ini")
+config = alun_utils.cfg_file(getFS():update_path('$game_data$', '').."atmosfear_options.ini",true)
 
 
 
@@ -24,7 +24,7 @@ function af_options_dialog:__init() super()
 		self:loadDefaultConsoleSettings()
 	end
 	
-	self.default_settings = alun_utils.cfg_file(getFS():update_path('$game_config$', '').."atmosfear_default_settings.ltx")
+	self.default_settings = alun_utils.cfg_file(getFS():update_path('$game_config$', '').."atmosfear_default_settings.ltx",true)
 	
 	-- Create INI if sections are missing
 	local need_save

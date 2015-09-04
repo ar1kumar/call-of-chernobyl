@@ -1260,9 +1260,7 @@ function se_smart_terrain:update()
 	
 	--alun_utils.debug_write(strformat("%s:update ",self:name()))
 	
-	if self.respawn_params ~= nil then
-		self:try_respawn()
-	end
+
 
 	-- delta
 	local tg = time_global()
@@ -1273,6 +1271,10 @@ function se_smart_terrain:update()
 	local sim = alife()
 	local se_actor = sim:actor()
 	local dist_to_actor = self.position:distance_to(se_actor.position)
+	
+	if self.respawn_params ~= nil then
+		self:try_respawn(dist_to_actor)
+	end
 	
 	simulation_objects.get_sim_obj_registry():update_avaliability(self)
 	
@@ -1509,7 +1511,7 @@ function se_smart_terrain:evaluate_prior(squad)
 end
 
 local available_sects = {}
-function se_smart_terrain:try_respawn()
+function se_smart_terrain:try_respawn(dist_to_actor)
 	if (self.disabled) then
 		return
 	end
@@ -1519,14 +1521,7 @@ function se_smart_terrain:try_respawn()
 	
 	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
 	
-	if (self.is_on_actor_level) then
-		local sim = alife()
-		local se_actor = sim:actor()
-		local dist_to_actor = se_actor and se_actor.position:distance_to_sqr(self.position) or 10000
-		if (dist_to_actor < self.respawn_radius) then
-			return
-		end
-	elseif (self.respawn_only_level) then
+	if (dist_to_actor < self.respawn_radius) then
 		return
 	end
 		
