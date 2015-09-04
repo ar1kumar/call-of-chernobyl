@@ -164,6 +164,12 @@ function evaluate_prior(target, squad)
 
 		-- Level travel
 		if not (is_on_the_same_level(target, squad)) then
+		
+			-- monster squads can't change level to prevent weird running in place at graph points
+			if (is_squad_monster[squad.player_id]) then 
+				return 0
+			end
+			
 			if not (ALLOW_NPC_LEVEL_TRANSITION) then
 				return 0
 			end
