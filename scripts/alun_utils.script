@@ -1181,19 +1181,22 @@ function file_to_table(fname,parent,simple)
 				t = str_explode(t[1],":")
 
 				sec = string.sub(t[1],2,-2)
-				
-				if (root[sec]) then 
-					printf("ERROR: Duplicate section exists! %s",line)
-				end 
-				
-				root[sec] = {}
 
-				if (simple ~= true and t[2]) then
-					local a = str_explode(t[2],",")
-					for k,v in pairs(a) do
-						if (root[v]) then
-							for kk,vv in pairs(root[v]) do
-								root[sec][kk] = vv
+				if (root[sec]) then
+					printf("ERROR: Duplicate section exists! %s",line)
+				end
+
+				root[sec] = {}
+				
+				if (t[2]) then
+					root[sec]["_____link"] = t[2]
+					if (simple ~= true) then
+						local a = str_explode(t[2],",")
+						for k,v in pairs(a) do
+							if (root[v]) then
+								for kk,vv in pairs(root[v]) do
+									root[sec][kk] = vv
+								end
 							end
 						end
 					end
@@ -1249,7 +1252,15 @@ function cfg_file:GetValue(sec,key,typ,def)
 end
 
 function cfg_file:GetKeys(sec)
-	return self.root and self.root[sec]
+	if (self.root and self.root[sec]) then
+		t={}
+		for k,v in pairs(self.root[sec]) do 
+			if (k ~= "_____link") then 
+				t[k] = v
+			end
+		end
+		return t
+	end
 end
 
 function cfg_file:SetValue(sec,key,val)
@@ -1262,6 +1273,17 @@ function cfg_file:SetValue(sec,key,val)
 	end
 
 	self.root[sec][key] = val == nil and "" or tostring(val)
+end
+
+function cfg_file:ClearValue(sec,key)
+	if not (self.root) then
+		self.root = {}
+	end
+
+	if not (self.root[sec]) then
+		self.root[sec] = {}
+	end
+	self.root[sec][key] = nil
 end
 
 function cfg_file:SectionExist(sec)
@@ -1317,39 +1339,53 @@ function cfg_file:SaveExt()
 	cfg:close()
 end
 
--- Recreates ini as stored in the table
+-- Recreates ini as stored in the table and sorted in alphabetical order
 function cfg_file:Save()
-	local str = "",count
-
-	if (self.includes) then
-		for i=1,#self.includes do
-			str = str .. self.includes[i] .. "\n"
+	local _s = {}
+	_s.__order = {}
+	
+	for section,tbl in pairs(self.root) do
+		table.insert(_s.__order,section)
+		if not (_s[section]) then 
+			_s[section] = {}
+		end
+		for k,v in pairs(tbl) do 
+			table.insert(_s[section],k)
 		end
 	end
-
-	for section,tbl in pairs(self.root) do
-		str = str .. "[" .. section .. "]\n"
-
-		if (self.links and self.links[section]) then
-			str = str .. ":"
-			count = #self.links[section]
-			for i=1,count do
-				if (count > 1 and i ~= count) then
-					str = str .. self.links[section][i] .. ","
-				else
-					str = str .. self.links[section][i]
-				end
-			end
+	
+	table.sort(_s.__order)
+	
+	for i,section in pairs(_s.__order) do 
+		table.sort(_s[section])
+	end 
+	
+	local str = ""
+	
+	local first
+	for i,section in pairs(_s.__order) do
+		if not (first) then
+			str = str .. "[" .. section .. "]"
+			first = true
+		else 
+			str = str .. "\n[" .. section .. "]"
 		end
 
-		for key,val in pairs(self.root[section]) do
+		if (self.root["_____link"]) then 
+			str = str .. ":" .. self.root["_____link"] .. "\n"
+		else 
+			str = str .. "\n"
+		end 
+
+		for ii, key in pairs(_s[section]) do
+			val = self.root[section][key]
 			if (val == "") then
-				str = str .. key .. " =\n"
+				str = str .. key .. "\n"
 			else
 				str = str .. key .. " = " .. tostring(val) .. "\n"
 			end
-		end
-	end
+		end 
+	end 
 
 	local cfg = io.open(self.fname,"w+")
 	cfg:write(str)
