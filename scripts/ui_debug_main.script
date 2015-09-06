@@ -4,6 +4,8 @@
 Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
+UI_ICON_EQUIPMENT_WIDTH = 1024 
+UI_ICON_EQUIPMENT_HEIGHT = 2048
 
 id_to_spawn_table = {
 		[1] = "Ammo",
@@ -2070,10 +2072,10 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	
 	owner.ui_icon_equipment_back = xml:InitFrame("ui_icon_equipment_back",owner)
 	owner.ui_icon_equipment = xml:InitStatic("ui_icon_equipment",owner)
+	
 	owner.ui_icon_equipment:InitTexture("ui\\ui_icon_equipment")
-	--owner.ui_icon_equipment:SetTextureRect(Frect():set(0,0,300,200))
-	owner.ui_icon_equipment:SetWndSize(vector2():set(512,512))
-	owner.ui_icon_equipment_back:SetWndSize(vector2():set(448,540))
+	owner.ui_icon_equipment:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/4,UI_ICON_EQUIPMENT_HEIGHT/4))
+	owner.ui_icon_equipment_back:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/4+20,UI_ICON_EQUIPMENT_HEIGHT/4+20))
 	
 	
 	owner.icon_square = xml:InitFrame("square",owner)
