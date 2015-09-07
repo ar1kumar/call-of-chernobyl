@@ -23,7 +23,8 @@ local function npc_on_death_callback(npc,who)
 				local tm = task_manager.get_task_manager()
 				local task = tm.task_info[task_id]
 				if (task and task.stage == 0) then 
-					task.stage = 3
+					--task.stage = 3
+					task.stage = 2 -- complete task anyway instead of failing
 				end			
 			end
 			return
