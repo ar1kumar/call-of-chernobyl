@@ -28,7 +28,7 @@ function set_esc_2_12_stalker_fanat_as_companion(a,b)
 	for k in squad:squad_members() do
 		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id))
 		if (npc) then
-			as = k.object and k.object:get_alife_storage(true)
+			as = k.object and k.object.get_alife_storage and k.object:get_alife_storage(true)
 			if (as) then
 				as.companion = true
 				as.companion_cannot_dismiss = true

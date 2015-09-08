@@ -76,7 +76,7 @@ function remove_task_companion(actor,npc,p)
 			npc:disable_info_portion("npcx_is_companion")
 			npc:disable_info_portion("npcx_beh_cannot_dismiss")
 			
-			as = k.object and k.object:get_alife_storage()
+			as = k.object and k.object.get_alife_storage and k.object:get_alife_storage()
 			if (as) then
 				as.companion = nil 
 				as.companion_cannot_dismiss = nil

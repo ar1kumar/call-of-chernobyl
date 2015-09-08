@@ -143,7 +143,7 @@ function motivator_binder:net_spawn(sobject)
 		self.object:set_npc_position(force_set_position)
 	end
 
-	local as = sobject:get_alife_storage()
+	local as = sobject.get_alife_storage and sobject:get_alife_storage()
 	if (as and as.companion) then
 		axr_companions.setup_companion_logic(self.object,self.st,self.loaded,as)
 	else
