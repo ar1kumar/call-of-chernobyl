@@ -100,7 +100,7 @@ function create_items(obj, section, number, rnd)
 				local position = vector():set(0,0,0)
 				position.x = obj:position().x --+ math.random(-30,30)/100
 				position.z = obj:position().z --+ math.random(-30,30)/100
-				position.y = obj:position().y + 0.1 --+ math.random(30,50)/100
+				position.y = obj:position().y + 0.3 --+ math.random(30,50)/100
 				
 				create_ammo(section,position,obj:level_vertex_id(),obj:game_vertex_id(),65535,number)
 			end
@@ -111,7 +111,7 @@ function create_items(obj, section, number, rnd)
 				local position = vector():set(0,0,0)
 				position.x = obj:position().x --+ math.random(-30,30)/100
 				position.z = obj:position().z --+ math.random(-30,30)/100
-				position.y = obj:position().y + 0.1 --+ math.random(30,50)/100
+				position.y = obj:position().y + 0.3 --+ math.random(30,50)/100
 
 				alife():create(section,position,obj:level_vertex_id(),obj:game_vertex_id())
 			end
@@ -168,7 +168,7 @@ function create_obligatory_items(obj, item , count)
 		local position = vector():set(0,0,0)
 		position.x = obj:position().x --+ math.random(-30,30)/100
 		position.z = obj:position().z --+ math.random(-30,30)/100
-		position.y = obj:position().y + 0.1 --+ math.random(30,50)/100 + 2
+		position.y = obj:position().y + 0.3 --+ math.random(30,50)/100 + 2
 		alife():create(item,position,obj:level_vertex_id(),obj:game_vertex_id())
 	end
 end
