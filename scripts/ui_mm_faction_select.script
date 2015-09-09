@@ -318,9 +318,9 @@ function faction_ui:OnFactionSelect(faction)
 	for i=1,#t do 
 		if not (t[i] == faction) then 
 			local v = relation_registry.community_relation("actor_"..faction, t[i])
-			if (v > 999) then 
+			if (v >= 1000) then 
 				desc = desc .. "   %c[0,51,255,51]".. gs("st_faction_"..t[i]) .. "\\n"
-			elseif (v < -999) then 
+			elseif (v <= -1000) then 
 				desc = desc .. "   %c[0,255,0,0]" .. gs("st_faction_"..t[i]) .. "\\n"
 			else 
 				desc = desc .. "   %c[0,255,255,51]" .. gs("st_faction_"..t[i]) .. "\\n"
