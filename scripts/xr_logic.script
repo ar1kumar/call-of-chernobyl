@@ -175,6 +175,11 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 	if scheme == nil then
 		printf("object '%s': unable to determine scheme name from section name '%s'", npc:name(), section)
 	end
+	
+	if not (db.storage[npc_id].stype and schemes_by_stype[db.storage[npc_id].stype][scheme]) then 
+		printf("ERROR: trying to use a scheme not intended for stype scheme=%s stype=%s",scheme,db.storage[npc_id].stype)
+		return 
+	end
 
 	-- Загрузить оверрайды:
 	db.storage[npc_id].overrides = cfg_get_overrides(ini, section, npc)
@@ -224,8 +229,7 @@ function reset_generic_schemes_on_scheme_switch(npc, scheme, section)
 end
 
 function assign_storage_and_bind(npc,ini,scheme,section,temp)
-	local id = npc:id()
-	
+	local id = npc:id()	
 	if not (db.storage[id][scheme]) then
 		db.storage[id][scheme] = {}
 		db.storage[id][scheme].npc = npc
