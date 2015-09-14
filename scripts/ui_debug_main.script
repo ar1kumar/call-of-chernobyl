@@ -1798,6 +1798,8 @@ function debug_ui:OnEditorSave()
 							ltx:SetValue(section,"inv_grid_height",h)
 						end
 						ltx:SaveExt()
+					else 
+						printf("make sure your gamedata is unpacked from db!")
 					end
 				end
 				if (self.need_save_offset_x or self.need_save_offset_y) and (string.find(data,"["..search_sec.."]",nil,true)) then
@@ -1810,6 +1812,8 @@ function debug_ui:OnEditorSave()
 							ltx:SetValue(search_sec,self._addons[ind].."_y",offset_y)
 						end
 						ltx:SaveExt()
+					else 
+						printf("make sure your gamedata is unpacked from db!")
 					end
 				end
 			end
