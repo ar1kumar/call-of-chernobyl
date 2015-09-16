@@ -227,7 +227,7 @@ function se_smart_terrain:read_params()
 	end
 				
 	self.respawn_only_smart = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_smart", self, false, false)
-	self.respawn_idle = utils.cfg_get_number(ini, "smart_terrain", "respawn_idle", 	self, false, 30000)
+	self.respawn_idle = utils.cfg_get_number(ini, "smart_terrain", "respawn_idle", 	self, false, 3000)
 	self.respawn_only_level = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_level", self, false, false)
 	self.respawn_point = false
 	
@@ -1247,6 +1247,16 @@ local function is_only_monsters_on_jobs(npc_info)
 	return true
 end
 
+local function is_monster_on_job(npc_info)
+	local pairs = pairs
+	for k,v in pairs(npc_info) do
+		if (v.stype == 1) then
+			return true
+		end
+	end
+	return false	
+end
+
 function se_smart_terrain:update()
 	cse_alife_smart_zone.update( self )
 
@@ -1526,19 +1536,14 @@ function se_smart_terrain:try_respawn(dist_to_actor)
 	end
 		
 	if self.sim_avail ~= nil and xr_logic.pick_section_from_condlist(db.actor, self, self.sim_avail) ~= "true" then return end
-
-	local squad_count = smart_terrain_squad_count(SIMBOARD.smarts[self.id].squads)
-	if self.max_population <= squad_count then
-		return
-	end
-		
 	local curr_time = game.get_game_time()
 	
-	-- first spawn after game load
-	if (self.last_respawn_update == nil and math.random() < 0.3) then 
-		self.last_respawn_update = curr_time
-		return
-	end 
+	if (self.props.lair > 0 or self.props.territory > 0) then
+		local squad_count = smart_terrain_squad_count(SIMBOARD.smarts[self.id].squads)
+		if self.max_population <= squad_count then
+			return
+		end
+	end
 	
 	if self.last_respawn_update == nil or curr_time:diffSec(self.last_respawn_update) > self.respawn_idle then
 		self.last_respawn_update = curr_time
