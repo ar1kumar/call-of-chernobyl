@@ -1531,7 +1531,7 @@ function se_smart_terrain:try_respawn(dist_to_actor)
 	
 	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
 	
-	if (dist_to_actor < self.respawn_radius) then
+	if (self.is_on_actor_level and dist_to_actor < self.respawn_radius) then
 		return
 	end
 		
