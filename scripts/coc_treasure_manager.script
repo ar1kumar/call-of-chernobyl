@@ -261,6 +261,9 @@ function create_random_stash(no_spot,hint,bonus_items)
 end
 
 function save(pk)
+	if (USE_MARSHAL) then 
+		return 
+	end
 	pk:w_u16(caches_count)
 	for id,v in pairs(caches) do
 		pk:w_u16(id)
@@ -269,6 +272,9 @@ function save(pk)
 end
 
 function load(pk)
+	if (USE_MARSHAL) then 
+		return 
+	end
 	caches_count = pk:r_u16()
 	for i=1,caches_count do
 		caches[pk:r_u16()] = pk:r_bool()
