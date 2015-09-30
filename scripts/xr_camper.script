@@ -63,7 +63,8 @@ function evaluator_close_combat:evaluate()
 	end
 	--]]
 	-- ^
-	if (self.object:position():distance_to(be:position()) < self.a.radius) then 
+	if (self.a.locked or self.object:position():distance_to(be:position()) < self.a.radius) then
+		self.a.locked = true
 		return true 
 	end
 
