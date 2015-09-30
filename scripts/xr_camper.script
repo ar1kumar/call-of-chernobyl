@@ -54,11 +54,17 @@ function evaluator_close_combat:evaluate()
 		return true
 	end
 	
+	--[[
 	local a = self.object:memory_time(be)
 	if a then
-		if (time_global() - a < 20000 and self.object:position():distance_to(self.object:memory_position(self.object:best_enemy())) < self.a.radius) then
+		if (time_global() - a < 20000 and self.object:position():distance_to(self.object:memory_position(be)) < self.a.radius) then
 			return true
 		end
+	end
+	--]]
+	-- ^
+	if (self.object:position():distance_to(be:position()) < self.a.radius) then 
+		return true 
 	end
 
 	return false
