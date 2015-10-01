@@ -124,6 +124,10 @@ function is_enemy(obj,enemy,no_memory)
 		return false 
 	end
 	
+	if not (enemy:alive()) then 
+		return false 
+	end
+	
 	if (obj:critically_wounded()) then 
 		return true 
 	end
