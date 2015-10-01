@@ -82,7 +82,11 @@ function eva_turn_on_campfire:find_valid_target()
 	
 	if (self.st.selected_id) then
 		if (already_selected[self.st.selected_id] == npc:id()) then 
-			return true
+			local camp = level.object_by_id(self.st.selected_id)
+			local CFZone = camp and camp:get_campfire()
+			if (CFZone and CFZone:is_on()) then
+				return true
+			end
 		end
 		--already_selected[self.st.selected_id] = nil
 		self.st.selected_id = nil
@@ -200,7 +204,7 @@ function act_turn_on_campfire:execute()
 	local npc = self.object
 	if (state_mgr.get_state(npc) == "light_campfire") then
 		local tg = time_global()
-		self.st.__stimer = not self.st.__stimer and tg + 15000 or self.st.__stimer
+		self.st.__stimer = not self.st.__stimer and tg + 10000 or self.st.__stimer
 		if (tg > self.st.__stimer) then
 			light_campfire(npc)
 		end
