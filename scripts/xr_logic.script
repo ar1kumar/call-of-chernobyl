@@ -177,7 +177,7 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 	end
 	
 	if not (db.storage[npc_id].stype and schemes_by_stype[db.storage[npc_id].stype][scheme]) then 
-		printf("ERROR: trying to use a scheme not intended for stype scheme=%s stype=%s",scheme,db.storage[npc_id].stype)
+		printf("ERROR: %s trying to use a scheme not intended for stype scheme=%s stype=%s",npc:name(),scheme,db.storage[npc_id].stype)
 		return 
 	end
 
