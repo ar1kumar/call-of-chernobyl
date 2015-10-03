@@ -1,5 +1,6 @@
 local item_by_community = {}
 local item_dependence = {}
+local item_count = {}
 local always_keep_item = {}
 local item_by_story_id
 local death_ini = ini_file("misc\\death_generic.ltx")
@@ -14,33 +15,18 @@ function init_drop_settings()
 			local id, value = "", ""
 			for i=0,n-1 do
 				result, id, value	= death_ini:r_line(v,i,"","")
-				item_by_community[v][id] = { chance = tonumber(value) }
+				item_by_community[v][id] = tonumber(value) or 0
 			end
 		end
 	end
 
-	-- Append to community list the mix and max for each section
-	for i,comm in pairs(community_list) do
-		for sec,t in pairs(item_by_community[comm]) do 
-			if (death_ini:line_exist("item_count",sec)) then
-				local result, id, value = death_ini:r_line("item_count",sec,"","")
-				local p = alun_utils.str_explode(value,",")
-				if (p and p[1] and p[2]) then 
-					item_by_community[comm][sec].min = tonumber(p[1]) or 0
-					item_by_community[comm][sec].max = tonumber(p[2]) or 0
-				end
-			end
-		end
-	end 
-	
-	local n = death_ini:line_count("item_dependence")
+	local n = death_ini:line_count("item_count")
 	local id, value = "", ""
 	for i=0,n-1 do
-		local result, id, value	= death_ini:r_line("item_dependence",i,"","")
-		item_dependence[id] = {}
-		local vvv = parse_names(value)
-		for k,v in pairs(vvv) do
-			item_dependence[id][v] = true
+		local result, id, value	= death_ini:r_line("item_count",i,"","")
+		local p = alun_utils.str_explode(value,",")
+		if (p and p[1] and p[2]) then
+			item_count[id] = {tonumber(p[1]) or 0,tonumber(p[2]) or 0}
 		end
 	end
 	
@@ -118,12 +104,10 @@ function drop_manager:create_release_item()
 		return
 	end
 	for sec,v in pairs(spawn_items) do
-		if (v.chance > 0 and v.max > 0 and v.min < v.max) then
-			if check_item_dependence(self.npc, k) == true then
-				local number = math.ceil(math.random(v.min, v.max))
-				--' Необходимо заспавнить нужное количество.
-				create_items(self.npc, k, number, v.chance)
-			end
+		if (v > 0 and item_count[sec] and check_item_dependence(self.npc, sec) == true) then
+			local number = math.ceil(math.random(item_count[sec][1], item_count[sec][2]))
+			--' Необходимо заспавнить нужное количество.
+			create_items(self.npc, sec, number, v)
 		end
 	end
 
@@ -214,7 +198,7 @@ function create_items(npc, section, number, rnd)
 		return 
 	end 
 	
-	--'printf("create %s of %s", tostring(number), tostring(section))
+	printf("death_dropped: create %s=%s",section,number)
 	if _G.ammo_section[section] == true then
 		if number > 0 then
 			create_ammo(section,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id(),number)
