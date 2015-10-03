@@ -150,6 +150,8 @@ function CGeneralTask:give_task()
 
 	db.actor:give_task(t, time*10, false, time)
 	self.t = t
+	self.stage = 0
+	self.forced_status = nil
 end
 --' ѕроверка текущего выполнени€ квеста
 function CGeneralTask:check_task(tm)
