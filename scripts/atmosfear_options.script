@@ -22,7 +22,6 @@ function af_options_dialog:__init() super()
 	
 	local reset = USE_MARSHAL and alife_storage_manager.get_state().GAME_VERSION ~= GAME_VERSION
 	if (reset or not file_exists(getFS():update_path('$game_config$', '').."atmosfear_default_settings.ltx")) then
-		get_console():execute("ai_die_in_anomaly 0")
 		self:loadDefaultConsoleSettings()
 	end
 	
