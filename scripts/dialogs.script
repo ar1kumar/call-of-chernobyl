@@ -33,9 +33,9 @@ end
 function actor_has_finished_ordered_task(a,b)
 	local npc = who_is_npc(a, b)
 	local task = axr_task_manager and axr_task_manager.get_first_finished_task(npc)
-	if (task == nil or task.status == "fail" or task.status == "completed") then 
+	if (task == nil) then 
 		return false 
-	end 
+	end
 	
 	return true
 end
