@@ -329,13 +329,6 @@ function repair_ui:OnKeyboard(dik, keyboard_action)
 end
 
 function repair_ui:OnButton_repair()
-	if (self.use_condition and self.object and self.object:get_remaining_uses() <= 0) then 
-		local se_obj = alife():object(self.object:id())
-		if (se_obj) then 
-			alife():release(se_obj,true)
-		end
-	end 
-	
 	local index = self.list_box:GetSelectedIndex()
 	if index == -1 then return end
 	local item  = self.list_box:GetItemByIndex(index)
@@ -345,6 +338,13 @@ function repair_ui:OnButton_repair()
 		return
 	end
 
+	if (self.use_condition and self.object and self.object:get_remaining_uses() <= 0) then 
+		local se_obj = alife():object(self.object:id())
+		if (se_obj) then 
+			alife():release(se_obj,true)
+		end
+	end
+	
 	local bonus = 0
 	if (self.list_box_parts) then
 		index = self.list_box_parts:GetSelectedIndex()
