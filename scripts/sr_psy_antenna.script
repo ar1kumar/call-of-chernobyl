@@ -374,7 +374,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------
 function save( p )
 	set_save_marker(p, "save", false, "sr_psy_antenna")
-	if psy_antenna and not utils.level_changing() then
+	if psy_antenna and psy_antenna.global_state ~= state_outside and not utils.level_changing() then
 		p:w_bool( true )
 
 		psy_antenna:save( p )

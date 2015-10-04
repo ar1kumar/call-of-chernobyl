@@ -168,28 +168,6 @@ function trigger_fetch_func(task_id)
 	end
 end 
 
-function get_random_available_task(npc,is_sim)
-	local tm = task_manager.get_task_manager()
-	local task_info = tm.task_info
-	
-	local sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
-	local task_id = sec.."1"
-	
-	local avail = {}
-	local count = 1
-	while (task_manager.task_ini:section_exist(task_id)) do
-		if (task_info[task_id] == nil and xr_conditions.has_completed_task_prerequisites(nil,nil,{task_id})) then 
-			table.insert(avail,task_id)
-		end
-		count = count + 1
-		task_id = sec..tostring(count)
-	end
-	
-	if (#avail > 0) then 
-		return avail[math.random(#avail)]
-	end
-end
-
 function get_task_job_description(task)
 	return alun_utils.read_from_ini(task_manager.task_ini,task,"job_descr","string")
 end 
