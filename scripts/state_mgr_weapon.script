@@ -309,8 +309,8 @@ local state_queue_params = {
 	bloodsucker_panic    = {30, 100, 0}
 }
 
-function get_queue_params(npc, st)
-	local a = state_queue_params[st.animation]
+function get_queue_params(npc, st, override)
+	local a = state_queue_params[st.animation] or override
 	if a ~= nil then
 		if a[3] ~= nil then
 			local weap = npc:best_weapon()

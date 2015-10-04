@@ -232,7 +232,7 @@ function action_fight_from_cover:execute()
 			
 			if (see) then
 				local dir = ene_pos and vector():sub(ene_pos,npc:bone_position("bip01_r_finger02")) or nil
-				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy,look_dir = dir},{fast_set = true})
+				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy},{fast_set = true})
 			else
 				state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 			end
@@ -268,7 +268,7 @@ function action_fight_from_cover:execute()
 			
 			if (see) then
 				local dir = ene_pos and vector():sub(ene_pos,npc:bone_position("bip01_r_finger02")) or nil
-				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy, look_dir = dir},{fast_set = true})
+				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy},{fast_set = true})
 			else 
 				state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 			end
