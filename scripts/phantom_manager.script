@@ -10,17 +10,23 @@ class "DynamicPhantom" (object_binder)
 function DynamicPhantom:__init(obj) super(obj)
 	phantom_registry[obj:section()] = phantom_registry[obj:section()] and phantom_registry[obj:section()] + 1 or 1
 end
+function DynamicPhantom:net_spawn(sobject)
+	if not object_binder.net_spawn(self, sobject) then
+		return false
+	end
+	return true
+end
 function DynamicPhantom:net_destroy()
 	phantom_registry[self.object:section()] = phantom_registry[self.object:section()] and phantom_registry[self.object:section()] - 1 or 0
+	object_binder.net_destroy(self)
 end
-
 function bind_phantom(obj)
 	obj:bind_object(DynamicPhantom(obj))
 end 
 
 --------------------------------------------------------------------------------------
 
-function spawn_dynamic_phantom(sec,pos,lvid)
+function spawn_dynamic_phantom(sec,pos,lvid,enemy)
 	if (level.spawn_item) then
 		--alun_utils.debug_write("spawn_dynamic_phantom")
 		level.spawn_item(sec,pos,lvid,65535,false)
@@ -73,7 +79,7 @@ local function monster_on_update(npc,st)
 	end
 	st.__phantom_check2 = tg + 10000
 	
-	phantom_manager.spawn_dynamic_phantom(sec,npc:position(),npc:level_vertex_id())
+	phantom_manager.spawn_dynamic_phantom(sec,npc:position(),npc:level_vertex_id(),npc:get_enemy())
 end 
 
 function on_game_start()

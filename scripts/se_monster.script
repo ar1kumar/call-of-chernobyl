@@ -32,6 +32,7 @@ function se_monster:switch_offline()
 end
 -----------------------
 function se_monster:STATE_Write(packet)
+	--alun_utils.debug_write(strformat("%s STATE_Write",self:name()))
 	cse_alife_monster_base.STATE_Write (self, packet)
 	packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].level_vertex_id))
 	packet:w_stringZ(tostring(db.offline_objects[self.id] and db.offline_objects[self.id].active_section))

@@ -52,6 +52,7 @@ function CRandomTask:give_task(task_id,task_giver_id)
 
 	if not task_ini:section_exist(task_id) then
 		printf("There is no task [%s] in task ini_file or ini_file is not included!!!", task_id)
+		return
 	end
 	
 	if (self.task_info[task_id]) then 
