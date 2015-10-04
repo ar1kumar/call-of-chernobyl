@@ -46,6 +46,15 @@ function CALifeStorageManager_before_save(fname)
 		device():pause(true)
 		force_pause = true
 	end
+	local sim = alife()
+	local se_obj
+	for i=1,65534 do
+		se_obj = sim:object(i)
+		if (se_obj and se_obj:clsid() == clsid.phantom) then
+			--printf("release phantom")
+			sim:release(se_obj,true)
+		end
+	end
 end 
 
 -- called from engine!
