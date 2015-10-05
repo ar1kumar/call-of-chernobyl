@@ -170,16 +170,16 @@ function action_patrol:execute()
 
 	if (npc:see(be) and self:can_shoot()) then
 		if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
-			local dir = self.enemy_position and vector():sub(self.enemy_position,npc:position()) or npc:direction()
+			local dir = vector():sub(be:position(),npc:position())
 			self.__keep_body_state_until = tg+3000
 			if (npc:body_state() ~= move.crouch) then
-				--if not (math.abs(self.enemy_position.y-npc:position().y) > 3.5) then
+				--if not (math.abs(be:position().y-npc:position().y) > 3.5) then
 					if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
 						self.stand = false
 					end
 				--end
 			else
-				if (math.abs(self.enemy_position.y-npc:position().y) > 3.5) or (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+				if (math.abs(be:position().y-npc:position().y) > 3.5) or (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
 					self.stand = true 
 				end
 			end
@@ -226,7 +226,7 @@ function action_patrol:execute()
 					end
 				--end
 			else
-				if (math.abs(self.enemy_position.y-npc:position().y) > 3.5) or (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+				if ( (self.enemy_position and math.abs(self.enemy_position.y-npc:position().y) > 3.5)) or (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
 					self.stand = true 
 				end
 			end
