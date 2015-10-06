@@ -111,12 +111,15 @@ function create_items(obj, section, number, rnd)
 				local position = vector():set(0,0,0)
 				position.x = obj:position().x --+ math.random(-30,30)/100
 				position.z = obj:position().z --+ math.random(-30,30)/100
-				position.y = obj:position().y + 0.5 --+ math.random(30,50)/100
+				position.y = obj:position().y + 0.2 --+ math.random(30,50)/100
 
 				alife():create(section,position,obj:level_vertex_id(),obj:game_vertex_id())
 			--end
 		end
 	end
+	
+	xr_statistic.inc_founded_secrets_counter()
+	news_manager.send_treasure(1)
 end
 
 function parse_names( s )

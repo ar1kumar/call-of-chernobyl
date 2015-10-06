@@ -178,12 +178,8 @@ function generic_physics_binder:death_callback(victim, who)
 	if (self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true) then
 		if (self.box_items and coc_treasure_manager.caches[self.object:id()] == true) then
 			coc_treasure_manager.caches[self.object:id()] = nil
-			
 			self.box_items:spawn_items()
-			
 			level.map_remove_object_spot(self.object:id(), "treasure")
-			xr_statistic.inc_founded_secrets_counter()
-			news_manager.send_treasure(1)
 		end
 	end
 end
