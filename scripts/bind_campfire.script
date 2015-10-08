@@ -48,13 +48,13 @@ function campfire_binder:net_spawn(server_object)
 		-- do not turn off campfire on game load
 		m_data.campfire_states[id] = nil
 	else
-		if (render_get_dx_level() == 655361) then 
-			self.object:disable_anomaly()
-		end
-
 		if (self.campfire and self.campfire:is_on()) then
 			self.campfire:turn_off()
 		end
+		
+		--if (render_get_dx_level() == 655361) then 
+		--	self.object:disable_anomaly()
+		--end
 	end
 	
 	local smart_name = string.gsub(self.object:name(), "_campfire_%d*", "")
@@ -95,11 +95,12 @@ function turn_off_campfires_by_smart_name(smart_name,use_rand)
 	if smart_campfires ~= nil and not empty(smart_campfires) then
 		for k,v in pairs (smart_campfires) do
 			if (math.random(100) < 20) then
-				if (v.object) then
-					if (render_get_dx_level() == 655361) then 
-						v.object:disable_anomaly()
-					end
-				end
+				-- shouldn't be needed with Open Xray because of DX11 lighting fix
+				--if (v.object) then
+				--	if (render_get_dx_level() == 655361) then 
+				--		v.object:disable_anomaly()
+				--	end
+				--end
 				if (v.campfire and v.campfire:is_on()) then
 					v.campfire:turn_off()
 				end

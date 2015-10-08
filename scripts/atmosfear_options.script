@@ -806,15 +806,6 @@ function af_options_dialog:loadDefaultConsoleSettings()
 	local console=get_console()
 	console:execute("r2_dof_far 800")
 	console:execute("r2_aa off")
-	
-	if (render_get_dx_level() == 655361) then
-		console:execute("r2_allow_r1_lights on")
-	else
-		console:execute("r2_allow_r1_lights off")
-	end 
-	
-	--r2_aa_weight 1,1,1
-	
 	console:execute("r2_dof -0.400000,1.400000,500.000000")
 	console:execute("r2_dof_enable on")
 	console:execute("r2_dof_kernel 2.")
