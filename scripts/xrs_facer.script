@@ -122,7 +122,7 @@ function evaluator_facer:evaluate()
 			return false
 		end
 
-		if not (xr_combat_ignore.is_enemy(npc,be,db.storage[npc:id()].combat_ignore)) then
+		if not (xr_combat_ignore.is_enemy(npc,be)) then
 			alun_utils.save_var(npc,"facer_target",nil)
 			return false
 		end

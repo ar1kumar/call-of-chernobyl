@@ -171,7 +171,7 @@ function monster_on_actor_use_callback(obj,who)
 			ui_mutant_loot.loot_ui(get_hud(),obj:id(),obj:section(),obj:clsid())
 		else
 			local t = {}
-			loot_mutant(se_obj,obj:clsid(),t)
+			loot_mutant(nil,obj:clsid(),t)
 			for sec,v in pairs(t) do
 				news_manager.relocate_item(db.actor, "in", sec, v.count)
 			end
