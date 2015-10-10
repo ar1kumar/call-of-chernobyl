@@ -80,21 +80,25 @@ function ph_item_box:spawn_items()
 		spawn_items = item_by_community["def_box"]
 	end
 
+	local found = false
 	for k,v in pairs(spawn_items) do
 		if (v > 0) then
 			local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
 			if (number > 0) then
-				create_items(self.obj, k, number, v)
+				create_items(self.obj, k, number, v, found)
 			end
 		end
 	end
+	if (found) then
+		xr_statistic.inc_founded_secrets_counter()
+		news_manager.send_treasure(1)
+	end
 end
 
-function create_items(obj, section, number, rnd)
+function create_items(obj, section, number, rnd, found)
 	if not (system_ini():section_exist(section)) then 
 		return 
 	end
-	local found = false
 	if ammo_sections[section] == true then
 		if math.random(100) <= rnd	then
 			if number > 0 then
@@ -119,11 +123,6 @@ function create_items(obj, section, number, rnd)
 				found = true
 			end
 		end
-	end
-	
-	if (found) then
-		xr_statistic.inc_founded_secrets_counter()
-		news_manager.send_treasure(1)
 	end
 end
 
