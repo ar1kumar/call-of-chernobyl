@@ -11,7 +11,7 @@ status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1
 on_init = %=on_init_bounty_hunt(zat_b7_bandit_boss_sultan_task_1:stalker:killer)%
-on_complete = %=reward_money(7000) =reward_stash(true) =inc_task_stage(zat_b7_bandit_boss_sultan_task_1) =complete_task_inc_goodwill(5:bandit)%
+on_complete = %=reward_money(7000) =reward_stash(true) =inc_task_stage(zat_b7_bandit_boss_sultan_task_1) =complete_task_inc_goodwill(10:bandit)%
 precondition = true
 
 [zat_a2_stalker_mechanic_task_1]
@@ -29,7 +29,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = zat_a2_stalker_mechanic_task_1_fetch_finish
-on_complete = %+zat_a2_stalker_mechanic_upgrade_tier_1 =complete_task_inc_goodwill(5:stalker) =reward_money(1000) =remove_fetch_item(zat_a2_stalker_mechanic_task_1_fetch) =inc_task_stage(zat_a2_stalker_mechanic_task_1)%
+on_complete = %+zat_a2_stalker_mechanic_upgrade_tier_1 =complete_task_inc_goodwill(10:stalker) =reward_money(1000) =remove_fetch_item(zat_a2_stalker_mechanic_task_1_fetch) =inc_task_stage(zat_a2_stalker_mechanic_task_1)%
 precondition = {-zat_a2_stalker_mechanic_upgrade_tier_1} true, false
 
 [zat_a2_stalker_mechanic_task_2]
@@ -47,5 +47,5 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = zat_a2_stalker_mechanic_task_2_fetch_finish
-on_complete = %+zat_a2_stalker_mechanic_upgrade_tier_2 =complete_task_inc_goodwill(5:stalker) =reward_money(1000) =remove_fetch_item(zat_a2_stalker_mechanic_task_2_fetch) =inc_task_stage(zat_a2_stalker_mechanic_task_2)%
+on_complete = %+zat_a2_stalker_mechanic_upgrade_tier_2 =complete_task_inc_goodwill(10:stalker) =reward_money(1000) =remove_fetch_item(zat_a2_stalker_mechanic_task_2_fetch) =inc_task_stage(zat_a2_stalker_mechanic_task_2)%
 precondition = {+zat_a2_stalker_mechanic_upgrade_tier_1 -zat_a2_stalker_mechanic_upgrade_tier_2} true, false
