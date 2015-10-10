@@ -1015,8 +1015,8 @@ function actor_neutral(actor, npc)
 end
 
 function is_factions_enemies(actor, npc, p)
-	if(p[1]~=nil) then
-		return game_relations.is_factions_enemies(character_community(actor), p[1])
+	if(p[1] and p[2]) then
+		return game_relations.is_factions_enemies(p[1], p[2])
 	else
 		return false
 	end
@@ -1027,8 +1027,8 @@ function is_factions_neutrals(actor, npc, p)
 end
 
 function is_factions_friends(actor, npc, p)
-	if(p[1]~=nil) then
-		return game_relations.is_factions_friends(character_community(actor), p[1])
+	if(p[1] and p[2]) then
+		return game_relations.is_factions_friends(p[1], p[2])
 	else
 		return false
 	end

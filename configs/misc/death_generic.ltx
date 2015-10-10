@@ -113,6 +113,7 @@ ammo_m209				= wpn_fn2000
 ammo_pkm_100			= wpn_pkm
 
 [keep_items]
+bad_psy_helmet = true
 af_quest_b14_twisted = true
 device_pda_zat_b5_dealer = true
 device_pda_port_bandit_leader = true
@@ -159,7 +160,7 @@ zat_b22_medic_pda = true
 jup_b202_bandit_pda = true
 af_compass = true 
 
-[spawn_by_story_id]			; story_id = section  (can be a list) spawned at 100% chance
-; example_npc1 = af_compass, jup_b47_merc_pda, quest_item_example1, quest_item_example2
-
+[spawn_by_story_id]			; story_id = section  (can be a condlist) spawned at 100% chance
+; example_npc1 = {=some_cond} af_compass, {!some_cond} wpn_pm
+yan_ecolog_semenov = {=actor_enemy} bad_psy_helmet
 

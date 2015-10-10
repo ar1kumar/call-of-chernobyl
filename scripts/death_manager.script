@@ -81,11 +81,11 @@ function drop_manager:create_release_item()
 	-- spawn items by story id 
 	local sid = item_by_story_id and get_object_story_id(self.npc:id())
 	if (sid and item_by_story_id[sid]) then
-		local p = alun_utils.str_explode(item_by_story_id[sid],",")
-		if (p) then
-			for i,v in pairs(p) do
-				create_items(self.npc, v, 1, 100)
-			end
+		local p = xr_logic.pick_section_from_condlist(db.actor,self.npc,alun_utils.parse_condlist(item_by_story_id[sid]))
+		--local p = alun_utils.str_explode(item_by_story_id[sid],",")
+		--printf("sid=%s p=%s",sid,p)
+		if (p and p ~= "" and p ~= "nil") then
+			create_items(self.npc, p, 1, 100)
 		end
 	end
 
