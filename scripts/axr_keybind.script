@@ -11,7 +11,8 @@ local keybinds = {
 					["debug_select_object"] 		= "DIK_NUMPAD9",
 					["debug_attachment_ui"] 		= "DIK_INSERT",
 					["debug_test"] 					= "DIK_NUMPADENTER",
-					["debug_reload_game"]			= "DIK_END"
+					["debug_reload_game"]			= "DIK_END",
+					["debug_hold_action"]		= "DIK_NUMPAD8"
 }
 local action = {}
 ------------------------------------------------------------------
@@ -170,6 +171,24 @@ function action.debug_reload_game(p)
 		local p = net_packet()
 		p:w_begin(15) -- reload game
 		level.send(p,true)
+	end
+end
+
+function action.debug_hold_action(p)
+	if (p == 1) then 
+		_G.DEV_DEBUG_HOLD_ACTION_1 = true
+		local squad
+		local sim = alife()
+		for i=1,65534 do 
+			squad = sim:object(i)
+			if (squad and squad:clsid() == clsid.online_offline_group_s) then
+				if (squad.first_update) then
+					squad:hide()
+				end
+			end
+		end
+	elseif (p == 0) then
+		_G.DEV_DEBUG_HOLD_ACTION_1 = false
 	end
 end
 -------------------------------------------

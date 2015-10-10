@@ -40,9 +40,16 @@ csky		= 1
 base 		= 1
 
 [default_lair]:default
-lair		= 1
-territory	= 1
-all			= 1
+lair					= 1
+territory				= 1
+zoo_monster				= 1
+monster					= 1
+monster_predatory_day 	= 1
+monster_predatory_night = 1
+monster_vegetarian		= 1
+monster_zombied_day		= 1
+monster_zombied_night	= 1
+monster_special			= 1
 
 [default_territory]:default
 territory 	= 1
@@ -62,7 +69,7 @@ all 		= 1
 [mar_smart_terrain_base]:default_base
 ecolog		= 1
 stalker		= 1
-csky 		= 1
+csky 		= 2
 surge 		= 1
 sim_avail 	= true
 
@@ -246,7 +253,7 @@ army_heli	= 1
 [esc_smart_terrain_7_11]:default_base
 sim_avail 	= true
 surge		= 1
-bandit		= 1
+bandit		= 2
 
 ;farmhouse
 [esc_smart_terrain_4_9]:default_lair
@@ -307,8 +314,8 @@ sim_avail = true
 sim_avail 	= true
 surge 		= 1
 all 		= 0
-army 		= 1
-bandit		= 1
+army 		= 2
+bandit		= 2
 
 [esc_smart_terrain_8_10]:default_lair
 sim_avail = true
@@ -355,7 +362,7 @@ surge 		= 1
 [gar_smart_terrain_3_5]:default_base
 sim_avail 	= true
 surge 		= 1
-bandit		= 1
+bandit		= 2
 
 [gar_smart_terrain_3_7]:default_resource
 sim_avail 	= true
@@ -369,13 +376,15 @@ sim_avail = true
 ;outpost to Bar
 [gar_smart_terrain_5_2]:default_base
 sim_avail 	= true
-surge		= 1
+surge		= 2
 stalker		= 1
-dolg		= 1
+dolg		= 2
+freedom		= 1
 ecolog		= 1
 csky		= 1
-killer		= 1
-bandit		= 1
+killer		= 2
+bandit		= 2
+monolith 	= 1
 
 [gar_smart_terrain_5_4]:default_lair
 sim_avail = true
@@ -893,23 +902,33 @@ sim_avail = true
 [mil_smart_terrain_2_10]:default_base
 sim_avail 	= true
 surge		= 1
-freedom		= 1 
-dolg		= 1
+freedom		= 5
+dolg		= 5
+monolith 	= 1 
+bandit 		= 1
 
 ;SOC merc outpost to Dead City
 [mil_smart_terrain_2_2]:default_base
 sim_avail 	= true
-killer		= 1
+killer		= 5
+stalker		= 1
+bandit		= 1 
+csky		= 1
+freedom		= 1 
+dolg		= 1 
+monolith	= 1
 
 ;SOC empty farmhouse north
 [mil_smart_terrain_2_4]:default_base
 sim_avail 	= true
 surge 		= 1
-stalker		= 1 
-ecolog		= 1 
-csky		= 1 
-freedom		= 1
-dolg		= 1
+stalker		= 1
+ecolog		= 1
+csky		= 1
+freedom		= 5
+dolg		= 2
+killer 		= 1 
+bandit		= 1
 
 [mil_smart_terrain_2_6]:default_lair
 sim_avail = true
@@ -917,8 +936,9 @@ sim_avail = true
 ;SOC Freedom outpost to Radar, barrier
 [mil_smart_terrain_3_8]:default_base
 sim_avail 	= true
-freedom		= 1 
-monolith	= 1
+freedom		= 5
+dolg 		= 1
+monolith	= 2
 
 ;SOC bloodsuckers village
 [mil_smart_terrain_4_2]:default_lair
@@ -932,7 +952,12 @@ surge		= 1
 
 [mil_smart_terrain_4_5]:default_base
 sim_avail 	= true
-freedom		= 1
+surge 		= 1
+stalker		= 1
+freedom		= 5
+dolg		= 2
+bandit		= 1
+monolith 	= 1
 
 [mil_smart_terrain_4_7]:default_lair
 sim_avail 	= true
@@ -941,39 +966,64 @@ territory	= 1
 ;SOC Freedom outpost to Radar, wagon
 [mil_smart_terrain_4_8]:default_base
 sim_avail 	= true
-surge		= 1
-freedom		= 1 
+surge 		= 1
+stalker		= 1
+freedom		= 5
+dolg		= 2
+bandit		= 1
+monolith 	= 1
 
 ;SOC Freedom base, near kitchen
 [mil_smart_terrain_7_10]:default_base
 sim_avail 	= true
-surge		= 1
-freedom		= 1
+surge 		= 1
+stalker		= 1
+freedom		= 5
+dolg		= 2
+bandit		= 1
+monolith 	= 1
 
 ;SOC Freedom base, near sleep barracks
 [mil_smart_terrain_7_12]:default_base
 sim_avail 	= true
-surge		= 1
-freedom		= 1
+surge 		= 1
+stalker		= 1
+freedom		= 5
+dolg		= 2
+bandit		= 1
 
 ;SOC Duty farm
 [mil_smart_terrain_7_4]:default_base
 sim_avail 	= true
-surge		= 1
-dolg		= 1
+surge 		= 1
+stalker		= 1
+freedom		= 1
+dolg		= 5
+bandit		= 1
+monolith 	= 1
 
 ;SOC Freedom base, main
 [mil_smart_terrain_7_7]:default_base
 sim_avail 	= true
-surge		= 1
-freedom		= 1 
+surge 		= 1
+stalker		= 1
+csky		= 1
+freedom		= 5
+dolg		= 2
+bandit		= 1
+monolith 	= 1
 
 ;SOC Freedom base, entrance
 [mil_smart_terrain_7_8]:default_base
 sim_avail 	= true
-surge		= 1
-freedom		= 1 
-dolg		= 1
+surge 		= 1
+stalker		= 1
+ecolog		= 1
+csky		= 1
+freedom		= 5
+dolg		= 2
+bandit		= 1
+monolith 	= 1
 
 [mil_smart_terrain_8_3]:default_lair
 sim_avail = true

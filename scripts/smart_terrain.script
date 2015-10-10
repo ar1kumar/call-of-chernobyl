@@ -225,6 +225,8 @@ function se_smart_terrain:read_params()
 	if (spawn_num) then 
 		self.faction_respawn_num = xr_logic.parse_condlist(nil, smart_terrain, "faction_respawn_num", spawn_num)
 	end
+	
+	self.default_faction = utils.cfg_get_string(self.ini, "smart_terrain", "default_faction",self, false,"")
 				
 	self.respawn_only_smart = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_smart", self, false, false)
 	self.respawn_idle = utils.cfg_get_number(ini, "smart_terrain", "respawn_idle", 	self, false, 3000)
@@ -383,11 +385,6 @@ function se_smart_terrain:register_npc(obj)
 		self.npc_info[obj.id] = self:fill_npc_info(obj)
 		self.dead_time = empty_table(self.dead_time)
 		self:select_npc_job(self.npc_info[obj.id])
-		
-		local comm = IsStalker(nil,obj:clsid()) and obj:community()
-		if (comm ~= "zombied" and self:only_faction_on_jobs(comm)) then 
-			self.faction = comm
-		end
 	else
 		self.arriving_npc[obj.id]  = obj
 	end
@@ -1162,18 +1159,18 @@ function se_smart_terrain:get_smart_props()
 		props = self:name().."  ["..self.id.."]\\n"
 		
 		if (self.faction_controlled) then 
-			props = props .. "faction_controlled = " .. tostring(self.faction_controlled) .. "\\n"
+			props = props .. "Faction_controlled=" .. tostring(self.faction_controlled) .. "\\nFaction_war_in_progress=" .. tostring(self.faction_war_in_progress) .. "\\n"
 		end 
 		
-		props = props .. "controlling_faction = ".. tostring(self.faction) .. "\\n"..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."capacity = "..squad_count.." of "..tostring(self.max_population).."\\n"
+		props = props .. "Controlling_faction=".. tostring(self.faction) .. "\\nType="..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."Capacity="..squad_count.." of "..tostring(self.max_population).."\\n"
 
 		if self.respawn_point ~= nil and self.already_spawned ~= nil then
-			props = props.."\\nalready_spawned :\n"
+			props = props.."\\nAlready_spawned :\n"
 			for k,v in pairs(self.already_spawned) do
 				props = props.."["..k.."] = "..v.num.."("..xr_logic.pick_section_from_condlist(db.actor, nil,self.respawn_params[k].num)..")\\n"
 			end
 			if self.last_respawn_update then
-				props = props.."\\ntime_to_spawn:"..tostring(self.respawn_idle - game.get_game_time():diffSec(self.last_respawn_update)).."\\n"
+				props = props.."\\nTime_to_spawn:"..tostring(self.respawn_idle - game.get_game_time():diffSec(self.last_respawn_update)).."\\n"
 			end
 		end
 
@@ -1247,14 +1244,33 @@ local function is_only_monsters_on_jobs(npc_info)
 	return true
 end
 
-local function is_monster_on_job(npc_info)
-	local pairs = pairs
-	for k,v in pairs(npc_info) do
-		if (v.stype == 1) then
-			return true
+function se_smart_terrain:check_smart_faction()
+	local factions_present = {}
+	for k,v in pairs(self.npc_info) do 
+		if (v.se_obj and IsStalker(nil,v.se_obj:clsid())) then
+			factions_present[v.se_obj:community()] = true
 		end
 	end
-	return false	
+	
+	self.faction_war_in_progress = false
+	local last_faction
+	-- check if factions are hostile to eachother
+	for f,v in pairs(factions_present) do
+		last_faction = f
+		for ff,vv in pairs(factions_present) do
+			if (f ~= ff) then
+				if (game_relations.is_factions_enemies(f, ff)) then 
+					self.faction_war_in_progress = true
+					break
+				end
+			end
+		end
+	end
+	
+	-- determine faction
+	if (self.faction_war_in_progress == false) then 
+		self.faction = self.faction and factions_present[self.faction] and self.faction or last_faction
+	end
 end
 
 function se_smart_terrain:update()
@@ -1270,7 +1286,9 @@ function se_smart_terrain:update()
 	
 	--alun_utils.debug_write(strformat("%s:update ",self:name()))
 	
-
+	if self.respawn_params ~= nil then
+		self:try_respawn()
+	end
 
 	-- delta
 	local tg = time_global()
@@ -1281,10 +1299,6 @@ function se_smart_terrain:update()
 	local sim = alife()
 	local se_actor = sim:actor()
 	local dist_to_actor = self.position:distance_to(se_actor.position)
-	
-	if self.respawn_params ~= nil then
-		self:try_respawn(dist_to_actor)
-	end
 	
 	simulation_objects.get_sim_obj_registry():update_avaliability(self)
 	
@@ -1310,6 +1324,7 @@ function se_smart_terrain:update()
 			--end
 		end
 
+		self:check_smart_faction()
 	else
 		-- check time
 		self.check_time = tg + 15000 + math.random(1000,5000)
@@ -1521,7 +1536,7 @@ function se_smart_terrain:evaluate_prior(squad)
 end
 
 local available_sects = {}
-function se_smart_terrain:try_respawn(dist_to_actor)
+function se_smart_terrain:try_respawn()
 	if (self.disabled) then
 		return
 	end
@@ -1531,19 +1546,33 @@ function se_smart_terrain:try_respawn(dist_to_actor)
 	
 	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
 	
-	if (self.is_on_actor_level and dist_to_actor < self.respawn_radius) then
+	if (self.is_on_actor_level) then
+		local sim = alife()
+		local se_actor = sim:actor()
+		local dist_to_actor = se_actor and se_actor.position:distance_to_sqr(self.position) or 10000
+		if (dist_to_actor < self.respawn_radius) then
+			return
+		end
+	elseif (self.respawn_only_level) then
 		return
 	end
 		
 	if self.sim_avail ~= nil and xr_logic.pick_section_from_condlist(db.actor, self, self.sim_avail) ~= "true" then return end
+
+	--[[
+	local squad_count = smart_terrain_squad_count(SIMBOARD.smarts[self.id].squads)
+	if self.max_population <= squad_count then
+		return
+	end
+	--]]
+		
 	local curr_time = game.get_game_time()
 	
-	if (self.props.lair > 0 or self.props.territory > 0) then
-		local squad_count = smart_terrain_squad_count(SIMBOARD.smarts[self.id].squads)
-		if self.max_population <= squad_count then
-			return
-		end
-	end
+	-- first spawn after game load
+	if (self.last_respawn_update == nil and math.random() < 0.3) then 
+		self.last_respawn_update = curr_time
+		return
+	end 
 	
 	if self.last_respawn_update == nil or curr_time:diffSec(self.last_respawn_update) > self.respawn_idle then
 		self.last_respawn_update = curr_time
@@ -1552,7 +1581,7 @@ function se_smart_terrain:try_respawn(dist_to_actor)
 		
 		-- check self.faction
 		if not (self.faction) then 
-			self.faction = utils.cfg_get_string(self.ini, "smart_terrain", "default_faction",self, false,"")
+			self.faction = self.default_faction
 		end
 				
 		for k,v in pairs(self.respawn_params) do
