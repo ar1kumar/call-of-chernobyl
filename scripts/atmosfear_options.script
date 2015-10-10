@@ -735,12 +735,16 @@ function af_options_dialog:OnBtnAccept()
 
 	if config:GetValue("atmosfear_current_parameters","opt_moon_phase") ~= self:GetRadioValue("moon_phase") then
 		self:SetRadioOption("moon_phase",false)
-		level_weathers.get_weather_manager():select_weather(true)
+		if (level.present()) then
+			level_weathers.get_weather_manager():select_weather(true)
+		end
 	end
 
 	if config:GetValue("atmosfear_current_parameters","opt_night_brightness") ~= self:GetComboValue("night_brightness") then
 		self:SetComboOption("night_brightness",false)
-		level_weathers.get_weather_manager():select_weather(true)
+		if (level.present()) then
+			level_weathers.get_weather_manager():select_weather(true)
+		end
 	end
 
 	self:SetComboOption("weather_balance_presets",false)
