@@ -94,8 +94,9 @@ function create_items(obj, section, number, rnd)
 	if not (system_ini():section_exist(section)) then 
 		return 
 	end
+	local found = false
 	if ammo_sections[section] == true then
-		--if math.random(100) <= rnd	then
+		if math.random(100) <= rnd	then
 			if number > 0 then
 				local position = vector():set(0,0,0)
 				position.x = obj:position().x --+ math.random(-30,30)/100
@@ -104,22 +105,26 @@ function create_items(obj, section, number, rnd)
 				
 				create_ammo(section,position,obj:level_vertex_id(),obj:game_vertex_id(),65535,number)
 			end
-		--end
+			found = true
+		end
 	else
 		for i=1,number do
-			--if math.random(100) <=  rnd then
+			if math.random(100) <=  rnd then
 				local position = vector():set(0,0,0)
 				position.x = obj:position().x --+ math.random(-30,30)/100
 				position.z = obj:position().z --+ math.random(-30,30)/100
 				position.y = obj:position().y + 0.2 --+ math.random(30,50)/100
 
 				alife():create(section,position,obj:level_vertex_id(),obj:game_vertex_id())
-			--end
+				found = true
+			end
 		end
 	end
 	
-	xr_statistic.inc_founded_secrets_counter()
-	news_manager.send_treasure(1)
+	if (found) then
+		xr_statistic.inc_founded_secrets_counter()
+		news_manager.send_treasure(1)
+	end
 end
 
 function parse_names( s )

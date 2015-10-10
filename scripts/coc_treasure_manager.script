@@ -21,14 +21,14 @@ local function on_game_load()
 			if (se_obj:clsid() == clsid.inventory_box_s) then
 				caches[se_obj.id] = false
 				caches_count = caches_count + 1
-			elseif (se_obj:spawn_ini() and se_obj:spawn_ini():section_exist("drop_box")) then 
-				caches[se_obj.id] = false
-				caches_count = caches_count + 1			
+			--elseif (se_obj:spawn_ini() and se_obj:spawn_ini():section_exist("drop_box")) then 
+			--	box_caches[se_obj.id] = false
+			--	box_caches_count = caches_count + 1
 			end
 		end
 	end
 
-	for i=1, math.floor(caches_count/2) do
+	for i=1, math.floor(caches_count/3) do
 		create_random_stash(true,"stash")
 	end
 	
