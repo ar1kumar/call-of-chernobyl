@@ -68,6 +68,21 @@ function check_smart_under_faction_control(task,task_id)
 	end
 	--]]
 	
+	if (smart.faction_controlled) then
+		local a_to_f = {	["actor_stalker"] = "stalker",
+							["actor_bandit"] = "bandit",
+							["actor_ecolog"] = "ecolog",
+							["actor_dolg"] = "dolg",
+							["actor_freedom"] = "freedom",
+							["actor_monolith"] = "monolith",
+							["actor_army"] = "army",
+							["actor_killer"] = "killer",
+							["actor_csky"] = "csky"
+		}
+		
+		smart.faction = a_to_f[character_community(db.actor)] or smart.faction
+	end
+	
 	return "complete"	
 end
 
@@ -127,6 +142,21 @@ function specific_check_smart_under_faction_control(task,task_id)
 		return "fail"
 	end
 	--]]
+
+	if (smart.faction_controlled) then
+		local a_to_f = {	["actor_stalker"] = "stalker",
+							["actor_bandit"] = "bandit",
+							["actor_ecolog"] = "ecolog",
+							["actor_dolg"] = "dolg",
+							["actor_freedom"] = "freedom",
+							["actor_monolith"] = "monolith",
+							["actor_army"] = "army",
+							["actor_killer"] = "killer",
+							["actor_csky"] = "csky"
+		}
+		
+		smart.faction = a_to_f[character_community(db.actor)] or smart.faction
+	end
 	
 	return "complete"	
 end
