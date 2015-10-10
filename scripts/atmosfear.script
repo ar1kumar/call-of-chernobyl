@@ -21,9 +21,7 @@ do
 		end
 	end
 	
-	local reset = USE_MARSHAL and alife_storage_manager.get_state().GAME_VERSION ~= GAME_VERSION
-
-	if (reset or not atmosfear_options.config:SectionExist("atmosfear_current_parameters")) then
+	if (not atmosfear_options.config:SectionExist("atmosfear_current_parameters")) then
 		for level,v in pairs(valid_levels) do
 			atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
