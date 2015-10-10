@@ -20,8 +20,7 @@ function af_options_dialog:__init() super()
 	   if f~=nil then f:close() return true else return false end
 	end
 	
-	local reset = USE_MARSHAL and alife_storage_manager.get_state().GAME_VERSION ~= GAME_VERSION
-	if (reset or not file_exists(getFS():update_path('$game_config$', '').."atmosfear_default_settings.ltx")) then
+	if (not file_exists(getFS():update_path('$game_config$', '').."atmosfear_default_settings.ltx")) then
 		self:loadDefaultConsoleSettings()
 	end
 	
@@ -30,7 +29,7 @@ function af_options_dialog:__init() super()
 	-- Create INI if sections are missing
 	local need_save
 
-	if (reset or not self.default_settings:SectionExist("atmosfear_default_parameters")) then
+	if (not self.default_settings:SectionExist("atmosfear_default_parameters")) then
 		for level,v in pairs(atmosfear.valid_levels) do
 			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
@@ -64,7 +63,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("atmosfear_option_names")) then
+	if (not self.default_settings:SectionExist("atmosfear_option_names")) then
 		self.default_settings:SetValue("atmosfear_option_names","kill","st_list_fate_kill")
 		self.default_settings:SetValue("atmosfear_option_names","explode","st_list_fate_explode")
 		self.default_settings:SetValue("atmosfear_option_names","nowarning","st_list_warning_none")
@@ -104,7 +103,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("list_blowout_fate")) then
+	if (not self.default_settings:SectionExist("list_blowout_fate")) then
 		self.default_settings:SetValue("list_blowout_fate","list_fate_killatwave",1)
 		self.default_settings:SetValue("list_blowout_fate","list_fate_killatend",0)
 		self.default_settings:SetValue("list_blowout_fate","list_fate_explode",3)
@@ -120,14 +119,14 @@ function af_options_dialog:__init() super()
 	end
 	--]]
 
-	if (reset or not self.default_settings:SectionExist("list_psi_storm_fate")) then
+	if (not self.default_settings:SectionExist("list_psi_storm_fate")) then
 		self.default_settings:SetValue("list_psi_storm_fate","list_fate_kill",0)
 		self.default_settings:SetValue("list_psi_storm_fate","list_fate_turntozombie",1)
 		self.default_settings:SetValue("list_psi_storm_fate","list_fate_none",2)
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("list_blowout_task")) then
+	if (not self.default_settings:SectionExist("list_blowout_task")) then
 		self.default_settings:SetValue("list_blowout_task","list_task_give",0)
 		self.default_settings:SetValue("list_blowout_task","list_task_none",1)
 		need_save = true
@@ -141,13 +140,13 @@ function af_options_dialog:__init() super()
 	end
 	--]]
 
-	if (reset or not self.default_settings:SectionExist("list_psi_storm_task")) then
+	if (not self.default_settings:SectionExist("list_psi_storm_task")) then
 		self.default_settings:SetValue("list_psi_storm_task","list_task_give",0)
 		self.default_settings:SetValue("list_psi_storm_task","list_task_none",1)
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("atmosfear_preset_length_short")) then
+	if (not self.default_settings:SectionExist("atmosfear_preset_length_short")) then
 		for level,v in pairs(atmosfear.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_length_short",level.."_period_good_length",3)
 			self.default_settings:SetValue("atmosfear_preset_length_short",level.."_period_bad_length",3)
@@ -155,7 +154,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("atmosfear_preset_length_long")) then
+	if (not self.default_settings:SectionExist("atmosfear_preset_length_long")) then
 		for level,v in pairs(atmosfear.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_length_long",level.."_period_good_length",3)
 			self.default_settings:SetValue("atmosfear_preset_length_long",level.."_period_bad_length",3)
@@ -163,7 +162,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("atmosfear_preset_length_default")) then
+	if (not self.default_settings:SectionExist("atmosfear_preset_length_default")) then
 		for level,v in pairs(atmosfear.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_length_default",level.."_period_good_length",random_choice(4,6,8))
 			self.default_settings:SetValue("atmosfear_preset_length_default",level.."_period_bad_length",random_choice(4,6,8))
@@ -171,7 +170,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("list_weather_length_presets")) then
+	if (not self.default_settings:SectionExist("list_weather_length_presets")) then
 		self.default_settings:SetValue("list_weather_length_presets","list_weather_length_preset_short",1)
 		self.default_settings:SetValue("list_weather_length_presets","list_weather_length_preset_default",0)
 		self.default_settings:SetValue("list_weather_length_presets","list_weather_length_preset_custom",3)
@@ -179,7 +178,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("atmosfear_preset_balance_bad")) then
+	if (not self.default_settings:SectionExist("atmosfear_preset_balance_bad")) then
 		for level,v in pairs(atmosfear.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_balance_bad",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_preset_balance_bad",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
@@ -187,7 +186,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("atmosfear_preset_balance_good")) then
+	if (not self.default_settings:SectionExist("atmosfear_preset_balance_good")) then
 		for level,v in pairs(atmosfear.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_balance_good",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_preset_balance_good",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
@@ -195,7 +194,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("atmosfear_preset_balance_default")) then
+	if (not self.default_settings:SectionExist("atmosfear_preset_balance_default")) then
 		for level,v in pairs(atmosfear.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_balance_default",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_preset_balance_default",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
@@ -203,7 +202,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("list_periods")) then
+	if (not self.default_settings:SectionExist("list_periods")) then
 		self.default_settings:SetValue("list_periods","list_periods_stormy",5)
 		self.default_settings:SetValue("list_periods","list_periods_clear",0)
 		self.default_settings:SetValue("list_periods","list_periods_rainy",4)
@@ -213,7 +212,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("list_weather_balance_presets")) then
+	if (not self.default_settings:SectionExist("list_weather_balance_presets")) then
 		self.default_settings:SetValue("list_weather_balance_presets","list_weather_balance_preset_default",0)
 		self.default_settings:SetValue("list_weather_balance_presets","list_weather_balance_preset_custom",3)
 		self.default_settings:SetValue("list_weather_balance_presets","list_weather_balance_preset_good",1)
@@ -221,7 +220,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("list_blowout_freq")) then
+	if (not self.default_settings:SectionExist("list_blowout_freq")) then
 		self.default_settings:SetValue("list_blowout_freq","list_freq_48",2)
 		self.default_settings:SetValue("list_blowout_freq","list_freq_24",1)
 		self.default_settings:SetValue("list_blowout_freq","list_freq_12",0)
@@ -239,7 +238,7 @@ function af_options_dialog:__init() super()
 	end
 	--]]
 	
-	if (reset or not self.default_settings:SectionExist("list_psi_storm_freq")) then
+	if (not self.default_settings:SectionExist("list_psi_storm_freq")) then
 		self.default_settings:SetValue("list_psi_storm_freq","list_freq_48",2)
 		self.default_settings:SetValue("list_psi_storm_freq","list_freq_24",1)
 		self.default_settings:SetValue("list_psi_storm_freq","list_freq_12",0)
@@ -255,13 +254,13 @@ function af_options_dialog:__init() super()
 	end
 	--]]
 
-	if (reset or not self.default_settings:SectionExist("list_psi_storm_warning")) then
+	if (not self.default_settings:SectionExist("list_psi_storm_warning")) then
 		self.default_settings:SetValue("list_psi_storm_warning","list_warning_siren",0)
 		self.default_settings:SetValue("list_psi_storm_warning","list_warning_none",1)
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("list_blowout_warning")) then
+	if (not self.default_settings:SectionExist("list_blowout_warning")) then
 		self.default_settings:SetValue("list_blowout_warning","list_warning_radio_siren",0)
 		self.default_settings:SetValue("list_blowout_warning","list_warning_radio",1)
 		self.default_settings:SetValue("list_blowout_warning","list_warning_siren",2)
@@ -269,7 +268,7 @@ function af_options_dialog:__init() super()
 		need_save = true
 	end
 
-	if (reset or not self.default_settings:SectionExist("list_night_brightness")) then
+	if (not self.default_settings:SectionExist("list_night_brightness")) then
 		self.default_settings:SetValue("list_night_brightness","list_night_brightness_bright",3)
 		self.default_settings:SetValue("list_night_brightness","list_night_brightness_dark",0)
 		self.default_settings:SetValue("list_night_brightness","list_night_brightness_slight",1)
