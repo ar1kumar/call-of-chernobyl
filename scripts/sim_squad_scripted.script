@@ -890,7 +890,7 @@ function sim_squad_scripted:can_switch_offline()
 	if (self.current_action == 1) then 
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
 		if (current_target.faction_controlled and current_target.faction_war_in_progress == true) then
-			printf("forced online %s",current_target:name())
+			--printf("forced online %s",current_target:name())
 			return false
 		end
 	end
