@@ -78,9 +78,9 @@ function generic_physics_binder:net_spawn(data)
 	if(self.object:spawn_ini()) then
 		--  CoC uses axr_treasure_manager.script instead to generate loot
 		if(self.object:spawn_ini():section_exist("drop_box")) then
-			if (coc_treasure_manager.caches[self.object:id()] ~= nil) then
+			--if (coc_treasure_manager.caches[self.object:id()] ~= nil) then
 				self.box_items = xr_box.ph_item_box(self.object)
-			end
+			--end
 		end
 
 		if(self.object:spawn_ini():section_exist("level_spot")) then
