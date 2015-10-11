@@ -52,6 +52,11 @@ function update(npc)
 		return
 	end
 	
+	if (db.actor and db.actor:has_info("actor_made_wish_for_riches")) then
+		trade_manager[npc:id()] = nil
+		return
+	end
+	
 	if (tg + 360000 < 2147483647) then 
 		tt.update_time = tg + 360000
 	else 

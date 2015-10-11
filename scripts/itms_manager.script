@@ -182,6 +182,9 @@ end
 
 -- bind_stalker on_item_use
 function actor_on_item_use(obj)
+	if (db.actor:has_info("actor_made_wish_for_riches")) then
+		return 
+	end
 
 	-- Backpack
 	if (BackPackStashEnable and obj:section() == "itm_backpack") then
@@ -304,6 +307,10 @@ function check_actor_backpack()
 		return
 	end
 
+	if (db.actor:has_info("actor_made_wish_for_riches")) then
+		return 
+	end
+	
 	local function itr_inv(temp,item)
 		local id = item and item:section() ~= "itm_actor_backpack" and ActorBackPackKeep[item:section()] == nil and item:id()
 		if (id and not is_ammo_for_wpn(item:section())) then
