@@ -330,7 +330,8 @@ function heli_combat:fastcall()
 		if self.vis_next_time < time_global() then
 			self.vis_next_time = time_global() + self.vis_time_quant
 
-			if (self.enemy and self.heliObject:isVisible(self.enemy)) then
+			local ene = self.st.enemy_id and db.storage[self.st.enemy_id] and db.storage[self.st.enemy_id].object
+			if (ene and self.heliObject:isVisible(ene)) then
 				self.vis = self.vis + self.vis_inc
 
 				if self.vis > 100 then
