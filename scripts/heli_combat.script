@@ -57,14 +57,12 @@ function heli_combat:__init( object, heliObject )
 	self.search_velocity       = utils.cfg_get_number( ltx, section, "search_velocity",      self.object, true )
 	self.round_velocity        = utils.cfg_get_number( ltx, section, "round_velocity",       self.object, true )
 
-	--[[
 	self.vis_time_quant        = utils.cfg_get_number( ltx, section, "vis_time_quant",       self.object, true )
 	self.vis_threshold         = utils.cfg_get_number( ltx, section, "vis_threshold",        self.object, true )
 	self.vis_inc               = utils.cfg_get_number( ltx, section, "vis_inc",              self.object, true ) * self.vis_time_quant * 0.001
 	self.vis_dec               = utils.cfg_get_number( ltx, section, "vis_dec",              self.object, true ) * self.vis_time_quant * 0.001
 	self.vis                   = 0
 	self.vis_next_time         = 0
-	--]]
 
 	self.forget_timeout        = utils.cfg_get_number( ltx, section, "forget_timeout",       self.object, true ) * 1000
 
@@ -129,7 +127,7 @@ function heli_combat:set_enemy(target)
 	--alun_utils.debug_write(strformat("heli_combat:set_enemy",target and target:name()))
 	local tg = time_global()
 	self.st.enemy_id = target:id()
-	self.__keep_target_until = tg + 30000
+	self.__keep_target_until = tg + 25000
 	self.enemy_last_seen_time = tg
 	self.enemy_last_seen_pos  = vector():set(target:position())
 	self.initialized = false
@@ -147,14 +145,15 @@ function heli_combat:find_valid_target()
 			self:forget_enemy()
 			current_target = nil
 		else
-			-- Keep target for short duration to prevent over evaluating and to prevent constant target switching
-			if (self.__keep_target_until and tg < self.__keep_target_until) then
-				return true
-			end
-			
-			current_target_visible = self.heliObject:isVisible(current_target)
-			
-			if (not current_target_visible and tg-self.enemy_last_seen_time > self.forget_timeout) then 
+			current_target_visible = self:SeeEnemy() --self.heliObject:isVisible(current_target)
+			if (current_target_visible) then 
+				-- Keep target for short duration to prevent over evaluating and to prevent constant target switching
+				if (self.__keep_target_until and tg < self.__keep_target_until) then
+					return true
+				end
+				
+				current_target = nil
+			elseif (tg-self.enemy_last_seen_time > self.forget_timeout) then 
 				self:forget_enemy()
 				current_target = nil
 			end
@@ -313,7 +312,7 @@ function heli_combat:initialize()
 	self.heliObject.m_min_mgun_dist = 15
 	self.heliObject.m_max_mgun_dist = self.m_max_mgun_dist
 
-	--self.object:set_fastcall( self.fastcall, self )
+	self.object:set_fastcall( self.fastcall, self )
 	
 	self.heliObject:TurnEngineSound(axr_main.config:GetValue("mm_options","enable_heli_engine_sound",1,false))
 	
@@ -322,6 +321,37 @@ function heli_combat:initialize()
 	self.round_initialized  = false
 	self.search_initialized = false
 	self.retreat_initialized = true
+end
+
+-- частое обновление.
+-- нужно для отслеживания видимости врага
+function heli_combat:fastcall()
+	if self.initialized then
+		if self.vis_next_time < time_global() then
+			self.vis_next_time = time_global() + self.vis_time_quant
+
+			if (self.enemy and self.heliObject:isVisible(self.enemy)) then
+				self.vis = self.vis + self.vis_inc
+
+				if self.vis > 100 then
+					self.vis = 100
+				end
+			else
+				self.vis = self.vis - self.vis_dec
+
+				if self.vis < 0 then
+					self.vis = 0
+				end
+			end
+		end
+		return false
+	else
+		return true
+	end
+end
+
+function heli_combat:SeeEnemy()
+	return self.enemy and self.vis >= self.vis_threshold
 end
 
 function heli_combat:save( packet )
@@ -489,7 +519,7 @@ function heli_combat:update()
 	
 	self:update_custom_data_settings()
 
-	local see_enemy = self.heliObject:isVisible(self.enemy)
+	local see_enemy = self:SeeEnemy() --self.heliObject:isVisible(self.enemy)
 	if (see_enemy) then
 		local tg = time_global()
 		--self.__keep_target_until = tg + 10000
