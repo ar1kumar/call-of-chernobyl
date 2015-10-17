@@ -344,3 +344,8 @@ function anabiotic_callback2()
 	_G.mus_vol = 0
 	disable_info("anabiotic_in_process")
 end
+
+function actor_on_info_callback(binder,obj,info_id)
+	printf("info_id = %s",info_id)
+	SendScriptCallback("actor_on_info_callback",obj,info_id)
+end
