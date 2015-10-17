@@ -248,6 +248,20 @@ end
 -- ----------------------------------------------------------------------------------------------------
 -- Functions for working specifically with combat_ignore_cond
 -- ----------------------------------------------------------------------------------------------------
+-- Match name against all given params (ex. {=check_enemy_name(name1:name2:name3:name4)})
+function check_enemy_name (enemy , npc , p)
+	local name
+	if enemy and enemy:alive() then
+		name = enemy:name()
+		for i, v in pairs(p) do
+			if string.find( name, v ) ~= nil then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function is_enemy_fighting_actor(enemy,npc)
 	if (enemy:alive() and xr_combat_ignore.fighting_with_actor_npcs[enemy:id()]) then
 		return true
@@ -330,22 +344,6 @@ end
 -------------------------------
 -- Conditions for enemies before combat_ignore_cond is checked
 -------------------------------
--- Match name against all given params (ex. {=check_enemy_name(name1:name2:name3:name4)})
-function check_enemy_name (actor , npc , p)
-	local st = db.storage[npc:id()]
-	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
-	local name
-	if enemy and enemy:alive() then
-		name = enemy:name()
-		for i, v in pairs(p) do
-			if string.find( name, v ) ~= nil then
-				return true
-			end
-		end
-	end
-	return false
-end
-
 function see_pure_enemy(actor,npc)
 	local st = db.storage[npc:id()]
 	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
