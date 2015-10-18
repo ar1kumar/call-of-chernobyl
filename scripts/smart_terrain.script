@@ -229,39 +229,38 @@ function se_smart_terrain:read_params()
 	self.respawn_point = false
 	
 	if (self.faction_controlled) then
-		local spawn_num = utils.cfg_get_string(ini, "smart_terrain", "spawn_num", self, false, "", "1")
+		local spawn_num = utils.cfg_get_string(ini, "smart_terrain", "faction_respawn_num",	self, false, "", nil)
 		if (spawn_num) then 
-			self.faction_respawn_num = xr_logic.parse_condlist(nil, smart_terrain, "faction_respawn_num", spawn_num)
-		end
-	
-		self.respawn_params 	= {}
-		
-		self.already_spawned	= {}
-		self.respawn_point		= true
-		local p = alun_utils.str_explode(self.faction_controlled,",")
-		if (p) then
-			local squads_by_faction = {
-				["stalker"] = "stalker_sim_squad_novice, stalker_sim_squad_advanced, stalker_sim_squad_veteran",
-				["bandit"] = "bandit_sim_squad_novice, bandit_sim_squad_advanced, bandit_sim_squad_veteran",
-				["ecolog"] = "ecolog_sim_squad_novice, ecolog_sim_squad_advanced, ecolog_sim_squad_veteran",
-				["army"] = "army_sim_squad_novice, army_sim_squad_advanced, army_sim_squad_veteran",
-				["csky"] = "csky_sim_squad_novice, csky_sim_squad_advanced, csky_sim_squad_veteran",
-				["killer"] = "merc_sim_squad_novice, merc_sim_squad_advanced, merc_sim_squad_veteran",
-				["monolith"] = "monolith_sim_squad_novice, monolith_sim_squad_advanced, monolith_sim_squad_veteran",
-				["dolg"] = "duty_sim_squad_novice, duty_sim_squad_advanced, duty_sim_squad_veteran",
-				["freedom"] = "freedom_sim_squad_novice, freedom_sim_squad_advanced, freedom_sim_squad_veteran"
-			}
+			spawn_num = xr_logic.parse_condlist(nil, "smart_terrain", "faction_respawn_num", spawn_num)
+			self.respawn_params 	= {}
 			
-			for i,faction in pairs(p) do
-				local prop_name = "faction_controlled_"..faction
-				if (squads_by_faction[prop_name]) then
-					self.respawn_params[prop_name] = {}
-					self.already_spawned[prop_name]	= {}
-					self.respawn_params[prop_name].num = self.faction_respawn_num
-					self.already_spawned[prop_name].num	= 0
-					local spawn_squads = utils.parse_names(squads_by_faction[faction])
-					self.respawn_params[prop_name].squads = spawn_squads
-					self.respawn_params[prop_name].faction = faction
+			self.already_spawned	= {}
+			self.respawn_point		= true
+			local p = utils.parse_names(self.faction_controlled)
+			if (p) then
+				local squads_by_faction = {
+					["stalker"] = "stalker_sim_squad_novice, stalker_sim_squad_advanced, stalker_sim_squad_veteran",
+					["bandit"] = "bandit_sim_squad_novice, bandit_sim_squad_advanced, bandit_sim_squad_veteran",
+					["ecolog"] = "ecolog_sim_squad_novice, ecolog_sim_squad_advanced, ecolog_sim_squad_veteran",
+					["army"] = "army_sim_squad_novice, army_sim_squad_advanced, army_sim_squad_veteran",
+					["csky"] = "csky_sim_squad_novice, csky_sim_squad_advanced, csky_sim_squad_veteran",
+					["killer"] = "merc_sim_squad_novice, merc_sim_squad_advanced, merc_sim_squad_veteran",
+					["monolith"] = "monolith_sim_squad_novice, monolith_sim_squad_advanced, monolith_sim_squad_veteran",
+					["dolg"] = "duty_sim_squad_novice, duty_sim_squad_advanced, duty_sim_squad_veteran",
+					["freedom"] = "freedom_sim_squad_novice, freedom_sim_squad_advanced, freedom_sim_squad_veteran"
+				}
+				
+				for i,faction in pairs(p) do
+					local prop_name = "faction_controlled_"..faction
+					if (squads_by_faction[faction]) then
+						self.respawn_params[prop_name] = {}
+						self.already_spawned[prop_name]	= {}
+						self.respawn_params[prop_name].num = spawn_num
+						self.already_spawned[prop_name].num	= 0
+						local spawn_squads = utils.parse_names(squads_by_faction[faction])
+						self.respawn_params[prop_name].squads = spawn_squads
+						self.respawn_params[prop_name].faction = faction
+					end
 				end
 			end
 		end
@@ -1559,7 +1558,7 @@ function se_smart_terrain:try_respawn()
 	if (self.is_on_actor_level) then
 		local sim = alife()
 		local se_actor = sim:actor()
-		local dist_to_actor = se_actor and se_actor.position:distance_to_sqr(self.position) or 10000
+		local dist_to_actor = se_actor and se_actor.position:distance_to_sqr(self.position) or 8100
 		if (dist_to_actor < self.respawn_radius) then
 			return
 		end
