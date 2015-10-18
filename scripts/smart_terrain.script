@@ -221,17 +221,52 @@ function se_smart_terrain:read_params()
 	end
 	
 	self.faction_controlled = utils.cfg_get_string(ini, "smart_terrain", "faction_controlled", self, false, "", nil)
-	local spawn_num = self.faction_controlled and utils.cfg_get_string(ini, smart_terrain, "faction_respawn_num", 	self, false, "", "1")
-	if (spawn_num) then 
-		self.faction_respawn_num = xr_logic.parse_condlist(nil, smart_terrain, "faction_respawn_num", spawn_num)
-	end
-	
 	self.default_faction = utils.cfg_get_string(self.ini, "smart_terrain", "default_faction",self, false,"")
 				
 	self.respawn_only_smart = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_smart", self, false, false)
 	self.respawn_idle = utils.cfg_get_number(ini, "smart_terrain", "respawn_idle", 	self, false, 3000)
 	self.respawn_only_level = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_level", self, false, false)
 	self.respawn_point = false
+	
+	if (self.faction_controlled) then
+		local spawn_num = utils.cfg_get_string(ini, "smart_terrain", "spawn_num", self, false, "", "1")
+		if (spawn_num) then 
+			self.faction_respawn_num = xr_logic.parse_condlist(nil, smart_terrain, "faction_respawn_num", spawn_num)
+		end
+	
+		self.respawn_params 	= {}
+		
+		self.already_spawned	= {}
+		self.respawn_point		= true
+		local p = alun_utils.str_explode(self.faction_controlled,",")
+		if (p) then
+			local squads_by_faction = {
+				["stalker"] = "stalker_sim_squad_novice, stalker_sim_squad_advanced, stalker_sim_squad_veteran",
+				["bandit"] = "bandit_sim_squad_novice, bandit_sim_squad_advanced, bandit_sim_squad_veteran",
+				["ecolog"] = "ecolog_sim_squad_novice, ecolog_sim_squad_advanced, ecolog_sim_squad_veteran",
+				["army"] = "army_sim_squad_novice, army_sim_squad_advanced, army_sim_squad_veteran",
+				["csky"] = "csky_sim_squad_novice, csky_sim_squad_advanced, csky_sim_squad_veteran",
+				["killer"] = "merc_sim_squad_novice, merc_sim_squad_advanced, merc_sim_squad_veteran",
+				["monolith"] = "monolith_sim_squad_novice, monolith_sim_squad_advanced, monolith_sim_squad_veteran",
+				["dolg"] = "duty_sim_squad_novice, duty_sim_squad_advanced, duty_sim_squad_veteran",
+				["freedom"] = "freedom_sim_squad_novice, freedom_sim_squad_advanced, freedom_sim_squad_veteran"
+			}
+			
+			for i,faction in pairs(p) do
+				local prop_name = "faction_controlled_"..faction
+				if (squads_by_faction[prop_name]) then
+					self.respawn_params[prop_name] = {}
+					self.already_spawned[prop_name]	= {}
+					self.respawn_params[prop_name].num = self.faction_respawn_num
+					self.already_spawned[prop_name].num	= 0
+					local spawn_squads = utils.parse_names(squads_by_faction[faction])
+					self.respawn_params[prop_name].squads = spawn_squads
+					self.respawn_params[prop_name].faction = faction
+				end
+			end
+		end
+		return
+	end
 	
 	local respawn_params = utils.cfg_get_string(ini, "smart_terrain", "respawn_params", 		self, false, "", nil)
 	if not (respawn_params) then 
@@ -247,12 +282,12 @@ function se_smart_terrain:read_params()
 	if n == 0 then
 		printf("Wrong smart_terrain respawn_params section [%s](empty params)", respawn_params)
 		return
-	end
+	end	
 
 	self.respawn_params 	= {}
 	self.already_spawned	= {}
 	self.respawn_point		= true
-
+	
 	for j=0,n-1 do
 		local result, prop_name, prop_condlist = ini:r_line(respawn_params,j,"","")
 		if not ini:section_exist(prop_name) then
@@ -282,36 +317,6 @@ function se_smart_terrain:read_params()
 				end
 			end
 		end
-	end
-	
-	if (self.faction_controlled) then 
-		local p = alun_utils.str_explode(self.faction_controlled,",")
-		if (p) then
-			local squads_by_faction = {
-				["stalker"] = "stalker_sim_squad_novice, stalker_sim_squad_advanced, stalker_sim_squad_veteran",
-				["bandit"] = "bandit_sim_squad_novice, bandit_sim_squad_advanced, bandit_sim_squad_veteran",
-				["ecolog"] = "ecolog_sim_squad_novice, ecolog_sim_squad_advanced, ecolog_sim_squad_veteran",
-				["army"] = "army_sim_squad_novice, army_sim_squad_advanced, army_sim_squad_veteran",
-				["csky"] = "csky_sim_squad_novice, csky_sim_squad_advanced, csky_sim_squad_veteran",
-				["killer"] = "merc_sim_squad_novice, merc_sim_squad_advanced, merc_sim_squad_veteran",
-				["monolith"] = "monolith_sim_squad_novice, monolith_sim_squad_advanced, monolith_sim_squad_veteran",
-				["dolg"] = "duty_sim_squad_novice, duty_sim_squad_advanced, duty_sim_squad_veteran",
-				["freedom"] = "freedom_sim_squad_novice, freedom_sim_squad_advanced, freedom_sim_squad_veteran"
-			}
-			
-			for i,faction in pairs(p) do
-				local prop_name = "faction_controlled_"..faction
-				if (squads_by_faction[prop_name]) then
-					self.respawn_params[prop_name] = {}
-					self.already_spawned[prop_name]	= {}
-					self.respawn_params[prop_name].num = self.faction_respawn_num
-					self.already_spawned[prop_name].num	= 0
-					local spawn_squads = utils.parse_names(squads_by_faction[faction])
-					self.respawn_params[prop_name].squads = spawn_squads
-					self.respawn_params[prop_name].faction = faction
-				end
-			end
-		end	
 	end
 end
 
@@ -1164,16 +1169,21 @@ function se_smart_terrain:get_smart_props()
 		
 		props = props .. "Controlling_faction=".. tostring(self.faction) .. "\\nType="..self.sim_type.."\\n".."squad_id = "..tostring(self.id).."\\n".."Capacity="..squad_count.." of "..tostring(self.max_population).."\\n"
 
-		if self.respawn_point ~= nil and self.already_spawned ~= nil then
+		if self.respawn_point and self.already_spawned then
 			props = props.."\\nAlready_spawned :\n"
 			for k,v in pairs(self.already_spawned) do
 				props = props.."["..k.."] = "..v.num.."("..xr_logic.pick_section_from_condlist(db.actor, nil,self.respawn_params[k].num)..")\\n"
 			end
-			if self.last_respawn_update then
-				props = props.."\\nTime_to_spawn:"..tostring(self.respawn_idle - game.get_game_time():diffSec(self.last_respawn_update)).."\\n"
-			end
+		end
+		
+		if not (self.respawn_params) then 
+			props = props .. "[smart has no respawn params]\\n"
 		end
 
+		if self.last_respawn_update then
+			props = props.."\\nTime_to_spawn:"..tostring(self.respawn_idle - game.get_game_time():diffSec(self.last_respawn_update)).."\\n"
+		end
+			
 		--' Добавляем информацию о находящихся в смарте отрядах
 		for k,v in pairs(SIMBOARD.smarts[self.id].squads) do
 			props = props .. tostring(v.id) .. "\\n"
@@ -1269,7 +1279,7 @@ function se_smart_terrain:check_smart_faction()
 	
 	-- determine faction
 	if (self.faction_war_in_progress == false) then 
-		self.faction = self.faction and factions_present[self.faction] and self.faction or last_faction
+		self.faction = self.faction and factions_present[self.faction] and self.faction or last_faction or self.default_faction
 	end
 end
 
@@ -1569,10 +1579,12 @@ function se_smart_terrain:try_respawn()
 	local curr_time = game.get_game_time()
 	
 	-- first spawn after game load
+	--[[
 	if (self.last_respawn_update == nil and math.random() < 0.3) then 
 		self.last_respawn_update = curr_time
 		return
-	end 
+	end
+	--]]
 	
 	if self.last_respawn_update == nil or curr_time:diffSec(self.last_respawn_update) > self.respawn_idle then
 		self.last_respawn_update = curr_time
