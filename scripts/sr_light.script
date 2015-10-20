@@ -74,7 +74,7 @@ function check_light(stalker)
 
 	-- Stalker dead or sleep animstate; release torch
 	local anim = state_mgr.get_state(stalker)
-	if (not stalker:alive() or anim == "sleep" or anim == "play_guitar" or anim == "animpoint_sit_knee_sleep" or anim == "animpoint_sit_ass_sleep") then
+	if (not stalker:alive() or anim == "sleep" or anim == "play_guitar" or anim == "animpoint_sit_knee_sleep" or anim == "animpoint_sit_ass_sleep" or string.find(anim,"sneak")) then
 		if (torch) then
 			if (torch:attachable_item_enabled()) then
 				torch:enable_attachable_item(false)
