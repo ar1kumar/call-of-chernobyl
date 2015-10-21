@@ -4170,6 +4170,10 @@ function set_new_scheme_and_logic(actor,npc,p)
 	local st = db.storage[npc:id()]
 	st.ini_filename = ini_filename
 	st.ini = ini_file(ini_filename)
+	if not (st.ini) then 
+		printf("Error: set_new_scheme_and_logic: can't find ini %s",ini_filename)
+		return
+	end
 
 	-- Set new section logic
 	st.section_logic = logic

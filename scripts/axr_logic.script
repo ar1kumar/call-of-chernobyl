@@ -16,6 +16,10 @@ function set_new_scheme_and_logic(npc,scheme,section,logic,gulag,ini_filename)
 	-- Store new ini
 	db.storage[npc:id()].ini_filename = ini_filename
 	db.storage[npc:id()].ini = ini_file(ini_filename)
+	if not (st.ini) then 
+		printf("Error: set_new_scheme_and_logic: cannot find ini %s",ini_filename)
+		return
+	end
 
 	-- Set new section logic
 	db.storage[npc:id()].section_logic = logic

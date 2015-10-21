@@ -85,6 +85,9 @@ end
 
 -- Вызывается биндером с целью определить первую активную схему
 function determine_section_to_activate(npc, ini, section_logic, actor)
+	if not (ini) then 
+		return "nil"
+	end
 	if not ini:section_exist(section_logic) then
 		return "nil"
 	end

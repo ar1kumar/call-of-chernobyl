@@ -905,6 +905,8 @@ function cmd.wound(me,txt,owner,p)
 	end
 
 	if (vo) then
+		vo:set_health_ex(0.05)
+		--[[
 		local h = hit()
 		h.power = vo.health+0.05
 		h.direction = vector()
@@ -913,6 +915,7 @@ function cmd.wound(me,txt,owner,p)
 		h.impulse = 6000
 		h.type = hit.wound
 		vo:hit(h)
+		--]]
 		return "wound:= %s has been wounded.",vo:name()
 	end
 end

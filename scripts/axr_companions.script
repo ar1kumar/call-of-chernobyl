@@ -179,6 +179,10 @@ function setup_companion_logic(npc,st,loaded,as)
 		
 	local ltx_name = "scripts\\beh_companion.ltx"
 	local ltx = ini_file(ltx_name)
+	if not (ltx) then 
+		log("ERROR: do not have access to scripts\\beh_companion.ltx! Make sure you installed properly!")
+		return
+	end
 	
 	if not (loaded) then
 		local id = npc:id()
