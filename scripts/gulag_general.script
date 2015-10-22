@@ -13,7 +13,7 @@ Another reason this was re-written is because it alters the job tables used by s
 the job system very inefficient by putting tables inside of tables which required deep recursion to find a job
 when you can simply put them all in one table and sort by priority. Indexing the jobs like I do here also
 allows to step through the table once per update for NPCs who already have a job and are just scanning for a higher
-priority job to switch to; This improves performance substantually.
+priority job to switch to; This improves performance substantially.
 
 TODO: Further optimize by replacing string concat with table.concat, though it's not important now that most of it is only generated once
 ----------

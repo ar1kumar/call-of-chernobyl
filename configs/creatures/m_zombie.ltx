@@ -21,7 +21,6 @@ spawn_phantom 		= m_phantom_zombi
 can_spawn_phantom 	= false
 
 MaxHealthValue		 = 100			; range [0..200]
-DynamicObjectsCount	 = 32
 smart_terrain_choose_interval	= 00:35:00 ;00:15:00
 
 ef_creature_type	 = 3				; option for evaluation functions
@@ -368,7 +367,6 @@ corpse_visual		 = monsters\zombi\zombi_1
 icon = ui_npc_monster_kontroler	
 
 MaxHealthValue		 = 100			; range [0..200]
-DynamicObjectsCount	 = 32
 smart_terrain_choose_interval	= 00:35:00 ;00:15:00
 
 ef_creature_type	 = 3				; option for evaluation functions
@@ -437,15 +435,6 @@ Accel_Generic			= 1.5
 Accel_Calm			= 2.5
 Accel_Aggressive		= 7.5
 
-;attack parameters
-MinAttackDist		= 1.7	;0.5
-MaxAttackDist		= 2.3	;3.8
-
-Melee_Rotation_Factor	= 1.6
-
-as_min_dist				= 1.4
-as_step					= 0.1
-
 feel_enemy_who_just_hit_max_distance = 80  ;дистанция на которой монстр почувствует стрельнувшего игрока даже спиной
 DayTime_Begin		= 0			; эрўрыр фэ  фы  ьюэёЄЁр
 DayTime_End			= 21		; ъюэхЎ фэ  фы  ьюэёЄЁр
@@ -472,21 +461,6 @@ hit_type = wound
 
 ;entity condition
 
-; entity condition
-satiety_v 				= 0.00001	;0.01			;скорость уменьшения сытости со временем
-radiation_v 			= 0.00001	;0.004			;скорость уменьшения радиации
-satiety_power_v 		= 0.01		;0.01			;увеличение силы при уменьшении сытости 
-satiety_health_v 		= 0.005		;0.03			;увеличение здоровья при уменьшении сытости 
-satiety_critical 		= -1.0			;0.25			;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
-radiation_health_v 		= 0.01		;0.006			;уменьшение здоровья при воздействии радиации
-morale_v				= 0.01						;скорость восстановления морали
-health_hit_part 		= 1.0		;0.8			;процент хита, уходящий на отнимание здоровья
-power_hit_part 			= 1.0		;0.9			;процент хита, уходящий на отнимание силы
-psy_health_v			= 0.1						;скорость восстановления psy-здоровья
-
-immunities_sect			= zombie_immunities
-
-
 ;открытые раны
 bleeding_v				= 0						;потеря крови при номинальной ране в секунду
 wound_incarnation_v		= 0.01				;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
@@ -504,14 +478,6 @@ eat_slice_weight	=	10.0	; єьхэ№°хэшх хфv є ЄЁєяр
 
 satiety_threshold	= 0.5							; below this value monster fill hunger
 
-
-; Morale
-Morale_Hit_Quant				= 0.001
-Morale_Attack_Success_Quant		= 0.1
-Morale_Take_Heart_Speed			= 0.1
-Morale_Despondent_Speed			= 0.1
-Morale_Stable_Speed				= 0.01
-Morale_Despondent_Threashold	= 0.1
 
 
 sound_idle				= monsters\zombie\zombie_idle_ 
@@ -546,15 +512,10 @@ StartFakeDeathHealthThreshold	= 0.6
 
 
 
-material				= creatures\medium
-DynamicObjectsCount		= 32
-
 squad_attack_algorithm	= 1
 LegsCount				= 2
 
-attack_effector			= m_zombie_attack_effector
 step_params				= m_zombie_step_params
-attack_params			= m_zombie_attack_params
 damage					= m_zombie_damage
 
 ;species of monster
@@ -573,10 +534,6 @@ morale_v		= 0.01					;скорость восстановления морали
 health_hit_part 	= 1.0		;0.8			;процент хита, уходящий на отнимание здоровья
 power_hit_part 		= 1.0		;0.9			;процент хита, уходящий на отнимание силы
 psy_health_v		= 0.1						;скорость восстановления psy-здоровья
-
-Accel_Generic			= 1.5
-Accel_Calm			= 2.5
-Accel_Aggressive		= 7.5
 
 ;attack parameters
 MinAttackDist		= 1.7	;0.5
