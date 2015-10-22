@@ -105,10 +105,9 @@ function se_smart_terrain:on_register()
 	local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
 	
 	self.smart_level = alife():level_name(game_graph():vertex(self.m_game_vertex_id):level_id())
-	self.is_on_actor_level = actor_level == self.smart_level
 
 	-- Disable any smart terrain that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
-	if not (self.is_on_actor_level) then
+	if not (actor_level == self.smart_level) then
 		if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
 			if not (string.find(simulation_objects.config:GetValue(actor_level,"target_maps",0,""),self.smart_level)) then
 				SIMBOARD.smarts[self.id] = nil
@@ -765,7 +764,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 		npc_info.begin_job = false
 
 		-- grab storage and ensure object is online.
-		local st = self.is_on_actor_level and db.storage[npc_info.se_obj.id]
+		local st = self.online and db.storage[npc_info.se_obj.id]
 		
 		-- If NPC has storage, it is online, so switch logic
 		if (st and st.object) then
@@ -779,7 +778,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 
 	if (npc_info.begin_job ~= true and npc_info.job) then
 		-- grab storage and ensure object is online.
-		local st = self.is_on_actor_level and db.storage[npc_info.se_obj.id]
+		local st = self.online and db.storage[npc_info.se_obj.id]
 		-- If NPC has storage it is online, so switch logic
 		if (st and st.object) then
 			npc_info.begin_job = true
@@ -1311,7 +1310,8 @@ function se_smart_terrain:update()
 	
 	simulation_objects.get_sim_obj_registry():update_avaliability(self)
 	
-	if (self.is_on_actor_level) then
+	if (self.online) then
+		self.dist_to_actor = dist_to_actor
 		local old_dist_to_actor = (nearest_to_actor_smart.id == nil and nearest_to_actor_smart.dist) or sim:object(nearest_to_actor_smart.id).position:distance_to(se_actor.position)
 		if dist_to_actor < old_dist_to_actor then
 			nearest_to_actor_smart.id = self.id
@@ -1555,11 +1555,8 @@ function se_smart_terrain:try_respawn()
 	
 	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
 	
-	if (self.is_on_actor_level) then
-		local sim = alife()
-		local se_actor = sim:actor()
-		local dist_to_actor = se_actor and se_actor.position:distance_to_sqr(self.position) or 8100
-		if (dist_to_actor < self.respawn_radius) then
+	if (self.online and self.dist_to_actor) then
+		if (self.dist_to_actor^2 < self.respawn_radius) then
 			return
 		end
 	elseif (self.respawn_only_level) then

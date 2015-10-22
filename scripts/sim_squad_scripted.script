@@ -889,8 +889,14 @@ function sim_squad_scripted:can_switch_offline()
 	
 	if (self.current_action == 1) then 
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
-		if (current_target.faction_controlled and current_target.faction_war_in_progress == true) then
+		if (current_target.online and current_target.faction_controlled and current_target.faction_war_in_progress == true) then
 			--printf("forced online %s",current_target:name())
+			return false
+		end
+	else 
+		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
+		if (se_target and se_target.online and se_target.dist_to_actor and se_target.dist_to_actor <= 150) then
+			--printf("force online %s",self:name())
 			return false
 		end
 	end
