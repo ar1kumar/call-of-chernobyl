@@ -118,13 +118,6 @@ function evaluator_radio_in_heli:evaluate()
 	local comm = character_community(npc)
 	for id,o in pairs(db.heli) do 
 		if (se_heli.se_helicopters[id] and se_heli.se_helicopters[id].community == comm) then
-			if (be:id() == 0) then 
-				alun_utils.save_var(db.actor,"heli_enemy_flag",true)
-			else 
-				if (db.storage[be:id()]) then 
-					db.storage[be:id()].heli_enemy_flag = true
-				end
-			end
 			if (se_heli.se_helicopters[id].help_id == nil) then
 				return true
 			end
