@@ -589,10 +589,11 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 		end
 	end
 
+	local path_end = index == #self.path_walk_info - 1
 	local sig = self.path_walk_info[index]["sig"]
 	if sig then
 		self:scheme_set_signal(sig)
-	elseif index == #self.path_walk_info - 1 then
+	elseif path_end then
 		self:scheme_set_signal("path_end")
 	end
 
@@ -604,20 +605,28 @@ function move_mgr:waypoint_callback(obj, action_type, index)
 	end
 	
 	if not (self.patrol_look) then
-		self.cur_state_standing = xr_logic.pick_section_from_condlist(db.actor, self.object, self.default_state_standing)
-		self:update_standing_state(look_pos, self.sound_after_anim_start)
-		self.state = state_standing
-		self:update()
+		if (path_end) then 
+			self.cur_state_standing = xr_logic.pick_section_from_condlist(db.actor, self.object, self.default_state_standing)
+			self:update_standing_state(look_pos, self.sound_after_anim_start)
+			self.state = state_standing
+			self:update()
+		else 
+			self:update_movement_state()
+		end
 		return
 	end 
 	
 	-- Значение флагов точки, которую будем искать:
 	local search_for = self.path_walk_info[index].flags
 	if search_for:get() == 0 then
-		self.cur_state_standing = xr_logic.pick_section_from_condlist(db.actor, self.object, self.default_state_standing)
-		self:update_standing_state(self.patrol_look:point(0), self.sound_after_anim_start)
-		self.state = state_standing
-		self:update()
+		if (path_end) then
+			self.cur_state_standing = xr_logic.pick_section_from_condlist(db.actor, self.object, self.default_state_standing)
+			self:update_standing_state(self.patrol_look:point(0), self.sound_after_anim_start)
+			self.state = state_standing
+			self:update()
+		else 
+			self:update_movement_state()
+		end
 		return
 	end
 
