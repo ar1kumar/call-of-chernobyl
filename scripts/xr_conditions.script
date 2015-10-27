@@ -2573,7 +2573,7 @@ end
 function all_avail_smart_stayed_squad_count_ge_by_faction(actor,npc,p)
 	if (#p >= 4) then
 		for name,v in pairs(SIMBOARD.smarts_by_names) do
-			if (v.is_on_actor_level) and (v.sim_avail == nil or v.sim_avail and xr_logic.pick_section_from_condlist(actor, v, v.sim_avail) == "true") then
+			if (v.online) and (v.sim_avail == nil or v.sim_avail and xr_logic.pick_section_from_condlist(actor, v, v.sim_avail) == "true") then
 				if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,unpack(p)}) == true) then 
 					return true 
 				end

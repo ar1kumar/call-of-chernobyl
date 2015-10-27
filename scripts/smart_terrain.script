@@ -816,7 +816,7 @@ function se_smart_terrain:setup_logic(npc)
 
 	--[[ fixed elsewhere now
 	-- sanity; Not sure why this happens. It happens in all 3 Stalker games, NPCs try to switch logic for a job on another level, causes waypoint/path crashes. Re-register NPC
-	if not (self.is_on_actor_level) then
+	if not (self.online) then
 		printf("%s.setup_logic: npc is trying to setup logic for a job on another level! npc=%s job=%s",self:name(),npc:name(),job.section)
 		self:unregister_npc(npc_info.se_obj)
 		--self:register_npc(npc_info.se_obj)
@@ -1618,7 +1618,7 @@ function se_smart_terrain:try_respawn()
 				end
 			elseif (sect_to_spawn_params.helicopter) then
 				local heli = sect_to_spawn_params.helicopter[math.random(1,#sect_to_spawn_params.helicopter)]
-				if (heli) then --if (heli and self.is_on_actor_level) then
+				if (heli) then --if (heli and self.online) then
 					local pos = vector():set(self.position.x,self.position.y+30,self.position.z)
 					local lvid = self.m_level_vertex_id
 					local gvid = self.m_game_vertex_id
