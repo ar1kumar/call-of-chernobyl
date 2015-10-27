@@ -115,6 +115,7 @@ function CRandomTask:task_complete(p1)
 		return false
 	end
 	if task.last_check_task == "complete" then
+		xr_logic.pick_section_from_condlist(db.actor, db.actor, task.on_complete)
 		task:give_reward()
 		xr_statistic.inc_completed_quests_counter()
 		task.status = "completed"

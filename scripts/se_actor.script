@@ -85,6 +85,7 @@ function se_actor:on_reach_target(squad)
 			empty_table(db.offline_objects[k.id])
 			--db.offline_objects[k.id] = {}
 		end
+		db.spawned_vertex_by_id[k.id] = nil
 	end
 	SIMBOARD:assign_squad_to_smart(squad, nil)
 end

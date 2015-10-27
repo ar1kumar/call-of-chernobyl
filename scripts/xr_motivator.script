@@ -118,6 +118,7 @@ function motivator_binder:net_spawn(sobject)
 	local force_set_position
 	if (db.offline_objects[id] and db.offline_objects[id].level_vertex_id) then
 		force_set_position = level.vertex_position(db.offline_objects[id].level_vertex_id)
+		db.offline_objects[id].level_vertex_id = nil
 	elseif (db.spawned_vertex_by_id[id]) then
 		force_set_position = level.vertex_position(db.spawned_vertex_by_id[id])
 		db.spawned_vertex_by_id[id] = nil

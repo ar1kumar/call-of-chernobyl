@@ -228,7 +228,7 @@ function bounty_task(task,task_id)
 		return "fail"
 	end 
 	
-	if (task.stage == 1) then
+	if (task.stage == 0) then
 		local id = axr_task_manager.bounties_by_id[task_id]
 		if not (id) then
 			return "fail"
@@ -241,9 +241,9 @@ function bounty_task(task,task_id)
 			return "fail"
 		end
 		if not (se_obj:alive()) then 
-			task.stage = 2
+			task.stage = 1
 		end
-	elseif (task.stage == 3) then 
+	elseif (task.stage == 254) then 
 		return "fail"
 	end
 end 

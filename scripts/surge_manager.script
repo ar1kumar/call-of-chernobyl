@@ -91,17 +91,27 @@ function CSurgeManager:initialize()
 		self.aspectRatio = 0.8
 	end
 	
+	local m_data = alife_storage_manager.get_state()
+	if not (m_data.artefact_respawn_levels) then 
+		m_data.artefact_respawn_levels = {}
+	end
+	
 	-- if atmosfear was removed, get indoor maps
 	if not (atmosfear) then
 		self.indoor_levels = {}
-		local level_name
-		local gg,gini = game_graph(),game_ini()
-		for level in gg:levels() do
-			level_name = sim:level_name(level.id)
-			weather = level_name and alun_utils.read_from_ini(gini,level_name,"weathers","string")
-			if (weather == "indoor") then
+	end 
+	
+	local level_name
+	local gg,gini,sim = game_graph(),game_ini(),alife()
+	for lvl in gg:levels() do
+		level_name = sim:level_name(lvl.id)
+		weather = level_name and alun_utils.read_from_ini(gini,level_name,"weathers","string")
+		if (weather == "indoor") then
+			if (self.indoor_levels) then
 				self.indoor_levels[level_name] = true
 			end
+		elseif (m_data.artefact_respawn_levels[level_name] == nil) then
+			m_data.artefact_respawn_levels[level_name] = false
 		end
 	end
 	
@@ -140,6 +150,14 @@ function CSurgeManager:initialize()
 
 	self.surge_message = ""
 	self.surge_task_sect = ""
+	
+	--printf("level=%s   artefact_respawn_levels=%s",level.name(),m_data.artefact_respawn_levels[level.name()])
+	-- check if artefacts can respawn for this level
+	if (m_data.artefact_respawn_levels[level.name()] == true) then 
+		--printf("DEBUG: surge_manager respawn artefacts")
+		self:respawn_artefacts_and_replace_anomaly_zone()
+		m_data.artefact_respawn_levels[level.name()] = false	
+	end 
 	
 	--alun_utils.debug_write("CSurgeManager:initialize() end")
 end
@@ -245,6 +263,8 @@ function CSurgeManager:skip_surge()
 	prev_sec				= 0
 
 	self:respawn_artefacts_and_replace_anomaly_zone()
+	self:toggle_level_artefact_respawns()
+	
 	xr_statistic.inc_surges_counter()
 	if not (self.skip_message) and (atmosfear == nil or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==1) then
 		news_manager.send_tip(db.actor, "st_surge_while_asleep", nil, "recent_surge", nil, nil)
@@ -255,7 +275,6 @@ function CSurgeManager:skip_surge()
 	self:displayIndicators(0)
 
 	level.set_time_factor(self.game_time_factor)
-
 end
 
 function CSurgeManager:end_surge(manual)
@@ -329,9 +348,23 @@ function CSurgeManager:end_surge(manual)
 	-- fix abuse from sleeping to respawn anoms
 	if not (self.time_forwarded) then
 		self:respawn_artefacts_and_replace_anomaly_zone()
+		self:toggle_level_artefact_respawns()
 	end
 
 	xr_statistic.inc_surges_counter()
+end
+
+function CSurgeManager:toggle_level_artefact_respawns()
+	local m_data = alife_storage_manager.get_state()
+	if not (m_data.artefact_respawn_levels) then 
+		m_data.artefact_respawn_levels = {}
+	end	
+	local level = level.name()
+	for lvl, v in pairs(m_data.artefact_respawn_levels) do
+		if (level ~= lvl and v == false) then
+			m_data.artefact_respawn_levels[lvl] = true
+		end
+	end
 end
 
 function CSurgeManager:pos_in_cover(pos)

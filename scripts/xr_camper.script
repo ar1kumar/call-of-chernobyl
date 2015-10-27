@@ -269,7 +269,7 @@ function action_patrol:process_danger()
 	local tg = time_global()
 	local passed_time = tg - best_danger:time()
 	
-	local urgent_danger = best_danger_object and (IsMonster(best_danger_object) or (IsStalker(best_danger_object) and self.object:relation(best_danger_object) >= game_object.enemy)) and (bd_type == danger_object.attacked or danger_object.enemy_sound) and passed_time < 3000
+	local urgent_danger = best_danger_object and (IsMonster(best_danger_object) or (IsStalker(best_danger_object) and self.object:relation(best_danger_object) >= game_object.enemy)) and (bd_type == danger_object.attacked) and passed_time < 3000
 	if not (urgent_danger) then 
 		if not (xr_danger.has_danger(self.object)) then
 			return false

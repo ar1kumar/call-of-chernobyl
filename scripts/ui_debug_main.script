@@ -1535,6 +1535,9 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	self.editor_icon:InitTexture("ui\\ui_icon_equipment")
 	self.editor_icon:SetTextureRect(Frect():set(x1,y1,x2,y2))
 	self.editor_icon:SetWndSize(vector2():set(w*scale,h*scale))
+	local xcor = w > 250 and (-32*scale) or w < 100 and (64*scale) or w < 200 and (48*scale) or 0
+	local ycor = h == 50 and (32*scale) or h == 150 and (-32*scale) or 0
+	self.editor_icon:SetWndPos(vector2():set( 230 + xcor, 45 + ycor ))
 	
 	self.fld_icon_x:SetText(tostring(inv_grid_x))
 	self.fld_icon_y:SetText(tostring(inv_grid_y))
