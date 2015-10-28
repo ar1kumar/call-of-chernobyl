@@ -905,7 +905,7 @@ function sim_squad_scripted:can_switch_offline()
 end
 function sim_squad_scripted:can_switch_online()
 	--alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
-	if (not self.online and is_squad_monster[self.player_id]) then
+	if (not self.online and is_squad_monster[self.player_id] and not get_object_story_id(self.id)) then
 		-- Check for exiled zones
 		local zone
 		for i,name in pairs(exiled_zones) do
@@ -913,6 +913,18 @@ function sim_squad_scripted:can_switch_online()
 			if (zone and zone:inside(self.position)) then
 				return false
 			end
+		end
+		if (self.current_action == 0) then
+			if (self.player_id == "monster_predatory_day" and not in_time_interval(22,5)) then 
+				return false
+			elseif (self.player_id == "monster_predatory_night" and not in_time_interval(5,22)) then
+				--printf("%s not allowed to come online",self:name())
+				return false
+			elseif (self.player_id == "monster_zombied_day" and not in_time_interval(22,5)) then 
+				return false
+			elseif (self.player_id == "monster_zombied_night" and not in_time_interval(5,22)) then 
+				return false
+			end 
 		end
 	end
 
