@@ -2631,6 +2631,24 @@ function smart_population_count(actor,npc,p)
 	return p[2] and SIMBOARD.smarts[smart.id] and SIMBOARD.smarts[smart.id].population == tonumber(p[2]) or false
 end 
 
+function smart_population_count_ge(actor,npc,p)
+	local smart = p[1] and SIMBOARD.smarts_by_names[p[1]]
+	if not (smart) then 
+		return false 
+	end
+	
+	return p[2] and SIMBOARD.smarts[smart.id] and SIMBOARD.smarts[smart.id].population >= tonumber(p[2]) or false
+end 
+
+function smart_population_count_le(actor,npc,p)
+	local smart = p[1] and SIMBOARD.smarts_by_names[p[1]]
+	if not (smart) then 
+		return false 
+	end
+	
+	return p[2] and SIMBOARD.smarts[smart.id] and SIMBOARD.smarts[smart.id].population <= tonumber(p[2]) or false
+end 
+
 -- Returns true if any instance of given community occupies a given smart
 -- param 1 is smart name
 function is_community_on_jobs(actor,npc,p)
