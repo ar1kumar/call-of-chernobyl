@@ -242,8 +242,6 @@ end
 
 --' Инициализация награды
 function CGeneralTask:give_reward()
-	xr_logic.pick_section_from_condlist(db.actor, db.actor, self.on_complete)
-
 	local money = xr_logic.pick_section_from_condlist(db.actor, db.actor, self.reward_money)
 	local items = xr_logic.pick_section_from_condlist(db.actor, db.actor, self.reward_item)
 
@@ -268,7 +266,6 @@ function CGeneralTask:give_reward()
 			dialogs.relocate_item_section(npc, k, "in", v)
 		end
 	end
-
 end
 function CGeneralTask:reverse_task()
 	self.last_check_task = "reversed"
@@ -279,6 +276,7 @@ function CGeneralTask:deactivate_task(task)
 
 	self.check_time = nil
 	if self.last_check_task == "fail" then
+		xr_logic.pick_section_from_condlist(db.actor, db.actor, task.on_fail)
 		news_manager.send_task(db.actor, "fail", task)
 	elseif self.last_check_task == "reversed" then
 		xr_logic.pick_section_from_condlist(db.actor, db.actor, self.on_reversed)
