@@ -30,6 +30,8 @@ C++ class task {
 
 class "CGeneralTask"
 function CGeneralTask:__init(id)
+	self.loaded = false
+	
 	local task_ini 		= task_manager.task_ini
 	self.id				= id
 	self.stage			= 0
@@ -436,6 +438,8 @@ function CGeneralTask:load_state(m_data)
 	self.stage = m_data.task_objects[self.id].stage
 	self.task_giver_id =  m_data.task_objects[self.id].task_giver_id
 	m_data.task_objects[self.id] = nil
+	
+	self.loaded = true
 	
 	--printf("task_objects: loaded persistent state %s  [status=%s]",self.id)
 end 
