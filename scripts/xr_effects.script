@@ -422,6 +422,14 @@ function force_talk(actor,npc,p)
 	db.actor:run_talk_dialog(npc, allow_break)
 end 
 
+function unlock_smart(actor,npc,p)
+	local id = p[1] and p[1] ~= "nil" and alun_utils.load_var(db.actor,p[1])
+	local smart = id and alife():object(id)
+	if (smart) then 
+		smart.locked = nil
+	end
+end
+
 -- Принудительно апдейтит логику у объектов, переданных параметром. Пока работает только с НПС
 function update_npc_logic(actor, object, p)
 	--printf("UPDATE NPC LOGIC %s", device():time_global())

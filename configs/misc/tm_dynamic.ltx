@@ -58,8 +58,8 @@ target_functor = simulation_task_target
 on_init = %=find_smart_under_faction_control_ex(simulation_task_3_id:bandit) =setup_companion_task(hostage_companion_task_1_stalker:nil:simulation_task_3_id:true) +hostage_companion_task_1_started%
 precondition = {=random_chance =is_faction_enemy_to_actor(bandit) -hostage_companion_task_1_started -hostage_companion_task_1_hostage_rescued =all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:bandit) !squad_exist(hostage_companion_task_1)} true, false
 repeat_timeout = 86400
-on_complete = %=complete_task_inc_goodwill(10:stalker) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_3_id) =pstor_reset(simulation_task_3_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_3)%
-on_fail = %=fail_task_dec_goodwill(10:stalker) =pstor_reset(simulation_task_3_id) =pstor_reset(simulation_task_3_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+on_complete = %=complete_task_inc_goodwill(10:stalker) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_3_id) =pstor_reset(simulation_task_3_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_3) =unlock_smart(simulation_task_3_id)%
+on_fail = %=unlock_smart(simulation_task_3_id) =fail_task_dec_goodwill(10:stalker) =pstor_reset(simulation_task_3_id) =pstor_reset(simulation_task_3_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
 condlist_0 = {!squad_exist(hostage_companion_task_1)} fail
 reward_money = 5000
 
@@ -79,8 +79,8 @@ target_functor = simulation_task_target
 on_init = %=find_smart_under_faction_control(simulation_task_4_id:freedom:bandit) =setup_companion_task(hostage_companion_task_1_dolg:nil:simulation_task_4_id:true) +hostage_companion_task_1_started%
 precondition = {=random_chance =is_faction_enemy_to_actor(bandit) =is_faction_enemy_to_actor(freedom) -hostage_companion_task_1_started -hostage_companion_task_1_hostage_rescued =all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:freedom:bandit) !squad_exist(hostage_companion_task_1)} true, false
 repeat_timeout = 86400
-on_complete = %=complete_task_inc_goodwill(10:dolg) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_4_id) =pstor_reset(simulation_task_4_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_4)%
-on_fail = %=fail_task_dec_goodwill(10:dolg) =pstor_reset(simulation_task_4_id) =pstor_reset(simulation_task_4_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+on_complete = %=unlock_smart(simulation_task_4_id) =complete_task_inc_goodwill(10:dolg) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_4_id) =pstor_reset(simulation_task_4_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_4)%
+on_fail = %=unlock_smart(simulation_task_4_id) =fail_task_dec_goodwill(10:dolg) =pstor_reset(simulation_task_4_id) =pstor_reset(simulation_task_4_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
 condlist_0 = {!squad_exist(hostage_companion_task_1)} fail
 reward_money = 5000
 
@@ -100,7 +100,7 @@ target_functor = simulation_task_target
 on_init = %=find_smart_under_faction_control(simulation_task_4_id:dolg:bandit) =setup_companion_task(hostage_companion_task_1_freedom:nil:simulation_task_4_id:true) +hostage_companion_task_1_started%
 precondition = {=random_chance =is_faction_enemy_to_actor(bandit) =is_faction_enemy_to_actor(dolg) -hostage_companion_task_1_started -hostage_companion_task_1_hostage_rescued =all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:dolg:bandit) !squad_exist(hostage_companion_task_1)} true, false
 repeat_timeout = 86400
-on_complete = %=complete_task_inc_goodwill(10:freedom) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_4_id) =pstor_reset(simulation_task_4_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_5)%
-on_fail = %=fail_task_dec_goodwill(10:freedom) =pstor_reset(simulation_task_4_id) =pstor_reset(simulation_task_4_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+on_complete = %=unlock_smart(simulation_task_5_id) =complete_task_inc_goodwill(10:freedom) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_4_id) =pstor_reset(simulation_task_4_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_5)%
+on_fail = %=unlock_smart(simulation_task_5_id) =fail_task_dec_goodwill(10:freedom) =pstor_reset(simulation_task_4_id) =pstor_reset(simulation_task_4_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
 condlist_0 = {!squad_exist(hostage_companion_task_1)} fail
 reward_money = 5000

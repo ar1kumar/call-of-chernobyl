@@ -339,7 +339,7 @@ function simulation_board:get_squad_target(squad)
 	local object_registry = simulation_objects.get_sim_obj_registry().objects
 	for k,v in pairs(object_registry) do
 		curr_prior = 0
-		if v.id ~= squad.id then
+		if v.id ~= squad.id and not v.locked == true then
 			curr_prior = v:evaluate_prior(squad)
 		end
 		if (curr_prior > 0 and v:target_precondition(squad)) then

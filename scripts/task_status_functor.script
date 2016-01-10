@@ -203,6 +203,12 @@ function hostage_task(task,task_id)
 	if not (squad and squad:clsid() == clsid.online_offline_group_s) then 
 		return
 	end
+	
+	local id = alun_utils.load_var(db.actor,task_id .. "_id")
+	local smart = id and alife():object(id)
+	if (smart) then 
+		smart.locked = true
+	end
 
 	if (task.stage == 0) then 
 		if (xrs_kill_wounded) then 
