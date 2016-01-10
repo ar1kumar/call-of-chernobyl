@@ -191,9 +191,9 @@ function heli_combat:find_valid_target()
 		return true 
 	end 
 	
-	if (self.heliObject:isVisible(target) and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 62500) then
+	if (self.heliObject:isVisible(target)) then
 		local target_pos = target:position()
-		if (id == 0 and alun_utils.load_var(db.actor,"heli_enemy_flag",false)) or (id ~= 0 and db.storage[id].heli_enemy_flag) then
+		if (id == 0 and alun_utils.load_var(db.actor,"heli_enemy_flag",false) and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 14400) or (id ~= 0 and db.storage[id].heli_enemy_flag and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 62500) then
 			if (self.st.ini and self.st.active_section) then
 				local smart = xr_gulag.get_npc_smart(self.object)
 				if (smart) then
@@ -500,7 +500,7 @@ function heli_combat:update()
 	end
 	
 	if not (self.enemy_from_custom_data) then
-		if not (self:find_valid_target()) then
+		if (not self:find_valid_target() or xr_conditions.surge_started()) then
 			self:forget_enemy()
 			--alun_utils.debug_write(strformat("heli_combat:update end 3"))
 			return false

@@ -52,10 +52,7 @@ To avoid this simply give exclusive jobs a prefix, like 'logic@exclusive_walker_
 
 -- HOW TO ADD HELI JOBS:
 --[[
-1. create <level_name>_heli_hide waypoint under map near edge
-2. create <level_name>_goto_hide path above map that leads to map edge. Heli will teleport to heli hide from this path
-3. create a new path <smart>_heli_<index>_fly for each smart terrain available to heli (army bases in sim_board)
-
+1. create a new path <smart>_heli_<index>_fly for each smart terrain available to heli (army bases in sim_board)
 
 In smart logic create a helicopter respawn section
 ie.
@@ -70,7 +67,6 @@ spawn_heli
 spawn_helicopter = helicopter
 spawn_num = 1
 -------------------------------------------------
-If there is a <level_name>_heli_hide path it will automatically spawn helicopter there
 --]]
 
 local ltx
@@ -1121,19 +1117,11 @@ local function init_heli_hide_jobs(smart,heli_jobs,gname)
 	local gg = game_graph()
 	local sim = alife()
 	local level_name = sim:level_name(gg:vertex(smart.m_game_vertex_id):level_id())
-	
-	if not (level.patrol_path_exists(level_name.."_heli_hide")) then 
-		return 
-	end
-	
-	if not (level.patrol_path_exists(level_name.."_goto_hide")) then 
-		return 
-	end
-	
+
 	if (ltx) then 
 		job_ltx = [[
 [heli_move@hide]
-path_move		  = %s
+retreat_mode      = 2
 max_velocity      = 60
 max_mgun_dist     = 100
 max_rocket_dist   = 100
@@ -1147,23 +1135,23 @@ fire_trail        = false
 immortal     	  = true
 mute 			  = true	
 ]]
-		job_ltx = strformat(job_ltx,level_name.."_heli_hide")
+		job_ltx = strformat(job_ltx)
 		ltx = ltx.."\n\n"..job_ltx
 	end 
 	
 	-- increase if you want more then 1 heli hide job per smart
 	for i=1, 1 do
 		name = gname.."_heli_"..i.."_hide"
-		if (level.patrol_path_exists(gname.."_heli_"..i.."_hide")) then
-			rawset(heli_jobs,#heli_jobs+1,{section = "logic@"..name, job_type_id = 18})
 
-			if (ltx) then
-				job_ltx = [[
+		rawset(heli_jobs,#heli_jobs+1,{section = "logic@"..name, job_type_id = 18})
+
+		if (ltx) then
+			job_ltx = [[
 [logic@%s]
 active = heli_move@%s
 
 [heli_move@%s]
-path_move         = %s
+retreat_mode 	  = 1
 max_velocity      = 60
 max_mgun_dist     = 100
 max_rocket_dist   = 100
@@ -1174,31 +1162,14 @@ use_mgun          = true
 engine_sound      = true
 show_health       = false
 fire_trail        = false
-on_info			  = {=dist_to_point_le(%s:0:3)} heli_move@hide
+on_info			  = {=heli_dist_to_max_bounding_le(3)} heli_move@hide
 ]]
-				job_ltx = strformat(job_ltx,name,name,name,level_name.."_goto_hide",level_name.."_goto_hide",level_name.."_heli_hide")
+			job_ltx = strformat(job_ltx,name,name,name)
 
-				if (level.patrol_path_exists(gname.."_heli_"..i.."_hide_look")) then
-					job_ltx = job_ltx.."path_look = heli_"..i.."_hide_look\n"
-				end
-
-				if (smart.safe_restr and xr_gulag.job_in_restrictor(smart, smart.safe_restr, name)) then
-					job_ltx = job_ltx .. "invulnerable = {=npc_in_zone("..smart.safe_restr..")} true\n"
-				end
-
-				if (smart.def_restr) then
-					--job_ltx = job_ltx .."out_restr = "..smart.def_restr..","..combat_restrictor.get_job_restrictor(name).."\n"
-				end
-
-				if (smart.base_on_actor_control and smart.base_on_actor_control.ignore_zone and xr_gulag.job_in_restrictor(smart, smart.base_on_actor_control.ignore_zone, name)) then
-					job_ltx = job_ltx .."combat_ignore_cond = {=npc_in_zone("..smart.base_on_actor_control.ignore_zone..")} true\ncombat_ignore_keep_when_attacked = true\n"
-				end
-
-				ltx = ltx.."\n\n"..job_ltx
-			end
-			i = i + 1
+			ltx = ltx.."\n\n"..job_ltx
 		end
-	end
+		i = i + 1
+	end	
 end
 
 local function init_heli_move_point_jobs(smart,heli_jobs,gname)

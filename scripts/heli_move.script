@@ -272,8 +272,15 @@ function heli_move:create_path_nodes()
 end 
 
 function heli_move:update_path_by_logic()
-	self:create_path_nodes()
-	self:iterate_nodes()
+	if not (self.a.retreat_mode) then
+		self:create_path_nodes()
+		self:iterate_nodes()
+	elseif (self.a.retreat_mode == 1) then 
+		self.heliObject:SetDestPosition(level.get_bounding_volume().max)
+	elseif (self.a.retreat_mode == 2) then 
+		local pos = vector():set(level.get_bounding_volume().max.x,level.get_bounding_volume().min.y-50,level.get_bounding_volume().max.z)
+		self.heliObject:SetDestPosition(pos)
+	end
 end 
 
 function heli_move:update_movement_state()
@@ -388,12 +395,17 @@ function set_scheme( npc, ini, scheme, section, gulag_name)
 	a.logic = xr_logic.cfg_get_switch_conditions( ini, section, npc )
 
 	local st = db.storage[npc:id()]
-	a.path_move         = utils.cfg_get_string( ini, section, "path_move", npc, true,  gulag_name)
-	if (a.path_move and not level.patrol_path_exists(a.path_move)) then
-		printf("Patrol path %s doesnt exist", a.path_move)
-		a.path_move = nil
+	a.retreat_mode = utils.cfg_get_number( ini, section, "retreat_mode", npc, false )
+	
+	if not (retreat_mode) then
+		a.path_move         = utils.cfg_get_string( ini, section, "path_move", npc, true,  gulag_name)
+		if (a.path_move and not level.patrol_path_exists(a.path_move)) then
+			printf("Patrol path %s doesnt exist", a.path_move)
+			a.path_move = nil
+		end
+		a.path_look         = utils.cfg_get_string( ini, section, "path_look", npc, false, gulag_name)
 	end
-	a.path_look         = utils.cfg_get_string( ini, section, "path_look", npc, false, gulag_name)
+	
 	a.max_velocity      = utils.cfg_get_number( ini, section, "max_velocity", npc, true, st.combat and st.combat.max_velocity ) or 45
 	a.enemy_            = utils.cfg_get_string( ini, section, "enemy", npc, false, "")
 	a.fire_point        = utils.cfg_get_string( ini, section, "fire_point", npc, false, "")

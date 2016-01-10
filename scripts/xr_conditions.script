@@ -2819,3 +2819,13 @@ function rad_pass_time(actor, npc)
 	return true
 --    return level.get_time_hours() >= 10 and level.get_time_hours() < 11
 end
+
+function heli_dist_to_max_bounding_le(actor,npc,p)
+	local heli = npc and npc:get_helicopter()
+	if not (heli) then 
+		return false 
+	end
+	local d = p[1] and tonumber(p[1])
+	local dist = d and heli_alife.distance_2d_sqr(npc:position(),level.get_bounding_volume().max)
+	return dist and dist <= d or false
+end

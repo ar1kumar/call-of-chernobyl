@@ -617,6 +617,23 @@ function heli_hud_show(hud)
 			end
 		end
 	end
+	
+	hud:add_msg("------------")
+	
+	if (smart_terrain.nearest_to_actor_smart and smart_terrain.nearest_to_actor_smart.id) then
+		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
+		if (smart) then
+			local npc,job,sec
+			if (smart.heli_jobs) then 
+				for i=1,#smart.heli_jobs do
+					job = smart.heli_jobs[i]
+					sec = string.gsub(job.section,"logic@","")
+					hud:add_msg("["..i.."]",strformat("'%s' | %s",sec,smart.npc_by_job_section[job.section] or "empty"))
+				end
+			end 
+		end
+	end
+	
 	hud:set_header("-[Helicopter Info]-")
 	hud:display()
 end 
@@ -1012,14 +1029,7 @@ function gulag_info_hud_show(hud)
 			hud:add_msg("Job Count",#smart.stalker_jobs)
 
 			local npc,job,sec
-			if (smart.heli_jobs) then 
-				for i=1,#smart.heli_jobs do
-					job = smart.heli_jobs[i]
-					sec = string.gsub(job.section,"logic@","")
-					hud:add_msg("["..i.."]",strformat("'%s' | %s",sec,smart.npc_by_job_section[job.section] or "empty"))
-				end
-			end 
-			
+		
 			for i=1,#smart.stalker_jobs do
 				job = smart.stalker_jobs[i]
 				sec = string.gsub(job.section,"logic@","")

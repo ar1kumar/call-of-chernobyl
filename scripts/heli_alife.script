@@ -143,6 +143,10 @@ end
 --												PUBLIC
 --------------------------------------------------------------------------------------------------------------
 function force_target_destination(id,target_id)
+	if (xr_conditions.surge_started()) then 
+		return 
+	end 
+	
 	--alun_utils.debug_write("heli_alife: force_target_destination")
 	local sim = alife()
 	local se_heli = sim:object(id)
@@ -206,6 +210,10 @@ function update(heli,se_heli,heliObject)
 	
 	local gg = game_graph()
 	local level_name = alife():level_name(gg:vertex(se_heli.m_game_vertex_id):level_id())
+	
+	if (xr_conditions.surge_started()) then 
+		se_heli.help_id = nil
+	end
 	
 	if (se_heli.current_action) then
 		-- Evaluate current assigned target; make sure it is still valid
