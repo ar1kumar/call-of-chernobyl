@@ -172,7 +172,7 @@ function on_init_bounty_hunt(actor,npc,p)
 end 
 
 function fail_task_dec_goodwill(actor,npc,p)
-	local amt = tonumber(p[1]) or 10
+	local amt = tonumber(p[1]) or 50
 	for i=2,#p do 
 		inc_faction_goodwill_to_actor(db.actor, nil, {p[i], -(amt)})
 	end
@@ -181,7 +181,7 @@ end
 -- param1 - amount of goodwill to increase
 -- param2+ - community
 function complete_task_inc_goodwill(actor,npc,p)
-	local amt = tonumber(p[1]) or 10
+	local amt = tonumber(p[1]) or 50
 	for i=2,#p do 
 		inc_faction_goodwill_to_actor(db.actor, nil, {p[i], amt})
 	end
