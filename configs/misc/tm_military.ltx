@@ -16,7 +16,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mil_smart_terrain_7_7_freedom_mechanic_stalker_task_1_fetch_finish
-on_complete = %+mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_1 =complete_task_inc_goodwill(10:freedom) =reward_money(1000) =remove_fetch_item(mil_smart_terrain_7_7_freedom_mechanic_stalker_task_1_fetch) =inc_task_stage(mil_smart_terrain_7_7_freedom_mechanic_stalker_task_1)%
+on_complete = %+mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_1 =complete_task_inc_goodwill(50:freedom) =reward_money(1000) =remove_fetch_item(mil_smart_terrain_7_7_freedom_mechanic_stalker_task_1_fetch) =inc_task_stage(mil_smart_terrain_7_7_freedom_mechanic_stalker_task_1)%
 precondition = {-mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_1} true, false
 
 [mil_smart_terrain_7_7_freedom_mechanic_stalker_task_2]
@@ -34,7 +34,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mil_smart_terrain_7_7_freedom_mechanic_stalker_task_2_fetch_finish
-on_complete = %+mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_2 =complete_task_inc_goodwill(10:freedom) =reward_money(1000) =remove_fetch_item(mil_smart_terrain_7_7_freedom_mechanic_stalker_task_2_fetch) =inc_task_stage(mil_smart_terrain_7_7_freedom_mechanic_stalker_task_2)%
+on_complete = %+mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_2 =complete_task_inc_goodwill(50:freedom) =reward_money(1000) =remove_fetch_item(mil_smart_terrain_7_7_freedom_mechanic_stalker_task_2_fetch) =inc_task_stage(mil_smart_terrain_7_7_freedom_mechanic_stalker_task_2)%
 precondition = {+mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_1 -mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_2} true, false
 
 ;================================================
@@ -56,7 +56,7 @@ repeat_timeout = 86400
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mil_smart_terrain_7_10_freedom_trader_stalker_task_1_fetch_finish
-on_complete = %=complete_task_inc_goodwill(10:freedom) =reward_item_cost_mult_and_remove(mil_smart_terrain_7_10_freedom_trader_stalker_task_1_fetch:15:15) =inc_task_stage(mil_smart_terrain_7_10_freedom_trader_stalker_task_1)%
+on_complete = %=complete_task_inc_goodwill(50:freedom) =reward_item_cost_mult_and_remove(mil_smart_terrain_7_10_freedom_trader_stalker_task_1_fetch:15:15) =inc_task_stage(mil_smart_terrain_7_10_freedom_trader_stalker_task_1)%
 
 ;================================================
 ;mil_smart_terrain_7_7_freedom_leader_stalker
@@ -76,7 +76,7 @@ status_functor_params = army,killer,bandit
 stage_complete = 1
 on_init = %=find_smart_under_faction_control_ex(mil_smart_terrain_7_7_freedom_leader_stalker_task_1_id:army:killer:bandit)%
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:army:killer:bandit)} true, false
-on_complete = %=complete_task_inc_goodwill(10:freedom) =reward_money(3000) =reward_stash(true) =inc_task_stage(mil_smart_terrain_7_7_freedom_leader_stalker_task_1) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_1_id) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_1_target_id)%
+on_complete = %=complete_task_inc_goodwill(50:freedom) =reward_money(3000) =reward_stash(true) =inc_task_stage(mil_smart_terrain_7_7_freedom_leader_stalker_task_1) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_1_id) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_1_target_id)%
 on_fail = %=pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_1_id) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_1_target_id)%
 
 [mil_smart_terrain_7_7_freedom_leader_stalker_task_2]
@@ -94,5 +94,5 @@ status_functor_params = dolg
 stage_complete = 1
 on_init = %=find_smart_under_faction_control(mil_smart_terrain_7_7_freedom_leader_stalker_task_2_id:dolg)%
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:dolg)} true, false
-on_complete = %=complete_task_inc_goodwill(10:freedom) =reward_money(4500) =inc_task_stage(mil_smart_terrain_7_7_freedom_leader_stalker_task_2) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_2_id) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_2_target_id)%
+on_complete = %=complete_task_inc_goodwill(50:freedom) =reward_money(4500) =inc_task_stage(mil_smart_terrain_7_7_freedom_leader_stalker_task_2) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_2_id) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_2_target_id)%
 on_fail = %=pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_2_id) =pstor_reset(mil_smart_terrain_7_7_freedom_leader_stalker_task_2_target_id)%

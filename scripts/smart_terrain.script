@@ -549,6 +549,8 @@ function se_smart_terrain:load_jobs()
 								printf("%s:load_jobs() There is no such patrol path %s",self:name(),path_name)
 							end
 						end
+					elseif (job_type == "heli_hide_job") then 
+						-- do nothing job.alife_task not needed
 					elseif (job_type == "smartcover_job") then
 						smartcover_name = ltx:r_string(active_section, "cover_name")
 						smartcover = se_smart_cover.registered_smartcovers[smartcover_name]
