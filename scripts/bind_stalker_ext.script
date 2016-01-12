@@ -45,6 +45,11 @@ end
 -------------------
 function actor_on_first_update(binder,delta)
 	SendScriptCallback("actor_on_first_update",binder,delta)
+	
+	-- AO3 hotfix for missing addon tool
+	if (system_ini():section_exist("addons_box") and not db.actor:object("addons_box")) then
+		alife():create("addons_box",db.actor:position(),0,0,0)
+	end
 end
 
 actor_light = nil
