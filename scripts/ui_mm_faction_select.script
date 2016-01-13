@@ -138,6 +138,10 @@ local function actor_on_first_update(binder,delta)
 	if (spawn_path) then 
 		ChangeLevel(spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0),vector():set(0,0,0))
 	end
+	-- AO3 hotfix for missing addon tool
+	if (system_ini():section_exist("addons_box") and not db.actor:object("addons_box")) then
+		alife():create("addons_box",db.actor:position(),0,0,0)
+	end
 end 
 
 local function actor_on_before_death()
