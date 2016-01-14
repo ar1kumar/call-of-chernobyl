@@ -1,8 +1,8 @@
 
 [trader]
 buy_condition                            = trade_generic_buy
-buy_supplies                             = {+pioneer_achievement_gained +research_man_gained +zat_b30_owl_in_trouble_dialog_done} supplies_advanced_anobiotik, {+pioneer_achievement_gained} supplies_anobiotik, {+research_man_gained +zat_b30_owl_in_trouble_dialog_done} supplies_advanced, supplies_start
-discounts                                = {+pioneer_achievement_gained +research_man_gained +zat_b30_owl_in_trouble_dialog_done} discount_2, {+research_man_gained +zat_b30_owl_in_trouble_dialog_done} discount
+buy_supplies                             = {=actor_goodwill_ge(ecolog:2000)} supplies_advanced_anobiotik, {=actor_goodwill_ge(ecolog:1500)} supplies_anobiotik, {=actor_goodwill_ge(ecolog:1000)} supplies_advanced, supplies_start
+discounts                                = {=actor_goodwill_ge(ecolog:1500)} discount_2, {=actor_goodwill_ge(ecolog:1000)} discount
 price_profile                            = ecolog
 sell_condition                           = trade_generic_sell
 
@@ -390,10 +390,10 @@ medkit_scientic                          = 10, 0.8
 [supplies_advanced]
 
 ;DET_ELIT
-detector_elite                           = 1,	0.0001
+detector_elite                           = 1,	0.25
 
 ;DET_SCIE
-detector_scientific                      = 2,	1
+detector_scientific                      = 2,	0.25
 
 ;S_FOOD
 antirad                                  = 20, 0.8

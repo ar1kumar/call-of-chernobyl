@@ -1,7 +1,7 @@
 --'******************************************************
 -- Edited by Alundaio
 --
---
+-- edited 1/14/2016: Added ability to create squad npcs without specifying a smart
 --'******************************************************
 
 -- Current Action: 0 - Reach Target | 1 - Stay Point
@@ -146,7 +146,7 @@ function sim_squad_scripted:update()
 			end
 		end
 		
-		if (skip ~= true and DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
+		if (skip ~= true) then
 			local gg = game_graph()
 
 			--printf("m_game_vertex_id=%s actor.m_game_vertex_id=%s",self.m_game_vertex_id,se_actor.m_game_vertex_id)
@@ -156,18 +156,30 @@ function sim_squad_scripted:update()
 
 				-- Disable any squad that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
 				if (level ~= actor_level) and (self:commander_id() and not sim:has_info(self:commander_id(),"npcx_is_companion")) then
+				
+					-- remove all npc except leader
+					if (SIM_PASSIVE_SQUAD_COUNT and not get_object_story_id(self.id) and not self.online) then 
+						for k in self:squad_members() do
+							if (not get_object_story_id(k.id) and k.id ~= self:commander_id()) then 
+								self:remove_npc(k.id)
+							end
+						end
+					end
+						
 					local sfind = string.find
 					if not (sfind(simulation_objects.config:GetValue(actor_level,"target_maps",0,""),level)) then
-						SIMBOARD.squads[self.id] = nil
-						if (self.smart_id) then
-							--SIMBOARD.tmp_entered_squad[self.smart_id] = nil
-							SIMBOARD.tmp_assigned_squad[self.smart_id] = nil
+						if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
+							SIMBOARD.squads[self.id] = nil
+							if (self.smart_id) then
+								--SIMBOARD.tmp_entered_squad[self.smart_id] = nil
+								SIMBOARD.tmp_assigned_squad[self.smart_id] = nil
+							end
+							simulation_objects.get_sim_obj_registry():unregister(self)
+							self.disabled = true
+							--printf("%s disabled",self:name())
+							--alun_utils.debug_write("sim_squad_scripted:update END 3")
+							return
 						end
-						simulation_objects.get_sim_obj_registry():unregister(self)
-						self.disabled = true
-						--printf("%s disabled",self:name())
-						--alun_utils.debug_write("sim_squad_scripted:update END 3")
-						return
 					end
 				end
 			end
@@ -200,6 +212,16 @@ function sim_squad_scripted:update()
 
 	self.dtimer = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
 	--
+	
+	if (SIM_PASSIVE_SQUAD_COUNT and self:npc_count() == 1 and self.dist_to_actor >= 150 and not self.check_size and not get_object_story_id(self.id)) then
+		self.check_size = true
+		local gg = game_graph()
+		local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
+		local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
+		if (level == actor_level) then
+			self:create_npc()
+		end
+	end
 
 	--self.sound_manager:update()
 	self:check_invulnerability()
@@ -598,73 +620,105 @@ function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_i
 	return obj.id
 end
 
-function sim_squad_scripted:create_npc(spawn_smart)
+function sim_squad_scripted:create_npc(spawn_smart,only_one)
 	--alun_utils.debug_write("sim_squad_scripted:create_npc")
 	local ini = system_ini()
 	local settings_id = self:section_name()
 	local spawn_sections = utils.parse_names(utils.cfg_get_string(ini, settings_id, "npc", self, false, "", ""))
 
-	local spawn_point = utils.cfg_get_string(ini, settings_id, "spawn_point", self, false, "","self") or
-						utils.cfg_get_string(spawn_smart.ini, "smart_terrain", "spawn_point", self, false,"","self")
-	spawn_point = xr_logic.parse_condlist(self, "spawn_point", "spawn_point", spawn_point)
-	spawn_point = xr_logic.pick_section_from_condlist(db.actor, self, spawn_point)
-
-	local base_spawn_position = spawn_smart.position
-	local base_lvi = spawn_smart.m_level_vertex_id
-	local base_gvi = spawn_smart.m_game_vertex_id
-	local spawn_vid = alun_utils.read_from_ini(ini,settings_id,"spawn_vid","string",nil) or alun_utils.read_from_ini(spawn_smart.ini,"smart_terrain","spawn_vid","string",nil)
-	spawn_vid = spawn_vid and xr_logic.pick_section_from_condlist(db.actor,self, xr_logic.parse_condlist(self,"spawn_vid","spawn_vid",spawn_vid))
-
-	if (spawn_vid) then
-		local vid = alun_utils.str_explode(spawn_vid,":")
-		base_lvi = tonumber(vid[1])
-		base_spawn_position = level.vertex_position(base_lvi)
-		base_gvi = tonumber(vid[2])
-	else
-		if spawn_point ~= nil then
-			if spawn_point == "self" then
-				base_spawn_position = spawn_smart.position
-				base_lvi = spawn_smart.m_level_vertex_id
-				base_gvi = spawn_smart.m_game_vertex_id
-			else
-				base_spawn_position = patrol(spawn_point):point(0)
-				base_lvi = patrol(spawn_point):level_vertex_id(0)
-				base_gvi = patrol(spawn_point):game_vertex_id(0)
+	local spawn_point, base_spawn_position, base_lvi, base_gvi, spawn_vid
+	if (spawn_smart) then 
+		spawn_point = utils.cfg_get_string(ini, settings_id, "spawn_point", self, false, "","self") or utils.cfg_get_string(spawn_smart.ini, "smart_terrain", "spawn_point", self, false,"","self")
+		spawn_point = xr_logic.parse_condlist(self, "spawn_point", "spawn_point", spawn_point)
+		spawn_point = xr_logic.pick_section_from_condlist(db.actor, self, spawn_point)
+		
+		base_spawn_position = spawn_smart.position
+		base_lvi = spawn_smart.m_level_vertex_id
+		base_gvi = spawn_smart.m_game_vertex_id
+		spawn_vid = alun_utils.read_from_ini(ini,settings_id,"spawn_vid","string",nil) or alun_utils.read_from_ini(spawn_smart.ini,"smart_terrain","spawn_vid","string",nil)
+		spawn_vid = spawn_vid and xr_logic.pick_section_from_condlist(db.actor,self, xr_logic.parse_condlist(self,"spawn_vid","spawn_vid",spawn_vid))
+		
+		if (spawn_vid) then
+			local vid = alun_utils.str_explode(spawn_vid,":")
+			base_lvi = tonumber(vid[1])
+			base_spawn_position = level.vertex_position(base_lvi)
+			base_gvi = tonumber(vid[2])
+		else
+			if spawn_point ~= nil then
+				if spawn_point == "self" then
+					base_spawn_position = spawn_smart.position
+					base_lvi = spawn_smart.m_level_vertex_id
+					base_gvi = spawn_smart.m_game_vertex_id
+				else
+					base_spawn_position = patrol(spawn_point):point(0)
+					base_lvi = patrol(spawn_point):level_vertex_id(0)
+					base_gvi = patrol(spawn_point):game_vertex_id(0)
+				end
+			elseif spawn_smart.spawn_point ~= nil then
+				base_spawn_position = patrol(spawn_smart.spawn_point):point(0)
+				base_lvi = patrol(spawn_smart.spawn_point):level_vertex_id(0)
+				base_gvi = patrol(spawn_smart.spawn_point):game_vertex_id(0)
 			end
-		elseif spawn_smart.spawn_point ~= nil then
-			base_spawn_position = patrol(spawn_smart.spawn_point):point(0)
-			base_lvi = patrol(spawn_smart.spawn_point):level_vertex_id(0)
-			base_gvi = patrol(spawn_smart.spawn_point):game_vertex_id(0)
 		end
-	end
-
+		
+		self.smart_id = spawn_smart.id
+	else 
+		base_spawn_position = self.position
+		base_lvi = self.m_level_vertex_id
+		base_gvi = self.m_game_vertex_id
+	end 
+	
+	local npcs_list = {}
+	
 	if #spawn_sections ~= 0 then
 		for k,v in pairs(spawn_sections) do
-			self:add_squad_member(v, base_spawn_position, base_lvi, base_gvi,k)
+			table.insert(npcs_list,self:add_squad_member(v, base_spawn_position, base_lvi, base_gvi,k))
+			if (only_one) then 
+				break
+			end
 		end
 	end
 
 	local random_spawn = utils.cfg_get_string(ini, settings_id, "npc_random", self, false, "",nil)
 	if random_spawn ~= nil then
-		random_spawn 				= 	utils.parse_names(random_spawn)
+		random_spawn = utils.parse_names(random_spawn)
+		
+		local random_count, count = 1,0
+		if not (only_one) then
+			count = alun_utils.read_from_ini(ini,settings_id,"npc_in_squad","string","1,2")
+			count = alun_utils.str_explode(count,",")
+			count[1] = count[1] and tonumber(count[1])
+			count[2] = count[2] and tonumber(count[2]) or count[1]
 
-		local count = alun_utils.read_from_ini(ini,settings_id,"npc_in_squad","string","1,2")
-		count = alun_utils.str_explode(count,",")
-		count[1] = count[1] and tonumber(count[1])
-		count[2] = count[2] and tonumber(count[2]) or count[1]
-
-		local random_count = count[1] and count[2] and math.random(count[1],count[2]) or math.random(1,2)
+			random_count = count[1] and count[2] and math.random(count[1],count[2]) or math.random(1,2)
+			random_count = random_count - self:npc_count()
+		end
+		
 		local random_id
 		for i = 1,random_count do
 			random_id = math.random(1, #random_spawn)
-			self:add_squad_member(random_spawn[random_id], base_spawn_position, base_lvi, base_gvi)
+			table.insert(npcs_list,self:add_squad_member(random_spawn[random_id], base_spawn_position, base_lvi, base_gvi))
 		end
 	elseif #spawn_sections == 0 then
 		printf("You are trying to spawn an empty squad [%s]!!!", settings_id)
 	end
 
-
-	self.smart_id = spawn_smart.id
+	if not (spawn_smart) then 
+		local smart = self.smart_id and db.smart_terrain_by_id[self.smart_id]
+		if (smart) then
+			local id, se_obj
+			for i=1, #npcs_list do 
+				id = npcs_list[i]
+				se_obj = id and alife():object(id)
+				if (se_obj) then 
+					smart:register_npc(se_obj)
+					SIMBOARD:setup_squad_and_group(se_obj)
+				end
+			end
+		end
+	end 
+	
+	self:set_squad_relation()
 	self:refresh()
 end
 
@@ -1025,10 +1079,10 @@ function sim_squad_scripted:get_squad_props()
 		local assigned_target = self.assigned_target_id and alife():object(self.assigned_target_id)
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
 
-		local t = self.disabled and "disabled\\n\\n" or ""
-
-		t = t .. "%s\\n\\n%s\\n\\n current_target=%s\\nassigned_target=%s\\n\\n"
-		t = strformat(t,self.disabled and "[disabled]" or "",self:name(),self.current_target_id == 0 and "actor" or current_target and current_target:name(),self.assigned_target_id == 0 and "actor" or assigned_target and assigned_target:name())
+		local t = ""
+		t = t .. ""
+		t = t .. "%s\\n\\n%s\\n\\nnpcs=%s\\n\\ncurrent_target=%s\\nassigned_target=%s\\n\\n"
+		t = strformat(t,self.disabled and "[disabled]" or "",self:name(),self:npc_count(),self.current_target_id == 0 and "actor" or current_target and current_target:name(),self.assigned_target_id == 0 and "actor" or assigned_target and assigned_target:name())
 
 		if (self.current_action) then
 			if (self.current_action == 0) then 
