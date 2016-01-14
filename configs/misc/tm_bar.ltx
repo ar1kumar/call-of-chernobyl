@@ -72,3 +72,19 @@ on_init = %=find_smart_under_faction_control(bar_dolg_general_petrenko_stalker_t
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:freedom)} true, false
 on_complete = %=complete_task_inc_goodwill(50:dolg) =reward_money(4500) =inc_task_stage(bar_dolg_general_petrenko_stalker_task_2) =pstor_reset(bar_dolg_general_petrenko_stalker_task_2_id) =pstor_reset(bar_dolg_general_petrenko_stalker_task_2_target_id)%
 on_fail = %=pstor_reset(bar_dolg_general_petrenko_stalker_task_2_id) =pstor_reset(bar_dolg_general_petrenko_stalker_task_2_target_id)%
+
+[bar_dolg_general_petrenko_stalker_task_3]
+icon = ui_inGame2_Odin_vistrel
+prior = 35
+storyline = false 
+title = bar_dolg_general_petrenko_stalker_task_3_name
+descr = bar_dolg_general_petrenko_stalker_task_3_text
+job_descr = bar_dolg_general_petrenko_stalker_task_3_about
+task_complete_descr = bar_dolg_general_petrenko_stalker_task_3_finish
+repeat_timeout = 1
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_init = %=on_init_bounty_hunt(bar_dolg_general_petrenko_stalker_task_3:freedom)%
+on_complete = %=reward_money(7000) =reward_stash(true) =inc_task_stage(bar_dolg_general_petrenko_stalker_task_3) =complete_task_inc_goodwill(50:dolg)%
+precondition = true
