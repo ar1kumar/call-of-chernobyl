@@ -265,8 +265,12 @@ function actor_has_fetch_item(task,task_id)
 	local section = db.actor and alun_utils.load_var(db.actor,task_id.."_fetch")
 	local item = section and db.actor:object(section)
 	if (item ~= nil) then 
-		if (task_id == "esc_2_12_stalker_nimble_task_1" and item:condition() >= 1) then 
-			task.stage = 1
+		if (task_id == "esc_2_12_stalker_nimble_task_1") then 
+			if (item:condition() >= 1) then 
+				task.stage = 1
+			else 
+				task.stage = 0
+			end
 		else 
 			local count = alun_utils.load_var(db.actor,task_id.."_fetch_count")
 			if (count and count > 1) then
@@ -355,7 +359,7 @@ function check_if_looted_enough(task,task_id)
 	end
 	
 	local total_loot_count, npc
-	for k in self:squad_members() do
+	for k in squad:squad_members() do
 		local npc = db.storage[k.id] and db.storage[k.id].object
 		if (npc) then 
 			total_loot_count = total_loot_count + (alun_utils.load_var(npc,"s_loot_count") or 0)
@@ -379,4 +383,17 @@ function task_type_ecolog_gathered_tissue_samples(task,task_id)
 		end
 	end
 	return
+end
+--------------------------------------------------------------
+function kill_strelok(task,task_id)
+	local squad = get_story_squad("legendary_strelok")
+	if (squad) then
+		local se_obj
+		for k in squad:squad_members() do
+			se_obj = alife():object(k.id)
+			if (se_obj and not se_obj:alive()) then 
+				return "complete"
+			end 
+		end
+	end
 end

@@ -30,6 +30,12 @@ function actor_on_net_spawn()
 	end
 	--]]
 	
+	if (axr_main.config:GetValue("mm_options","enable_heli_spawn",1,true) == false) then 
+		for k,v in pairs (se_heli.se_helicopters) do 
+			alife():release(v,true)
+		end
+	end
+	
 	SendScriptCallback("on_game_load",binder)
 end
 
@@ -255,6 +261,12 @@ end
 -- on_actor_before_death
 ---------------------------------------------
 function actor_on_before_death(binder,whoID)
+	
+	local who = db.storage[whoID] and db.storage[whoID].object 
+	if (who) then 
+		SetHudMsg(who:character_name() .. " ended your life.",5)
+	end
+
 	-- if you want to keep actor alive, then use db.actor:set_health_ex(1) and do not use db.actor:kill(db.actor,true)
 	--db.actor:set_health_ex(1)
 	

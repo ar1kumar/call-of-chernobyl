@@ -47,6 +47,19 @@ function update(npc)
 		return
 	end
 
+	if (npc:is_talking()) then
+		local n = tonumber(xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_item_condition_factor))
+		tt.current_buy_item_condition_factor = n
+		if (db.actor:had_info("scavenger_skill_tier_1")) then 
+			if (n - 0.10 >= 0) then 
+				n = n - 0.10
+			else 
+				n = 0
+			end
+		end 
+		npc:buy_item_condition_factor(n)
+	end 
+	
 	local tg = time_global()
 	if tt.update_time ~= nil and tt.update_time < tg then
 		return
@@ -83,12 +96,6 @@ function update(npc)
 		tt.current_sell_condition = str
 	else
 		--printf("TRADE [%s]: current = %s   sell = %s", npc:name(), tostring(tt.current_sell_condition), tostring(str))
-	end
-
-	str = tonumber(xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_item_condition_factor))
-	if tt.current_buy_item_condition_factor ~= str then
-		npc:buy_item_condition_factor(str)
-		tt.current_buy_item_condition_factor = str
 	end
 
 	if tt.buy_supplies == nil then

@@ -465,3 +465,11 @@ end
 function psi_storm_task_target(id, field, p)
 	return psi_storm_manager and psi_storm_manager.get_task_target() or nil
 end
+
+-----------------------------------------
+function kill_strelok(id,field,p)
+	local squad = get_story_squad("legendary_strelok")
+	if (squad) then 
+		return squad.id
+	end
+end

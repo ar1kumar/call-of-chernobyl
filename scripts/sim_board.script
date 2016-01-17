@@ -2,12 +2,29 @@
 --'*Registry of smart terrains. The playing field simulation.
 -- Edited by Alundaio
 --'******************************************************
+
+-- Legendary Squad Sections
+legendaries = { "legendary_strelok" }
+
+
+
 -------------------
 local level,alife,game_graph,math,pairs,tostring,tonumber,tsort,tinsert = level,alife,game_graph,math,pairs,tostring,tonumber,table.sort,table.insert
 -------------------
 -----------------------------------------------------------------------------------
 --						Public
 -----------------------------------------------------------------------------------
+function is_legendary(squad) 
+	local sq
+	for i=1,#legendaries do
+		sq = get_story_squad(legendaries[i])
+		if (sq and sq.id == squad.id) then
+			return true
+		end
+	end
+	return false
+end 
+
 function general_squad_precondition(squad,target)
 	-- duty and freedom target eachother
 	--[[
@@ -278,6 +295,22 @@ function simulation_board:fill_start_position()
 		return
 	end
 	self.start_position_filled = true
+	
+	-- Spawn Legendaries at random smarts
+	local t = {}
+	for k,v in pairs (self.smarts) do 
+		table.insert(t,v.smrt)
+	end
+
+	--printf("fill_start_position %s",#t)
+	for i=1,#legendaries do 
+		local smart = t[math.random(1, #t) and math.random(1, #t) and math.random(1, #t)]
+		if (smart) then
+			--printf("before %s = %s",smart:name(),legendaries[i])
+			self:create_squad(smart, legendaries[i])
+			--printf("after %s = %s",smart:name(),legendaries[i])
+		end
+	end
 	
 	--alun_utils.debug_write(strformat("simulation_board:fill_start_position"))
 

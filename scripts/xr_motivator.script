@@ -302,7 +302,7 @@ function motivator_binder:death_callback(victim, who)
 	stalker_generic.remove_level_spot(victim, self.st)
 
 	if who:id() == db.actor:id() then
-		xr_statistic.inc_killed_stalkers_counter()
+		xr_statistic.inc_killed_stalkers_counter(victim:character_rank())
 		xr_statistic.set_best_monster(victim)
 	end
 	

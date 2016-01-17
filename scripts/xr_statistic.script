@@ -1,7 +1,22 @@
 -- run_string log("----->"..tostring(xr_statistic.actor_statistic.best_monster).." "..tostring(xr_statistic.actor_statistic.best_monster_rank))
 -- Modified by Alundaio
 
+
+local LEVEL_CAP = 100
+
 actor_statistic = {
+					-- RPG feature
+					experience = 0,
+					skills = 	{ 	
+								["Scavenger"] = 0, 
+								["Trespasser"] = 0, 
+								["Adventurer"] = 0, 
+								["Loner"] = 0, 
+								["Killer"] = 0, 
+								["Explorer"] = 0, 
+								["Robber"] = 0
+								},
+					
 					surges = 0,
 					completed_quests = 0,
 					killed_monsters = 0,
@@ -64,7 +79,6 @@ artefacts_table = {
 
 taken_artefacts = {}
 
-
 local function save_state(data)
 	if not (data.xr_statistic) then
 		data.xr_statistic = {}
@@ -103,12 +117,15 @@ function inc_surges_counter()
 end
 function inc_completed_quests_counter()
 	actor_statistic.completed_quests = actor_statistic.completed_quests + 1
+	add_experience_mul(0.10)
 end
-function inc_killed_monsters_counter()
+function inc_killed_monsters_counter(rank)
 	actor_statistic.killed_monsters = actor_statistic.killed_monsters + 1
+	add_experience(math.floor(rank/5))
 end
-function inc_killed_stalkers_counter()
+function inc_killed_stalkers_counter(rank)
 	actor_statistic.killed_stalkers = actor_statistic.killed_stalkers + 1
+	add_experience(math.floor(rank/5))
 end
 function inc_founded_artefacts_counter(art_id)
 	if(taken_artefacts[art_id]==nil) then
@@ -118,10 +135,12 @@ function inc_founded_artefacts_counter(art_id)
 		if(s_art and s_art:section_name()) then
 			artefacts_table[s_art:section_name()] = true
 		end
+		add_experience_mul(0.10)
 	end
 end
 function inc_founded_secrets_counter()
 	actor_statistic.founded_secrets = actor_statistic.founded_secrets + 1
+	add_experience_mul(0.02)
 end
 
 function set_best_monster(obj)
@@ -193,6 +212,81 @@ function set_best_weapon(hit_amount)
 		return
 	end	
 end
+-------------------------------------------------------------------------------------
+function add_experience(n)
+	if (has_alife_info("loner_skill_tier_1")) then 
+		n = (n*0.05) + n
+	end
+	actor_statistic.experience = actor_statistic.experience + n
+end
+
+function add_experience_mul(n)
+	n = (needed_for_next_level(true)*n)
+	if (has_alife_info("loner_skill_tier_1")) then 
+		n = (n*0.05) + n
+	end
+	actor_statistic.experience = actor_statistic.experience + n
+end
+
+function remove_experience(n)
+	actor_statistic.experience = actor_statistic.experience - n
+end
+
+function remove_experience_mul(n)
+	actor_statistic.experience = actor_statistic.experience - (needed_for_next_level(true)*n)
+end
+
+function character_level()
+	points = 0
+	for level=1,LEVEL_CAP do
+		local diff = level + 300 * math.pow(2,level/7)
+		points = points + diff
+		if not ( math.floor(points/4) <= actor_statistic.experience ) then
+			return level
+		end
+	end
+	return LEVEL_CAP
+end
+
+function max_available_points()
+	return math.floor(character_level()/3)
+end
+
+function needed_for_next_level(total)
+	points = 0
+	for level=1,LEVEL_CAP do
+		if (level == LEVEL_CAP) then 
+			return 0 
+		end
+		local diff = level + 300 * math.pow(2,level/7)
+		points = points + diff
+		local c = math.floor(points/4)
+		if not ( c <= actor_statistic.experience ) then
+			local d = math.floor( (points + (level+1) + 300 * math.pow(2,level/7)) / 4)
+			if (total) then
+				return d - c
+			else
+				return c - actor_statistic.experience
+			end
+		end
+	end
+	return 0
+end
+-----------------------------------------------------------------------------------------------
+function assign_point_to_skill(skill,n)
+	actor_statistic.skills[skill] = actor_statistic.skills[skill] + n
+end
+function calculate_available_points()
+	local used = 0
+	for skill, v in pairs(actor_statistic.skills) do 
+		used = used + v
+	end
+	return max_available_points() - used
+end
+function apply_skill_bonuses()
+	skill_trees.apply_bonuses(actor_statistic.skills)
+end
+-----------------------------------------------------------------------------------------------
 
 function save(package)
 	if (USE_MARSHAL) then

@@ -1,0 +1,136 @@
+class "char_list" (CUIScriptWnd)
+function char_list:__init(action_list,...) super()
+	self:InitControls()
+	self:InitCallBacks()
+
+	self:FillList(action_list,...)
+end
+
+function char_list:__finalize()
+end
+
+function char_list:InitControls()
+	self:SetWndRect			(Frect():set(0,0,1024,768))
+
+	self:SetAutoDelete(true)
+
+	self.xml				= CScriptXmlInit()
+	local ctrl
+	self.xml:ParseFile			("ui_rpg_main.xml")
+
+	ctrl					= CUIWindow()
+	self.xml:InitWindow			("char_list:file_item:main",0,ctrl)
+
+	self.file_item_main_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+
+	self.xml:InitWindow			("char_list:file_item:fn",0,ctrl)
+	self.file_item_fn_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+
+	self.xml:InitWindow			("char_list:file_item:fd",0,ctrl)
+	self.file_item_fd_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+
+	self.form				= self.xml:InitStatic("char_list:form",self)
+	--self.form:SetWndPos(vector2():set(device().width/4-(self.form:GetWidth()/4), device().height/2 - self.form:GetHeight()))
+
+	-- List Box
+	self.xml:InitFrame("char_list:form:list_frame",self.form)
+
+	self.list_box			= self.xml:InitListBox("char_list:form:list",self.form)
+
+	self.list_box:ShowSelectedItem	(true)
+	self:Register			(self.list_box, "list_window")
+
+	-- Button OK
+	--[[
+	ctrl = self.xml:Init3tButton("char_list:form:btn_ok",self.form)
+	self:Register(ctrl, "button_ok")
+	--]]
+end
+
+function char_list:InitCallBacks()
+	self:AddCallback("button_ok",ui_events.BUTTON_CLICKED,self.OnButton_ok,self)
+
+	self:AddCallback("list_window",ui_events.LIST_ITEM_CLICKED,self.OnListItemClicked,self)
+	self:AddCallback("list_window",ui_events.WINDOW_LBUTTON_DB_CLICK,self.OnListItemDbClicked,self)
+end
+
+function char_list:FillList(action_list,...)
+	self.list_box:RemoveAll()
+
+	self.choices = {...}
+	
+	for i,str_id in pairs(self.choices) do
+		self:AddItemToList(i,str_id,action_list and action_list[i] or nil)
+	end
+	
+	self:ShowDialog()
+end
+
+function char_list:OnListItemClicked()
+	if self.list_box:GetSize()==0 then return end
+
+	local item = self.list_box:GetSelectedItem()
+
+	if not (item) then
+		return
+	end
+end
+
+function char_list:OnListItemDbClicked()
+	if self.list_box:GetSize()==0 then return end
+
+	local item = self.list_box:GetSelectedItem()
+
+	if not (item) then
+		return
+	end
+	
+	if (item.func) then 
+		item.func()
+	end
+
+	item.fn:SetText(item.name .. "    " .. tostring(xr_statistic.actor_statistic.skills[item.name]))
+end
+
+function char_list:OnButton_ok()
+	
+end
+
+function char_list:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if (keyboard_action == ui_events.WINDOW_KEY_PRESSED) then
+		if (dik == DIK_keys.DIK_RETURN) then
+
+		elseif (dik == DIK_keys.DIK_ESCAPE) then
+			self:HideDialog()
+		end
+	end
+	return true
+end
+
+function char_list:AddItemToList(index,str_id,func)
+	local _itm		= load_item(self.file_item_main_sz.y)
+	_itm.name 		= str_id --game.translate_string(str_id) or "This is obviously broken if you see this"
+
+	_itm:SetWndSize		(self.file_item_main_sz)
+
+	_itm.fn:SetWndPos(vector2():set(0,0))
+	_itm.fn:SetWndSize(self.file_item_fn_sz)
+	_itm.fn:SetText(_itm.name .. "     " .. tostring(xr_statistic.actor_statistic.skills[_itm.name]))
+	
+	_itm.func = func
+
+	self.list_box:AddExistingItem(_itm)
+end
+
+----------------------------------------------------------
+class "load_item" (CUIListBoxItem)
+function load_item:__init(height) super(height)
+	self:SetTextColor(GetARGB(255, 170, 170, 170))
+	self.fn = self:GetTextItem()
+	self.fn:SetFont(GetFontLetterica18Russian())
+	self.fn:SetEllipsis(true)
+end
+
+function load_item:__finalize()
+end

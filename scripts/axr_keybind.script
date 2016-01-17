@@ -103,6 +103,16 @@ function action.debug_test(p)
 	end 
 	if (p==1) then 
 		
+		for k,v in pairs(xr_statistic.actor_statistic.skills) do
+			if (v < 5) then
+				xr_statistic.assign_point_to_skill(k,5)
+			end
+		end 
+		
+		xr_statistic.apply_skill_bonuses()
+		
+		ui_rpg_char_menu.char_list(nil,"Scavenger", "Trespasser", "Adventurer", "Loner", "Explorer", "Robber")
+		
 		-- RELEASES TASK GIVER FOR ALL TASKS WITH task_giver_id; useful for testing how a task works when giver is dead
 		--[[
 		local debug_task_infos = task_manager.get_task_manager().task_info

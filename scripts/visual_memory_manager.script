@@ -1,0 +1,19 @@
+-- Visual Memory Manager exports
+-- by Alundaio 
+
+-- called from engine
+-- This occurs during the visible check. If value >= visiblity_threshold then object is considered visible
+-- warning npc and who can be nil sometimes
+function get_visible_value(npc,who,time_delta,time_quant,luminocity,velocity_factor,velocity,distance,object_distance,always_visible_distance)
+	if (distance <= 0) then
+		distance = 0.001
+	end 
+	
+	local value = time_delta / time_quant * luminocity * (1 + velocity_factor*velocity) * (distance - object_distance) / (distance - always_visible_distance)
+
+	if (who and who:id() == 0) then 
+		printf("value = %s luminocity=%s",value,luminocity)
+	end
+	
+	return value
+end

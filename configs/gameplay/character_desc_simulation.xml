@@ -2,9 +2,45 @@
 
 <xml>
 
+	<specific_character id="legendary_stalker_strelok" team_default = "1">
+		<name>pri_b305_strelok_name</name>
+		<icon>ui_inGame2_Strelok</icon>
+		<map_icon x="1" y="0">
+		</map_icon>
+		<bio>Опытный сталкер. Детальная информация отсутствует.</bio>
 
+		<class>legendary_stalker_strelok</class>
+		<community>stalker</community>
+		<terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_02\stalker\</snd_config>
 
-  <!-------------------------ECOLOG------------------------------>
+		<rank>100</rank>
+		<reputation>0</reputation>
+
+		<visual>actors\stalker_neutral\stalker_neutral_nauchniy_face_2</visual>
+		<supplies>
+
+      [spawn] \n
+	  device_torch \n
+	  detector_elite \n
+	  wpn_binoc \n
+      wpn_colt1911 = 1 \n
+      ammo_11.43x23_fmj = 1 \n
+      wpn_ak74u = 1 \n
+	  ammo_5.45x39_ap = 3 \n
+      
+
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals_4.xml"
+		<actor_dialog>actor_break_dialog</actor_dialog>
+
+  </specific_character>
+
+  <!--ECOLOG-->
 	<specific_character id="sim_default_ecolog_0_default_0" team_default = "1">
 		<name>GENERATE_NAME_stalker</name>
 		<icon>ui_npc_u_stalker_ecolog</icon>
@@ -431,7 +467,7 @@
 
 
 
-	 <!------------------CLEAR SKY-------------------->
+	 <!-- CLEAR SKY -->
 
 
 

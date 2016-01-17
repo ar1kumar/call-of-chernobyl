@@ -1,0 +1,161 @@
+-- Dynamic Skill tree system for CoC
+-- by Alundaio
+
+--list = { "Scavenger", "Trespasser", "Adventurer", "Loner", "Killer", "Explorer", "Robber" }
+
+function apply_bonuses(skill_list)
+	local actor_condition = {}
+	local function add_actor_condition(ac,n)
+		if not actor_condition[ac] then 
+			actor_condition[ac] = 0
+		end
+		actor_condition[ac] = actor_condition[ac] + n
+	end 
+	
+	for skill, v in pairs(skill_list) do 
+		if (this[skill] and this[skill].apply_bonus) then 
+			this[skill].apply_bonus(v,add_actor_condition)
+		end
+	end
+
+	-- see OXR wiki for actor exports.
+	local max_weight = db.actor:get_actor_max_weight()
+	local max_walk_weight = db.actor:get_actor_max_walk_weight()
+	local sprint_k = db.actor:get_actor_sprint_koef()
+	local run_coef = db.actor:get_actor_run_coef()
+	local jump_speed = db.actor:get_actor_jump_speed() 
+	local runback_k = db.actor:get_actor_runback_coef()
+	for ac,v in pairs(actor_condition) do 
+		if (ac == "max_item_mass") then 
+			max_weight = max_weight + v
+		elseif (ac == "sprint_k") then 
+			sprint_k = sprint_k + v
+		elseif (ac == "run_coef") then 
+			run_coef = run_coef + v
+		elseif (ac == "jump_speed") then
+			jump_speed = jump_speed + v
+		elseif (ac == "runback_k") then
+			runback_k = runback_k + v
+		elseif (ac == "max_walk_weight") then 
+			max_walk_weight = max_walk_weight + v
+		end
+	end
+	db.actor:set_actor_max_weight(max_weight)
+	db.actor:set_actor_max_walk_weight(max_walk_weight)
+	db.actor:set_actor_sprint_koef(sprint_k)
+	db.actor:set_actor_run_coef(run_coef)
+	db.actor:set_actor_jump_speed(jump_speed)
+	db.actor:set_actor_runback_coef(runback_k)
+end
+
+Scavenger = {}
+function Scavenger.apply_bonus(n,add_actor_condition)
+	if n >= 1 then -- traders buy equipment at 10% lower condition then usual trade_manager.script
+		give_info("scavenger_skill_tier_1")
+	else 
+		disable_info("scavenger_skill_tier_1")
+	end
+	
+	if n >= 2 then -- a chance to find more ammo on a corpse death_manager.script
+		give_info("scavenger_skill_tier_2")
+	else 
+		disable_info("scavenger_skill_tier_2")
+	end
+
+	if n >= 3 then -- increased condition in death_manager.script
+		give_info("scavenger_skill_tier_3")
+	else 
+		disable_info("scavenger_skill_tier_3")
+	end
+
+	if n >= 4 then -- increased carry weight
+		add_actor_condition("max_item_mass",15)
+	end
+
+	if n >= 5 then -- chance to spawn more items in death_manager.script
+		give_info("scavenger_skill_tier_5")
+	else 
+		disable_info("scavenger_skill_tier_5")
+	end
+end
+
+Trespasser = {}
+function Trespasser.apply_bonus(n,add_actor_condition)
+	if n >= 1 then 
+		give_info("trespasser_skill_tier_1")
+	else 
+		disable_info("trespasser_skill_tier_1")
+	end
+end
+
+Adventurer = {}
+function Adventurer.apply_bonus(n,add_actor_condition)
+	if n >= 3 then 
+		give_info("adventurer_skill_tier_3")
+	else 
+		disable_info("adventurer_skill_tier_3")
+	end
+end
+
+Loner = {}
+function Loner.apply_bonus(n,add_actor_condition)
+	if n >= 1 then -- xp gain increased by 5%
+		give_info("loner_skill_tier_1")
+	else 
+		disable_info("loner_skill_tier_1")
+	end
+	
+	if n >= 2 then 
+		give_info("loner_skill_tier_2")
+	else 
+		disable_info("loner_skill_tier_2")
+	end
+end
+
+Killer = {}
+function Killer.apply_bonus(n,add_actor_condition)
+	if n >= 1 then 
+		give_info("killer_skill_tier_1")
+	else 
+		disable_info("killer_skill_tier_1")
+	end
+end
+
+Explorer = {}
+function Explorer.apply_bonus(n,add_actor_condition)
+	if (n >= 1) then 
+		add_actor_condition("run_coef",0.15)
+		add_actor_condition("sprint_k",0.02)
+		add_actor_condition("max_walk_weight",3)
+	end 
+	
+	if (n >= 2) then
+		add_actor_condition("run_coef",0.15)
+		add_actor_condition("sprint_k",0.02)
+		add_actor_condition("max_walk_weight",3)
+	end
+	
+	if (n >= 3) then
+		add_actor_condition("run_coef",0.15)
+		add_actor_condition("sprint_k",0.02)
+		add_actor_condition("max_walk_weight",3)
+	end
+	
+	if (n >= 4) then
+		add_actor_condition("run_coef",0.15)
+		add_actor_condition("sprint_k",0.02)
+		add_actor_condition("max_walk_weight",3)
+	end
+	
+	if (n >= 5) then
+		add_actor_condition("run_coef",0.1)
+		add_actor_condition("sprint_k",0.02)
+		add_actor_condition("max_walk_weight",3)
+	end
+end
+
+Robber = {}
+function Robber.apply_bonus(n,add_actor_condition)
+
+end
+
