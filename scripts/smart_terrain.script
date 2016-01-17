@@ -1618,7 +1618,7 @@ function se_smart_terrain:try_respawn()
 					printf("call respawn failed for %s, check squad descriptions",sect_to_spawn)
 					return
 				end
-			elseif (sect_to_spawn_params.helicopter) then
+			elseif (sect_to_spawn_params.helicopter and axr_main.config:GetValue("mm_options","enable_heli_spawn",1,true)) then
 				local heli = sect_to_spawn_params.helicopter[math.random(1,#sect_to_spawn_params.helicopter)]
 				if (heli) then --if (heli and self.online) then
 					local pos = vector():set(level.get_bounding_volume().max.x,level.get_bounding_volume().min.y-50,level.get_bounding_volume().max.z)

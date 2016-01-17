@@ -153,8 +153,11 @@ function get_companion_count()
 	local count = 0
 	for i=1,max_actor_squad_size do
 		local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
-		if (c) then
+		local se_obj = c and alife():object(c)
+		if (se_obj and se_obj:alive()) then
 			count = count + 1
+		else 
+			alun_utils.save_var(db.actor,"companion_"..i,nil)
 		end
 	end
 	return count
@@ -165,7 +168,12 @@ function list_actor_squad_by_id()
 	for i=1,max_actor_squad_size do
 		local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
 		if (c) then
-			table.insert(t,c)
+			local se_obj = alife():object(c)
+			if (se_obj and se_obj:alive()) then
+				table.insert(t,c)
+			else 
+				alun_utils.save_var(db.actor,"companion_"..i,nil)
+			end
 		end
 	end
 	return t

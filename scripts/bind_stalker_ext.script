@@ -30,6 +30,12 @@ function actor_on_net_spawn()
 	end
 	--]]
 	
+	if (axr_main.config:GetValue("mm_options","enable_heli_spawn",1,true) == false) then 
+		for k,v in pairs(se_heli.se_helicopters) do 
+			alife():release(v,true)
+		end
+	end
+	
 	SendScriptCallback("on_game_load",binder)
 end
 
