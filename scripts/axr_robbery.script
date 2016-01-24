@@ -1,0 +1,47 @@
+-- Force wounded surrender on npc USE
+-- by alundaio
+
+local function npc_on_use(npc,who)
+	if not (who and who:id() == 0) then 
+		return 
+	end
+	
+	if not (has_alife_info("robber_skill_tier_5")) then 
+		return 
+	end
+	
+	if not (npc:relation(who) == game_object.enemy) then 
+		return
+	end
+	
+	if (IsStalker(npc) == false or character_community(npc) == "zombied" or character_community(npc) == "monolith") then
+		return
+	end
+	
+	local st = db.storage[npc:id()]
+	if (st == nil or st.victim_surrender ~= nil) then
+		return 
+	end
+	
+	local active_item = db.actor:active_item()
+	if (not active_item or not IsWeapon(active_item)) then
+		return
+	end
+	
+	st.victim_surrender = 0
+	st.surrender_state = "hands_up"
+	
+	npc:set_health_ex(0.10)
+	
+	local snd = sound_object([[characters_voice\human_02\bandit\fight\detour\detour_7]])
+	if (snd) then
+		snd:play(db.actor, 0, sound_object.s2d)
+	end
+	
+	--npc:stop_talk()
+end
+
+function on_game_start()
+	RegisterScriptCallback("npc_on_use",npc_on_use)
+end 
+

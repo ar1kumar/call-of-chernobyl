@@ -132,6 +132,9 @@ function action_wounded:execute()
 	local id = npc:id()
 	local po = db.storage[id].victim_surrender and level.object_by_id(db.storage[id].victim_surrender)
 	if (po and po:alive() and not alun_utils.load_var(npc,"victim_surrender",nil)) then
+		state_mgr.set_state(npc,db.storage[id].surrender_state or "prisoner",nil,nil,nil,{fast_set = true})
+		return
+	elseif (db.storage[id].victim_surrender == 65535 and db.storage[id].surrender_state) then 
 		state_mgr.set_state(npc,"prisoner",nil,nil,nil,{fast_set = true})
 		return
 	end
@@ -175,6 +178,11 @@ function action_wounded:finalize()
 --  xr_sound.set_sound(self.object, nil)
 	self.object:wounded(false)
 	self.object:movement_enabled(true)
+	local st = db.storage[self.object:id()]
+	if (st) then 
+		st.surrender_state = nil
+	--	st.victim_surrender = nil
+	end
 end
 
 ----------------------------------------------------------------------------------------------------------------------

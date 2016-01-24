@@ -373,6 +373,16 @@ function victim_is_bounty(a,b)
 	return false
 end 
 
+function npc_is_robbed(a,b)
+	local npc = who_is_npc(a, b)
+	local st = db.storage[npc:id()]
+	return st.surrender_state ~= nil
+end 
+
+function not_npc_is_robbed(a,b)
+	return not npc_is_robbed(a,b)
+end 	
+
 function npc_is_surrendered(a,b)
 	local npc = who_is_npc(a, b)
 	local st = db.storage[npc:id()]
@@ -492,6 +502,7 @@ function surrender_victim_answers_1(a,b)
 		elseif (r <= 0.5) then 
 			sec = "itm_pda_uncommon"
 		end
+		--relocate_money_to_actor(a,b,math.random(500,1000))
 		relocate_item_section_to_actor(a, b, sec, 1)
 		return game.translate_string("st_surrender_victim_answer_4")
 	elseif (r == 5) then

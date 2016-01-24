@@ -1309,7 +1309,7 @@ far_snd                        = nil
 far_victim                     = nil
 use                            = {=npc_surrendered} true, {=is_wounded} false, {!is_squad_commander} false, {=actor_enemy} false, {=has_enemy} false,  {=dist_to_actor_le(3)} true, false
 snd_on_use                     = {=is_wounded} nil, {=actor_enemy} nil, {!is_squad_commander} meet_use_no_talk_leader,  {=has_enemy} meet_use_no_fight, {=dist_to_actor_le(3)} meet_use_no_default, nil
-meet_dialog                    = {=npc_surrendered} dm_surrender_dialog, nil
+meet_dialog                    = {=npc_surrendered !npc_robbed} dm_surrender_dialog, {=npc_surrendered =npc_robbed} dm_robbery_dialog,nil
 abuse                          = {=has_enemy} false, true
 trade_enable                   = {=actor_enemy} false, true
 allow_break                    = true
@@ -1327,7 +1327,7 @@ far_snd                        = nil
 far_victim                     = nil
 use                            = {=npc_surrendered} true, {=is_wounded} false, {!is_squad_commander} false, {=actor_enemy} false, {=has_enemy} false,  {=dist_to_actor_le(3)} true, false
 snd_on_use                     = {=is_wounded} nil, {=actor_enemy} nil, {!is_squad_commander} meet_use_no_talk_leader,  {=has_enemy} meet_use_no_fight, {=dist_to_actor_le(3)} meet_use_no_default, nil
-meet_dialog                    = {=npc_surrendered} dm_surrender_dialog, nil
+meet_dialog                    = {=npc_surrendered !npc_robbed} dm_surrender_dialog, {=npc_surrendered =npc_robbed} dm_robbery_dialog,nil
 abuse                          = {=has_enemy} false, true
 trade_enable                   = true
 allow_break                    = true

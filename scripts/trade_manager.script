@@ -50,7 +50,7 @@ function update(npc)
 	if (npc:is_talking()) then
 		local n = tonumber(xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_item_condition_factor))
 		tt.current_buy_item_condition_factor = n
-		if (db.actor:had_info("scavenger_skill_tier_1")) then 
+		if (has_alife_info("scavenger_skill_tier_1")) then 
 			if (n - 0.10 >= 0) then 
 				n = n - 0.10
 			else 

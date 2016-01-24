@@ -2137,7 +2137,12 @@ end
 -- Returns true if calling NPC has the surrender flag to actor
 function npc_surrendered(actor,npc,p)
 	local st = db.storage[npc:id()]
-	return st and st.victim_surrender == db.actor:id() or false
+	return st and st.victim_surrender == db.actor:id() and IsWounded(npc) and alun_utils.load_var(npc,"victim_surrender",false) == false or false
+end
+
+function npc_robbed(actor,npc,p)
+	local st = db.storage[npc:id()]
+	return st and st.surrender_state ~= nil
 end
 
 -- Returns true if calling NPC has the surrender flag

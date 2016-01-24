@@ -113,6 +113,11 @@ function action.debug_test(p)
 		
 		ui_rpg_char_menu.char_list(nil,"Scavenger", "Trespasser", "Adventurer", "Loner", "Explorer", "Robber")
 		
+		local wpn = db.actor:item_in_slot(0)
+		if (wpn) then
+			wpn:play_hud_motion("knife_kick_2",true,wpn:get_state())
+		end
+		
 		-- RELEASES TASK GIVER FOR ALL TASKS WITH task_giver_id; useful for testing how a task works when giver is dead
 		--[[
 		local debug_task_infos = task_manager.get_task_manager().task_info

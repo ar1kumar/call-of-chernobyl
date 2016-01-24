@@ -188,7 +188,7 @@ end
 function set_weapon_drop_condition(item)
 	local condition = 0
 	
-	if (db.actor:has_info("scavenger_skill_tier_3")) then 
+	if (has_alife_info("scavenger_skill_tier_3")) then 
 		condition = (math.random(50)+40)/100
 	else 
 		condition = (math.random(35)+25)/100
@@ -208,7 +208,7 @@ function create_items(npc, section, number, rnd)
 
 	--printf("death_dropped: create %s=%s",section,number)
 	if _G.ammo_section[section] == true then
-		if (db.actor:has_info("scavenger_skill_tier_2")) then
+		if (has_alife_info("scavenger_skill_tier_2")) then
 			if (math.random(100) < 40) then 
 				number = number + math.random(10,25)
 			end
@@ -217,7 +217,7 @@ function create_items(npc, section, number, rnd)
 			create_ammo(section,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id(),number)
 		end
 	else
-		if (db.actor:has_info("scavenger_skill_tier_5")) then
+		if (has_alife_info("scavenger_skill_tier_5")) then
 			number = number + math.random(0,1)
 		end
 		for i=1,number do

@@ -1,7 +1,7 @@
 -- Dynamic Skill tree system for CoC
 -- by Alundaio
 
---list = { "Scavenger", "Trespasser", "Adventurer", "Loner", "Killer", "Explorer", "Robber" }
+active_modifiers = { ["luminocity_mod"] = 0, ["velocity_mod"] = 0 }
 
 function apply_bonuses(skill_list)
 	local actor_condition = {}
@@ -25,6 +25,7 @@ function apply_bonuses(skill_list)
 	local run_coef = db.actor:get_actor_run_coef()
 	local jump_speed = db.actor:get_actor_jump_speed() 
 	local runback_k = db.actor:get_actor_runback_coef()
+	local luminocity_mod, velocity_mod = 0,0
 	for ac,v in pairs(actor_condition) do 
 		if (ac == "max_item_mass") then 
 			max_weight = max_weight + v
@@ -38,6 +39,10 @@ function apply_bonuses(skill_list)
 			runback_k = runback_k + v
 		elseif (ac == "max_walk_weight") then 
 			max_walk_weight = max_walk_weight + v
+		elseif (ac == "luminocity_mod") then 
+			luminocity_mod = luminocity_mod + v
+		elseif (ac == "velocity_mod") then 
+			velocity_mod = velocity_mod + v
 		end
 	end
 	db.actor:set_actor_max_weight(max_weight)
@@ -46,6 +51,8 @@ function apply_bonuses(skill_list)
 	db.actor:set_actor_run_coef(run_coef)
 	db.actor:set_actor_jump_speed(jump_speed)
 	db.actor:set_actor_runback_coef(runback_k)
+	active_modifiers.luminocity_mod = luminocity_mod
+	active_modifiers.velocity_mod = velocity_mod
 end
 
 Scavenger = {}
@@ -72,7 +79,7 @@ function Scavenger.apply_bonus(n,add_actor_condition)
 		add_actor_condition("max_item_mass",15)
 	end
 
-	if n >= 5 then -- chance to spawn more items in death_manager.script
+	if n >= 5 then -- chance to spawn more items in death_manager.script and xr_box.script
 		give_info("scavenger_skill_tier_5")
 	else 
 		disable_info("scavenger_skill_tier_5")
@@ -82,9 +89,21 @@ end
 Trespasser = {}
 function Trespasser.apply_bonus(n,add_actor_condition)
 	if n >= 1 then 
-		give_info("trespasser_skill_tier_1")
-	else 
-		disable_info("trespasser_skill_tier_1")
+		add_actor_condition("luminocity_mod",0.03)
+	end
+	if n >= 2 then 
+		add_actor_condition("velocity_mod",0.35)
+	end
+	if n >= 3 then 
+		add_actor_condition("luminocity_mod",0.03)
+	end
+	if n >= 4 then 
+		add_actor_condition("velocity_mod",0.35)
+	end
+	if n >= 5 then
+		give_info("trespasser_skill_tier_5")
+	else
+		disable_info("trespasser_skill_tier_5")
 	end
 end
 
@@ -156,6 +175,10 @@ end
 
 Robber = {}
 function Robber.apply_bonus(n,add_actor_condition)
-
+	if (n >= 5) then
+		give_info("robber_skill_tier_5")
+	else 
+		disable_info("robber_skill_tier_5")
+	end
 end
 

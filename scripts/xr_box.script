@@ -84,6 +84,9 @@ function ph_item_box:spawn_items()
 	for k,v in pairs(spawn_items) do
 		if (v > 0) then
 			local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
+			if (has_alife_info("scavenger_skill_tier_5")) then
+				number = number + math.random(0,1)
+			end
 			if (number > 0) then
 				create_items(self.obj, k, number, v, found)
 			end
