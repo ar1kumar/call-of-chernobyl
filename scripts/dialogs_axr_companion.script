@@ -283,7 +283,10 @@ function become_actor_companion(actor,npc)
 
 	if not (squad) then
 		axr_companions.add_to_actor_squad(npc)
-		npc:switch_offline()
+		local se_npc = alife():object(npc:id())
+		if (se_npc) then
+			se_npc:switch_offline()
+		end
 		return
 	end
 	

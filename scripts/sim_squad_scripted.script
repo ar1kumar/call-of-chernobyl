@@ -625,6 +625,10 @@ function sim_squad_scripted:create_npc(spawn_smart,only_one)
 	local ini = system_ini()
 	local settings_id = self:section_name()
 	local spawn_sections = utils.parse_names(utils.cfg_get_string(ini, settings_id, "npc", self, false, "", ""))
+	
+	if not (SIM_PASSIVE_SQUAD_COUNT) then 
+		only_one = false 
+	end
 
 	local spawn_point, base_spawn_position, base_lvi, base_gvi, spawn_vid
 	if (spawn_smart) then 

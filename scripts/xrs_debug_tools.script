@@ -840,7 +840,7 @@ function stalker_data_hud_show(hud)
 		hud:add_msg("Out Rest.",stalker_data.base_out_restrictors)
 		hud:add_msg("In Rest.",stalker_data.base_in_restrictors)
 		hud:add_msg("luminocity_hemi",obj.get_luminocity_hemi and obj:get_luminocity_hemi())
-		hud:add_msg("luminocity",obj.get_luminocity_hemi and obj:get_luminocity())
+		hud:add_msg("luminocity",obj.get_luminocity and obj:get_luminocity())
 	end
 	hud:display()
 end
@@ -1000,7 +1000,7 @@ function position_hud_show(hud)
 	
 	hud:add_msg("","------ MISC. ------")
 	hud:add_msg("luminocity_hemi",db.actor.get_luminocity_hemi and db.actor:get_luminocity_hemi())
-	hud:add_msg("luminocity",db.actor.get_luminocity_hemi and db.actor:get_luminocity())
+	hud:add_msg("luminocity",db.actor.get_luminocity and db.actor:get_luminocity())
 	__tmr_pos_hud = not __tmr_pos_hud and time_global()+5000 or __tmr_pos_hud
 	if (time_global() > __tmr_pos_hud) then
 		__tmr_pos_hud = nil
