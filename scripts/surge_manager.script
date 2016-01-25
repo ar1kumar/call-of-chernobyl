@@ -520,7 +520,7 @@ function CSurgeManager:update()
 					end
 					self:launch_rockets()
 
-					if (atmosfear == nil or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_blowout_task",0,"give")=="give") then
+					if (atmosfear == nil or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_blowout_task",0,"give")=="give") and (not character_community(db.actor) == "actor_monolith") then
 						self:give_surge_hide_task()
 					end
 					self.task_given = true

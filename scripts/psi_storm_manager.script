@@ -272,7 +272,7 @@ function CPsiStormManager:update()
 			end
 			-- psi storm warning -----------------------------------------------------------------------------------------------------------------------------------------
 			if (diff_sec>=12) and not(self.task_given) then
-				if atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_task",0,"give")=="give" then
+				if not character_community(db.actor) == "actor_monolith" and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_task",0,"give")=="give" then
 					self:give_psi_storm_hide_task()
 				end
 				self.task_given = true
