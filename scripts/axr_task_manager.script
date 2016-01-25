@@ -130,7 +130,7 @@ function get_first_finished_task(npc,is_sim)
 	local count = 1
 	while (task_manager.task_ini:section_exist(task_id)) do
 	--	printf("get_first_finished_task task_id=%s",task_id)
-		if (task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","float",254)) then
+		if (db.actor:get_task(task_id, true) ~= nil and task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","float",254)) then
 			--printf("get_first_finished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
 			if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
 				if (is_sim and task_info[task_id].task_giver_id) then 
@@ -153,7 +153,8 @@ end
 
 function set_finished_task_complete(npc,is_sim)
 	local task_id = get_first_finished_task(npc,is_sim)
-	if not (task_id) then 
+	if not (task_id) then
+		printf("WARNING: axr_task_manager.set_finished_task_complete: no task %s",task_id)
 		return 
 	end 
 
