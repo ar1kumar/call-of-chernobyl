@@ -85,8 +85,9 @@ function update(npc)
 		--printf("TRADE [%s]: current = %s   sell = %s", npc:name(), tostring(tt.current_sell_condition), tostring(str))
 	end
 
-	str = tonumber(xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_item_condition_factor))
-	if tt.current_buy_item_condition_factor ~= str then
+	str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_item_condition_factor)
+	str = str and str ~= "" and tonumber(str)
+	if str and tt.current_buy_item_condition_factor ~= str then
 		npc:buy_item_condition_factor(str)
 		tt.current_buy_item_condition_factor = str
 	end
