@@ -846,7 +846,7 @@ function CSurgeManager:update()
 							if fate=="killatend" then
 								self:kill_all_unhided()
 							else
-								if(xr_logic.pick_section_from_condlist(db.actor, nil, self.survive)~="true") then
+								if(xr_logic.pick_section_from_condlist(db.actor, nil, self.survive)~="true" and not character_community(db.actor) == "actor_monolith") then
 									if (atmosfear == nil) or not(atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_god_mode",1,false)) then
 										if not (get_console():get_bool("g_god") or has_alife_info("actor_marked_by_zone_3_times")) then 
 											self:kill_actor_at_pos(wave_pos.z)
