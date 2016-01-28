@@ -48,7 +48,7 @@ function sim_squad_scripted:init_squad()
 	self.death_condlist		= xr_logic.parse_condlist(self, "death_condlist", "on_death", utils.cfg_get_string(sys_ini, settings_id, "on_death", self, false, "", ""))
 	self.invulnerability	= xr_logic.parse_condlist(self, "invulnerability", "invulnerability", utils.cfg_get_string(sys_ini, settings_id, "invulnerability", self, false, "", ""))
 	
-	local rel 				= utils.cfg_get_string(sys_ini, settings_id, "relationship", self, false, "")
+	local rel 				= utils.cfg_get_string(sys_ini, settings_id, "relationship", self, false, nil)
 	self.relationship_condlist = rel and xr_logic.parse_condlist(self, settings_id, "relationship",rel)
 	
 	if (self.relationship_condlist) then 
@@ -213,13 +213,15 @@ function sim_squad_scripted:update()
 	self.dtimer = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
 	--
 	
-	if (SIM_PASSIVE_SQUAD_COUNT and self:npc_count() == 1 and not self.check_size and not get_object_story_id(self.id)) then
+	if (SIM_PASSIVE_SQUAD_COUNT and not self.check_size and not get_object_story_id(self.id)) then
 		self.check_size = true
-		local gg = game_graph()
-		local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
-		local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
-		if (level == actor_level) then
-			self:create_npc()
+		if (self:npc_count() == 1) then
+			local gg = game_graph()
+			local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
+			local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
+			if (level == actor_level) then
+				self:create_npc()
+			end
 		end
 	end
 

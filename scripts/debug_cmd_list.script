@@ -160,6 +160,20 @@ function cmd.reload_system_ini(me,text,owner,p)
 	return "reload_system_ini:= failure, engine does not have this function!"
 end
 
+-- Relations
+function cmd.relations(me,txt,owner,p)
+	owner:SendOutput("Stalker = %s",relation_registry.community_goodwill("stalker", 0))
+	owner:SendOutput("Bandit = %s",relation_registry.community_goodwill("bandit", 0))
+	owner:SendOutput("Mercenary = %s",relation_registry.community_goodwill("killer", 0))
+	owner:SendOutput("CSky = %s",relation_registry.community_goodwill("csky", 0))
+	owner:SendOutput("Freedom = %s",relation_registry.community_goodwill("freedom", 0))
+	owner:SendOutput("Duty = %s",relation_registry.community_goodwill("dolg", 0))
+	owner:SendOutput("Army = %s",relation_registry.community_goodwill("army", 0))
+	owner:SendOutput("Monolith = %s",relation_registry.community_goodwill("monolith", 0))
+	owner:SendOutput("Ecolog = %s",relation_registry.community_goodwill("ecolog", 0))
+	return "relations:= command finished"
+end 
+
 -- Community
 function cmd.community(me,txt,owner,p)
 	local wrd = check_and_set_help(me,txt,owner,"<community>")
