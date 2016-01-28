@@ -1556,6 +1556,7 @@ function task_hud_show(hud)
 		local smart_id = alun_utils.load_var(db.actor,k.."_id")
 		local smart = smart_id and alife():object(smart_id)
 		
+		hud:add_msg("Has CTaskObject",v.t ~= nil)
 		if (v.status ~= "selected") then
 			hud:add_msg("Status",v.status)
 		end

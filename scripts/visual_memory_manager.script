@@ -6,23 +6,7 @@
 -- warning npc and who can be nil sometimes
 function get_visible_value(npc,who,time_delta,time_quant,luminocity,velocity_factor,velocity,distance,object_distance,always_visible_distance)
 	distance = distance <= 0 and 0.00001 or distance
-	
-	-- RPG feature active_modifiers for stealth gameplay
-	if (who and who:id() == 0) then
-		velocity = velocity - skill_trees.active_modifiers.velocity_mod
-		velocity = velocity < 0 and 0 or velocity
-		
-		if (luminocity <= 0.3) then -- only subtract mod during low light levels
-			luminocity = luminocity - skill_trees.active_modifiers.luminocity_mod
-			if (has_alife_info("trespasser_skill_tier_5") and velocity == 0) then 
-				luminocity = luminocity - 0.05
-			end
-		end
-		
-		luminocity = luminocity <= 0 and 0.0001 or luminocity
-
-		--printf("luminocity=%s velocity=%s",luminocity,velocity)
-	end
+	luminocity = luminocity <= 0 and 0.0001 or luminocity
 	
 	-- unaltered formula
 	-- time_delta / time_quant * luminocity * (1 + velocity_factor*velocity) * (distance - object_distance) / (distance - always_visible_distance)

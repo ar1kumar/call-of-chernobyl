@@ -319,7 +319,13 @@ function simulation_board:fill_start_position()
 
 	local n, result, id, value, smart, smrt_names, section_name, squad
 	
-	local setting_ini = ini_file("misc\\simulation.ltx")
+	local setting_ini
+	if (IsSurvivalMode()) then 
+		setting_ini = ini_file("misc\\simulation_survival_mode.ltx")
+	else 
+		setting_ini = ini_file("misc\\simulation.ltx")
+	end 
+	
 	for level in gg:levels() do
 		section_name = "start_position_" .. sim:level_name(level.id)
 		if setting_ini:section_exist(section_name) then

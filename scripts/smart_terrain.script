@@ -9,7 +9,6 @@ local STEP_SIZE 			= 5
 local STEP_SIZE_OFFLINE 	= 1
 local ALLOW_USE_MARSHAL 	= false
 
-
 ------------------------------------------
 local level,alife,game_graph,math,pairs,tostring,tonumber = level,alife,game_graph,math,pairs,tostring,tonumber
 ------------------------------------------
@@ -1211,7 +1210,7 @@ function se_smart_terrain:show()
 		return
 	end
 	self.showtime = tg
-	
+
 	if (self.props and self.props.lair > 0 and has_alife_info("adventurer_skill_tier_1") and level.map_has_object_spot(self.id,"alife_presentation_faction_monster") == 0) then 
 		level.map_add_object_spot(self.id,"alife_presentation_faction_monster","Mutant lair")
 		return 
@@ -1236,11 +1235,11 @@ function se_smart_terrain:show()
 		return
 	end
 
-	if(self.smrt_showed_spot~=nil) then
+		if(self.smrt_showed_spot~=nil) then
 		level.map_remove_object_spot(self.id, "alife_presentation_smart_default_"..self.smrt_showed_spot)
-	end
+		end
 	level.map_add_object_spot(self.id, "alife_presentation_smart_default_"..spot, self:get_smart_props())
-	self.smrt_showed_spot = spot
+		self.smrt_showed_spot = spot
 end
 
 function se_smart_terrain:hide()
@@ -1613,7 +1612,14 @@ function se_smart_terrain:try_respawn()
 			local sect_to_spawn_params = self.respawn_params[sect_to_spawn]
 			
 			if (sect_to_spawn_params.squads) then
-				local squad = has_alife_info("actor_made_wish_for_control") and SIMBOARD:create_squad(self, "simulation_controller_psy") or SIMBOARD:create_squad(self, sect_to_spawn_params.squads[math.random(1,#sect_to_spawn_params.squads)])
+				local squad
+				if (IsSurvivalMode()) then
+					local t = {"simulation_zombie","simulation_zombie","simulation_zombie","simulation_zombie","simulation_zombie","zombied_sim_squad_novice","zombied_sim_squad_advanced","zombied_sim_squad_veteran","simulation_fracture","simulation_snork"}
+					squad = SIMBOARD:create_squad(self, t[math.random(#t)])
+				else 
+					squad = has_alife_info("actor_made_wish_for_control") and SIMBOARD:create_squad(self, "simulation_controller_psy") or SIMBOARD:create_squad(self, sect_to_spawn_params.squads[math.random(1,#sect_to_spawn_params.squads)])
+				end
+				
 				if (squad) then
 					squad.respawn_point_id = self.id
 					squad.respawn_point_prop_section = sect_to_spawn

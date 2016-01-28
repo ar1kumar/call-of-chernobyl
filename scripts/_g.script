@@ -2,7 +2,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.2.32"
+GAME_VERSION = "1.2.35"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -253,6 +253,9 @@ function TeleportSquad(squad,pos,lvid,gvid)
 	end
 end 
 
+function IsSurvivalMode()
+	return axr_main.config:GetValue("temp","new_game_survival_mode",1) == true or alife_storage_manager.get_state().enable_survival_mode == true
+end
 --------------------------------------------------------------------
 -- Serialization of userdata for Marshal Library
 --------------------------------------------------------------------
@@ -1088,7 +1091,16 @@ ammo_section["ammo_12x70_buck"] = true
 ammo_section["ammo_12x76_zhekan"] = true
 ammo_section["ammo_9x39_pab9"] = true
 ammo_section["ammo_5.56x45_ss190"] = true
-
+-- STCOC
+ammo_section["ammo_9x39_sp5"] = true
+ammo_section["ammo_7.62x25_p"] = true
+ammo_section["ammo_7.62x25_ps"] = true
+ammo_section["ammo_7.62x39_ap"] = true
+ammo_section["ammo_7.62x51_ap"] = true
+ammo_section["ammo_12.7x55_fmj"] = true
+ammo_section["ammo_50ae"] = true
+ammo_section["ammo_338_lapua"] = true
+ammo_section["ammo_50bmg"] = true
 
 quest_section = {}
 -- преобразует строку в соответствии со значением

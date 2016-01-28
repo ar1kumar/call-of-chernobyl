@@ -28,8 +28,9 @@ local function on_fighting_actor(npc)
 	if (db.actor:has_info("axr_has_companion")) then
 		for i=1,max_actor_squad_size do
 			local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
-			if (c) then
-				alun_utils.set_squad_relation_to_squad(level.object_by_id(c),npc,game_object.enemy)
+			local obj = c and level.object_by_id(c)
+			if (obj) then
+				alun_utils.set_squad_relation_to_squad(obj,npc,game_object.enemy)
 			end
 		end
 	end

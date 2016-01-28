@@ -114,6 +114,43 @@ function CGeneralTask:get_icon_name()
 	return self.icon
 end
 
+-- This is a retroactive fix to a task issue
+function CGeneralTask:reset_task_on_load()
+	if (db.actor:get_task(self.id, true)) then 
+		return -- NO don't create if task exists already!
+	end 
+	
+	local t = CGameTask()
+	t:set_id(tostring(self.id))
+	if(self.storyline) then
+		t:set_type(task.storyline)
+	else
+		t:set_type(task.additional)
+	end
+	t:set_title(self.current_title)
+	t:set_description(self.current_descr)
+	t:set_priority(self.prior)
+	t:set_icon_name(self.icon)
+	t:add_complete_func("task_manager.task_complete")
+	t:add_fail_func("task_manager.task_fail")
+	db.actor:give_task(t, time*10, false, time)
+	if self.current_target ~= nil then
+		t:set_map_location(self.spot)
+		t:set_map_object_id(self.current_target)
+
+		if(self.storyline) then
+			level.map_add_object_spot(self.current_target, "ui_storyline_task_blink", "")
+		else
+			level.map_add_object_spot(self.current_target, "ui_secondary_task_blink", "")
+		end
+	end
+	local time = 0
+	if self.wait_time ~= nil then
+		time = self.wait_time
+	end
+	self.t = t
+end 
+
 --' Выдача квеста
 function CGeneralTask:give_task()
 	local t = db.actor and db.actor:get_task(self.id, true) or CGameTask()
@@ -404,14 +441,16 @@ function CGeneralTask:load(packet)
 end
 
 function CGeneralTask:save_state(m_data)
-	if not (m_data.task_objects) then
-		m_data.task_objects = {}
-	end
+	if (self.t == nil) then
+		if (self.repeat_timeout == nil or self.timeout == nil) then 
+			return 
+		end
+		if (game.get_game_time():diffSec(self.timeout) > self.repeat_timeout) then 
+			return
+		end
+	end 
 	
-	if not (m_data.task_objects[self.id]) then 
-		m_data.task_objects[self.id] = {}
-	end
-	
+	m_data.task_objects[self.id] = {}
 	m_data.task_objects[self.id].status = self.status
 	m_data.task_objects[self.id].timeout = self.timeout
 	m_data.task_objects[self.id].inited_time = self.inited_time
@@ -420,13 +459,12 @@ function CGeneralTask:save_state(m_data)
 	m_data.task_objects[self.id].current_target = self.current_target
 	m_data.task_objects[self.id].stage = self.stage
 	m_data.task_objects[self.id].task_giver_id = self.task_giver_id
-	
 	--printf("task_objects: %s save state",self.id)
 end 
 
 function CGeneralTask:load_state(m_data)
 	if not (m_data.task_objects and m_data.task_objects[self.id]) then 
-		return 
+		return false
 	end 
 	
 	self.status = m_data.task_objects[self.id].status
@@ -441,5 +479,5 @@ function CGeneralTask:load_state(m_data)
 	
 	self.loaded = true
 	
-	--printf("task_objects: loaded persistent state %s  [status=%s]",self.id)
+	return true
 end 
