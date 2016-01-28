@@ -213,7 +213,7 @@ function sim_squad_scripted:update()
 	self.dtimer = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
 	--
 	
-	if (SIM_PASSIVE_SQUAD_COUNT and self:npc_count() == 1 and self.dist_to_actor >= 150 and not self.check_size and not get_object_story_id(self.id)) then
+	if (SIM_PASSIVE_SQUAD_COUNT and self:npc_count() == 1 and not self.check_size and not get_object_story_id(self.id)) then
 		self.check_size = true
 		local gg = game_graph()
 		local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
