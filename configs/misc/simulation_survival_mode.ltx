@@ -1,0 +1,746 @@
+[sim_faction]
+GroupControlSection	= 
+$spawn 			= "ai\DO_NOT_USE"
+class			= SCRIPTZN
+;script_binding	= bind_faction.bind
+
+shape_transp_color		= 0, 0, 255, 60 ;0x1800FF00
+shape_edge_color		= 32, 32, 32, 255 ;0xFF202020
+
+
+[smart_terrain]
+GroupControlSection	= 
+$spawn 			= "ai\smart_terrain"
+;$prefetch 		= 4
+$def_sphere		= 2
+class			= SMRTTRRN
+script_binding	= bind_smart_terrain.bind
+
+shape_transp_color		= 100, 100, 180, 60 ;0x1800FF00
+shape_edge_color		= 32, 32, 32, 255 ;0xFF202020
+
+
+[smart_terrain_stay_time]
+quick   = 2,  5
+medium  = 6,  8
+long    = 12, 14
+default = 10000, 10001
+
+
+
+;in the sections of simulation.ltx [start_position_<name of the level>]
+;write a line below: <id_squad> = <name_of_the_smart>
+
+;;;;;;;;;;;;;;;;;;;;;; MARSH ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[start_position_k00_marsh]
+;unique squads
+mar_doctor_squad = mar_smart_terrain_base
+mar_smart_terrain_base_dog_doctor_squad = mar_smart_terrain_base
+mar_base_stalker_barmen_squad = mar_smart_terrain_base
+mar_base_owl_stalker_trader_squad = mar_smart_terrain_base
+mar_base_stalker_tech_squad = mar_smart_terrain_base
+mar_smart_terrain_base_lager_squad = mar_smart_terrain_base
+mar_smart_terrain_base_stalker_guide_marsh_squad = mar_smart_terrain_base
+
+;sim squads
+zombied_sim_squad_novice = mar_smart_terrain_base
+zombied_sim_squad_advanced = mar_smart_terrain_base
+zombied_sim_squad_veteran = mar_smart_terrain_base
+simulation_zombie = mar_smart_terrain_10_10
+zombied_sim_squad_novice = mar_smart_terrain_10_5
+zombied_sim_squad_advanced = mar_smart_terrain_10_5
+zombied_sim_squad_veteran = mar_smart_terrain_10_5
+zombied_sim_squad_veteran = mar_smart_terrain_10_5
+simulation_fracture = mar_smart_terrain_10_7
+zombied_sim_squad_novice = mar_smart_terrain_11_11
+zombied_sim_squad_advanced = mar_smart_terrain_11_11
+zombied_sim_squad_novice = mar_smart_terrain_11_11
+simulation_fracture = mar_smart_terrain_11_3
+zombied_sim_squad_novice = mar_smart_terrain_12_2
+zombied_sim_squad_advanced = mar_smart_terrain_12_2
+zombied_sim_squad_novice = mar_smart_terrain_12_2
+simulation_bloodsucker = mar_smart_terrain_3_10
+zombied_sim_squad_novice = mar_smart_terrain_3_3
+zombied_sim_squad_advanced = mar_smart_terrain_3_3
+simulation_fracture = mar_smart_terrain_3_7
+zombied_sim_squad_novice = mar_smart_terrain_4_5
+zombied_sim_squad_advanced = mar_smart_terrain_4_5
+zombied_sim_squad_veteran = mar_smart_terrain_4_5
+zombied_sim_squad_veteran = mar_smart_terrain_4_5
+simulation_bloodsucker = mar_smart_terrain_4_7
+zombied_sim_squad_novice = mar_smart_terrain_5_12
+zombied_sim_squad_advanced = mar_smart_terrain_5_12
+zombied_sim_squad_veteran = mar_smart_terrain_5_12
+zombied_sim_squad_novice = mar_smart_terrain_5_8
+zombied_sim_squad_advanced = mar_smart_terrain_5_8
+zombied_sim_squad_veteran = mar_smart_terrain_5_8
+simulation_fracture = mar_smart_terrain_6_10
+simulation_fracture = mar_smart_terrain_6_4
+simulation_zombie = mar_smart_terrain_6_7
+simulation_fracture = mar_smart_terrain_6_8
+simulation_fracture = mar_smart_terrain_7_3
+simulation_fracture = mar_smart_terrain_7_7
+zombied_sim_squad_novice = mar_smart_terrain_8_11
+zombied_sim_squad_advanced = mar_smart_terrain_8_11
+zombied_sim_squad_veteran = mar_smart_terrain_8_11
+simulation_snork = mar_smart_terrain_8_4
+simulation_snork = mar_smart_terrain_8_8
+simulation_fracture = mar_smart_terrain_8_9
+zombied_sim_squad_advanced = mar_smart_terrain_6_11
+zombied_sim_squad_novice = mar_smart_terrain_6_11
+
+[start_position_k01_darkscape]
+zombied_sim_squad_veteran = ds_grverfer2
+zombied_sim_squad_novice = ds_deb1
+simulation_bloodsucker = ds_kem1
+zombied_sim_squad_novice = ds_kem2
+zombied_sim_squad_advanced = ds_kem2
+zombied_sim_squad_veteran = ds_kem2
+simulation_fracture = ds_kem3
+simulation_zombie = ds_ptr
+simulation_fracture = ds_ptr
+simulation_fracture = ds_ptr2
+simulation_fracture = ds_ptr3
+simulation_snork = ds_ptr4
+simulation_boar = ds_boars_nest
+zombied_sim_squad_novice = ds2_domik_st
+zombied_sim_squad_advanced = ds2_domik_st
+zombied_sim_squad_novice = ds2_lager_st
+zombied_sim_squad_advanced = ds2_lager_st
+simulation_fracture = ds2_st_dogs
+simulation_fracture = ds2_st_hoofs
+
+[start_position_l01_escape]
+;unique squads
+esc_2_12_stalker_wolf_squad = esc_smart_terrain_2_12
+esc_2_12_stalker_nimble_squad = esc_smart_terrain_2_12
+esc_2_12_stalker_fanat_squad = esc_smart_terrain_2_12
+esc_smart_terrain_5_7_loner_mechanic_stalker_squad = esc_smart_terrain_5_7
+;sim squads
+zombied_sim_squad_veteran = esc_smart_terrain_3_16
+zombied_sim_squad_novice = esc_smart_terrain_3_16
+zombied_sim_squad_advanced = esc_smart_terrain_3_16
+zombied_sim_squad_veteran = esc_smart_terrain_3_16
+zombied_sim_squad_novice = esc_smart_terrain_1_11
+simulation_stalker = esc_smart_terrain_2_12
+zombied_sim_squad_novice = esc_smart_terrain_2_12
+zombied_sim_squad_advanced = esc_smart_terrain_2_12
+zombied_sim_squad_veteran = esc_smart_terrain_2_12
+simulation_fracture = esc_smart_terrain_2_14
+simulation_fracture = esc_smart_terrain_3_7
+simulation_fracture = esc_smart_terrain_4_11
+simulation_boar = esc_smart_terrain_4_13
+simulation_bloodsucker = esc_smart_terrain_4_9
+simulation_fracture = esc_smart_terrain_5_12
+zombied_sim_squad_novice = esc_smart_terrain_5_2
+zombied_sim_squad_advanced = esc_smart_terrain_5_2
+simulation_fracture = esc_smart_terrain_5_4
+simulation_fracture = esc_smart_terrain_5_6
+zombied_sim_squad_novice = esc_smart_terrain_5_7
+zombied_sim_squad_advanced = esc_smart_terrain_5_7
+zombied_sim_squad_veteran = esc_smart_terrain_5_7
+zombied_sim_squad_novice = esc_smart_terrain_5_9
+zombied_sim_squad_advanced = esc_smart_terrain_5_9
+zombied_sim_squad_novice = esc_smart_terrain_6_6
+zombied_sim_squad_advanced = esc_smart_terrain_6_6
+zombied_sim_squad_novice = esc_smart_terrain_6_8
+zombied_sim_squad_advanced = esc_smart_terrain_6_8
+zombied_sim_squad_novice = esc_smart_terrain_7_11
+zombied_sim_squad_advanced = esc_smart_terrain_7_11
+simulation_fracture = esc_smart_terrain_8_10
+simulation_boar = esc_smart_terrain_8_10
+simulation_fracture = esc_smart_terrain_8_9
+simulation_fracture = esc_smart_terrain_8_9
+simulation_fracture = esc_smart_terrain_9_7
+
+[start_position_l02_garbage]
+zombied_sim_squad_novice = gar_smart_terrain_1_5
+zombied_sim_squad_novice = gar_smart_terrain_1_7
+zombied_sim_squad_advanced = gar_smart_terrain_1_7
+zombied_sim_squad_novice = gar_smart_terrain_2_4
+zombied_sim_squad_novice = gar_smart_terrain_3_5
+zombied_sim_squad_advanced = gar_smart_terrain_3_5
+zombied_sim_squad_veteran = gar_smart_terrain_3_5
+zombied_sim_squad_novice = gar_smart_terrain_3_7
+zombied_sim_squad_advanced = gar_smart_terrain_3_7
+simulation_fracture = gar_smart_terrain_4_2
+simulation_fracture = gar_smart_terrain_4_5
+zombied_sim_squad_novice = gar_smart_terrain_5_2
+zombied_sim_squad_advanced = gar_smart_terrain_5_2
+simulation_bloodsucker = gar_smart_terrain_5_4
+simulation_fracture = gar_smart_terrain_5_5
+zombied_sim_squad_novice = gar_smart_terrain_5_6
+zombied_sim_squad_advanced = gar_smart_terrain_5_6
+simulation_fracture = gar_smart_terrain_6_1
+simulation_fracture = gar_smart_terrain_6_3
+simulation_bloodsucker = gar_smart_terrain_6_6
+simulation_fracture = gar_smart_terrain_6_7
+simulation_fracture = gar_smart_terrain_7_4
+simulation_boar = gar_smart_terrain_8_5
+
+[start_position_l03_agroprom]
+simulation_snork = agr_smart_terrain_1_2
+simulation_fracture = agr_smart_terrain_1_3
+agr_smart_terrain_1_6_army_trader_stalker_squad = agr_smart_terrain_1_6
+agr_smart_terrain_1_6_army_mechanic_stalker_squad = agr_smart_terrain_1_6
+zombied_sim_squad_novice = agr_smart_terrain_1_6
+zombied_sim_squad_advanced = agr_smart_terrain_1_6
+zombied_sim_squad_veteran = agr_smart_terrain_1_6
+zombied_sim_squad_veteran = agr_smart_terrain_1_6
+zombied_sim_squad_novice = agr_smart_terrain_1_6_near_1
+zombied_sim_squad_advanced = agr_smart_terrain_1_6_near_1
+zombied_sim_squad_veteran = agr_smart_terrain_1_6_near_1
+zombied_sim_squad_veteran = agr_smart_terrain_1_6_near_1
+zombied_sim_squad_novice = agr_smart_terrain_1_6_near_2
+zombied_sim_squad_veteran = agr_smart_terrain_1_6_near_2
+zombied_sim_squad_advanced = agr_smart_terrain_1_6_near_2
+zombied_sim_squad_veteran = agr_smart_terrain_1_6_near_2
+simulation_bloodsucker = agr_smart_terrain_2_2
+zombied_sim_squad_novice = agr_smart_terrain_4_4
+zombied_sim_squad_advanced = agr_smart_terrain_4_4
+zombied_sim_squad_veteran = agr_smart_terrain_4_4
+simulation_bloodsucker = agr_smart_terrain_4_4_near_1
+simulation_zombie = agr_smart_terrain_4_4_near_2
+simulation_zombie = agr_smart_terrain_4_4_near_3
+simulation_fracture = agr_smart_terrain_4_6
+simulation_fracture = agr_smart_terrain_5_2
+simulation_fracture = agr_smart_terrain_5_3
+simulation_zombie = agr_smart_terrain_5_7
+simulation_fracture = agr_smart_terrain_6_4
+simulation_fracture = agr_smart_terrain_7_5
+
+
+[start_position_l04_darkvalley]
+zombied_sim_squad_novice = val_smart_terrain_1_2
+zombied_sim_squad_advanced = val_smart_terrain_1_2
+zombied_sim_squad_veteran = val_smart_terrain_1_2
+zombied_sim_squad_veteran = val_smart_terrain_1_2
+simulation_fracture = val_smart_terrain_3_0
+zombied_sim_squad_novice = val_smart_terrain_4_0
+zombied_sim_squad_advanced = val_smart_terrain_4_0
+simulation_zombie = val_smart_terrain_5_10
+simulation_fracture = val_smart_terrain_6_4
+simulation_fracture = val_smart_terrain_6_5
+zombied_sim_squad_veteran = val_smart_terrain_7_3
+zombied_sim_squad_advanced = val_smart_terrain_7_3
+zombied_sim_squad_novice = val_smart_terrain_7_3
+zombied_sim_squad_advanced = val_smart_terrain_7_4
+zombied_sim_squad_veteran = val_smart_terrain_7_4
+val_smart_terrain_7_4_bandit_trader_stalker_squad = val_smart_terrain_7_4
+val_smart_terrain_7_3_bandit_mechanic_stalker_squad = val_smart_terrain_7_3
+zat_b7_bandit_boss_sultan_squad = val_smart_terrain_7_5
+zombied_sim_squad_novice = val_smart_terrain_7_5
+zombied_sim_squad_veteran = val_smart_terrain_7_5
+zombied_sim_squad_advanced = val_smart_terrain_7_5
+zombied_sim_squad_novice = val_smart_terrain_8_6
+simulation_fracture = val_smart_terrain_8_7
+simulation_snork = val_smart_terrain_8_9
+simulation_snork = val_smart_terrain_9_10
+simulation_fracture = val_smart_terrain_9_2
+zombied_sim_squad_novice = val_smart_terrain_9_4
+simulation_fracture = val_smart_terrain_9_6
+
+;;;;;;;;;;;;;;;;;;;;;; BAR ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[start_position_l05_bar]
+;unique squads
+bar_visitors_barman_stalker_trader_squad = bar_visitors
+bar_visitors_garik_stalker_guard_squad = bar_visitors
+bar_visitors_zhorik_stalker_guard2_squad = bar_visitors
+bar_visitors_cardan_tech_squad = bar_visitors
+bar_duty_security_squad_leader_squad = bar_zastava
+bar_zastava_2_commander_squad = bar_zastava_2
+bar_dolg_general_zoneguard_stalker_squad = bar_dolg_general
+bar_dolg_general_petrenko_stalker_squad = bar_dolg_general
+;sim squads
+simulation_stalker = bar_visitors
+zombied_sim_squad_veteran = bar_visitors
+zombied_sim_squad_advanced = bar_visitors
+zombied_sim_squad_novice = bar_visitors
+zombied_sim_squad_novice = bar_visitors
+zombied_sim_squad_advanced = bar_visitors
+zombied_sim_squad_veteran = bar_visitors
+simulation_zombie = bar_zastava_dogs_lair
+simulation_fracture = bar_zastava_dogs_lair
+simulation_zombie = bar_zastava_dogs_lair_2
+simulation_fracture = bar_zastava_dogs_lair_2
+zombied_sim_squad_novice = bar_dolg_bunker
+zombied_sim_squad_advanced = bar_dolg_bunker
+zombied_sim_squad_veteran = bar_dolg_bunker
+zombied_sim_squad_novice = bar_dolg_general
+zombied_sim_squad_advanced = bar_dolg_general
+zombied_sim_squad_veteran = bar_dolg_general
+
+[start_position_l06_rostok]
+zombied_sim_squad_novice = ros_smart_killers1
+zombied_sim_squad_advanced = ros_smart_killers1
+zombied_sim_squad_veteran = ros_smart_killers1
+simulation_zombie = ros_smart_monster4
+simulation_zombie = ros_smart_monster4
+simulation_fracture = ros_smart_monster4
+simulation_fracture = ros_smart_monster5
+simulation_snork = ros_smart_monster5
+simulation_poltergeist_tele = ros_smart_monster5
+simulation_fracture = ros_smart_monster7
+simulation_zombie = ros_smart_poltergeist2
+simulation_fracture = ros_smart_poltergeist2
+simulation_poltergeist_tele = ros_smart_poltergeist2
+simulation_snork = ros_smart_snork1
+simulation_bloodsucker = ros_smart_snork1
+simulation_fracture = ros_smart_snork1
+zombied_sim_squad_novice = ros_smart_stalker_killers1
+zombied_sim_squad_advanced = ros_smart_stalker_killers1
+zombied_sim_squad_veteran = ros_smart_stalker_killers1
+zombied_sim_squad_advanced = ros_smart_stalker1
+zombied_sim_squad_veteran = ros_smart_stalker1
+
+[start_position_l07_military]
+simulation_fracture = mil_smart_terrain_2_1
+zombied_sim_squad_novice = mil_smart_terrain_2_10
+zombied_sim_squad_novice = mil_smart_terrain_2_2
+zombied_sim_squad_advanced = mil_smart_terrain_2_2
+zombied_sim_squad_veteran = mil_smart_terrain_2_2
+zombied_sim_squad_novice = mil_smart_terrain_2_4
+simulation_snork = mil_smart_terrain_2_6
+zombied_sim_squad_novice = mil_smart_terrain_3_8
+zombied_sim_squad_advanced = mil_smart_terrain_3_8
+zombied_sim_squad_veteran = mil_smart_terrain_3_8
+simulation_fracture = mil_smart_terrain_4_2
+simulation_zombie = mil_smart_terrain_4_3
+simulation_fracture = mil_smart_terrain_4_5
+simulation_fracture = mil_smart_terrain_4_5
+simulation_fracture = mil_smart_terrain_4_7
+zombied_sim_squad_veteran = mil_smart_terrain_4_8
+zombied_sim_squad_novice = mil_smart_terrain_7_10
+zombied_sim_squad_veteran = mil_smart_terrain_7_10
+mil_smart_terrain_7_10_freedom_trader_stalker_squad  = mil_smart_terrain_7_10
+zombied_sim_squad_novice = mil_smart_terrain_7_12
+zombied_sim_squad_veteran = mil_smart_terrain_7_12
+zombied_sim_squad_novice = mil_smart_terrain_7_4
+zombied_sim_squad_advanced = mil_smart_terrain_7_4
+zombied_sim_squad_veteran = mil_smart_terrain_7_4
+mil_smart_terrain_7_7_freedom_mechanic_stalker_squad = mil_smart_terrain_7_7
+mil_smart_terrain_7_7_freedom_leader_stalker_squad = mil_smart_terrain_7_7
+zombied_sim_squad_novice = mil_smart_terrain_7_7
+zombied_sim_squad_advanced = mil_smart_terrain_7_7
+zombied_sim_squad_veteran = mil_smart_terrain_7_7
+zombied_sim_squad_novice = mil_smart_terrain_7_8
+zombied_sim_squad_veteran = mil_smart_terrain_7_8
+zombied_sim_squad_advanced = mil_smart_terrain_7_8
+simulation_fracture = mil_smart_terrain_8_3
+
+[start_position_l08_yantar]
+;unique squads
+yan_stalker_sakharov_squad = yan_smart_terrain_6_4
+yan_ecolog_kruglov_squad = yan_smart_terrain_6_4
+yan_ecolog_semenov_squad = yan_smart_terrain_6_4
+yan_ecolog_vasilyev_squad = yan_smart_terrain_6_4
+yan_bunker_guards_squad = yan_smart_terrain_6_4
+;sim squads
+zombied_sim_squad_veteran = yan_smart_terrain_2_4
+zombied_sim_squad_advanced = yan_smart_terrain_2_4
+simulation_fracture = yan_smart_terrain_2_5
+zombied_sim_squad_novice = yan_smart_terrain_3_4
+zombied_sim_squad_advanced = yan_smart_terrain_3_4
+zombied_sim_squad_veteran = yan_smart_terrain_3_6
+zombied_sim_squad_advanced = yan_smart_terrain_3_6
+zombied_sim_squad_novice = yan_smart_terrain_3_6
+simulation_fracture = yan_smart_terrain_4_5
+simulation_fracture = yan_smart_terrain_5_5
+simulation_fracture = yan_smart_terrain_6_2
+ecolog_sim_squad_veteran = yan_smart_terrain_6_4
+ecolog_sim_squad_advanced = yan_smart_terrain_6_4
+ecolog_sim_squad_novice = yan_smart_terrain_6_4
+zombied_sim_squad_veteran = yan_smart_terrain_zombi_spawn
+zombied_sim_squad_advanced = yan_smart_terrain_zombi_spawn
+zombied_sim_squad_novice = yan_smart_terrain_zombi_spawn
+
+[start_position_l09_deadcity]
+zombied_sim_squad_veteran = cit_bandits
+zombied_sim_squad_advanced = cit_bandits
+zombied_sim_squad_novice = cit_bandits
+zombied_sim_squad_advanced = cit_bandits_2
+zombied_sim_squad_veteran = cit_bandits_2
+simulation_fracture = cit_kanaliz1
+simulation_fracture  = cit_kanaliz1
+simulation_fracture = cit_kanaliz2
+simulation_zombie  = cit_kanaliz2
+simulation_killer = cit_killers
+zombied_sim_squad_veteran = cit_killers
+zombied_sim_squad_advanced = cit_killers
+zombied_sim_squad_novice = cit_killers
+cit_killers_merc_trader_stalker_squad = cit_killers
+cit_killers_merc_mechanic_stalker_squad = cit_killers
+zombied_sim_squad_advanced = cit_killers_2
+zombied_sim_squad_veteran = cit_killers_2
+zombied_sim_squad_advanced = cit_killers_vs_bandits
+zombied_sim_squad_veteran = cit_killers_vs_bandits
+zombied_sim_squad_advanced = cit_killers_vs_bandits
+zombied_sim_squad_novice = cit_killers_vs_bandits
+
+[start_position_l10_red_forest]
+simulation_fracture = red_smart_terrain_3_1
+simulation_zombie = red_smart_terrain_3_2
+simulation_bloodsucker = red_smart_terrain_3_3
+zombied_sim_squad_veteran = red_smart_terrain_4_2
+simulation_fracture = red_smart_terrain_4_3
+simulation_zombie = red_smart_terrain_4_5
+simulation_fracture = red_smart_terrain_5_5
+simulation_snork = red_smart_terrain_5_6
+simulation_snork = red_smart_terrain_6_3
+simulation_fracture = red_smart_terrain_6_6
+zombied_sim_squad_advanced = red_smart_terrain_bridge
+simulation_zombie = red_smart_terrain_monsters
+simulation_snork = red_smart_terrain_monsters_2
+simulation_zombie = red_smart_terrain_monsters_3
+
+[start_position_l10_limansk]
+simulation_fracture = lim_smart_terrain_1
+zombied_sim_squad_veteran = lim_smart_terrain_10
+zombied_sim_squad_veteran = lim_smart_terrain_10
+zombied_sim_squad_advanced = lim_smart_terrain_10
+zombied_sim_squad_novice = lim_smart_terrain_10
+zombied_sim_squad_advanced = lim_smart_terrain_3
+zombied_sim_squad_veteran = lim_smart_terrain_3
+zombied_sim_squad_advanced = lim_smart_terrain_4
+zombied_sim_squad_advanced = lim_smart_terrain_5
+zombied_sim_squad_novice = lim_smart_terrain_6
+zombied_sim_squad_advanced = lim_smart_terrain_6
+simulation_bloodsucker = lim_smart_terrain_8
+zombied_sim_squad_novice = lim_smart_terrain_9
+
+[start_position_l10_radar]
+simulation_zombie = rad2_loner_0000
+zombied_sim_squad_veteran = rad2_loner_0001
+simulation_zombie = rad2_loner_0002
+zombied_sim_squad_advanced = rad2_prip_teleport
+zombied_sim_squad_novice = rad2_prip_teleport
+simulation_snork  = rad_after_valley
+zombied_sim_squad_advanced  = rad_antenna_camper
+zombied_sim_squad_novice  = rad_antenna_monolith
+zombied_sim_squad_advanced = rad_antenna_monolith
+zombied_sim_squad_novice = rad_antenna_patrol
+zombied_sim_squad_advanced  = rad_antenna_patrol
+zombied_sim_squad_veteran = rad_antenna_patrol
+zombied_sim_squad_veteran = rad_antenna_patrol
+simulation_bloodsucker  = rad_bloodsucker
+zombied_sim_squad_novice   = rad_entrance
+zombied_sim_squad_advanced  = rad_entrance
+simulation_zombie  = rad_pseudodogs
+simulation_fracture  = rad_pseudodogs
+simulation_snork  = rad_snork1
+simulation_snork  = rad_snork2
+zombied_sim_squad_veteran  = rad_valley
+simulation_fracture  = rad_valley_dogs
+zombied_sim_squad_veteran = rad_zombied1
+zombied_sim_squad_veteran = rad_zombied2
+zombied_sim_squad_advanced  = rad_zombied2
+
+[start_position_l11_hospital]
+zombied_sim_squad_novice = katacomb_smart_terrain
+zombied_sim_squad_advanced = katacomb_smart_terrain
+zombied_sim_squad_veteran = katacomb_smart_terrain
+zombied_sim_squad_veteran = katacomb_smart_terrain
+
+[start_position_l11_pripyat]
+zombied_sim_squad_novice = pri_depot
+zombied_sim_squad_advanced = pri_depot
+zombied_sim_squad_veteran = pri_depot
+zombied_sim_squad_novice = pri_monolith
+zombied_sim_squad_advanced = pri_monolith
+zombied_sim_squad_veteran = pri_monolith
+zombied_sim_squad_veteran = pri_monolith
+pri_monolith_monolith_mechanic_stalker_squad = pri_monolith
+pri_monolith_monolith_trader_stalker_squad = pri_monolith
+simulation_bloodsucker = pri_smart_bloodsucker_lair1
+simulation_zombie = pri_smart_controler_lair1
+simulation_zombie = pri_smart_controler_lair2
+simulation_snork = pri_smart_giant_lair1
+simulation_fracture = pri_smart_giant_lair1
+simulation_fracture = pri_smart_giant_lair1
+zombied_sim_squad_veteran = pri_smart_monolith_stalker2
+zombied_sim_squad_veteran = pri_smart_monolith_stalker3
+zombied_sim_squad_veteran = pri_smart_monolith_stalker4
+zombied_sim_squad_novice = pri_smart_monolith_stalker6
+zombied_sim_squad_advanced = pri_smart_monolith_stalker6
+zombied_sim_squad_veteran = pri_smart_monolith_stalker6
+zombied_sim_squad_veteran = pri_smart_monolith_stalker6
+simulation_snork = pri_smart_monster_lair1
+zombied_sim_squad_veteran = pri_smart_neutral_stalker1
+simulation_zombie = pri_smart_pseudodog_lair1
+simulation_fracture = pri_smart_pseudodog_lair1
+simulation_snork = pri_smart_snork_lair1
+simulation_snork = pri_smart_snork_lair2
+simulation_poltergeist_tele = pri_smart_snork_lair2
+simulation_fracture = pri_smart_tushkano_lair1
+simulation_zombie = pri_smart_tushkano_lair1
+
+[start_position_l12_stancia]
+zombied_sim_squad_novice = aes_smart_terrain_monolit_blockpost
+zombied_sim_squad_advanced = aes_smart_terrain_monolit_blockpost
+zombied_sim_squad_veteran = aes_smart_terrain_monolit_blockpost
+zombied_sim_squad_novice = aes_smart_terrain_monolit_blockpost2
+zombied_sim_squad_advanced = aes_smart_terrain_monolit_blockpost2
+zombied_sim_squad_veteran = aes_smart_terrain_monolit_blockpost2
+zombied_sim_squad_advanced = aes_smart_terrain_monolit_blockpost4
+zombied_sim_squad_veteran = aes_smart_terrain_monolit_blockpost4
+zombied_sim_squad_veteran = aes_smart_terrain_monolit_blockpost4
+zombied_sim_squad_advanced = aes_smart_terran_soldier
+zombied_sim_squad_veteran = aes_smart_terran_soldier
+zombied_sim_squad_veteran = aes_smart_terran_soldier
+zombied_sim_squad_advanced = aes_smart_terran_soldier2
+zombied_sim_squad_veteran = aes_smart_terran_soldier2
+simulation_bloodsucker = aes_smart_terrain_monsters1
+simulation_snork = aes_smart_terrain_monsters1
+simulation_zombie = aes_smart_terrain_monsters2
+simulation_snork = aes_smart_terrain_monsters2
+simulation_snork = aes_smart_terrain_monsters3
+simulation_zombie = aes_smart_terrain_monsters3
+simulation_snork = aes_smart_terrain_monsters4
+simulation_snork = aes_smart_terrain_monsters4
+
+[start_position_l12_stancia_2]
+zombied_sim_squad_advanced = aes2_monolith_camp1
+zombied_sim_squad_advanced = aes2_monolith_camp2
+zombied_sim_squad_veteran = aes2_monolith_camp2
+zombied_sim_squad_advanced = aes2_monolith_camp3
+zombied_sim_squad_veteran = aes2_monolith_camp3
+zombied_sim_squad_advanced = aes2_monolith_camp4
+zombied_sim_squad_veteran = aes2_monolith_camp4
+zombied_sim_squad_veteran = aes2_monolith_snipers_1
+zombied_sim_squad_veteran = aes2_monolith_snipers_1
+zombied_sim_squad_veteran = aes2_monolith_snipers_2
+zombied_sim_squad_veteran = aes2_monolith_snipers_2
+zombied_sim_squad_veteran = aes2_monolith_snipers_3
+zombied_sim_squad_veteran = aes2_monolith_snipers_3
+simulation_poltergeist_tele = aes2_monsters1
+simulation_snork = aes2_monsters1
+simulation_snork = aes2_monsters2
+simulation_zombie = aes2_monsters2
+
+[start_position_l13_generators]
+zombied_sim_squad_veteran = gen_smart_terrain_cemetery
+simulation_zombie = gen_smart_terrain_forest
+simulation_zombie = gen_smart_terrain_junk
+zombied_sim_squad_veteran = gen_smart_terrain_lab_entrance
+zombied_sim_squad_novice = gen_smart_terrain_lab_entrance
+zombied_sim_squad_advanced = gen_smart_terrain_lab_entrance
+zombied_sim_squad_veteran = gen_smart_terrain_lab_entrance
+simulation_zombie = gen_smart_terrain_lab_entrance_2
+zombied_sim_squad_veteran = gen_smart_terrain_military
+simulation_snork = gen_smart_terrain_urod
+
+[l03u_agr_underground]
+
+[l04u_labx18]
+
+[l08u_brainlab]
+
+[l10u_bunker]
+
+[l12u_sarcofag]
+
+[l12u_control_monolith]
+
+[l13u_warlab]
+
+;;;;;;;;;;;;;;;;;;;;;; FINAL ZATON ;;;;;;;;;;;;;;;;;;;;;;;;;
+[start_position_zaton]
+zat_a2_stalker_mechanic_squad = zat_stalker_base_smart
+;zat_a2_stalker_nimble_squad = zat_stalker_base_smart
+zat_b30_owl_stalker_trader_squad = zat_stalker_base_smart
+;zat_b7_bandit_boss_sultan_squad = zat_stalker_base_smart
+;zat_a2_stalkers_guards = zat_stalker_base_smart
+zombied_sim_squad_novice = zat_stalker_base_smart
+zombied_sim_squad_novice = zat_stalker_base_smart
+zombied_sim_squad_advanced = zat_stalker_base_smart
+zat_b22_barmen = zat_stalker_base_smart
+zat_b22_medic = zat_stalker_base_smart
+zat_b7_stalkers_raiders = zat_stalker_base_smart
+zat_b104_zombied_1 = zat_b104_zombied
+zat_b104_zombied_2 = zat_b104_zombied
+zat_b104_zombied_3 = zat_b104_zombied
+zat_b33_snork_first_wave = zat_b33
+zat_b18_noah_squad = zat_b18
+zat_b18_dog_noah_squad = zat_b18
+zat_b28_snork_squad = zat_b28
+zat_b42_controller_squad = zat_b42_smart_terrain
+zat_b40_merc_squad = zat_b40_smart_terrain
+zat_b106_stalker_gonta_squad = zat_stalker_base_smart
+;zat_b106_stalker_garmata_squad = zat_stalker_base_smart
+zat_b106_stalker_crab_squad = zat_stalker_base_smart
+zat_b38_default_bloodsucker = zat_b38
+zat_b7_stalkers_victims_1 = zat_b7
+zat_b100_poltergeist_squad_01 = zat_b100
+zat_b39_dogs_squad = zat_b39
+simulation_fracture = zat_b42_smart_terrain
+simulation_fracture = zat_sim_1
+simulation_fracture = zat_sim_2
+simulation_fracture = zat_sim_3
+simulation_fracture = zat_sim_4
+simulation_fracture = zat_sim_5
+simulation_fracture = zat_sim_6
+simulation_bloodsucker = zat_sim_7
+simulation_zombie = zat_sim_8
+simulation_bloodsucker = zat_sim_9
+zombied_sim_squad_advanced = zat_sim_10
+simulation_snork = zat_sim_11
+simulation_zombie = zat_sim_12
+simulation_bandit = zat_sim_13
+simulation_snork = zat_sim_14
+simulation_stalker_for_a1 = zat_sim_15
+simulation_zombie = zat_sim_16
+simulation_fracture = zat_sim_17
+simulation_fracture = zat_sim_18
+zombied_sim_squad_novice = zat_sim_19
+zombied_sim_squad_novice = zat_sim_20
+simulation_fracture = zat_sim_21
+simulation_zombie = zat_sim_22
+simulation_bloodsucker = zat_sim_23
+simulation_snork = zat_sim_24
+simulation_snork = zat_sim_25
+simulation_snork = zat_sim_26
+simulation_fracture = zat_sim_27
+zombied_sim_squad_novice = zat_sim_28
+ecolog_sim_squad_veteran = zat_sim_29
+simulation_zombie = zat_sim_30
+
+;;;;;;;;;;;;;;;;;;;;;; FINAL JUPITER ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[start_position_jupiter]
+jup_b208_burers_squad = jup_b208
+jup_b6_scientist_group = jup_b41
+jup_b1_stalker_squad = jup_b41
+jup_a12_bandit_cashier_squad = jup_a12
+jup_a12_bandit_chief_squad = jup_a12
+jup_a12_bandit_guard_squad = jup_a12
+jup_a12_zombied_sim_squad = jup_a12
+jup_b25_alex_squad = jup_a6
+jup_b8_psy_dog_squad = jup_b8_smart_terrain
+;jup_b200_stalker_squad = jup_b200
+jup_b200_tushkano_squad = jup_b200_tushkan_smart_terrain
+jup_a6_stalker_medik_squad = jup_a6
+jup_a6_stalker_barmen_squad = jup_a6
+jup_b6_swamp_hunters = jup_b211
+jup_b19_kopatci_zombied_squad = jup_b19
+jup_a6_freedom_leader_squad = jup_a6
+jup_b203_zombied_squad = jup_b203
+jup_b203_tushkano = jup_b203
+jup_b204_squad = jup_b204
+jup_b205_zombie_01_squad = jup_b205_smart_terrain
+jup_b205_zombie_02_squad = jup_b205_smart_terrain
+jup_b205_monster_01_squad = jup_b205_smart_terrain
+jup_b205_monster_02_squad = jup_b205_smart_terrain_tushkano
+jup_b205_monster_04_squad = jup_b205_smart_terrain
+jup_b10_stalker_drunk_squad = jup_a6
+jup_a9_dogs_normal = jup_b47
+jup_b47_merc_guard_squad = jup_b41
+simulation_fracture = jup_sim_1
+simulation_snork = jup_sim_2
+simulation_fracture = jup_sim_3
+simulation_zombie = jup_sim_4
+zombied_sim_squad_advanced = jup_sim_5
+simulation_snork = jup_sim_6
+simulation_bloodsucker = jup_sim_7
+simulation_snork = jup_sim_8
+zombied_sim_squad_advanced = jup_sim_9
+simulation_fracture = jup_sim_10
+simulation_fracture = jup_sim_11
+zombied_sim_squad_novice = jup_sim_12
+simulation_fracture = jup_sim_13
+simulation_fracture = jup_sim_14
+simulation_fracture = jup_sim_15
+simulation_fracture = jup_sim_16
+simulation_fracture = jup_sim_17
+simulation_fracture = jup_sim_18
+simulation_zombie = jup_sim_19
+simulation_bloodsucker = jup_sim_20
+zombied_sim_squad_advanced = jup_sim_21
+
+;;;;;;;;;;;;;;;;;;;;;; FINAL JUPITER UNDERGROUND ;;;;;;;;;;;;;;;;;;;;;;;;;
+[start_position_jupiter_underground]
+pas_b400_elevator_tushkano = pas_b400_elevator
+pas_b400_snork_elevator_4 = pas_b400_elevator
+pas_b400_snork_track_2 = pas_b400_track
+pas_b400_track_tushkano = pas_b400_track
+pas_b400_downstairs_tushkano = pas_b400_downstairs
+pas_b400_tunnel_tushkano = pas_b400_tunnel
+pas_b400_snork_tunnel_2 = pas_b400_tunnel
+pas_b400_snork_tunnel_3 = pas_b400_tunnel
+pas_b400_snork_tunnel_5 = pas_b400_hall
+pas_b400_hall_tushkano = pas_b400_hall
+pas_b400_canalisation_tushkano = pas_b400_canalisation
+pas_b400_canalisation_snork_2 = pas_b400_canalisation
+pas_b400_canalisation_1_zombied = pas_b400_canalisation
+pas_b400_canalisation_3_zombied = pas_b400_canalisation
+pas_b400_canalisation_5_zombied = pas_b400_canalisation
+
+;;;;;;;;;;;;;;;;;;;;;; FINAL PRIPYAT ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[start_position_pripyat]
+;;;base;;;!!!;;;smart = pri_a16;;;
+pri_a16_medic_yar_squad = pri_a16
+;;;
+pri_b304_dogs = pri_b304_monsters_smart_terrain
+pri_b306_4_floor_monolith = pri_b306
+pri_b306_4_floor_monolith_2 = pri_b306
+pri_b306_3_floor_monolith = pri_b306
+pri_b306_3_floor_zombied = pri_b306
+pri_b306_2_floor_monolith = pri_b306
+pri_b306_2_floor_zombied = pri_b306
+pri_b306_1_floor_zombied = pri_b306
+pri_b306_1_floor_zombied_2 = pri_b306
+pri_b36_monolith_sniper_squad = pri_b36_smart_terrain
+pri_b36_zombied_squad = pri_b36_smart_terrain
+pri_b36_monolith_marine_squad = pri_b36_smart_terrain
+pri_b36_monolith_guard_squad = pri_b36_smart_terrain
+;pri_a15_squad = pri_a15
+;pri_a15_military_squad = pri_a15
+pri_b303_burer_squad = pri_b303
+zombied_sim_squad_advanced = pri_sim_1
+zombied_sim_squad_advanced = pri_sim_2
+simulation_zombie = pri_sim_3
+zombied_sim_squad_veteran = pri_sim_4
+simulation_fracture = pri_sim_5
+zombied_sim_squad_veteran = pri_sim_6
+zombied_sim_squad_veteran = pri_sim_7
+simulation_zombie = pri_sim_8
+simulation_bloodsucker = pri_sim_9
+simulation_bloodsucker = pri_sim_10
+simulation_fracture = pri_sim_11
+simulation_snork = pri_sim_12
+  
+;;;;;;;;;;;;;;;;;;;;;;;; labx8 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[start_position_labx8]
+;lx8_snork_down_squad = lx8_smart_terrain
+;lx8_snork_up_squad = lx8_smart_terrain
+;lx8_burers_squad = lx8_smart_terrain
+;lx8_toilet_burer_squad = lx8_smart_terrain
+;lx8_tushkano_1_squad = lx8_smart_terrain
+;lx8_tushkano_2_squad = lx8_smart_terrain
+
+[start_position_k02_trucks_cemetery]
+zombied_sim_squad_veteran = trc_sim_1
+zombied_sim_squad_veteran = trc_sim_2
+zombied_sim_squad_veteran = trc_sim_3
+zombied_sim_squad_veteran = trc_sim_4
+simulation_snork = trc_sim_5
+zombied_sim_squad_veteran = trc_sim_6
+zombied_sim_squad_veteran = trc_sim_7
+simulation_zombie = trc_sim_8
+simulation_fracture = trc_sim_8
+simulation_fracture = trc_sim_9
+zombied_sim_squad_veteran = trc_sim_10
+simulation_fracture = trc_sim_11
+zombied_sim_squad_veteran = trc_sim_12
+simulation_snork = trc_sim_13
+simulation_fracture = trc_sim_14
+simulation_fracture = trc_sim_15
+simulation_fracture = trc_sim_16
+zombied_sim_squad_veteran = trc_sim_17
+zombied_sim_squad_veteran = trc_sim_18
+simulation_zombie = trc_sim_19
+zombied_sim_squad_advanced = trc_sim_20
+zombied_sim_squad_veteran = trc_sim_20
+simulation_bloodsucker = trc_sim_21

@@ -285,6 +285,13 @@ local function can_help_actor(squad)
 end
 
 local function get_help_target_id(squad)
+
+	if (IsSurvivalMode()) then
+		if (squad.player_id == "zombied" or _g.is_squad_monster[squad.player_id]) then
+			return 0
+		end
+	end 
+	
 	-- Alundaio
 	local target_id = axr_main and axr_main.squad_assign_new_target(squad)
 	if (target_id and alife():object(target_id)) then
@@ -599,6 +606,12 @@ end
 function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_id, gv_id)
 	--alun_utils.debug_write("sim_squad_scripted:add_squad_member")
 	local spawn_sections_ltx = system_ini()
+	
+	if not (spawn_sections_ltx:section_exist(spawn_section)) then 
+		printf("ERROR: npc section %s does not exist!",spawn_section)
+		return
+	end 
+	
 	local custom_data = utils.cfg_get_string(spawn_sections_ltx, spawn_section, "custom_data", self, false, "", "default_custom_data.ltx")
 	if custom_data ~= "default_custom_data.ltx" then
 		printf("INCORRECT npc_spawn_section USED [%s]. You cannot use npc with custom_data in squads", spawn_section)
@@ -620,7 +633,7 @@ function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_i
 	return obj.id
 end
 
-function sim_squad_scripted:create_npc(spawn_smart,only_one)
+function sim_squad_scripted:create_npc(spawn_smart,only_one,pos,lvid,gvid)
 	--alun_utils.debug_write("sim_squad_scripted:create_npc")
 	local ini = system_ini()
 	local settings_id = self:section_name()
@@ -667,9 +680,13 @@ function sim_squad_scripted:create_npc(spawn_smart,only_one)
 		
 		self.smart_id = spawn_smart.id
 	else 
-		base_spawn_position = self.position
-		base_lvi = self.m_level_vertex_id
-		base_gvi = self.m_game_vertex_id
+		base_spawn_position = pos or self.position
+		base_lvi = lvid or self.m_level_vertex_id
+		base_gvi = gvid or self.m_game_vertex_id
+	end
+	
+	if (base_gvi == 65535) then 
+		return 
 	end 
 	
 	local npcs_list = {}
@@ -701,6 +718,7 @@ function sim_squad_scripted:create_npc(spawn_smart,only_one)
 		local random_id
 		for i = 1,random_count do
 			random_id = math.random(1, #random_spawn)
+			--printf("%s pos=%s lvid=%s gvid=%s",random_spawn[random_id],alun_utils.vec_to_str(base_spawn_position),base_lvi,base_gvi)
 			table.insert(npcs_list,self:add_squad_member(random_spawn[random_id], base_spawn_position, base_lvi, base_gvi))
 		end
 	elseif #spawn_sections == 0 then

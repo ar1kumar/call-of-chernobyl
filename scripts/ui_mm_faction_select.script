@@ -27,6 +27,11 @@ local function on_game_load()
 			config:SetValue("temp","new_game_hardcore_mode")
 			need_save = true
 		end
+		if (config:GetValue("temp","new_game_survival_mode",1) == true) then
+			alife_storage_manager.get_state().enable_survival_mode = true
+			config:SetValue("temp","new_game_survival_mode")
+			need_save = true
+		end
 		local con = get_console()
 		if (config:GetValue("temp","new_game_hardcore_aim_mode",1) == true) then 
 			config:SetValue("temp","new_game_hardcore_aim_mode")
@@ -135,7 +140,28 @@ local function on_game_load()
 end
 
 local function actor_on_first_update(binder,delta)
-	if (spawn_path) then 
+	if (spawn_path) then
+		-- survival mode
+		local faction = character_community(db.actor):sub(7)
+		if (IsSurvivalMode() and system_ini():section_exist("survival_squad_"..faction)) then 
+			local sim = alife()
+			local squad = sim:create("survival_squad_"..faction,spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0))
+			if (squad) then
+				squad:create_npc(nil,nil,spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0))
+				local se_obj,as
+				for k in squad:squad_members() do
+					se_obj = k.object or k.id and sim:object(k.id)
+					if (se_obj) then
+						SIMBOARD:setup_squad_and_group(se_obj)
+						as = se_obj:get_alife_storage(true)
+						if (as) then
+							as.companion = true 
+							as.companion_cannot_dismiss = true 
+						end
+					end
+				end
+			end
+		end
 		ChangeLevel(spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0),vector():set(0,0,0))
 	end
 	-- AO3 hotfix for missing addon tool
@@ -257,9 +283,20 @@ function faction_ui:InitControls(f)
 	if (USE_MARSHAL) then
 		xml:InitStatic("main_dialog:cap_check_hardcore",self.dialog)
 		self.ck_hardcore = xml:InitCheck("main_dialog:check_hardcore",	self.dialog)
+		self:Register(self.ck_hardcore,"check_hardcore")
 		
 		xml:InitStatic("main_dialog:cap_check_hardcore_aim",self.dialog)
 		self.ck_hardcore_aim = xml:InitCheck("main_dialog:check_hardcore_aim",	self.dialog)
+		self:Register(self.ck_hardcore_aim,"check_hardcore_aim")
+		
+		xml:InitStatic("main_dialog:cap_check_survival",self.dialog)
+		self.ck_survival = xml:InitCheck("main_dialog:check_survival",	self.dialog)
+		self:Register(self.ck_survival,"check_survival")
+		
+		self.ck_states = { 	["ck_survival"] = false, 
+							["ck_hardcore"] = false, 
+							["ck_hardcore_aim"] = false 
+		}
 	end
 end 
 
@@ -269,8 +306,40 @@ function faction_ui:InitCallBacks(f)
 	self:AddCallback("btn_submit", ui_events.BUTTON_CLICKED, self.OnStartGame, self)
 	self:AddCallback("list_factions", ui_events.LIST_ITEM_SELECT, self.OnSelectFactionList,		self)
 	
+	self:AddCallback("check_survival", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
+	self:AddCallback("check_hardcore", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
+	self:AddCallback("check_hardcore_aim", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
+	
 	for i=1,#f do 
 		self:AddCallback("btn_"..f[i].."_inactive_select", ui_events.BUTTON_CLICKED, self["OnFaction_"..f[i]], self)
+	end
+end
+
+function faction_ui:OnCheckSet()
+	local ck = nil
+	local value = nil
+	for k,v in pairs(self.ck_states) do 
+		if (self[k] and self[k]:GetCheck() ~= v) then
+			self.ck_states[k] = self[k]:GetCheck()
+			ck = k
+			value = self[k]:GetCheck()
+		end
+	end
+
+	if (ck == "ck_survival") then
+		if (value == true and self.ck_hardcore) then
+			self.ck_hardcore:SetCheck(true)
+			self.ck_states["ck_hardcore"] = true
+		end
+	elseif (ck == "ck_hardcore") then
+		if (value == false and self.ck_survival) then
+			self.ck_survival:SetCheck(false)
+			self.ck_states["ck_survival"] = false
+		end
+	end
+	
+	if (self[ck]:GetCheck()) then
+		self.desc_text:SetText(game.translate_string("st_mm_"..ck.."_desc"))
 	end
 end
 
@@ -466,6 +535,10 @@ function faction_ui:OnStartGame()
 	
 	if (self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck()) then 
 		axr_main.config:SetValue("temp","new_game_hardcore_aim_mode",true)
+	end
+	
+	if (self.ck_survival and self.ck_survival:GetCheck()) then 
+		axr_main.config:SetValue("temp","new_game_survival_mode",true)
 	end 
 	
 	if (self.selected_faction) then 

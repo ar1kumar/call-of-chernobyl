@@ -1612,7 +1612,14 @@ function se_smart_terrain:try_respawn()
 			local sect_to_spawn_params = self.respawn_params[sect_to_spawn]
 			
 			if (sect_to_spawn_params.squads) then
-				local squad = has_alife_info("actor_made_wish_for_control") and SIMBOARD:create_squad(self, "simulation_controller_psy") or SIMBOARD:create_squad(self, sect_to_spawn_params.squads[math.random(1,#sect_to_spawn_params.squads)])
+				local squad
+				if (IsSurvivalMode()) then
+					local t = {"zombied_sim_squad_novice","zombied_sim_squad_advanced","zombied_sim_squad_veteran","simulation_fracture","simulation_zombie","simulation_snork"}
+					squad = SIMBOARD:create_squad(self, t[math.random(#t)])
+				else 
+					squad = has_alife_info("actor_made_wish_for_control") and SIMBOARD:create_squad(self, "simulation_controller_psy") or SIMBOARD:create_squad(self, sect_to_spawn_params.squads[math.random(1,#sect_to_spawn_params.squads)])
+				end
+				
 				if (squad) then
 					squad.respawn_point_id = self.id
 					squad.respawn_point_prop_section = sect_to_spawn

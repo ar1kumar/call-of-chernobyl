@@ -241,6 +241,11 @@ end
 
 function is_actor_friend(actor,npc)
 	local npc = dialogs.who_is_npc(actor,npc)
+	
+	local squad = get_object_squad(npc)
+	if not (squad) then 
+		return false 
+	end
 
 	if not (axr_companions.allow_simulation_squads_as_companions) then 
 		return false 
@@ -282,11 +287,6 @@ function become_actor_companion(actor,npc)
 	local squad = get_object_squad(npc)
 
 	if not (squad) then
-		axr_companions.add_to_actor_squad(npc)
-		local se_npc = alife():object(npc:id())
-		if (se_npc) then
-			se_npc:switch_offline()
-		end
 		return
 	end
 	

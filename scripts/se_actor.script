@@ -105,6 +105,9 @@ end
 
 -- Мой прекондишн.
 function se_actor:target_precondition(squad)
+	if (IsSurvivalMode()) then 
+		return true 
+	end
 	return false
 end
 
