@@ -66,18 +66,20 @@ function evaluator_contact:evaluate()
 			return false
 		end
 		
-		--[[ Not needed now that companions can be ordered to move
 		if (self.a.gtfo == true) then 
 			return true 
 		end 
 		
-		if (self.object:has_info("npcx_is_companion")) then --or not get_object_story_id(self.object:id())) then
-			if (db.actor:position():distance_to_sqr(self.object:position()) < 1.6) and not (good_acts[alun_utils.get_current_action_id(self.object)]) then
+		if (self.object:has_info("npcx_is_companion") or not get_object_story_id(self.object:id())) and not (self.object:is_talking()) then
+			if (db.actor:position():distance_to_sqr(self.object:position()) < 1.5) and not (good_acts[alun_utils.get_current_action_id(self.object)]) then
+				self.a.dtimer = not self.a.dtimer and time_global() + 4000 or self.a.dtimer
+				if (time_global() > self.a.dtimer) then
+					self.a.dtimer = nil
 				self.a.gtfo = true
 				return true
 			end
 		end
-		--]]
+		end
 
 		local squad = self.object and get_object_squad(self.object)
 		local commander = squad and squad:commander_id() ~= self.object:id() and level.object_by_id(squad:commander_id())
@@ -116,6 +118,13 @@ function action_meet_wait:execute ()
 	local npc = self.object
 	-- Move npc out of the way if player bumps into him
 	if (self.a.gtfo) then 
+		if (npc:is_talking() or db.actor:position():distance_to_sqr(npc:position()) > 4) then 
+			utils.send_to_nearest_accessible_vertex(npc,npc:level_vertex_id())
+			self.a.gtfo = nil
+			self.a.vertex_id = nil
+			self.a.stage = 0	
+			return
+		end
 		if (self.a.stage == 0) then 
 			self.a.vertex_id = alun_utils.try_go_backward(npc,5,self.a.vertex_id)
 			if (self.a.vertex_id) then

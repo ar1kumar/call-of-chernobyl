@@ -213,7 +213,7 @@ DamagedThreshold		= 0.5
 critical_wound_threshold		= -1
 critical_wound_decrease_quant	= 0.
 
-FakeDeathCount					= 4		; max count of fake death
+FakeDeathCount					= 2		; max count of fake death
 StartFakeDeathHealthThreshold	= 0.6
 
 
@@ -230,7 +230,7 @@ attack_params			= m_zombie_attack_params
 damage					= m_zombie_damage
 
 ;species of monster
-species					= zombie
+species					= corpse
 community				= fracture
 
 [zombie_vision_free]
@@ -273,7 +273,7 @@ bip01_pelvis 		= 0.5, -1, 0.01
 bip01_spine 		= 0.5, -1, 0.01
 bip01_spine1 		= 0.5, -1, 0.01
 bip01_neck 			= 0.5, -1, 0.01
-bip01_head 			= 2.0, -1, 0.01
+bip01_head 			= 2.5, -1, 0.01
 
 
 
@@ -345,7 +345,7 @@ radiation_immunity		= 0.0	;0.5
 telepatic_immunity		= 1.0
 chemical_burn_immunity	= 0.3
 explosion_immunity		= 0.5
-fire_wound_immunity		= 0.05
+fire_wound_immunity		= 0.55
 	
 [zombie_weak]:m_zombie_e
 
@@ -358,18 +358,18 @@ radiation_immunity		= 0.0
 telepatic_immunity		= 1.0
 chemical_burn_immunity	= 1.0
 explosion_immunity		= 0.55
-fire_wound_immunity		= 4
+fire_wound_immunity		= 0.55
 
 [zombie_attack_params_weak]
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;right hand strike
-stand_attack_0 =	  	0.30,		0.35,		    100,        0.0, 1.0, 0.0,		 -0.3, 1.0, -0.6, 0.6,							  2.0
+stand_attack_0 =	  	0.30,		0.25,		    100,        0.0, 1.0, 0.0,		 -0.3, 1.0, -0.6, 0.6,							  2.0
 ;left hand strike
-stand_attack_1 =	  	0.35,		0.45,		    100,        0.0, 1.0, 0.0,		 -1.8, 0.6, -0.6, 0.6,							  2.0
+stand_attack_1 =	  	0.35,		0.35,		    100,        0.0, 1.0, 0.0,		 -1.8, 0.6, -0.6, 0.6,							  2.0
 ;left hand strike2
-stand_attack_2 =	  	0.30,		0.55,		    120,        0.0, 1.0, 0.0,		 -0.6, 0.6, -1.0, 1.0,							  2.0
+stand_attack_2 =	  	0.30,		0.45,		    120,        0.0, 1.0, 0.0,		 -0.6, 0.6, -1.0, 1.0,							  2.0
 ;left hand strike3
 stand_attack_3 =	  	0.30,		0.35,		    180,        0.0, 1.0, 0.0,		 -1.0, 0.3, -0.6, 0.6,							  2.0
 
@@ -378,11 +378,11 @@ stand_attack_3 =	  	0.30,		0.35,		    180,        0.0, 1.0, 0.0,		 -1.0, 0.3, -0
 [zombie_normal]:zombie_weak
 visual				= monsters\zombi\zombi_trup_2
 
-FakeDeathCount					= 5		; max count of fake death
 StartFakeDeathHealthThreshold	= 0.6
 
 [zombie_strong]:zombie_weak
 visual				= monsters\zombi\zombi_3
+FakeDeathCount					= 3		; max count of fake death
 
 [zombie_ghost]:zombie_weak
 visual              = monsters\zombi\zombi_1
