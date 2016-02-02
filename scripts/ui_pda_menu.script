@@ -1,0 +1,146 @@
+--[[ CUIPdaWnd wrapper
+author: Alundaio
+
+class CUIPdaWnd (CUIScriptWnd)
+
+		.def("AddCallback", (void(BaseType::*)(LPCSTR, s16, const luabind::functor<void>&, const luabind::object&))&BaseType::AddCallback)
+		.def("Register", (void (BaseType::*)(CUIWindow*, LPCSTR))&BaseType::Register)
+		.def("SetCaption", &BaseType::SetCaption)
+		.def("SetActiveCaption", &BaseType::SetActiveCaption)
+		.def("Show_SecondTaskWnd", &BaseType::Show_SecondTaskWnd)
+		.def("Show_MapLegendWnd", &BaseType::Show_MapLegendWnd)
+		.def("Show_MapLegendWnd", &BaseType::Show_MapLegendWnd)
+		.def("get_hint_wnd", &BaseType::get_hint_wnd)
+		.def("set_hint_wnd", &BaseType::set_hint_wnd)
+		.def_readwrite("m_clock", &BaseType::m_clock)
+		.def_readwrite("m_btn_close", &BaseType::m_btn_close)
+		.def_readwrite("m_caption", &BaseType::m_caption)
+		.def_readwrite("UITabControl", &BaseType::UITabControl)
+		.def_readwrite("UIMainPdaFrame", &BaseType::UIMainPdaFrame)
+		.def_readwrite("UINoice", &BaseType::UINoice)
+		.def_readwrite("m_pActiveDialog", &BaseType::m_pActiveDialog)
+		.def_readwrite("m_sActiveSection", &BaseType::m_sActiveSection)
+		.def_readwrite("UITaskWnd", &BaseType::pUITaskWnd)
+		.def_readwrite("UILogsWnd", &BaseType::pUILogsWnd)
+		.def_readwrite("UIRankingWnd", &BaseType::pUIRankingWnd)
+--]]
+
+class "pda_menu" (CUIPdaWnd)
+function pda_menu:__init() super()
+	self.active_section = ""
+	self:Init()
+end
+
+function pda_menu:Init()
+	printf("pda_menu Init")
+	--CUIPdaWnd.Init(self)
+	
+	self.m_pActiveDialog = nil
+	self.m_sActiveSection = ""
+	
+	self.xml = CScriptXmlInit()
+	self.xml:ParseFile("pda.xml")
+	
+	self.xml:InitWindow("main", 0, self)
+	
+	self.UIMainPdaFrame	= self.xml:InitStatic("background_static",self)
+	self.m_caption = self.xml:InitTextWnd("caption_static",self)
+	self.m_clock = self.xml:InitTextWnd("clock_wnd",self)
+	self.m_btn_close = self.xml:Init3tButton("close_button",self)
+	
+	self.hint_wnd = self.xml:InitHint("hint_wnd",self)
+	self:set_hint_wnd(self.hint_wnd)
+	
+	if (IsGameTypeSingle()) then 
+		self.UITaskWnd = CUITaskWnd()
+		self.UITaskWnd:set_hint_wnd(self.hint_wnd)
+		self.UITaskWnd:Init()
+		
+		self.UIRankingWnd = CUIRankingWnd()
+		self.UIRankingWnd:Init()
+		
+		self.UILogsWnd = CUILogsWnd()
+		self.UILogsWnd:Init()		
+	end
+	
+	self.UITabControl = self.xml:InitTab("tab",self)
+	self.UITabControl:SetAutoDelete(true)
+	self:Register(self.UITabControl, "tab")
+	
+	self.UINoice = self.xml:InitStatic("noice_static",self)
+	self.UINoice:SetAutoDelete(true)
+	
+	self.test_ui = ui_dyn_msg_box.multi_choice({},"option 1", "option 2")
+end 
+
+function pda_menu:Update()
+	CUIPdaWnd.Update(self)
+end 
+
+function pda_menu:Show(b)
+	CUIPdaWnd.Show(self,b)
+end 
+
+function pda_menu:SetActiveSubdialog(id)
+	--CUIPdaWnd.SetActiveSubdialog(self,id)
+	
+	printf("SetActiveSubdialog %s",self.UITaskWnd ~= nil)
+	if (self.m_sActiveSection == id) then 
+		return 
+	end
+	
+	if (self.m_pActiveDialog) then 
+		self.UIMainPdaFrame:DetachChild(self.m_pActiveDialog)
+		self.m_pActiveDialog:Show(false)
+	end
+	
+	if (id == "eptTasks") then 
+		self.m_pActiveDialog = self.UITaskWnd
+	elseif (id == "eptRanking") then 
+		self.m_pActiveDialog = self.UIRankingWnd
+	elseif (id == "eptLogs") then 
+		self.m_pActiveDialog = self.UILogsWnd
+	elseif (id == "eptCharacter") then 
+		self.m_pActiveDialog = self.test_ui
+	end
+	
+	if (self.m_pActiveDialog) then
+		self.UIMainPdaFrame:AttachChild(self.m_pActiveDialog)
+		self.m_pActiveDialog:Show(true)
+	end
+	
+	if (self.UITabControl:GetActiveId() ~= id) then
+		self.UITabControl:SetActiveTab(id)
+	end
+	
+	self.m_sActiveSection = id
+	
+	self:SetActiveCaption()
+end
+
+function pda_menu:UpdatePda()
+	CUIPdaWnd.UpdatePda(self)
+end
+
+function pda_menu:OnKeyboard(dik,action)
+	CUIPdaWnd.OnKeyboard(self,dik,action)
+	if action == ui_events.WINDOW_KEY_RELEASED then
+		if (dik == DIK_keys.DIK_ESCAPE) then
+			self:OnQuit()
+		end
+	end
+	return true
+end 
+
+function pda_menu:OnMouse(x,y,action)
+	CUIPdaWnd.OnMouse(self,x,y,action)
+	return true
+end
+
+function pda_menu:UpdateRankingWnd()
+	CUIPdaWnd.UpdateRankingWnd(self)
+end
+
+function pda_menu:OnQuit()
+	self:HideDialog()
+end

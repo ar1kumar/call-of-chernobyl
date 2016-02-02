@@ -362,6 +362,9 @@ end
 ------------------------------------------------------------------------------------
 --										GAME START
 function on_game_start()
+	if not (DEV_DEBUG) then 
+		return 
+	end
 	if (keybinds) then 
 		return -- obviously on_game_start already triggered if this exists
 	end 

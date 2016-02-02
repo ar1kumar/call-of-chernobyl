@@ -4,41 +4,15 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 
 Callback and module manager for easy plug-in based script management
 by Alundaio
+
+1/31/2016
+axr_main now auto-executes any script that has on_game_load method. To create a new module, simply
+add a on_game_start function
 --]]
 
 -- axr_options.ini
 config = alun_utils.cfg_file(getFS():update_path('$game_data$', '').."axr_options.ini",true)
 -------------------------------------------------------------------------------------------------
-
-
---[[ 				REGISTER YOUR SCRIPT HERE
-The list of scripts where on_game_start is called
---]]
-local script_modules = { 	
-	"modules", 
-	"alife_storage_manager",
-	"atmosfear",
-	"surge_manager",
-	"psi_storm_manager",
-	"phantom_manager", 
-	"xrs_dyn_music", 
-	"coc_treasure_manager", 
-	"ui_mm_faction_select", 
-	"axr_keybind",
-	--"xrs_rnd_npc_loadout",
-	--"axr_dynamic_spawn",
-	"itms_manager",
-	"xr_statistic",
-	"m_mines",
-	"axr_task_manager",
-	"axr_companions",
-	"xr_eat_medkit",
-	"axr_trade_manager",
-	"inventory_upgrades",
-	"axr_task_manager",
-	"axr_robbery"
-}
-	
 
 -- Valid Callbacks (named intercepts to avoid namespace conflicts)
 -- You must register a callback before or during on_game_load (ie. bind_actor net_spawn)
@@ -199,16 +173,28 @@ end
 -- ON GAME START
 --------------------------------------------------------------------------------------------------------------------
 function on_game_start()
-	if (DEV_DEBUG) then 
-		xrs_debug_tools.on_game_start()
-	end
-	for i=1,#script_modules do 
-		if (_G[script_modules[i]]) then 
-			if (_G[script_modules[i]].on_game_start) then
-				_G[script_modules[i]].on_game_start()
+	local ignore = { 
+		["ce_new_attachable_item.script"] = true,
+		["ce_new_game_dm.script"] = true,
+		["sim_faction_brain_human.script"] = true,
+		["sim_faction_brain_mutant.script"] = true,
+		["ce_switcher.script"] = true,
+		["axr_main.script"] = true,
+		["lua_help.script"] = true,
+		["_g.script"] = true
+	}
+	local f	= getFS()
+	local flist = f:file_list_open_ex("$game_scripts$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*.script")
+	local f_cnt = flist:Size()
+	for	it=0, f_cnt-1 do
+		local file = flist:GetAt(it)
+		local file_name = file:NameShort()
+		if not (ignore[file_name]) then
+			file_name = file_name:sub(0,file_name:len()-7)
+			if (_G[file_name] and _G[file_name].on_game_start) then
+				printf("axr_main module added %s",file_name)
+				_G[file_name].on_game_start()
 			end
-		else 
-			printf("axr_main: Registered script module %s is absent",script_modules[i])
 		end
 	end
 end

@@ -103,6 +103,21 @@ function action.debug_test(p)
 	end 
 	if (p==1) then 
 		
+		--[[
+		if not (TEST_pda) then
+			TEST_pda = ui_pda_menu.pda_menu()
+		end
+		TEST_pda:ShowDialog()
+		TEST_pda:Show(true)
+		--]]
+		
+		if not (TEST_pda) then 
+			TEST_pda = ui_pda_menu.pda_menu() --CUIPdaWnd()
+		end 
+		TEST_pda:SetActiveSubdialog("eptTasks")
+		TEST_pda:ShowDialog()
+		
+		--[[
 		for k,v in pairs(xr_statistic.actor_statistic.skills) do
 			if (v < 5) then
 				xr_statistic.assign_point_to_skill(k,5)
@@ -113,10 +128,7 @@ function action.debug_test(p)
 		
 		ui_rpg_char_menu.char_list(nil,"Scavenger", "Trespasser", "Adventurer", "Loner", "Explorer", "Robber")
 		
-		local wpn = db.actor:item_in_slot(0)
-		if (wpn) then
-			wpn:play_hud_motion("knife_kick_2",true,wpn:get_state())
-		end
+		--]]
 		
 		-- RELEASES TASK GIVER FOR ALL TASKS WITH task_giver_id; useful for testing how a task works when giver is dead
 		--[[
@@ -139,6 +151,7 @@ function action.debug_test(p)
 		
 		-- SET ALL ACTIVE TASKS TO COMPLETE STAGE
 
+		--[[
 		local debug_task_infos = task_manager.get_task_manager().task_info
 		local task_ini = task_manager.task_ini
 		for k,v in pairs(debug_task_infos) do
@@ -147,6 +160,7 @@ function action.debug_test(p)
 				v.stage = stage
 			end
 		end
+		--]]
 
 	
 		-- test
