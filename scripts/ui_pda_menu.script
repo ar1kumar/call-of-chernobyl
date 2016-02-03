@@ -27,17 +27,13 @@ class CUIPdaWnd (CUIScriptWnd)
 
 class "pda_menu" (CUIPdaWnd)
 function pda_menu:__init() super()
-	self.active_section = ""
-	self:Init()
+
 end
 
 function pda_menu:Init()
 	printf("pda_menu Init")
-	--CUIPdaWnd.Init(self)
-	
-	self.m_pActiveDialog = nil
-	self.m_sActiveSection = ""
-	
+	CUIPdaWnd.Init(self)
+	--[[
 	self.xml = CScriptXmlInit()
 	self.xml:ParseFile("pda.xml")
 	
@@ -70,27 +66,49 @@ function pda_menu:Init()
 	self.UINoice = self.xml:InitStatic("noice_static",self)
 	self.UINoice:SetAutoDelete(true)
 	
-	self.test_ui = ui_dyn_msg_box.multi_choice({},"option 1", "option 2")
+	--self.test_ui = ui_dyn_msg_box.multi_choice({},"option 1", "option 2")
+	--]]
+	printf("init finished")
 end 
 
 function pda_menu:Update()
+	printf("before 1")
 	CUIPdaWnd.Update(self)
-end 
+	printf("after 1")
+end
+
+function pda_menu:UpdatePda()
+	printf("before 2")
+	CUIPdaWnd.UpdatePda(self)
+	printf("after 2")
+end
+
+function pda_menu:UpdateRankingWnd()
+	printf("before 3")
+	CUIPdaWnd.UpdateRankingWnd(self)
+	printf("after 3")
+end
 
 function pda_menu:Show(b)
+	printf("before 4")
 	CUIPdaWnd.Show(self,b)
+	printf("after 4")
 end 
 
 function pda_menu:SetActiveSubdialog(id)
 	--CUIPdaWnd.SetActiveSubdialog(self,id)
+	printf("before 5")
 	
 	printf("SetActiveSubdialog %s",self.UITaskWnd ~= nil)
-	if (self.m_sActiveSection == id) then 
+	if (self.m_sActiveSection == id) then
+		printf("after 5 early")
 		return 
 	end
 	
-	if (self.m_pActiveDialog) then 
+	if (self.m_pActiveDialog and self.m_pActiveDialog:IsShown()) then 
+		printf("UIMainPdaFrame %s DetachChild = %s",self.UIMainPdaFrame ~= nil,self.UIMainPdaFrame.DetachChild ~= nil)
 		self.UIMainPdaFrame:DetachChild(self.m_pActiveDialog)
+		printf("after UIMainPdaFrame detach child")
 		self.m_pActiveDialog:Show(false)
 	end
 	
@@ -105,21 +123,23 @@ function pda_menu:SetActiveSubdialog(id)
 	end
 	
 	if (self.m_pActiveDialog) then
+		printf("UIMainPdaFrame %s AttachChild = %s",self.UIMainPdaFrame ~= nil,self.UIMainPdaFrame.AttachChild ~= nil)
 		self.UIMainPdaFrame:AttachChild(self.m_pActiveDialog)
+		printf("after attach %s Show_exist=%s",id,self.m_pActiveDialog.Show ~= nil)
 		self.m_pActiveDialog:Show(true)
 	end
 	
+	printf("before set active tab  %s  ~= %s",self.UITabControl:GetActiveId(),id)
 	if (self.UITabControl:GetActiveId() ~= id) then
 		self.UITabControl:SetActiveTab(id)
 	end
 	
 	self.m_sActiveSection = id
 	
+	printf("before SetActiveCaption")
 	self:SetActiveCaption()
-end
-
-function pda_menu:UpdatePda()
-	CUIPdaWnd.UpdatePda(self)
+	
+	printf("after 5")
 end
 
 function pda_menu:OnKeyboard(dik,action)
@@ -135,10 +155,6 @@ end
 function pda_menu:OnMouse(x,y,action)
 	CUIPdaWnd.OnMouse(self,x,y,action)
 	return true
-end
-
-function pda_menu:UpdateRankingWnd()
-	CUIPdaWnd.UpdateRankingWnd(self)
 end
 
 function pda_menu:OnQuit()
