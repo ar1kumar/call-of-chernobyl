@@ -441,7 +441,7 @@ function CGeneralTask:load(packet)
 end
 
 function CGeneralTask:save_state(m_data)
-	if (self.t == nil) then
+	if (self.t == nil and not db.actor:get_task(self.id, true)) then
 		if (self.repeat_timeout == nil or self.timeout == nil) then 
 			return 
 		end
