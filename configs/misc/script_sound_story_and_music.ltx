@@ -30,6 +30,62 @@ joke
 reac_joke
 reac_laugh
 
+;Байки
+strange_story_1_0
+strange_story_1_1
+strange_story_1_2
+strange_story_1_3
+strange_story_2_0
+strange_story_2_1
+strange_story_2_2
+strange_story_2_3
+strange_story_2_4
+strange_story_3_0
+strange_story_3_1
+strange_story_4_0
+strange_story_4_1
+strange_story_5_0
+strange_story_5_1
+strange_story_5_2
+strange_story_6_0
+strange_story_6_1
+strange_story_6_2
+strange_story_6_3
+strange_story_6_4
+strange_story_6_5
+strange_story_7_0
+strange_story_7_1
+strange_story_7_2
+strange_story_7_3
+strange_story_7_4
+strange_story_7_5
+strange_story_7_6
+strange_story_8_0
+strange_story_8_1
+strange_story_8_2
+strange_story_9_0
+strange_story_9_1
+strange_story_9_2
+strange_story_10_0
+strange_story_11_0
+strange_story_11_1
+strange_story_11_2
+strange_story_11_3
+strange_story_11_4
+strange_story_11_5
+strange_story_11_6
+strange_story_11_7
+strange_story_11_8
+
+;Реакции на байки
+strange_story_agree
+strange_story_action
+strange_story_belief
+strange_story_continue
+strange_story_cool
+strange_story_final_happy
+strange_story_final_tragic
+
 ;***************************************************************
 ;**  attack
 ;***************************************************************
@@ -213,7 +269,7 @@ idle = 1,1,100
 ;***************************************************************
 [intro_joke]
 type = npc
-avail_communities = stalker, bandit, dolg, freedom, army, monolith, csky, ecolog
+avail_communities = stalker, bandit, dolg, freedom, army, csky
 npc_prefix = true
 path = talk\intros\intro_joke_
 shuffle = rnd
@@ -222,7 +278,7 @@ group_snd = true
 
 [joke]
 type = npc
-avail_communities = stalker, bandit, dolg, freedom, army, monolith, csky, ecolog
+avail_communities = stalker, bandit, dolg, freedom, army, csky
 npc_prefix = true
 path = talk\jokes\joke_
 shuffle = rnd
@@ -231,7 +287,7 @@ group_snd = true
 
 [reac_joke]
 type = npc
-avail_communities = stalker, bandit, dolg, freedom, army, monolith, csky, ecolog
+avail_communities = stalker, bandit, dolg, freedom, army, csky
 npc_prefix = true
 path = reactions\joke\reaction_joke_
 shuffle = rnd
@@ -240,127 +296,447 @@ group_snd = true
 
 [reac_laugh]
 type = npc
-avail_communities = stalker, bandit, dolg, freedom, army, monolith, csky, ecolog
+avail_communities = stalker, bandit, dolg, freedom, army, csky
 npc_prefix = true
 path = reactions\story\laughter_
 shuffle = rnd
 idle = 0,0,100
 group_snd = true
 
+;***************************************************************
+;**  Байки
+;***************************************************************
+[strange_story_1_0]
+type = npc
+avail_communities = stalker, ;Ограничитель, чтобы рассказывали только сталкеры. Чтобы байки травились другими групировками, добавить им в папку со звуками нужные файлы
+npc_prefix = true
+path = states\s_story\story1_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_1_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story1_part_1
+idle = 0,0,100
+group_snd = true
+
+[strange_story_1_2]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story1_part_2
+idle = 0,0,100
+group_snd = true
+
+[strange_story_1_3]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story1_part_3
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_2_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story2_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_2_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story2_part_1
+idle = 0,0,100
+group_snd = true
+
+[strange_story_2_2]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story2_part_2
+idle = 0,0,100
+group_snd = true
+
+[strange_story_2_3]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story2_part_3
+idle = 0,0,100
+group_snd = true
+
+[strange_story_2_4]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story2_part_4
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_3_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story3_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_3_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story3_part_1
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_4_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story4_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_4_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story4_part_1
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_5_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story5_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_5_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story5_part_1
+idle = 0,0,100
+group_snd = true
+
+[strange_story_5_2]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story5_part_2
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_6_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story6_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_6_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story6_part_1
+idle = 0,0,100
+group_snd = true
+
+[strange_story_6_2]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story6_part_2
+idle = 0,0,100
+group_snd = true
+
+[strange_story_6_3]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story6_part_3
+idle = 0,0,100
+group_snd = true
+
+[strange_story_6_4]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story6_part_4
+idle = 0,0,100
+group_snd = true
+
+[strange_story_6_5]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story6_part_5
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_7_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story7_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_7_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story7_part_1
+idle = 0,0,100
+group_snd = true
+
+[strange_story_7_2]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story7_part_2
+idle = 0,0,100
+group_snd = true
+
+[strange_story_7_3]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story7_part_3
+idle = 0,0,100
+group_snd = true
+
+[strange_story_7_4]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story7_part_4
+idle = 0,0,100
+group_snd = true
+
+[strange_story_7_5]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story7_part_5
+idle = 0,0,100
+group_snd = true
+
+[strange_story_7_6]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story7_part_6
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_8_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story8_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_8_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story8_part_1
+idle = 0,0,100
+group_snd = true
+
+[strange_story_8_2]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story8_part_2
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_9_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story9_part_0
+idle = 0,0,100
+group_snd = true
+
+[strange_story_9_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story9_part_1
+idle = 0,0,100
+group_snd = true
+
+[strange_story_9_2]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story9_part_2
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_10_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story10_part_0
+idle = 0,0,100
+group_snd = true
 
 
+[strange_story_11_0]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_0
+idle = 0,0,100
+group_snd = true
 
+[strange_story_11_1]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_1
+idle = 0,0,100
+group_snd = true
 
+[strange_story_11_2]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_2
+idle = 0,0,100
+group_snd = true
 
+[strange_story_11_3]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_3
+idle = 0,0,100
+group_snd = true
 
-[story_01_seq]
-stalker	= 1,talk\stories\story001_part_
+[strange_story_11_4]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_4
+idle = 0,0,100
+group_snd = true
 
-[story_02_seq]
-stalker	= 1,talk\stories\story002_part_
+[strange_story_11_5]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_5
+idle = 0,0,100
+group_snd = true
 
-[story_03_seq]
-stalker	= 1,talk\stories\story003_part_
+[strange_story_11_6]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_6
+idle = 0,0,100
+group_snd = true
 
-[story_04_seq]
-stalker	= 1,talk\stories\story004_part_
+[strange_story_11_7]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_7
+idle = 0,0,100
+group_snd = true
 
-[story_05_seq]
-stalker	= 1,talk\stories\story005_part_
+[strange_story_11_8]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = states\s_story\story11_part_8
+idle = 0,0,100
+group_snd = true
+;***************************************************************
+;**  Реакции на Байки
+;***************************************************************
+[strange_story_agree]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = reactions\s_story\agree_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
 
-[story_06_seq]
-stalker	= 1,talk\stories\story006_part_
+[strange_story_action]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = reactions\s_story\action_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
 
-[legend_01_seq]
-stalker	= 1,talk\stories\legend001_part_
+[strange_story_belief]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = reactions\s_story\belief_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
 
-[legend_02_seq]
-stalker	= 1,talk\stories\legend002_part_
+[strange_story_continue]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = reactions\s_story\continue_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
 
-[legend_03_seq]
-stalker	= 1,talk\stories\legend003_part_
+[strange_story_cool]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = reactions\s_story\cool_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
 
-[legend_04_seq]
-stalker	= 1,talk\stories\legend004_part_
+[strange_story_final_happy]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = reactions\s_story\final_happy_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
 
-[legend_05_seq]
-stalker	= 1,talk\stories\legend005_part_
-
-
-[story_reac_action_right_rnd]
-stalker	= 1,reactions\story\action_right_
-
-[story_reac_action_wrong_rnd]
-stalker	= 1,reactions\story\action_wrong_
-
-[story_reac_advice_sceptic_rnd]
-stalker	= 1,reactions\story\advice_sceptic_
-
-[story_reac_advice_support_rnd]
-stalker	= 1,reactions\story\advice_support_
-
-[story_reac_belief_story_rnd]
-stalker	= 1,reactions\story\belief_story_
-
-[story_reac_continue_rnd]
-stalker	= 1,reactions\story\continue_
-
-[story_reac_cool_info_rnd]
-stalker	= 1,reactions\story\cool_info_
-
-[story_reac_cool_teller_rnd]
-stalker	= 1,reactions\story\cool_teller_
-
-[story_reac_disbelief_rnd]
-stalker	= 1,reactions\story\disbelief_
-
-[story_reac_disbelief_story_rnd]
-stalker	= 1,reactions\story\disbelief_story_
-
-[story_reac_disbelief_teller_rnd]
-stalker	= 1,reactions\story\disbelief_teller_
-
-[story_reac_doubt_rnd]
-stalker	= 1,reactions\story\doubt_
-
-[story_reac_fear_rnd]
-stalker	= 1,reactions\story\fear_
-
-[story_reac_final_happy_rnd]
-stalker	= 1,reactions\story\final_happy_
-
-[story_reac_final_tragic_rnd]
-stalker	= 1,reactions\story\final_tragic_
-
-[story_reac_laughter_rnd]
-stalker	= 1,reactions\story\laughter_
-
-[story_reac_old_story_rnd]
-stalker	= 1,reactions\story\old_story_
-
-[story_reac_uncertain_rnd]
-stalker	= 1,reactions\story\uncertain_
-
-[story_reac_wonder_rnd]
-stalker	= 1,reactions\story\wonder_
-
-[story_reac_yes_rnd]
-stalker	= 1,reactions\story\yes_
+[strange_story_final_tragic]
+type = npc
+avail_communities = stalker
+npc_prefix = true
+path = reactions\s_story\final_tragic_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true

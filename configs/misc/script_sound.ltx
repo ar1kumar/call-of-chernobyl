@@ -6,7 +6,8 @@
 #include "axr_script_sound.ltx"
 #include "script_sound_l05_bar.ltx"
 #include "script_sound_escape.ltx"
-[list]: list_music_and_stories, list_script_sound_zaton, list_script_sound_jupiter, list_script_sound_pripyat, list_script_sound_underpass, list_axr_script_sound, list_script_sound_l05_bar, list_script_sound_escape
+#include "script_sound_marsh.ltx"
+[list]: list_music_and_stories, list_script_sound_zaton, list_script_sound_jupiter, list_script_sound_pripyat, list_script_sound_underpass, list_axr_script_sound, list_script_sound_l05_bar, list_script_sound_escape, list_script_sound_marsh
 bloodsucker_growl
 bloodsucker_hit
 bloodsucker_swarm
@@ -50,6 +51,8 @@ post_combat_relax
 alarm
 
 meet_hello
+meet_wait
+meet_stop
 meet_hide_weapon
 meet_use_no_default
 meet_use_no_fight
@@ -329,7 +332,7 @@ idle = 3,5,100 ;min,max,rnd
 ;************************************************************
 [wait]
 type = npc
-avail_communities = stalker, bandit, dolg, freedom, army, monolith
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, monolith, stalker
 npc_prefix = true
 path = states\idle\idle_
 shuffle = rnd
@@ -378,24 +381,30 @@ idle = 0,0,100
 [patrol_sneak]
 type = npc
 actor_stereo = false
-npc_prefix = false
-path = human_01\stalker\alife\patrol\sneak_
+npc_prefix = true
+group_snd = true
+path = alife\patrol\sneak_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
 shuffle = rnd
 idle = 1,1,100
 
 [patrol_run]
 type = npc
 actor_stereo = false
-npc_prefix = false
-path = human_01\stalker\alife\patrol\run_
+npc_prefix = true
+group_snd = true
+path = alife\patrol\run_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
 shuffle = rnd
 idle = 1,1,100
 
 [patrol_walk]
 type = npc
 actor_stereo = false
-npc_prefix = false
-path = human_01\stalker\alife\patrol\walk_
+npc_prefix = true
+group_snd = true
+path = alife\patrol\walk_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
 shuffle = rnd
 idle = 1,1,100
 
@@ -404,6 +413,7 @@ type = npc
 actor_stereo = false
 npc_prefix = true
 path = fight\attack\script_attack_
+avail_communities = bandit, csky, dolg, freedom, army, stalker, monolith
 shuffle = rnd
 idle = 1,1,100
 is_combat_sound = true
@@ -416,7 +426,7 @@ actor_stereo = false
 npc_prefix = true
 group_snd = true
 path = fight\post_combat_wait\wait_
-avail_communities = stalker, bandit, dolg, freedom, army
+avail_communities = bandit, csky, dolg, freedom, army, stalker
 shuffle = rnd
 idle = 3,5,100
 
@@ -426,7 +436,7 @@ actor_stereo = false
 npc_prefix = true
 group_snd = true
 path = fight\post_combat_wait\wait_
-avail_communities = stalker, bandit, dolg, freedom, army
+avail_communities = bandit, csky, dolg, freedom, army, stalker
 shuffle = rnd
 idle = 7,10,100
 
@@ -436,7 +446,7 @@ actor_stereo = false
 npc_prefix = true
 group_snd = true
 path = fight\post_combat_wait\relax_
-avail_communities = stalker, bandit, dolg, freedom, army
+avail_communities = bandit, csky, dolg, freedom, army, stalker
 shuffle = rnd
 idle = 1,1,100
 
@@ -619,23 +629,39 @@ idle = 0,0,100
 
 [meet_hello]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom, csky, ecolog
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, stalker, monolith
 npc_prefix = true
 path = states\meet\meet_hello_
+shuffle = rnd
+idle = 7,10,100
+
+[meet_wait]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, stalker
+npc_prefix = true
+path = states\meet\meet_wait_
+shuffle = seq
+idle = 10,20,100
+
+[meet_stop]
+type = npc
+avail_communities = bandit, csky, dolg, freedom, killer, stalker
+npc_prefix = true
+path = states\meet\meet_stop_
 shuffle = rnd
 idle = 2,2,100
 
 [meet_hide_weapon]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom, csky
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker
 npc_prefix = true
 path = states\meet\meet_hide_weapon_
 shuffle = rnd
-idle = 5,7,100
+idle = 7,10,100
 
 [meet_use_no_default]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker
 npc_prefix = true
 path = states\meet\meet_use_no_default_
 shuffle = rnd
@@ -643,7 +669,7 @@ idle = 1,1,100
 
 [meet_use_no_fight]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker
 npc_prefix = true
 path = states\meet\meet_use_no_fight_
 shuffle = rnd
@@ -651,7 +677,7 @@ idle = 2,2,100
 
 [meet_use_no_weapon]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom, csky
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker
 npc_prefix = true
 path = states\meet\meet_use_no_weapon_
 shuffle = rnd
@@ -659,7 +685,7 @@ idle = 5,7,100
 
 [meet_use_no_talk_leader]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker
 npc_prefix = true
 path = states\meet\meet_use_no_talk_leader_
 shuffle = rnd
@@ -668,7 +694,7 @@ idle = 5,7,100
 
 [corpse_loot_begin]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom
+avail_communities = bandit, csky, dolg, freedom, killer, army, monolith, stalker
 npc_prefix = true
 path = states\loot\loot_begin_
 shuffle = rnd
@@ -676,7 +702,7 @@ idle = 10,11,100
 
 [corpse_loot_good]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom
+avail_communities = bandit, csky, dolg, freedom, killer, army, monolith, stalker
 npc_prefix = true
 path = states\loot\loot_good_
 shuffle = rnd
@@ -684,7 +710,7 @@ idle = 10,11,100
 
 [corpse_loot_bad]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom
+avail_communities = bandit, csky, dolg, freedom, killer, army, monolith, stalker
 npc_prefix = true
 path = states\loot\loot_bad_
 shuffle = rnd
@@ -692,7 +718,7 @@ idle = 10,11,100
 
 [help_heavy]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom, csky
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, monolith, stalker
 npc_prefix = true
 path = help\wounded_heavy\help_
 shuffle = rnd
@@ -700,7 +726,7 @@ idle = 4,8,100
 
 [help_thanks]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom, killer, csky
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, stalker
 npc_prefix = true
 path = help\wounded_thanx\thanx_
 shuffle = rnd
@@ -708,7 +734,7 @@ idle = 1,1,100
 
 [wounded_medkit]
 type = npc
-avail_communities = army, stalker, bandit, dolg, freedom, killer, monolith, csky
+avail_communities = army, stalker, bandit, dolg, freedom, killer, csky
 npc_prefix = true
 path = help\wounded\medkit_
 shuffle = rnd
