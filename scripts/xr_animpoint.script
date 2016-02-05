@@ -243,9 +243,31 @@ function animpoint:fill_approved_actions()
 end
 -- Чувак дошел до точки и может начинать работать
 function animpoint:start()
-	-- Определяем, находится ли точка в каком то из кампов
-	if self.st.use_camp then
-		self.camp = sr_camp.get_current_camp(self.vertex_position)
+	local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
+	if not (npc) then 
+		printf("xr_animpoint: ERROR: NPC don't exist!")
+		return 
+	end 
+	
+	local state = state_mgr.get_state(npc)
+	local camp = sr_camp.get_current_camp(self.vertex_position)
+	
+	if (camp) then 
+		if (self.st.use_camp == true and not string.find(state,"sleep")) then
+			self.camp = camp
+			self.camp:register_npc(self.npc_id)
+			self.in_camp = true			
+		elseif (self.st.use_camp == false or string.find(state,"sleep")) then 
+			if self.in_camp == true then
+				self.camp:unregister_npc(self.npc_id)
+				self.in_camp = nil
+				self.camp = nil
+			end				
+		end
+	elseif (self.in_camp == true and self.camp ~= nil) then
+		self.camp:unregister_npc(npc:id())
+		self.in_camp = nil
+		self.camp = nil
 	end
 
 	self:fill_approved_actions()
@@ -285,14 +307,16 @@ function animpoint:update()
 	if not (self.vertex_position) then
 		return
 	end
-	if not (self.camp) then 
-		return 
+	
+	if (self.npc_id==nil) then
+		printf("Trying to use destroyed object!")
+		return
 	end
 	
 	local tmp_actions = {}
 	local descr = self.st.description
 
-	if not(self.st.use_camp) then
+	if (self.camp == nil or self.st.use_camp ~= true) then
 		if self.st.avail_animations == nil then
 			if self.st.approved_actions == nil then
 				printf("animpoint not in camp and approved_actions is nil. Name [%s]", self.st.cover_name)
@@ -312,9 +336,7 @@ function animpoint:update()
 		return
 	end
 
-	if(self.npc_id==nil) then
-		printf("Trying to use destroyed object!")
-	end
+
 
 	local camp_action, is_director = self.camp:get_camp_action(self.npc_id)
 	local tbl = {}

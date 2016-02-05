@@ -75,11 +75,13 @@ function action_walker_activity:execute()
 			if self.in_camp == true then
 				self.camp:unregister_npc(self.object:id())
 				self.in_camp = nil
+				self.camp = nil
 			end				
 		end
 	elseif (self.in_camp == true and self.camp ~= nil) then
 		self.camp:unregister_npc(self.object:id())
 		self.in_camp = nil
+		self.camp = nil
 	end
 	
 	if (state == "sleep" or state == "sleep_sit") then 

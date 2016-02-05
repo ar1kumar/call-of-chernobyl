@@ -153,11 +153,13 @@ function action_point_campfire:execute()
 			if (self.in_camp) then 
 				camp:unregister_npc(npc:id())
 				self.in_camp = nil
+				self.st.camp = nil
 			end
 		end
 	elseif (self.in_camp == true and not self.st.camp) then
 		self.st.camp:unregister_npc(npc:id())
-		self.in_camp = nil	
+		self.in_camp = nil
+		self.st.camp = nil
 	end
 	
 	if (self.st.camp) then

@@ -77,14 +77,14 @@ end
 
 function animpoint_predicate_need_sleep(id, camp)
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc and level.get_time_hours() < 5 or level.get_time_hours() > 20) then
+	if (npc and not db.storage[id].need_sleep and level.get_time_hours() < 5 or level.get_time_hours() > 20) then
 		if (db.storage[id].check_sleep and time_global() < db.storage[id].check_sleep) then
 			return db.storage[id].need_sleep == true
 		end
 
 		db.storage[id].check_sleep = time_global() + 320000
 
-		if (math.random(100) > 80) then
+		if (math.random(100) > 10) then
 			db.storage[id].need_sleep = true
 			return true
 		end
@@ -96,7 +96,7 @@ end
 
 function animpoint_predicate_roast(id,camp)
 	local npc = db.storage[id] and db.storage[id].object
-	if (npc) then
+	if (npc and not db.storage[id].need_sleep) then
 		local smart = xr_gulag.get_npc_smart(npc)
 		if (smart) then
 			local fires = db.campfire_table_by_smart_names[smart:name()]
