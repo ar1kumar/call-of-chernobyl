@@ -26,11 +26,12 @@ function camp_binder:net_spawn(data)
 	local ini = self.object:spawn_ini()
 
 	if ini:section_exist(CAMP_SECTION) then
-		local filename = utils.cfg_get_string(ini, CAMP_SECTION, "cfg", nil, false, "", nil)
+		local filename = utils.cfg_get_string(ini, CAMP_SECTION, "cfg", nil, false, "", nil) or "scripts\\camp.ltx"
 		if filename then
 			ini = ini_file(filename)
 		end
-	
+		
+		printf("filename = %s",filename)
 		--printf("!!!!!")
 		camps[self.object:id()].camp = sr_camp.CCampManager(self.object, ini)
 	end
