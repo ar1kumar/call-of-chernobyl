@@ -142,13 +142,35 @@ function action_point_campfire:execute()
 		return
 	end
 
-	if (self.st.use_camp and not self.st.camp and not self.st.camp_checked) then
+	local state = state_mgr.get_state(self.object)
+	local camp = sr_camp.get_current_camp(npc:position())
+	if (camp) then 
+		if (self.st.use_camp == true and state ~= "sleep" and state ~= "sleep_sit") then 
+			self.st.camp = camp
+			camp:register_npc(npc:id())
+			self.in_camp = true
+		elseif (self.st.use_camp ~= true or state == "sleep" or state == "sleep_sit") then
+			if (self.in_camp) then 
+				camp:unregister_npc(npc:id())
+				self.in_camp = nil
+			end
+		end
+	elseif (self.in_camp == true and not self.st.camp) then
+		self.st.camp:unregister_npc(npc:id())
+		self.in_camp = nil	
+	end
+	
+	if (self.st.camp) then
+		if (self.st.use_camp ~= true or state == "sleep" or state == "sleep_sit") then
+			self.st.camp:unregister_npc(npc:id())
+		end
+	elseif (self.st.use_camp and state ~= "sleep" and state ~= "sleep_sit" and not self.st.camp_checked) then
 		self.st.camp_checked = true
 		local camp = sr_camp.get_current_camp(npc:position())
 		if (camp) then
 			self.st.camp = camp
 			camp:register_npc(npc:id())
-		end
+		end		
 	end
 
 	local tg = time_global()

@@ -64,18 +64,27 @@ function action_walker_activity:execute()
 	self.move_mgr:update()
 
 	-- Определяем, в каком мы кемпе.
+	local state = state_mgr.get_state(self.object)
 	local camp = sr_camp.get_current_camp(self.object:position())
-	if camp ~= nil and self.st.use_camp == true then
-		self.camp = camp
-		self.camp:register_npc(self.object:id())
-		self.in_camp = true
-	else
-		if self.in_camp == true then
-			self.camp:unregister_npc(self.object:id())
-			self.in_camp = nil
+	if (camp) then 
+		if (self.st.use_camp == true and state ~= "sleep" and state ~= "sleep_sit") then 
+			self.camp = camp
+			self.camp:register_npc(self.object:id())
+			self.in_camp = true			
+		elseif (self.st.use_camp == false or state == "sleep" or state == "sleep_sit") then 
+			if self.in_camp == true then
+				self.camp:unregister_npc(self.object:id())
+				self.in_camp = nil
+			end				
 		end
+	elseif (self.in_camp == true and self.camp ~= nil) then
+		self.camp:unregister_npc(self.object:id())
+		self.in_camp = nil
 	end
-
+	
+	if (state == "sleep" or state == "sleep_sit") then 
+		return 
+	end
 
 	if not self.in_camp and self.st.sound_idle ~= nil then
 		xr_sound.set_sound_play(self.object:id(), self.st.sound_idle)
