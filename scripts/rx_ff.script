@@ -9,7 +9,7 @@ evaid = 18803
 actid = evaid
 --------------------------------------
 
-local STEP_SIZE = 10
+local STEP_SIZE = 15
 
 local function validate(npc,vid)
 	if (vid and vid < 4294967295 and npc:accessible(vid) and vid ~= npc:level_vertex_id()) then 
@@ -62,7 +62,7 @@ function evaluator_dont_shoot:check_in_los(friend,be,be_pos)
 		--if (friend_dist < be_dist) then
 			local dir_friend = vector():sub(friend_pos,pos):normalize()
 			local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
-			local mywho = friend_dist < 1.6 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1)
+			local mywho = friend_dist <= 2.1 or vec_who:similar(vec_be,1) --friend_dist < 1.6 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1)
 			if (mywho == 1) then
 				return true
 			end
