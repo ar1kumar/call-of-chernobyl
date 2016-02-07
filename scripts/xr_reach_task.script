@@ -189,6 +189,10 @@ function action_reach_task_location:commander_execute()
 			end
 		end
 
+		if squad.rush_to_target ~= nil then
+			rush_to_target = squad.rush_to_target
+		end
+
 		if (rush_to_target) then
 			npc:set_movement_type(move.run)
 			if (squad_target.position:distance_to_sqr(npc:position()) <= 10000) then
@@ -261,6 +265,10 @@ function action_reach_task_location:soldier_execute()
 				npc:set_mental_state(commander:mental_state())
 			end
 		end
+	end
+	
+	if squad.rush_to_target ~= nil and squad.rush_to_target == true then
+		npc:set_mental_state(commander:mental_state())
 	end
 
 	if commander:movement_type() == move.stand then

@@ -585,6 +585,9 @@ function bind_manager(object)
 
 	action = manager:action(stalker_ids.action_combat_planner)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
+	
+	local combat_action_planner = cast_planner(action)
+	combat_action_planner:remove_action(stalker_ids.action_kill_enemy_if_not_visible)
 
 	-- anomaly_planner (disable with a const false because it's busted)
 	manager:add_evaluator(18799,property_evaluator_const(false))
