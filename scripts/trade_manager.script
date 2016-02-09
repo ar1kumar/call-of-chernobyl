@@ -43,7 +43,7 @@ function update(npc)
 	
 	local tt = trade_manager[npc:id()]
 	if (tt == nil or tt.config == nil) then
-		printf("TRADE [%s]:  tt is nil", npc:name())
+		--printf("TRADE [%s]:  tt is nil", npc:name())
 		return
 	end
 
@@ -101,16 +101,16 @@ function update(npc)
 		printf("Wrong section in buy_condition condlist for npc [%s]!", npc:name())
 	end
 	if tt.current_buy_supplies ~= str then
-		if tt.resuply_time ~= nil and tt.resuply_time < tg then
+		if tt.resupply_time ~= nil and tt.resupply_time < tg then
 			return
 		end
 		--'printf("TRADE [%s]: buy_supplies = %s", npc:name(), str)
 		npc:buy_supplies(tt.config, str)
 		tt.current_buy_supplies = str
 		if (tg + 86400000 < 2147483647) then
-			tt.resuply_time = tg + 86400000
+			tt.resupply_time = tg + 86400000
 		else 
-			tt.resuply_time = 2147483646
+			tt.resupply_time = 2147483646
 		end
 	end
 end
@@ -120,6 +120,58 @@ function on_npc_death(npc)
 		trade_manager[npc:id()] = nil
 	end
 end
+
+function save_state(m_data,npc)
+	if not (npc:alive()) then 
+		return 
+	end
+	
+	local id = npc:id()
+	local tt = trade_manager[id]
+	if not (tt) then 
+		return 
+	end
+	
+	if not (utils.valid_pathname(tt.cfg_ltx)) then 
+		printf("ERROR: trade_manager: Invalid pathname %s.",tt.cfg_ltx)
+		return
+	end
+	
+	m_data.trade_manager[id] = {}
+	m_data.trade_manager[id].cfg_ltx = tt.cfg_ltx
+	m_data.trade_manager[id].current_buy_condition = tt.current_buy_condition
+	m_data.trade_manager[id].current_sell_condition = tt.current_sell_condition
+	m_data.trade_manager[id].current_buy_supplies = tt.current_buy_supplies
+	m_data.trade_manager[id].update_time = (tt.update_time or 0) - time_global()
+	m_data.trade_manager[id].resupply_time = (tt.resupply_time or 0) - time_global()
+end 
+
+function load_state(m_data,npc)
+	local id = npc:id()
+	if not (m_data.trade_manager and m_data.trade_manager[id]) then 
+		return 
+	end
+	if not (npc:alive()) then 
+		return 
+	end
+	
+	trade_manager[id] = empty_table(trade_manager[id])
+	trade_manager[id].cfg_ltx = m_data.trade_manager[id].cfg_ltx
+	trade_manager[id].config = ini_file(trade_manager[id].cfg_ltx)
+	if not (trade_manager[id].config) then 
+		printf("ERROR: trade_manager: Invalid pathname %s.",tt.cfg_ltx)
+		return
+	end
+	trade_manager[id].current_buy_condition = m_data.trade_manager[id].current_buy_condition
+	trade_manager[id].current_sell_condition = m_data.trade_manager[id].current_sell_condition
+	trade_manager[id].current_buy_supplies = m_data.trade_manager[id].current_buy_supplies
+	trade_manager[id].update_time = m_data.trade_manager[id].update_time + time_global()
+	trade_manager[id].resupply_time = m_data.trade_manager[id].resupply_time + time_global()
+	
+	npc:buy_condition(trade_manager[id].config, trade_manager[id].current_buy_condition)
+	npc:sell_condition(trade_manager[id].config, trade_manager[id].current_sell_condition)
+end 
+
 
 function save(obj, packet)
 	local tt = trade_manager[obj:id()]
@@ -149,10 +201,10 @@ function save(obj, packet)
 	 	packet:w_s32(tt.update_time - cur_tm)
 	end
 
-	if tt.resuply_time == nil then
+	if tt.resupply_time == nil then
 		packet:w_s32(-1)
 	else
-	 	packet:w_s32(tt.resuply_time - cur_tm)
+	 	packet:w_s32(tt.resupply_time - cur_tm)
 	end
 	set_save_marker(packet, "save", true, "trade_manager")
 end
@@ -209,7 +261,7 @@ function load(obj, packet)
 
 	a = packet:r_s32()
 	if a ~= -1 then
-		tt.resuply_time = cur_tm + a
+		tt.resupply_time = cur_tm + a
 	end
 	
 	if not (obj:alive()) then 

@@ -118,6 +118,47 @@ function set_volume_sound_looped(npc_id, sound, level)
 	end
 end
 
+function actor_save_state(m_data)
+	m_data.xr_sound[0] = {}
+	for k,v in pairs(sound_theme.theme) do
+		v:save_state(m_data.xr_sound[0])
+	end	
+	m_data.xr_sound[0].sound_table = {}
+	for k,v in pairs(sound_table) do
+		m_data.xr_sound[0].sound_table[k] = v.section
+	end
+	m_data.xr_sound[0].looped_sound = {}
+	for k,v in pairs(looped_sound) do
+		m_data.xr_sound[0].looped_sound[k] = {}
+		for kk,vv in pairs(looped_sound[k]) do
+			m_data.xr_sound[0].looped_sound[k][kk] = true
+		end
+	end
+end 
+
+function actor_load_state(m_data)
+	if not (m_data.xr_sound and m_data.xr_sound[0]) then 
+		return 
+	end 
+	for k,v in pairs(sound_theme.theme) do
+		v:load_state(m_data.xr_sound[0])
+	end
+	for k,v in pairs(m_data.xr_sound[0].sound_table) do
+		if (sound_theme.theme[v]) then
+			sound_table[k] = sound_theme.theme[v]
+		end
+	end
+	for k,v in pairs(m_data.xr_sound[0].looped_sound) do 
+		looped_sound[k] = {}
+		for kk,vv in pairs(m_data.xr_sound[0].looped_sound[k]) do
+			if (sound_theme.theme[kk]) then
+				looped_sound[k][kk] = sound_theme.theme[kk]
+			end
+		end
+	end
+	m_data.xr_sound[0] = nil 
+end
+
 function actor_save(stpk)
 	set_save_marker(stpk, "save", false, "sound_actor_save")
 	for k,v in pairs(sound_theme.theme) do
@@ -177,6 +218,22 @@ function actor_load(stpk)
 	end
 	set_save_marker(stpk, "load", true, "sound_actor_save")
 end
+function npc_save_state(m_data,npc)
+	m_data.xr_sound[npc:id()] = {}
+	for k,v in pairs(sound_theme.theme) do
+		v:save_state(m_data.xr_sound[npc:id()])
+	end
+end 
+
+function npc_load_state(m_data,npc)
+	if not (m_data.xr_sound and m_data.xr_sound[npc:id()]) then 
+		return 
+	end 
+	for k,v in pairs(sound_theme.theme) do
+		v:load_state(m_data.xr_sound[npc:id()])
+	end
+	m_data.xr_sound[npc:id()] = nil
+end 
 
 function save_npc(stpk, npc_id)
 	--alun_utils.debug_write("xr_sound:save_npc")

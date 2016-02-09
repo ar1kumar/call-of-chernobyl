@@ -17,22 +17,14 @@ local check_items
 local weapon_upgrades = {}
 local effect_funct
 
-local function save_state(m_data)
+function save_state(m_data)
 	m_data.RepairItemList = RepairItemList
 end
 
-local function load_state(m_data)
+function load_state(m_data)
 	RepairItemList = m_data.RepairItemList or RepairItemList
 	m_data.RepairItemList = nil
-	printf("load_state ")
 end
-
-function on_game_start()
-	if (USE_MARSHAL) then
-		RegisterScriptCallback("save_state",save_state)
-		RegisterScriptCallback("load_state",load_state)
-	end
-end 
 
 ----------- Dialog Func--------------------
 

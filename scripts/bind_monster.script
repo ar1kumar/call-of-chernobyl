@@ -15,6 +15,10 @@ local last_update = 0 -- combat
 class "generic_object_binder" (object_binder)
 function generic_object_binder:__init(obj) super(obj)
 	self.loaded = false
+	
+	if (USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 
 function generic_object_binder:reinit()
@@ -343,6 +347,11 @@ function generic_object_binder:net_destroy()
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
 	db.storage[self.object:id()] = nil
+	
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self)
+	end	
+	
 	object_binder.net_destroy(self)
 	--alun_utils.debug_write("generic_object_binder:net_destroy END")
 end
@@ -360,22 +369,67 @@ function generic_object_binder:net_save_relevant()
 	return true
 end
 
+function generic_object_binder:save_state(m_data)
+	local id = self.object:id()
+	m_data.xr_logic[id] = {}
+	m_data.xr_logic[id].job_ini = self.st.job_ini
+	m_data.xr_logic[id].ini_filename = self.st.ini_filename
+	m_data.xr_logic[id].section_logic = self.st.section_logic
+	m_data.xr_logic[id].active_section = self.st.active_section
+	m_data.xr_logic[id].gulag_name = self.st.gulag_name
+	m_data.xr_logic[id].activation_time = (self.st.activation_time or 0) - time_global()
+	m_data.xr_logic[id].activation_game_time = self.st.activation_game_time
+
+	if self.st.active_scheme then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "save_state")
+	end
+
+	xr_logic.pstor_save_all(self.object)
+end 
+
+function generic_object_binder:load_state(m_data)
+	local id = self.object:id()
+	if not (m_data.xr_logic and m_data.xr_logic[id]) then 
+		return 
+	end
+	self.st.job_ini = m_data.xr_logic[id].job_ini
+	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
+	self.st.loaded_section_logic = m_data.xr_logic[id].section_logic
+	self.st.loaded_active_section = m_data.xr_logic[id].active_section
+	self.st.loaded_gulag_name = m_data.xr_logic[id].gulag_name
+	self.st.activation_time = m_data.xr_logic[id].activation_time + time_global()
+	self.st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
+
+	if self.st.active_scheme then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "load_state")
+	end
+	
+	xr_logic.pstor_load_all(self.object)
+end
+
 function generic_object_binder:save(packet)
-	--alun_utils.debug_write("\n-------bind_monster save start------ "..self.object:name(),true)
 	set_save_marker(packet, "save", false, "generic_object_binder")
 	object_binder.save(self, packet)
-	xr_logic.save_obj(self.object, packet)
 	set_save_marker(packet, "save", true, "generic_object_binder")
+	if (USE_MARSHAL) then 
+		return 
+	end
+	--alun_utils.debug_write("\n-------bind_monster save start------ "..self.object:name(),true)
+	xr_logic.save_obj(self.object, packet)
 	--alun_utils.debug_write("\n-------bind_monster save END----------"..self.object:name(),true)
 end
 
 function generic_object_binder:load(reader)
-	--alun_utils.debug_write("\n-------bind_monster load start------ "..self.object:name(),true)
 	self.loaded = true
 	set_save_marker(reader, "load", false, "generic_object_binder")
 	object_binder.load(self, reader)
-	xr_logic.load_obj(self.object, reader)
 	set_save_marker(reader, "load", true, "generic_object_binder")
+	if (USE_MARSHAL) then 
+		self:load_state(alife_storage_manager.get_state())
+		return 
+	end
+	--alun_utils.debug_write("\n-------bind_monster load start------ "..self.object:name(),true)
+	xr_logic.load_obj(self.object, reader)
 	--alun_utils.debug_write("\n--------bind monster load END -------"..self.object:name())
 end
 

@@ -16,35 +16,35 @@ local good_acts = {[xr_actions_id.smartcover_action] = true,[xr_actions_id.smart
 local bad_acts = {xr_actions_id.stohe_meet_base+1}
 local Enable
 
-function on_game_start()
-	local gl_ini = ini_file("ai_tweaks\\rx_gl.ltx")
-	Enable = alun_utils.read_from_ini(gl_ini,"main","enabled","bool",false)
-	if not (Enable) then return end
+--function on_game_start()
+--	local gl_ini = ini_file("ai_tweaks\\rx_gl.ltx")
+--	Enable = alun_utils.read_from_ini(gl_ini,"main","enabled","bool",false)
+--	if not (Enable) then return end
 
-	RegisterScriptCallback("on_game_load",on_game_load)
-	RegisterScriptCallback("actor_on_update",actor_on_update)
-	RegisterScriptCallback("actor_on_item_pickup",actor_on_item_pickup)
-	RegisterScriptCallback("npc_on_update",npc_on_update)
-	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
-	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
+--	RegisterScriptCallback("on_game_load",on_game_load)
+--	RegisterScriptCallback("actor_on_update",actor_on_update)
+--	RegisterScriptCallback("actor_on_item_pickup",actor_on_item_pickup)
+--	RegisterScriptCallback("npc_on_update",npc_on_update)
+--	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
+--	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
 
-	gl_sets = {forbiddens = {weapons = {},factions = {},npcs = {}},
-				weapons = {},
-				ranks = {},
-				fms = {},
-				min_dist = alun_utils.read_from_ini(gl_ini,"main","min_dist","float",5),
-				max_dist = alun_utils.read_from_ini(gl_ini,"main","max_dist","float",90),
-				check_prd = alun_utils.read_from_ini(gl_ini,"main","check_period","float",2000),
-				spawn_prd = alun_utils.read_from_ini(gl_ini,"main","spawn_period","float",180)}
+--	gl_sets = {forbiddens = {weapons = {},factions = {},npcs = {}},
+--				weapons = {},
+--				ranks = {},
+--				fms = {},
+--				min_dist = alun_utils.read_from_ini(gl_ini,"main","min_dist","float",5),
+--				max_dist = alun_utils.read_from_ini(gl_ini,"main","max_dist","float",90),
+--				check_prd = alun_utils.read_from_ini(gl_ini,"main","check_period","float",2000),
+--				spawn_prd = alun_utils.read_from_ini(gl_ini,"main","spawn_period","float",180)}
 
-	local ranks = alun_utils.get_rank_list()
-	for k,v in ipairs(ranks) do
-		gl_sets.ranks[v] = {aim = alun_utils.read_from_ini(gl_ini,v,"aim_time","float",100),reload = alun_utils.read_from_ini(gl_ini,v,"reload_time","float",3200)}
-	end
-	gl_sets.forbiddens.weapons = alun_utils.parse_list(gl_ini,"main","forbidden_weapons",true)
-	gl_sets.forbiddens.factions = alun_utils.parse_list(gl_ini,"main","forbidden_factions",true)
-	gl_sets.forbiddens.npcs = alun_utils.parse_list(gl_ini,"main","forbidden_npcs",true)
-end
+--	local ranks = alun_utils.get_rank_list()
+--	for k,v in ipairs(ranks) do
+--		gl_sets.ranks[v] = {aim = alun_utils.read_from_ini(gl_ini,v,"aim_time","float",100),reload = alun_utils.read_from_ini(gl_ini,v,"reload_time","float",3200)}
+--	end
+--	gl_sets.forbiddens.weapons = alun_utils.parse_list(gl_ini,"main","forbidden_weapons",true)
+--	gl_sets.forbiddens.factions = alun_utils.parse_list(gl_ini,"main","forbidden_factions",true)
+--	gl_sets.forbiddens.npcs = alun_utils.parse_list(gl_ini,"main","forbidden_npcs",true)
+--end
 
 function on_game_load()
 	if not (Enable) then

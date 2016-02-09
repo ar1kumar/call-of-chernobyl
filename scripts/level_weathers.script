@@ -1,6 +1,7 @@
 --18.02.2008 - added dynamic weather
 --25.06.2011 - modified for AtmosFear 3 by Cromm Cruac
 --28.12.2013 - modified by Alundaio for all levels
+--8.02.2016  - modified by Alundaio to USE_MARSHAL
 local weather_manager = nil
 local prev_sec = 0
 local diff_sec = 0
@@ -497,24 +498,24 @@ function WeatherManager:set_state_as_string(ss)
 		laststring=lvlstring
 	end
 
-		local i,j,grname,curs,nexs=string.find(laststring,"([^=]+)=([^,]+),([^,]+)")
-		if not grname then
-			printf("WeatherManager:set_state_as_string: malformed state string. "..ss)
-		end
-		--local lvl_name=self:unpack_level(lvl)
-		local current_state=self:unpack_state(curs)
-		local next_state=self:unpack_state(nexs)
-		local graph_name=self:unpack_graph_name(grname)
-		local graph=self:get_graph_by_name(graph_name)
-		self.curr_weather=current_state
-		self.next_weather=current_state
-		if graph==nil then
-		-- Старая сохранёнка? Будем считать что на этом уровне - статическая погода
-		else
-			--self.debugMessages[11]:SetText("loaded string="..laststring)
-			--self.debugMessages[12]:SetText("self.state["..graph_name.."]={current_state="..current_state..",next_state="..next_state..",graph_name="..graph_name..",graph=}")
-			self.state[graph_name]={current_state=current_state,next_state=next_state,graph_name=graph_name,graph=graph}
-		end
+	local i,j,grname,curs,nexs=string.find(laststring,"([^=]+)=([^,]+),([^,]+)")
+	if not grname then
+		printf("WeatherManager:set_state_as_string: malformed state string. "..ss)
+	end
+	--local lvl_name=self:unpack_level(lvl)
+	local current_state=self:unpack_state(curs)
+	local next_state=self:unpack_state(nexs)
+	local graph_name=self:unpack_graph_name(grname)
+	local graph=self:get_graph_by_name(graph_name)
+	self.curr_weather=current_state
+	self.next_weather=current_state
+	if graph==nil then
+	-- Старая сохранёнка? Будем считать что на этом уровне - статическая погода
+	else
+		--self.debugMessages[11]:SetText("loaded string="..laststring)
+		--self.debugMessages[12]:SetText("self.state["..graph_name.."]={current_state="..current_state..",next_state="..next_state..",graph_name="..graph_name..",graph=}")
+		self.state[graph_name]={current_state=current_state,next_state=next_state,graph_name=graph_name,graph=graph}
+	end
 end
 
 -- Преобразуем текущее состояние менеджера в строку
@@ -792,3 +793,36 @@ function WeatherManager:lightning()
 		--atmosfear.debugMessages[13]:SetText("("..tostring(self.thunder_index)..") beyond the map - not launched")
 	end
 end
+
+function WeatherManager:save_state(m_data)
+	local wm = get_weather_manager()
+	m_data.weather_manager = {}
+	m_data.weather_manager.levelWeather = self.levelWeather
+	m_data.weather_manager.period = self.period
+	m_data.weather_manager.last_period_change_hour = self.last_period_change_hour
+	m_data.weather_manager.next_period_change_hour = self.next_period_change_hour
+	m_data.weather_manager.state = wm:get_state_as_string()
+	m_data.weather_manager.update_time = self.update_time
+	m_data.weather_manager.weather_fx = self.weather_fx
+	m_data.weather_manager.weather_fx_time = self.weather_fx and level.get_wfx_time() or 0
+end 
+
+function WeatherManager:load_state(m_data)
+	if not (m_data.weather_manager) then 
+		return 
+	end
+	local wm = get_weather_manager()
+	self.levelWeather = m_data.weather_manager.levelWeather
+	self.period = m_data.weather_manager.period
+	self.last_period_change_hour = m_data.weather_manager.last_period_change_hour
+	self.next_period_change_hour = m_data.weather_manager.next_period_change_hour
+	wm:set_state_as_string(m_data.weather_manager.state)
+	self.update_time = m_data.weather_manager.update_time
+	self.weather_fx = m_data.weather_manager.weather_fx
+	self.wfx_time = m_data.weather_manager.weather_fx_time
+	if (self.levelWeather == "atmosfear_transition") then 
+		self.transition_period = true
+	elseif (self.levelWeather == "atmosfear_pre_blowout") then
+		self.pre_blowout_period = true
+	end	
+end 
