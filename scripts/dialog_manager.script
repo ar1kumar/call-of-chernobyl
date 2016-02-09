@@ -291,28 +291,6 @@ function init_start_dialogs(dialog, str)
 		end
 	end
 
-	-- test all conditions and display a failsafe dialog message
-	--[[
-	if (use_npc) then
-		--printf("dialog for %s",use_npc:name())
-		local pass = false
-		local func
-		for i=1,#cond_list do
-			--printf("precondition = %s",cond_list[i])
-			func = alun_utils.findfunction(cond_list[i],_G)
-			if (func and func(db.actor,use_npc) == true) then
-				pass = true
-				break
-			end
-		end
-
-		if (pass == false) then
-			printf("%s has empty dialog, using failsafe message [str=%s community=%s]",use_npc:name(),str,character_community(use_npc))
-			ph = nil
-		end
-	end
-	--]]
-
 	if not(ph) then
 		add_dialog(1,2,"dm_"..str.."_general")
 	end

@@ -375,7 +375,6 @@ function motivator_binder:use_callback(obj, who)
 	if not obj:alive() then
 		return
 	end
-	dialog_manager.use_npc = obj --Dialog method can't get game_object, YOU NEED THIS! 
 	inventory_upgrades.need_victim(obj)
 	xr_meet.notify_on_use(obj, who)
 	dialog_manager.disabled_phrases[obj:id()] = nil
