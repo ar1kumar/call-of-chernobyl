@@ -65,7 +65,7 @@ artefacts_table = {
 taken_artefacts = {}
 
 
-local function save_state(data)
+function save_state(data)
 	if not (data.xr_statistic) then
 		data.xr_statistic = {}
 	end
@@ -76,7 +76,7 @@ local function save_state(data)
 	data.xr_statistic.weapons_table = weapons_table
 end
 
-local function load_state(data)
+function load_state(data)
 	if not (data.xr_statistic) then
 		return
 	end
@@ -88,15 +88,6 @@ local function load_state(data)
 
 	data.xr_statistic = nil
 end
-
-function on_game_start()
-	if not (USE_MARSHAL) then
-		return
-	end
-	RegisterScriptCallback("save_state",save_state)
-	RegisterScriptCallback("load_state",load_state)
-end
-
 
 function inc_surges_counter()
 	actor_statistic.surges = actor_statistic.surges + 1

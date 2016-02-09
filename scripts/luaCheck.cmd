@@ -24,7 +24,7 @@ goto end
 
 :scan_var
 
-"%LUA_DEV%\lua.exe" LuaCheck.lua %1 %2
+"C:\Program Files (x86)\LuaJit\lua5.1.exe" LuaCheck.lua %1 %2
 
 goto end
 
@@ -34,7 +34,7 @@ goto end
 
 for %%f in (.\*.script) do (
 
-        "%LUA_DEV%\lua.exe" "%cd%\LuaCheck.lua" "%%f"
+        "C:\Program Files (x86)\LuaJit\lua5.1.exe" "%cd%\LuaCheck.lua" "%%f"
 
         if %errorlevel% neq 0 pause
 

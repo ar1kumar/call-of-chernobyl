@@ -262,8 +262,8 @@ function CSurgeManager:skip_surge()
 	self.wave_sound 			= false
 	prev_sec				= 0
 
-	self:respawn_artefacts_and_replace_anomaly_zone()
 	self:toggle_level_artefact_respawns()
+	self:respawn_artefacts_and_replace_anomaly_zone()
 	
 	xr_statistic.inc_surges_counter()
 	if not (self.skip_message) and (atmosfear == nil or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==1) then
@@ -345,11 +345,11 @@ function CSurgeManager:end_surge(manual)
 		self:kill_all_unhided()
 	end
 
-	-- fix abuse from sleeping to respawn anoms
-	if not (self.time_forwarded) then
+	-- fix abuse from sleeping to respawn anoms (removed due to complaints of no respawning)
+	--if not (self.time_forwarded) then
 		self:respawn_artefacts_and_replace_anomaly_zone()
 		self:toggle_level_artefact_respawns()
-	end
+	--end
 
 	xr_statistic.inc_surges_counter()
 end

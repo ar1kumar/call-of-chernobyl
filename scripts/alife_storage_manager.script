@@ -55,38 +55,28 @@ function CALifeStorageManager_before_save(fname)
 			sim:release(se_obj,true)
 		end
 	end
-end 
-
--- called from engine!
-function CALifeStorageManager_save(fname)
-	if (force_pause) then 
-		device():pause(false)
-		force_pause = nil
-	end
-
 	if not (USE_MARSHAL) then 
 		return 
-	end 
-
+	end
 	local path = getFS():update_path('$game_saves$', '') .. fname:sub(0,-6):lower() .. ".scoc"
 	local savegame = io.open(path,"wb")
 	if (savegame) then
 		m_data.GAME_VERSION = GAME_VERSION
+		m_data.smart_terrains = {}
+		m_data.xr_logic = {}
+		m_data.xr_sound = {}
+		m_data.trade_manager = {}
 		
 		--alun_utils.debug_write(strformat("CALifeStorageManager_save %s GAME_VERSION=%s",savegame,m_data.GAME_VERSION))
 
 		SendScriptCallback("save_state",m_data)
 		
-		-- custom calls
-		task_manager.save_state(m_data)
-		
 		-- save pstor
+		m_data.pstor_all = {}
+		m_data.pstor_ctime = {}
 		for id,t in pairs(db.storage) do
 			if (t and type(t) == "table") then
 				if (t.pstor) then
-					if not (m_data.pstor_all) then
-						m_data.pstor_all = {}
-					end
 					if not (empty(t.pstor)) then
 						m_data.pstor_all[id] = t.pstor
 					end
@@ -94,9 +84,6 @@ function CALifeStorageManager_save(fname)
 		
 				-- serialization with game.CTime.__persist
 				if (t.pstor_ctime) then
-					if not (m_data.pstor_ctime) then
-						m_data.pstor_ctime = {}
-					end
 					if not (empty(t.pstor_ctime)) then
 						m_data.pstor_ctime[id] = t.pstor_ctime
 					end
@@ -125,12 +112,20 @@ function CALifeStorageManager_save(fname)
 	end	
 end 
 
+-- called from engine!
+function CALifeStorageManager_save(fname)
+	if (force_pause) then 
+		device():pause(false)
+		force_pause = nil
+	end
+end 
+
 -- called from engine
 function CALifeStorageManager_load(fname)
 	if not (USE_MARSHAL) then 
 		return 
 	end 
-	
+
 	local path = fname:sub(0,-6) .. ".scoc"
 	
 	--alun_utils.debug_write(strformat("CALifeStorageManager_load %s",path))
@@ -155,9 +150,6 @@ function CALifeStorageManager_load(fname)
 	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
 
 	SendScriptCallback("load_state",m_data)
-	
-	-- custom calls
-	task_manager.load_state(m_data)
 end
 
 function get_state()

@@ -174,14 +174,14 @@ end
 --------------------------------------------------------------------------------------------------------------------
 function on_game_start()
 	local ignore = { 
+		["_g.script"] = true,
 		["ce_new_attachable_item.script"] = true,
 		["ce_new_game_dm.script"] = true,
 		["sim_faction_brain_human.script"] = true,
 		["sim_faction_brain_mutant.script"] = true,
 		["ce_switcher.script"] = true,
 		["axr_main.script"] = true,
-		["lua_help.script"] = true,
-		["_g.script"] = true
+		["lua_help.script"] = true
 	}
 	local f	= getFS()
 	local flist = f:file_list_open_ex("$game_scripts$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*.script")
@@ -194,7 +194,7 @@ function on_game_start()
 			if (_G[file_name] and _G[file_name].on_game_start) then
 				printf("axr_main module added %s",file_name)
 				_G[file_name].on_game_start()
-	end
+			end
 		end
 	end
 end

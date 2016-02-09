@@ -5,7 +5,7 @@
 -- HELPERS
 -----------------------------------------------------------
 local function under_faction_control_target_id(task_id)
-	local smart_id = alun_utils.load_var(db.actor,task_id.."_id")
+	local smart_id = db.actor and alun_utils.load_var(db.actor,task_id.."_id")
 	if not (smart_id) then
 		printf("task_functor.under_faction_control_target_id is nil")
 		return 

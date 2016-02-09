@@ -166,7 +166,14 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 		if current_gulag == nil then
 			printf("ERROR: xr_logic: activate_by_section: section is NIL and NPC not in gulag.")
 		end
-		local t = current_gulag:getJob(npc_id)
+		local t = current_gulag and current_gulag:getJob(npc_id)
+		if not (t) then
+			db.storage[npc_id].overrides = nil
+			reset_generic_schemes_on_scheme_switch(npc, "nil", "nil")
+			db.storage[npc_id].active_section = nil
+			db.storage[npc_id].active_scheme = nil
+			return 
+		end
 		section = t.section
 	end
 
