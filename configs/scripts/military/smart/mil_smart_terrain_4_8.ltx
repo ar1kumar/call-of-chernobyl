@@ -1,9 +1,13 @@
 [smart_terrain]
 squad_id = 11
 max_population = 1
-respawn_idle = 30000
-respawn_radius = 200  
+respawn_params = respawn@mil_smart_terrain_4_8
+respawn_idle = 60000
+respawn_radius = 200
 
-faction_controlled = bandit, freedom, dolg, monolith
-faction_respawn_num = 1 
-default_faction = freedom
+[respawn@mil_smart_terrain_4_8]
+spawn_freedom@advanced
+
+[spawn_freedom@advanced]
+spawn_squads =  freedom_sim_squad_advanced, freedom_sim_squad_advanced, freedom_sim_squad_novice
+spawn_num = 2

@@ -181,7 +181,7 @@ function is_enemy(obj,enemy,no_memory)
 	end
 
 	local is_monster = character_community(enemy) == "zombied" or IsMonster(enemy)
-	local is_actor = db.actor:id() == ene_id
+	local is_actor = (ene_id == 0)
 	
 	-- Ignore enemies during surge, only if npc has a surge job at a smart_terrain and the enemy is greater then 25m (actor 100m) away from the npc's surge job's alife_task position
 	if (xr_conditions.surge_started and not obj:has_info("npcx_is_companion")) then 

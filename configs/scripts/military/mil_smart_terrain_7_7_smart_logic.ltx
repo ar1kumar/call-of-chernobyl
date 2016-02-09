@@ -1,30 +1,6 @@
 ;freedom mechanic
 [logic@mil_smart_terrain_7_7_freedom_mechanic]
-suitable = {=smart_under_faction_control(mil_smart_terrain_7_7:freedom:false) =check_npc_name(mil_smart_terrain_7_7_freedom_mechanic_stalker)} true, {!squad_exist(mil_smart_terrain_7_7_freedom_mechanic_stalker_squad) =smart_under_faction_control(mil_smart_terrain_7_7:freedom:true)} true, false
-prior = 200
-active = animpoint@stand
-level_spot = mechanic
-can_select_weapon = false
-
-;dolg mechanic
-[logic@faction_control_dolg_mechanic]
-suitable = {=smart_under_faction_control(mil_smart_terrain_7_7:dolg:true)} true
-prior = 200
-active = animpoint@stand
-level_spot = mechanic
-can_select_weapon = false
-
-;monolith mechanic
-[logic@faction_control_monolith_mechanic]
-suitable = {=smart_under_faction_control(mil_smart_terrain_7_7:monolith:true)} true
-prior = 200
-active = animpoint@stand
-level_spot = mechanic
-can_select_weapon = false
-
-;bandit mechanic
-[logic@faction_control_bandit_mechanic]
-suitable = {=smart_under_faction_control(mil_smart_terrain_7_7:bandit:true)} true
+suitable = {=check_npc_name(mil_smart_terrain_7_7_freedom_mechanic_stalker)} true
 prior = 200
 active = animpoint@stand
 level_spot = mechanic
@@ -37,7 +13,7 @@ use_camp = false
 meet = meet@mechanic
 combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
-invulnerable = {!actor_enemy !smart_under_faction_war(mil_smart_terrain_7_7)} true, false
+invulnerable = {!actor_enemy} true, false
 ;reach_distance = 10
 gather_items_enabled = false
 help_wounded_enabled = false
@@ -55,7 +31,7 @@ use = {=actor_enemy} false, true
 
 ;freedom leader
 [logic@mil_smart_terrain_7_7_freedom_leader]
-suitable = {=smart_under_faction_control(mil_smart_terrain_7_7:freedom:false) =check_npc_name(mil_smart_terrain_7_7_freedom_leader_stalker)} true
+suitable = {=check_npc_name(mil_smart_terrain_7_7_freedom_leader_stalker)} true
 prior = 200
 active = animpoint@mil_freedom_leader
 level_spot = quest_npc
@@ -91,7 +67,7 @@ meet_on_talking = false
 [logic@mil_smart_terrain_7_7_freedom_bodyguard1]
 active = walker@guard
 prior = 150
-suitable = {=smart_under_faction_control(mil_smart_terrain_7_7:freedom:false) =check_npc_name(mil_smart_terrain_7_7_freedom_bodyguard_stalker)} true
+suitable = {=check_npc_name(mil_smart_terrain_7_7_freedom_bodyguard_stalker)} true
 
 [walker@guard]
 path_walk = freedom_bodyguard_1_walk
@@ -123,7 +99,7 @@ use = false
 [logic@mil_smart_terrain_7_7_freedom_bodyguard2]
 active = walker@guard_2
 prior = 150
-suitable = {=smart_under_faction_control(mil_smart_terrain_7_7:freedom:false) =check_npc_name(mil_smart_terrain_7_7_freedom_bodyguard2_stalker)} true
+suitable = {=check_npc_name(mil_smart_terrain_7_7_freedom_bodyguard2_stalker)} true
 
 [walker@guard_2]
 path_walk = freedom_bodyguard_2_walk

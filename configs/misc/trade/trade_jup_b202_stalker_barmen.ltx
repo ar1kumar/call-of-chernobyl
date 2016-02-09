@@ -2,12 +2,10 @@
 [trader]
 buy_condition                            = trade_generic_buy
 buy_item_condition_factor                = 0.7
-buy_supplies                             = {=actor_community(actor_freedom) =wealthy_functor} sci_supplies_freedom_wealthy_tier_2, {=actor_community(actor_freedom) =wealthy_functor} supplies_freedom_wealthy_tier_2, {=actor_community(actor_dolg) =wealthy_functor} sci_supplies_duty_wealthy_tier_2, {=actor_community(actor_dolg) =wealthy_functor} supplies_duty_wealthy_tier_2, {+jup_a9_tech_way_info =counter_greater(jup_a6_actor_help_freedom:3)} sci_supplies_freedom_tier_2, {=counter_greater(jup_a6_actor_help_freedom:3)} supplies_freedom_tier_2, {+jup_a9_tech_way_info =counter_greater(jup_a6_actor_help_duty:3)} sci_supplies_duty_tier_2, {=counter_greater(jup_a6_actor_help_duty:3)} supplies_duty_tier_2, {+jup_a9_tech_way_info =counter_equal(jup_a6_actor_help_duty:2) =counter_equal(jup_a6_actor_help_freedom:2)} sci_supplies_freedom_duty_tier, {=actor_community(actor_freedom)} supplies_freedom_duty_tier, {=actor_community(actor_dolg)} sci_supplies_duty_tier_1, {=actor_community(actor_dolg)} supplies_duty_tier_1, {=actor_community(actor_freedom)} sci_supplies_freedom_tier_1, {=actor_community(actor_freedom)} supplies_freedom_tier_1, supplies_generic
-discounts                                = discount_3
+buy_supplies                             = {=actor_community(actor_freedom) =wealthy_functor} supplies_freedom_wealthy_tier_2, {=actor_community(actor_freedom)} supplies_freedom_tier_1, supplies_generic
+discounts                                = {=actor_goodwill_ge(freedom:1200)} discount_3, {=actor_goodwill_ge(freedom:1000)} discount_2, discount_1
 price_profile                            = default
 sell_condition                           = trade_generic_sell
-
-[sci_supplies_duty_wealthy_tier_2]
 
 [trade_generic_sell]
 
@@ -345,145 +343,6 @@ helm_respirator                          = 1.3, 2
 helm_respirator_joker                    = 1.1, 1.9
 helm_tactic                              = 1.3, 2
 
-[supplies_freedom_tier_2]
-
-;S_FOOD
-antirad                                  = 1, 0.8
-bandage                                  = 2, 0.8
-drug_antidot                             = 1, 0.3
-drug_booster                             = 1, 0.3
-drug_coagulant                           = 1, 0.3
-drug_psy_blockade                        = 1, 0.25
-drug_radioprotector                      = 1, 0.3
-medkit                                   = 3, 0.8
-medkit_scientic                          = 3, 0.8
-
-;G_F1_S
-grenade_f1                               = 5,	0.7
-
-;G_RGD5_S
-grenade_rgd5                             = 1,	0.0001
-
-;AMMO_S
-ammo_11.43x23_hydro                      = 3,	0.7
-ammo_7.62x54_7h1                         = 4,	0.7
-
-;S_M209
-ammo_m209                                = 3,	0.7
-
-;WP_SCOPE
-wpn_addon_scope_susat_dusk               = 1,	0.7
-
-;WP_GLAUN
-wpn_addon_grenade_launcher_m203          = 1,	0.7
-
-;WP_AK74
-wpn_g36                                  = 1,	0.6
-wpn_l85                                  = 1,	0.1
-wpn_lr300                                = 1,	0.3
-wpn_sig550                               = 1,	0.8
-
-;WP_ASHTG
-wpn_wincheaster1300                      = 1,	0.1
-
-;WP_LR300
-wpn_beretta                              = 1,	0.3
-wpn_sig220                               = 1,	0.8
-
-;WP_PM
-wpn_desert_eagle                         = 1,	0.8
-
-;WP_SVD
-wpn_svd                                  = 1,	0.7
-
-;WP_SVU
-wpn_svu                                  = 1,	0.6
-
-;E_STLK
-stalker_outfit                           = 1,	0.0001
-svoboda_heavy_outfit                     = 1,	0.8
-
-;E_HLMET
-helm_hardhat                             = 1, 	0.1
-helm_protective                          = 1,	0.8
-helm_respirator                          = 1,	0.1
-
-[supplies_freedom_duty_tier]
-
-;DET_ADVA
-detector_advanced                        = 1,	0.0001
-
-;DET_ELIT
-detector_elite                           = 2,	1
-
-;S_FOOD
-antirad                                  = 3, 0.8
-bandage                                  = 3, 0.8
-drug_antidot                             = 1, 0.3
-drug_booster                             = 1, 0.3
-drug_coagulant                           = 1, 0.3
-drug_psy_blockade                        = 1, 0.25
-drug_radioprotector                      = 1, 0.3
-medkit                                   = 3, 0.8
-medkit_army                              = 3, 0.8
-medkit_scientic                          = 3, 0.8
-
-;G_F1_S
-grenade_f1                               = 4, 	0.8
-
-;AMMO_S
-ammo_11.43x23_fmj                        = 4,	0.7
-ammo_12x76_zhekan                        = 4,	0.7
-ammo_5.45x39_ap                          = 2,	0.7
-ammo_5.56x45_ap                          = 2,	0.7
-ammo_5.56x45_ss190                       = 4,	0.7
-ammo_9x18_fmj                            = 4,	0.7
-ammo_9x19_fmj                            = 4,	0.7
-ammo_9x19_pbp                            = 4,	0.7
-
-;WP_SCOPE
-wpn_addon_scope                          = 1,	0.6
-wpn_addon_scope_night                    = 1,	0.6
-wpn_addon_scope_susat                    = 1,	0.6
-wpn_addon_scope_susat_night              = 1,	0.4
-wpn_addon_scope_susat_x1.6               = 1,	0.4
-wpn_addon_scope_x2.7                     = 1,	0.4
-
-;WP_SILEN
-wpn_addon_silencer                       = 2,	0.5
-
-;WP_GLAUN
-wpn_addon_grenade_launcher               = 1,	0.6
-
-;WP_AK74
-wpn_abakan                               = 1,	0.5
-wpn_ak74u                                = 1,	0.1
-wpn_l85                                  = 1,	0.7
-wpn_lr300                                = 1,	0.5
-
-;WP_ASHTG
-wpn_spas12                               = 1,	0.5
-wpn_wincheaster1300                      = 1,	0.7
-
-;WP_HPSA
-wpn_hpsa                                 = 1,	0.7
-
-;WP_LR300
-wpn_beretta                              = 1,	0.7
-wpn_mp5                                  = 1,	0.7
-wpn_walther                              = 1,	0.7
-
-;WP_PM
-wpn_fort                                 = 1,	0.1
-
-;E_STLK
-dolg_outfit                              = 1,	0.7
-svoboda_light_outfit                     = 1,	0.7
-
-;E_HLMET
-helm_hardhat                             = 1, 	0.3
-helm_respirator                          = 1,	0.3
-
 [discount_1]
 buy                                      = 1
 sell                                     = 0.80
@@ -491,10 +350,6 @@ sell                                     = 0.80
 [discount_2]
 buy                                      = 1
 sell                                     = 0.85
-
-[sci_supplies_generic]
-
-[sci_supplies_freedom_duty_tier]
 
 [supplies_freedom_tier_1]
 
@@ -550,105 +405,12 @@ wpn_fort                                 = 1,	0.1
 wpn_svd                                  = 1,	0.5
 
 ;E_STLK
-svoboda_light_outfit                     = 1,	0.9
+svoboda_scientific_outfit                = 1, 0.25
+svoboda_light_outfit                     = 1, 0.65
+svoboda_novice_outfit                    = 1, 0.75
 
 ;E_HLMET
 helm_respirator                          = 1,	0.4
-
-[supplies_duty_wealthy_tier_2]
-
-;S_FOOD
-medkit_scientic                          = 2, 0.8
-
-;WP_SCOPE
-wpn_addon_scope_detector                 = 1,	0.7
-wpn_addon_scope_night                    = 1,	1
-
-;WP_GLAUN
-wpn_addon_grenade_launcher               = 1,	1
-
-;WP_AK74
-wpn_groza                                = 1,	1
-wpn_pkm                                  = 1,	0.8
-wpn_vintorez                             = 1,	0.9
-
-;WP_ASHTG
-wpn_protecta                             = 1,	1
-
-;WP_LR300
-wpn_usp                                  = 1,	1
-
-;WP_RG6
-wpn_rg-6                                 = 1,	0.5
-
-;WP_RPG7
-wpn_rpg7                                 = 1,	0.5
-
-;E_STLK
-exo_outfit                               = 1, 	0.5
-
-[supplies_duty_tier_1]
-
-;S_FOOD
-antirad                                  = 1, 0.8
-bandage                                  = 1, 0.8
-drug_antidot                             = 1, 0.3
-drug_booster                             = 1, 0.3
-drug_coagulant                           = 1, 0.3
-drug_psy_blockade                        = 1, 0.25
-drug_radioprotector                      = 1, 0.3
-medkit                                   = 2, 0.8
-medkit_army                              = 2, 0.8
-
-;AMMO_S
-ammo_12x76_zhekan                        = 4,	0.7
-ammo_5.45x39_ap                          = 4,	0.7
-ammo_5.45x39_fmj                         = 6,	0.7
-ammo_5.56x45_ap                          = 1,	0.0001
-ammo_9x19_fmj                            = 4,	0.7
-
-;S_VOG25
-ammo_vog-25                              = 6,	0.7
-
-;WP_SCOPE
-wpn_addon_scope                          = 1,	1
-wpn_addon_scope_night                    = 1,	0.8
-
-;WP_GLAUN
-wpn_addon_grenade_launcher               = 1,	0.8
-
-;WP_AK74
-wpn_abakan                               = 1,	0.8
-wpn_ak74u                                = 1,	0.1
-wpn_l85                                  = 1,	0.0001
-wpn_lr300                                = 1,	0.0001
-
-;WP_ASHTG
-wpn_spas12                               = 1,	0.8
-wpn_wincheaster1300                      = 1,	0.1
-
-;WP_HPSA
-wpn_hpsa                                 = 1,	0.0001
-
-;WP_LR300
-wpn_beretta                              = 1,	0.0001
-wpn_mp5                                  = 1,	0.0001
-wpn_walther                              = 1,	0.8
-
-;WP_PM
-wpn_colt1911                             = 1,	0.0001
-wpn_fort                                 = 1,	0.1
-
-;E_STLK
-dolg_outfit                              = 1,	0.8
-
-;E_HLMET
-helm_hardhat                             = 1, 	0.9
-helm_respirator                          = 1,	0.4
-
-[sci_supplies_freedom_tier_1]
-
-[sci_supplies_freedom_wealthy_tier_2]
 
 [trade_generic_buy]
 
@@ -1016,9 +778,9 @@ wpn_svd                                  = 1,	1
 wpn_svu                                  = 1,	0.9
 
 ;E_STLK
-exo_outfit                               = 1, 	0.5
-
-[sci_supplies_freedom_tier_2]
+svoboda_exo_outfit                       = 1, 0.25
+svoboda_heavy_outfit                     = 1, 0.55
+svoboda_heavy_outfit_2                   = 1, 0.45
 
 [supplies_generic]
 
@@ -1095,89 +857,6 @@ stalker_outfit                           = 1,	0.8
 ;E_HLMET
 helm_respirator                          = 1,	0.8
 
-[supplies_scientific]
-
-;E_STLK
-scientific_outfit                        = 1, 	1
-
-[sci_supplies_duty_tier_2]
-
-[supplies_duty_tier_2]
-
-;DET_ADVA
-detector_advanced                        = 1,	0.0001
-
-;DET_ELIT
-detector_elite                           = 2,	1
-
-;S_FOOD
-antirad                                  = 1, 0.8
-bandage                                  = 1, 0.8
-drug_antidot                             = 1, 0.3
-drug_booster                             = 1, 0.3
-drug_coagulant                           = 1, 0.3
-drug_psy_blockade                        = 1, 0.25
-drug_radioprotector                      = 1, 0.3
-medkit                                   = 2, 0.8
-medkit_army                              = 2, 0.8
-medkit_scientic                          = 2, 0.8
-
-;G_F1_S
-grenade_f1                               = 6,	0.7
-
-;G_RGD5_S
-grenade_rgd5                             = 1,	0.0001
-
-;AMMO_S
-ammo_11.43x23_fmj                        = 5,	0.7
-ammo_11.43x23_hydro                      = 3,	0.7
-ammo_9x39_ap                             = 3,	0.7
-ammo_9x39_pab9                           = 5,	0.7
-ammo_pkm_100                             = 2,	0.7
-
-;S_VOG25
-ammo_vog-25                              = 4,	0.7
-
-;WP_SCOPE
-wpn_addon_scope                          = 1,	1
-wpn_addon_scope_night                    = 1,	0.8
-wpn_addon_scope_x2.7                     = 1,	0.5
-
-;WP_GLAUN
-wpn_addon_grenade_launcher               = 1,	0.8
-
-;WP_AK74
-wpn_abakan                               = 1,	0.3
-wpn_ak74                                 = 1,	0.1
-wpn_groza                                = 1,	0.7
-wpn_pkm                                  = 1,	0.5
-wpn_vintorez                             = 1,	0.5
-
-;WP_ASHTG
-wpn_protecta                             = 1,	0.7
-wpn_spas12                               = 1,	0.3
-
-;WP_LR300
-wpn_sig220                               = 1,	0.8
-wpn_usp                                  = 1,	0.8
-
-;WP_PM
-wpn_pb                                   = 1,	0.5
-
-;WP_VAL
-wpn_val                                  = 1,	0.8
-
-;E_STLK
-dolg_heavy_outfit                        = 1,	0.8
-stalker_outfit                           = 1,	0.0001
-
-;E_HLMET
-helm_battle                              = 1,	0.8
-helm_hardhat                             = 1, 	0.1
-helm_respirator                          = 1,	0.1
-
 [discount_3]
 buy                                      = 1.1
 sell                                     = 1.1
-
-[sci_supplies_duty_tier_1]

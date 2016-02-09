@@ -6,13 +6,15 @@ function actor_init(npc)
 	npc:bind_object(actor_binder(npc))
 end
 
+ACTOR_FIRST_UPDATE = false
 ----------------------------------------------------------------------------------------------------------------------
 class "actor_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:__init (obj) super(obj)
+	db.actor_binder = self
 	--alun_utils.debug_write("actor init start")
 	self.bCheckStart = false
-	self.last_level_name = "nil"
+	--self.last_level_name = "nil" -- Not used for anything
 	self.deimos_intensity = nil
 
 	self.last_detective_achievement_spawn_time 	= nil
@@ -22,6 +24,10 @@ function actor_binder:__init (obj) super(obj)
 	
 	self.weather_manager = level_weathers.get_weather_manager()
 	--alun_utils.debug_write("actor init end")
+	
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -117,6 +123,10 @@ function actor_binder:net_destroy()
 	end
 	
 	bind_stalker_ext.actor_on_net_destroy(self)
+	
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self)
+	end
 
 	object_binder.net_destroy(self)
 	
@@ -168,12 +178,12 @@ end
 function actor_binder:update(delta)
 	object_binder.update(self, delta)
 	--alun_utils.debug_write("actor update START")
-	--printf("actor update start")
 	if not (db.actor:alive()) then
 		return
 	end
 	
 	if self.bCheckStart then -- first update after netspawn
+		ACTOR_FIRST_UPDATE = true
 		bind_stalker_ext.actor_on_first_update(self,delta)
 		--printf("SET DEFAULT INFOS")
 		if not has_alife_info("global_dialogs") then
@@ -183,7 +193,7 @@ function actor_binder:update(delta)
 			self.object:give_info_portion("level_changer_icons")
 		end
 		pda.fill_primary_objects()
-		self.object:activate_slot(self.loaded_active_slot)
+		self.object:activate_slot(self.loaded_active_slot or 0)
 		self.bCheckStart = false
 	end
 	
@@ -245,10 +255,20 @@ function actor_binder:update(delta)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save(packet)
-	--alun_utils.debug_write("--------------- actor_binder:save -------- Start")
 	set_save_marker(packet, "save", false, "actor_binder")
 	object_binder.save(self, packet)
-	--' Сохраняем уровень сложности
+	set_save_marker(packet, "save", true, "actor_binder")
+	
+	if (USE_MARSHAL) then
+		object_binder.save(self, packet)
+		if (utils.level_changing()) then
+			alun_utils.save_var(db.actor,"heli_enemy_flag",false)
+			SendScriptCallback("on_level_changing")
+		end
+		return
+	end
+	--alun_utils.debug_write("--------------- actor_binder:save -------- Start")
+	set_save_marker(packet, "save", false, "actor_binder")
 
 	if (utils.level_changing()) then
 		alun_utils.save_var(db.actor,"heli_enemy_flag",false)
@@ -266,38 +286,85 @@ function actor_binder:save(packet)
 	alun_utils.w_stpk(packet,"bool",SIMBOARD.simulation_started, "sim started")
 
 	xr_sound.actor_save(packet)
-	alun_utils.w_stpk(packet,"stringZ",self.last_level_name,"last level name")
+	--alun_utils.w_stpk(packet,"stringZ",self.last_level_name,"last level name")
 	xr_statistic.save(packet)
 	treasure_manager.get_treasure_manager():save(packet)
 	task_manager.get_task_manager():save(packet)
 	packet:w_u8(self.object:active_slot())
-
-	local deimos_exist = false
-	for k,v in pairs(db.zone_by_name) do
-		if(db.storage[v:id()] and db.storage[v:id()].active_scheme=="sr_deimos") then
-			deimos_exist = true
-			packet:w_bool(true)
-			alun_utils.w_stpk(packet,"float",db.storage[v:id()].sr_deimos.intensity, "deimos.intensity")
-		end
-	end
-	if not deimos_exist then
-		packet:w_bool(false)
-	end
 
 	alun_utils.w_stpk(packet,"CTime",self.last_detective_achievement_spawn_time, "detective spawn time")
 	alun_utils.w_stpk(packet,"CTime",self.last_mutant_hunter_achievement_spawn_time, "hunter spawn time")
 
 	bind_stalker_ext.actor_on_save(self,packet)
 
-	set_save_marker(packet, "save", true, "actor_binder")
 	--alun_utils.debug_write("--------------- actor_binder:save -------- End")
 end
 
 ----------------------------------------------------------------------------------------------------------------------
+function actor_binder:save_state(m_data)
+	m_data.actor_binder = {}
+	m_data.actor_binder.game_difficulty = level.get_game_difficulty()
+	m_data.actor_binder.disable_input_time = self.st.disable_input_time
+	m_data.actor_binder.simulation_started = SIMBOARD.simulation_started
+	--m_data.actor_binder.last_level_name = self.last_level_name
+	m_data.actor_binder.active_slot = self.object:active_slot()
+	m_data.actor_binder.last_detective_achievement_spawn_time = self.last_detective_achievement_spawn_time
+	m_data.actor_binder.last_mutant_hunter_achievement_spawn_time = self.last_mutant_hunter_achievement_spawn_time
+	
+	xr_logic.pstor_save_all(self.object)
+	if (sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state ~= 0 and not utils.level_changing()) then 
+		sr_psy_antenna.psy_antenna:save_state(m_data)
+	end
+	
+	xr_statistic.save_state(m_data)
+	inventory_upgrades.save_state(m_data)
+	xr_sound.actor_save_state(m_data)
+	task_manager.save_state(m_data)
+	level_weathers.get_weather_manager():save_state(m_data)
+end
+
+function actor_binder:load_state(m_data)
+	if not (m_data.actor_binder) then 
+		return 
+	end
+	--alun_utils.debug_write("actor_binder:load_state")
+	local game_difficulty_by_num = {
+				[0] = "gd_novice",
+				[1] = "gd_stalker",
+				[2] = "gd_veteran",
+				[3] = "gd_master"
+				}
+	get_console():execute("g_game_difficulty "..game_difficulty_by_num[m_data.actor_binder.game_difficulty or 3])
+	self.st.disable_input_time = m_data.actor_binder.disable_input_time
+	SIMBOARD.simulation_started = m_data.actor_binder.simulation_started
+	--self.last_level_name = m_data.actor_binder.last_level_name
+	self.loaded_active_slot = m_data.actor_binder.active_slot or 0
+	self.last_detective_achievement_spawn_time = m_data.actor_binder.last_detective_achievement_spawn_time
+	self.last_mutant_hunter_achievement_spawn_time = m_data.actor_binder.last_mutant_hunter_achievement_spawn_time
+	
+	xr_logic.pstor_load_all(self.object)
+	if (sr_psy_antenna.psy_antenna) then 
+		sr_psy_antenna.psy_antenna:load_state(m_data)
+	end
+	
+	xr_statistic.load_state(m_data)
+	inventory_upgrades.load_state(m_data)
+	xr_sound.actor_load_state(m_data)
+	task_manager.load_state(m_data)
+	level_weathers.get_weather_manager():load_state(m_data)
+	
+	m_data.actor_binder = nil
+end 
+
 function actor_binder:load(reader)
-	--alun_utils.debug_write("actor_binder:load start")
 	set_save_marker(reader, "load", false, "actor_binder")
 	object_binder.load(self, reader)
+	set_save_marker(reader, "load", true, "actor_binder")
+	if (USE_MARSHAL) then
+		self:load_state(alife_storage_manager.get_state())
+		return
+	end
+	--alun_utils.debug_write("actor_binder:load start")
 
 	local game_difficulty_by_num = {
 				[0] = "gd_novice",
@@ -320,20 +387,17 @@ function actor_binder:load(reader)
 	SIMBOARD.simulation_started = reader:r_bool()
 
 	xr_sound.actor_load(reader)
+	--[[
 	local n = reader:r_stringZ()
 	if(n~="nil") then
 		self.last_level_name = n
 	end
+	--]]
 	xr_statistic.load(reader)
 	treasure_manager.get_treasure_manager():load(reader)
 	task_manager.get_task_manager():load(reader)
 
 	self.loaded_active_slot = reader:r_u8()
-
-	local b = reader:r_bool()
-	if(b) then
-		self.deimos_intensity = reader:r_float()
-	end
 
 	local stored_achievement_time = reader:r_bool()
 	if stored_achievement_time == true then
@@ -346,7 +410,5 @@ function actor_binder:load(reader)
 
 	bind_stalker_ext.actor_on_load(self,reader)
 
-	set_save_marker(reader, "load", true, "actor_binder")
-	
 	--alun_utils.debug_write("actor_binder:load end")
 end

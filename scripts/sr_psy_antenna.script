@@ -1,7 +1,11 @@
 --[[------------------------------------------------------------------------------------------------
 Зоны пси-излучения. Отыгрывают постпроцесс и фантомов по настройкам из custom_data
 --------------------------------------------------------------------------------------------------]]
+local state_outside = 0 -- актер снаружи
+local state_inside  = 1 -- актер внутри
+local state_void  = 2 -- неизвестный статус
 
+psy_antenna = false
 
 class "PsyAntenna"
 function PsyAntenna:__init				()
@@ -205,6 +209,35 @@ function PsyAntenna:update(dt)
 
 	self:update_psy_hit(dt)
 end
+
+function PsyAntenna:save_state(m_data)
+	m_data.PsyAntenna = {}
+	m_data.PsyAntenna.hit_intensity = self.hit_intensity
+	m_data.PsyAntenna.sound_intensity = self.sound_intensity
+	m_data.PsyAntenna.sound_intensity_base = self.sound_intensity_base
+	m_data.PsyAntenna.mute_sound_threshold = self.mute_sound_threshold
+	m_data.PsyAntenna.no_static = self.no_static
+	m_data.PsyAntenna.no_mumble = self.no_mumble
+	m_data.PsyAntenna.hit_type = self.hit_type
+	m_data.PsyAntenna.hit_freq = self.hit_freq
+	m_data.PsyAntenna.postprocess = self.postprocess
+end 
+
+function PsyAntenna:load_state(m_data)
+	if not (m_data.PsyAntenna) then 
+		return 
+	end
+	self.hit_intensity = m_data.PsyAntenna.hit_intensity
+	self.sound_intensity = m_data.PsyAntenna.sound_intensity
+	self.sound_intensity_base = m_data.PsyAntenna.sound_intensity_base
+	self.mute_sound_threshold = m_data.PsyAntenna.mute_sound_threshold
+	self.no_static = m_data.PsyAntenna.no_static
+	self.no_mumble = m_data.PsyAntenna.no_mumble
+	self.hit_type = m_data.PsyAntenna.hit_type
+	self.hit_freq = m_data.PsyAntenna.hit_freq
+	self.postprocess = m_data.PsyAntenna.postprocess
+end 
+
 function PsyAntenna:save(p)
 	--printf("Psy Antenna SAVE")
 	set_save_marker(p, "save", false, "psy_antenna_obj")
@@ -258,11 +291,7 @@ end
 ----------------------------------------------------------------------------------------------------
 
 
-local state_outside = 0 -- актер снаружи
-local state_inside  = 1 -- актер внутри
-local state_void  = 2 -- неизвестный статус
 
-psy_antenna = false
 
 
 class "action_psy_antenna"
@@ -373,6 +402,9 @@ end
 
 ---------------------------------------------------------------------------------------------------------------------
 function save( p )
+	if (USE_MARSHAL) then 
+		return
+	end
 	set_save_marker(p, "save", false, "sr_psy_antenna")
 	if psy_antenna and psy_antenna.global_state ~= state_outside and not utils.level_changing() then
 		p:w_bool( true )
@@ -385,6 +417,9 @@ function save( p )
 end
 
 function load(p)
+	if (USE_MARSHAL) then
+		return 
+	end
 	set_save_marker(p, "load", false, "sr_psy_antenna")
 	local b = p:r_bool()
 

@@ -7,7 +7,7 @@
 -- How many jobs are checked per update per npc, for a job
 local STEP_SIZE 			= 5
 local STEP_SIZE_OFFLINE 	= 1
-local ALLOW_USE_MARSHAL 	= false
+local ALLOW_USE_MARSHAL 	= true
 
 ------------------------------------------
 local level,alife,game_graph,math,pairs,tostring,tonumber = level,alife,game_graph,math,pairs,tostring,tonumber
@@ -86,9 +86,9 @@ function se_smart_terrain:__init(section) super(section)
 	self.npc_info  = {}
 	self.arriving_npc  = {}
 	self.__campfire_check_time = game.get_game_time()
-	
 	if (USE_MARSHAL and ALLOW_USE_MARSHAL) then 
 		RegisterScriptCallback("save_state",self.save_state,self)
+		--RegisterScriptCallback("load_state",self.load_state,self) -- AlifeStorageManager Load happens before object binds itself to class registered script
 	end
 end
 function se_smart_terrain:on_before_register()
@@ -123,19 +123,18 @@ function se_smart_terrain:on_register()
 	story_objects.check_spawn_ini_for_story_id(self)
 	simulation_objects.get_sim_obj_registry():register(self)
 	
+	self:load_jobs()
 	self.b_registred = true
 
 	SIMBOARD:init_smart(self)
-	
-	self:load_jobs()
 
+	self:register_delayed_npc()
+		
 	if (self.need_init_npc) then
 		self.need_init_npc = nil
 		self:init_npc_after_load()
 	end
 	
-	self:register_delayed_npc()
-
 	self.check_time = time_global()
 	--alun_utils.debug_write(strformat("%s:ON_REGISTER END",self:name()))
 end
@@ -182,7 +181,7 @@ function se_smart_terrain:read_params()
 
 	self.squad_id		= utils.cfg_get_number(ini, "smart_terrain", "squad_id", 		self, false, 0)
 	self.respawn_sector = utils.cfg_get_string(ini, "smart_terrain", "respawn_sector", 	self, false, "")
-	self.respawn_radius  = utils.cfg_get_number(ini, "smart_terrain", "respawn_radius", 	self, false, 80)^2
+	self.respawn_radius  = utils.cfg_get_number(ini, "smart_terrain", "respawn_radius", 	self, false, 200)^2
 	if self.respawn_sector ~= nil then
 		if self.respawn_sector == "default" then
 			self.respawn_sector = "all"
@@ -911,32 +910,53 @@ end
 
 
 function se_smart_terrain:save_state(m_data)
-	if not (m_data.smart_terrains) then 
-		m_data.smart_terrains = {}
-	end
-	
-	if not (m_data.smart_terrains[self.id]) then 
-		m_data.smart_terrains[self.id] = {}
-	end
-	
-	m_data.smart_terrains[self.id].arriving_npc = {}
-	for id,v in pairs(self.arriving_npc) do 
+	m_data.smart_terrains[self.id] = {}
+
+	for id,v in pairs(self.arriving_npc) do
+		if not (m_data.smart_terrains[self.id].arriving_npc) then 
+			m_data.smart_terrains[self.id].arriving_npc = {}
+		end
 		table.insert(m_data.smart_terrains[self.id].arriving_npc,id)
 	end
 	
-	m_data.smart_terrains[self.id].npc_info = {}
-	for id,info in pairs(self.npc_info) do 
-		if not (m_data.smart_terrains[self.id].npc_info[id]) then 
-			m_data.smart_terrains[self.id].npc_info[id] = {}
-		end 
+	for id,info in pairs(self.npc_info) do
+		if not (m_data.smart_terrains[self.id].npc_info) then 
+			m_data.smart_terrains[self.id].npc_info = {}
+		end
+		m_data.smart_terrains[self.id].npc_info[id] = {}
 		m_data.smart_terrains[self.id].npc_info[id].job_section = info.job and info.job.section
 		m_data.smart_terrains[self.id].npc_info[id].begin_job = info.begin_job
 		m_data.smart_terrains[self.id].npc_info[id].need_job = info.need_job
 	end
 	
-	m_data.smart_terrains[self.id].dead_time = self.dead_time
-	m_data.smart_terrains[self.id].already_spawned = self.already_spawned
+	if not (empty(self.dead_time)) then
+		m_data.smart_terrains[self.id].dead_time = self.dead_time
+	end
+	if not (empty(self.already_spawned)) then
+		m_data.smart_terrains[self.id].already_spawned = self.already_spawned
+	end
 	m_data.smart_terrains[self.id].last_respawn_update = self.last_respawn_update
+end
+
+function se_smart_terrain:load_state(m_data)
+	if not (m_data.smart_terrains and m_data.smart_terrains[self.id]) then 
+		return 
+	end
+	
+	self.need_init_npc = true
+	
+	if (m_data.smart_terrains[self.id].arriving_npc) then
+		for i,id in pairs(m_data.smart_terrains[self.id].arriving_npc) do 
+			self.arriving_npc[id] = false
+		end
+	end
+	
+	self.load_info = m_data.smart_terrains[self.id].npc_info or {}
+	self.dead_time = m_data.smart_terrains[self.id].dead_time or self.dead_time
+	self.already_spawned = m_data.smart_terrains[self.id].already_spawned or self.already_spawned
+	self.last_respawn_update = m_data.smart_terrains[self.id].last_respawn_update
+	
+	m_data.smart_terrains[self.id] = nil
 end
 --*******************************************************
 -- СЕЙВ/ЛОАД
@@ -1009,34 +1029,17 @@ end
 function se_smart_terrain:STATE_Read(packet, size)
 	--alun_utils.debug_write(strformat("%s:STATE_READ start",self:name()))
 	cse_alife_smart_zone.STATE_Read(self, packet, size)
-	
 	self:read_params()
-	self.need_init_npc = true
-	
 	if (USE_MARSHAL and ALLOW_USE_MARSHAL) then
-		local m_data = alife_storage_manager.get_state()
-		if (m_data.smart_terrains and m_data.smart_terrains[self.id]) then
-			empty_table(self.arriving_npc)
-			for i,id in pairs(m_data.smart_terrains[self.id].arriving_npc) do 
-				self.arriving_npc[id] = false
-			end 
-			
-			empty_table(self.npc_info)
-			for id,v in pairs(m_data.smart_terrains[self.id].npc_info) do 
-				self.npc_info[id] = v
-			end 
-			
-			self.dead_time = m_data.smart_terrains[self.id].dead_time
-			self.already_spawned = m_data.smart_terrains[self.id].already_spawned
-			self.last_respawn_update = m_data.smart_terrains[self.id].last_respawn_update
-		end
+		self:load_state(alife_storage_manager.get_state())
 		return 
 	end
 	-- под LevelEditor не пытаться читать из пакета ничего
 	if editor() then
 		return
 	end
-
+	
+	self.need_init_npc = true
 	--set_save_marker(packet, "load", false, "se_smart_terrain")
 
 	-- Информацию о НПС, идущих в смарт
@@ -1113,12 +1116,11 @@ function se_smart_terrain:init_npc_after_load()
 	local sobj
 
 	-- validate and fill saved npc_info; find job by saved uid
-	local new_info
-	for id, info in pairs(self.npc_info) do
+	for id, info in pairs(self.load_info) do
 		sobj = sim:object(id)
 		local cls = sobj and sobj:clsid()
 		if (cls) and (IsStalker(nil,cls) or IsMonster(nil,cls) or IsHelicopter(nil,cls)) then
-			new_info = self:fill_npc_info(sobj)
+			local new_info = self:fill_npc_info(sobj)
 			new_info.job = self:find_job_by_section(info.job_section)
 
 			if (new_info.job) then
@@ -1133,6 +1135,8 @@ function se_smart_terrain:init_npc_after_load()
 			self:clear_job(id,true)
 		end
 	end
+	
+	self.load_info = nil
 end
 
 function se_smart_terrain:stayed_squad_count()

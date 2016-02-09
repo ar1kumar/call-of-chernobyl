@@ -5,6 +5,10 @@ function motivator_binder:__init (obj) super(obj)
 	self.opened_doors = {}
 	self.first_update = false
 	self.upd_stage = 1
+	
+	if (USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
@@ -230,6 +234,10 @@ function motivator_binder:net_destroy()
 
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
+	
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self)
+	end
 
 	object_binder.net_destroy(self)
 end
@@ -480,34 +488,85 @@ function motivator_binder:net_save_relevant()
 	return true
 end
 
+function motivator_binder:save_state(m_data)
+	local id = self.object:id()
+	m_data.xr_logic[id] = {}
+	m_data.xr_logic[id].job_ini = self.st.job_ini
+	m_data.xr_logic[id].ini_filename = self.st.ini_filename
+	m_data.xr_logic[id].section_logic = self.st.section_logic
+	m_data.xr_logic[id].active_section = self.st.active_section
+	m_data.xr_logic[id].gulag_name = self.st.gulag_name
+	m_data.xr_logic[id].activation_time = (self.st.activation_time or 0) - time_global()
+	m_data.xr_logic[id].activation_game_time = self.st.activation_game_time
+
+	if self.st.active_scheme then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "save_state")
+	end
+
+	xr_logic.pstor_save_all(self.object)
+	xr_sound.npc_save_state(m_data,self.object)
+	trade_manager.save_state(m_data,self.object)
+end 
+
+function motivator_binder:load_state(m_data)
+	local id = self.object:id()
+	if not (m_data.xr_logic and m_data.xr_logic[id]) then 
+		return 
+	end
+	--alun_utils.debug_write("motivator_binder:load_state")
+	self.st.job_ini = m_data.xr_logic[id].job_ini
+	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
+	self.st.loaded_section_logic = m_data.xr_logic[id].section_logic
+	self.st.loaded_active_section = m_data.xr_logic[id].active_section
+	self.st.loaded_gulag_name = m_data.xr_logic[id].gulag_name
+	self.st.activation_time = m_data.xr_logic[id].activation_time + time_global()
+	self.st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
+
+	if self.st.active_scheme then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "load_state")
+	end
+	
+	xr_logic.pstor_load_all(self.object)
+	xr_sound.npc_load_state(m_data,self.object)
+	trade_manager.load_state(m_data,self.object)
+end 
+
 function motivator_binder:save(packet)
+	set_save_marker(packet, "save", false, "motivator_binder")
 	object_binder.save(self, packet)
+	set_save_marker(packet, "save", true, "motivator_binder")
+	
+	if (USE_MARSHAL) then 
+		return 
+	end
 	
 	--alun_utils.debug_write("\n-------motivator save start------ "..self.object:name(),true)
-	set_save_marker(packet, "save", false, "motivator_binder")
 	
 	xr_logic.save_obj(self.object, packet)
 	trade_manager.save(self.object, packet)
-
 	xr_sound.save_npc(packet, self.object:id())
 
-	set_save_marker(packet, "save", true, "motivator_binder")
 	--alun_utils.debug_write("\nmotivator save end------ "..self.object:name(),true)
 end
 
 function motivator_binder:load(reader)
-	--alun_utils.debug_write("\nmotivator load start "..self.object:name(),true)
+	set_save_marker(reader, "load", false, "motivator_binder")
 	object_binder.load(self, reader)
+	set_save_marker(reader, "load", true, "motivator_binder")
 	
 	self.loaded = true
-	set_save_marker(reader, "load", false, "motivator_binder")
+	
+	if (USE_MARSHAL) then
+		self:load_state(alife_storage_manager.get_state())
+		return 
+	end
+	
+	--alun_utils.debug_write("\nmotivator load start "..self.object:name(),true)	
 	
 	xr_logic.load_obj(self.object, reader)
 	trade_manager.load(self.object, reader)
-
 	xr_sound.load_npc(reader, self.object:id())
 	
-	set_save_marker(reader, "load", true, "motivator_binder")
 	--alun_utils.debug_write("\nmotivator load END "..self.object:name())
 end
 
