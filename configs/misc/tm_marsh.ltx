@@ -100,7 +100,7 @@ descr = mar_base_stalker_tech_task_1_text
 descr_functor = general_fetch_task
 job_descr = mar_base_stalker_tech_task_1_about
 fetch_descr = mar_base_stalker_tech_task_1_fetch_about
-fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_1_fetch:1:itm_gunsmith_toolkit)%
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_1_fetch:1:itm_repairkit_tier_1)%
 stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
@@ -118,10 +118,28 @@ descr = mar_base_stalker_tech_task_2_text
 descr_functor = general_fetch_task
 job_descr = mar_base_stalker_tech_task_2_about
 fetch_descr = mar_base_stalker_tech_task_2_fetch_about
-fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_2_fetch:1:itm_gunsmith_toolkit_tier_2)%
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_2_fetch:1:itm_repairkit_tier_2)%
 stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mar_base_stalker_tech_task_2_fetch_finish
 on_complete = %+mar_base_stalker_tech_upgrade_tier_2 =complete_task_inc_goodwill(50:csky) =reward_money(1000) =remove_fetch_item(mar_base_stalker_tech_task_2_fetch) =inc_task_stage(mar_base_stalker_tech_task_2)%
 precondition = {+mar_base_stalker_tech_upgrade_tier_1 -mar_base_stalker_tech_upgrade_tier_2} true, false
+
+[mar_base_stalker_tech_task_3]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = mar_base_stalker_tech_task_3_name
+title_functor = general_fetch_task
+descr = mar_base_stalker_tech_task_3_text
+descr_functor = general_fetch_task
+job_descr = mar_base_stalker_tech_task_3_about
+fetch_descr = mar_base_stalker_tech_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_3_fetch:1:itm_repairkit_tier_3)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = mar_base_stalker_tech_task_3_fetch_finish
+on_complete = %+mar_base_stalker_tech_upgrade_tier_3 =complete_task_inc_goodwill(50:csky) =reward_money(1000) =remove_fetch_item(mar_base_stalker_tech_task_3_fetch) =inc_task_stage(mar_base_stalker_tech_task_3)%
+precondition = {+mar_base_stalker_tech_upgrade_tier_2 -mar_base_stalker_tech_upgrade_tier_3} true, false

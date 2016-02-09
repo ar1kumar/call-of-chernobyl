@@ -8,7 +8,7 @@ descr = bar_visitors_stalker_mechanic_task_1_text
 descr_functor = general_fetch_task
 job_descr = bar_visitors_stalker_mechanic_task_1_about
 fetch_descr = bar_visitors_stalker_mechanic_task_1_fetch_about
-fetch_func = %=setup_generic_fetch_task(bar_visitors_stalker_mechanic_task_1_fetch:1:itm_gunsmith_toolkit)%
+fetch_func = %=setup_generic_fetch_task(bar_visitors_stalker_mechanic_task_1_fetch:1:itm_repairkit_tier_1)%
 stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
@@ -26,7 +26,7 @@ descr = bar_visitors_stalker_mechanic_task_2_text
 descr_functor = general_fetch_task
 job_descr = bar_visitors_stalker_mechanic_task_2_about
 fetch_descr = bar_visitors_stalker_mechanic_task_2_fetch_about
-fetch_func = %=setup_generic_fetch_task(bar_visitors_stalker_mechanic_task_2_fetch:1:itm_gunsmith_toolkit_tier_2)%
+fetch_func = %=setup_generic_fetch_task(bar_visitors_stalker_mechanic_task_2_fetch:1:itm_repairkit_tier_2)%
 stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
@@ -34,6 +34,23 @@ task_complete_descr = bar_visitors_stalker_mechanic_task_2_fetch_finish
 on_complete = %+bar_visitors_stalker_mechanic_upgrade_tier_2 =complete_task_inc_goodwill(50:dolg) =remove_fetch_item(bar_visitors_stalker_mechanic_task_2_fetch) =inc_task_stage(bar_visitors_stalker_mechanic_task_2)%
 precondition = {+bar_visitors_stalker_mechanic_upgrade_tier_1 -bar_visitors_stalker_mechanic_upgrade_tier_2} true, false
 
+[bar_visitors_stalker_mechanic_task_3]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = bar_visitors_stalker_mechanic_task_3_name
+title_functor = general_fetch_task
+descr = bar_visitors_stalker_mechanic_task_3_text
+descr_functor = general_fetch_task
+job_descr = bar_visitors_stalker_mechanic_task_3_about
+fetch_descr = bar_visitors_stalker_mechanic_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(bar_visitors_stalker_mechanic_task_3_fetch:1:itm_repairkit_tier_3)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = bar_visitors_stalker_mechanic_task_3_fetch_finish
+on_complete = %+bar_visitors_stalker_mechanic_upgrade_tier_3 =complete_task_inc_goodwill(50:dolg) =remove_fetch_item(bar_visitors_stalker_mechanic_task_3_fetch) =inc_task_stage(bar_visitors_stalker_mechanic_task_3)%
+precondition = {+bar_visitors_stalker_mechanic_upgrade_tier_2 -bar_visitors_stalker_mechanic_upgrade_tier_3} true, false
 ;================================================
 ;bar_dolg_general_petrenko_stalker
 ;================================================
