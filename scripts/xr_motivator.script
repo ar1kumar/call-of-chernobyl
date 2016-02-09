@@ -1,10 +1,14 @@
 class "motivator_binder" (object_binder)
 function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
-	--self.last_update = 0
+	self.last_update = 0
 	self.opened_doors = {}
 	self.first_update = false
-	--self.upd_stage = 1
+	self.upd_stage = 1
+	
+	if (USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
@@ -37,7 +41,7 @@ function motivator_binder:reinit()
 	self.st = db.storage[id]
 
 	self.st.state_mgr = state_mgr.bind_manager(self.object)
-	self.object:enable_vision(false) -- Чтобы до нет спаун неписи ничего не видели
+	self.object:enable_vision(false)
 		
 	--alun_utils.debug_write(self.object:name()..":motivator_reinit() end")
 end
@@ -102,13 +106,11 @@ function motivator_binder:net_spawn(sobject)
 		
 	db.add_enemy(self.object)
 
-	--local relation = db.goodwill.relations and db.goodwill.relations[id]
 	local relation = db.goodwill.relations and db.goodwill.relations[self.object:id()]
 	if (relation and db.actor) then
 		game_relations.set_npcs_relation(self.object, db.actor, relation)
 	end
 
-	--local sympathy = db.goodwill.sympathy and db.goodwill.sympathy[id]
 	local sympathy = db.goodwill.sympathy and db.goodwill.sympathy[self.object:id()]
 	if (sympathy) then
 		game_relations.set_npc_sympathy(self.object, sympathy)
@@ -234,6 +236,10 @@ function motivator_binder:net_destroy()
 
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
+	
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self)
+	end
 
 	object_binder.net_destroy(self)
 end
@@ -341,14 +347,13 @@ function motivator_binder:death_callback(victim, who)
 	sr_light.check_light(victim)
 
 	db.delete_enemy(victim)
--- А эот код нужен точно?
+
 	if (actor_stats.remove_from_ranking) then
 		local community = character_community(victim)
 		if (community ~= "zombied" and community ~= "monolith") then
 			actor_stats.remove_from_ranking(victim:id())
 		end
 	end
--- А эот код нужен точно?
 	release_body_manager.get_release_body_manager():moving_dead_body(victim)
 	
 	if (who) and (IsStalker(who) or IsMonster(who)) then
@@ -370,7 +375,7 @@ function motivator_binder:use_callback(obj, who)
 	if not obj:alive() then
 		return
 	end
-	--dialog_manager.use_npc = obj --???
+	dialog_manager.use_npc = obj --Dialog method can't get game_object, YOU NEED THIS! 
 	inventory_upgrades.need_victim(obj)
 	xr_meet.notify_on_use(obj, who)
 	dialog_manager.disabled_phrases[obj:id()] = nil
@@ -390,6 +395,7 @@ function motivator_binder:update(delta)
 
 	local object = self.object
 	local id = object:id()
+	local st = db.storage[id]
 
 	-- check dead
 	local object_alive = object:alive()
@@ -436,7 +442,36 @@ function motivator_binder:update(delta)
 	stalker_generic.update_invulnerability(object)
 	xr_sound.update(id)
 	
-	update_logic(object)
+	local st_combat = st.combat
+	if (st.active_scheme) then 
+		local switched
+		if (st_combat) then
+			self.mgr = self.mgr or object:motivation_action_manager()
+			if (self.mgr and self.mgr:initialized() and self.mgr:current_action_id() == stalker_ids.action_combat_planner) then 
+				local overrides = xr_logic.generic_scheme_overrides(object)
+				if (overrides) then 
+					if (overrides.on_combat) then 
+						xr_logic.pick_section_from_condlist(db.actor,object,overrides.on_combat.condlist)
+					end
+					if (st_combat and st_combat.logic) then 
+						if (xr_logic.try_switch_to_another_section(object,st_combat,db.actor)) then 
+							switched = true 
+						elseif (overrides.combat_type) then
+							xr_combat.set_combat_type(object, db.actor, overrides)
+						end
+					end
+				else 
+					xr_combat.set_combat_type(object, db.actor, st_combat)
+				end			
+			end
+		end 
+		
+		if not switched then
+			xr_logic.try_switch_to_another_section(object, st[st.active_scheme], db.actor)
+		end
+	elseif (st_combat) then
+		xr_combat.set_combat_type(object, db.actor, st_combat)
+	end
 	
 	--alun_utils.debug_write("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name())
 
@@ -455,35 +490,85 @@ function motivator_binder:net_save_relevant()
 	return true
 end
 
+function motivator_binder:save_state(m_data)
+	local id = self.object:id()
+	m_data.xr_logic[id] = {}
+	m_data.xr_logic[id].job_ini = self.st.job_ini
+	m_data.xr_logic[id].ini_filename = self.st.ini_filename
+	m_data.xr_logic[id].section_logic = self.st.section_logic
+	m_data.xr_logic[id].active_section = self.st.active_section
+	m_data.xr_logic[id].gulag_name = self.st.gulag_name
+	m_data.xr_logic[id].activation_time = (self.st.activation_time or 0) - time_global()
+	m_data.xr_logic[id].activation_game_time = self.st.activation_game_time
+
+	if self.st.active_scheme then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "save_state")
+	end
+
+	xr_logic.pstor_save_all(self.object)
+	xr_sound.npc_save_state(m_data,self.object)
+	trade_manager.save_state(m_data,self.object)
+end 
+
+function motivator_binder:load_state(m_data)
+	local id = self.object:id()
+	if not (m_data.xr_logic and m_data.xr_logic[id]) then 
+		return 
+	end
+	--alun_utils.debug_write("motivator_binder:load_state")
+	self.st.job_ini = m_data.xr_logic[id].job_ini
+	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
+	self.st.loaded_section_logic = m_data.xr_logic[id].section_logic
+	self.st.loaded_active_section = m_data.xr_logic[id].active_section
+	self.st.loaded_gulag_name = m_data.xr_logic[id].gulag_name
+	self.st.activation_time = m_data.xr_logic[id].activation_time + time_global()
+	self.st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
+
+	if self.st.active_scheme then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "load_state")
+	end
+	
+	xr_logic.pstor_load_all(self.object)
+	xr_sound.npc_load_state(m_data,self.object)
+	trade_manager.load_state(m_data,self.object)
+end 
+
 function motivator_binder:save(packet)
 	set_save_marker(packet, "save", false, "motivator_binder")
 	object_binder.save(self, packet)
+	set_save_marker(packet, "save", true, "motivator_binder")
+	
+	if (USE_MARSHAL) then 
+		return 
+	end
 	
 	--alun_utils.debug_write("\n-------motivator save start------ "..self.object:name(),true)
-
 	
 	xr_logic.save_obj(self.object, packet)
 	trade_manager.save(self.object, packet)
-
 	xr_sound.save_npc(packet, self.object:id())
 
-	set_save_marker(packet, "save", true, "motivator_binder")
 	--alun_utils.debug_write("\nmotivator save end------ "..self.object:name(),true)
 end
 
 function motivator_binder:load(reader)
-	--alun_utils.debug_write("\nmotivator load start "..self.object:name(),true)
 	set_save_marker(reader, "load", false, "motivator_binder")
 	object_binder.load(self, reader)
+	set_save_marker(reader, "load", true, "motivator_binder")
 	
 	self.loaded = true
 	
+	if (USE_MARSHAL) then
+		self:load_state(alife_storage_manager.get_state())
+		return 
+	end
+	
+	--alun_utils.debug_write("\nmotivator load start "..self.object:name(),true)	
+	
 	xr_logic.load_obj(self.object, reader)
 	trade_manager.load(self.object, reader)
-
 	xr_sound.load_npc(reader, self.object:id())
 	
-	set_save_marker(reader, "load", true, "motivator_binder")
 	--alun_utils.debug_write("\nmotivator load END "..self.object:name())
 end
 
@@ -504,47 +589,3 @@ function AddToMotivator(npc)
 		npc:bind_object(this.motivator_binder(npc))
 	end
 end
-
-function update_logic(npc)
-	local st = db.storage[npc:id()]
-	local st_combat = st.combat
-	if (st.active_scheme) then 
-		local switched
-		if st_combat then --and st.active_scheme ~= "camper" then
-			--printf("motivator: combat yes [%s] for npc=[%s] [%s]", st.active_scheme, npc:name(), st_combat)
-			--if st.active_scheme == "camper" then
-				--printf("motivator: счема кемпер актив yes [%s] for npc=[%s] [%s]", st.active_scheme, npc:name(), st_combat)
-				--callstack()
-			--end
-			local mgr = npc:motivation_action_manager()
-			if (mgr and mgr:initialized() and mgr:current_action_id() == stalker_ids.action_combat_planner) then 
-				local overrides = xr_logic.generic_scheme_overrides(npc)
-				if (overrides) then 
-					if (overrides.on_combat) then 
-						xr_logic.pick_section_from_condlist(db.actor,npc,overrides.on_combat.condlist)
-					end
-					if (st_combat and st_combat.logic) then 
-						if (xr_logic.try_switch_to_another_section(npc,st_combat,db.actor)) then 
-							switched = true 
-						elseif (overrides.combat_type) then
-							xr_combat.set_combat_type(npc, db.actor, overrides)
-						end
-					end
-				else 
-					xr_combat.set_combat_type(npc, db.actor, st_combat)
-				end			
-			end
-		--else
-			--printf("motivator: combat ?camper? yes [%s] for npc=[%s] [%s]", st.active_scheme, npc:name(), st_combat)
-		end 
-		
-		if not switched then
-			--printf("motivator: not switched [%s] for npc=[%s] [%s]", st.active_scheme, npc:name(), st_combat)
-			xr_logic.try_switch_to_another_section(npc, st[st.active_scheme], db.actor)
-		end
-	elseif (st_combat) then
-		--printf("motivator: st_combat!!! [%s] for npc=[%s] [%s]", st.active_scheme, npc:name(), st_combat)
-		xr_combat.set_combat_type(npc, db.actor, st_combat)
-	end
-end
-

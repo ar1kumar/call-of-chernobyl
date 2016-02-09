@@ -10,7 +10,7 @@ actid_gl_fire = evid_gl_fire
 actid_gl_reload = evid_gl_reload
 ---------------------------------
 
-local temps = {fms = {},npcs = {},rem = {}}
+local temp = {fms = {},npcs = {},rem = {}}
 local gl_sets
 local good_acts = {[xr_actions_id.smartcover_action] = true,[xr_actions_id.smartcover_action+2] = true}
 local bad_acts = {xr_actions_id.stohe_meet_base+1}
@@ -56,8 +56,8 @@ function on_game_load()
 		if sobj then
 			local sec = sobj:section_name()
 			if string.find(sec,"gl_test_shell") or string.find(sec,"gl_fake_missile") then
-				printf("net_spawn:remove %s",sec)
-				temps.rem[a] = true
+				--printf("net_spawn:remove %s",sec)
+				temp.rem[a] = true
 			end
 		end
 	end
@@ -209,6 +209,9 @@ function action_launch_grenade:initialize()
 	self.target_point = vid and level.vertex_position(vid) or self.st.target:position()
 	self.direction = vector():set(self.target_point):sub(npc:position()):add(vector():set(0,1,0))
 	self.test_end = time_global()+5000
+	if rx_wmgr then
+		rx_wmgr.get_wm(npc):disable(10000)
+	end
 	self.stage = 0
 end
 
@@ -216,7 +219,7 @@ function action_launch_grenade:execute()
 	action_base.execute(self)
 	local npc,wpn,tg = self.object,self.object:active_item(),time_global()
 	if not self.stage then
-		printf("launch[%s]:not self.stage",npc:character_name())
+		--printf("launch[%s]:not self.stage",npc:character_name())
 		return
 	elseif not wpn or wpn:get_ammo_in_magazine() == 0 then
 		--printf("launch[%s]:ammo_in_magazine() == 0",npc:character_name())
@@ -257,7 +260,7 @@ function action_launch_grenade:execute()
 			npc:set_item(object.aim1,wpn)
 			npc:set_sight(look.fire_point,self.target_point)
 		end
-		local ts = temps.fms[self.test_shell]
+		local ts = temp.fms[self.test_shell]
 		if not ts then
 			--printf("launch[%s]:stage 2:not ts",npc:character_name())
 			self:cancel(3000)
@@ -307,7 +310,7 @@ function action_launch_grenade:execute()
 		self.st.charged = alun_utils.save_var(npc,"gl_charged",false)
 		local rem = npc:object(self.shell)
 		if rem then
-			temps.rem[rem:id()] = true
+			temp.rem[rem:id()] = true
 		end
 		--printf("launch[%s]:stage 4:end",npc:character_name())
 		self:cancel(3000)
@@ -315,11 +318,11 @@ function action_launch_grenade:execute()
 end
 
 function action_launch_grenade:cancel(ms)
-	--local npc = self.object
+	local npc = self.object
 	--printf("cancel[%s]",npc:character_name())
 	if self.test_shell then
-		temps.fms[self.test_shell] = nil
-		temps.rem[self.test_shell] = false
+		temp.fms[self.test_shell] = nil
+		temp.rem[self.test_shell] = false
 	end
 	self.st.launch = nil
 	self.bodystate = nil
@@ -344,7 +347,11 @@ function action_launch_grenade:finalize()
 		self:cancel()
 	end
 	self.object:set_item(object.idle,self.object:active_item())
+	if rx_wmgr then
+		rx_wmgr.get_wm(self.object):enable()
+	end
 end
+
 
 class "evaluator_reload_gl" (property_evaluator)
 function evaluator_reload_gl:__init(npc,name,storage) super (nil,name)
@@ -360,9 +367,6 @@ function evaluator_reload_gl:evaluate()
 		return false 
 	end 
 	if self.st.charged then
-		return false
-	end
-	if xr_wounded.is_wounded(npc) then
 		return false
 	end
 	if good_acts[alun_utils.get_current_action_id(npc)] then
@@ -396,6 +400,7 @@ function evaluator_reload_gl:evaluate()
 		self.evn = false
 	end
 
+
 	return self.evn or false
 end
 
@@ -404,7 +409,7 @@ function npc_on_hit_callback(npc,amount)
 	local st = db.storage[npc:id()].gl
 	if (st) then
 		st.wait = time_global()+amount*1000
-		--printf("ev[%s]:hit %s",npc:character_name(),amount*15000)
+		--	printf("ev[%s]:hit %s",self.object:character_name(),amount*15000)
 	end
 end
 
@@ -422,7 +427,9 @@ function action_reload_gl:initialize()
 	npc:set_item(object.idle,npc:active_item())
 	self.dir = npc:direction()
 	self.end_time = time_global()+(self.st.charge_time or gl_sets.ranks[ranks.get_obj_rank_name(npc)].reload or 3000)
-
+	if rx_wmgr then
+		rx_wmgr.get_wm(npc):disable(self.end_time)
+	end
 	self.mgr = npc:motivation_action_manager()
 	for k,v in pairs(bad_acts) do
 		local actn = self.mgr:action(v)
@@ -447,11 +454,11 @@ function action_reload_gl:execute()
 	if self.play then
 		if self.end_time <= time_global() then
 			self.st.charged = alun_utils.save_var(npc,"gl_charged",true)
-			--printf("reload_gl[%s]:end",self.object:character_name())
+			printf("reload_gl[%s]:end",self.object:character_name())
 		end
 --		printf("reload_gl[%s]:play",self.object:character_name())
 	else
-		--printf("reload_gl[%s]:start, bs = %s",npc:character_name(),tostring(npc:body_state()))
+		printf("reload_gl[%s]:start, bs = %s",npc:character_name(),tostring(npc:body_state()))
 		if not npc:weapon_unstrapped() then
 			npc:set_item(object.idle,wpn)
 			return
@@ -479,7 +486,9 @@ function action_reload_gl:finalize()
 	self.play = nil
 	self.end_time = nil
 	self.direction = nil
-
+	if rx_wmgr then
+		rx_wmgr.get_wm(npc):enable()
+	end
 	for k,v in pairs(bad_acts) do
 		local actn = self.mgr:action(v)
 		if actn then
@@ -487,7 +496,7 @@ function action_reload_gl:finalize()
 		end
 	end
 	self.mgr = nil
-	--printf("reload_gl[%s]:finalize",npc:character_name())
+	printf("reload_gl[%s]:finalize",npc:character_name())
 end
 
 
@@ -526,7 +535,7 @@ end
 
 function launch2(npc,id,target,pos,radius,typ,test)
 	npc:drop_item_and_teleport(level.object_by_id(id),pos)
-	temps.fms[id] = {npc = npc,time = time_global()+6000,radius = radius,target = target,cnt = 0,vel = 0,launch = true,type = typ,test = test}
+	temp.fms[id] = {npc = npc,time = time_global()+6000,radius = radius,target = target,cnt = 0,vel = 0,launch = true,type = typ,test = test}
 end
 
 function gl_switch(npc)
@@ -578,7 +587,7 @@ function check_weapon(wpn)
 					if ini:section_exist("gl_test_shell_"..s) and ini:section_exist("gl_fake_missile_"..s) then
 						table.insert(shells,s)
 					else
-						abort("not found gl sections for shell [%s]",s)
+						printf("not found gl sections for shell [%s]",s)
 					end
 				end
 				--printf("read_wpn_params[%s]:vel=[%s],launcher=[%s],prtcl=[%s],sshoot=[%s],sreload=[%s],sswitch=[%s],",sec,vel,launcher,particles,sound_shoot,sound_reload,sound_switch)
@@ -607,7 +616,7 @@ function check_ammo(npc)
 end
 
 function check_enemy(npc,be)
-	return be:alive() and npc:see(be) and not IsWounded(be)
+	return be:alive() and npc:see(be) and not IsWounded(be) -- and be:position():distance_to(level.vertex_position(be:level_vertex_id()))<2
 end
 
 function check_victims(npc,pos,radius,pre)
@@ -650,16 +659,15 @@ function spawn_shell(npc)
 		local cnt = #gl_sets.weapons[wpn:section()].shells
 		if cnt ~= 0 then
 			local shell = gl_sets.weapons[wpn:section()].shells[math.random(cnt)]
-			--printf("create shell %s for npc=[%s]",shell, npc:name())
-			--_g.msg("rx_gl:spawn_shell")
+			--printf("create shell %s",shell)
 			alife():create(shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 		end
 	end
 end
 
-function actor_on_update(binder,delta)
+function actor_on_update()
 	local tg = time_global()
-	for k,v in pairs(temps.fms) do
+	for k,v in pairs(temp.fms) do
 		local sobj = alife():object(k)
 		if sobj then
 			local obj = level.object_by_id(k)
@@ -668,20 +676,20 @@ function actor_on_update(binder,delta)
 			elseif obj then
 				if v.launch then
 					launch(obj,v.target,v.type)
-					--if v.test then
+					if v.test then
 --						level.map_add_object_spot(obj:id(),"red_location","")
-					--else
+					else
 --						level.map_add_object_spot(obj:id(),"grenade_location","")
-					--end
-					temps.fms[k].launch = nil
-					temps.fms[k].type = nil
+					end
+					temp.fms[k].launch = nil
+					temp.fms[k].type = nil
 					--printf("launch!")
 				end
 				local vel = get_atn_vel(obj)
 				if v.explode then
 				elseif v.time < tg then
-					temps.rem[k] = true
-					temps.fms[k] = nil
+					temp.rem[k] = true
+					temp.fms[k] = nil
 					--printf("release")
 				elseif v.cnt > 6 or v.vel > 20 then
 					--printf("test:vel=[%s],v.vel=[%s]",vel,v.vel)
@@ -690,9 +698,9 @@ function actor_on_update(binder,delta)
 						--printf("trigger")
 						if v.test then
 --							level.map_remove_object_spot(k,"red_location")
-							temps.fms[k].pos = pos
-							temps.fms[k].explode = true
-							temps.rem[k] = true
+							temp.fms[k].pos = pos
+							temp.fms[k].explode = true
+							temp.rem[k] = true
 							--printf("test:explode!:dist=[%s]",pos:distance_to(v.target))
 						else
 --							level.map_remove_object_spot(k,"grenade_location")
@@ -701,32 +709,32 @@ function actor_on_update(binder,delta)
 								obj:explode(0)
 							else
 								--printf("release!:dist=[%s]",pos:distance_to(v.target))
-								temps.rem[k] = true
+								temp.rem[k] = true
 								spawn_shell(v.npc)
 							end
-							temps.fms[k] = nil
+							temp.fms[k] = nil
 						end
 					else
 --						--printf("else")
-						temps.fms[k].vel = vel
-						temps.fms[k].cnt = v.cnt + 1
+						temp.fms[k].vel = vel
+						temp.fms[k].cnt = v.cnt + 1
 --						obj:set_desired_direction(utils.vector_copy_by_val(v.target):sub(pos))
 					end
 				else
-					temps.fms[k].vel = vel
-					temps.fms[k].cnt = v.cnt + 1
+					temp.fms[k].vel = vel
+					temp.fms[k].cnt = v.cnt + 1
 				end
 			else
 				--printf("not obj!")
-				temps.rem[k] = true
-				temps.fms[k] = nil
+				temp.rem[k] = true
+				temp.fms[k] = nil
 			end
 		elseif not v.explode then
 			--printf("not sobj! %s",k)
-			temps.fms[k] = nil
+			temp.fms[k] = nil
 		end
 	end
-	for id,v in pairs(temps.rem) do
+	for id,v in pairs(temp.rem) do
 		local se = alife():object(id)
 		if se or (se == false and se.parent_id and se.parent_id ~= 65535) then
 			--printf("parent_id %s",tostring(se.parent_id))
@@ -734,24 +742,20 @@ function actor_on_update(binder,delta)
 			alife():release(se)
 		end
 	end
-	temps.rem = empty_table(temps.rem)
+	temp.rem = empty_table(temp.rem)
 end
 
 function npc_on_update(npc,st)
-	castle.oau_watchdog = 5
 	if gl_sets.spawn_prd == 0 or gl_sets.forbiddens.factions[npc:character_community()] or gl_sets.forbiddens.npcs[npc:name()] then
 		return
 	end
-	castle.oau_watchdog = 6
 	if not st.gl_shell_spawn then
 		st.gl_shell_spawn = time_global()+gl_sets.spawn_prd*1000+math.random(2000)
 		return
 	end
-	castle.oau_watchdog = 7
 	if npc:alive() and time_global() > st.gl_shell_spawn then
 		st.gl_shell_spawn = time_global()+gl_sets.spawn_prd*1000
 		local wpn = npc:active_item()
-		castle.oau_watchdog = 8
 		if check_weapon(wpn) then
 			local prb = npc:character_rank()/150
 			if prb > 0.9 then
@@ -759,7 +763,6 @@ function npc_on_update(npc,st)
 			elseif prb < 0.01 then
 				prb = 0.01
 			end
-			castle.oau_watchdog = 9
 			if math.random() < prb then
 				local have_shell
 				local shells = gl_sets.weapons[wpn:section()].shells
@@ -772,26 +775,22 @@ function npc_on_update(npc,st)
 						break
 					end
 				end
-				castle.oau_watchdog = 10
 				if not have_shell then
 					local shell = shells[math.random(#shells)]
-					--printf("npc_on_update[%s]:spawn %s",npc:name(),shell)
-					--_g.msg("rx_gl:npc_on_update")
+					--printf("npc_update[%s]:spawn %s",npc:name(),shell)
 					alife():create(shell,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 				end
 			end
 		end
 	end
-	castle.oau_watchdog = 0
 end
 
 function npc_on_death_callback(npc)
 	local function remove_fms(q,item)
 		local sec = item:section()
 		if string.find(sec,"gl_test_shell") or string.find(sec,"gl_fake_missile") then
-			printf("death:remove %s",item:name())
-			_g.msg("rx_gl:npc_on_death_callback")
-			temps.rem[item:id()] = true
+			--printf("death:remove %s",item:name())
+			temp.rem[item:id()] = true
 		end
 	end
 	npc:iterate_inventory(remove_fms,q)
@@ -800,9 +799,8 @@ end
 function actor_on_item_take(obj)
 	local sec = obj:section()
 	if string.find(sec,"gl_test_shell") or string.find(sec,"gl_fake_missile") then
-		printf("fake_pickup:remove %s",obj:name())
-		_g.msg("rx_gl:actor_on_item_take")
-		temps.rem[obj:id()] = true
+		--printf("fake_pickup:remove %s",obj:name())
+		temp.rem[obj:id()] = true
 	end
 end
 
@@ -850,7 +848,7 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 end
 
 function configure_actions(npc,ini,scheme,section,stype,temp)
-	if (_G.schemes["facer"]) then
+	if xrs_facer then
 		temp.action[evid_gl_fire]:add_precondition(world_property(xrs_facer.evid_facer,false))
 	end
 
@@ -871,7 +869,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	local manager = npc:motivation_action_manager()
 	local action
-	local p = {xr_actions_id.alife,xr_actions_id.state_mgr + 1, xr_actions_id.state_mgr + 2, stalker_ids.action_combat_planner,stalker_ids.action_danger_planner}
+	local p = {xr_actions_id.alife,stalker_ids.action_combat_planner,stalker_ids.action_danger_planner}
 	
 	for i=1,#p do
 		action = manager:action(p[i])
@@ -883,7 +881,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 end 
 
 function disable_generic_scheme(npc,scheme,stype)
-	local st = db.storage[npc:id()]["gl"]
+	local st = db.storage[npc:id()][scheme]
 	if st then
 		st.enabled = false
 	end
