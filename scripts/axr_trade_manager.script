@@ -42,7 +42,7 @@ local function npc_on_item_take(npc,item)
 		return
 	end
 
-	local buy_sell = ini:r_string("buy_sell",sec)
+	local buy_sell = ini:r_string_ex("buy_sell",sec)
 	if (buy_sell == nil or buy_sell == "") then
 		return
 	end
@@ -120,14 +120,14 @@ function npc_trade_buy_sell(npc)
 					end
 				end
 
-				buy_sell = ini:r_string("buy_sell",sec)
+				buy_sell = ini:r_string_ex("buy_sell",sec)
 				if (buy_sell and buy_sell ~= "" and can_sell) then
 					buy_sell = alun_utils.str_explode(buy_sell,",")
 
 					sim:release(sim:object(itm:id()),true)
 					printf("trading %s",sec)
 
-					itm_base_cost = system_ini():r_float(sec,"cost") or 30
+					itm_base_cost = system_ini():r_float_ex(sec,"cost") or 30
 					npc:money(itm_base_cost * (tonumber(buy_sell[4]) or 1))
 
 					-- Only sell enough till reach keep-in-stock count (param 1)
@@ -189,11 +189,11 @@ function npc_trade_buy_sell(npc)
 
 	local buy_sell,total_cost
 	for sec,v in pairs(valid_items) do
-		buy_sell = ini:r_string("buy_sell",sec)
+		buy_sell = ini:r_string_ex("buy_sell",sec)
 		if (buy_sell and buy_sell ~= "") then
 			buy_sell = alun_utils.str_explode(buy_sell,",")
 
-			itm_base_cost = system_ini():r_float(sec,"cost") or 30
+			itm_base_cost = system_ini():r_float_ex(sec,"cost") or 30
 			total_cost = (itm_base_cost * (tonumber(buy_sell[5]) or 1))
 
 			-- If section is ammo, only buy ammo for best weapon

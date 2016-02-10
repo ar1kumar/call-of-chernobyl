@@ -137,7 +137,7 @@ function WeatherManager:reset()
 		local cycle_ltx=ini_file(("environment\\weathers\\af3_dark_"..cycle..phase..".ltx"))
 		for h = 0, 23 do
 			local hour=self:get_hour_as_string(h)
-			self.far_distances[cycle][hour] = cycle_ltx:r_float(hour, "fog_distance")
+			self.far_distances[cycle][hour] = cycle_ltx:r_float_ex(hour, "fog_distance")
 		end
 	end
 	self.next_period_change_hour=self:get_next_period_change_hour(self.period)

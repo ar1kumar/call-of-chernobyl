@@ -1353,11 +1353,11 @@ end
 
 -- extensions
 function ini_file:r_string_ex(s,k)
-	return self:line_exist(s,k) and self:r_string(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_string(s,k)
 end
 function ini_file:r_bool_ex(s,k)
-	return self:line_exist(s,k) and self:r_bool(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_bool(s,k)
 end
 function ini_file:r_float_ex(s,k)
-	return self:line_exist(s,k) and self:r_float(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_float(s,k)
 end

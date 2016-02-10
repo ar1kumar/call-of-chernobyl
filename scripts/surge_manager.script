@@ -105,7 +105,7 @@ function CSurgeManager:initialize()
 	local gg,gini,sim = game_graph(),game_ini(),alife()
 	for lvl in gg:levels() do
 		level_name = sim:level_name(lvl.id)
-		weather = level_name and gini:r_string(level_name,"weathers")
+		weather = level_name and gini:r_string_ex(level_name,"weathers")
 		if (weather and weather == "indoor") then
 			if (self.indoor_levels) then
 				self.indoor_levels[level_name] = true
@@ -138,13 +138,13 @@ function CSurgeManager:initialize()
 	local ini = self.ini
 	local cond_string = "true"
 	if(ini:line_exist("settings", "condlist")) then
-		cond_string = ini:r_string("settings", "condlist")
+		cond_string = ini:r_string_ex("settings", "condlist")
 	end
 	self.condlist = xr_logic.parse_condlist(nil, "surge_manager", "condlist", cond_string)
 
 	cond_string = "false"
 	if(ini:line_exist("settings", "survive")) then
-		cond_string = ini:r_string("settings", "survive")
+		cond_string = ini:r_string_ex("settings", "survive")
 	end
 	self.survive = xr_logic.parse_condlist(nil, "surge_manager", "survive_condlist", cond_string)
 
@@ -389,7 +389,7 @@ function CSurgeManager:init_surge_covers()
 	local ini = self.ini
 	for i = 0, ini:line_count("list")-1 do
 		temp1, id, temp2 = ini:r_line("list", i, "", "")
-		self.covers[id] = ini:line_exist(id, "condlist") and xr_logic.parse_condlist(db.actor, id, "condlist", ini:r_string(id, "condlist")) or true
+		self.covers[id] = ini:line_exist(id, "condlist") and xr_logic.parse_condlist(db.actor, id, "condlist", ini:r_string_ex(id, "condlist")) or true
 	end
 end
 
@@ -888,7 +888,7 @@ function CSurgeManager:hit_power(power,hit_type)
 		g_time = utils.CTimeToSec(game.get_game_time())
 		if g_time<expiration then
 			ini = system_ini()
-			self.drug_telepatic_protection = ini:r_float("drug_psy_blockade","boost_telepat_protection")
+			self.drug_telepatic_protection = ini:r_float_ex("drug_psy_blockade","boost_telepat_protection")
 		else
 			self.drug_telepatic_protection = nil
 		end
@@ -899,7 +899,7 @@ function CSurgeManager:hit_power(power,hit_type)
 		g_time = g_time or utils.CTimeToSec(game.get_game_time())
 		if g_time<expiration then
 			ini = ini or system_ini()
-			self.drug_radiation_protection = ini:r_float("drug_radioprotector","boost_radiation_protection")
+			self.drug_radiation_protection = ini:r_float_ex("drug_radioprotector","boost_radiation_protection")
 		else
 			self.drug_radiation_protection = nil
 		end
@@ -910,7 +910,7 @@ function CSurgeManager:hit_power(power,hit_type)
 		g_time = g_time or utils.CTimeToSec(game.get_game_time())
 		if g_time<expiration then
 			ini = ini or system_ini()
-			self.drug_chemical_burn_protection = ini:r_float("drug_antidot","boost_chemburn_protection")
+			self.drug_chemical_burn_protection = ini:r_float_ex("drug_antidot","boost_chemburn_protection")
 		else
 			self.drug_chemical_burn_protection = nil
 		end

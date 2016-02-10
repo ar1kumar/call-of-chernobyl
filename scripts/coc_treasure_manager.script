@@ -226,15 +226,15 @@ function create_random_stash(no_spot,hint,bonus_items)
 					-- Create random addon flag for weapon
 					flag = 0
 					
-					if (ini:r_float(sec,"scope_status")) then
+					if (ini:r_float_ex(sec,"scope_status")) then
 						flag = flag + 1
 					end
 
-					if (ini:r_float(sec,"grenade_launcher_status")) then
+					if (ini:r_float_ex(sec,"grenade_launcher_status")) then
 						flag = flag + 2
 					end
 
-					if (ini:r_float(sec,"silencer_status")) then
+					if (ini:r_float_ex(sec,"silencer_status")) then
 						flag = flag + 4
 					end
 

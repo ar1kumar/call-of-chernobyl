@@ -113,7 +113,7 @@ function actor_on_item_take_from_box(box,obj)
 		news_manager.send_treasure(1)
 		secret_stashes[sid] = false
 
-		local info = ini:r_string(sid,"secret_info")
+		local info = ini:r_string_ex(sid,"secret_info")
 		if (info and info ~= "") then
 			give_info(info)
 		end
@@ -131,7 +131,7 @@ function actor_on_item_take(item)
 	news_manager.send_treasure(1)
 	secret_stashes[sid] = false
 
-	local info = ini:r_string(sid,"secret_info")
+	local info = ini:r_string_ex(sid,"secret_info")
 	if (info and info ~= "") then
 		give_info(info)
 	end
@@ -166,7 +166,7 @@ function parse_ltx(actor,sections,ltx_data)
 	local gvid,id
 	local sim = alife()
 	for sec in string.gmatch(ltx_data,"%[(.-)%]") do
-		gvid = ini:r_float(sec,"game_vertex_id")
+		gvid = ini:r_float_ex(sec,"game_vertex_id")
 		if (gvid and (USE_MARSHAL and is_on_the_same_level(actor,gvid))) then
 			if (ini:line_exist(sec,"on_info")) then
 				if not (on_info_sections) then
@@ -331,10 +331,10 @@ function interpret_spawn_data(sections)
 		if (dynamic_story_id[sec] == nil and secret_stashes[sec] == nil) then
 			t = alun_utils.collect_section(ini,sec,true)
 
-			enable = ini:r_string(sec,"enable") or true
+			enable = ini:r_string_ex(sec,"enable") or true
 			enable = xr_logic.pick_section_from_condlist(db.actor,db.actor,xr_logic.parse_condlist(db.actor,"enable",sec,enable))
 
-			on_info = ini:r_string(sec,"on_info") or "true"
+			on_info = ini:r_string_ex(sec,"on_info") or "true"
 			on_info = xr_logic.pick_section_from_condlist(db.actor,db.actor,xr_logic.parse_condlist(db.actor,"on_info",sec,on_info))
 
 			if (enable == "true" and on_info == "true") then
@@ -363,7 +363,7 @@ function interpret_spawn_data(sections)
 					--se_obj.repack.direction = t.direction and alun_utils.string_to_vector(t.direction) or vector():set(0,0,0)
 
 					-- Alter packet properties
-					local class = system_ini():r_string(section,"class")
+					local class = system_ini():r_string_ex(section,"class")
 					if (class and m_classes[class] and dynamic[m_classes[class]]) then
 						dynamic[m_classes[class]](se_obj,t,sec)
 

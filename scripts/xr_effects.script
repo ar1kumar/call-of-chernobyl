@@ -302,7 +302,7 @@ function setup_generic_fetch_task(actor,npc,p)
 			if (count > 1) then 
 				alun_utils.save_var(db.actor,p[1].."_count",count)
 			end
-			dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string(sec,"inv_name") or "")
+			dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
 		else
 			printf("ERROR: xr_effects:setup_generic_fetch_task - invalid section %s",sec)
 		end
@@ -321,7 +321,7 @@ function setup_rare_mutant_fetch_task(actor,npc,p)
 	"mutant_part_chimera_kogot"
 	}
 	local part = parts[math.random(#parts)]
-	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string(part,"inv_name") or "")
+	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(part,"inv_name") or "")
 	alun_utils.save_var(db.actor,p[1],part)
 end 
 
@@ -354,7 +354,7 @@ function setup_artefact_fetch_task(actor,npc,p)
 	}
 	
 	local artefact = arts[math.random(#arts)]
-	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string(artefact,"inv_name") or "")
+	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(artefact,"inv_name") or "")
 	alun_utils.save_var(db.actor,p[1],artefact)
 end 
 
@@ -384,7 +384,7 @@ function setup_weapon_fetch_task(actor,npc,p)
 			"wpn_pkm"
 	}
 	local wpn = itm[math.random(#itm)]
-	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string(wpn,"inv_name") or "")
+	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(wpn,"inv_name") or "")
 	alun_utils.save_var(db.actor,p[1],wpn)
 end 
 
@@ -413,7 +413,7 @@ function setup_supplies_fetch_task(actor,npc,p)
 				"energy_drink"
 				}
 	local itm = itm[math.random(#itm)]
-	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string(itm,"inv_name") or "")
+	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(itm,"inv_name") or "")
 	alun_utils.save_var(db.actor,p[1],itm)
 	alun_utils.save_var(db.actor,p[1].."_count",math.random(p[2] and tonumber(p[2]) or 1,p[3] and tonumber(p[3]) or 1))
 end 

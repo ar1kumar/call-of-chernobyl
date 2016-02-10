@@ -88,12 +88,12 @@ function on_game_start()
 
 	if not (Enable) then return end
 	Items = {}
-	StateWalk = ini:r_string("settings","state_walk") or "patrol"
-	StateRun = ini:r_string("settings","state_run") or "rush"
-	RunDist = ini:r_float("settings","run_dist") or 3
-	MaxDetectDistance = ini:r_float("settings","max_detect_dist") or 900
+	StateWalk = ini:r_string_ex("settings","state_walk") or "patrol"
+	StateRun = ini:r_string_ex("settings","state_run") or "rush"
+	RunDist = ini:r_float_ex("settings","run_dist") or 3
+	MaxDetectDistance = ini:r_float_ex("settings","max_detect_dist") or 900
 	ArtifactDectection = ini:r_bool("settings","allow_artifact_detection")
-	ArtifactSearchTimer = ini:r_float("settings","artifact_search_time") or 60000
+	ArtifactSearchTimer = ini:r_float_ex("settings","artifact_search_time") or 60000
 	ArtifactCommunities = alun_utils.collect_section(ini,"artifact_communities",true)
 	UseCorpseLootTable = ini:r_bool("settings","use_xr_corpse_detection_loot_table")
 	if not (UseCorpseLootTable) then

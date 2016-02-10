@@ -631,7 +631,7 @@ function action_beh:get_current_waypoint(use_var)
 	if (self.object:has_info("npcx_beh_patrol_mode")) then
 		str = alun_utils.load_var(self.object,"pathpoint"..self.st.path_index)
 	else
-		str = st.ini:r_string(st.active_section,"pt"..tostring(self.st.path_index))
+		str = st.ini:r_string_ex(st.active_section,"pt"..tostring(self.st.path_index))
 	end
 
 	if not (str) then
@@ -723,7 +723,7 @@ function action_beh:next_waypoint_index()
 	if (self.object:has_info("npcx_beh_patrol_mode")) then 
 		return alun_utils.load_var(self.object,"pathpoint"..tostring(self.st.path_index+inc))
 	end 
-	return st.ini:r_string(st.active_section,"pt"..tostring(self.st.path_index+inc))
+	return st.ini:r_string_ex(st.active_section,"pt"..tostring(self.st.path_index+inc))
 end
 
 function action_beh:increment_waypoint_index()

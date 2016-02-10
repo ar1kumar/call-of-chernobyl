@@ -15,7 +15,7 @@ do
 	local gini  = game_ini()
 	local levels = alun_utils.collect_section(gini,"level_maps_single")
 	for i=1,#levels do
-		weather = gini:r_string(levels[i],"weathers")
+		weather = gini:r_string_ex(levels[i],"weathers")
 		if (weather == "atmosfear") then
 			valid_levels[levels[i]] = true
 		end

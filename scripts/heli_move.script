@@ -246,7 +246,7 @@ function heli_move:create_path_nodes()
 
 	local st = db.storage[self.object:id()]
 	local index = 1
-	local str = st.ini:r_string(st.active_section,"pt"..tostring(index))
+	local str = st.ini:r_string_ex(st.active_section,"pt"..tostring(index))
 	local p
 	
 	while (str and str ~= "" and str ~= "nil") do
@@ -267,7 +267,7 @@ function heli_move:create_path_nodes()
 		end
 		
 		index = index + 1 
-		str = st.ini:r_string(st.active_section,"pt"..tostring(index))
+		str = st.ini:r_string_ex(st.active_section,"pt"..tostring(index))
 	end
 end 
 

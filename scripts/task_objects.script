@@ -60,7 +60,7 @@ function CGeneralTask:__init(id)
 	local i = 0
 	self.condlist = {}
 	while task_ini:line_exist(id, "condlist_"..i) do
-		self.condlist[i] = xr_logic.parse_condlist(nil, "task_manager", "condlist", task_ini:r_string(id, "condlist_"..i))
+		self.condlist[i] = xr_logic.parse_condlist(nil, "task_manager", "condlist", task_ini:r_string_ex(id, "condlist_"..i))
 		i = i + 1
 	end
 

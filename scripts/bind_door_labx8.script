@@ -48,17 +48,17 @@ function door_binder_labx8:__init(obj) super(obj)
 	local on_stop	= "true"
 
 	if(ini:line_exist(ANIMATED_OBJECT_SECT, "on_use")) then
-		on_use = ini:r_string(ANIMATED_OBJECT_SECT, "on_use")
+		on_use = ini:r_string_ex(ANIMATED_OBJECT_SECT, "on_use")
 	end
 	self.on_use = xr_logic.parse_condlist(nil, "door_binder_labx8", "on_use", on_use)
 
 	if(ini:line_exist(ANIMATED_OBJECT_SECT, "on_start")) then
-		on_start = ini:r_string(ANIMATED_OBJECT_SECT, "on_start")
+		on_start = ini:r_string_ex(ANIMATED_OBJECT_SECT, "on_start")
 	end
 	self.on_start = xr_logic.parse_condlist(nil, "door_binder_labx8", "on_start", on_start)
 
 	if(ini:line_exist(ANIMATED_OBJECT_SECT, "on_stop")) then
-		on_stop = ini:r_string(ANIMATED_OBJECT_SECT, "on_stop")
+		on_stop = ini:r_string_ex(ANIMATED_OBJECT_SECT, "on_stop")
 	end
 	self.on_stop = xr_logic.parse_condlist(nil, "door_binder_labx8", "on_stop", on_stop)
 
