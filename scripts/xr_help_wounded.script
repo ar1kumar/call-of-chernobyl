@@ -11,11 +11,11 @@ local alife, level = alife, level
 --------------------
 
 local ini = ini_file("ai_tweaks\\xr_help_wounded.ltx")
-local HelpInCombat = alun_utils.read_from_ini(ini,"settings","help_in_combat","bool",false)
-local UseNewAnim = alun_utils.read_from_ini(ini,"settings","use_new_anim","bool",true)
-local AnimCombat = alun_utils.read_from_ini(ini,"settings","anim_combat_type","float",2)
-local AnimFree = alun_utils.read_from_ini(ini,"settings","anim_free_type","float",1)
-local AlwaysHelpDistance = alun_utils.read_from_ini(ini,"settings","help_in_combat","float",3)
+local HelpInCombat = ini:r_bool("settings","help_in_combat")
+local UseNewAnim = ini:r_bool("settings","use_new_anim")
+local AnimCombat = ini:r_float("settings","anim_combat_type") or 2
+local AnimFree = ini:r_float("settings","anim_free_type") or 1
+local AlwaysHelpDistance = ini:r_float("settings","help_in_combat") or 3
 local HelpInCombatVisuals = alun_utils.collect_sections(ini,{"help_in_combat_visuals"})
 ini = nil
 

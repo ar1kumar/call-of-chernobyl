@@ -16,7 +16,7 @@ end
 
 local function has_known_info(obj)
 	local spawn_ini = obj.spawn_ini and obj:spawn_ini()
-	local filename = spawn_ini and alun_utils.read_from_ini(spawn_ini,"logic","cfg","string")
+	local filename = spawn_ini and spawn_ini:r_string("logic","cfg")
 
 	local FS = getFS()
 	local char_ini
@@ -27,7 +27,7 @@ local function has_known_info(obj)
 		char_ini = st.ini
 	end
 
-	local known_info = st.section_logic and alun_utils.read_from_ini(char_ini,st.section_logic,"known_info","string") or "known_info"
+	local known_info = st.section_logic and char_ini:r_string(st.section_logic,"known_info") or "known_info"
 	if (char_ini and char_ini:section_exist(known_info)) then
 		return true
 	end

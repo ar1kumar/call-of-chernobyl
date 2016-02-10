@@ -9,39 +9,39 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 --]]
 local ini = ini_file("plugins\\itms_manager.ltx")
 	--Backpack stash mod
-	local BackPackStashEnable = alun_utils.read_from_ini(ini,"backpack_stash","enable","bool",true)
-	local BackPackStashAllowInBase = BackPackStashEnable and alun_utils.read_from_ini(ini,"backpack_stash","allow_in_base","bool",false)
-	local BackPackStashSpot = BackPackStashEnable and alun_utils.read_from_ini(ini,"backpack_stash","map_spot","string","treasure")
-	local BackPackStashEnableTip = BackPackStashEnable and alun_utils.read_from_ini(ini,"backpack_stash","enable_news_tip","bool",true)
-	local BackPackStashEnableUi = BackPackStashEnable and alun_utils.read_from_ini(ini,"backpack_stash","enable_ui","bool",true)
+	local BackPackStashEnable = ini:r_bool("backpack_stash","enable")
+	local BackPackStashAllowInBase = BackPackStashEnable and ini:r_bool("backpack_stash","allow_in_base")
+	local BackPackStashSpot = BackPackStashEnable and ini:r_string("backpack_stash","map_spot") or "treasure"
+	local BackPackStashEnableTip = BackPackStashEnable and ini:r_bool("backpack_stash","enable_news_tip")
+	local BackPackStashEnableUi = BackPackStashEnable and ini:r_bool("backpack_stash","enable_ui")
 
 	-- Sleep bag mod
-	local SleepBagEnable = alun_utils.read_from_ini(ini,"sleeping_bag","enable","bool",true)
-	local SleepBagEnableDangerous = SleepBagEnable and alun_utils.read_from_ini(ini,"sleeping_bag","dangerous_sleep","bool",true)
-	local SleepBagRadius = SleepBagEnable and alun_utils.read_from_ini(ini,"sleeping_bag","unsafe_radius","float",5000)
-	local SleepBagPlaceable = SleepBagEnable and alun_utils.read_from_ini(ini,"sleeping_bag","use_placeable","bool",true)
-	local SleepBagGameStart = SleepBagEnable and alun_utils.read_from_ini(ini,"sleeping_bag","have_at_start","bool",true)
+	local SleepBagEnable = ini:r_bool("sleeping_bag","enable")
+	local SleepBagEnableDangerous = SleepBagEnable and ini:r_bool("sleeping_bag","dangerous_sleep")
+	local SleepBagRadius = SleepBagEnable and ini:r_float("sleeping_bag","unsafe_radius") or 5000
+	local SleepBagPlaceable = SleepBagEnable and ini:r_bool("sleeping_bag","use_placeable")
+	local SleepBagGameStart = SleepBagEnable and ini:r_bool("sleeping_bag","have_at_start")
 	local SleepBagSections = SleepBagEnable and alun_utils.collect_section(ini,"sleeping_bag_sections",true)
 	local SleepBagPlaceableSections = SleepBagEnable and alun_utils.collect_section(ini,"sleeping_bag_ph_sections",true)
 
 	-- Actor backpack mod
-	local ActorBackPackEnable = alun_utils.read_from_ini(ini,"actor_backpack","enable","bool",true)
-	local ActorBackPackSpot = ActorBackPackEnable and alun_utils.read_from_ini(ini,"actor_backpack","map_spot","string","treasure")
-	local ActorBackPackSlot = ActorBackPackEnable and alun_utils.read_from_ini(ini,"actor_backpack","quick_slot","string","slot_3")
+	local ActorBackPackEnable = ini:r_bool("actor_backpack","enable") or true
+	local ActorBackPackSpot = ActorBackPackEnable and ini:r_string("actor_backpack","map_spot") or "treasure"
+	local ActorBackPackSlot = ActorBackPackEnable and ini:r_string("actor_backpack","quick_slot") or "slot_3"
 	local ActorBackPackKeep = ActorBackPackEnable and alun_utils.collect_section(ini,"actor_backpack_keep_items",true)
-	local ActorBackPackForced = ActorBackPackEnable and alun_utils.read_from_ini(ini,"actor_backpack","actor_backpack_always_have","bool",true)
+	local ActorBackPackForced = ActorBackPackEnable and ini:r_bool("actor_backpack","actor_backpack_always_have")
 
 	-- Repair mod
-	local RepairModEnable = alun_utils.read_from_ini(ini,"repair_mod","enable","bool",true)
+	local RepairModEnable = ini:r_bool("repair_mod","enable")
 	local RepairTools = RepairModEnable and alun_utils.collect_section(ini,"repair_mod_tools",true)
 
 	-- Loot Mutant mod
-	local MutantLootEnable = alun_utils.read_from_ini(ini,"mutant_loot_mod","enable","bool",true)
-	local MutantLootEnableUI = alun_utils.read_from_ini(ini,"mutant_loot_mod","enable_ui","bool",true)
-	local MutantLootDecayTime = alun_utils.read_from_ini(ini,"mutant_loot_mod","decay_time","float",7200)
+	local MutantLootEnable = ini:r_bool("mutant_loot_mod","enable")
+	local MutantLootEnableUI = ini:r_bool("mutant_loot_mod","enable_ui")
+	local MutantLootDecayTime = ini:r_float("mutant_loot_mod","decay_time") or 7200
 
 	-- Flashlight mod
-	local FlashlightModEnable = alun_utils.read_from_ini(ini,"flashlight_mod","enable","bool",true)
+	local FlashlightModEnable = ini:r_bool("flashlight_mod","enable")
 	local FlashlightSections = FlashlightModEnable and alun_utils.collect_section(ini,"flashlight_sections",true)
 
 -- Static Message
@@ -236,7 +236,7 @@ function actor_on_item_use(obj)
 	if (SleepBagEnable and SleepBagSections[obj:section()]) then
 		local sec = obj:section()
 		if (SleepBagPlaceable) then
-			local ph_sec = alun_utils.read_from_ini(nil,sec,"placeable_section","string",nil)
+			local ph_sec = system_ini():r_string(sec,"placeable_section")
 			local se_obj = alife():create(ph_sec or "ph_sleepbag",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 			se_obj.sleepbag_section = sec
 		else

@@ -130,7 +130,7 @@ function get_first_finished_task(npc,is_sim)
 	local count = 1
 	while (task_manager.task_ini:section_exist(task_id)) do
 	--	printf("get_first_finished_task task_id=%s",task_id)
-		if (db.actor:get_task(task_id, true) ~= nil and task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task_id,"stage_complete","float",254)) then
+		if (db.actor:get_task(task_id, true) ~= nil and task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == (task_manager.task_ini:r_float(task_id,"stage_complete") or 254)) then
 			--printf("get_first_finished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
 			if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
 				if (is_sim and task_info[task_id].task_giver_id) then 
@@ -170,15 +170,15 @@ function trigger_fetch_func(task_id)
 end 
 
 function get_task_job_description(task)
-	return alun_utils.read_from_ini(task_manager.task_ini,task,"job_descr","string")
+	return task_manager.task_ini:r_string(task,"job_descr")
 end 
 
 function get_fetch_task_description(task)
-	return alun_utils.read_from_ini(task_manager.task_ini,task,"fetch_descr","string")
+	return task_manager.task_ini:r_string(task,"fetch_descr")
 end 
 
 function get_task_complete_text(task)
-	return alun_utils.read_from_ini(task_manager.task_ini,task,"task_complete_descr","string")
+	return task_manager.task_ini:r_string(task,"task_complete_descr")
 end
 
 function is_task_on_complete_stage(task)
@@ -187,7 +187,7 @@ function is_task_on_complete_stage(task)
 	if not (task_info[task_id]) then 
 		return false 
 	end 
-	return task_info[task_id].stage ~= nil and task_info[task_id].stage == alun_utils.read_from_ini(task_manager.task_ini,task,"stage_complete","number")
+	return task_info[task_id].stage ~= nil and task_info[task_id].stage == (task_manager.task_ini:r_float(task,"stage_complete") or 255)
 end
 
 function npc_has_task_to_give(npc,is_sim)

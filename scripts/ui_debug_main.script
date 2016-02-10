@@ -1457,17 +1457,17 @@ function debug_ui:OnEditorTriggerAddonSectionSelection()
 	local scope_sec = section
 	local ind = self.addon_list:CurrentID()
 	if (self._addons[ind] == "scope" and self._scopes[ind]) then 
-		local s = alun_utils.read_from_ini(ini,self._scopes[ind],self._addons[ind].."_name","string")
+		local s = ini:r_string(self._scopes[ind],self._addons[ind].."_name")
 		addon_sec = s or addon_sec
 		scope_sec = self._scopes[ind] or section
 	end 
 	
 	local scale = 0.75
 	
-	local addon_inv_grid_width = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_width","float",0)
-	local addon_inv_grid_height = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_height","float",0)
-	local addon_inv_grid_x = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_x","float",0)
-	local addon_inv_grid_y = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_y","float",0)
+	local addon_inv_grid_width = ini:r_float(addon_sec,"inv_grid_width") or 0
+	local addon_inv_grid_height = ini:r_float(addon_sec,"inv_grid_height") or 0
+	local addon_inv_grid_x = ini:r_float(addon_sec,"inv_grid_x") or 0
+	local addon_inv_grid_y = ini:r_float(addon_sec,"inv_grid_y") or 0
 
 	local addon_x1 = addon_inv_grid_x*50
 	local addon_y1 = addon_inv_grid_y*50
@@ -1478,8 +1478,8 @@ function debug_ui:OnEditorTriggerAddonSectionSelection()
 	local addon_x2 = addon_x1 + addon_w
 	local addon_y2 = addon_y1 + addon_h
 	
-	local offset_x = alun_utils.read_from_ini(ini,scope_sec,self._addons[ind].."_x","float",0)
-	local offset_y = alun_utils.read_from_ini(ini,scope_sec,self._addons[ind].."_y","float",0)
+	local offset_x = ini:r_float(scope_sec,self._addons[ind].."_x") or 0
+	local offset_y = ini:r_float(scope_sec,self._addons[ind].."_y") or 0
 	
 	self.editor_icon_addon:InitTexture("ui\\ui_icon_equipment")
 	self.editor_icon_addon:SetTextureRect(Frect():set(addon_x1,addon_y1,addon_x2,addon_y2))
@@ -1527,10 +1527,10 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	-----------------------
 	local scale = 0.75
 	
-	local inv_grid_width = alun_utils.read_from_ini(ini,section,"inv_grid_width","float",0)
-	local inv_grid_height = alun_utils.read_from_ini(ini,section,"inv_grid_height","float",0)
-	local inv_grid_x = alun_utils.read_from_ini(ini,section,"inv_grid_x","float",0)
-	local inv_grid_y = alun_utils.read_from_ini(ini,section,"inv_grid_y","float",0)
+	local inv_grid_width = ini:r_float(section,"inv_grid_width") or 0)
+	local inv_grid_height = ini:r_float(section,"inv_grid_height") or 0
+	local inv_grid_x = ini:r_float(section,"inv_grid_x") or 0
+	local inv_grid_y = ini:r_float(section,"inv_grid_y") or 0
 
 	self.editor_old_x = inv_grid_x
 	self.editor_old_y = inv_grid_y
@@ -1564,8 +1564,8 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	self.icon_square:SetWndSize(vector2():set(w/4,h/4))
 	
 	-- attachments
-	local silencer = alun_utils.read_from_ini(ini,section,"silencer_name","string")
-	local grenade_launcher = alun_utils.read_from_ini(ini,section,"grenade_launcher_name","string")
+	local silencer = ini:r_string(section,"silencer_name")
+	local grenade_launcher = ini:r_string(section,"grenade_launcher_name")
 	
 	local ind = 1
 	if (silencer and ini:section_exist(silencer)) then

@@ -119,7 +119,7 @@ end
 ---------------------------------
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\axr_companions.ltx")
-	Enabled = alun_utils.read_from_ini(ini,"main","enable","bool",false)
+	Enabled = ini:r_bool("main","enable")
 	if not (Enabled) then return end
 	RegisterScriptCallback("npc_on_fighting_actor",on_fighting_actor)
 	RegisterScriptCallback("squad_on_update",squad_on_update)
@@ -128,9 +128,9 @@ function on_game_start()
 	RegisterScriptCallback("squad_can_switch_offline",squad_can_switch_offline)
 	RegisterScriptCallback("on_level_changing",on_level_changing)
 
-	allow_only_friends_as_companions = alun_utils.read_from_ini(ini,"main","allow_only_friends_as_companions","bool",true)
-	allow_simulation_squads_as_companions = alun_utils.read_from_ini(ini,"main","allow_simulation_squads_as_companions","bool",false)
-	max_actor_squad_size = alun_utils.read_from_ini(ini,"main","max_actor_squad_size","float",3)
+	allow_only_friends_as_companions = ini:r_bool("main","allow_only_friends_as_companions")
+	allow_simulation_squads_as_companions = ini:r_bool("main","allow_simulation_squads_as_companions")
+	max_actor_squad_size = ini:r_float("main","max_actor_squad_size") or 3
 end
 
 function companion_squad_can_teleport(squad)

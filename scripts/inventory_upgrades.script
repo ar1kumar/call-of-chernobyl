@@ -158,7 +158,7 @@ function dm_repair_not_done(a,b)
 		local itm = level.object_by_id(itm_id)
 		local itm_sec = itm and itm:section()
 
-		local inv_name = game.translate_string(alun_utils.read_from_ini(nil,itm_sec,"inv_name","string",""))
+		local inv_name = game.translate_string(system_ini():r_string(itm_sec,"inv_name") or "")
 
 		-- TODO: replace with translatable strings
 		local text = { "Your %s will be ready in %s minutes. Come back then.",
@@ -378,7 +378,7 @@ local function how_much_repair( item_name, item_condition )
 	local ltx = system_ini()
 	local cost = ltx:r_u32(item_name, "cost")
 	local class = ltx:r_string(item_name, "class")
-	local factor = alun_utils.read_from_ini(nil,"mechanic_repair","cost_factor","float",1)
+	local factor = ltx:r_float("mechanic_repair","cost_factor") or 1
 
 	return math.floor( cost * ((1 * (1-item_condition)) / (1 / (1-item_condition))) * factor * cur_price_percent )
 end
@@ -412,11 +412,11 @@ function effect_upgrade_item(item,upgrade_section) -- Alundaio: called from engi
 		return
 	end
 	
-	if not (USE_MARSHAL and alun_utils.read_from_ini(nil,"mechanic_repair","upgrade_queue_enable","bool",false)) then
+	if not (USE_MARSHAL and system_ini():r_bool("mechanic_repair","upgrade_queue_enable")) then
 		return
 	end
 	
-	local rt = alun_utils.read_from_ini(nil,"mechanic_repair","upgrade_queue_time","float",1500)
+	local rt = system_ini():r_float("mechanic_repair","upgrade_queue_time") or 1500
 	lend_item_for_repair(item,mechanic_name,rt)
 end 
 
@@ -428,7 +428,7 @@ function effect_repair_item( item_name, item_condition)
 		return
 	end
 	
-	if not (USE_MARSHAL and alun_utils.read_from_ini(nil,"mechanic_repair","repair_queue_enable","bool",false)) then
+	if not (USE_MARSHAL and system_ini():r_bool("mechanic_repair","repair_queue_enable")) then
 		return
 	end
 
@@ -443,7 +443,7 @@ function effect_repair_item( item_name, item_condition)
 	db.actor:iterate_inventory(itr,db.actor)
 
 	if (item) then
-		local rt = alun_utils.read_from_ini(nil,"mechanic_repair","repair_queue_time","float",1500)
+		local rt = system_ini():r_float("mechanic_repair","repair_queue_time") or 1500
 		lend_item_for_repair(item,mechanic_name,rt)
 	end
 end

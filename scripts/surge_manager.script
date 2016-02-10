@@ -105,8 +105,8 @@ function CSurgeManager:initialize()
 	local gg,gini,sim = game_graph(),game_ini(),alife()
 	for lvl in gg:levels() do
 		level_name = sim:level_name(lvl.id)
-		weather = level_name and alun_utils.read_from_ini(gini,level_name,"weathers","string")
-		if (weather == "indoor") then
+		weather = level_name and gini:r_string(level_name,"weathers")
+		if (weather and weather == "indoor") then
 			if (self.indoor_levels) then
 				self.indoor_levels[level_name] = true
 			end

@@ -26,14 +26,14 @@ function repair_ui:__init(owner,obj,section) super()
 	self.object = obj
 	self.owner = owner
 	self.section = section
-
-	self.use_condition = alun_utils.read_from_ini(nil,section,"use_condition",bool,false)
-	self.min_condition = alun_utils.read_from_ini(nil,section,"repair_min_condition","float",0)
-	self.max_condition = alun_utils.read_from_ini(nil,section,"repair_max_condition","float",0)
-	self.add_condition = alun_utils.read_from_ini(nil,section,"repair_add_condition","float",0)
-	self.part_bonus = alun_utils.read_from_ini(nil,section,"repair_part_bonus","float",0)
-	self.use_parts = alun_utils.read_from_ini(nil,section,"repair_use_parts","bool",false)
-	self.repair_type = alun_utils.read_from_ini(nil,section,"repair_type","string","weapon")
+	local ini = system_ini()
+	self.use_condition = ini:r_bool(section,"use_condition")
+	self.min_condition = ini:r_float(section,"repair_min_condition") or 0
+	self.max_condition = ini:r_float(section,"repair_max_condition") or 0
+	self.add_condition = ini:r_float(section,"repair_add_condition") or 0
+	self.part_bonus = ini:r_float(section,"repair_part_bonus") or 0
+	self.use_parts = ini:r_bool(section,"repair_use_parts")
+	self.repair_type = ini:r_string(section,"repair_type") or "weapon"
 
 	self.repair_only = alun_utils.parse_list(nil,section,"repair_only",true)
 	self.repair_refuse = alun_utils.parse_list(nil,section,"repair_refuse",true)
@@ -41,7 +41,7 @@ function repair_ui:__init(owner,obj,section) super()
 	self.parts_include = alun_utils.parse_list(nil,section,"repair_parts_include",true)
 	self.parts_exclude = alun_utils.parse_list(nil,section,"repair_parts_exclude",true)
 
-	self.use_actor_effects = alun_utils.read_from_ini(nil,section,"repair_use_actor_effects","bool",false)
+	self.use_actor_effects = ini:r_bool(section,"repair_use_actor_effects")
 
 	self:InitControls()
 	self:InitCallBacks()
@@ -81,7 +81,7 @@ function repair_ui:FillPartsList()
 	local function fill_list(actor,itm)
 		if (itm and itm:id() ~= item.item_id) then
 			if (self.parts_include and self.parts_include[itm:section()]) or (self.parts_exclude == nil and string.find(obj:section(),itm:section())) or (self.parts_exclude and self.parts_exclude[itm:section()] == nil and string.find(obj:section(),itm:section())) then
-				self:AddItemToList(itm,self.list_box_parts,alun_utils.read_from_ini(nil,itm:section(),"repair_part_bonus","float",nil) or self.part_bonus)
+				self:AddItemToList(itm,self.list_box_parts,system_ini():r_float(itm:section(),"repair_part_bonus") or self.part_bonus)
 			end
 		end
 	end
@@ -129,10 +129,11 @@ function repair_ui:InitControls()
 	-- Repair tool picture
 	self.pic = self.xml:InitStatic("itm_repair:form:icon_tool",self.form)
 
-	local inv_grid_width = alun_utils.read_from_ini(ini,self.section,"inv_grid_width","float",0)
-	local inv_grid_height = alun_utils.read_from_ini(ini,self.section,"inv_grid_height","float",0)
-	local inv_grid_x = alun_utils.read_from_ini(ini,self.section,"inv_grid_x","float",0)
-	local inv_grid_y = alun_utils.read_from_ini(ini,self.section,"inv_grid_y","float",0)
+	local ini = system_ini()
+	local inv_grid_width = ini:r_float(self.section,"inv_grid_width") or 0 
+	local inv_grid_height = ini:r_float(self.section,"inv_grid_height") or 0
+	local inv_grid_x = ini:r_float(self.section,"inv_grid_x") or 0
+	local inv_grid_y = ini:r_float(self.section,"inv_grid_y") or 0
 
 	local x1 = inv_grid_x*50
 	local y1 = inv_grid_y*50
@@ -226,7 +227,7 @@ function repair_ui:OnPartsListItemClicked()
 	end
 
 	local sec = se_item:section_name()
-	local part_bonus = alun_utils.read_from_ini(nil,sec,"repair_part_bonus","float",nil) or self.part_bonus
+	local part_bonus = system_ini():r_float(sec,"repair_part_bonus") or self.part_bonus
 	local con = math.floor((self.add_condition + part_bonus)*100)
 	self.caption_repair:SetText("+"..con.."%")
 
@@ -353,7 +354,7 @@ function repair_ui:OnButton_repair()
 			local se_parts = item and item.item_id and alife():object(item.item_id)
 			if (se_parts) then
 				local sec = se_parts:section_name()
-				bonus = alun_utils.read_from_ini(nil,sec,"repair_part_bonus","float",nil) or self.part_bonus
+				bonus = system_ini():r_float(sec,"repair_part_bonus") or self.part_bonus
 				alife():release(se_parts,true)
 			end
 		end
@@ -373,10 +374,10 @@ function repair_ui:OnButton_repair()
 end
 
 function repair_ui:AddItemToList(item,listbox,condition)
-
+	local ini = system_ini()
 	local _itm			= load_item(self.file_item_main_sz.y)
 	local sec = item and item:section()
-	local inv_name 		= item and game.translate_string(alun_utils.read_from_ini(nil,sec,"inv_name","string","error")) or "none"
+	local inv_name 		= item and game.translate_string(ini:r_string(sec,"inv_name") or "none")
 
 	_itm:SetWndSize		(self.file_item_main_sz)
 
@@ -393,10 +394,10 @@ function repair_ui:AddItemToList(item,listbox,condition)
 
 		_itm.item_id = item:id()
 
-		local inv_grid_width = alun_utils.read_from_ini(ini,sec,"inv_grid_width","float",0)
-		local inv_grid_height = alun_utils.read_from_ini(ini,sec,"inv_grid_height","float",0)
-		local inv_grid_x = alun_utils.read_from_ini(ini,sec,"inv_grid_x","float",0)
-		local inv_grid_y = alun_utils.read_from_ini(ini,sec,"inv_grid_y","float",0)
+		local inv_grid_width = ini:r_float(sec,"inv_grid_width") or 0
+		local inv_grid_height = ini:r_float(sec,"inv_grid_height") or 0
+		local inv_grid_x = ini:r_float(sec,"inv_grid_x") or 0
+		local inv_grid_y = ini:r_float(sec,"inv_grid_y") or 0
 
 		_itm.x1 = inv_grid_x*50
 		_itm.y1 = inv_grid_y*50

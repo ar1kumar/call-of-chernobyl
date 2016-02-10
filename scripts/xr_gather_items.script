@@ -84,18 +84,18 @@ end
 ---------------------------------------
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\xr_gather_items.ltx")
-	Enable = alun_utils.read_from_ini(ini,"settings","enable","bool",true)
+	Enable = ini:r_bool("settings","enable")
 
 	if not (Enable) then return end
 	Items = {}
-	StateWalk = alun_utils.read_from_ini(ini,"settings","state_walk","string","patrol")
-	StateRun = alun_utils.read_from_ini(ini,"settings","state_run","string","rush")
-	RunDist =	alun_utils.read_from_ini(ini,"settings","run_dist","float",3)
-	MaxDetectDistance = alun_utils.read_from_ini(ini,"settings","max_detect_dist","float",900)
-	ArtifactDectection =  alun_utils.read_from_ini(ini,"settings","allow_artifact_detection","bool",true)
-	ArtifactSearchTimer = alun_utils.read_from_ini(ini,"settings","artifact_search_time","float",60000)
+	StateWalk = ini:r_string("settings","state_walk") or "patrol"
+	StateRun = ini:r_string("settings","state_run") or "rush"
+	RunDist = ini:r_float("settings","run_dist") or 3
+	MaxDetectDistance = ini:r_float("settings","max_detect_dist") or 900
+	ArtifactDectection = ini:r_bool("settings","allow_artifact_detection")
+	ArtifactSearchTimer = ini:r_float("settings","artifact_search_time") or 60000
 	ArtifactCommunities = alun_utils.collect_section(ini,"artifact_communities",true)
-	UseCorpseLootTable = alun_utils.read_from_ini(ini,"settings","use_xr_corpse_detection_loot_table","bool",true)
+	UseCorpseLootTable = ini:r_bool("settings","use_xr_corpse_detection_loot_table")
 	if not (UseCorpseLootTable) then
 		LootTable = alun_utils.collect_section(ini,"lootable",true)
 	end

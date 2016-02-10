@@ -11,16 +11,16 @@ local eating = {}
 
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\xr_eat_medkit.ltx")
-	local enabled = alun_utils.read_from_ini(ini,"plugin","enable","bool",false)
+	local enabled = ini:r_bool("plugin","enable")
 	if not (enabled) then ini = nil return end
 	RegisterScriptCallback("npc_on_update",npc_update)
 
 	local sect = "plugin"
 	eating.exc_comms = alun_utils.parse_list(ini,sect,"excluded_communities",true)
-	eating.ic = alun_utils.read_from_ini(ini,sect,"in_combat","bool",false)
-	eating.oc = alun_utils.read_from_ini(ini,sect,"out_combat","bool",true)
-	eating.max_h = alun_utils.read_from_ini(ini,sect,"medkit_health","float",50)/100
-	eating.min_b = alun_utils.read_from_ini(ini,sect,"bandage_bleeding","float",0.2)
+	eating.ic = ini:r_bool(sect,"in_combat")
+	eating.oc = ini:r_bool(sect,"out_combat")
+	eating.max_h = (ini:r_float(sect,"medkit_health") or 50)/100
+	eating.min_b = ini:r_float(sect,"bandage_bleeding") or 0.2
 	eating.medkits = alun_utils.parse_list(ini,sect,"medkits")
 	eating.bandages = alun_utils.parse_list(ini,sect,"bandages")
 	eating.medkit_delay = {}
@@ -128,9 +128,10 @@ end
 function consume_medkit(npc,medkit)
 	local ms = medkit:section()
 	npc:eat(medkit)
-	local time = alun_utils.read_from_ini(nil,ms,"boost_time","float",1)
-	local health_restore = alun_utils.read_from_ini(nil,ms,"boost_health_restore","float",0)
-	local bleeding_restore = alun_utils.read_from_ini(nil,ms,"boost_bleeding_restore","float",0)
+	local ini = system_ini()
+	local time = ini:r_float(ms,"boost_time") or 1
+	local health_restore = ini:r_float(ms,"boost_health_restore") or 0
+	local bleeding_restore = ini:r_float(ms,"boost_bleeding_restore") or 0
 	if (health_restore) then
 		npc.health = health_restore*time*10
 	end

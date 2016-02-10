@@ -476,7 +476,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.reach_movement = xr_logic.parse_condlist(db.actor, "animpoint", "reach_movement", utils.cfg_get_string(ini, section, "reach_movement", npc, false, "", "walk"))
 	st.reach_distance = st.reach_distance*st.reach_distance
 
-	st.direction = alun_utils.read_from_ini(ini,section,"direction","string",nil)
+	st.direction = utils.cfg_get_string(ini, section, "direction", npc, false, "", nil)
 	st.direction = st.direction and alun_utils.string_to_vector(st.direction)
 
 	local tmp = utils.cfg_get_string(ini, section, "avail_animations", npc, false, "", nil)

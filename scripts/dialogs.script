@@ -476,7 +476,7 @@ function surrender_victim_answers_1(a,b)
 		end
 
 		if (axr_dynamic_spawn.last_secret) then
-			local hint = alun_utils.read_from_ini(axr_dynamic_spawn.ini,axr_dynamic_spawn.last_secret,"hint","string",nil)
+			local hint = axr_dynamic_spawn.ini:r_string(axr_dynamic_spawn.last_secret,"hint")
 			hint = hint and " " .. game.translate_string(hint) or ""
 			return game.translate_string("st_surrender_victim_answer_"..math.random(3)) .. hint
 		elseif (coc_treasure_manager and coc_treasure_manager.last_secret) then
