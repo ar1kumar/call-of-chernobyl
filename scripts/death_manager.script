@@ -103,14 +103,43 @@ function drop_manager:create_release_item()
 	if spawn_items == nil then
 		return
 	end
+	
+	try_spawn_ammo(self.npc,spawn_items)
+	
+	local grenade_classes = { 
+								["ammo_m209"] = true,
+								["ammo_vog-25"] = true
+							}
 	for sec,v in pairs(spawn_items) do
-		if (v > 0 and item_count[sec] and check_item_dependence(self.npc, sec) == true) then
-			local number = math.ceil(math.random(item_count[sec][1], item_count[sec][2]))
-			--' Необходимо заспавнить нужное количество.
+		if (v > 0 and item_count[sec] and not _G.ammo_section[sec] and grenade_classes[sec]) then
+			local number = math.random(item_count[sec][1], item_count[sec][2])
 			create_items(self.npc, sec, number, v)
 		end
 	end
+end
 
+function try_spawn_ammo(npc,spawn_items)
+	local ini = system_ini()
+	local ammo_class,sec
+	local function itr(npc,itm)
+		if (IsWeapon(nil,itm:clsid()) and not npc:marked_dropped(itm)) then
+			ammo_class = alun_utils.parse_list(ini,itm:section(),"ammo_class")
+			for i=1,#ammo_class do
+				sec = ammo_class[i]
+				if (spawn_items[sec] and spawn_items[sec] > 0 and item_count[sec]) then 
+					create_items(npc,sec,math.random(item_count[sec][1], item_count[sec][2]),spawn_items[sec])
+				end
+			end
+			ammo_class = alun_utils.parse_list(ini,itm:section(),"grenade_class")
+			for i=1,#ammo_class do
+				sec = ammo_class[i]
+				if (spawn_items[sec] and spawn_items[sec] > 0 and item_count[sec]) then 
+					create_items(npc,sec,math.random(item_count[sec][1], item_count[sec][2]),spawn_items[sec])
+				end
+			end			
+		end
+	end
+	npc:iterate_inventory(itr,npc)
 end
 
 --' Функция вызывается для каждого предмета, если вернет false то предмет удалится.
@@ -211,22 +240,4 @@ function create_items(npc, section, number, rnd)
 			end
 		end
 	end
-end
-
---' Функция проверяет есть ли хоть один из зависимых объектов у персонажа
-function check_item_dependence(npc, section)
-	if item_dependence[section] == nil then
-		return true
-	end
-
-	local d_flag = true
-	for k,v in pairs(item_dependence[section]) do
-		local obj = npc:object(k)
-		if obj ~= nil and npc:marked_dropped(obj) ~= true then
-			return true
-		end
-		d_flag = false
-	end
-
-	return d_flag
 end
