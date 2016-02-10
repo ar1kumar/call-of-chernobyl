@@ -708,7 +708,7 @@ function sim_squad_scripted:create_npc(spawn_smart,only_one,pos,lvid,gvid)
 		
 		local random_count, count = 1,0
 		if not (only_one) then
-			count = ini:r_string(settings_id,"npc_in_squad") or "1,2"
+			count = ini:r_string_ex(settings_id,"npc_in_squad") or "1,2"
 			count = alun_utils.str_explode(count,",")
 			count[1] = count[1] and tonumber(count[1])
 			count[2] = count[2] and tonumber(count[2]) or count[1]
