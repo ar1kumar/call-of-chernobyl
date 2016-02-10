@@ -286,7 +286,7 @@ function parse_list(ini,key,val,convert)
 	local str = ini:r_string_ex(key,val)
 	local t = str and str ~= "" and str_explode(str,",")
 	if not (t) then
-		return
+		return {}
 	end
 	if (convert and #t > 0) then
 		local l = {}
