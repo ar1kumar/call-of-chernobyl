@@ -14,10 +14,10 @@ local wp = world_property
 -- INI
 ------------------------
 local ini = ini_file("ai_tweaks\\xr_corpse_detection.ltx")
-local AlwaysDetectDistance = ini:r_float("settings","always_detect_dist") or 2500
-local StateWalk	 = ini:r_string("settings","state_walk") or "walk_noweap"
-local StateRun	 = ini:r_string("settings","state_run") or "rush"
-local MonsterLoot = ini:r_bool("settings","enable_mutant_looting")
+local AlwaysDetectDistance = ini:r_float_ex("settings","always_detect_dist") or 2500
+local StateWalk	 = ini:r_string_ex("settings","state_walk") or "walk_noweap"
+local StateRun	 = ini:r_string_ex("settings","state_run") or "rush"
+local MonsterLoot = ini:r_bool_ex("settings","enable_mutant_looting")
 local MonsterLootCommunities = alun_utils.collect_section(ini,"loot_mutant_communities",true)
 lootable_table = alun_utils.collect_section(ini,"lootable",true)
 ini = nil

@@ -27,13 +27,13 @@ function repair_ui:__init(owner,obj,section) super()
 	self.owner = owner
 	self.section = section
 	local ini = system_ini()
-	self.use_condition = ini:r_bool(section,"use_condition")
-	self.min_condition = ini:r_float(section,"repair_min_condition") or 0
-	self.max_condition = ini:r_float(section,"repair_max_condition") or 0
-	self.add_condition = ini:r_float(section,"repair_add_condition") or 0
-	self.part_bonus = ini:r_float(section,"repair_part_bonus") or 0
-	self.use_parts = ini:r_bool(section,"repair_use_parts")
-	self.repair_type = ini:r_string(section,"repair_type") or "weapon"
+	self.use_condition = ini:r_bool_ex(section,"use_condition")
+	self.min_condition = ini:r_float_ex(section,"repair_min_condition") or 0
+	self.max_condition = ini:r_float_ex(section,"repair_max_condition") or 0
+	self.add_condition = ini:r_float_ex(section,"repair_add_condition") or 0
+	self.part_bonus = ini:r_float_ex(section,"repair_part_bonus") or 0
+	self.use_parts = ini:r_bool_ex(section,"repair_use_parts")
+	self.repair_type = ini:r_string_ex(section,"repair_type") or "weapon"
 
 	self.repair_only = alun_utils.parse_list(ini,section,"repair_only",true)
 	self.repair_refuse = alun_utils.parse_list(ini,section,"repair_refuse",true)
@@ -41,7 +41,7 @@ function repair_ui:__init(owner,obj,section) super()
 	self.parts_include = alun_utils.parse_list(ini,section,"repair_parts_include",true)
 	self.parts_exclude = alun_utils.parse_list(ini,section,"repair_parts_exclude",true)
 
-	self.use_actor_effects = ini:r_bool(section,"repair_use_actor_effects")
+	self.use_actor_effects = ini:r_bool_ex(section,"repair_use_actor_effects")
 
 	self:InitControls()
 	self:InitCallBacks()
@@ -130,10 +130,10 @@ function repair_ui:InitControls()
 	self.pic = self.xml:InitStatic("itm_repair:form:icon_tool",self.form)
 
 	local ini = system_ini()
-	local inv_grid_width = ini:r_float(self.section,"inv_grid_width") or 0 
-	local inv_grid_height = ini:r_float(self.section,"inv_grid_height") or 0
-	local inv_grid_x = ini:r_float(self.section,"inv_grid_x") or 0
-	local inv_grid_y = ini:r_float(self.section,"inv_grid_y") or 0
+	local inv_grid_width = ini:r_float_ex(self.section,"inv_grid_width") or 0 
+	local inv_grid_height = ini:r_float_ex(self.section,"inv_grid_height") or 0
+	local inv_grid_x = ini:r_float_ex(self.section,"inv_grid_x") or 0
+	local inv_grid_y = ini:r_float_ex(self.section,"inv_grid_y") or 0
 
 	local x1 = inv_grid_x*50
 	local y1 = inv_grid_y*50
@@ -377,7 +377,7 @@ function repair_ui:AddItemToList(item,listbox,condition)
 	local ini = system_ini()
 	local _itm			= load_item(self.file_item_main_sz.y)
 	local sec = item and item:section()
-	local inv_name 		= item and game.translate_string(ini:r_string(sec,"inv_name") or "none")
+	local inv_name 		= item and game.translate_string(ini:r_string_ex(sec,"inv_name") or "none")
 
 	_itm:SetWndSize		(self.file_item_main_sz)
 
@@ -394,10 +394,10 @@ function repair_ui:AddItemToList(item,listbox,condition)
 
 		_itm.item_id = item:id()
 
-		local inv_grid_width = ini:r_float(sec,"inv_grid_width") or 0
-		local inv_grid_height = ini:r_float(sec,"inv_grid_height") or 0
-		local inv_grid_x = ini:r_float(sec,"inv_grid_x") or 0
-		local inv_grid_y = ini:r_float(sec,"inv_grid_y") or 0
+		local inv_grid_width = ini:r_float_ex(sec,"inv_grid_width") or 0
+		local inv_grid_height = ini:r_float_ex(sec,"inv_grid_height") or 0
+		local inv_grid_x = ini:r_float_ex(sec,"inv_grid_x") or 0
+		local inv_grid_y = ini:r_float_ex(sec,"inv_grid_y") or 0
 
 		_itm.x1 = inv_grid_x*50
 		_itm.y1 = inv_grid_y*50

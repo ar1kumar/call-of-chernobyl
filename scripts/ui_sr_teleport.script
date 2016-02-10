@@ -23,13 +23,13 @@ function msg_box_ui:__init(obj,disable_msg,item) super()
 		return
 	end
 
-	local enable = ini:r_string(self.name,"enable")
+	local enable = ini:r_string_ex(self.name,"enable")
 	enable = enable and xr_logic.pick_section_from_condlist(db.actor,obj,xr_logic.parse_condlist(obj,"enable",self.name,enable))
 
 	if (enable ~= "true") then
-		local reject_on_disable = ini:r_bool(self.name,"reject_on_disabled")
+		local reject_on_disable = ini:r_bool_ex(self.name,"reject_on_disabled")
 		if (reject_on_disable) then
-			local warning = ini:r_string(self.name,"warning")
+			local warning = ini:r_string_ex(self.name,"warning")
 			if (warning) then
 				SetHudMsg(game.translate_string(warning),5)
 			end
@@ -59,8 +59,8 @@ function msg_box_ui:InitCallBacks()
 end
 
 function msg_box_ui:OnMsgOk()
-	local pos = ini:r_string(self.name,"position")
-	local path = pos == nil and ini:r_string(self.name,"path")
+	local pos = ini:r_string_ex(self.name,"position")
+	local path = pos == nil and ini:r_string_ex(self.name,"path")
 	local point = path and patrol(path)
 
 	if not (pos or point) then
@@ -71,14 +71,14 @@ function msg_box_ui:OnMsgOk()
 		level.add_pp_effector("black.ppe", 1313, false)
 	end
 	
-	if (ini:r_bool(self.name,"autosave")) then
-		xr_effects.scenario_autosave(nil,nil,{ini:r_string(self.name,"hint") or "moving"})
+	if (ini:r_bool_ex(self.name,"autosave")) then
+		xr_effects.scenario_autosave(nil,nil,{ini:r_string_ex(self.name,"hint") or "moving"})
 	end
 	
 	local p = pos and alun_utils.str_explode(pos,",")
 	pos = p and vector():set(tonumber(p[1]),tonumber(p[2]),tonumber(p[3]))
 
-	if (ini:r_bool(self.name,"allow_vehicle")) then
+	if (ini:r_bool_ex(self.name,"allow_vehicle")) then
 		-- allow vehicles to teleport too
 		local car = db.actor:get_attached_vehicle()
 		if (car) then
@@ -92,8 +92,8 @@ function msg_box_ui:OnMsgOk()
 		if (car) then 
 			db.actor:detach_vehicle()
 			
-			local cpos = ini:r_string(self.name,"reject")
-			local cpath = cpos == nil and ini:r_string(self.name,"reject_path")
+			local cpos = ini:r_string_ex(self.name,"reject")
+			local cpath = cpos == nil and ini:r_string_ex(self.name,"reject_path")
 			local cpoint = cpath and patrol(cpath)
 			
 			local cp = cpos and alun_utils.str_explode(cpos,",")
@@ -112,8 +112,8 @@ function msg_box_ui:OnMsgOk()
 end
 
 function msg_box_ui:OnMsgCancel()
-	local pos = ini:r_string(self.name,"reject")
-	local path = pos == nil and ini:r_string(self.name,"reject_path")
+	local pos = ini:r_string_ex(self.name,"reject")
+	local path = pos == nil and ini:r_string_ex(self.name,"reject_path")
 	local point = path and patrol(path)
 
 	if not (pos or point) then
@@ -143,6 +143,6 @@ function msg_box_ui:InitControls()
 
 	self.message_box:InitMessageBox("message_box_yes_no")
 	self.message_box:ShowDialog(true)
-	local str = game.translate_string(ini:r_string(self.name,"text") or "")
+	local str = game.translate_string(ini:r_string_ex(self.name,"text") or "")
 	self.message_box:SetText(str)
 end
