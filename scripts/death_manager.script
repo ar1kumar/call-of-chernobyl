@@ -95,7 +95,8 @@ function drop_manager:create_release_item()
 	
 	local grenade_classes = { 
 								["ammo_m209"] = true,
-								["ammo_vog-25"] = true
+								["ammo_vog-25"] = true,
+								["ammo_og-7b"] = true
 							}
 	for sec,v in pairs(spawn_items) do
 		if (v > 0 and item_count[sec] and not _G.ammo_section[sec] and not grenade_classes[sec]) then
@@ -111,19 +112,23 @@ function try_spawn_ammo(npc,spawn_items)
 	local function itr(npc,itm)
 		if (IsWeapon(nil,itm:clsid()) and not npc:marked_dropped(itm)) then
 			ammo_class = alun_utils.parse_list(ini,itm:section(),"ammo_class")
-			for i=1,#ammo_class do
-				sec = ammo_class[i]
-				if (spawn_items[sec] and spawn_items[sec] > 0 and item_count[sec]) then 
+			-- randomly spawn only 1 ammo type
+			if (#ammo_class > 0) then
+				sec = ammo_class[math.random(1,#ammo_class)]
+				if (sec and spawn_items[sec] and spawn_items[sec] > 0 and item_count[sec]) then 
 					create_items(npc,sec,math.random(item_count[sec][1], item_count[sec][2]),spawn_items[sec])
 				end
 			end
-			ammo_class = alun_utils.parse_list(ini,itm:section(),"grenade_class")
-			for i=1,#ammo_class do
-				sec = ammo_class[i]
-				if (spawn_items[sec] and spawn_items[sec] > 0 and item_count[sec]) then 
-					create_items(npc,sec,math.random(item_count[sec][1], item_count[sec][2]),spawn_items[sec])
+			-- spawn grenade ammo if there is launcher attached
+			if (ini:r_float_ex(itm:section(),"grenade_launcher_status") > 0) then
+				ammo_class = alun_utils.parse_list(ini,itm:section(),"grenade_class")
+				for i=1,#ammo_class do
+					sec = ammo_class[i]
+					if (spawn_items[sec] and spawn_items[sec] > 0 and item_count[sec]) then 
+						create_items(npc,sec,math.random(item_count[sec][1], item_count[sec][2]),spawn_items[sec])
+					end
 				end
-			end			
+			end
 		end
 	end
 	npc:iterate_inventory(itr,npc)
