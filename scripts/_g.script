@@ -1350,3 +1350,14 @@ function give_object_to_actor(obj,count)
      alife():create(obj,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
   end
 end
+
+-- extensions
+function ini_file:r_string_ex(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_string(s,k)
+end
+function ini_file:r_bool_ex(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_bool(s,k)
+end
+function ini_file:r_float_ex(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_float(s,k)
+end

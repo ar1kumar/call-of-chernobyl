@@ -142,8 +142,8 @@ function get_object_data(sobj)
 		["Z_NOGRAV"] = this.get_anom_zone_data,
 		["Z_TORRID"] = this.get_anom_zone_data
 	}
-	local class = alun_utils.read_from_ini(nil,sobj:section_name(),"class","string",nil)
-	if not (class) then 
+	local class = system_ini():r_string_ex(sobj:section_name(),"class")
+	if (class == nil or class == "") then 
 		return 
 	end 
 	
@@ -280,8 +280,8 @@ function set_object_data(t,sobj)
 		["Z_NOGRAV"] = this.set_anom_zone_data,
 		["Z_TORRID"] = this.set_anom_zone_data
 	}
-	local class = alun_utils.read_from_ini(nil,sobj:section_name(),"class","string",nil)
-	if not (class) then 
+	local class = system_ini():r_string_ex(sobj:section_name(),"class")
+	if (class == nil or class == "") then 
 		return 
 	end 
 	

@@ -108,7 +108,7 @@ function loot_ui:SetMutantImage()
 	giant				= {file="ui\\ui_actor_monsters_pda_1",x="0",y="200",special="0"},
 	}
 
-	local mutant_id = game.translate_string(alun_utils.read_from_ini(nil,self.section,"species","string",nil))
+	local mutant_id = game.translate_string(system_ini():r_string_ex(self.section,"species") or "")
 
 	local mutant_f = "ui\\ui_actor_monsters_pda_1"
 	local mutant_x = 0
@@ -229,7 +229,7 @@ end
 
 function loot_ui:AddItemToList(sec,count)
 	local _itm			= load_item(self.file_item_main_sz.y)
-	local inv_name 		= game.translate_string(alun_utils.read_from_ini(nil,sec,"inv_name","string","error")) or "none"
+	local inv_name 		= game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "none")
 
 	_itm:SetWndSize		(self.file_item_main_sz)
 
@@ -244,10 +244,11 @@ function loot_ui:AddItemToList(sec,count)
 
 	_itm.sec = sec
 
-	local inv_grid_width = alun_utils.read_from_ini(ini,sec,"inv_grid_width","float",0)
-	local inv_grid_height = alun_utils.read_from_ini(ini,sec,"inv_grid_height","float",0)
-	local inv_grid_x = alun_utils.read_from_ini(ini,sec,"inv_grid_x","float",0)
-	local inv_grid_y = alun_utils.read_from_ini(ini,sec,"inv_grid_y","float",0)
+	local ini = system_ini()
+	local inv_grid_width = ini:r_float_ex(sec,"inv_grid_width") or 0
+	local inv_grid_height = ini:r_float_ex(sec,"inv_grid_height") or 0
+	local inv_grid_x = ini:r_float_ex(sec,"inv_grid_x") or 0
+	local inv_grid_y = ini:r_float_ex(sec,"inv_grid_y") or 0
 
 	_itm.x1 = inv_grid_x*50
 	_itm.y1 = inv_grid_y*50

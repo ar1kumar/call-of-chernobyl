@@ -75,7 +75,7 @@ function reset_logic(npc,st)
 end
 
 function str_from_condlist(obj,ini,section,field)
-	local str = section and ini and ini:section_exist(section) and ini:line_exist(section,field) and ini:r_string(section,field) or "nil"
+	local str = section and ini and ini:section_exist(section) and ini:line_exist(section,field) and ini:r_string_ex(section,field) or "nil"
 	local condlist = xr_logic.parse_condlist(obj,section,field,str)
 	return xr_logic.pick_section_from_condlist(db.actor,obj,condlist)
 end

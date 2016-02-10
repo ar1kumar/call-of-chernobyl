@@ -114,8 +114,8 @@ function has_completed_task_prerequisites(actor,npc,p)
 		return true 
 	end
 	
-	local precond = alun_utils.read_from_ini(task_manager.task_ini,p[1],"precondition")
-	if (precond) then 
+	local precond = task_manager.task_ini:r_string(p[1],"precondition")
+	if (precond and precond ~= "") then 
 		precond = xr_logic.parse_condlist(npc, p[1], "precondition",utils.cfg_get_string(task_manager.task_ini, p[1], "precondition", npc, false,"","true"))
 		if (precond == "false") then 
 			return false 
@@ -125,7 +125,7 @@ function has_completed_task_prerequisites(actor,npc,p)
 		end
 	end
 	
-	local prereq = alun_utils.read_from_ini(task_manager.task_ini,p[1],"prerequisites")
+	local prereq = task_manager.task_ini:r_string(p[1],"prerequisites")
 	if (prereq == nil or prereq == "") then 
 		return true
 	end 

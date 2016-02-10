@@ -80,17 +80,17 @@ function se_restrictor:on_register()
 	local id = self.id
 	local name = self:name()
 	if (sr_teleport_ini:section_exist(name)) then
-		local enable = sr_teleport_ini:line_exist(name,"enable") and sr_teleport_ini:r_string(name,"enable")
+		local enable = sr_teleport_ini:line_exist(name,"enable") and sr_teleport_ini:r_string_ex(name,"enable")
 		enable = enable and xr_logic.pick_section_from_condlist(db.actor,self,xr_logic.parse_condlist(self,"enable",name,enable))
 		if (enable == "true") then
-			local spot = sr_teleport_ini:line_exist(name,"spot") and sr_teleport_ini:r_string(name,"spot")
+			local spot = sr_teleport_ini:line_exist(name,"spot") and sr_teleport_ini:r_string_ex(name,"spot")
 			if (spot and level.map_has_object_spot(id,spot) == 0) then
-				local str = sr_teleport_ini:line_exist(name,"hint") and sr_teleport_ini:r_string(name,"hint")
+				local str = sr_teleport_ini:line_exist(name,"hint") and sr_teleport_ini:r_string_ex(name,"hint")
 				str = str and game.translate_string(str)
 				level.map_add_object_spot_ser(id,spot,str)
 			end
 		else
-			local spot = sr_teleport_ini:line_exist(name,"spot") and sr_teleport_ini:r_string(name,"spot")
+			local spot = sr_teleport_ini:line_exist(name,"spot") and sr_teleport_ini:r_string_ex(name,"spot")
 			if (spot and level.map_has_object_spot(id,spot) ~= 0) then
 				level.map_remove_object_spot(id,spot)
 			end

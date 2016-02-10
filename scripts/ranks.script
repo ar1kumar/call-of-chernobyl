@@ -35,8 +35,8 @@ function read_all_ranks()
 
 	local ltx  = system_ini()
 
-	stalker_max_rank_name = parse_ranks( ltx:r_string( "game_relations", "rating" ),         stalker_rank_intervals )
-	monster_max_rank_name = parse_ranks( ltx:r_string( "game_relations", "monster_rating" ), monster_rank_intervals )
+	stalker_max_rank_name = parse_ranks( ltx:r_string_ex( "game_relations", "rating" ),         stalker_rank_intervals )
+	monster_max_rank_name = parse_ranks( ltx:r_string_ex( "game_relations", "monster_rating" ), monster_rank_intervals )
 
 	ranks_loaded = true
 

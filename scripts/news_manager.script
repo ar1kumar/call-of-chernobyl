@@ -216,7 +216,7 @@ function send_treasure(param)
 end
 
 function get_inv_name(section)
-	return system_ini():r_string(section,"inv_name")
+	return system_ini():r_string_ex(section,"inv_name")
 end
 
 function relocate_item(actor, type, item, amount)

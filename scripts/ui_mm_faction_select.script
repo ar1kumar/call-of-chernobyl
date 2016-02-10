@@ -423,7 +423,7 @@ function faction_ui:OnFactionSelect(faction)
 			for i=2,#supplies do
 				local sec = alun_utils.str_explode(supplies[i],"=")
 				if (ini:section_exist(sec[1])) then
-					local itm_name = gs(alun_utils.read_from_ini(ini,sec[1],"inv_name","string",""))
+					local itm_name = gs(ini:r_string_ex(sec[1],"inv_name") or "")
 					sec[2] = sec[2] and tonumber(sec[2]) or 1
 					if (sec[2] > 1) then 
 						desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(sec[2]).."\\n"
@@ -439,7 +439,7 @@ function faction_ui:OnFactionSelect(faction)
 				for i=1,#supplies do
 					local sec = alun_utils.str_explode(supplies[i],"=")
 					if (ini:section_exist(sec[1])) then
-						local itm_name = gs(alun_utils.read_from_ini(ini,sec[1],"inv_name","string",""))
+						local itm_name = gs(ini:r_string_ex(sec[1],"inv_name") or "")
 						sec[2] = sec[2] and tonumber(sec[2]) or 1
 						if (sec[2] > 1) then 
 							desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(sec[2]).."\\n"

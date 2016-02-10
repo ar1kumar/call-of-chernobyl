@@ -225,22 +225,23 @@ function create_random_stash(no_spot,hint,bonus_items)
 				if (data) then
 					-- Create random addon flag for weapon
 					flag = 0
-					if (alun_utils.read_from_ini(nil,sec,"scope_status","float",nil)) then
+					
+					if (ini:r_float_ex(sec,"scope_status")) then
 						flag = flag + 1
 					end
 
-					if (alun_utils.read_from_ini(nil,sec,"grenade_launcher_status","float",nil)) then
+					if (ini:r_float_ex(sec,"grenade_launcher_status")) then
 						flag = flag + 2
 					end
 
-					if (alun_utils.read_from_ini(nil,sec,"silencer_status","float",nil)) then
+					if (ini:r_float_ex(sec,"silencer_status")) then
 						flag = flag + 4
 					end
 
 					flag = math.random(0,flag)
 
 					-- Create random ammo type
-					ammos = alun_utils.parse_list(system_ini(),sec,"ammo_class")
+					ammos = alun_utils.parse_list(ini,sec,"ammo_class")
 					ct = ammos and #ammos
 					ammo_type = ammos and ct and math.random(0,ct-1) or 0
 					ammo_section = ammo_type and ammos[ammo_type+1]

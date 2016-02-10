@@ -6,7 +6,7 @@
 -- TODO: replace read_from_ini with type specific functions to remove code smell
 
 function get_inv_name(section)
-	return game.translate_string(read_from_ini(nil,section,"inv_name","string",""))
+	return game.translate_string(system_ini():r_string_ex(section,"inv_name"))
 end 
 
 -- Prints a formated lua table to print_table.txt for debugging purposes
@@ -280,10 +280,13 @@ function hex2float (c)
 end
 
 function parse_list(ini,key,val,convert)
-	local str = read_from_ini(ini,key,val,"string","")
+	if not (ini) then 
+		error(strformat("alun_utils.parse_list ini is nil for key=%s val=%s",key,val))
+	end
+	local str = ini:r_string_ex(key,val)
 	local t = str and str ~= "" and str_explode(str,",")
 	if not (t) then
-		return
+		return {}
 	end
 	if (convert and #t > 0) then
 		local l = {}
@@ -362,7 +365,7 @@ function get_rank_list()
 	if ranks then
 		return ranks
 	end
-	local tmp = parse_list(nil,"game_relations","rating")
+	local tmp = parse_list(system_ini(),"game_relations","rating")
 	ranks = {}
 	for i,rn in ipairs(tmp) do
 		if not tonumber(rn) then
@@ -378,7 +381,7 @@ function get_communities_list()
 	if communities then
 		return communities
 	end
-	local tmp = parse_list(nil,"game_relations","communities")
+	local tmp = parse_list(system_ini(),"game_relations","communities")
 	communities = {}
 	for i,cn in ipairs(tmp) do
 		if not tonumber(cn) then

@@ -508,7 +508,7 @@ function se_smart_terrain:load_jobs()
 				if not (ltx:line_exist(section,"active")) then
 					printf("gulag: ltx=%s  no 'active' in section %s", self.ltx_name, section)
 				else
-					active_section = ltx:r_string(section, "active")
+					active_section = ltx:r_string_ex(section, "active")
 
 					job_type = gulag_general.get_job_type(job)
 					job.alife_task = self.smart_alife_task
@@ -528,9 +528,9 @@ function se_smart_terrain:load_jobs()
 						else
 							prefix_name = gulag_general.get_job_prefix_name(job)
 							if (prefix_name) then 
-								path_name = (prefix_name == "nil" and "" or prefix_name) .. ltx:r_string(active_section, path_field)
+								path_name = (prefix_name == "nil" and "" or prefix_name) .. ltx:r_string_ex(active_section, path_field)
 							else 
-								path_name = self:name() .. "_" .. ltx:r_string(active_section, path_field)
+								path_name = self:name() .. "_" .. ltx:r_string_ex(active_section, path_field)
 							end 
 
 							if (path_field == "center_point") then
@@ -552,7 +552,7 @@ function se_smart_terrain:load_jobs()
 					elseif (job_type == "heli_hide_job") then 
 						-- do nothing job.alife_task not needed
 					elseif (job_type == "smartcover_job") then
-						smartcover_name = ltx:r_string(active_section, "cover_name")
+						smartcover_name = ltx:r_string_ex(active_section, "cover_name")
 						smartcover = se_smart_cover.registered_smartcovers[smartcover_name]
 
 						if not (smartcover) then
