@@ -1,5 +1,4 @@
 local item_by_community = {}
-local item_dependence = {}
 local item_count = {}
 local always_keep_item = {}
 local item_by_story_id
@@ -30,18 +29,6 @@ function init_drop_settings()
 		end
 	end
 	
-	-- Create a list of spawn sections that depend on the existence of other items
-	local n = death_ini:line_count("item_dependence")
-	local id, value = "", ""
-	for i=0,n-1 do
-		local result, id, value	= death_ini:r_line("item_dependence",i,"","")
-		item_dependence[id] = {}
-		local vvv = parse_names(value)
-		for k,v in pairs(vvv) do
-			item_dependence[id][v] = true
-		end
-	end
-
  	-- Create a list of item sections that npc must keep
 	local n = death_ini:line_count("keep_items")
 	for i=0,n-1 do

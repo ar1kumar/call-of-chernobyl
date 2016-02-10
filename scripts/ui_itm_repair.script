@@ -35,11 +35,11 @@ function repair_ui:__init(owner,obj,section) super()
 	self.use_parts = ini:r_bool(section,"repair_use_parts")
 	self.repair_type = ini:r_string(section,"repair_type") or "weapon"
 
-	self.repair_only = alun_utils.parse_list(nil,section,"repair_only",true)
-	self.repair_refuse = alun_utils.parse_list(nil,section,"repair_refuse",true)
+	self.repair_only = alun_utils.parse_list(ini,section,"repair_only",true)
+	self.repair_refuse = alun_utils.parse_list(ini,section,"repair_refuse",true)
 
-	self.parts_include = alun_utils.parse_list(nil,section,"repair_parts_include",true)
-	self.parts_exclude = alun_utils.parse_list(nil,section,"repair_parts_exclude",true)
+	self.parts_include = alun_utils.parse_list(ini,section,"repair_parts_include",true)
+	self.parts_exclude = alun_utils.parse_list(ini,section,"repair_parts_exclude",true)
 
 	self.use_actor_effects = ini:r_bool(section,"repair_use_actor_effects")
 

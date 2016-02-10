@@ -647,14 +647,14 @@ function sim_squad_scripted:create_npc(spawn_smart,only_one,pos,lvid,gvid)
 
 	local spawn_point, base_spawn_position, base_lvi, base_gvi, spawn_vid
 	if (spawn_smart) then 
-		spawn_point = utils.cfg_get_string(ini, settings_id, "spawn_point", self, false, "","self") or utils.cfg_get_string(spawn_smart.ini, "smart_terrain", "spawn_point", self, false,"","self")
+		spawn_point = utils.cfg_get_string(ini, settings_id, "spawn_point", self, false, "") or utils.cfg_get_string(spawn_smart.ini, "smart_terrain", "spawn_point", self, false,"") or "self"
 		spawn_point = xr_logic.parse_condlist(self, "spawn_point", "spawn_point", spawn_point)
 		spawn_point = xr_logic.pick_section_from_condlist(db.actor, self, spawn_point)
 		
 		base_spawn_position = spawn_smart.position
 		base_lvi = spawn_smart.m_level_vertex_id
 		base_gvi = spawn_smart.m_game_vertex_id
-		spawn_vid = ini:r_string(settings_id,"spawn_vid") or spawn_smart.ini:r_string("smart_terrain","spawn_vid")
+		spawn_vid = utils.cfg_get_string(ini, settings_id, "spawn_vid", self, false, "") or utils.cfg_get_string(spawn_smart.ini, settings_id, "spawn_vid", self, false, "")
 		spawn_vid = spawn_vid and spawn_vid ~= "" and xr_logic.pick_section_from_condlist(db.actor,self, xr_logic.parse_condlist(self,"spawn_vid","spawn_vid",spawn_vid))
 		
 		if (spawn_vid) then
