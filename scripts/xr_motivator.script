@@ -1,11 +1,8 @@
 class "motivator_binder" (object_binder)
 function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
-	self.last_update = 0
 	self.opened_doors = {}
 	self.first_update = false
-	self.upd_stage = 1
-	
 	if (USE_MARSHAL) then 
 		RegisterScriptCallback("save_state",self.save_state,self)
 	end
@@ -348,12 +345,6 @@ function motivator_binder:death_callback(victim, who)
 
 	db.delete_enemy(victim)
 
-	if (actor_stats.remove_from_ranking) then
-		local community = character_community(victim)
-		if (community ~= "zombied" and community ~= "monolith") then
-			actor_stats.remove_from_ranking(victim:id())
-		end
-	end
 	release_body_manager.get_release_body_manager():moving_dead_body(victim)
 	
 	if (who) and (IsStalker(who) or IsMonster(who)) then
@@ -490,6 +481,8 @@ function motivator_binder:net_save_relevant()
 end
 
 function motivator_binder:save_state(m_data)
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",self.object:name()))
+	
 	local id = self.object:id()
 	m_data.xr_logic[id] = {}
 	m_data.xr_logic[id].job_ini = self.st.job_ini
@@ -507,6 +500,8 @@ function motivator_binder:save_state(m_data)
 	xr_logic.pstor_save_all(self.object)
 	xr_sound.npc_save_state(m_data,self.object)
 	trade_manager.save_state(m_data,self.object)
+	
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",self.object:name()))
 end 
 
 function motivator_binder:load_state(m_data)
@@ -514,7 +509,7 @@ function motivator_binder:load_state(m_data)
 	if not (m_data.xr_logic and m_data.xr_logic[id]) then 
 		return 
 	end
-	--alun_utils.debug_write("motivator_binder:load_state")
+	--alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",self.object:name()))
 	self.st.job_ini = m_data.xr_logic[id].job_ini
 	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
 	self.st.loaded_section_logic = m_data.xr_logic[id].section_logic
@@ -530,6 +525,8 @@ function motivator_binder:load_state(m_data)
 	xr_logic.pstor_load_all(self.object)
 	xr_sound.npc_load_state(m_data,self.object)
 	trade_manager.load_state(m_data,self.object)
+	
+	--alun_utils.debug_write(strformat("motivator_binder:load_state %s AFTER",self.object:name()))
 end 
 
 function motivator_binder:save(packet)

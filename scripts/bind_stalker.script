@@ -6,7 +6,6 @@ function actor_init(npc)
 	npc:bind_object(actor_binder(npc))
 end
 
-ACTOR_FIRST_UPDATE = false
 ----------------------------------------------------------------------------------------------------------------------
 class "actor_binder" (object_binder)
 ----------------------------------------------------------------------------------------------------------------------
@@ -183,7 +182,6 @@ function actor_binder:update(delta)
 	end
 	
 	if self.bCheckStart then -- first update after netspawn
-		ACTOR_FIRST_UPDATE = true
 		bind_stalker_ext.actor_on_first_update(self,delta)
 		--printf("SET DEFAULT INFOS")
 		if not has_alife_info("global_dialogs") then

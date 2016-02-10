@@ -274,6 +274,8 @@ function actor_on_before_death(binder,whoID)
 	
 	db.actor:kill(db.actor, true)
 	
+	get_console():execute("demo_record t")
+	
 	SendScriptCallback("actor_on_before_death",whoID)
 end
 
