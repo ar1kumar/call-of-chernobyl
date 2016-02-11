@@ -184,6 +184,7 @@ function on_game_start()
 		["lua_help.script"] = true,
 		["rx_gl.script"] = true
 	}
+	local t = {}
 	local f	= getFS()
 	local flist = f:file_list_open_ex("$game_scripts$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*.script")
 	local f_cnt = flist:Size()
@@ -193,10 +194,13 @@ function on_game_start()
 		if not (ignore[file_name]) then
 			file_name = file_name:sub(0,file_name:len()-7)
 			if (_G[file_name] and _G[file_name].on_game_start) then
-				printf("axr_main module added %s",file_name)
-				_G[file_name].on_game_start()
+				table.insert(t,file_name) -- load all scripts first
 			end
 		end
+	end
+	for i=1,#t do
+		printf("axr_main module added %s",t[i])
+		_G[t[i]].on_game_start()
 	end
 end
 

@@ -155,6 +155,11 @@ function gather_item(npc)
 		end
 		local artefact = itm:get_artefact()
 		artefact:FollowByPath("NULL",0,vector():set(500,500,500))
+		
+		if (dynamic_news_manager) then 
+			dynamic_news_manager.get_dynamic_news():FoundArtefact(npc,itm)
+		end
+		
 	elseif (IsWeapon(itm)) then
 		npc:transfer_item(itm,npc)
 		return
