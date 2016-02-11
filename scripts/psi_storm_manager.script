@@ -33,10 +33,6 @@ function on_game_start()
 	if not (USE_MARSHAL) then
 		RegisterScriptCallback("actor_on_load",this.actor_on_load)
 		RegisterScriptCallback("actor_on_save",this.actor_on_save)
-	else 
-		RegisterScriptCallback("actor_on_load",this.actor_on_load) -- for initialize()
-		RegisterScriptCallback("load_state",this.load_state)
-		RegisterScriptCallback("save_state",this.save_state)
 	end
 	RegisterScriptCallback("actor_on_update",actor_on_update)
 	RegisterScriptCallback("actor_on_init",actor_on_init)
@@ -60,7 +56,6 @@ function CPsiStormManager:initialize()
 		self.inited_time = self.last_psi_storm_time
 		self.started = false
 		self.finished = true
-		self.loaded = false
 		self.task_given = nil
 	end 
 	
@@ -86,11 +81,6 @@ function CPsiStormManager:initialize()
 end
 
 function CPsiStormManager:start(manual)
-	if not (self.loaded) then
-		printf("CPsiStormManager: Not loaded!")
-		return 
-	end 
-	
 	self.game_time_factor=level.get_time_factor()
 
 	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
@@ -220,12 +210,6 @@ end
 -- ###############################################################################################
 
 function CPsiStormManager:update()
-	if(device().precache_frame > 1) then
-		return
-	end
-	if not (self.loaded) then
-		return 
-	end 
 	if not(self.started) then
 		local g_time = game.get_game_time()
 		if(self.time_forwarded) then
@@ -510,14 +494,12 @@ function CPsiStormManager:launch_rockets()
 end
 
 function save_state(m_data)
-	if not (m_data.PsiStormManager) then 
-		m_data.PsiStormManager = {}
-	end
+	m_data.PsiStormManager = {}
 	
 	local mgr = PsiStormManager
-	if not (mgr.loaded) then
+	if not (mgr._state_loaded) then
 		mgr:initialize()
-		mgr.loaded = true
+		mgr._state_loaded = true
 	end
 	
 	m_data.PsiStormManager.finished = mgr.finished 
@@ -529,6 +511,7 @@ function save_state(m_data)
 		m_data.PsiStormManager.game_time_factor = mgr.game_time_factor
 	end
 	m_data.PsiStormManager._delta = mgr._delta
+	m_data.PsiStormManager = nil
 end 
 
 function load_state(m_data)
@@ -539,6 +522,7 @@ function load_state(m_data)
 		PsiStormManager = CPsiStormManager()
 	end
 	local mgr = PsiStormManager
+	mgr:initialize()
 	mgr.finished = m_data.PsiStormManager.finished
 	mgr.started = m_data.PsiStormManager.started
 	mgr.last_psi_storm_time = utils.CTime_from_table(m_data.PsiStormManager.last_psi_storm_time) or game.get_game_time()
@@ -561,9 +545,9 @@ function actor_on_save(binder,packet)
 	end
 	-- load defaults if not loaded
 	local mgr = PsiStormManager
-	if not (mgr.loaded) then
+	if not (mgr._state_loaded) then
 		mgr:initialize()
-		mgr.loaded = true
+		mgr._state_loaded = true
 	end
 	set_save_marker(packet, "save", false, "PsiStorm")
 	packet:w_bool(mgr.finished)
@@ -583,9 +567,9 @@ function actor_on_load(binder,packet)
 		PsiStormManager = CPsiStormManager()
 	end
 	local mgr = PsiStormManager
-	if not (mgr.loaded) then
+	if not (mgr._state_loaded) then
 		mgr:initialize()
-		mgr.loaded = true
+		mgr._state_loaded = true
 	end
 	if (USE_MARSHAL) then 
 		return 
@@ -635,7 +619,7 @@ function is_finished()
 end
 
 function is_loaded()
-	return PsiStormManager and PsiStormManager.loaded == true
+	return PsiStormManager and PsiStormManager._state_loaded == true
 end
 
 function get_task_title()

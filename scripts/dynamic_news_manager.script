@@ -562,6 +562,37 @@ function DynamicNewsManager:FoundArtefact(sender,itm)
 	self:PushToChannel(sender:character_community(),{Mg=strformat(Tbl[math.random(#Tbl)],inv_name),Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
 end
 
+function DynamicNewsManager:BoughtItems(sender,who,list)
+	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+	
+	local msg = ""
+	local sec = list[math.random(#list)]
+	local inv_name = game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
+	
+	local r = math.random(1,2)
+	if (r == 1) then
+		local Tbl1 = {	
+						"%s has some very shitty deals. I think he ripped me off on a %s.",
+						"Anyone know when %s will get more %s in stock?",
+						"%s has some good deals on %s, today.",
+						"I'll be broke in no time if %s keeps raising his prices."
+		}
+		
+		msg = strformat(Tbl1[math.random(#Tbl1)],who:character_name(),inv_name)
+	elseif (r == 2) then 
+		local Tbl1 = {	
+						"%s cost too much... damn.",
+						"Anyone know where I can buy %s? %s is out of them.",
+						"Shit... Good deals on %s, today.",
+						"I just bought %s, just don't hope some asshole doesn't takes it from my stash..."
+		}
+		
+		msg = strformat(Tbl1[math.random(#Tbl1)],inv_name,who:character_name())	
+	end
+
+	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+end
+
 function DynamicNewsManager:KillWounded(sender,victim)
 	if not (show_about_wounded) then 
 		return 

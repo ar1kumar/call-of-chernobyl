@@ -2017,7 +2017,7 @@ function npc_has_items_to_sell(actor,npc,p)
 		return false
 	end
 
-	local smart = p and p[1] and board and board.smarts_by_names[p[1]]
+	local smart = p and p[1] and SIMBOARD.smarts_by_names[p[1]]
 	if (smart and smart.npc_info[id]) then
 		local job = smart.npc_info[id].job
 		if (job and job.idle and time_global() < job.idle) then
