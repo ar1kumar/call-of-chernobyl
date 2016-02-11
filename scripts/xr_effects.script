@@ -4328,10 +4328,10 @@ function trade_job_give_id(actor,npc,p)
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
 	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
 	local npc_info = id and smart.npc_info[id]
-	if not (npc_info) then
+	--printf("smart=%s id=%s npc_info=%s job=%s",smart and smart:name(),id,npc_info ~= nil,npc_info and npc_info.job and npc_info.job.section)
+	if not (npc_info and npc_info.job) then
 		return
 	end
-
 	npc_info.job.seller_id = npc:id()
 end
 

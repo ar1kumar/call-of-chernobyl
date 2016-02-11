@@ -1182,7 +1182,7 @@ local function get_current_task(squad)
 	--alun_utils.debug_write("sim_squad_scripted:get_current_task")
 	local smart = squad.assigned_target_id and alife():object(squad.assigned_target_id)
 	if (smart) then
-		if (smart.job_data and smart.arriving_npc and not smart.arriving_npc[squad:commander_id()]) then
+		if (smart.arriving_npc and not smart.arriving_npc[squad:commander_id()]) then
 			local npc_info = smart.npc_info and smart.npc_info[squad:commander_id()]
 			if (npc_info and npc_info.job) then
 				return npc_info.job.alife_task or smart:get_alife_task() or squad:get_alife_task()

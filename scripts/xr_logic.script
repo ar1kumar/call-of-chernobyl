@@ -1108,7 +1108,10 @@ end
 function pstor_save_all(obj, packet)
 	local npc_id = obj:id()
 	if (USE_MARSHAL) then
-		--printf("pstor_save_all obj %s before",obj and obj:name())
+		if not (db.storage[npc_id]) then
+			callstack()
+			printf("pstor_save_all obj %s before",obj and obj:name())
+		end
 		db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 		SendScriptCallback("on_pstor_save_all",obj,packet)
 		--printf("pstor_save_all obj %s after",obj and obj:name())

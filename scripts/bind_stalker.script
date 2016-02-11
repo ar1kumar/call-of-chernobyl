@@ -319,6 +319,8 @@ function actor_binder:save_state(m_data)
 	xr_sound.actor_save_state(m_data)
 	task_manager.save_state(m_data)
 	level_weathers.get_weather_manager():save_state(m_data)
+	surge_manager.save_state(m_data)
+	psi_storm_manager.save_state(m_data)
 end
 
 function actor_binder:load_state(m_data)
@@ -350,6 +352,8 @@ function actor_binder:load_state(m_data)
 	xr_sound.actor_load_state(m_data)
 	task_manager.load_state(m_data)
 	level_weathers.get_weather_manager():load_state(m_data)
+	surge_manager.load_state(m_data)
+	psi_storm_manager.load_state(m_data)
 	
 	m_data.actor_binder = nil
 end 
@@ -360,6 +364,7 @@ function actor_binder:load(reader)
 	set_save_marker(reader, "load", true, "actor_binder")
 	if (USE_MARSHAL) then
 		self:load_state(alife_storage_manager.get_state())
+		bind_stalker_ext.actor_on_load(self,reader)
 		return
 	end
 	--alun_utils.debug_write("actor_binder:load start")
@@ -405,8 +410,6 @@ function actor_binder:load(reader)
 	if stored_achievement_time == true then
 		self.last_mutant_hunter_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
 	end
-
-	bind_stalker_ext.actor_on_load(self,reader)
 
 	--alun_utils.debug_write("actor_binder:load end")
 end

@@ -23,6 +23,11 @@ local alife, math_random, pairs, tostring = alife,  math.random, pairs, tostring
 ---------------------------------------------------------------------
 -- class instance
 SurgeManager = nil
+
+function get_surge_manager()
+	SurgeManager = SurgeManager or CSurgeManager()
+	return SurgeManager
+end
 ---------------------------------------------------------------------
 
 local surge_shock_pp_eff 	= 1
@@ -40,20 +45,13 @@ local function actor_on_update(binder,delta)
 end
 
 local function actor_on_init(binder)
-	if not (SurgeManager) then 
-		--printf("surge actor_on_init")
-		SurgeManager = CSurgeManager()
-	end
+	get_surge_manager()
 end
 
 function on_game_start()
 	if not (USE_MARSHAL) then
 		RegisterScriptCallback("actor_on_load",this.actor_on_load)
 		RegisterScriptCallback("actor_on_save",this.actor_on_save)
-	else 
-		RegisterScriptCallback("actor_on_load",this.actor_on_load) -- for initialize()
-		RegisterScriptCallback("load_state",this.load_state)
-		RegisterScriptCallback("save_state",this.save_state)
 	end
 	RegisterScriptCallback("actor_on_update",actor_on_update)
 	RegisterScriptCallback("actor_on_init",actor_on_init)
@@ -116,7 +114,6 @@ function CSurgeManager:initialize()
 	end
 	
 	if not (self._state_loaded) then -- because state_load called too early, we wait till actor_on_load to truly init and we do not want to overwrite loaded values
-		self.loaded = false
 		self.last_surge_time = game.get_game_time()
 		self.inited_time = game.get_game_time()
 		self.started = false
@@ -163,11 +160,6 @@ function CSurgeManager:initialize()
 end
 
 function CSurgeManager:start(manual)
-	if not (self.loaded) then
-		printf("CSurgeManager: Not loaded!")
-		return 
-	end 
-	
 	--alun_utils.debug_write("CSurgeManager:start()")
 	
 	self.game_time_factor=level.get_time_factor()
@@ -341,9 +333,7 @@ function CSurgeManager:end_surge(manual)
 		v:stop()
 	end
 
-	if self.loaded then
-		self:kill_all_unhided()
-	end
+	self:kill_all_unhided()
 
 	-- fix abuse from sleeping to respawn anoms (removed due to complaints of no respawning)
 	--if not (self.time_forwarded) then
@@ -430,13 +420,6 @@ function CSurgeManager:calculate_best_surge_cover()
 end
 
 function CSurgeManager:update()
-	if(device().precache_frame > 1) then
-		return
-	end
-	if not (self.loaded) then
-		return
-	end
-	
 	--alun_utils.debug_write("CSurgeManager:update()")
 
 	if not(self.started) then
@@ -1540,9 +1523,9 @@ function actor_on_save(binder,packet)
 	end 
 	-- initialize to set default values if not loaded
 	local mgr = SurgeManager
-	if not (mgr.loaded) then 
+	if not (mgr._state_loaded) then 
 		mgr:initialize()
-		mgr.loaded = true
+		mgr._state_loaded = true
 	end
 	set_save_marker(packet, "save", false, "SurgeHide")
 
@@ -1581,9 +1564,9 @@ function actor_on_load(binder,packet)
 		SurgeManager = CSurgeManager()
 	end 
 	local mgr = SurgeManager
-	if not (mgr.loaded) then 
+	if not (mgr._state_loaded) then 
 		mgr:initialize()
-		mgr.loaded = true
+		mgr._state_loaded = true
 	end
 	if (USE_MARSHAL) then 
 		return 
@@ -1622,14 +1605,12 @@ function actor_on_load(binder,packet)
 end
 
 function save_state(m_data)
-	if not (m_data.SurgeManager) then 
-		m_data.SurgeManager = {}
-	end
+	m_data.SurgeManager = {}
 
 	local mgr = SurgeManager
-	if not (mgr.loaded) then 
+	if not (mgr._state_loaded) then 
 		mgr:initialize()
-		mgr.loaded = true
+		mgr._state_loaded = true
 	end
 	
 	m_data.SurgeManager.finished = mgr.finished
@@ -1654,13 +1635,8 @@ function load_state(m_data)
 		return
 	end
 	
-	if not (SurgeManager) then 
-		SurgeManager = CSurgeManager()
-		--printf("load state")
-	end 
-	
-	
 	local mgr = SurgeManager
+	mgr:initialize()
 	mgr.finished = m_data.SurgeManager.finished
 	mgr.started = m_data.SurgeManager.started
 	mgr.last_surge_time = utils.CTime_from_table(m_data.SurgeManager.last_surge_time)
@@ -1689,6 +1665,8 @@ function load_state(m_data)
 	end
 	mgr._delta = m_data.SurgeManager._delta
 	mgr._state_loaded = true
+	
+	m_data.SurgeManager = nil
 end
 
 --------------------------------------------------------------------------------
@@ -1758,7 +1736,7 @@ function is_finished()
 end
 
 function is_loaded()
-	return SurgeManager and SurgeManager.loaded == true
+	return SurgeManager and SurgeManager._state_loaded == true
 end
 
 function resurrect_skip_message()
