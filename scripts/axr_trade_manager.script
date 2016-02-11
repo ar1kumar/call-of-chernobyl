@@ -78,12 +78,12 @@ function npc_trade_buy_sell(npc)
 	end
 
 	if not (st.has_items_to_sell) then
-		printf("st.has_items_to_sell = nil!")
+		--printf("st.has_items_to_sell = nil!")
 		return
 	end
 
 	if not (st.trade_items) then
-		printf("no items to sell")
+		--printf("no items to sell")
 		return
 	end
 
@@ -125,7 +125,8 @@ function npc_trade_buy_sell(npc)
 					buy_sell = alun_utils.str_explode(buy_sell,",")
 
 					sim:release(sim:object(itm:id()),true)
-					printf("trading %s",sec)
+
+					--printf("trading %s",sec)
 
 					itm_base_cost = system_ini():r_float_ex(sec,"cost") or 30
 					npc:money(itm_base_cost * (tonumber(buy_sell[4]) or 1))
@@ -138,7 +139,7 @@ function npc_trade_buy_sell(npc)
 			end
 		end
 	end
-
+	
 	empty_table(st.trade_items)
 	st.has_items_to_sell = false
 
@@ -162,6 +163,7 @@ function npc_trade_buy_sell(npc)
 	local seller_id = npc_info.job.seller_id
 	local seller = seller_id and (db.storage[seller_id] and db.storage[seller_id].object or level.object_by_id(seller_id))
 
+	printf("seller = %s", seller and seller:name())
 	if not (seller) then
 		return
 	end
@@ -186,7 +188,7 @@ function npc_trade_buy_sell(npc)
 	bw = bw and bw:section()
 
 	local bw_ammos = bw and alun_utils.parse_list(system_ini(),bw,"ammo_class",true)
-
+	local buy_sell_items = {}
 	local buy_sell,total_cost
 	for sec,v in pairs(valid_items) do
 		buy_sell = ini:r_string_ex("buy_sell",sec)
@@ -202,9 +204,10 @@ function npc_trade_buy_sell(npc)
 					-- only buy enough to reach restock goals (param 3)
 					for i=item_list[sec],tonumber(buy_sell[3]) do
 						if (money >= total_cost) then
+							table.insert(buy_sell_items,sec)
 							sim:create(sec,npc:position(),0,0,npc:id())
 							npc:transfer_money(total_cost,seller)
-							printf("%s bought %s for %s",npc:name(),sec,total_cost)
+							--printf("%s bought %s for %s",npc:name(),sec,total_cost)
 							money = money - total_cost
 						end
 					end
@@ -212,6 +215,7 @@ function npc_trade_buy_sell(npc)
 					-- only buy enough to reach restock goals (param 3)
 					for i=1,tonumber(buy_sell[3]) do
 						if (money >= total_cost) then
+							table.insert(buy_sell_items,sec)
 							sim:create(sec,npc:position(),0,0,npc:id())
 							npc:transfer_money(total_cost,seller)
 							printf("%s bought %s for %s",npc:name(),sec,total_cost)
@@ -224,7 +228,13 @@ function npc_trade_buy_sell(npc)
 
 		-- NPC ran out of money, end loop
 		if (money <= 0) then
-			return
+			break
+		end
+	end
+	
+	if (#buy_sell_items > 0) then 
+		if (dynamic_news_manager) then 
+			dynamic_news_manager.get_dynamic_news():BoughtItems(npc,seller,buy_sell_items)
 		end
 	end
 end

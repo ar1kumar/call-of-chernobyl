@@ -220,6 +220,7 @@ function WeatherManager:forced_weather_change()
 end
 
 function WeatherManager:apply_dof()
+	--[[
 	local console=get_console()
 	if string.sub(self.levelWeather,1,9)=="atmosfear" then
 		local last_hour_str=self:get_hour_as_string(self.last_hour)
@@ -296,6 +297,7 @@ function WeatherManager:apply_dof()
 	--self.debugMessages[7]:SetText("next_hour_distance: "..next_dist)
 	--self.debugMessages[10]:SetText("self.weather_fx="..tostring(self.weather_fx))
 	--self.debugMessages[11]:SetText("weather: "..tostring(self.levelWeather))
+	--]]
 end
 
 function WeatherManager:get_hour_as_string(h)
