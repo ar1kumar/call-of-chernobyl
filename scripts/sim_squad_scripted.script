@@ -36,6 +36,10 @@ function sim_squad_scripted:__init(section) super (section)
 	self.idle_time			= math.random(STAY_POINT_IDLE_MIN,STAY_POINT_IDLE_MAX)
 	self:init_squad()
 	self:set_squad_behaviour()
+	self.virtual_squad_size = nil -- For use with SIM_PASSIVE_SQUAD_COUNT
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 
 function sim_squad_scripted:init_squad()
@@ -161,7 +165,8 @@ function sim_squad_scripted:update()
 					if (SIM_PASSIVE_SQUAD_COUNT and not get_object_story_id(self.id) and not self.online) then 
 						for k in self:squad_members() do
 							if (not get_object_story_id(k.id) and k.id ~= self:commander_id()) then 
-								self:remove_npc(k.id)
+								self:unregister_member(k.id)
+								alife():release(k.object,true)
 							end
 						end
 					end
@@ -213,9 +218,9 @@ function sim_squad_scripted:update()
 	self.dtimer = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
 	--
 	
-	if (SIM_PASSIVE_SQUAD_COUNT and not self.check_size and not get_object_story_id(self.id)) then
+	if (SIM_PASSIVE_SQUAD_COUNT and not self.check_size and not get_object_story_id(self.id) and self.virtual_squad_size) then
 		self.check_size = true
-		if (self:npc_count() == 1) then
+		if (self:npc_count() == 1 and self.virtual_squad_size > self:npc_count()) then
 			local gg = game_graph()
 			local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
 			local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
@@ -484,6 +489,9 @@ function sim_squad_scripted:on_npc_death(npc,killer)
 	--printf("Squad %s. Killed member %s", tostring(self.id), npc.id)
 	--self.sound_manager:unregister_npc(npc.id)
 	self:unregister_member(npc.id)
+	if (self.virtual_squad_size) then
+		self.virtual_squad_size = self.virtual_squad_size - 1
+	end
 	-- Alundaio
 	SendScriptCallback("squad_on_npc_death",self,npc,killer)
 	-- End Alundaio
@@ -692,13 +700,11 @@ function sim_squad_scripted:create_npc(spawn_smart,only_one,pos,lvid,gvid)
 	end 
 	
 	local npcs_list = {}
-	
-	if #spawn_sections ~= 0 then
-		for k,v in pairs(spawn_sections) do
-			table.insert(npcs_list,self:add_squad_member(v, base_spawn_position, base_lvi, base_gvi,k))
-			if (only_one) then 
-				break
-			end
+	local count = self:npc_count()
+	for i=count+1,#spawn_sections do
+		table.insert(npcs_list,self:add_squad_member(spawn_sections[i], base_spawn_position, base_lvi, base_gvi))
+		if (only_one) then 
+			break
 		end
 	end
 
@@ -706,15 +712,20 @@ function sim_squad_scripted:create_npc(spawn_smart,only_one,pos,lvid,gvid)
 	if random_spawn ~= nil then
 		random_spawn = utils.parse_names(random_spawn)
 		
-		local random_count, count = 1,0
-		if not (only_one) then
-			count = ini:r_string_ex(settings_id,"npc_in_squad") or "1,2"
-			count = alun_utils.str_explode(count,",")
-			count[1] = count[1] and tonumber(count[1])
-			count[2] = count[2] and tonumber(count[2]) or count[1]
+		count = ini:r_string_ex(settings_id,"npc_in_squad") or "1,2"
+		count = alun_utils.str_explode(count,",")
+		count[1] = count[1] and tonumber(count[1])
+		count[2] = count[2] and tonumber(count[2]) or count[1]
 
-			random_count = count[1] and count[2] and math.random(count[1],count[2]) or math.random(1,2)
-			random_count = random_count - self:npc_count()
+		local random_count = count[1] and count[2] and math.random(count[1],count[2]) or math.random(1,2)
+		random_count = random_count - self:npc_count()
+
+		if not (self.virtual_squad_size) then
+			self.virtual_squad_size = random_count
+		end
+		
+		if (only_one) then 
+			random_count = 1
 		end
 		
 		local random_id
@@ -881,10 +892,35 @@ end
 --***********************************************************************************************
 --*										SAVE\LOAD												*
 --***********************************************************************************************
+function sim_squad_scripted:save_state(m_data)
+	m_data.sim_squad_scripted[self.id] = {}
+	m_data.sim_squad_scripted[self.id].virtual_squad_size = self.virtual_squad_size
+	m_data.sim_squad_scripted[self.id].current_target_id = self.current_target_id
+	m_data.sim_squad_scripted[self.id].respawn_point_id = self.respawn_point_id
+	m_data.sim_squad_scripted[self.id].respawn_point_prop_section = self.respawn_point_prop_section
+	m_data.sim_squad_scripted[self.id].smart_id = self.smart_id
+end 
+
+function sim_squad_scripted:load_state(m_data)
+	if not (m_data.sim_squad_scripted[self.id]) then 
+		return 
+	end
+	self.virtual_squad_size = m_data.sim_squad_scripted[self.id].virtual_squad_size
+	self.current_target_id = m_data.sim_squad_scripted[self.id].current_target_id
+	self.respawn_point_id = m_data.sim_squad_scripted[self.id].respawn_point_id
+	self.respawn_point_prop_section = m_data.sim_squad_scripted[self.id].respawn_point_prop_section
+	self.smart_id = m_data.sim_squad_scripted[self.id].smart_id
+	m_data.sim_squad_scripted[self.id] = nil
+end 
 
 function sim_squad_scripted:STATE_Write(packet)
 	--alun_utils.debug_write("sim_squad_scripted:STATE_Write")
 	cse_alife_online_offline_group.STATE_Write (self, packet)
+	
+	if (USE_MARSHAL) then 
+		return 
+	end
+	
 	set_save_marker(packet, "save", false, "sim_squad_scripted")
 
 	packet:w_stringZ(tostring(self.current_target_id))
@@ -897,7 +933,14 @@ end
 function sim_squad_scripted:STATE_Read(packet, size)
 	--alun_utils.debug_write( strformat("\n%s:STATE_Read start",self:name()) )
 	cse_alife_online_offline_group.STATE_Read (self, packet, size)
-	set_save_marker(packet, "load", false, "sim_squad_scripted")
+	
+	if (USE_MARSHAL) then 
+		self:load_state(alife_storage_manager.get_state())
+		self:init_squad_on_load()
+		return 
+	end 
+	
+	set_save_marker(packet, "load", false, "sim_squad_scripted")	
 
 	self.current_target_id = packet:r_stringZ()
 	if self.current_target_id == "nil" then
@@ -920,10 +963,6 @@ function sim_squad_scripted:STATE_Read(packet, size)
 		self.smart_id = nil
 	else
 		self.smart_id = tonumber(self.smart_id)
-	end
-
-	if (self.id == 22579) then 
-		printf("self.current_target_id=%s self.smart_id=%s",self.current_target_id,self.smart_id)
 	end
 	self:init_squad_on_load()
 	set_save_marker(packet, "load", true, "sim_squad_scripted")
@@ -955,6 +994,9 @@ function sim_squad_scripted:on_unregister()
 			return
 		end
 		smart.already_spawned[self.respawn_point_prop_section].num = smart.already_spawned[self.respawn_point_prop_section].num - 1
+	end
+	if (USE_MARSHAL) then 
+		UnregisterScriptCallback("save_state",self)
 	end
 end
 

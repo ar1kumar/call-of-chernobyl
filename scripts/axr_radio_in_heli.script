@@ -201,6 +201,10 @@ function action_radio_in_heli:execute()
 			if (be:id() ~= 0) then 
 				alun_utils.execute_script_on_squad(be,set_heli_flag)
 			end
+			
+			if (dynamic_news_manager) then 
+				dynamic_news_manager.get_dynamic_news():RadioInHeli(npc,be)
+			end
 		end
 	else 
 		self.st.vid = utils.send_to_nearest_accessible_vertex(npc,self.st.vid)

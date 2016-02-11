@@ -135,6 +135,10 @@ function CreateTimeEvent(ev_id,act_id,timer,f,...)
 	end
 end
 function ProcessEventQueue(force)
+	if has_alife_info("sleep_active") then
+		return 
+	end 
+	
 	local gt
 	for event_id,actions in pairs(ev_queue) do
 
@@ -1353,11 +1357,11 @@ end
 
 -- extensions
 function ini_file:r_string_ex(s,k)
-	return self:section_exist(s) and self:line_exist(s,k) and self:r_string(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_string(s,k) or nil
 end
 function ini_file:r_bool_ex(s,k)
-	return self:section_exist(s) and self:line_exist(s,k) and self:r_bool(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_bool(s,k) or nil
 end
 function ini_file:r_float_ex(s,k)
-	return self:section_exist(s) and self:line_exist(s,k) and self:r_float(s,k)
+	return self:section_exist(s) and self:line_exist(s,k) and self:r_float(s,k) or nil
 end

@@ -289,6 +289,9 @@ function act_kill_wounded:begin_kill_wounded(vo)
 		if (character_community(vo) ~= "monolith" and character_community(vo) ~= "zombied") then
 			if (CauseSurrenderCommunities[character_community(self.object)] and SurrenderChance > math.random() ) then
 				db.storage[vo:id()].victim_surrender = self.object:id()
+				if (dynamic_news_manager) then 
+					dynamic_news_manager.get_dynamic_news():KillWounded(self.object,vo)
+				end
 			else
 				db.storage[vo:id()].victim_surrender = 65535
 			end
