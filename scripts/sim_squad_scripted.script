@@ -902,7 +902,7 @@ function sim_squad_scripted:save_state(m_data)
 end 
 
 function sim_squad_scripted:load_state(m_data)
-	if not (m_data.sim_squad_scripted[self.id]) then 
+	if not (m_data.sim_squad_scripted and m_data.sim_squad_scripted[self.id]) then 
 		return 
 	end
 	self.virtual_squad_size = m_data.sim_squad_scripted[self.id].virtual_squad_size
