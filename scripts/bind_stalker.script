@@ -258,7 +258,6 @@ function actor_binder:save(packet)
 	set_save_marker(packet, "save", true, "actor_binder")
 	
 	if (USE_MARSHAL) then
-		object_binder.save(self, packet)
 		if (utils.level_changing()) then
 			alun_utils.save_var(db.actor,"heli_enemy_flag",false)
 			SendScriptCallback("on_level_changing")
