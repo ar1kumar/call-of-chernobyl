@@ -547,9 +547,11 @@ end
 
 function update_npc_dialog(first_speaker, second_speaker)
 	local npc = who_is_npc(first_speaker, second_speaker)
-	db.storage[npc:id()].meet.meet_manager:update()
+	local st = db.storage[npc:id()]
+	st.meet.meet_manager:update()
 	xr_meet.process_npc_usability(npc)
-	xr_motivator.update_logic(npc)
+	--xr_motivator.update_logic(npc)
+	xr_logic.try_switch_to_another_section(npc, st[st.active_scheme], db.actor)
 end
 
 function disable_talk_self(first_speaker, second_speaker)
