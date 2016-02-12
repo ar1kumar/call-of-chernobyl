@@ -151,12 +151,12 @@ function npc_sim_set_finished_task_complete(a,b)
 end
 
 function npc_give_last_task_id(a,b)
+	local npc = who_is_npc(a, b)
 	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
 	while last_task_id and task_section ~= nil and task_section ~= last_task_id do 
 		task_section = axr_task_manager.get_first_available_task(npc,true,true)
 	end
 	if (last_task_id) then
-		local npc = who_is_npc(a,b)
 		local se_obj = npc and alife():object(npc:id())
 		local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
 		task_manager.get_task_manager():give_task(last_task_id,giver_id)
@@ -165,12 +165,12 @@ function npc_give_last_task_id(a,b)
 end
 
 function npc_sim_give_last_task_id(a,b)
+	local npc = who_is_npc(a, b)
 	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
 	while last_task_id and task_section ~= nil and task_section ~= last_task_id do 
 		task_section = axr_task_manager.get_first_available_task(npc,true,true)
 	end
 	if (last_task_id) then
-		local npc = who_is_npc(a,b)
 		local se_obj = npc and alife():object(npc:id())
 		local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
 		task_manager.get_task_manager():give_task(last_task_id,giver_id)
@@ -1014,11 +1014,7 @@ function npc_has_item(first_speaker, second_speaker, section)
 end
 
 function who_is_npc(first_speaker, second_speaker)
-	local npc = second_speaker
-	if db.actor:id() == npc:id() then
-		npc	= first_speaker
-	end
-	return npc
+	return first_speaker:id() == 0 and second_speaker or first_speaker
 end
 
 --------------------------------------------------------------------------------
