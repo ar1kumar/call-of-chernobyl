@@ -203,7 +203,7 @@ function DynamicNewsManager:FindSpeakerNoVictim(who,same_as_who,not_in_combat)
 					comm_sender = npc:character_community()
 					if (same_as_who == nil) or (same_as_who == true and comm_sender == comm_who) or (same_as_who == false and comm_sender ~= comm_who) then
 						if (self.channel_status[comm_sender]) then
-							if not (self.spammer[npc:id()]) then
+							if (self.spammer[npc:id()] == nil) then
 								self.spammer[npc:id()] = 1
 								return npc
 							else 
@@ -236,7 +236,7 @@ function DynamicNewsManager:FindSpeaker(victim,who,same_as_victim,same_as_who,no
 						if (same_as_who == nil) or (same_as_who == true and comm_sender == comm_who) or (same_as_who == false and comm_sender ~= comm_who) then
 							if (self.channel_status[comm_sender]) then
 								if (can_see == nil) or (can_see and npc:see(victim)) or (can_see == false) then
-									if not (self.spammer[npc:id()]) then
+									if (self.spammer[npc:id()] == nil) then
 										self.spammer[npc:id()] = 1
 										return npc
 									else 
@@ -270,7 +270,7 @@ function DynamicNewsManager:FindSpeakerWithEnemy(victim,who,same_as_victim,same_
 					if (same_as_who == nil) or (same_as_who == true and comm_sender == comm_who) or (same_as_who == false and comm_sender ~= comm_who) then
 						if (self.channel_status[comm_sender]) then
 							if (can_see == nil) or (can_see and npc:see(victim)) or (can_see == false) then
-								if not (self.spammer[npc:id()]) then
+								if (self.spammer[npc:id()] == nil) then
 									self.spammer[npc:id()] = 1
 									return npc
 								else 
