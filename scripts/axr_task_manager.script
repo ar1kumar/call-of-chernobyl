@@ -94,7 +94,19 @@ function get_first_available_task(npc,skip,is_sim)
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
 	
-	local sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	local sec
+	local st = db.storage[npc:id()]
+	if (st and st.ini and st.section_logic) then 
+		sec = st.ini:r_string_ex(st.section_logic,"task_section")
+		if (sec) then 
+			sec = sec .. "_task_"
+		end
+	end 
+	
+	if not (sec) then
+		sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	end 
+	
 	local task_id = sec.."1"
 	
 	local count = 1
@@ -124,7 +136,20 @@ function get_first_finished_task(npc,is_sim)
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
 	
-	local sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	local sec
+	local st = db.storage[npc:id()]
+	if (st and st.ini and st.section_logic) then 
+		sec = st.ini:r_string_ex(st.section_logic,"task_section")
+		if (sec) then 
+			sec = sec .. "_task_"
+		end
+		--printf("sec = %s")
+	end 
+	
+	if not (sec) then
+		sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+	end 
+
 	local task_id = sec.."1"
 	
 	local count = 1
