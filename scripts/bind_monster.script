@@ -377,8 +377,8 @@ function generic_object_binder:save_state(m_data)
 	m_data.xr_logic[id].job_ini = self.st.job_ini
 	m_data.xr_logic[id].ini_filename = self.st.ini_filename
 	m_data.xr_logic[id].section_logic = self.st.section_logic
-	m_data.xr_logic[id].active_section = self.st.active_section
-	m_data.xr_logic[id].gulag_name = self.st.gulag_name
+	m_data.xr_logic[id].active_section = self.st.active_section or "nil"
+	m_data.xr_logic[id].gulag_name = self.st.gulag_name or ""
 	m_data.xr_logic[id].activation_time = (self.st.activation_time or 0) - time_global()
 	m_data.xr_logic[id].activation_game_time = self.st.activation_game_time
 
