@@ -1111,6 +1111,7 @@ function pstor_save_all(obj, packet)
 		if not (db.storage[npc_id]) then
 			callstack()
 			printf("pstor_save_all obj %s before",obj and obj:name())
+			return
 		end
 		db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 		SendScriptCallback("on_pstor_save_all",obj,packet)
@@ -1171,6 +1172,9 @@ end
 function pstor_load_all(obj, reader)
 	local npc_id = obj:id()
 	if (USE_MARSHAL) then
+		if not (db.storage[npc_id]) then 
+			return 
+		end
 		db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 		SendScriptCallback("on_pstor_load_all",obj,reader)
 		return
