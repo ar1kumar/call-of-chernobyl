@@ -19,7 +19,6 @@
 local m_data = {}
 m_data.se_stalker = {}
 
-force_pause = nil
 local function on_pstor_load_all(obj,packet)
 	local id = obj:id()
 	if (m_data.pstor_all and m_data.pstor_all[id]) then 
@@ -42,10 +41,6 @@ end
 
 -- called from engine!
 function CALifeStorageManager_before_save(fname)
-	if not (device():is_paused()) then -- possible threads can still be running if not paused
-		device():pause(true)
-		force_pause = true
-	end
 	local sim = alife()
 	local se_obj
 	for i=1,65534 do
@@ -59,7 +54,7 @@ function CALifeStorageManager_before_save(fname)
 		return 
 	end
 	local path = getFS():update_path('$game_saves$', '') .. fname:sub(0,-6):lower() .. ".scoc"
-	local savegame = io.open(path,"wb")
+	local savegame = io.open(path,"wb+")
 	if (savegame) then
 		m_data.GAME_VERSION = GAME_VERSION
 		m_data.smart_terrains = {}
@@ -108,17 +103,14 @@ function CALifeStorageManager_before_save(fname)
 		if (data) then
 			printf("axr_main: saving custom data %s",path)
 			savegame:write(data)
-			savegame:close()
 		end
+		savegame:close()
 	end	
 end 
 
 -- called from engine!
 function CALifeStorageManager_save(fname)
-	if (force_pause) then 
-		device():pause(false)
-		force_pause = nil
-	end
+
 end 
 
 -- called from engine
