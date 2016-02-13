@@ -96,11 +96,11 @@ function action_car:reset_scheme(loading)
 	    end
 
 	    if loading then
-		    self.speed = xr_logic.pstor_retrieve(self.object, "speed")
-		    self.loop = xr_logic.pstor_retrieve(self.object, "loop")
-		    self.min_delta_per_sec = xr_logic.pstor_retrieve(self.object, "min_delta_per_sec")
-		    self.min_car_explode_time = xr_logic.pstor_retrieve(self.object, "min_car_explode_time")
-		    self.state_moving = xr_logic.pstor_retrieve(self.object, "state_moving")
+		    self.speed = xr_logic.pstor_retrieve(self.object, "speed") or def_moving_speed
+		    self.loop = xr_logic.pstor_retrieve(self.object, "loop") or false
+		    self.min_delta_per_sec = xr_logic.pstor_retrieve(self.object, "min_delta_per_sec") or def_min_delta_per_sec
+		    self.min_car_explode_time = xr_logic.pstor_retrieve(self.object, "min_car_explode_time") or def_min_car_explode_time
+		    self.state_moving = xr_logic.pstor_retrieve(self.object, "state_moving") or state_none
 	    else
 		    self.speed = def_moving_speed
 		    self.loop = false
