@@ -3,9 +3,11 @@
 --]]
 
 local show_about_death = true -- show death alerts from other stalkers
+local show_about_death_mutant = true -- show death alerts from other stalkers about mutant deaths
 local show_death_generic = false -- show generic death alerts (ie. Dead:)
 local show_about_something = true  -- show general news tips
-local show_about_wounded = true -- show kill wounded tips
+local show_about_kill_wounded = true
+local show_about_bounty = true
 
 ----------------------------------------------------------------------------------------------------
 local instance = nil -- don't touch
@@ -64,7 +66,12 @@ function DynamicNewsManager:__init()
 		["bandit"]   		= {}
 	}
 	
-	self.spammer = {}
+	self.spammer = {	
+		["show_about_death"] = 0,
+		["show_about_kill_wounded"] = 0,
+		["show_about_bounty"] = 0,
+		["show_about_death_mutant"] = 0
+	}
 	
 	CreateTimeEvent("DynamicNewsManager","NewsTick",10*level.get_time_factor(),self.NewsTick,self)
 	CreateTimeEvent("DynamicNewsManager","TickSpecialEvent",10*level.get_time_factor(),self.TickSpecialEvent,self)
@@ -128,14 +135,25 @@ function DynamicNewsManager:monster_on_net_spawn(npc,se_obj)
 end 
 
 function DynamicNewsManager:monster_on_death_callback(victim,who)
-	if not (who and IsStalker(who)) then
+	if not (who and IsStalker(who) and show_about_death_mutant) then
 		return 
 	end
-	local l = math.random(1,2)
-	if l == 1 then
-		self:GossipDeathOfMutant(victim,who)
-	elseif l == 2 then 
-		self:SeenDeathOfMutant(victim,who)
+	
+	local say = false
+	if (self.spammer.show_about_death_mutant == 0) then
+		local l = math.random(1,2)
+		if l == 1 then
+			say = self:GossipDeathOfMutant(victim,who)
+		elseif l == 2 then 
+			say = self:SeenDeathOfMutant(victim,who)
+		end
+	end
+	
+	if (say) then
+		self.spammer.show_about_death_mutant = self.spammer.show_about_death_mutant + 1
+		if (self.spammer.show_about_death_mutant > 3) then
+			self.spammer.show_about_death_mutant = 0
+		end
 	end
 end
 
@@ -156,26 +174,38 @@ function DynamicNewsManager:npc_on_death_callback(victim,who)
 		return
 	end
 
-	if (IsStalker(who)) then
-		local i = show_death_generic and math.random(1,4) or math.random(2,4)
-		if i == 1 then
-			self:DeathByStalker(victim,who,comm)
-		elseif i == 2 then
-			self:GossipDeathByStalker(victim,who)
-		elseif i == 3 then
-			self:SOSDeathByStalker(victim,who,comm)
-		elseif i == 4 then
-			self:SeenDeathOfStalker(victim,who,comm)
+	local say = false
+	if (self.spammer.show_about_death == 0) then
+		if (IsStalker(who)) then
+			say = self:SOSDeathByStalker(victim,who,comm)
+			if not (say) then
+				local i = show_death_generic and math.random(1,3) or math.random(2,3)
+				if i == 1 then
+					self:DeathByStalker(victim,who,comm)
+				elseif i == 2 then
+					self:GossipDeathByStalker(victim,who)
+				elseif i == 3 then
+					self:SeenDeathOfStalker(victim,who,comm)
+				end
+			end
+		elseif (IsMonster(who)) then
+			say = self:SOSDeathByMutant(victim,who,comm)
+			if not (say) then
+				local k = show_death_generic and math.random(1,2) or 2
+				if k == 1 then
+					self:DeathByMutant(victim,who,comm)
+				elseif k == 2 then 
+					self:SeenDeathByMutant(victim,who,comm)
+				end
+			end
 		end
-	elseif (IsMonster(who)) then
-		local k = show_death_generic and math.random(1,3) or math.random(2,3)
-		if k == 1 then
-			self:DeathByMutant(victim,who,comm)
-		elseif k == 2 then 
-			self:SeenDeathByMutant(victim,who,comm)
-		elseif k == 3 then 
-			self:SOSDeathByMutant(victim,who,comm)
-		end		
+	end
+	
+	if (say) then
+		self.spammer.show_about_death = self.spammer.show_about_death + 1
+		if (self.spammer.show_about_death > 3) then
+			self.spammer.show_about_death = 0
+		end
 	end
 end
 
@@ -194,6 +224,7 @@ function DynamicNewsManager:FindSpeakerNoVictim(who,same_as_who,not_in_combat)
 	local comm_sender
 	local comm_who = character_community(who)
 	local who_id = who:id()
+	local t = {}
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
 			st = db.storage[db.OnlineStalkers[i]]
@@ -203,21 +234,14 @@ function DynamicNewsManager:FindSpeakerNoVictim(who,same_as_who,not_in_combat)
 					comm_sender = npc:character_community()
 					if (same_as_who == nil) or (same_as_who == true and comm_sender == comm_who) or (same_as_who == false and comm_sender ~= comm_who) then
 						if (self.channel_status[comm_sender]) then
-							if (self.spammer[npc:id()] == nil) then
-								self.spammer[npc:id()] = 1
-								return npc
-							else 
-								self.spammer[npc:id()] = self.spammer[npc:id()] + 1
-								if (self.spammer[npc:id()] > 3) then 
-									self.spammer[npc:id()] = nil
-								end
-							end
+							table.insert(t,npc)
 						end
 					end
 				end
 			end
 		end
 	end
+	return t[math.random(#t)]
 end
 
 function DynamicNewsManager:FindSpeaker(victim,who,same_as_victim,same_as_who,not_in_combat,can_see)
@@ -225,6 +249,7 @@ function DynamicNewsManager:FindSpeaker(victim,who,same_as_victim,same_as_who,no
 	local comm_sender
 	local comm_who = character_community(who)
 	local who_id = who:id()
+	local t = {}
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
 			st = db.storage[db.OnlineStalkers[i]]
@@ -236,15 +261,7 @@ function DynamicNewsManager:FindSpeaker(victim,who,same_as_victim,same_as_who,no
 						if (same_as_who == nil) or (same_as_who == true and comm_sender == comm_who) or (same_as_who == false and comm_sender ~= comm_who) then
 							if (self.channel_status[comm_sender]) then
 								if (can_see == nil) or (can_see and npc:see(victim)) or (can_see == false) then
-									if (self.spammer[npc:id()] == nil) then
-										self.spammer[npc:id()] = 1
-										return npc
-									else 
-										self.spammer[npc:id()] = self.spammer[npc:id()] + 1
-										if (self.spammer[npc:id()] > 3) then 
-											self.spammer[npc:id()] = nil
-										end
-									end
+									table.insert(t,npc)
 								end
 							end
 						end
@@ -253,6 +270,7 @@ function DynamicNewsManager:FindSpeaker(victim,who,same_as_victim,same_as_who,no
 			end
 		end
 	end
+	return t[math.random(#t)]
 end
 
 function DynamicNewsManager:FindSpeakerWithEnemy(victim,who,same_as_victim,same_as_who,can_see)
@@ -260,6 +278,7 @@ function DynamicNewsManager:FindSpeakerWithEnemy(victim,who,same_as_victim,same_
 	local comm_sender
 	local comm_who = character_community(who)
 	local who_id = who:id()
+	local t = {}
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
 			st = db.storage[db.OnlineStalkers[i]]
@@ -270,15 +289,7 @@ function DynamicNewsManager:FindSpeakerWithEnemy(victim,who,same_as_victim,same_
 					if (same_as_who == nil) or (same_as_who == true and comm_sender == comm_who) or (same_as_who == false and comm_sender ~= comm_who) then
 						if (self.channel_status[comm_sender]) then
 							if (can_see == nil) or (can_see and npc:see(victim)) or (can_see == false) then
-								if (self.spammer[npc:id()] == nil) then
-									self.spammer[npc:id()] = 1
-									return npc
-								else 
-									self.spammer[npc:id()] = self.spammer[npc:id()] + 1
-									if (self.spammer[npc:id()] > 3) then 
-										self.spammer[npc:id()] = nil
-									end
-								end
+								table.insert(t,npc)
 							end
 						end
 					end
@@ -286,39 +297,54 @@ function DynamicNewsManager:FindSpeakerWithEnemy(victim,who,same_as_victim,same_
 			end
 		end
 	end
+	return t[math.random(#t)]
 end
 
 function DynamicNewsManager:GossipBounty()
-	local bounty
-	for task_id,npc_id in pairs(axr_task_manager.bounties_by_id) do
-		bounty = db.storage[npc_id] and db.storage[npc_id].object
-		if (bounty and bounty:alive()) then 
-			break 
+	if not (show_about_bounty) then 
+		return 
+	end
+	if (self.spammer.show_about_bounty == 0) then
+		local bounty
+		for task_id,npc_id in pairs(axr_task_manager.bounties_by_id) do
+			bounty = db.storage[npc_id] and db.storage[npc_id].object
+			if (bounty and bounty:alive()) then 
+				break 
+			end
 		end
-	end
-	
-	if not (bounty) then
-		return 
-	end
+		
+		if not (bounty) then
+			return false
+		end
 
-	local sender = self:FindSpeakerNoVictim(bounty,true,true)
-	if not (sender) then
-		--printf("GossipBounty can't find sender")
-		return 
+		local sender = self:FindSpeakerNoVictim(bounty,false,true)
+		if not (sender) then
+			--printf("GossipBounty can't find sender")
+			return false
+		end
+		
+		local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+		
+		local s = {	"I just seen %s, %s. I heard someone put a bounty on his head.", 
+					"Anyone know what's up with %s lately? He's been hanging around %s. It's almost like he is hiding from someone.",
+					"I heard Sidorovich is looking for %s. I just saw him %s."
+		}
+		
+		local a = strformat(s[math.random(#s)],bounty:character_name(),dynamic_news_helper.GetPointDescription(bounty))
+		
+		local msg = a
+		
+		self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+		
+		return true
 	end
 	
-	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+	self.spammer.show_about_bounty = self.spammer.show_about_bounty + 1
+	if (self.spammer.show_about_bounty > 3) then
+		self.spammer.show_about_bounty = 0
+	end
 	
-	local s = {	"I just seen %s, %s. I heard someone put a bounty on his head.", 
-				"Anyone know what's up with %s lately? He's been hanging around %s. It's almost like he is hiding from someone.",
-				"I heard Sidorovich is looking for %s. I just saw him %s."
-	}
-	
-	local a = strformat(s[math.random(#s)],bounty:character_name(),dynamic_news_helper.GetPointDescription(bounty))
-	
-	local msg = a
-	
-	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	return false
 end
 
 function DynamicNewsManager:RadioInHeli(sender,who)
@@ -357,16 +383,19 @@ function DynamicNewsManager:RadioInHeli(sender,who)
 	end
 	
 	self:PushToChannel("general",{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	return true
 end
 
 function DynamicNewsManager:DeathBySurge(victim,who,comm)
 	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]Found %s. Blowout.",victim:character_name(),game.translate_string(comm),dynamic_news_helper.GetPointDescription(victim))
 	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se="Died:",It="gr"})
+	return true
 end
 
 function DynamicNewsManager:DeathByStalker(victim,who,comm)
 	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]Found %s. %s.",victim:character_name(),game.translate_string(comm),dynamic_news_helper.GetPointDescription(victim),dynamic_news_helper.GetWeaponDescription(victim,1))
 	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se="Died:",It="gr"})
+	return true
 end
 
 function DynamicNewsManager:DeathByMutant(victim,who,comm)
@@ -376,18 +405,19 @@ function DynamicNewsManager:DeathByMutant(victim,who,comm)
 	local d = dynamic_news_helper.GetMonsterDescription(who,2)
 	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]Found %s. %s.",a,b,c,d)
 	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se="Died:",It="gr"})
+	return true
 end 
 
 function DynamicNewsManager:GossipDeathByStalker(victim,who)
 	local cls = dynamic_news_helper.GetWeaponClass(who)
 	if (cls == 1 or cls == 9) then 
-		return
+		return false
 	end
 	
 	local sender = self:FindSpeaker(victim,who,false,nil,true)
 	if not (sender) then
 		--printf("GossipDeathByStalker can't find sender")
-		return 
+		return false
 	end
 	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
@@ -402,18 +432,20 @@ function DynamicNewsManager:GossipDeathByStalker(victim,who)
 
 	local msg = strformat("%s %s %s. %s",a,b,c,d)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	
+	return true
 end
 
 function DynamicNewsManager:SOSDeathByStalker(victim,who,comm)
 	local cls = dynamic_news_helper.GetWeaponClass(who)
 	if (cls == 1 or cls == 9) then 
-		return
+		return false
 	end
 	
 	local sender = self:FindSpeakerWithEnemy(victim,who,true,false)
 	if not (sender) then
 		--printf("SOSDeathByStalker can't find sender")
-		return 
+		return false
 	end
 	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
@@ -423,19 +455,21 @@ function DynamicNewsManager:SOSDeathByStalker(victim,who,comm)
 	local d = dynamic_news_helper.GetPointDescription(victim)
 
 	local msg = strformat("%s %s %s %s!",a,b,c,d)
-	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})	
+	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})
+	
+	return true
 end
 
 function DynamicNewsManager:SeenDeathOfStalker(victim,who,comm)
 	local cls = dynamic_news_helper.GetWeaponClass(who)
 	if (cls == 1 or cls == 9) then 
-		return
+		return false
 	end
 	
 	local sender = self:FindSpeaker(victim,who,false,false,true)
 	if not (sender) then
 		--printf("SeenDeathOfStalker can't find sender")
-		return
+		return false
 	end
 	
 	local sentence = {"I saw","I just saw","Hey, I just saw","A little while ago I saw","A few minutes ago I saw","Just now I saw","Hey, uh, I just saw"}
@@ -448,19 +482,21 @@ function DynamicNewsManager:SeenDeathOfStalker(victim,who,comm)
 	local e = dynamic_news_helper.GetPointDescription(victim)
 	
 	local msg = strformat("%s %s %s %s %s.",a,b,c,d,e)
-	self:PushToChannel("general",{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})	
+	self:PushToChannel("general",{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})
+	
+	return true
 end
 
 function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 	local cls = dynamic_news_helper.GetWeaponClass(who)
 	if (cls == 1 or cls == 9) then 
-		return
+		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,false,nil,true)
+	local sender = self:FindSpeaker(victim,who,nil,false,true)
 	if not (sender) then
 		--printf("SeenDeathOfMutant can't find sender")
-		return
+		return false
 	end
 	
 	local sentence = {"I saw","I just saw","Hey, I just saw","A little while ago I saw","A few minutes ago I saw","Just now I saw","Hey, uh, I just saw"}
@@ -474,13 +510,15 @@ function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 	
 	local msg = strformat("%s %s %s %s %s.",a,b,c,d,e)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})
+	
+	return true
 end
 
 function DynamicNewsManager:SeenDeathByMutant(victim,who,comm)
 	local sender = self:FindSpeaker(victim,who,false,nil,true)
 	if not (sender) then
 		--printf("SeenDeathByMutant can't find sender")
-		return
+		return false
 	end
 	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
@@ -496,18 +534,20 @@ function DynamicNewsManager:SeenDeathByMutant(victim,who,comm)
 	
 	local msg = strformat("%s %s %s.\\n%s",a,b,c,d)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})
+	
+	return true
 end 
 
 function DynamicNewsManager:GossipDeathOfMutant(victim,who,comm)
 	local cls = dynamic_news_helper.GetWeaponClass(who)
 	if (cls == 1 or cls == 9) then 
-		return
+		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,false,nil,true)
+	local sender = self:FindSpeaker(victim,who,nil,false,true)
 	if not (sender) then
 		--printf("GossipDeathByStalker can't find sender")
-		return 
+		return false
 	end
 	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
@@ -522,13 +562,15 @@ function DynamicNewsManager:GossipDeathOfMutant(victim,who,comm)
 
 	local msg = strformat("%s %s %s. %s",a,b,c,d)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	
+	return true
 end 
 
 function DynamicNewsManager:SOSDeathByMutant(victim,who)
-	local sender = self:FindSpeakerWithEnemy(victim,who,nil,false)
+	local sender = self:FindSpeakerWithEnemy(victim,who,true,nil)
 	if not (sender) then
 		--printf("SOSDeathByMutant can't find sender")
-		return 
+		return false
 	end
 	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
@@ -538,17 +580,12 @@ function DynamicNewsManager:SOSDeathByMutant(victim,who)
 	local c = dynamic_news_helper.GetPointDescription(victim)
 
 	local msg = strformat("%s %s %s!",a,b,c)
-	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})	
+	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})
+	
+	return true
 end
 
 function DynamicNewsManager:FoundArtefact(sender,itm)
-	if not (self.spammer[sender:id()]) then 
-		self.spammer[sender:id()] = true
-	else 
-		self.spammer[sender:id()] = nil
-		return
-	end 
-	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
 	local Tbl = {	
 					"My lucky day! I just found a %s",
@@ -560,6 +597,8 @@ function DynamicNewsManager:FoundArtefact(sender,itm)
 	local inv_name = game.translate_string(system_ini():r_string_ex(itm:section(),"inv_name") or "")
 
 	self:PushToChannel(sender:character_community(),{Mg=strformat(Tbl[math.random(#Tbl)],inv_name),Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	
+	return true
 end
 
 function DynamicNewsManager:BoughtItems(sender,who,list)
@@ -591,38 +630,56 @@ function DynamicNewsManager:BoughtItems(sender,who,list)
 	end
 
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	return true
 end
 
-function DynamicNewsManager:KillWounded(sender,victim)
-	if not (show_about_wounded) then 
-		return 
+function DynamicNewsManager:KillWounded(sender,victim,is_hostage)
+	if not (show_about_kill_wounded) then 
+		return false
 	end
+	
 	local squad = get_object_squad(sender)
 	if not (squad and squad:commander_id() == sender:id()) then
-		return
-	end 
-	if not (self.spammer["KillWounded"]) then 
-		self.spammer["KillWounded"] = 1
-	else 
-		self.spammer["KillWounded"] = self.spammer["KillWounded"] + 1 
-		if (self.spammer["KillWounded"] > 5) then 
-			self.spammer["KillWounded"] = nil
-		end
-		return
+		return false
 	end
 	
-	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
-	local Tbl = { 
-					"One is still alive. Put them out of their misery!",
-					"Quick! Over there, he is still alive.",
-					"This on thought he could get away by playing dead.",
-					"Time to put him down for good.",
-					"Let sleeping dogs lie.",
-					"There is still one let. Let's see if we can extract information."	
-	}
+	if (self.spammer.show_about_kill_wounded == 0) then
+		local Tbl, Se
+		if not (is_hostage) then
+			Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+			Tbl = { 
+							"One is still alive. Put them out of their misery!",
+							"Quick! Over there, he is still alive.",
+							"This on thought he could get away by playing dead.",
+							"Time to put him down for good.",
+							"Let sleeping dogs lie.",
+							"There is still one let. Let's see if we can extract information.",
+							"Put this dog down!",
+							"Surrender, asshole! We know you are wounded!",
+							"He's wounded... Kill him"
+			}
+		else 
+			Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+			Tbl = { 
+							"Looks like we got ourselves a hostage, boys.",
+							"This punkass thought he could escape. Someone keep an eye on him.",
+							"Do you think those stalkers will pay his ransom?",
+							"I don't think your friends are coming for you "..vo:character_name() .. "!",
+							"Looking for offers on this dick head " .. vo:character_name() .. ". If not we'll kill 'em!",
+							"Let's see if we can extract information from this lowlife."
+			}			
+		end
+		
+		local msg = Tbl[math.random(#Tbl)]
+		self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+		
+		return true
+	end
 	
-	local msg = Tbl[math.random(#Tbl)]
-	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	self.spammer.show_about_kill_wounded = self.spammer.show_about_kill_wounded + 1 
+	if (self.spammer.show_about_kill_wounded  > 10) then
+		self.spammer.show_about_kill_wounded  = 0
+	end
 end 
 
 ----------------------------------- helpers
