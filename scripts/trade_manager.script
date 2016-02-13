@@ -57,6 +57,10 @@ function update(npc)
 		return
 	end
 	
+	if not (trade_manager[npc:id()].loaded) then 
+		return 
+	end
+	
 	if (tg + 360000 < 2147483647) then 
 		tt.update_time = tg + 360000
 	else 
@@ -170,6 +174,8 @@ function load_state(m_data,npc)
 	
 	npc:buy_condition(trade_manager[id].config, trade_manager[id].current_buy_condition)
 	npc:sell_condition(trade_manager[id].config, trade_manager[id].current_sell_condition)
+	
+	trade_manager[id].loaded = true
 end 
 
 
