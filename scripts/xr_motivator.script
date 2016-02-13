@@ -513,8 +513,8 @@ function motivator_binder:load_state(m_data)
 	self.st.job_ini = m_data.xr_logic[id].job_ini
 	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
 	self.st.loaded_section_logic = m_data.xr_logic[id].section_logic
-	self.st.loaded_active_section = m_data.xr_logic[id].active_section
-	self.st.loaded_gulag_name = m_data.xr_logic[id].gulag_name
+	self.st.loaded_active_section = m_data.xr_logic[id].active_section or "nil"
+	self.st.loaded_gulag_name = m_data.xr_logic[id].gulag_name or ""
 	self.st.activation_time = m_data.xr_logic[id].activation_time + time_global()
 	self.st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
 
