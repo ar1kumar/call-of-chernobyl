@@ -299,33 +299,53 @@ end
 
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save_state(m_data)
+	alun_utils.debug_write(strformat("actor_binder:save_state BEFORE"))
+	
+	printf("1")
 	m_data.actor_binder = {}
 	m_data.actor_binder.game_difficulty = level.get_game_difficulty()
 	m_data.actor_binder.disable_input_time = self.st.disable_input_time
+	printf("2")
 	m_data.actor_binder.simulation_started = SIMBOARD.simulation_started
+	printf("3")
 	--m_data.actor_binder.last_level_name = self.last_level_name
 	m_data.actor_binder.active_slot = self.object:active_slot()
+	printf("4")
 	m_data.actor_binder.last_detective_achievement_spawn_time = self.last_detective_achievement_spawn_time
+	printf("5")
 	m_data.actor_binder.last_mutant_hunter_achievement_spawn_time = self.last_mutant_hunter_achievement_spawn_time
+	printf("6")
 	
 	xr_logic.pstor_save_all(self.object)
+	printf("7")
 	if (sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state ~= 0 and not utils.level_changing()) then 
 		sr_psy_antenna.psy_antenna:save_state(m_data)
 	end
+	printf("8")	
 	
 	xr_statistic.save_state(m_data)
+	printf("9")
 	inventory_upgrades.save_state(m_data)
+	printf("10")
 	xr_sound.actor_save_state(m_data)
+	printf("11")
 	task_manager.save_state(m_data)
+	printf("12")
 	level_weathers.get_weather_manager():save_state(m_data)
+	printf("13")
 	surge_manager.save_state(m_data)
+	printf("14")
 	psi_storm_manager.save_state(m_data)
+	printf("15")
+	
+	alun_utils.debug_write(strformat("actor_binder:save_state AFTER"))
 end
 
 function actor_binder:load_state(m_data)
 	if not (m_data.actor_binder) then 
 		return 
 	end
+	alun_utils.debug_write(strformat("actor_binder:load_state %s BEFORE",self.object:name()))
 	--alun_utils.debug_write("actor_binder:load_state")
 	local game_difficulty_by_num = {
 				[0] = "gd_novice",
@@ -355,6 +375,8 @@ function actor_binder:load_state(m_data)
 	psi_storm_manager.load_state(m_data)
 	
 	m_data.actor_binder = nil
+	
+	alun_utils.debug_write(strformat("actor_binder:load_state %s AFTER",self.object:name()))
 end 
 
 function actor_binder:load(reader)

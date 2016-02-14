@@ -126,6 +126,7 @@ function on_npc_death(npc)
 end
 
 function save_state(m_data,npc)
+	alun_utils.debug_write(strformat("trade_manager:save_state %s",npc and npc:name()))
 	if not (npc:alive()) then 
 		return 
 	end
@@ -151,6 +152,7 @@ function save_state(m_data,npc)
 end 
 
 function load_state(m_data,npc)
+	alun_utils.debug_write(strformat("trade_manager:load_state %s",npc and npc:name()))
 	local id = npc:id()
 	if not (m_data.trade_manager and m_data.trade_manager[id]) then 
 		return 

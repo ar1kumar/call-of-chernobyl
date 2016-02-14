@@ -494,6 +494,7 @@ function CPsiStormManager:launch_rockets()
 end
 
 function save_state(m_data)
+	alun_utils.debug_write("PsiStormManager:save_state BEFORE")
 	m_data.PsiStormManager = {}
 	
 	local mgr = PsiStormManager
@@ -502,7 +503,7 @@ function save_state(m_data)
 		mgr._state_loaded = true
 	end
 	
-	m_data.PsiStormManager.finished = mgr.finished 
+	m_data.PsiStormManager.finished = mgr.finished
 	m_data.PsiStormManager.started = mgr.started
 	m_data.PsiStormManager.last_psi_storm_time = utils.CTime_to_table(mgr.last_psi_storm_time) or game.get_game_time()
 	if (mgr.started) then 
@@ -511,25 +512,26 @@ function save_state(m_data)
 		m_data.PsiStormManager.game_time_factor = mgr.game_time_factor
 	end
 	m_data.PsiStormManager._delta = mgr._delta
-	m_data.PsiStormManager = nil
+	alun_utils.debug_write("PsiStormManager:save_state AFTER")
 end 
 
 function load_state(m_data)
 	if not (m_data.PsiStormManager) then 
 		return
 	end
+	alun_utils.debug_write("PsiStormManager:load_state BEFORE")
 	if not (PsiStormManager) then 
 		PsiStormManager = CPsiStormManager()
 	end
 	local mgr = PsiStormManager
 	mgr:initialize()
-	mgr.finished = m_data.PsiStormManager.finished
-	mgr.started = m_data.PsiStormManager.started
-	mgr.last_psi_storm_time = utils.CTime_from_table(m_data.PsiStormManager.last_psi_storm_time) or game.get_game_time()
+	mgr.finished = m_data.PsiStormManager.finished or true
+	mgr.started = m_data.PsiStormManager.started or false
+	mgr.last_psi_storm_time = m_data.PsiStormManager.last_psi_storm_time and utils.CTime_from_table(m_data.PsiStormManager.last_psi_storm_time) or game.get_game_time()
 	if (mgr.started) then 
-		mgr.inited_time = utils.CTime_from_table(m_data.PsiStormManager.inited_time)
-		mgr.task_given = m_data.PsiStormManager.task_given
-		mgr.game_time_factor = m_data.PsiStormManager.game_time_factor
+		mgr.inited_time = utils.CTime_from_table(m_data.PsiStormManager.inited_time) or game.get_game_time()
+		mgr.task_given = m_data.PsiStormManager.task_given or false
+		mgr.game_time_factor = m_data.PsiStormManager.game_time_factor or level.get_time_factor()
 		mgr.stages = empty_table(mgr.stages)
 		mgr.humanParticles = empty_table(mgr.humanParticles)
 		mgr.vortexes = empty_table(mgr.vortexes)
@@ -537,6 +539,8 @@ function load_state(m_data)
 	end
 	mgr._delta = m_data.PsiStormManager._delta
 	mgr._state_loaded = true
+	m_data.PsiStormManager = nil 
+	alun_utils.debug_write("PsiStormManager:save_state AFTER")
 end 
 
 function actor_on_save(binder,packet)

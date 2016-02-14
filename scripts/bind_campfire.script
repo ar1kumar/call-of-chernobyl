@@ -6,6 +6,7 @@
 
 -- For use with Marshal save state system
 local function save_state(m_data)
+	alun_utils.debug_write("bind_campfire:save_state")
 	empty_table(m_data.campfire_states)
 	for smart,t in pairs(db.campfire_table_by_smart_names) do 
 		for id,binder in pairs(t) do 

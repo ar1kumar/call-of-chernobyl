@@ -370,15 +370,15 @@ function generic_object_binder:net_save_relevant()
 end
 
 function generic_object_binder:save_state(m_data)
-	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
+	alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
 	
 	local id = self.object:id()
 	m_data.xr_logic[id] = {}
 	m_data.xr_logic[id].job_ini = self.st.job_ini
 	m_data.xr_logic[id].ini_filename = self.st.ini_filename
 	m_data.xr_logic[id].section_logic = self.st.section_logic
-	m_data.xr_logic[id].active_section = self.st.active_section or "nil"
-	m_data.xr_logic[id].gulag_name = self.st.gulag_name or ""
+	m_data.xr_logic[id].active_section = self.st.active_section
+	m_data.xr_logic[id].gulag_name = self.st.gulag_name
 	m_data.xr_logic[id].activation_time = (self.st.activation_time or 0) - time_global()
 	m_data.xr_logic[id].activation_game_time = self.st.activation_game_time
 
@@ -388,7 +388,7 @@ function generic_object_binder:save_state(m_data)
 
 	xr_logic.pstor_save_all(self.object)
 	
-	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
+	alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
 end 
 
 function generic_object_binder:load_state(m_data)
@@ -397,14 +397,14 @@ function generic_object_binder:load_state(m_data)
 		return 
 	end
 	
-	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
+	alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
 	
 	self.st.job_ini = m_data.xr_logic[id].job_ini
 	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
 	self.st.loaded_section_logic = m_data.xr_logic[id].section_logic
-	self.st.loaded_active_section = m_data.xr_logic[id].active_section
-	self.st.loaded_gulag_name = m_data.xr_logic[id].gulag_name
-	self.st.activation_time = m_data.xr_logic[id].activation_time + time_global()
+	self.st.loaded_active_section = m_data.xr_logic[id].active_section or "nil"
+	self.st.loaded_gulag_name = m_data.xr_logic[id].gulag_name or ""
+	self.st.activation_time = m_data.xr_logic[id].activation_time and m_data.xr_logic[id].activation_time + time_global() or time_global()
 	self.st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
 
 	if self.st.active_scheme then
@@ -412,7 +412,7 @@ function generic_object_binder:load_state(m_data)
 	end
 	
 	xr_logic.pstor_load_all(self.object)
-	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
+	alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
 end
 
 function generic_object_binder:save(packet)

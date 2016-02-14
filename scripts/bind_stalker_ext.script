@@ -133,11 +133,9 @@ end
 -- actor_on_item_take(item)
 -------------------
 function actor_on_item_take(binder,item)
-	--[[
-	if(device().precache_frame > 1) then -- game is paused or loading
-		return
+	if not (db.actor) then 
+		return -- don't remove, for some reason this callback is triggered before actor is fully loaded
 	end
-	--]]
 	if IsArtefact(item) then
 		local artefact = item:get_artefact()
 		if (artefact) then
