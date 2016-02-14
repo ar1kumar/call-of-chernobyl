@@ -123,7 +123,7 @@ function CALifeStorageManager_load(fname)
 	
 	--alun_utils.debug_write(strformat("CALifeStorageManager_load %s",path))
 	
-	local savegame = io.open(path,"rb")
+	local savegame = io.open(path,"rb+")
 	if not (savegame) then
 		return
 	end

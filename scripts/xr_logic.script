@@ -1223,6 +1223,10 @@ function save_obj(obj, packet)
 	set_save_marker(packet, "save", false, "object "..obj:name())
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]
+	if not (st) then
+		printf("save_obj WARNING: db.storage is nil! %s",obj:name())
+		return
+	end
 
 	packet:w_stringZ(st.job_ini or "")
 	packet:w_stringZ(st.ini_filename or "")
@@ -1248,7 +1252,7 @@ function load_obj(obj, reader)
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]
 	if not (st) then 
-		error(strformat("load_obj st is nil for %s",obj and obj:id()))
+		error(strformat("load_obj st is nil for %s",obj and obj:name()))
 	end 
 	
 	local job_ini = reader:r_stringZ()

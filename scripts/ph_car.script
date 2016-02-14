@@ -146,7 +146,7 @@ function action_car:reset_scheme(loading)
 	        self.target_dist = -1
 
 	        if loading then
-		        self.target_walk_pt = xr_logic.pstor_retrieve(self.object, "target_walk_pt")
+		        self.target_walk_pt = xr_logic.pstor_retrieve(self.object, "target_walk_pt") or self:get_nearest_walkpoint()
 		        if self.target_walk_pt == -1 then
 		            self.target_walk_pt = self:get_nearest_walkpoint()
 		        end
