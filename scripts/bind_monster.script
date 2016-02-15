@@ -15,10 +15,6 @@ local last_update = 0 -- combat
 class "generic_object_binder" (object_binder)
 function generic_object_binder:__init(obj) super(obj)
 	self.loaded = false
-	
-	if (USE_MARSHAL) then 
-		RegisterScriptCallback("save_state",save_state,obj:id())
-	end
 end
 
 function generic_object_binder:reinit()
@@ -348,10 +344,6 @@ function generic_object_binder:net_destroy()
 	db.delete_enemy(self.object)
 	db.storage[self.object:id()] = nil
 	
-	if (USE_MARSHAL) then
-		UnregisterScriptCallback("save_state",self.object:id())
-	end	
-	
 	object_binder.net_destroy(self)
 	--alun_utils.debug_write("generic_object_binder:net_destroy END")
 end
@@ -373,7 +365,10 @@ function generic_object_binder:save(packet)
 	set_save_marker(packet, "save", false, "generic_object_binder")
 	object_binder.save(self, packet)
 	set_save_marker(packet, "save", true, "generic_object_binder")
-	if (USE_MARSHAL) then 
+	if (USE_MARSHAL) then
+		if (self.object) then 
+			save_state(self.object:id(),alife_storage_manager.get_state())
+		end
 		return 
 	end
 	--alun_utils.debug_write("\n-------bind_monster save start------ "..self.object:name(),true)
@@ -402,6 +397,9 @@ function save_state(id,m_data)
 	local st = id and db.storage[id]
 	if not (st) then
 		return
+	end
+	if not (m_data.xr_logic) then 
+		m_data.xr_logic = {}
 	end
 	m_data.xr_logic[id] = {}
 	m_data.xr_logic[id].job_ini = st.job_ini

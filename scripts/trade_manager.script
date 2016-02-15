@@ -101,7 +101,9 @@ function save_state(id,m_data)
 		printf("ERROR: trade_manager: Invalid pathname %s.",tt.cfg_ltx)
 		return
 	end
-	
+	if not (m_data.trade_manager) then 
+		m_data.trade_manager = {}
+	end
 	m_data.trade_manager[id] = {}
 	m_data.trade_manager[id].cfg_ltx = tt.cfg_ltx
 	m_data.trade_manager[id].current_buy_condition = tt.current_buy_condition
