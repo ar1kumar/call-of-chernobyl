@@ -219,22 +219,22 @@ function actor_load(stpk)
 	end
 	set_save_marker(stpk, "load", true, "sound_actor_save")
 end
-function npc_save_state(m_data,npc)
+function npc_save_state(id,m_data)
 	--alun_utils.debug_write("npc_save_state")
-	m_data.xr_sound[npc:id()] = {}
+	m_data.xr_sound[id] = {}
 	for k,v in pairs(sound_theme.theme) do
-		v:save_state(m_data.xr_sound[npc:id()])
+		v:save_state(m_data.xr_sound[id])
 	end
 end 
 
-function npc_load_state(m_data,npc)
-	if not (m_data.xr_sound and m_data.xr_sound[npc:id()]) then 
+function npc_load_state(id,m_data)
+	if not (m_data.xr_sound and m_data.xr_sound[id]) then 
 		return 
 	end 
 	for k,v in pairs(sound_theme.theme) do
-		v:load_state(m_data.xr_sound[npc:id()])
+		v:load_state(m_data.xr_sound[id])
 	end
-	m_data.xr_sound[npc:id()] = nil
+	m_data.xr_sound[id] = nil
 end 
 
 function save_npc(stpk, npc_id)
