@@ -1605,7 +1605,7 @@ function actor_on_load(binder,packet)
 end
 
 function save_state(m_data)
-	alun_utils.debug_write("SurgeManager:save_state BEFORE")
+	--alun_utils.debug_write("SurgeManager:save_state BEFORE")
 	m_data.SurgeManager = {}
 
 	local mgr = SurgeManager
@@ -1629,14 +1629,14 @@ function save_state(m_data)
 		m_data.SurgeManager.game_time_factor = mgr.game_time_factor
 	end
 	m_data.SurgeManager._delta = mgr._delta
-	alun_utils.debug_write("SurgeManager:save_state AFTER")
+	--alun_utils.debug_write("SurgeManager:save_state AFTER")
 end 
 
 function load_state(m_data)
 	if not (m_data.SurgeManager) then 
 		return
 	end
-	alun_utils.debug_write("SurgeManager:load_state BEFORE")
+	--alun_utils.debug_write("SurgeManager:load_state BEFORE")
 	local mgr = SurgeManager
 	mgr:initialize()
 	mgr.finished = m_data.SurgeManager.finished
@@ -1669,7 +1669,7 @@ function load_state(m_data)
 	mgr._state_loaded = true
 	
 	m_data.SurgeManager = nil
-	alun_utils.debug_write("SurgeManager:load_state BEFORE")
+	--alun_utils.debug_write("SurgeManager:load_state BEFORE")
 end
 
 --------------------------------------------------------------------------------

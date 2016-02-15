@@ -441,7 +441,7 @@ function CGeneralTask:load(packet)
 end
 
 function CGeneralTask:save_state(m_data)
-	alun_utils.debug_write(strformat("CGeneralTask:save_state %s BEFORE",self.id))
+	--alun_utils.debug_write(strformat("CGeneralTask:save_state %s BEFORE",self.id))
 	if (self.t == nil) then
 		if (self.repeat_timeout == nil or self.timeout == nil) then 
 			return 
@@ -460,14 +460,14 @@ function CGeneralTask:save_state(m_data)
 	m_data.task_objects[self.id].current_target = self.current_target
 	m_data.task_objects[self.id].stage = self.stage
 	m_data.task_objects[self.id].task_giver_id = self.task_giver_id
-	alun_utils.debug_write(strformat("CGeneralTask:save_state %s AFTER",self.id))
+	--alun_utils.debug_write(strformat("CGeneralTask:save_state %s AFTER",self.id))
 end 
 
 function CGeneralTask:load_state(m_data)
 	if not (m_data.task_objects and m_data.task_objects[self.id]) then 
 		return false
 	end 
-	alun_utils.debug_write(strformat("CGeneralTask:load_state %s BEFORE",self.id))
+	--alun_utils.debug_write(strformat("CGeneralTask:load_state %s BEFORE",self.id))
 	self.status = m_data.task_objects[self.id].status
 	self.timeout = m_data.task_objects[self.id].timeout
 	self.inited_time = m_data.task_objects[self.id].inited_time
@@ -480,6 +480,6 @@ function CGeneralTask:load_state(m_data)
 	
 	self.loaded = true
 	
-	alun_utils.debug_write(strformat("CGeneralTask:load_state %s AFTER",self.id))
+	--alun_utils.debug_write(strformat("CGeneralTask:load_state %s AFTER",self.id))
 	return true
 end 

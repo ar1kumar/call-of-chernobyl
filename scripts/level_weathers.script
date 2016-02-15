@@ -797,7 +797,7 @@ function WeatherManager:lightning()
 end
 
 function WeatherManager:save_state(m_data)
-	alun_utils.debug_write("WeatherManager:save_state BEFORE")
+	--alun_utils.debug_write("WeatherManager:save_state BEFORE")
 	local wm = get_weather_manager()
 	m_data.weather_manager = {}
 	m_data.weather_manager.levelWeather = self.levelWeather
@@ -808,14 +808,14 @@ function WeatherManager:save_state(m_data)
 	m_data.weather_manager.update_time = self.update_time
 	m_data.weather_manager.weather_fx = self.weather_fx
 	m_data.weather_manager.weather_fx_time = self.weather_fx and level.get_wfx_time() or 0
-	alun_utils.debug_write("WeatherManager:save_state AFTER")
+	--alun_utils.debug_write("WeatherManager:save_state AFTER")
 end 
 
 function WeatherManager:load_state(m_data)
 	if not (m_data.weather_manager) then 
 		return 
 	end
-	alun_utils.debug_write("WeatherManager:load_state BEFORE")
+	--alun_utils.debug_write("WeatherManager:load_state BEFORE")
 	local wm = get_weather_manager()
 	self.levelWeather = m_data.weather_manager.levelWeather
 	self.period = m_data.weather_manager.period
@@ -830,5 +830,5 @@ function WeatherManager:load_state(m_data)
 	elseif (self.levelWeather == "atmosfear_pre_blowout") then
 		self.pre_blowout_period = true
 	end
-	alun_utils.debug_write("WeatherManager:load_state AFTER")
+	--alun_utils.debug_write("WeatherManager:load_state AFTER")
 end 

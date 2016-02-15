@@ -1,37 +1,12 @@
 local trade_manager = {}
 
 function trade_init(npc, cfg)
-	if not (utils.valid_pathname(cfg)) then 
-		return 
-	end
-	trade_manager[npc:id()] = {}
-	trade_manager[npc:id()].cfg_ltx = cfg
-	trade_manager[npc:id()].config = ini_file(cfg)
-
-	-- коэфициенты покупки
-	local str = utils.cfg_get_string(trade_manager[npc:id()].config, "trader", "buy_condition", npc, true, "")
-	if str == nil then
-		printf("Incorrect trader settings. Cannot find buy_condition. [%s]->[%s]", npc:name(), cfg)
-	end
-	trade_manager[npc:id()].buy_condition = xr_logic.parse_condlist(npc, "trade_manager", "buy_condition", str)
-
-	-- коэфициенты продажи
-	str = utils.cfg_get_string(trade_manager[npc:id()].config, "trader", "sell_condition", npc, true, "")
-	if str == nil then
-		printf("Incorrect trader settings. Cannot find sell_condition. [%s]->[%s]", npc:name(), cfg)
-	end
-	trade_manager[npc:id()].sell_condition = xr_logic.parse_condlist(npc, "trade_manager", "sell_condition", str)
-
-	-- список закупки
-	str = utils.cfg_get_string(trade_manager[npc:id()].config, "trader", "buy_supplies", npc, false, "")
-	if str ~= nil then
-		trade_manager[npc:id()].buy_supplies = xr_logic.parse_condlist(npc, "trade_manager", "buy_supplies", str)
-	end
-
--- buy_item_condition_factor
-	str = utils.cfg_get_string(trade_manager[npc:id()].config, "trader", "buy_item_condition_factor", npc, false, "", "0.7")
-	if str ~= nil then
-		trade_manager[npc:id()].buy_item_condition_factor = xr_logic.parse_condlist(npc, "trade_manager", "buy_item_condition_factor", str)
+	local id = npc:id()
+	trade_manager[id] = {}
+	trade_manager[id].cfg_ltx = cfg
+	trade_manager[id].config = ini_file(cfg)
+	if not (trade_manager[id].config) then
+		trade_manager[id] = nil
 	end
 end
 
@@ -48,74 +23,62 @@ function update(npc)
 	end
 
 	local tg = time_global()
-	if tt.update_time ~= nil and tt.update_time < tg then
+	if tt.update_time and tt.update_time < tg then
 		return
 	end
-	
-	if (db.actor and db.actor:has_info("actor_made_wish_for_riches")) then
-		trade_manager[npc:id()] = nil
-		return
-	end
-	
-	if not (trade_manager[npc:id()].loaded) then 
-		return 
-	end
-	
-	if (tg + 360000 < 2147483647) then 
-		tt.update_time = tg + 360000
-	else 
-		tt.update_time = 2147483646
-	end
+	tt.update_time = tg + 120000
 
-	local str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_condition)
-	if(str=="" or str==nil) then
+	local condlist = xr_logic.parse_condlist(npc, "trader", "buy_condition", utils.cfg_get_string(tt.config, "trader", "buy_condition", npc, true, "",""))
+	local str = condlist and xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
+	if(str == nil or str == "") then
 		printf("Wrong section in buy_condition condlist for npc [%s]!", npc:name())
+		return
 	end
-	if tt.current_buy_condition ~= str then
+	
+	if tt.current_buy_condition == nil or tt.current_buy_condition ~= str then
 		--'printf("TRADE [%s]: buy condition = %s", npc:name(), str)
 		npc:buy_condition(tt.config, str)
 		tt.current_buy_condition = str
 	end
 
-	str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.sell_condition)
-	if(str=="" or str==nil) then
-		printf("Wrong section in buy_condition condlist for npc [%s]!", npc:name())
+	condlist = xr_logic.parse_condlist(npc, "trader", "sell_condition", utils.cfg_get_string(tt.config, "trader", "sell_condition", npc, true, "",""))
+	str = condlist and xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
+	if(str == nil or str == "") then
+		printf("Wrong section in sell_condition condlist for npc [%s]!", npc:name())
+		return
 	end
-	if tt.current_sell_condition ~= str then
+	if (tt.current_sell_condition == nil or tt.current_sell_condition ~= str) then
 		--printf("TRADE [%s]: sell condition = %s", npc:name(), str)
 		npc:sell_condition(tt.config, str)
 		tt.current_sell_condition = str
-	else
-		--printf("TRADE [%s]: current = %s   sell = %s", npc:name(), tostring(tt.current_sell_condition), tostring(str))
 	end
 
-	str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_item_condition_factor)
-	str = str and str ~= "" and tonumber(str)
-	if str and tt.current_buy_item_condition_factor ~= str then
+	condlist = xr_logic.parse_condlist(npc, "trader", "buy_item_condition_factor", utils.cfg_get_string(tt.config, "trader", "buy_item_condition_factor", npc, false, "", "0.7"))
+	str = condlist and xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
+	if (str == nil or str == "") then
+		printf("Wrong section in buy_item_condition_factor condlist for npc [%s]!", npc:name())
+		return 
+	end
+	str = tonumber(str)
+	if (tt.current_buy_item_condition_factor == nil or tt.current_buy_item_condition_factor ~= str) then
 		npc:buy_item_condition_factor(str)
 		tt.current_buy_item_condition_factor = str
 	end
 
-	if tt.buy_supplies == nil then
-		return
+	str = utils.cfg_get_string(tt.config, "trader", "buy_supplies", npc, true, "")
+	if not (str) then 
+		return -- no buy_supplies this is normal
 	end
 
-	str = xr_logic.pick_section_from_condlist(db.actor, npc, tt.buy_supplies)
+	condlist = xr_logic.parse_condlist(npc, "trader", "buy_supplies", str)
+	str = condlist and xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
 	if(str=="" or str==nil) then
-		printf("Wrong section in buy_condition condlist for npc [%s]!", npc:name())
+		printf("Wrong section in buy_supplies condlist for npc [%s]!", npc:name())
+		return
 	end
-	if tt.current_buy_supplies ~= str then
-		if tt.resupply_time ~= nil and tt.resupply_time < tg then
-			return
-		end
-		--'printf("TRADE [%s]: buy_supplies = %s", npc:name(), str)
+	if (tt.current_buy_supplies == nil or tt.current_buy_supplies ~= str) then
 		npc:buy_supplies(tt.config, str)
 		tt.current_buy_supplies = str
-		if (tg + 86400000 < 2147483647) then
-			tt.resupply_time = tg + 86400000
-		else 
-			tt.resupply_time = 2147483646
-		end
 	end
 end
 
@@ -126,7 +89,6 @@ function on_npc_death(npc)
 end
 
 function save_state(m_data,npc)
-	alun_utils.debug_write(strformat("trade_manager:save_state %s",npc and npc:name()))
 	if not (npc:alive()) then 
 		return 
 	end
@@ -147,21 +109,18 @@ function save_state(m_data,npc)
 	m_data.trade_manager[id].current_buy_condition = tt.current_buy_condition
 	m_data.trade_manager[id].current_sell_condition = tt.current_sell_condition
 	m_data.trade_manager[id].current_buy_supplies = tt.current_buy_supplies
-	m_data.trade_manager[id].update_time = (tt.update_time or 0) - time_global()
-	m_data.trade_manager[id].resupply_time = (tt.resupply_time or 0) - time_global()
+	m_data.trade_manager[id].resupply_time = tt.resupply_time
 end 
 
 function load_state(m_data,npc)
-	alun_utils.debug_write(strformat("trade_manager:load_state %s",npc and npc:name()))
 	local id = npc:id()
-	if not (m_data.trade_manager and m_data.trade_manager[id]) then 
+	if not (m_data.trade_manager and m_data.trade_manager[id] and m_data.trade_manager[id].cfg_ltx) then 
 		return 
 	end
 	if not (npc:alive()) then 
 		return 
 	end
-	
-	trade_manager[id] = empty_table(trade_manager[id])
+	trade_manager[id] = trade_manager[id] or {}
 	trade_manager[id].cfg_ltx = m_data.trade_manager[id].cfg_ltx
 	trade_manager[id].config = ini_file(trade_manager[id].cfg_ltx)
 	if not (trade_manager[id].config) then 
@@ -171,13 +130,18 @@ function load_state(m_data,npc)
 	trade_manager[id].current_buy_condition = m_data.trade_manager[id].current_buy_condition
 	trade_manager[id].current_sell_condition = m_data.trade_manager[id].current_sell_condition
 	trade_manager[id].current_buy_supplies = m_data.trade_manager[id].current_buy_supplies
-	trade_manager[id].update_time = m_data.trade_manager[id].update_time + time_global()
-	trade_manager[id].resupply_time = m_data.trade_manager[id].resupply_time + time_global()
+	trade_manager[id].resupply_time = m_data.trade_manager[id].resupply_time or game.get_game_time()
 	
-	npc:buy_condition(trade_manager[id].config, trade_manager[id].current_buy_condition)
-	npc:sell_condition(trade_manager[id].config, trade_manager[id].current_sell_condition)
+	if (trade_manager[id].current_buy_condition and trade_manager[id].current_sell_condition) then
+		npc:buy_condition(trade_manager[id].config, trade_manager[id].current_buy_condition)
+		npc:sell_condition(trade_manager[id].config, trade_manager[id].current_sell_condition)
 	
-	trade_manager[id].loaded = true
+		trade_manager[id].loaded = true
+	else 
+		trade_manager[id] = nil -- failed to load
+	end
+	
+	m_data.trade_manager[id] = nil
 end 
 
 
@@ -289,13 +253,16 @@ function get_buy_discount(npc_id)
 	end 
 	
 	local str = utils.cfg_get_string(trade_manager[npc_id].config, "trader", "discounts", nil, false, "", "")
-	if(str=="") then
+	if(str == nil or str=="") then
 		return 1
 	end
 
-	local sect = xr_logic.pick_section_from_condlist(db.actor, nil, xr_logic.parse_condlist(nil, "trade_manager", "discounts", str))
+	local sect = xr_logic.pick_section_from_condlist(db.actor, nil, xr_logic.parse_condlist(nil, "trader", "discounts", str))
+	if (sect == nil or sect == "") then 
+		return 1 
+	end
 	str = utils.cfg_get_number(trade_manager[npc_id].config, sect, "buy", nil, false, 1)
-		return str
+	return str
 end
 ----------- NOT TO DELETE!!!!!!!!! called from engine
 function get_sell_discount(npc_id)
@@ -309,11 +276,15 @@ function get_sell_discount(npc_id)
 	end 
 	
 	local str = utils.cfg_get_string(trade_manager[npc_id].config, "trader", "discounts", nil, false, "", "")
-	if(str=="") then
+	if(str == nil or str=="") then
 		return 1
 	end
 
 	local sect = xr_logic.pick_section_from_condlist(db.actor, nil, xr_logic.parse_condlist(npc, "trade_manager", "discounts", str))
+	if (sect == nil or sect == "") then 
+		return 1 
+	end
+	
 	str = utils.cfg_get_number(trade_manager[npc_id].config, sect, "sell", nil, false, 1)
 
 	return str

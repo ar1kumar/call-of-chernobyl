@@ -119,7 +119,7 @@ function set_volume_sound_looped(npc_id, sound, level)
 end
 
 function actor_save_state(m_data)
-	alun_utils.debug_write("actor_save_state")
+	--alun_utils.debug_write("actor_save_state")
 	m_data.xr_sound[0] = {}
 	for k,v in pairs(sound_theme.theme) do
 		v:save_state(m_data.xr_sound[0])
@@ -220,7 +220,7 @@ function actor_load(stpk)
 	set_save_marker(stpk, "load", true, "sound_actor_save")
 end
 function npc_save_state(m_data,npc)
-	alun_utils.debug_write("npc_save_state")
+	--alun_utils.debug_write("npc_save_state")
 	m_data.xr_sound[npc:id()] = {}
 	for k,v in pairs(sound_theme.theme) do
 		v:save_state(m_data.xr_sound[npc:id()])

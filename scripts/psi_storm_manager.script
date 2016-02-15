@@ -494,7 +494,7 @@ function CPsiStormManager:launch_rockets()
 end
 
 function save_state(m_data)
-	alun_utils.debug_write("PsiStormManager:save_state BEFORE")
+	--alun_utils.debug_write("PsiStormManager:save_state BEFORE")
 	m_data.PsiStormManager = {}
 	
 	local mgr = PsiStormManager
@@ -512,14 +512,14 @@ function save_state(m_data)
 		m_data.PsiStormManager.game_time_factor = mgr.game_time_factor
 	end
 	m_data.PsiStormManager._delta = mgr._delta
-	alun_utils.debug_write("PsiStormManager:save_state AFTER")
+	--alun_utils.debug_write("PsiStormManager:save_state AFTER")
 end 
 
 function load_state(m_data)
 	if not (m_data.PsiStormManager) then 
 		return
 	end
-	alun_utils.debug_write("PsiStormManager:load_state BEFORE")
+	--alun_utils.debug_write("PsiStormManager:load_state BEFORE")
 	if not (PsiStormManager) then 
 		PsiStormManager = CPsiStormManager()
 	end
@@ -540,7 +540,7 @@ function load_state(m_data)
 	mgr._delta = m_data.PsiStormManager._delta
 	mgr._state_loaded = true
 	m_data.PsiStormManager = nil 
-	alun_utils.debug_write("PsiStormManager:save_state AFTER")
+	--alun_utils.debug_write("PsiStormManager:save_state AFTER")
 end 
 
 function actor_on_save(binder,packet)

@@ -481,7 +481,7 @@ function motivator_binder:net_save_relevant()
 end
 
 function motivator_binder:save_state(m_data)
-	alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",self.object:name()))
 	
 	local id = self.object:id()
 	m_data.xr_logic[id] = {}
@@ -501,7 +501,7 @@ function motivator_binder:save_state(m_data)
 	xr_sound.npc_save_state(m_data,self.object)
 	trade_manager.save_state(m_data,self.object)
 	
-	alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",self.object:name()))
 end 
 
 function motivator_binder:load_state(m_data)
@@ -509,7 +509,7 @@ function motivator_binder:load_state(m_data)
 	if not (m_data.xr_logic and m_data.xr_logic[id]) then 
 		return 
 	end
-	alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",self.object:name()))
 	self.st.job_ini = m_data.xr_logic[id].job_ini
 	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
 	self.st.loaded_section_logic = m_data.xr_logic[id].section_logic
@@ -526,7 +526,7 @@ function motivator_binder:load_state(m_data)
 	xr_sound.npc_load_state(m_data,self.object)
 	trade_manager.load_state(m_data,self.object)
 	
-	alun_utils.debug_write(strformat("motivator_binder:load_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:load_state %s AFTER",self.object:name()))
 end 
 
 function motivator_binder:save(packet)

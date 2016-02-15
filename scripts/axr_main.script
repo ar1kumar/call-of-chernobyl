@@ -167,7 +167,7 @@ function make_callback(name,...)
 		--printf("make_callback %s",name)
 		--[[
 		if not (pcall(function(...) func(...) end)) then
-			--error(strformat("axr_main.make_callback failed %s",name))
+			error(strformat("axr_main.make_callback failed %s",name))
 		end
 		--]]
 		func(...)

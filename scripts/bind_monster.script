@@ -370,7 +370,7 @@ function generic_object_binder:net_save_relevant()
 end
 
 function generic_object_binder:save_state(m_data)
-	alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
+	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
 	
 	local id = self.object:id()
 	m_data.xr_logic[id] = {}
@@ -388,7 +388,7 @@ function generic_object_binder:save_state(m_data)
 
 	xr_logic.pstor_save_all(self.object)
 	
-	alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
 end 
 
 function generic_object_binder:load_state(m_data)
@@ -397,7 +397,7 @@ function generic_object_binder:load_state(m_data)
 		return 
 	end
 	
-	alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
+	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
 	
 	self.st.job_ini = m_data.xr_logic[id].job_ini
 	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
@@ -412,7 +412,7 @@ function generic_object_binder:load_state(m_data)
 	end
 	
 	xr_logic.pstor_load_all(self.object)
-	alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
 end
 
 function generic_object_binder:save(packet)

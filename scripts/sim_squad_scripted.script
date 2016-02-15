@@ -622,10 +622,6 @@ function sim_squad_scripted:create_npc(spawn_smart,pos,lvid,gvid)
 	local settings_id = self:section_name()
 	local spawn_sections = utils.parse_names(utils.cfg_get_string(ini, settings_id, "npc", self, false, "", ""))
 	
-	if not (SIM_PASSIVE_SQUAD_COUNT) then 
-		only_one = false 
-	end
-
 	local spawn_point, base_spawn_position, base_lvi, base_gvi, spawn_vid
 	if (spawn_smart) then 
 		spawn_point = utils.cfg_get_string(ini, settings_id, "spawn_point", self, false, "","self") or utils.cfg_get_string(spawn_smart.ini, "smart_terrain", "spawn_point", self, false,"","self")
@@ -852,27 +848,27 @@ end
 --*										SAVE\LOAD												*
 --***********************************************************************************************
 function sim_squad_scripted:save_state(m_data)
-	alun_utils.debug_write(strformat("%s:%s sim_squad_scripted:save_state BEFORE",self:name(),self.id))
+	--alun_utils.debug_write(strformat("%s:%s sim_squad_scripted:save_state BEFORE",self:name(),self.id))
 	m_data.sim_squad_scripted[self.id] = {}
 	m_data.sim_squad_scripted[self.id].name = self:name() -- debugging only
 	m_data.sim_squad_scripted[self.id].current_target_id = self.current_target_id
 	m_data.sim_squad_scripted[self.id].respawn_point_id = self.respawn_point_id
 	m_data.sim_squad_scripted[self.id].respawn_point_prop_section = self.respawn_point_prop_section
 	m_data.sim_squad_scripted[self.id].smart_id = self.smart_id
-	alun_utils.debug_write(strformat("%s:%s sim_squad_scripted:save_state AFTER",self:name(),self.id))
+	--alun_utils.debug_write(strformat("%s:%s sim_squad_scripted:save_state AFTER",self:name(),self.id))
 end 
 
 function sim_squad_scripted:load_state(m_data)
 	if not (m_data.sim_squad_scripted and m_data.sim_squad_scripted[self.id]) then 
 		return 
 	end
-	alun_utils.debug_write("sim_squad_scripted:load_state BEFORE")
+	--alun_utils.debug_write("sim_squad_scripted:load_state BEFORE")
 	self.current_target_id = m_data.sim_squad_scripted[self.id].current_target_id
 	self.respawn_point_id = m_data.sim_squad_scripted[self.id].respawn_point_id
 	self.respawn_point_prop_section = m_data.sim_squad_scripted[self.id].respawn_point_prop_section
 	self.smart_id = m_data.sim_squad_scripted[self.id].smart_id
 	m_data.sim_squad_scripted[self.id] = nil
-	alun_utils.debug_write("sim_squad_scripted:load_state AFTER")
+	--alun_utils.debug_write("sim_squad_scripted:load_state AFTER")
 end 
 
 function sim_squad_scripted:STATE_Write(packet)
