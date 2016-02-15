@@ -17,7 +17,7 @@ function generic_object_binder:__init(obj) super(obj)
 	self.loaded = false
 	
 	if (USE_MARSHAL) then 
-		RegisterScriptCallback("save_state",self.save_state,self)
+		RegisterScriptCallback("save_state",save_state,obj:id())
 	end
 end
 
@@ -349,7 +349,7 @@ function generic_object_binder:net_destroy()
 	db.storage[self.object:id()] = nil
 	
 	if (USE_MARSHAL) then
-		UnregisterScriptCallback("save_state",self)
+		UnregisterScriptCallback("save_state",self.object:id())
 	end	
 	
 	object_binder.net_destroy(self)
@@ -369,52 +369,6 @@ function generic_object_binder:net_save_relevant()
 	return true
 end
 
-function generic_object_binder:save_state(m_data)
-	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
-	
-	local id = self.object:id()
-	m_data.xr_logic[id] = {}
-	m_data.xr_logic[id].job_ini = self.st.job_ini
-	m_data.xr_logic[id].ini_filename = self.st.ini_filename
-	m_data.xr_logic[id].section_logic = self.st.section_logic
-	m_data.xr_logic[id].active_section = self.st.active_section
-	m_data.xr_logic[id].gulag_name = self.st.gulag_name
-	m_data.xr_logic[id].activation_time = (self.st.activation_time or 0) - time_global()
-	m_data.xr_logic[id].activation_game_time = self.st.activation_game_time
-
-	if self.st.active_scheme then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "save_state")
-	end
-
-	xr_logic.pstor_save_all(self.object)
-	
-	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
-end 
-
-function generic_object_binder:load_state(m_data)
-	local id = self.object:id()
-	if not (m_data.xr_logic and m_data.xr_logic[id]) then 
-		return 
-	end
-	
-	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
-	
-	self.st.job_ini = m_data.xr_logic[id].job_ini
-	self.st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
-	self.st.loaded_section_logic = m_data.xr_logic[id].section_logic
-	self.st.loaded_active_section = m_data.xr_logic[id].active_section or "nil"
-	self.st.loaded_gulag_name = m_data.xr_logic[id].gulag_name or ""
-	self.st.activation_time = m_data.xr_logic[id].activation_time and m_data.xr_logic[id].activation_time + time_global() or time_global()
-	self.st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
-
-	if self.st.active_scheme then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "load_state")
-	end
-	
-	xr_logic.pstor_load_all(self.object)
-	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
-end
-
 function generic_object_binder:save(packet)
 	set_save_marker(packet, "save", false, "generic_object_binder")
 	object_binder.save(self, packet)
@@ -432,12 +386,61 @@ function generic_object_binder:load(reader)
 	set_save_marker(reader, "load", false, "generic_object_binder")
 	object_binder.load(self, reader)
 	set_save_marker(reader, "load", true, "generic_object_binder")
-	if (USE_MARSHAL) then 
-		self:load_state(alife_storage_manager.get_state())
+	if (USE_MARSHAL) then
+		if (self.object) then -- ??
+			load_state(self.object:id(),alife_storage_manager.get_state())
+		end
 		return 
 	end
 	--alun_utils.debug_write("\n-------bind_monster load start------ "..self.object:name(),true)
 	xr_logic.load_obj(self.object, reader)
 	--alun_utils.debug_write("\n--------bind monster load END -------"..self.object:name())
 end
+-----------------------------------------------------------------------------------------------------------------
+function save_state(id,m_data)
+	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
+	local st = id and db.storage[id]
+	if not (st) then
+		return
+	end
+	m_data.xr_logic[id] = {}
+	m_data.xr_logic[id].job_ini = st.job_ini
+	m_data.xr_logic[id].ini_filename = st.ini_filename
+	m_data.xr_logic[id].section_logic = st.section_logic
+	m_data.xr_logic[id].active_section = st.active_section
+	m_data.xr_logic[id].gulag_name = st.gulag_name
+	m_data.xr_logic[id].activation_time = (st.activation_time or 0) - time_global()
+	m_data.xr_logic[id].activation_game_time = st.activation_game_time
 
+	db.storage[id].pstor = db.storage[id].pstor or {}
+	
+	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
+end 
+
+function load_state(id,m_data)
+	if not (id and m_data.xr_logic and m_data.xr_logic[id]) then 
+		return 
+	end
+	db.storage[id] = db.storage[id] or {}
+	local st = db.storage[id]	
+	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
+	st.job_ini = m_data.xr_logic[id].job_ini
+	st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
+	st.loaded_section_logic = m_data.xr_logic[id].section_logic
+	st.loaded_active_section = m_data.xr_logic[id].active_section or "nil"
+	st.loaded_gulag_name = m_data.xr_logic[id].gulag_name or ""
+	st.activation_time = m_data.xr_logic[id].activation_time and m_data.xr_logic[id].activation_time + time_global() or time_global()
+	st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
+	
+	if (m_data.pstor_all and m_data.pstor_all[id]) then 
+		db.storage[id].pstor = m_data.pstor_all[id]
+		m_data.pstor_all[id] = nil
+	end 
+
+	if (m_data.pstor_ctime and m_data.pstor_ctime[id]) then
+		db.storage[id].pstor_ctime = m_data.pstor_ctime[id]
+		m_data.pstor_ctime[id] = nil
+	end
+	
+	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
+end

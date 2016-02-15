@@ -309,7 +309,6 @@ function actor_binder:save_state(m_data)
 	m_data.actor_binder.last_detective_achievement_spawn_time = self.last_detective_achievement_spawn_time
 	m_data.actor_binder.last_mutant_hunter_achievement_spawn_time = self.last_mutant_hunter_achievement_spawn_time
 	
-	xr_logic.pstor_save_all(self.object)
 	if (sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state ~= 0 and not utils.level_changing()) then 
 		sr_psy_antenna.psy_antenna:save_state(m_data)
 	end
@@ -321,6 +320,8 @@ function actor_binder:save_state(m_data)
 	level_weathers.get_weather_manager():save_state(m_data)
 	surge_manager.save_state(m_data)
 	psi_storm_manager.save_state(m_data)
+	
+	db.storage[0].pstor = db.storage[0].pstor or {}
 	--alun_utils.debug_write(strformat("actor_binder:save_state AFTER"))
 end
 
@@ -344,7 +345,6 @@ function actor_binder:load_state(m_data)
 	self.last_detective_achievement_spawn_time = m_data.actor_binder.last_detective_achievement_spawn_time
 	self.last_mutant_hunter_achievement_spawn_time = m_data.actor_binder.last_mutant_hunter_achievement_spawn_time
 	
-	xr_logic.pstor_load_all(self.object)
 	if (sr_psy_antenna.psy_antenna) then 
 		sr_psy_antenna.psy_antenna:load_state(m_data)
 	end
@@ -357,8 +357,17 @@ function actor_binder:load_state(m_data)
 	surge_manager.load_state(m_data)
 	psi_storm_manager.load_state(m_data)
 	
-	m_data.actor_binder = nil
+	if (m_data.pstor_all and m_data.pstor_all[0]) then 
+		db.storage[0].pstor = m_data.pstor_all[0]
+		m_data.pstor_all[0] = nil
+	end 
+
+	if (m_data.pstor_ctime and m_data.pstor_ctime[0]) then
+		db.storage[0].pstor_ctime = m_data.pstor_ctime[0]
+		m_data.pstor_ctime[0] = nil
+	end
 	
+	m_data.actor_binder = nil
 	--alun_utils.debug_write(strformat("actor_binder:load_state %s AFTER",self.object:name()))
 end 
 

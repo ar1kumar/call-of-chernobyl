@@ -316,14 +316,17 @@ function act_kill_wounded:begin_kill_wounded(vo)
 			self.st.timer = tg + math.random(MinTriggerTimer,MaxTriggerTimer)
 		end
 		
-		if (hostage_list[vo:id()] == true) then 
-			if (dynamic_news_manager) then 
-				dynamic_news_manager.get_dynamic_news():KillWounded(self.object,vo,true)
-			end		
-		else 
-			if (dynamic_news_manager) then 
-				dynamic_news_manager.get_dynamic_news():KillWounded(self.object,vo)
+		if not (self.st.news_triggered) then
+			if (hostage_list[vo:id()] == true) then 
+				if (dynamic_news_manager) then 
+					dynamic_news_manager.get_dynamic_news():KillWounded(self.object,vo,true)
+				end		
+			else 
+				if (dynamic_news_manager) then 
+					dynamic_news_manager.get_dynamic_news():KillWounded(self.object,vo)
+				end
 			end
+			self.st.news_triggered = true
 		end
 	end
 end

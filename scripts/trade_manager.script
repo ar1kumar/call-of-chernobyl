@@ -12,8 +12,8 @@ end
 
 
 function update(npc)
-	if not (npc:alive()) then 
-		return 
+	if not (npc:alive()) then
+		return
 	end
 	
 	local tt = trade_manager[npc:id()]
@@ -88,12 +88,10 @@ function on_npc_death(npc)
 	end
 end
 
-function save_state(m_data,npc)
-	if not (npc:alive()) then 
-		return 
+function save_state(id,m_data)
+	if not (id) then
+		return
 	end
-	
-	local id = npc:id()
 	local tt = trade_manager[id]
 	if not (tt) then 
 		return 
@@ -112,12 +110,12 @@ function save_state(m_data,npc)
 	m_data.trade_manager[id].resupply_time = tt.resupply_time
 end 
 
-function load_state(m_data,npc)
-	local id = npc:id()
-	if not (m_data.trade_manager and m_data.trade_manager[id] and m_data.trade_manager[id].cfg_ltx) then 
+function load_state(id,m_data)
+	if not (id and m_data.trade_manager and m_data.trade_manager[id] and m_data.trade_manager[id].cfg_ltx) then 
 		return 
 	end
-	if not (npc:alive()) then 
+	local npc = db.storage[id] and db.storage[id].object
+	if not (npc and npc:alive()) then 
 		return 
 	end
 	trade_manager[id] = trade_manager[id] or {}
