@@ -53,59 +53,58 @@ function CALifeStorageManager_before_save(fname)
 	if not (USE_MARSHAL) then 
 		return 
 	end
+
+	m_data.GAME_VERSION = GAME_VERSION
+	m_data.xr_logic = {}
+	m_data.xr_sound = {}
+	m_data.trade_manager = {}
+	m_data.smart_terrains = {}
+	
+	SendScriptCallback("save_state",m_data)
+	
+	-- save pstor
+	m_data.pstor_all = {}
+	m_data.pstor_ctime = {}
+	for id,t in pairs(db.storage) do
+		if (t and type(t) == "table") then
+			if (t.pstor) then
+				if not (empty(t.pstor)) then
+					m_data.pstor_all[id] = t.pstor
+				end
+			end
+	
+			-- serialization with game.CTime.__persist
+			if (t.pstor_ctime) then
+				if not (empty(t.pstor_ctime)) then
+					m_data.pstor_ctime[id] = t.pstor_ctime
+				end
+			end
+		end
+	end
+	
+	--ProcessEventQueueState(m_data,true)
+	
+	-- clean out se_stalker table of empty tables
+	for k,v in pairs(m_data.se_stalker) do 
+		if (empty(v)) then 
+			v = nil 
+		end
+	end
+	
+	local data = marshal.encode(m_data)
+	if not (data) then 
+		return 
+	end
+		
 	local path = getFS():update_path('$game_saves$', '') .. fname:sub(0,-6):lower() .. ".scoc"
 	local savegame = io.open(path,"wb+")
-	if (savegame) then
-		m_data.GAME_VERSION = GAME_VERSION
-		m_data.smart_terrains = {}
-		m_data.xr_logic = {}
-		m_data.xr_sound = {}
-		m_data.trade_manager = {}
-		m_data.sim_squad_scripted = {}
-		
-		--alun_utils.debug_write(strformat("CALifeStorageManager_save %s GAME_VERSION=%s",savegame,m_data.GAME_VERSION))
-
-		SendScriptCallback("save_state",m_data)
-		
-		-- save pstor
-		m_data.pstor_all = {}
-		m_data.pstor_ctime = {}
-		for id,t in pairs(db.storage) do
-			if (t and type(t) == "table") then
-				if (t.pstor) then
-					if not (empty(t.pstor)) then
-						m_data.pstor_all[id] = t.pstor
-					end
-				end
-		
-				-- serialization with game.CTime.__persist
-				if (t.pstor_ctime) then
-					if not (empty(t.pstor_ctime)) then
-						m_data.pstor_ctime[id] = t.pstor_ctime
-					end
-				end
-			end
-		end
-		
-		--ProcessEventQueueState(m_data,true)
-		
-		-- clean out se_stalker table of empty tables
-		for k,v in pairs(m_data.se_stalker) do 
-			if (empty(v)) then 
-				v = nil 
-			end
-		end
-		
-		-- for debugging save state
-		--alun_utils.print_table(m_data,"m_data_on_save ("..path..")")
-		
-		local data = marshal.encode(m_data)
-		if (data) then
-			printf("axr_main: saving custom data %s",path)
-			savegame:write(data)
-		end
-		savegame:close()
-	end	
+	if not (savegame) then
+		return 
+	end
+	
+	printf("axr_main: saving custom data %s",path)
+	savegame:write(data)
+	savegame:close()
 end 
 
 -- called from engine!
@@ -132,6 +131,7 @@ function CALifeStorageManager_load(fname)
 	savegame:close()
 
 	if not (data) then
+		error("Failed to read %s",path)
 		return
 	end
 

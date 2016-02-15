@@ -147,7 +147,7 @@ local function actor_on_first_update(binder,delta)
 			local sim = alife()
 			local squad = sim:create("survival_squad_"..faction,spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0))
 			if (squad) then
-				squad:create_npc(nil,nil,spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0))
+				squad:create_npc(nil,spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0))
 				local se_obj,as
 				for k in squad:squad_members() do
 					se_obj = k.object or k.id and sim:object(k.id)

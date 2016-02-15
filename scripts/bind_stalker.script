@@ -299,6 +299,7 @@ end
 
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save_state(m_data)
+	--alun_utils.debug_write(strformat("actor_binder:save_state BEFORE"))
 	m_data.actor_binder = {}
 	m_data.actor_binder.game_difficulty = level.get_game_difficulty()
 	m_data.actor_binder.disable_input_time = self.st.disable_input_time
@@ -320,12 +321,14 @@ function actor_binder:save_state(m_data)
 	level_weathers.get_weather_manager():save_state(m_data)
 	surge_manager.save_state(m_data)
 	psi_storm_manager.save_state(m_data)
+	--alun_utils.debug_write(strformat("actor_binder:save_state AFTER"))
 end
 
 function actor_binder:load_state(m_data)
 	if not (m_data.actor_binder) then 
 		return 
 	end
+	--alun_utils.debug_write(strformat("actor_binder:load_state %s BEFORE",self.object:name()))
 	--alun_utils.debug_write("actor_binder:load_state")
 	local game_difficulty_by_num = {
 				[0] = "gd_novice",
@@ -355,6 +358,8 @@ function actor_binder:load_state(m_data)
 	psi_storm_manager.load_state(m_data)
 	
 	m_data.actor_binder = nil
+	
+	--alun_utils.debug_write(strformat("actor_binder:load_state %s AFTER",self.object:name()))
 end 
 
 function actor_binder:load(reader)

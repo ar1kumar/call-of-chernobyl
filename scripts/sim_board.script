@@ -180,7 +180,7 @@ function simulation_board:create_squad(spawn_smart, sq_id)
 	end
 
 	local squad = alife():create(squad_id,spawn_smart.position,	spawn_smart.m_level_vertex_id,spawn_smart.m_game_vertex_id)
-	squad:create_npc(spawn_smart,not get_object_story_id(squad.id))
+	squad:create_npc(spawn_smart)
 	self:assign_squad_to_smart(squad, spawn_smart.id)
 
 	local se_obj

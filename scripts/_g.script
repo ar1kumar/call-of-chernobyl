@@ -2,7 +2,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.3.04"
+GAME_VERSION = "1.3.05"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -11,9 +11,6 @@ end
 -- Improves performance if true, by disabling update methods for squads and smart terrains on levels not linked in configs\ai_tweaks\simulation_objects.ltx
 -- But this means simulation will only be active on actor level and linked levels everything else will remain in an idle state
 DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = true
-
--- Squads not on actor level are reduced to only squad leader, deleting members. This frees game_object ids and prevents packet overflow due to too many objects
-SIM_PASSIVE_SQUAD_COUNT = true
 
 -------------------------------------------------------------------------------------------------
 -- Use marshal library for saving persistent data (like xr_logic pstor)

@@ -1108,11 +1108,6 @@ end
 function pstor_save_all(obj, packet)
 	local npc_id = obj:id()
 	if (USE_MARSHAL) then
-		if not (db.storage[npc_id]) then
-			callstack()
-			printf("pstor_save_all obj %s before",obj and obj:name())
-			return
-		end
 		db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 		SendScriptCallback("on_pstor_save_all",obj,packet)
 		--printf("pstor_save_all obj %s after",obj and obj:name())
@@ -1172,9 +1167,6 @@ end
 function pstor_load_all(obj, reader)
 	local npc_id = obj:id()
 	if (USE_MARSHAL) then
-		if not (db.storage[npc_id]) then 
-			return 
-		end
 		db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 		SendScriptCallback("on_pstor_load_all",obj,reader)
 		return
@@ -1220,6 +1212,11 @@ function pstor_load_all(obj, reader)
 end
 
 function save_obj(obj, packet)
+	if not (obj) then 
+		callstack()
+		error("xr_logic:save_obj obj is nil!")
+		return
+	end
 	set_save_marker(packet, "save", false, "object "..obj:name())
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]
@@ -1248,6 +1245,11 @@ function save_obj(obj, packet)
 end
 
 function load_obj(obj, reader)
+	if not (obj) then 
+		callstack()
+		error("xr_logic:load_obj obj is nil!")	
+		return
+	end
 	set_save_marker(reader, "load", false, "object "..obj:name())
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]

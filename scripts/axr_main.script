@@ -159,12 +159,17 @@ function callback_unset(name,func_or_userdata)
 end
 
 function make_callback(name,...)
-	--printf("make_callback %s",name)
 	if not (intercepts[name]) then
 		return 
 	end
 	
 	for k,func in pairs(intercepts[name]) do
+		--printf("make_callback %s",name)
+		--[[
+		if not (pcall(function(...) func(...) end)) then
+			error(strformat("axr_main.make_callback failed %s",name))
+		end
+		--]]
 		func(...)
 	end 
 end

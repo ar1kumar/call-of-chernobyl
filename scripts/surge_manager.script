@@ -1605,6 +1605,7 @@ function actor_on_load(binder,packet)
 end
 
 function save_state(m_data)
+	--alun_utils.debug_write("SurgeManager:save_state BEFORE")
 	m_data.SurgeManager = {}
 
 	local mgr = SurgeManager
@@ -1613,12 +1614,12 @@ function save_state(m_data)
 		mgr._state_loaded = true
 	end
 	
-	m_data.SurgeManager.finished = mgr.finished
-	m_data.SurgeManager.started = mgr.started
-	m_data.SurgeManager.last_surge_time = utils.CTime_to_table(mgr.last_surge_time)
+	m_data.SurgeManager.finished = mgr.finished or true
+	m_data.SurgeManager.started = mgr.started or false
+	m_data.SurgeManager.last_surge_time = utils.CTime_to_table(mgr.last_surge_time) or game.get_game_time()
 
 	if(mgr.started) then
-		m_data.SurgeManager.inited_time = utils.CTime_to_table(mgr.inited_time)
+		m_data.SurgeManager.inited_time = utils.CTime_to_table(mgr.inited_time) or game.get_game_time()
 		--m_data.SurgeManager.levels_respawn = mgr.levels_respawn
 		m_data.SurgeManager.task_given = mgr.task_given
 		m_data.SurgeManager.effector_set = mgr.effector_set
@@ -1628,20 +1629,21 @@ function save_state(m_data)
 		m_data.SurgeManager.game_time_factor = mgr.game_time_factor
 	end
 	m_data.SurgeManager._delta = mgr._delta
+	--alun_utils.debug_write("SurgeManager:save_state AFTER")
 end 
 
 function load_state(m_data)
 	if not (m_data.SurgeManager) then 
 		return
 	end
-	
+	--alun_utils.debug_write("SurgeManager:load_state BEFORE")
 	local mgr = SurgeManager
 	mgr:initialize()
 	mgr.finished = m_data.SurgeManager.finished
 	mgr.started = m_data.SurgeManager.started
 	mgr.last_surge_time = utils.CTime_from_table(m_data.SurgeManager.last_surge_time)
 	if(mgr.started) then
-		mgr.inited_time = utils.CTime_from_table(m_data.SurgeManager.inited_time)
+		mgr.inited_time = m_data.SurgeManager.inited_time and utils.CTime_from_table(m_data.SurgeManager.inited_time) or mgr.inited_time
 
 		--[[
 		for level,value in pairs(mgr.levels_respawn) do
@@ -1651,12 +1653,12 @@ function load_state(m_data)
 		end
 		--]]
 
-		mgr.task_given = m_data.SurgeManager.task_given
-		mgr.effector_set = m_data.SurgeManager.effector_set
-		mgr.second_message_given = m_data.SurgeManager.second_message_given
-		mgr.ui_disabled = m_data.SurgeManager.ui_disabled
-		mgr.blowout_sound = m_data.SurgeManager.blowout_sound
-		mgr.game_time_factor = m_data.SurgeManager.game_time_factor
+		mgr.task_given = m_data.SurgeManager.task_given or false
+		mgr.effector_set = m_data.SurgeManager.effector_set or false
+		mgr.second_message_given = m_data.SurgeManager.second_message_given or false
+		mgr.ui_disabled = m_data.SurgeManager.ui_disabled or false
+		mgr.blowout_sound = m_data.SurgeManager.blowout_sound or false
+		mgr.game_time_factor = m_data.SurgeManager.game_time_factor or level.get_time_factor()
 		
 		mgr.blowout_waves = empty_table(mgr.blowout_waves)
 		mgr.objects_to_kill = empty_table(mgr.objects_to_kill)
@@ -1667,6 +1669,7 @@ function load_state(m_data)
 	mgr._state_loaded = true
 	
 	m_data.SurgeManager = nil
+	--alun_utils.debug_write("SurgeManager:load_state BEFORE")
 end
 
 --------------------------------------------------------------------------------

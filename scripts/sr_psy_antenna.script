@@ -211,6 +211,7 @@ function PsyAntenna:update(dt)
 end
 
 function PsyAntenna:save_state(m_data)
+	--alun_utils.debug_write("PsyAntenna:save_state BEFORE")
 	m_data.PsyAntenna = {}
 	m_data.PsyAntenna.hit_intensity = self.hit_intensity
 	m_data.PsyAntenna.sound_intensity = self.sound_intensity
@@ -221,21 +222,24 @@ function PsyAntenna:save_state(m_data)
 	m_data.PsyAntenna.hit_type = self.hit_type
 	m_data.PsyAntenna.hit_freq = self.hit_freq
 	m_data.PsyAntenna.postprocess = self.postprocess
+	--alun_utils.debug_write("PsyAntenna:save_state AFTER")
 end 
 
 function PsyAntenna:load_state(m_data)
 	if not (m_data.PsyAntenna) then 
 		return 
 	end
-	self.hit_intensity = m_data.PsyAntenna.hit_intensity
-	self.sound_intensity = m_data.PsyAntenna.sound_intensity
-	self.sound_intensity_base = m_data.PsyAntenna.sound_intensity_base
-	self.mute_sound_threshold = m_data.PsyAntenna.mute_sound_threshold
-	self.no_static = m_data.PsyAntenna.no_static
-	self.no_mumble = m_data.PsyAntenna.no_mumble
-	self.hit_type = m_data.PsyAntenna.hit_type
-	self.hit_freq = m_data.PsyAntenna.hit_freq
-	self.postprocess = m_data.PsyAntenna.postprocess
+	--alun_utils.debug_write("PsyAntenna:load_state BEFORE")
+	self.hit_intensity = m_data.PsyAntenna.hit_intensity or 0
+	self.sound_intensity = m_data.PsyAntenna.sound_intensity or 0
+	self.sound_intensity_base = m_data.PsyAntenna.sound_intensity_base or 0
+	self.mute_sound_threshold = m_data.PsyAntenna.mute_sound_threshold or 0
+	self.no_static = m_data.PsyAntenna.no_static or false
+	self.no_mumble = m_data.PsyAntenna.no_mumble or false
+	self.hit_type = m_data.PsyAntenna.hit_type or "wound"
+	self.hit_freq = m_data.PsyAntenna.hit_freq or 5000
+	self.postprocess = m_data.PsyAntenna.postprocess or 0
+	--alun_utils.debug_write("PsyAntenna:load_state AFTER")
 end 
 
 function PsyAntenna:save(p)

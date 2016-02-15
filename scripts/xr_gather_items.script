@@ -60,7 +60,9 @@ local function npc_on_item_take(npc,item)
 end
 
 local function actor_on_item_take(item)
-	Items[item:id()] = nil
+	if (Items and item) then
+		Items[item:id()] = nil
+	end
 end
 
 local function get_best_detector(npc)

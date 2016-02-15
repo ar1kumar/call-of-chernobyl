@@ -172,12 +172,12 @@ function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name,
 			return char_ini:r_string(section, field)
 		end
 	end
-	if not mandatory then
-		return default_val
-	end
-	local err = "'Attempt to read a non-existant string field '" ..
-		field .. "' in section '" .. section .. "'";
+	--if not mandatory then
+	--	return default_val
+	--end
+	--local err = "'Attempt to read a non-existant string field '" .. field .. "' in section '" .. section .. "'";
 	--printf("%s", err)
+	return default_val
 end
 
 function cfg_get_number(char_ini, section, field, object, mandatory, default_val)
