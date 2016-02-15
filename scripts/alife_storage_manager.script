@@ -50,15 +50,15 @@ function CALifeStorageManager_before_save(fname)
 			sim:release(se_obj,true)
 		end
 	end
+end 
+
+-- called from engine!
+function CALifeStorageManager_save(fname)
 	if not (USE_MARSHAL) then 
 		return 
 	end
 
 	m_data.GAME_VERSION = GAME_VERSION
-	m_data.xr_logic = {}
-	m_data.xr_sound = {}
-	m_data.trade_manager = {}
-	m_data.smart_terrains = {}
 	
 	SendScriptCallback("save_state",m_data)
 	
@@ -105,11 +105,6 @@ function CALifeStorageManager_before_save(fname)
 	printf("axr_main: saving custom data %s",path)
 	savegame:write(data)
 	savegame:close()
-end 
-
--- called from engine!
-function CALifeStorageManager_save(fname)
-
 end 
 
 -- called from engine

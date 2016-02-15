@@ -23,10 +23,6 @@ function actor_binder:__init (obj) super(obj)
 	
 	self.weather_manager = level_weathers.get_weather_manager()
 	--alun_utils.debug_write("actor init end")
-	
-	if (USE_MARSHAL) then
-		RegisterScriptCallback("save_state",self.save_state,self)
-	end
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -122,10 +118,6 @@ function actor_binder:net_destroy()
 	end
 	
 	bind_stalker_ext.actor_on_net_destroy(self)
-	
-	if (USE_MARSHAL) then
-		UnregisterScriptCallback("save_state",self)
-	end
 
 	object_binder.net_destroy(self)
 	
@@ -262,6 +254,7 @@ function actor_binder:save(packet)
 			alun_utils.save_var(db.actor,"heli_enemy_flag",false)
 			SendScriptCallback("on_level_changing")
 		end
+		self:save_state(alife_storage_manager.get_state())
 		return
 	end
 	--alun_utils.debug_write("--------------- actor_binder:save -------- Start")
@@ -295,6 +288,62 @@ function actor_binder:save(packet)
 	bind_stalker_ext.actor_on_save(self,packet)
 
 	--alun_utils.debug_write("--------------- actor_binder:save -------- End")
+end
+
+function actor_binder:load(reader)
+	set_save_marker(reader, "load", false, "actor_binder")
+	object_binder.load(self, reader)
+	set_save_marker(reader, "load", true, "actor_binder")
+	if (USE_MARSHAL) then
+		self:load_state(alife_storage_manager.get_state())
+		bind_stalker_ext.actor_on_load(self,reader)
+		return
+	end
+	--alun_utils.debug_write("actor_binder:load start")
+
+	local game_difficulty_by_num = {
+				[0] = "gd_novice",
+				[1] = "gd_stalker",
+				[2] = "gd_veteran",
+				[3] = "gd_master"
+				}
+	local dif = game_difficulty_by_num[reader:r_u8()]
+	if not (dif) then
+		abort("actor_binder:load save corrupted!")
+		return 
+	end
+	get_console():execute("g_game_difficulty "..dif)
+	self.st.disable_input_time = utils.r_CTime(reader,"bind_stalker")
+
+	xr_logic.pstor_load_all(self.object, reader)
+	self.weather_manager:load(reader)
+
+	sr_psy_antenna.load(reader)
+	SIMBOARD.simulation_started = reader:r_bool()
+
+	xr_sound.actor_load(reader)
+	--[[
+	local n = reader:r_stringZ()
+	if(n~="nil") then
+		self.last_level_name = n
+	end
+	--]]
+	xr_statistic.load(reader)
+	treasure_manager.get_treasure_manager():load(reader)
+	task_manager.get_task_manager():load(reader)
+
+	self.loaded_active_slot = reader:r_u8()
+
+	local stored_achievement_time = reader:r_bool()
+	if stored_achievement_time == true then
+		self.last_detective_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
+	end
+	stored_achievement_time = reader:r_bool()
+	if stored_achievement_time == true then
+		self.last_mutant_hunter_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
+	end
+
+	--alun_utils.debug_write("actor_binder:load end")
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -371,58 +420,3 @@ function actor_binder:load_state(m_data)
 	--alun_utils.debug_write(strformat("actor_binder:load_state %s AFTER",self.object:name()))
 end 
 
-function actor_binder:load(reader)
-	set_save_marker(reader, "load", false, "actor_binder")
-	object_binder.load(self, reader)
-	set_save_marker(reader, "load", true, "actor_binder")
-	if (USE_MARSHAL) then
-		self:load_state(alife_storage_manager.get_state())
-		bind_stalker_ext.actor_on_load(self,reader)
-		return
-	end
-	--alun_utils.debug_write("actor_binder:load start")
-
-	local game_difficulty_by_num = {
-				[0] = "gd_novice",
-				[1] = "gd_stalker",
-				[2] = "gd_veteran",
-				[3] = "gd_master"
-				}
-	local dif = game_difficulty_by_num[reader:r_u8()]
-	if not (dif) then
-		abort("actor_binder:load save corrupted!")
-		return 
-	end
-	get_console():execute("g_game_difficulty "..dif)
-	self.st.disable_input_time = utils.r_CTime(reader,"bind_stalker")
-
-	xr_logic.pstor_load_all(self.object, reader)
-	self.weather_manager:load(reader)
-
-	sr_psy_antenna.load(reader)
-	SIMBOARD.simulation_started = reader:r_bool()
-
-	xr_sound.actor_load(reader)
-	--[[
-	local n = reader:r_stringZ()
-	if(n~="nil") then
-		self.last_level_name = n
-	end
-	--]]
-	xr_statistic.load(reader)
-	treasure_manager.get_treasure_manager():load(reader)
-	task_manager.get_task_manager():load(reader)
-
-	self.loaded_active_slot = reader:r_u8()
-
-	local stored_achievement_time = reader:r_bool()
-	if stored_achievement_time == true then
-		self.last_detective_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
-	end
-	stored_achievement_time = reader:r_bool()
-	if stored_achievement_time == true then
-		self.last_mutant_hunter_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
-	end
-
-	--alun_utils.debug_write("actor_binder:load end")
-end

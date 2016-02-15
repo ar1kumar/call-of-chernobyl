@@ -3,9 +3,6 @@ function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
 	self.opened_doors = {}
 	self.first_update = false
-	if (USE_MARSHAL) then 
-		RegisterScriptCallback("save_state",save_state,obj:id())
-	end
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
@@ -234,10 +231,6 @@ function motivator_binder:net_destroy()
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
 	
-	if (USE_MARSHAL) then
-		UnregisterScriptCallback("save_state",self.object:id())
-	end
-
 	object_binder.net_destroy(self)
 end
 
@@ -485,7 +478,10 @@ function motivator_binder:save(packet)
 	object_binder.save(self, packet)
 	set_save_marker(packet, "save", true, "motivator_binder")
 	
-	if (USE_MARSHAL) then 
+	if (USE_MARSHAL) then
+		if (self.object) then
+			save_state(self.object:id(),alife_storage_manager.get_state())
+		end
 		return 
 	end
 	
@@ -545,6 +541,9 @@ function save_state(id,m_data)
 	local st = id and db.storage[id]
 	if not (st) then 
 		return
+	end
+	if not (m_data.xr_logic) then 
+		m_data.xr_logic = {}
 	end
 	m_data.xr_logic[id] = {}
 	m_data.xr_logic[id].job_ini = st.job_ini
