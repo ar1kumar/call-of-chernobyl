@@ -4,7 +4,7 @@
 --------------------------------------------------------------------------------------------------]]
 
 used_level_vertex_ids = {}
-OnlineStalkers		= nil
+OnlineStalkers		= {}
 campfire_by_name	= nil
 campfire_table_by_smart_names = {}
 zone_by_name        = {}
@@ -119,9 +119,6 @@ function del_anim_obj(anim_obj)
 end
 
 function add_stalker(npc)
-	if not (db.OnlineStalkers) then
-		db.OnlineStalkers = {}
-	end
 	for i=#db.OnlineStalkers,1,-1 do
 		if (npc:id() == db.OnlineStalkers[i]) then
 			return
