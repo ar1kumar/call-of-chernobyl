@@ -255,7 +255,7 @@ function TeleportSquad(squad,pos,lvid,gvid)
 end 
 
 function IsSurvivalMode()
-	return axr_main.config:GetValue("temp","new_game_survival_mode",1) == true or alife_storage_manager.get_state().enable_survival_mode == true
+	return axr_main.config and axr_main.config:GetValue("temp","new_game_survival_mode",1) == true or alife_storage_manager.get_state().enable_survival_mode == true
 end
 --------------------------------------------------------------------
 -- Serialization of userdata for Marshal Library
