@@ -5,6 +5,24 @@ Copyright (C) 2015 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
 
+--[[
+IMPORTANT: If your addon makes changes to character_desc_general.xml, instead of altering the original, create a new one
+and link it in system.ltx. Then in a new script reference ui_mm_faction_select.ACTOR_PROFILES in an on_game_start method
+if your new character_desc_general changes any of the starting actor faction profiles, like what AO3 and STCoP does.
+
+example:
+	system.ltx under [profiles] section
+		replace: character_desc_general with character_desc_general_example
+
+	Then create a new script and add:
+		function on_game_start()
+			ui_mm_faction_select.ACTOR_PROFILES = "character_desc_general_example.xml"
+		end
+
+This way you will avoid conflicts with players updating CoC
+--]]
+ACTOR_PROFILES = "character_desc_general.xml"
+
 ------------------
 -- on_game_load()
 ------------------
@@ -85,7 +103,7 @@ local function on_game_load()
 		-- set default goodwill for all factions vs. actor's new faction
 		game_relations.set_community_goodwill_for_faction("actor_"..faction)
 		
-		local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\character_desc_general.xml")
+		local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\".. ACTOR_PROFILES)
 		_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
 		if (_xml) then
 			local supplies = alun_utils.XmlGetNodeValue(_xml,"supplies")
@@ -405,7 +423,7 @@ function faction_ui:OnFactionSelect(faction)
 	
 	desc = desc .. "\\n \\n"
 	
-	local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\character_desc_general.xml")
+	local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\".. ACTOR_PROFILES)
 	_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
 	if (_xml) then
 	
