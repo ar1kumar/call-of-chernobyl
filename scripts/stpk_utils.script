@@ -117,10 +117,10 @@ function get_object_data(sobj)
 
 		["S_EXPLO"]  = this.get_item_data,
 
-		--["AMMO_S"]   = "cse_alife_item_ammo",
-		--["S_OG7B"]   = "cse_alife_item_ammo",
-		--["S_VOG25"]  = "cse_alife_item_ammo",
-		--["S_M209"]   = "cse_alife_item_ammo",
+		["AMMO_S"]   = this.get_ammo_data,
+		["S_OG7B"]   = this.get_ammo_data,
+		["S_VOG25"]  = this.get_ammo_data,
+		["S_M209"]   = this.get_ammo_data,
 
 		["G_F1_S"]   = this.get_item_data,
 		["G_RGD5_S"] = this.get_item_data,
@@ -255,10 +255,10 @@ function set_object_data(t,sobj)
 
 		["S_EXPLO"]  = this.set_item_data,
 
-		--["AMMO_S"]   = "cse_alife_item_ammo",
-		--["S_OG7B"]   = "cse_alife_item_ammo",
-		--["S_VOG25"]  = "cse_alife_item_ammo",
-		--["S_M209"]   = "cse_alife_item_ammo",
+		["AMMO_S"]   = this.set_ammo_data,
+		["S_OG7B"]   = this.set_ammo_data,
+		["S_VOG25"]  = this.set_ammo_data,
+		["S_M209"]   = this.set_ammo_data,
 
 		["G_F1_S"]   = this.set_item_data,
 		["G_RGD5_S"] = this.set_item_data,
@@ -435,6 +435,35 @@ function set_item_data(t,sobj)
 	end
 end
 
+function get_ammo_data(sobj)
+	if not sobj then
+		return
+	end
+	stpk:w_begin(0)
+	sobj:STATE_Write(stpk)
+	stpk:r_seek(2)
+
+	local t = {}
+	stpk_utils.parse_cse_alife_object_properties_packet(t,stpk)
+	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
+	stpk_utils.parse_cse_alife_item_properties_packet(t,stpk)
+	t.ammo_left = stpk:r_u16()
+	return t
+end
+
+function set_ammo_data(t,sobj)
+	if sobj then
+		stpk:w_begin(0)
+		stpk_utils.fill_cse_alife_object_properties_packet(t,stpk)
+		stpk_utils.fill_cse_visual_properties_packet(t,stpk)
+		stpk_utils.fill_cse_alife_item_properties_packet(t,stpk)
+		stpk:w_u16(t.ammo_left)
+		local size = stpk:w_tell()
+		stpk:r_seek(2)
+		
+		sobj:STATE_Read(stpk,size)
+	end
+end
 
 function get_inv_box_data(sobj)
 	if not sobj then
