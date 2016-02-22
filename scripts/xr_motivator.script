@@ -357,7 +357,8 @@ end
 function motivator_binder:use_callback(obj, who)
 	--alun_utils.debug_write(strformat("motivator_binder:use_callback %s",obj and obj:name()))
 	if not obj:alive() then
-		return
+lootmoney.lootmoney(self.object)
+		--return
 	end
 	inventory_upgrades.need_victim(obj)
 	xr_meet.notify_on_use(obj, who)
