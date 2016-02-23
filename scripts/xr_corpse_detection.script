@@ -212,9 +212,7 @@ function get_all_from_corpse(npc)
 	end
 
 	corpse_npc:iterate_inventory(get_item,corpse_npc)
-if lootmoney then
-		lootmoney.lootmoney_effect(npc, corpse_npc)
-	end
+
 	if items_value >= 100 then
 		xr_sound.set_sound_play(id,"corpse_loot_good")
 	elseif items_value > 0 and math.random() < 0.5 then
