@@ -1801,22 +1801,38 @@ end
 
 -- cse_alife_item_weapon_properties
 function parse_cse_alife_item_weapon_properties_packet(ret,stpk)
+	--[[
 	ret.ammo_current = stpk:r_u16()
 	ret.ammo_elapsed = stpk:r_u16()
 	ret.weapon_state = stpk:r_u8()
 	ret.addon_flags = stpk:r_u8()
 	ret.ammo_type = stpk:r_u8()
 	ret.xz1 = stpk:r_u8()
+	--]]
+	ret.ammo_elapsed = stpk:r_u32()
+	ret.scope = stpk:r_u8()
+	ret.addon_flags = stpk:r_u8()
+	ret.ammo_type = stpk:r_u8()
+	ret.zoomed = stpk:r_bool()
+	ret.remember_nv_status = stpk:r_bool()
 	return ret
 end
 
 function fill_cse_alife_item_weapon_properties_packet(ret,stpk)
+	--[[
 	stpk:w_u16(ret.ammo_current)
 	stpk:w_u16(ret.ammo_elapsed)
 	stpk:w_u8(ret.weapon_state)
 	stpk:w_u8(ret.addon_flags)
 	stpk:w_u8(ret.ammo_type)
 	stpk:w_u8(ret.xz1)
+	--]]
+	stpk:w_u32(ret.ammo_elapsed)
+	stpk:w_u8(ret.scope)
+	stpk:w_u8(ret.addon_flags)
+	stpk:w_u8(ret.ammo_type)
+	stpk:w_bool(ret.zoomed)
+	stpk:w_bool(ret.remember_nv_status)
 	return ret
 end
 
