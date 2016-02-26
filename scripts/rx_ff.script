@@ -57,16 +57,20 @@ function evaluator_dont_shoot:check_in_los(friend,be,be_pos)
 		
 		local be_dist = pos:distance_to(be_pos)
 		local friend_dist = pos:distance_to(friend_pos)
+		
+		if (friend_dist <= 2.1) then 
+			return true 
+		end
+			
 		local dir_aim = vector():sub(be_pos,pos):normalize()
-
-		--if (friend_dist < be_dist) then
-			local dir_friend = vector():sub(friend_pos,pos):normalize()
-			local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
-			local mywho = friend_dist <= 2.1 or vec_who:similar(vec_be,1) --friend_dist < 1.6 and vec_who:similar(vec_be,0) or vec_who:similar(vec_be,1)
-			if (mywho == 1) then
-				return true
-			end
-		--end
+		local dir_friend = vector():sub(friend_pos,pos):normalize()
+		local vec_be,vec_who = vector():set(dir_aim):set_length(friend_dist),dir_friend:set_length(friend_dist)
+		if (vec_who:similar(vec_be,0) == 1) then 
+			return true 
+		end
+		if (vec_who:similar(vec_be,1) == 1) then 
+			return true 
+		end
 	end
 end 
 
