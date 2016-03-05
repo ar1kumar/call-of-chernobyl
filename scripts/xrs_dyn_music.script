@@ -31,8 +31,6 @@ local was_in_silence = false
 function on_game_start()
 	RegisterScriptCallback("actor_on_update",on_actor_update)
 	RegisterScriptCallback("on_game_end",on_actor_destroy)
-	RegisterScriptCallback("main_menu_on_init",main_menu_on)
-	RegisterScriptCallback("main_menu_on_quit",main_menu_off)
 end
 
 function initialize_themes()
@@ -75,8 +73,9 @@ function on_actor_destroy()
 	get_console():execute("snd_volume_music "..ambient_vol)
 end
 
-function main_menu_on()
+function main_menu_on_init()
 	get_console():execute("snd_volume_music "..ambient_vol)
+	RegisterScriptCallback("main_menu_on_quit",main_menu_off)
 end
 
 function main_menu_off()
