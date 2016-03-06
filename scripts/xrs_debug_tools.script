@@ -1485,12 +1485,10 @@ function weapon_hud_show(hud)
 			hud:add_msg("Visual Flag",data.visual_flags)
 			hud:add_msg("Condition",data.condition and math.floor(data.condition*100))
 			hud:add_msg("Upgrades",table.concat(data.upgrades,","))
-			hud:add_msg("Weapon State",data.weapon_state)
-			hud:add_msg("AmmoCurrent",data.ammo_current)
-			hud:add_msg("AmmoClip",data.ammo_elapsed)
+			hud:add_msg("Scope",data.scope)
 			hud:add_msg("AddonFlag",data.addon_flags)
 			hud:add_msg("AmmoType",data.ammo_type)
-			hud:add_msg("XZ1",data.xz1)
+			hud:add_msg("NV Status",data.remember_nv_status)
 		end
 		
 		local states = {
@@ -1507,6 +1505,10 @@ function weapon_hud_show(hud)
         eSwitch				--= 10
 		}
 		hud:add_msg("State",strformat("%s (%s)",states[wpn:get_state()],wpn:get_state()))
+		hud:add_msg("SubState",wpn:get_weapon_substate())
+		hud:add_msg("AmmoCountTotal",wpn:get_ammo_count_for_type(0))
+		hud:add_msg("MainWeaponType",wpn:get_main_weapon_type())
+		hud:add_msg("WeaponType",wpn:get_weapon_type())
 	end
 
 	hud:set_header("-[Weapon Info]-")
