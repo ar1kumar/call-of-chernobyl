@@ -331,7 +331,7 @@ function interpret_spawn_data(sections)
 		if (dynamic_story_id[sec] == nil and secret_stashes[sec] == nil) then
 			t = alun_utils.collect_section(ini,sec,true)
 
-			enable = ini:r_string_ex(sec,"enable") or true
+			enable = ini:r_string_ex(sec,"enable") or "true"
 			enable = xr_logic.pick_section_from_condlist(db.actor,db.actor,xr_logic.parse_condlist(db.actor,"enable",sec,enable))
 
 			on_info = ini:r_string_ex(sec,"on_info") or "true"
