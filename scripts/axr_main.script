@@ -258,44 +258,9 @@ end
 -- main_menu_on_init()
 ------------------
 function main_menu_on_init(menu)
-	math.randomseed(os.time())
-	
-	local ignore = { 
-		["_g.script"] = true,
-		["ce_new_attachable_item.script"] = true,
-		["ce_new_game_dm.script"] = true,
-		["sim_faction_brain_human.script"] = true,
-		["sim_faction_brain_mutant.script"] = true,
-		["ce_switcher.script"] = true,
-		["axr_main.script"] = true,
-		["lua_help.script"] = true,
-		["rx_gl.script"] = true
-	}
-	local t = {}
-	local f	= getFS()
-	local flist = f:file_list_open_ex("$game_scripts$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*.script")
-	local f_cnt = flist:Size()
-	for	it=0, f_cnt-1 do
-		local file = flist:GetAt(it)
-		local file_name = file:NameShort()
-		if not (ignore[file_name]) then
-			file_name = file_name:sub(0,file_name:len()-7)
-			if (_G[file_name] and _G[file_name].main_menu_on_init) then
-				table.insert(t,file_name) -- load all scripts first
-			end
-		end
-	end
-	for i=1,#t do
-		printf("%s main_menu_on_init",t[i])
-		_G[t[i]].main_menu_on_init(menu)
-	end
-	
-	--axr_main_options.main_menu_on_init(menu)
-	-- THIS IS HERE BECAUSE ON_GAME_START is only triggered when alife simulator starts. We need this here to use icon editor
-	if (DEV_DEBUG) then
-		if (xrs_debug_tools) then xrs_debug_tools.on_game_start() end
-	end 
-	--closecaption.main_menu_on_init(menu)
+	xrs_dyn_music.main_menu_on(menu)
+	closecaption.main_menu_on_init(menu)
+	axr_main_options.main_menu_on_init(menu)
 end
 
 ------------------
@@ -303,6 +268,7 @@ end
 ------------------
 function main_menu_on_quit(menu)
 	closecaption.main_menu_on_quit(menu)
+	xrs_dyn_music.main_menu_off(menu)
 end
 
 ------------------
