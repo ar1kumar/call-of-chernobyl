@@ -7,19 +7,7 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 
 --[[
 IMPORTANT: If your addon makes changes to character_desc_general.xml, instead of altering the original, create a new one
-and link it in system.ltx. Then in a new script reference ui_mm_faction_select.ACTOR_PROFILES in an on_game_start method
-if your new character_desc_general changes any of the starting actor faction profiles, like what AO3 and STCoP does.
-
-example:
-	system.ltx under [profiles] section
-		replace: character_desc_general with character_desc_general_example
-
-	Then create a new script and add:
-		function main_menu_on_init()
-			ui_mm_faction_select.ACTOR_PROFILES = "character_desc_general_example.xml"
-		end
-
-This way you will avoid conflicts with players updating CoC
+and link it in system.ltx. Then change ACTOR_PROFILES below:
 --]]
 ACTOR_PROFILES = "character_desc_general.xml"
 
@@ -181,10 +169,6 @@ local function actor_on_first_update(binder,delta)
 			end
 		end
 		ChangeLevel(spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0),vector():set(0,0,0))
-	end
-	-- AO3 hotfix for missing addon tool
-	if (system_ini():section_exist("addons_box") and not db.actor:object("addons_box")) then
-		alife():create("addons_box",db.actor:position(),0,0,0)
 	end
 end 
 
