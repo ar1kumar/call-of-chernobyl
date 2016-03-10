@@ -241,6 +241,7 @@ end
 function text_trade_npc_pda(a,b)
 	local npc = who_is_npc(a, b)
 
+	local count = 0
 	local common = {}
 	local uncommon = {}
 	local rare = {}
@@ -250,16 +251,23 @@ function text_trade_npc_pda(a,b)
 		if (sec == "itm_pda_common") then
 			table.insert(common,itm)
 			actor:transfer_item(itm,npc)
+			count = count + 1
 		elseif (sec == "itm_pda_uncommon") then
 			table.insert(uncommon,itm)
 			actor:transfer_item(itm,npc)
+			count = count + 1
 		elseif (sec == "itm_pda_rare") then
 			table.insert(rare,itm)
 			actor:transfer_item(itm,npc)
+			count = count + 1
 		end
 	end
 
 	db.actor:iterate_inventory(itr,db.actor)
+	
+	if (count > 49) then
+		db.actor:give_info_portion("actor_information_dealer_trigger")
+	end
 
 	local npc_text = ""
 
@@ -348,6 +356,11 @@ function text_trade_npc_pda(a,b)
 		end
 	end
 
+	local bonus = (total_value / 10)
+	if (has_alife_info("actor_information_dealer")) then
+		total_value = total_value + bonus
+	end
+	
 	relocate_money(npc, total_value, "in")
 
 	if (pda_bonus_coords > 0 and coc_treasure_manager) then
