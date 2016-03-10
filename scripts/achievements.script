@@ -29,19 +29,19 @@ function marked_by_zone_functor()
 	return false
 end
 
--- Off the Radar
-function off_the_radar_functor()
+-- Duga Free
+function duga_free_functor()
 	if not (db.actor) then
 		return false
 	end
-	if has_alife_info("actor_off_the_radar") then
+	if has_alife_info("actor_duga_free") then
 		return true
 	end
 	if (has_alife_info("yan_labx16_switcher_primary_off") and has_alife_info("bar_deactivate_radar_done")) then
-		db.actor:give_info_portion("actor_off_the_radar")
-		news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "off_the_radar", nil, nil)
+		db.actor:give_info_portion("actor_duga_free")
+		news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
 	end
-	return has_alife_info("actor_off_the_radar")
+	return has_alife_info("actor_duga_free")
 end
 
 -- Wealthy Client
