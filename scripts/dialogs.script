@@ -266,7 +266,7 @@ function text_trade_npc_pda(a,b)
 	db.actor:iterate_inventory(itr,db.actor)
 	
 	if (count > 49) then
-		db.actor:give_info_portion("actor_information_dealer_trigger")
+		db.actor:give_info_portion("actor_infopreneur_trigger")
 	end
 
 	local npc_text = ""
@@ -356,8 +356,8 @@ function text_trade_npc_pda(a,b)
 		end
 	end
 
-	local bonus = (total_value / 10)
-	if (has_alife_info("actor_information_dealer")) then
+	local bonus = (total_value / 20)
+	if (has_alife_info("actor_infopreneur")) then
 		total_value = total_value + bonus
 	end
 	
