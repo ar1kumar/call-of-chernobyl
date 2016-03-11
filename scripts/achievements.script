@@ -63,7 +63,7 @@ function radiotherapy_functor()
 	if has_alife_info("actor_radiotherapy") or (character_community(db.actor) == "actor_monolith") then 
 		return true 
 	end
-	if xr_statistic.actor_statistic.surges >= 10 then
+	if xr_statistic.actor_statistic.surges >= 25 then
 		db.actor:give_info_portion("actor_radiotherapy")
 		news_manager.send_tip(db.actor, "st_achievement_2_unlock", nil, "radiotherapy", nil, nil)
 	end
