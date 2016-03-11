@@ -492,7 +492,7 @@ function loot_mutant(obj,cls,t,npc)
 				if (math.random() <= tonumber(loot[3])) then
 					--printf("loot_mutant: section=%s",loot[1])
 					local se_obj = alife():create(loot[1],npc and npc:position() or db.actor:position(),0,0,npc and npc:id() or 0)
-					if(math.random() <= 0.1) then
+					if(has_alife_info("actor_well_dressed") and (math.random() <= 0.1)) then
 						--printf("bonus loot")
 						alife():create(loot[1],npc and npc:position() or db.actor:position(),0,0,npc and npc:id() or 0)
 					end
