@@ -6,6 +6,11 @@ function information_dealer_functor()
 	if has_alife_info("actor_information_dealer") then
 		return true
 	end
+	if (has_alife_info("actor_information_dealer_trigger")) then
+		db.actor:give_info_portion("actor_information_dealer")
+		news_manager.send_tip(db.actor, "st_achievement_3_unlock", nil, "information_dealer", nil, nil)
+	end
+	return has_alife_info("actor_information_dealer")
 end
 
 -- Marked by the Zone
@@ -39,7 +44,7 @@ function duga_free_functor()
 	end
 	if (has_alife_info("yan_labx16_switcher_primary_off") and has_alife_info("bar_deactivate_radar_done")) then
 		db.actor:give_info_portion("actor_duga_free")
-		news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
+		news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "pioneer", nil, nil)
 	end
 	return has_alife_info("actor_duga_free")
 end
@@ -54,4 +59,19 @@ function wealthy_functor()
 		news_manager.send_tip(db.actor, "st_achievement_1_unlock", nil, "wealthy", nil, nil)
 	end
 	return has_alife_info("actor_wealthy")
+end
+
+-- Well Dressed
+function well_dressed_functor()
+	if not (db.actor) then
+		return false
+	end
+	if (has_alife_info("actor_well_dressed")) then
+		return true
+	end
+	if (xr_statistic.actor_statistic.killed_monsters >= 500) then
+		db.actor:give_info_portion("actor_well_dressed")
+		news_manager.send_tip(db.actor, "st_achievement_5_unlock", nil, "mutant_hunter", nil, nil)
+	end
+	return has_alife_info("actor_well_dressed")
 end
