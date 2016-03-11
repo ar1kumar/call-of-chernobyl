@@ -484,6 +484,9 @@ function surrender_victim_answers_1(a,b)
 
 		if (coc_treasure_manager) then
 			coc_treasure_manager.create_random_stash(nil,npc:character_name().."'s stash")
+			if (has_alife_info("actor_lead_tongue") and (math.random() <= 0.1)) then
+				coc_treasure_manager.create_random_stash(nil,npc:character_name().."'s stash")
+			end
 		else
 			axr_dynamic_spawn.random_secret()
 		end
