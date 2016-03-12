@@ -94,6 +94,21 @@ function silver_or_lead_functor()
 	return has_alife_info("achieved_silver_or_lead")
 end
 
+-- Tourist
+function tourist_functor()
+	if not (db.actor) then
+		return false
+	end
+	if (has_alife_info("achieved_tourist")) then
+		return true
+	end
+	if (xr_statistic.actor_visited_all_levels()) then
+		db.actor:give_info_portion("achieved_tourist")
+		news_manager.send_tip(db.actor, "st_achievement_8_unlock", nil, "tourist", nil, nil)
+	end
+	return has_alife_info("achieved_tourist")
+end
+
 -- Well Dressed
 function well_dressed_functor()
 	if not (db.actor) then
