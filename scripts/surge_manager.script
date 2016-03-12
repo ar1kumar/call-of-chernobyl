@@ -831,7 +831,7 @@ function CSurgeManager:update()
 							else
 								if(xr_logic.pick_section_from_condlist(db.actor, nil, self.survive)~="true" and not character_community(db.actor) == "actor_monolith") then
 									if (atmosfear == nil) or not(atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_god_mode",1,false)) then
-										if not (get_console():get_bool("g_god") or has_alife_info("actor_radiotherapy")) then 
+										if not (get_console():get_bool("g_god") or has_alife_info("achieved_radiotherapy")) then 
 											self:kill_actor_at_pos(wave_pos.z)
 										end
 									end
@@ -1424,7 +1424,7 @@ function CSurgeManager:kill_all_unhided()
 	
 	local chance = math.random()
 	printf(chance)
-	if (get_console():get_bool("g_god") or character_community(db.actor) == "actor_monolith") or (has_alife_info("actor_radiotherapy") and chance < 0.33) then 
+	if (get_console():get_bool("g_god") or character_community(db.actor) == "actor_monolith") or (has_alife_info("achieved_radiotherapy") and chance < 0.33) then 
 		return 
 	end
 	
