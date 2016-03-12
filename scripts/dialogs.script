@@ -266,7 +266,7 @@ function text_trade_npc_pda(a,b)
 	db.actor:iterate_inventory(itr,db.actor)
 	
 	if (count >= 25) then
-		db.actor:give_info_portion("actor_infopreneur_trigger")
+		db.actor:give_info_portion("achieved_infopreneur_trigger")
 	end
 
 	local npc_text = ""
@@ -357,7 +357,7 @@ function text_trade_npc_pda(a,b)
 	end
 
 	local bonus = (total_value / 20)
-	if (has_alife_info("actor_infopreneur")) then
+	if (has_alife_info("achieved_infopreneur")) then
 		total_value = total_value + bonus
 	end
 	
@@ -484,7 +484,7 @@ function surrender_victim_answers_1(a,b)
 
 		if (coc_treasure_manager) then
 			coc_treasure_manager.create_random_stash(nil,npc:character_name().."'s stash")
-			if (has_alife_info("actor_lead_tongue") and (math.random() <= 0.1)) then
+			if (has_alife_info("achieved_silver_or_lead") and (math.random() <= 0.1)) then
 				coc_treasure_manager.create_random_stash(nil,npc:character_name().."'s stash")
 			end
 		else
