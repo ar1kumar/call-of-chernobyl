@@ -102,9 +102,22 @@ function tourist_functor()
 	if (has_alife_info("achieved_tourist")) then
 		return true
 	end
-	if (xr_statistic.actor_visited_all_levels()) then
+	-- News messages are silent if they fire instantly after the load screen.
+	-- Delaying the reward until the next check (3 seconds?) is more noticable.
+	if (has_alife_info("achieved_tourist_delay")) then
+		for i=3,1,-1 do
+			news_manager.send_treasure(0)
+			if (coc_treasure_manager) then
+				coc_treasure_manager.create_random_stash(nil, "Hidden stash")
+			else
+				axr_dynamic_spawn.random_secret()
+			end
+		end
 		db.actor:give_info_portion("achieved_tourist")
 		news_manager.send_tip(db.actor, "st_achievement_8_unlock", nil, "tourist", nil, nil)
+	end
+	if (xr_statistic.actor_visited_all_levels()) then
+		db.actor:give_info_portion("achieved_tourist_delay")
 	end
 	return has_alife_info("achieved_tourist")
 end
