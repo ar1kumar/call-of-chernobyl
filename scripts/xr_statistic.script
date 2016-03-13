@@ -11,7 +11,32 @@ actor_statistic = {
 					best_monster = nil,
 					favorite_weapon_sect = nil,
 					best_monster_rank = 0,
+					visited = { 
+								["k00_marsh"] = false,
+								["k01_darkscape"] = false,
+								["k02_trucks_cemetery"] = false,
+								["l01_escape"] = false,
+								["l02_garbage"] = false,
+								["l03_agroprom"] = false,
+								["l04_darkvalley"] = false,
+								["l05_bar"] = false,
+								["l06_rostok"] = false,
+								["l07_military"] = false,
+								["l08_yantar"] = false,
+								["l09_deadcity"] = false,
+								["l10_limansk"] = false,
+								["l10_radar"] = false,
+								["l10_red_forest"] = false,
+								["l11_hospital"] = false,
+								["l11_pripyat"] = false,
+								["l12_stancia"] = false,
+								["l12_stancia_2"] = false,
+								["l13_generators"] = false,
+								["jupiter"] = false,
+								["pripyat"] = false,
+								["zaton"] = false,
 					}
+			}
 
 monster_classes = {
 			[clsid.bloodsucker_s] 	  = "bloodsucker",
@@ -64,6 +89,13 @@ artefacts_table = {
 
 taken_artefacts = {}
 
+function on_game_start()
+	RegisterScriptCallback("on_game_load",on_game_load)
+end
+
+function on_game_load()
+	actor_statistic.visited[level.name()] = true
+end
 
 function save_state(data)
 	--alun_utils.debug_write("xr_statistic.save_state")
@@ -199,7 +231,21 @@ function save(package)
 	package:w_u32(actor_statistic.best_monster_rank)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
+	
 	local i = 0
+	
+	-- write visited levels
+	for k,v in pairs(actor_statistic.visited) do
+		i = i + 1
+	end
+	package:w_u16(i)
+	for k,v in pairs(actor_statistic.visited) do
+		package:w_stringZ(tostring(k))
+		package:w_bool(v)
+	end
+	i = 0
+	--
+	
 	for k,v in pairs(weapons_table) do
 		i = i + 1
 	end
@@ -239,6 +285,7 @@ function load(package)
 	actor_statistic.founded_secrets  	= package:r_u16()
 	actor_statistic.artefacts_founded	= package:r_u16()
 	actor_statistic.best_monster_rank 	= package:r_u32()
+	
 	local str = package:r_stringZ()
 	if(str~="nil") then
 		actor_statistic.best_monster = str
@@ -247,6 +294,14 @@ function load(package)
 	if(str~="nil") then
 		actor_statistic.favorite_weapon_sect = str
 	end
+	
+	-- read visited levels
+	actor_statistic.visited = {}
+	for i = 1,package:r_u16() do
+		actor_statistic.visited[package:r_stringZ()] = package:r_bool()
+	end
+	--
+	
 	weapons_table = {}
 	local n = package:r_u16()
 	for i = 1,n do
@@ -269,4 +324,13 @@ function load(package)
 		local k = package:r_u32()
 		taken_artefacts[k] = k
 	end
+end
+
+function actor_visited_all_levels()
+	for level,v in pairs(actor_statistic.visited) do 
+		if (v == false) then 
+			return false 
+		end
+	end
+	return true
 end
