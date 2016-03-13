@@ -33,11 +33,13 @@ local function on_game_load()
 	end
 	
 	-- remove all unused stashes from the list
+	--[[
 	for k,v in pairs(caches) do 
 		if (v == false) then 
 			caches[k] = nil
 		end
 	end
+	--]]
 end
 
 local function actor_on_item_take_from_box(box,itm)

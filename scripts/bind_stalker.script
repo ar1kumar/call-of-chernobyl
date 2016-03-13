@@ -184,7 +184,8 @@ function actor_binder:update(delta)
 		end
 		pda.fill_primary_objects()
 		self.object:activate_slot(self.loaded_active_slot or 0)
-		self.bCheckStart = false
+		self.bCheckStart = nil
+		db.actor.afterFirstUpdate = true
 	end
 	
 	self.task_manager:update()
