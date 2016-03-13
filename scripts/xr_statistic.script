@@ -231,7 +231,21 @@ function save(package)
 	package:w_u32(actor_statistic.best_monster_rank)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
+	
 	local i = 0
+	
+	-- write visited levels
+	for k,v in pairs(actor_statistic.visited) do
+		i = i + 1
+	end
+	package:w_u16(i)
+	for k,v in pairs(actor_statistic.visited) do
+		package:w_stringZ(tostring(k))
+		package:w_bool(v)
+	end
+	i = 0
+	--
+	
 	for k,v in pairs(weapons_table) do
 		i = i + 1
 	end
@@ -271,6 +285,7 @@ function load(package)
 	actor_statistic.founded_secrets  	= package:r_u16()
 	actor_statistic.artefacts_founded	= package:r_u16()
 	actor_statistic.best_monster_rank 	= package:r_u32()
+	
 	local str = package:r_stringZ()
 	if(str~="nil") then
 		actor_statistic.best_monster = str
@@ -279,6 +294,14 @@ function load(package)
 	if(str~="nil") then
 		actor_statistic.favorite_weapon_sect = str
 	end
+	
+	-- read visited levels
+	actor_statistic.visited = {}
+	for i = 1,package:r_u16() do
+		actor_statistic.visited[package:r_stringZ()] = package:r_bool()
+	end
+	--
+	
 	weapons_table = {}
 	local n = package:r_u16()
 	for i = 1,n do
