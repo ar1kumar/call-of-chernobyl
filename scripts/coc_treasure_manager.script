@@ -201,9 +201,7 @@ function create_random_stash(no_spot,hint,bonus_items,bonus_lottery)
 			lottery = lottery + math.random(0,3)
 		end
 		
-		if (not bonus_lottery) then
-			bonus_lottery = 0
-		end
+		bonus_lottery = bonus_lottery or 0
 		
 		if (has_alife_info("achieved_rag_and_bone")) then
 			bonus_lottery = bonus_lottery + math.random(0, 2)
