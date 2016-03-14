@@ -113,7 +113,10 @@ function load_state(data)
 	if not (data.xr_statistic) then
 		return
 	end
-
+	-- previous save compatibility
+	if (data.xr_statistic.actor_statistic.visited == nil) then 
+		data.xr_statistic.actor_statistic.visited = actor_statistic.visited
+	end
 	actor_statistic = data.xr_statistic.actor_statistic or actor_statistic
 	artefacts_table = data.xr_statistic.artefacts_table or artefacts_table
 	taken_artefacts = data.xr_statistic.taken_artefacts or taken_artefacts
