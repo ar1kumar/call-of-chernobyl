@@ -14,7 +14,8 @@ function a_friend_of_tejas_functor()
 	and (has_alife_info("achieved_rag_and_bone"))
 	and (has_alife_info("achieved_silver_or_lead"))
 	and (has_alife_info("achieved_tourist"))
-	and (has_alife_info("achieved_well_dressed")) then
+	and (has_alife_info("achieved_well_dressed"))
+	and (has_alife_info("achieved_wishful_thinking")) then
 		db.actor:give_info_portion("achieved_a_friend_of_tejas")
 		news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "a_friend_of_tejas", nil, nil)
 	end
@@ -180,4 +181,22 @@ function well_dressed_functor()
 		news_manager.send_tip(db.actor, "st_achievement_5_unlock", nil, "well_dressed", nil, nil)
 	end
 	return has_alife_info("achieved_well_dressed")
+end
+
+-- Wishful Thinking
+function wishful_thinking_functor()
+	if not (db.actor and db.actor.afterFirstUpdate) then
+		return false
+	end
+	if (has_alife_info("achieved_wishful_thinking")) then
+		return true
+	end
+	if (has_alife_info("achieved_wishful_thinking_trigger")) then
+		db.actor:give_info_portion("achieved_wishful_thinking")
+		news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
+	end
+	if (level.name() == "l12u_sarcofag") then
+		db.actor:give_info_portion("achieved_wishful_thinking_trigger")
+	end
+	return has_alife_info("achieved_wishful_thinking")
 end
