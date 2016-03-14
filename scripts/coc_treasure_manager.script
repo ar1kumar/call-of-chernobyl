@@ -90,7 +90,7 @@ end
 -------------------------------------------------------------------------------------------------------------------
 
 last_secret = nil
-function create_random_stash(no_spot,hint,bonus_items)
+function create_random_stash(no_spot,hint,bonus_items,bonus_lottery)
 	last_secret = nil
 
 	if (caches_count <= 0) then
@@ -194,13 +194,21 @@ function create_random_stash(no_spot,hint,bonus_items)
 	local spawned_item = bonus_items or {}
 	local max_weight = (max_roll * math.random(1,100)/25)
 	local lottery = 0
+	
 	repeat
 		lottery = math.random(0,6)
 		if (lottery == 6) then 
 			lottery = lottery + math.random(0,3)
 		end
-
+		
+		bonus_lottery = bonus_lottery or 0
+		
+		if (has_alife_info("achieved_rag_and_bone")) then
+			bonus_lottery = bonus_lottery + math.random(0, 2)
+		end
+		
 		rnd = math.random(max_roll+lottery)
+		rnd = rnd + bonus_lottery
 		if (rnd > 15) then 
 			rnd = 15 
 		end
