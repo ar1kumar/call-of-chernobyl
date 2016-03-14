@@ -29,6 +29,7 @@ tips_icons = {
 	infopreneur				= "ui_inGame2_PD_Torgovets_informatsiey",
 	mechanized_warfare		= "ui_inGame2_PD_master_boevih_sistem",
 	radiotherapy			= "ui_inGame2_PD_Otmecheniy_zonoy",
+	rag_and_bone			= "ui_inGame2_PD_RagAndBone",
 	silver_or_lead			= "ui_inGame2_PD_Avtoritet",
 	tourist					= "ui_inGame2_PD_Tourist",
 	well_dressed			= "ui_inGame2_PD_Ohotnik_na_mutantov",
@@ -76,6 +77,7 @@ function send_tip(actor, news_id, timeout, sender, showtime, sender_id)
 
 	--' Играем дефолтный звук
 	xr_sound.set_sound_play(db.actor:id(), "pda_tips")
+	--sound_object(sound_theme.theme["pda_tips"].path):play_at_pos(actor, vector():set(0,0,0), timeout, sound_object.s2d)
 
 
 	local texture = "ui_iconsTotal_grouping"
