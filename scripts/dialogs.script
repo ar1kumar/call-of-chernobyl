@@ -259,10 +259,12 @@ function text_trade_npc_pda(a,b)
  
     local first_line
     for j,count in pairs(tbl) do
-        local mul = j == "common" and 1 or j == "uncommon" and 2 or j == "rare" and 4
-        local mul2 = j == "common" and 0.5 or j == "uncommon" and 5 or j == "rare" and 10
         if (count > 0) then
+		    local mul = j == "common" and 1 or j == "uncommon" and 2 or j == "rare" and 4
+			local mul2 = j == "common" and 0.5 or j == "uncommon" and 5 or j == "rare" and 10
+			
             news_manager.relocate_item(db.actor, "out", "itm_pda_"..j, count)
+			
             for i=1, count do
                 total_value = total_value + (mul * math.random(250,500))
                
