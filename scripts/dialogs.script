@@ -241,7 +241,6 @@ end
 function text_trade_npc_pda(a,b)
 	local npc = who_is_npc(a, b)
 
-	local count = 0
 	local common = {}
 	local uncommon = {}
 	local rare = {}
@@ -251,23 +250,19 @@ function text_trade_npc_pda(a,b)
 		if (sec == "itm_pda_common") then
 			table.insert(common,itm)
 			actor:transfer_item(itm,npc)
-			count = count + 1
+			xr_statistic.inc_pdas_delivered_counter()
 		elseif (sec == "itm_pda_uncommon") then
 			table.insert(uncommon,itm)
 			actor:transfer_item(itm,npc)
-			count = count + 1
+			xr_statistic.inc_pdas_delivered_counter()
 		elseif (sec == "itm_pda_rare") then
 			table.insert(rare,itm)
 			actor:transfer_item(itm,npc)
-			count = count + 1
+			xr_statistic.inc_pdas_delivered_counter()
 		end
 	end
 
 	db.actor:iterate_inventory(itr,db.actor)
-	
-	if (count >= 25) then
-		db.actor:give_info_portion("achieved_infopreneur_trigger")
-	end
 
 	local npc_text = ""
 
