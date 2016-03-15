@@ -239,134 +239,69 @@ function text_actor_has_pda(a,b)
 end
 
 function text_trade_npc_pda(a,b)
-	local npc = who_is_npc(a, b)
-
-	local common = {}
-	local uncommon = {}
-	local rare = {}
-
-	local function itr(actor,itm)
-		local sec = itm:section()
-		if (sec == "itm_pda_common") then
-			table.insert(common,itm)
-			actor:transfer_item(itm,npc)
-			xr_statistic.inc_pdas_delivered_counter()
-		elseif (sec == "itm_pda_uncommon") then
-			table.insert(uncommon,itm)
-			actor:transfer_item(itm,npc)
-			xr_statistic.inc_pdas_delivered_counter()
-		elseif (sec == "itm_pda_rare") then
-			table.insert(rare,itm)
-			actor:transfer_item(itm,npc)
-			xr_statistic.inc_pdas_delivered_counter()
-		end
-	end
-
-	db.actor:iterate_inventory(itr,db.actor)
-
-	local npc_text = ""
-
-	local itm
-	local total_value = 0
-	local pda_bonus_coords = 0
-
-	local first_line
-
-	if (#common > 0) then
-		news_manager.relocate_item(db.actor, "out", "itm_pda_common", #common)
-		for i=1, #common do
-			total_value = total_value + math.random(250,500)
-		end
-
-		if (#common == 1) then
-			npc_text = game.translate_string("st_broker_npc_about_pda_common_"..math.random(1,20))
-			first_line = true
-		elseif (#common > 1) then
-			for i=1,math.random(#common) do
-				if not (first_line) then
-					first_line = true
-					npc_text = game.translate_string("st_broker_npc_about_pda_common_"..math.random(1,20))
-				else
-					npc_text = npc_text .. "\n [...] " .. game.translate_string("st_broker_npc_about_pda_common_"..math.random(1,20))
-				end
-			end
-		end
-	end
-
-	if (#uncommon > 0) then
-		news_manager.relocate_item(db.actor, "out", "itm_pda_uncommon", #uncommon)
-		for i=1, #uncommon do
-			total_value = total_value + math.random(500,1000)
-
-			if (math.random(1,100) <= 5) then
-				pda_bonus_coords = pda_bonus_coords + 1
-			end
-		end
-
-		if (#uncommon == 1) then
-			if not (first_line) then
-				first_line = true
-				npc_text = game.translate_string("st_broker_npc_about_pda_uncommon_"..math.random(1,20))
-			else
-				npc_text = npc_text .. "\n [...] " .. game.translate_string("st_broker_npc_about_pda_uncommon_"..math.random(1,20))
-			end
-		elseif (#uncommon > 1) then
-			for i=1,math.random(#uncommon) do
-				if not (first_line) then
-					first_line = true
-					npc_text = game.translate_string("st_broker_npc_about_pda_uncommon_"..math.random(1,20))
-				else
-					npc_text = npc_text .. "\n [...] " .. game.translate_string("st_broker_npc_about_pda_uncommon_"..math.random(1,20))
-				end
-			end
-		end
-	end
-
-	if (#rare > 0) then
-		news_manager.relocate_item(db.actor, "out", "itm_pda_rare", #rare)
-		for i=1, #rare do
-			total_value = total_value + math.random(1000,2000)
-
-			if (math.random(1,100) <= 10) then
-				pda_bonus_coords = pda_bonus_coords + 1
-			end
-		end
-
-		if (#rare == 1) then
-			if not (first_line) then
-				first_line = true
-				npc_text = game.translate_string("st_broker_npc_about_pda_rare_"..math.random(1,20))
-			else
-				npc_text = npc_text .. "\n [...] " .. game.translate_string("st_broker_npc_about_pda_rare_"..math.random(1,20))
-			end
-		elseif (#rare > 1) then
-			for i=1,math.random(#rare) do
-				if not (first_line) then
-					first_line = true
-					npc_text = game.translate_string("st_broker_npc_about_pda_rare_"..math.random(1,20))
-				else
-					npc_text = npc_text .. "\n [...] " .. game.translate_string("st_broker_npc_about_pda_rare_"..math.random(1,20))
-				end
-			end
-		end
-	end
-
-	local bonus = (total_value / 20)
-	if (has_alife_info("achieved_infopreneur")) then
-		total_value = total_value + bonus
-	end
-	
-	relocate_money(npc, total_value, "in")
-
-	if (pda_bonus_coords > 0 and coc_treasure_manager) then
-		npc_text = npc_text .. "\n\n" .. game.translate_string("st_broker_npc_about_pda_bonus_coords")
-
-		for i=1,pda_bonus_coords do
-			coc_treasure_manager.create_random_stash()
-		end
-	end
-
-	return npc_text
+    local npc = who_is_npc(a, b)
+ 
+    local tbl = { common = 0, uncommon = 0, rare = 0} 
+    local function itr(actor,itm)  
+        local chk, pda_t = itm:section():match("(itm_pda_)([%l]+)")
+        if chk and tbl[pda_t] then
+			tbl[pda_t] = tbl[pda_t] + 1
+            actor:transfer_item(itm,npc)
+            xr_statistic.inc_pdas_delivered_counter()
+        end
+    end
+    db.actor:iterate_inventory(itr,db.actor)
+ 
+    local npc_text = ""
+ 
+    local total_value = 0
+    local pda_bonus_coords = 0
+ 
+    local first_line
+    for j,count in pairs(tbl) do
+        local mul = j == "common" and 1 or j == "uncommon" and 2 or j == "rare" and 4
+        local mul2 = j == "common" and 0.5 or j == "uncommon" and 5 or j == "rare" and 10
+        if (count > 0) then
+            news_manager.relocate_item(db.actor, "out", "itm_pda_"..j, count)
+            for i=1, count do
+                total_value = total_value + (mul * math.random(250,500))
+               
+                if (math.random(1,100) <= mul2) then
+                    pda_bonus_coords = pda_bonus_coords + 1
+                end
+            end
+   
+            if (count == 1) then
+                npc_text = game.translate_string("st_broker_npc_about_pda_"..j.."_"..math.random(1,20))
+                first_line = true
+            elseif (count > 1) then
+                for i=1,math.random(count) do
+                    if not (first_line) then
+                        first_line = true
+                        npc_text = game.translate_string("st_broker_npc_about_pda_"..j.."_"..math.random(1,20))
+                    else
+                        npc_text = npc_text .. "\n [...] " .. game.translate_string("st_broker_npc_about_pda_"..j.."_"..math.random(1,20))
+                    end
+                end
+            end
+        end
+    end
+ 
+    if (has_alife_info("achieved_infopreneur")) then
+        total_value = total_value + (total_value / 20)
+    end
+ 
+    relocate_money(npc, total_value, "in")
+ 
+    if (pda_bonus_coords > 0 and coc_treasure_manager) then
+        npc_text = npc_text .. "\n\n" .. game.translate_string("st_broker_npc_about_pda_bonus_coords")
+ 
+        for i=1,pda_bonus_coords do
+            coc_treasure_manager.create_random_stash()
+        end
+    end
+ 
+    return npc_text
 end
 
 -- Dynamic Surrender dialog
