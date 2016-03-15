@@ -193,6 +193,7 @@ function heli_binder:check_health()
 end
 
 ------------------------------ callbacks ---------------------------------
+local killer = false
 function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	--printf( "heli_binder: hit callback")
 
@@ -222,6 +223,13 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	if self.last_hit_snd_timeout < time_global() then
 		xr_sound.set_sound_play(self.object:id(), self.snd_hit)
 		self.last_hit_snd_timeout = time_global() + math.random( 4000, 8000 )
+	end
+	
+	-- Fly Swatter achievement
+	if (not has_alife_info("achieved_fly_swatter")) then
+		if db.actor and enemy == db.actor and db.actor:active_item():section() == "wpn_rpg7" then
+			killer = true
+		end
 	end
 end
 
@@ -263,7 +271,12 @@ function heli_die( obj )
 		end
 	end
 
-	db.actor:give_info_portion("achieved_fly_swatter_trigger")
+	-- Fly Swatter achievement
+	if (not has_alife_info("achieved_fly_swatter")) then
+		if killer then
+			db.actor:give_info_portion("achieved_fly_swatter_trigger")
+		end
+	end
 
 	local heli = obj:get_helicopter()
 	local st   = db.storage[obj:id()]

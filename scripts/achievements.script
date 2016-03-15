@@ -1,9 +1,9 @@
--- A Friend of Tejas
-function a_friend_of_tejas_functor()
+-- Completionist
+function completionist_functor()
 	if not (db.actor and db.actor.afterFirstUpdate) then
 		return false
 	end
-	if has_alife_info("achieved_a_friend_of_tejas") then
+	if has_alife_info("achieved_completionist") then
 		return true
 	end
 	if (has_alife_info("achieved_duga_free"))
@@ -17,10 +17,10 @@ function a_friend_of_tejas_functor()
 	and (has_alife_info("achieved_tourist"))
 	and (has_alife_info("achieved_well_dressed"))
 	and (has_alife_info("achieved_wishful_thinking")) then
-		db.actor:give_info_portion("achieved_a_friend_of_tejas")
-		news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "a_friend_of_tejas", nil, nil)
+		db.actor:give_info_portion("achieved_completionist")
+		news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
 	end
-	return has_alife_info("achieved_a_friend_of_tejas")
+	return has_alife_info("achieved_completionist")
 end
 
 -- Duga Free
