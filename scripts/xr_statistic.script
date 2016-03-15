@@ -11,6 +11,8 @@ actor_statistic = {
 					best_monster = nil,
 					favorite_weapon_sect = nil,
 					best_monster_rank = 0,
+					pdas_delivered = 0,
+					heli_rocket_kills = 0,
 					visited = { 
 								["k00_marsh"] = false,
 								["k01_darkscape"] = false,
@@ -114,9 +116,12 @@ function load_state(data)
 		return
 	end
 	-- previous save compatibility
-	if (data.xr_statistic.actor_statistic.visited == nil) then 
-		data.xr_statistic.actor_statistic.visited = actor_statistic.visited
+	for i,j in pairs(actor_statistic) do
+		if data.xr_statistic.actor_statistic[i] == nil then
+			data.xr_statistic.actor_statistic[i] = actor_statistic[i]
+		end
 	end
+	
 	actor_statistic = data.xr_statistic.actor_statistic or actor_statistic
 	artefacts_table = data.xr_statistic.artefacts_table or artefacts_table
 	taken_artefacts = data.xr_statistic.taken_artefacts or taken_artefacts
@@ -150,7 +155,12 @@ end
 function inc_founded_secrets_counter()
 	actor_statistic.founded_secrets = actor_statistic.founded_secrets + 1
 end
-
+function inc_pdas_delivered_counter()
+	actor_statistic.pdas_delivered = actor_statistic.pdas_delivered + 1
+end
+function inc_heli_rocket_kills()
+	actor_statistic.heli_rocket_kills = actor_statistic.heli_rocket_kills + 1
+end
 function set_best_monster(obj)
 	if not IsMonster(obj) then
 		return 
@@ -232,6 +242,8 @@ function save(package)
 	package:w_u16(actor_statistic.founded_secrets)
 	package:w_u16(actor_statistic.artefacts_founded)
 	package:w_u32(actor_statistic.best_monster_rank)
+	package:w_u32(actor_statistic.pdas_delivered)
+	package:w_u32(actor_statistic.heli_rocket_kills)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
 	
@@ -288,6 +300,8 @@ function load(package)
 	actor_statistic.founded_secrets  	= package:r_u16()
 	actor_statistic.artefacts_founded	= package:r_u16()
 	actor_statistic.best_monster_rank 	= package:r_u32()
+	actor_statistic.pdas_delivered 		= package:r_u32()
+	actor_statistic.heli_rocket_kills 		= package:r_u32()
 	
 	local str = package:r_stringZ()
 	if(str~="nil") then
