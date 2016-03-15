@@ -7,7 +7,6 @@ function completionist_functor()
 		return true
 	end
 	if (has_alife_info("achieved_duga_free"))
-	and (has_alife_info("achieved_fly_swatter"))
 	and (has_alife_info("achieved_heavy_pockets"))
 	and (has_alife_info("achieved_infopreneur"))
 	and (has_alife_info("achieved_mechanized_warfare"))
@@ -38,19 +37,19 @@ function duga_free_functor()
 	return has_alife_info("achieved_duga_free")
 end
 
--- Fly Swatter
-function fly_swatter_functor()
+-- Clear Skies
+function clear_skies_functor()
 	if not (db.actor and db.actor.afterFirstUpdate) then
 		return false
 	end
-	if has_alife_info("achieved_fly_swatter") then
+	if has_alife_info("achieved_clear_skies") then
 		return true
 	end
-	if (has_alife_info("achieved_fly_swatter_trigger")) then
-		db.actor:give_info_portion("achieved_fly_swatter")
-		news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "fly_swatter", nil, nil)
+	if (xr_statistic.actor_statistic.heli_rocket_kills >= 1) then
+		db.actor:give_info_portion("achieved_clear_skies")
+		news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "clear_skies", nil, nil)
 	end
-	return has_alife_info("achieved_fly_swatter")
+	return has_alife_info("achieved_clear_skies")
 end
 
 -- Heavy Pockets
@@ -76,7 +75,7 @@ function infopreneur_functor()
 	if has_alife_info("achieved_infopreneur") then
 		return true
 	end
-	if (xr_statistic.actor_statistic.pdas_delivered >= 50) then
+	if (xr_statistic.actor_statistic.pdas_delivered >= 25) then
 		db.actor:give_info_portion("achieved_infopreneur")
 		news_manager.send_tip(db.actor, "st_achievement_3_unlock", nil, "infopreneur", nil, nil)
 	end
@@ -122,7 +121,7 @@ function radiotherapy_functor()
 		db.actor:give_info_portion("achieved_radiotherapy")
 	end
 	
-	if xr_statistic.actor_statistic.surges >= 20 then
+	if xr_statistic.actor_statistic.surges >= 25 then
 		db.actor:give_info_portion("achieved_radiotherapy")
 		news_manager.send_tip(db.actor, "st_achievement_2_unlock", nil, "radiotherapy", nil, nil)
 	end
