@@ -274,22 +274,23 @@ fire_wound_immunity		= 0.001
 ;							SIMULATION HELI
 ;====================================================================
 [simulation_helicopter_weak]:helicopter
-visual                  	= dynamics\vehicles\mi24\veh_mi24_u_01.ogf
+visual                  	= dynamics\vehicles\mi2\veh_mi2_01.ogf
 faction						= army
-player_id					= army_heli									; For simulation_activies in sim_board.script and required for heli_alife.script
-safe_altitude				= 1
+player_id					= army_heli
+safe_altitude				= 1.0
 velocity					= 20
-immunities_sect				= sect_heli_immunities_weak
+immunities_sect				= sect_heli_immunities_weak_mi2
 use_rocket					= false
 
 [simulation_helicopter_strong]:helicopter
 visual                  	= dynamics\vehicles\mi24\veh_mi24_u_01.ogf
 faction						= army
 player_id					= army_heli
-safe_altitude				= 3.0
+safe_altitude				= 2.75
 velocity					= 30
 time_between_rocket_attack	= 30000
 immunities_sect				= sect_heli_immunities_strong
+use_rocket					= true
 
 [simulation_mono_helicopter_weak]:helicopter
 visual                  	= dynamics\vehicles\mi2\veh_mi2_01.ogf
@@ -305,8 +306,9 @@ actor_always_enemy			= true
 visual                  	= dynamics\vehicles\mi24\veh_mi24_u_01.ogf
 faction						= monolith
 player_id					= monolith_heli
-safe_altitude				= 3.0
+safe_altitude				= 2.75
 velocity					= 30
 time_between_rocket_attack	= 20000
 immunities_sect				= sect_heli_immunities_strong
 actor_always_enemy			= true
+use_rocket					= true
