@@ -17,6 +17,13 @@ function sim_dynamic_ordered_task_precondition(a,b)
 	return true
 end
 
+-- This function allows Player to see NPC inventory as if it was a corpse
+function free_trade_with_npc(a,b)
+	local npc = who_is_npc(a, b)
+	get_hud():HideActorMenu()
+	npc:use(db.actor)
+end 
+
 -- Dynamic Ordered Task dialog 
 last_task_id = nil
 function npc_has_ordered_task_to_give(a,b)

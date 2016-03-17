@@ -103,6 +103,11 @@ function action.debug_test(p)
 	end 
 	if (p==1) then 
 	
+		local obj = level.get_target_obj()
+		if (obj) then 
+			printf("obj=%s Use=%s",obj:name(),obj:use(db.actor))
+		end
+	
 		-- RELEASES TASK GIVER FOR ALL TASKS WITH task_giver_id; useful for testing how a task works when giver is dead
 		--[[
 		local debug_task_infos = task_manager.get_task_manager().task_info
