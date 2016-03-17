@@ -67,6 +67,16 @@
         <precondition>dialogs_axr_companion.dm_actor_become_companion_guide_precond</precondition>
         <init_func>dialogs_axr_companion.dm_init_actor_become_guide_to_companion</init_func>
     </dialog>
+	<dialog id="dm_companion_trade">
+        <precondition>dialogs_axr_companion.is_actor_companion</precondition>
+        <phrase_list>
+            <phrase id="0">
+				<action>dialogs.free_trade_with_npc</action>
+				<action>dialogs.break_dialog</action>
+                <text>axr_phrase_actor_give_command_trade</text>
+            </phrase>
+		</phrase_list>
+    </dialog>
     <dialog id="dm_is_actor_companion_dialog">
         <precondition>dialogs_axr_companion.is_actor_companion</precondition>
         <init_func>dialogs_axr_companion.dm_init_is_actor_companion</init_func>
