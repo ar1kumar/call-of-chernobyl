@@ -67,7 +67,7 @@ function generic_physics_binder:update(delta)
 	if self.object:clsid() == clsid.inventory_box then
 		self.object:set_callback(callback.use_object, generic_physics_binder.use_callback, self)
 	end
-
+	
 	xr_sound.update(self.object:id())
 end
 
@@ -89,6 +89,7 @@ function generic_physics_binder:net_spawn(data)
 			end
 		end
 	end
+	
 	db.add_obj(self.object)
 	return true
 end
