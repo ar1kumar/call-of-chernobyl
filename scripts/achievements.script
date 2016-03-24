@@ -7,6 +7,7 @@ function completionist_functor()
 		return true
 	end
 	if (has_alife_info("achieved_duga_free"))
+	and (has_alife_info("achieved_geologist"))
 	and (has_alife_info("achieved_heavy_pockets"))
 	and (has_alife_info("achieved_infopreneur"))
 	and (has_alife_info("achieved_mechanized_warfare"))
@@ -49,6 +50,21 @@ function clear_skies_functor()
 		news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "clear_skies", nil, nil)
 	end
 	return has_alife_info("achieved_clear_skies")
+end
+
+-- Geologist
+function geologist_functor()
+	if not (db.actor and db.actor.afterFirstUpdate) then
+		return false
+	end
+	if (has_alife_info("achieved_geologist")) then
+		return true
+	end
+	if (xr_statistic.actor_statistic.artefacts_detected >= 25) then
+		db.actor:give_info_portion("achieved_geologist")
+		news_manager.send_tip(db.actor, "st_achievement_13_unlock", nil, "geologist", nil, nil)
+	end
+	return has_alife_info("achieved_geologist")
 end
 
 -- Heavy Pockets
