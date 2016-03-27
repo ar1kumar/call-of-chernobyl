@@ -193,7 +193,6 @@ function heli_binder:check_health()
 end
 
 ------------------------------ callbacks ---------------------------------
-local killer = false
 function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	--printf( "heli_binder: hit callback")
 
@@ -227,8 +226,14 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	
 	-- Clear Skies achievement
 	if (not has_alife_info("achieved_clear_skies")) then
-		if db.actor and enemy == db.actor and db.actor:active_item():section() == "wpn_rpg7" then
-			killer = true
+		if (db.actor and enemy:id() == 0) then 
+			local itm = db.actor:active_item()
+			if (itm and itm:section() == "wpn_rpg7") then
+				local health = get_heli_health(self.st.heliObject,self.st)
+				if (health <= 0.005) then
+					xr_statistic.inc_heli_rocket_kills()
+				end
+			end
 		end
 	end
 end
@@ -268,14 +273,6 @@ function heli_die( obj )
 	if (level.name() == "k00_marsh") then 
 		if (xr_conditions.has_task_not_completed(nil,nil,{"mar_base_owl_stalker_trader_task_2"}) == true) then 
 			xr_effects.set_task_completed(nil,nil,{"mar_base_owl_stalker_trader_task_2"})
-		end
-	end
-
-	-- Clear Skies achievement
-	if (not has_alife_info("achieved_clear_skies")) then
-		if killer then
-			xr_statistic.inc_heli_rocket_kills()
-			killer = false
 		end
 	end
 
