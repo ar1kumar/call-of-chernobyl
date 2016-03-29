@@ -12,23 +12,25 @@ meet = meet
 path_walk = yan_walker_saharov_walk
 path_look = yan_walker_saharov_look
 on_info = {+yan_actor_away_saharov} camper@1
-combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
+combat_ignore_cond = true ; {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
-invulnerable = {!actor_enemy} true, false
+invulnerable = true ; {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
 out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
+aggressive = false
 
 [camper@default]
 meet = meet
-combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
+combat_ignore_cond = true ; {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
-invulnerable = {!actor_enemy} true, false
+invulnerable = true ; {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
 out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
+aggressive = false
 
 [camper@1]:camper@default
 path_walk = yan_camper_saharov_walk
@@ -59,6 +61,6 @@ far_victim 		= nil
 close_distance  = 2
 far_distance 	= 6
 close_snd_distance = 3
-use = {=actor_enemy} false, true
+use = true ; {=actor_enemy} false, true
 allow_break = false
 trade_enable = true
