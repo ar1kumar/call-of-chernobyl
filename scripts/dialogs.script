@@ -303,7 +303,7 @@ function text_trade_npc_pda(a,b)
     relocate_money(npc, total_value, "in")
  
     if (pda_bonus_coords > 0 and coc_treasure_manager) then
-        npc_text = npc_text .. "\n\n" .. game.translate_string("st_broker_npc_about_pda_bonus_coords")
+        npc_text = npc_text .. "\n\n " .. game.translate_string("st_broker_npc_about_pda_bonus_coords")
  
         for i=1,pda_bonus_coords do
             coc_treasure_manager.create_random_stash()
