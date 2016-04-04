@@ -297,7 +297,7 @@ function text_trade_npc_pda(a,b)
     end
  
     if (has_alife_info("achieved_infopreneur")) then
-        total_value = total_value + (total_value / 20)
+        total_value = total_value + math.floor(total_value / 20)
     end
  
     relocate_money(npc, total_value, "in")
