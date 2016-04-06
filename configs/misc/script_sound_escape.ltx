@@ -2,7 +2,9 @@
 esc_trader_start_pda
 esc_trader_call
 esc_trader_greet
-
+agr_duty_trader_meet
+agr_duty_trader_meet_bye
+val_bandit_trader_meet
 ;***********ESCAPE**
 ;********************
 [esc_trader_start_pda]
@@ -24,4 +26,28 @@ type = actor
 actor_stereo = false
 path = characters_voice\scenario\escape\esc_trader_greet_
 shuffle = seq
+idle = 1,10,100
+
+[agr_duty_trader_meet]
+type = npc
+actor_stereo = false
+npc_prefix = false
+path = scenario\agroprom\agr_duty_trader_meet_
+shuffle = rnd
+idle = 1,10,100
+
+[agr_duty_trader_meet_bye]
+type = npc
+actor_stereo = false
+npc_prefix = false
+path = scenario\agroprom\agr_duty_trader_meet_bye_
+shuffle = rnd
+idle = 1,10,100
+
+[val_bandit_trader_meet]
+type = npc
+actor_stereo = false
+npc_prefix = false
+path = scenario\darkvalley\val_bandit_trader_meet_
+shuffle = rnd
 idle = 1,10,100
