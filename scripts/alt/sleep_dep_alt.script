@@ -1,0 +1,110 @@
+--// -------------		sleep deprivation for Coc		---------------------
+--// author	: 	Nuor
+--// version:	1.21
+--// created:	4-09-2016
+--// last edit:	4-09-2016
+--//-------------------------------------------------------------------------
+local force = 48
+local start_blur = 16
+local itn_mul = 0.2
+local die_chance = 0.1
+local last_chk = nil
+last_sleep, no_sleep = 0, 1	-- change no_sleep to 0 to allow sleep spam
+
+local items = {
+	energy_drink	= -4,
+	medkit			= 2,
+	medkit_army		= 3,
+	medkit_scientic = 4
+}
+
+function on_game_start()
+	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
+	RegisterScriptCallback("actor_on_update",actor_on_update)
+	RegisterScriptCallback("actor_on_item_use",actor_on_item_use)
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",save_state)
+		RegisterScriptCallback("load_state",load_state)
+	end
+end
+
+function save_state(m_data)
+	if (USE_MARSHAL) then
+		if last_sleep > 0 then
+			m_data.sleep_deprived = m_data.sleep_deprived or {}
+			m_data.sleep_deprived["last_sleep"] = last_sleep
+			m_data.sleep_deprived["chk"] = last_chk
+		else
+			m_data.sleep_deprived = nil
+		end
+	end
+end
+
+function load_state(m_data)
+	if (USE_MARSHAL) then
+		last_sleep = m_data.sleep_deprived and m_data.sleep_deprived.last_sleep or 0
+		last_chk = m_data.sleep_deprived and m_data.sleep_deprived.chk
+	end
+end
+
+function actor_on_item_use(item)
+	for i,j in pairs(items) do
+		if item:section() == i then
+			diff = diff + j
+			break
+		end
+	end
+	test_blur()
+end
+
+function actor_on_first_update()
+	if last_sleep > start_blur then
+		level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
+		level.set_pp_effector_factor(999, (last_sleep-start_blur) * itn_mul)
+		SetHudMsg("You are exhausted and need to find a place to sleep",5)
+	end
+end
+local cnt = 10000
+function actor_on_update(b,d)
+	if (axr_main and axr_main.config)
+	  and (axr_main.config:GetValue("mm_options","enable_sleep_deprived",1,false) ~= true) then
+		return
+	end
+	if db.actor:has_info("actor_is_sleeping") then
+		last_sleep = 0
+		level.remove_pp_effector(999)
+	end
+	if cnt < 10000 then -- test to see if fixes odd crash with diffSec
+		cnt = cnt + d
+		return
+	else
+		cnt = 0
+	end
+	local gt = game.get_game_time()
+printf("1:gt=%s last_sleep=%s last_chk=%s",gt,last_sleep,last_chk)
+	last_chk = last_chk or gt
+	if math.floor(gt:diffSec(last_chk)/3600) < 1 then return end 		-- jump in hour increments
+	last_chk = gt
+	last_sleep = last_sleep + 1
+printf("2:gt=%s last_sleep=%s last_chk=%s",gt,last_sleep,last_chk)
+	test_blur()
+end
+
+function test_blur()
+	level.remove_pp_effector(999)
+	if last_sleep > force then
+		force_sleep()
+	elseif last_sleep > start_blur then
+		level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
+		level.set_pp_effector_factor(999, (last_sleep-start_blur) * itn_mul)
+		SetHudMsg("You are exhausted and need to find a place to sleep",5)
+	end
+end
+
+function force_sleep()
+	ui_sleep_dialog.sleep_forced()
+	if math.random() < die_chance then
+		SetHudMsg("Sleeping in the open is HAZARDOUS!",5)
+		db.actor:kill(db.actor)
+	end
+end

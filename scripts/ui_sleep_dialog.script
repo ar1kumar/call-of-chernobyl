@@ -105,6 +105,11 @@ function sleep_dialog:TestAndShow()
 		end
 	end
 
+	if sleep_dep and (sleep_dep.last_sleep < sleep_dep.no_sleep) then
+		SetHudMsg("I'm not tired.",4)
+		return
+	end
+	
 	--if (xr_logic.pstor_retrieve(db.actor,"drowse",0) < 0.2) then
 		--SetHudMsg("I'm not tired.",4)
 		--return
