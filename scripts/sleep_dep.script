@@ -61,7 +61,7 @@ function actor_on_first_update()
 	if last_sleep > start_blur then
 		level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
 		level.set_pp_effector_factor(999, (last_sleep-start_blur) * itn_mul)
-		SetHudMsg("You are exhausted and need to find a place to sleep",5)
+		SetHudMsg(game.translate_string("st_sleep_exhausted"),5)
 	end
 end
 
@@ -92,14 +92,14 @@ function test_blur()
 	elseif last_sleep > start_blur then
 		level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
 		level.set_pp_effector_factor(999, (last_sleep-start_blur) * itn_mul)
-		SetHudMsg("You are exhausted and need to find a place to sleep",5)
+		SetHudMsg(game.translate_string("st_sleep_exhausted"),5)
 	end
 end
 
 function force_sleep()
 	ui_sleep_dialog.sleep_forced()
 	if math.random() < die_chance then
-		SetHudMsg("Sleeping in the open is HAZARDOUS!",5)
+		SetHudMsg(game.translate_string("st_sleep_deprived"),5)
 		db.actor:kill(db.actor)
 	end
 end
