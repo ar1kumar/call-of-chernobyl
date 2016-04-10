@@ -90,7 +90,7 @@ end
 function CRandomTask:set_task_failed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "fail"
-		xr_statistic.inc_actor_rank(-50)
+		--xr_statistic.inc_actor_rank(-50)
 		xr_statistic.inc_actor_reputation(-50)
 	end
 end
