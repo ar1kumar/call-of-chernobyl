@@ -272,6 +272,9 @@ function text_trade_npc_pda(a,b)
 			
             news_manager.relocate_item(db.actor, "out", "itm_pda_"..j, count)
 			
+			xr_statistic.inc_actor_rank(10)
+			xr_statistic.inc_actor_reputation(10)
+			
             for i=1, count do
                 total_value = total_value + (mul * math.random(250,500))
                
@@ -468,9 +471,8 @@ function surrender_victim_answers_2(a,b)
 		end
 	end
 
-	if (db.actor:character_reputation()+5 <= 10000) then
-		db.actor:change_character_reputation(5)
-	end
+	xr_statistic.inc_actor_rank(50)
+	xr_statistic.inc_actor_reputation(50)
 
 	npc:iterate_inventory(itr,npc)
 
@@ -586,9 +588,8 @@ function transfer_medkit(first_speaker, second_speaker)
 		npc:set_relation(game_object.friend,db.actor)
 	end
 
-	if (db.actor:character_reputation()+10 <= 10000) then
-		db.actor:change_character_reputation(10)
-	end
+	xr_statistic.inc_actor_rank(50)
+	xr_statistic.inc_actor_reputation(50)
 end
 function transfer_bandage(first_speaker, second_speaker)
 	dialogs.relocate_item_section(second_speaker, "bandage", "out")

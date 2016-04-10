@@ -371,6 +371,7 @@ end
 -- Increment the actor rank.
 function inc_actor_rank(rank)
 	db.actor:set_character_rank(get_actor_rank() + rank)
+	--news_manager.send_tip(db.actor, "Rank: ".. get_actor_rank(), nil, "completionist", nil, nil)
 	
 end
 
@@ -381,5 +382,8 @@ end
 
 -- Increment the actor reputation.
 function inc_actor_reputation(reputation)
-	db.actor:change_character_reputation(reputation)
+	if (get_actor_reputation() + reputation <= 10000) then
+		db.actor:change_character_reputation(reputation)
+		--news_manager.send_tip(db.actor, "Reputation: ".. get_actor_reputation(), nil, "completionist", nil, nil)
+	end
 end
