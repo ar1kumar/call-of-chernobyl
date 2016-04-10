@@ -357,3 +357,29 @@ function actor_visited_all_levels()
 	end
 	return true
 end
+
+-- Notes --
+-- These methods are disabled in-engine:
+-- db.actor:change_character_rank(num)
+-- db.actor:set_character_reputation(num)
+
+-- Return the actor rank.
+function get_actor_rank()
+	return db.actor:character_rank()
+end
+
+-- Increment the actor rank.
+function inc_actor_rank(rank)
+	db.actor:set_character_rank(get_actor_rank() + rank)
+	
+end
+
+-- Return the actor reputation.
+function get_actor_reputation()
+	return db.actor:character_reputation()
+end
+
+-- Increment the actor reputation.
+function inc_actor_reputation(reputation)
+	db.actor:change_character_reputation(reputation)
+end

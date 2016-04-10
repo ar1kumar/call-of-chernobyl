@@ -87,35 +87,34 @@ function sleep_dialog:TestAndShow()
 		sleep_control.ph_sleepbag_id = nil
 	end
 
-	-- Sleep deprivation being enabled may disable the interface on occasions.
-	if (axr_main and axr_main.config) and (axr_main.config:GetValue("mm_options","enable_sleep_deprived",1,false)) then
-	
-		-- If the player is bleeding and/or iradiated.
-		if (bleeding or radiation) then
-			if (bleeding and radiation) then
-				SetHudMsg(game.translate_string("st_sleep_bleeding_irradiated"),5)
-			elseif (bleeding) then
-				SetHudMsg(game.translate_string("st_sleep_bleeding"),4)
-			elseif (radiation) then
-				SetHudMsg(game.translate_string("st_sleep_irradiated"),4)
-			end
-			return
-		end
-
-		-- If an emission is currently ongoing.
-		if (xr_conditions.surge_started()) then
-			if not (surge_manager.actor_in_cover()) then
-				SetHudMsg(game.translate_string("st_sleep_surge"),4)
-				return
-			end
-		end
-	
-		-- If the player has no need to sleep.
-		if sleep_dep and (sleep_dep.last_sleep < sleep_dep.no_sleep) then
-			SetHudMsg(game.translate_string("st_sleep_awake"),4)
-			return
+	-- Prevent sleep if not tired.
+	--[[
+	if sleep_dep and (sleep_dep.last_sleep < sleep_dep.no_sleep) then
+		SetHudMsg(game.translate_string("st_sleep_awake"),4)
+		return
 		end
 	end
+	]]
+	
+	-- Prevent sleep if bleeding and/or iradiated.
+	if (bleeding or radiation) then
+		if (bleeding and radiation) then
+			SetHudMsg(game.translate_string("st_sleep_bleeding_irradiated"),5)
+		elseif (bleeding) then
+			SetHudMsg(game.translate_string("st_sleep_bleeding"),4)
+		elseif (radiation) then
+			SetHudMsg(game.translate_string("st_sleep_irradiated"),4)
+		end
+		return
+	end
+	
+	-- Prevent sleep if an emission is currently ongoing.
+	if (xr_conditions.surge_started()) then
+		if not (surge_manager.actor_in_cover()) then
+			SetHudMsg(game.translate_string("st_sleep_surge"),4)
+			return
+		end
+	end	
 
 	self:Initialize()
 	self:ShowDialog(true)
