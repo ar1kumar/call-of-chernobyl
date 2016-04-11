@@ -1,9 +1,10 @@
+#include "trade_discounts.ltx"
 
 [trader]
 buy_condition                            = trade_generic_buy
 buy_item_condition_factor                = 0.7
-buy_supplies                             = {+jup_a9_tech_way_info =is_faction_friend_to_actor(stalker) +zat_b30_sultan_loose =heavy_pockets_functor} sci_supplies_stalker_wealthy_tier_2, {=is_faction_friend_to_actor(stalker) +zat_b30_sultan_loose =heavy_pockets_functor} supplies_stalker_wealthy_tier_2, {+jup_a9_tech_way_info =is_faction_friend_to_actor(bandit) +zat_b30_barmen_under_sultan =heavy_pockets_functor} sci_supplies_bandit_wealthy_tier_2, {=is_faction_friend_to_actor(bandit) +zat_b30_barmen_under_sultan =heavy_pockets_functor} supplies_bandit_wealthy_tier_2, {+jup_a9_tech_way_info =is_faction_friend_to_actor(stalker) +zat_b30_sultan_loose} sci_supplies_stalker_tier_2, {=is_faction_friend_to_actor(stalker) +zat_b30_sultan_loose} supplies_stalker_tier_2, {+jup_a9_tech_way_info =is_faction_friend_to_actor(bandit) +zat_b30_barmen_under_sultan} sci_supplies_bandit_tier_2, {=is_faction_friend_to_actor(bandit) +zat_b30_barmen_under_sultan} supplies_bandit_tier_2, {+jup_a9_tech_way_info =is_faction_friend_to_actor(stalker) =is_faction_friend_to_actor(bandit)} sci_supplies_stalker_bandit_tier, {=is_faction_friend_to_actor(stalker) =is_faction_friend_to_actor(bandit)} supplies_stalker_bandit_tier, {+jup_a9_tech_way_info =is_faction_friend_to_actor(stalker)} sci_supplies_stalker_tier_1, {=is_faction_friend_to_actor(stalker)} supplies_stalker_tier_1, {+jup_a9_tech_way_info =is_faction_friend_to_actor(bandit)} sci_supplies_bandit_tier_1, {=is_faction_friend_to_actor(bandit)} supplies_bandit_tier_1, {+jup_a9_tech_way_info} sci_supplies_generic, supplies_generic
-discounts                                = discount_1
+buy_supplies                             = {+jup_a9_tech_way_info =is_faction_friend_to_actor(stalker) +zat_b30_sultan_loose =heavy_pockets_functor} sci_supplies_stalker_wealthy_tier_2, {=is_faction_friend_to_actor(stalker) +zat_b30_sultan_loose =heavy_pockets_functor} supplies_stalker_wealthy_tier_2, {+jup_a9_tech_way_info =is_faction_friend_to_actor(bandit) +zat_b30_barmen_under_sultan =heavy_pockets_functor} sci_supplies_bandit_wealthy_tier_2, {=is_faction_friend_to_actor(bandit) +zat_b30_barmen_under_sultan =heavy_pockets_functor} supplies_bandit_wealthy_tier_2, {+jup_a9_tech_way_info =is_faction_friend_to_actor(stalker) +zat_b30_sultan_loose} sci_supplies_stalker_tier_2, {=is_faction_friend_to_actor(stalker) +zat_b30_sultan_loose} supplies_stalker_tier_2, {+jup_a9_tech_way_info =is_faction_friend_to_actor(bandit) +zat_b30_barmen_under_sultan} sci_supplies_bandit_tier_2, {=is_faction_friend_to_actor(bandit) +zat_b30_barmen_under_sultan} supplies_bandit_tier_2, {+jup_a9_tech_way_info =is_faction_friend_to_actor(stalker) =is_faction_friend_to_actor(bandit)} sci_supplies_stalker_bandit_tier, {=is_faction_friend_to_actor(stalker) =is_faction_friend_to_actor(bandit)} supplies_stalker_bandit_tier, {=is_faction_friend_to_actor(stalker)} supplies_stalker_tier_1, {+jup_a9_tech_way_info =is_faction_friend_to_actor(bandit)} sci_supplies_bandit_tier_1, {=is_faction_friend_to_actor(bandit)} supplies_bandit_tier_1, {+jup_a9_tech_way_info} sci_supplies_generic, supplies_generic
+discounts                                = {=actor_goodwill_ge(csky:2000)} discount_3, {=actor_goodwill_ge(csky:1000)} discount_2, {=actor_goodwill_ge(csky:500)} discount_1, discount_0
 price_profile                            = default
 sell_condition                           = trade_generic_sell
 
@@ -490,10 +491,6 @@ helm_battle                              = 1,	0.7
 helm_hardhat                             = 1, 	0.1
 helm_respirator                          = 1,	0.1
 helm_tactic                              = 1, 	0.5
-
-[discount_1]
-buy                                      = 1
-sell                                     = 0.90
 
 [buy_tier_2]
 
@@ -1107,12 +1104,6 @@ helm_respirator                          = 1,	0.7
 ;E_STLK
 scientific_outfit                        = 1, 	1
 
-[sci_supplies_stalker_tier_1]
-
-[discount_3]
-buy                                      = 1
-sell                                     = 0.75
-
 [supplies_stalker_bandit_tier]
 
 ;DET_ELIT
@@ -1173,7 +1164,3 @@ stalker_outfit                           = 1, 	0.7
 ;E_HLMET
 helm_hardhat                             = 1, 	0.4
 helm_respirator                          = 1,	0.4
-
-[discount_2]
-buy                                      = 1
-sell                                     = 0.85

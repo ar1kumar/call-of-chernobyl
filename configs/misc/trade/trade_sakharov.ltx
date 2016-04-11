@@ -1,14 +1,11 @@
+#include "trade_discounts.ltx"
 
 [trader]
 buy_condition                            = trade_generic_buy
-buy_supplies                             = {=actor_goodwill_ge(ecolog:2000)} supplies_advanced_anobiotik, {=actor_goodwill_ge(ecolog:1500)} supplies_anobiotik, {=actor_goodwill_ge(ecolog:1000)} supplies_advanced, supplies_start
-discounts                                = {=actor_goodwill_ge(ecolog:1500)} discount_2, {=actor_goodwill_ge(ecolog:1000)} discount
+buy_supplies                             = {=actor_goodwill_ge(ecolog:2000)} supplies_advanced_anobiotik, {=actor_goodwill_ge(ecolog:1000)} supplies_anobiotik, {=actor_goodwill_ge(ecolog:500)} supplies_advanced, supplies_start
+discounts                                = {=actor_goodwill_ge(ecolog:2000)} discount_3, {=actor_goodwill_ge(ecolog:1000)} discount_2, {=actor_goodwill_ge(ecolog:500)} discount_1, discount_0
 price_profile                            = ecolog
 sell_condition                           = trade_generic_sell
-
-[discount]
-buy                                      = 1
-sell                                     = 0.75
 
 [supplies_start]
 
@@ -418,10 +415,6 @@ drug_psy_blockade                        = 10, 0.35
 drug_radioprotector                      = 10, 0.4
 medkit                                   = 20, 0.8
 medkit_scientic                          = 6, 0.8
-
-[discount_2]
-buy                                      = 1
-sell                                     = 0.6
 
 [buy_tier_2]
 
