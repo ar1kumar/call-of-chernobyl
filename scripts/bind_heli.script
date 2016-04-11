@@ -226,8 +226,8 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	
 	-- Clear Skies achievement
 	if (db.actor and enemy:id() == 0) then
-		xr_statistic.inc_actor_rank(100)
-		xr_statistic.inc_actor_reputation(100)
+		xr_statistic.inc_actor_rank(50)
+		xr_statistic.inc_actor_reputation(50)
 		local itm = db.actor:active_item()
 		if (itm and itm:section() == "wpn_rpg7") then
 			local health = get_heli_health(self.st.heliObject,self.st)
