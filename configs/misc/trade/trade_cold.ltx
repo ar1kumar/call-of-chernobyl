@@ -1,7 +1,9 @@
+#include "trade_discounts.ltx"
 
 [trader]
 buy_condition                            = trade_generic_buy
 buy_supplies                             = supplies_start
+discounts                                = {=actor_goodwill_ge(csky:2000)} discount_3, {=actor_goodwill_ge(csky:1000)} discount_2, {=actor_goodwill_ge(csky:500)} discount_1, discount_0
 price_profile                            = food_only
 sell_condition                           = trade_generic_sell
 
