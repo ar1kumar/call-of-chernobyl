@@ -399,7 +399,7 @@ function notify_actor_rank_change()
 	
 	-- Rank values span from ±0 (Rookie) to +2500 (Legend).
 	-- Prevent notifications that rank is changed to levels which don't exist.
-	if (actual_rank < 0 or actual_rank >= 2000) then
+	if (actual_rank < 0 or actual_rank > 2000) then
 		return
 	end
 	
@@ -441,7 +441,7 @@ function notify_actor_reputation_change()
 	
 	-- Reputation values span from -2000 (Villainous) to +2000 (Exceptional).
 	-- Prevent notifications that rank is changed to levels which don't exist.
-	if (actual_reputation <= -2000 or actual_reputation >= 2000) then
+	if (actual_reputation < -2000 or actual_reputation > 2000) then
 		return
 	end
 	
