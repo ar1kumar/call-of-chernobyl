@@ -48,6 +48,8 @@ local function actor_on_item_take_from_box(box,itm)
 		get_hud():HideActorMenu()
 		level.map_remove_object_spot(box:id(), "treasure")
 		xr_statistic.inc_founded_secrets_counter()
+		xr_statistic.inc_actor_rank(10)
+		xr_statistic.inc_actor_reputation(10)
 		news_manager.send_treasure(1)
 	end
 end

@@ -110,6 +110,8 @@ function actor_on_item_take_from_box(box,obj)
 		--story_objects.get_story_objects_registry():unregister_by_story_id(sid)
 		--alife():release(alife():object(box:id()),true)
 		xr_statistic.inc_founded_secrets_counter()
+		xr_statistic.inc_actor_rank(10)
+		xr_statistic.inc_actor_reputation(10)
 		news_manager.send_treasure(1)
 		secret_stashes[sid] = false
 
@@ -128,6 +130,8 @@ function actor_on_item_take(item)
 
 	level.map_remove_object_spot(item:id(), "treasure")
 	xr_statistic.inc_founded_secrets_counter()
+	xr_statistic.inc_actor_rank(10)
+	xr_statistic.inc_actor_reputation(10)
 	news_manager.send_treasure(1)
 	secret_stashes[sid] = false
 
