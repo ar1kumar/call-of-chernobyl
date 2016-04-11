@@ -397,9 +397,9 @@ function notify_actor_rank_change()
 	local previous_rank			= actual_rank - 500				-- Exact value of next rank.
 	local next_rank 				= actual_rank + 500				-- Exact value of previous rank.
 	
-	-- Rank values span from ±0 (Rookie) to +2500 (Legend).
+	-- Rank values span from ±0 (Rookie) to +7500 (Legend).
 	-- Prevent notifications that rank is changed to levels which don't exist.
-	if (actual_rank < 0 or actual_rank > 2500) then
+	if (actual_rank < 0 or actual_rank > 7500) then
 		return
 	end
 	
