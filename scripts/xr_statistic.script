@@ -95,7 +95,13 @@ artefacts_table = {
 taken_artefacts = {}
 
 function on_game_start()
+	RegisterScriptCallback("actor_on_update",actor_on_update)
 	RegisterScriptCallback("on_game_load",on_game_load)
+end
+
+function actor_on_update()
+	notify_actor_rank_change()
+	notify_actor_reputation_change()
 end
 
 function on_game_load()
@@ -393,7 +399,7 @@ function notify_actor_rank_change()
 	
 	-- Rank values span from ±0 (Rookie) to +2500 (Legend).
 	-- Prevent notifications that rank is changed to levels which don't exist.
-	if (actual_rank <= 0 or actual_rank >= 2000) then
+	if (actual_rank < 0 or actual_rank >= 2000) then
 		return
 	end
 	
