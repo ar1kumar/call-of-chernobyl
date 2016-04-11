@@ -259,6 +259,7 @@ function CSurgeManager:skip_surge()
 	
 	xr_statistic.inc_surges_counter()
 	xr_statistic.inc_actor_rank(5)
+	xr_statistic.inc_actor_reputation(5)
 	if not (self.skip_message) and (atmosfear == nil or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==1) then
 		news_manager.send_tip(db.actor, "st_surge_while_asleep", nil, "recent_surge", nil, nil)
 		self.skip_message = true
@@ -344,6 +345,7 @@ function CSurgeManager:end_surge(manual)
 
 	xr_statistic.inc_surges_counter()
 	xr_statistic.inc_actor_rank(5)
+	xr_statistic.inc_actor_reputation(5)
 end
 
 function CSurgeManager:toggle_level_artefact_respawns()
