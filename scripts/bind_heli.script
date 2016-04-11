@@ -224,10 +224,13 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 		self.last_hit_snd_timeout = time_global() + math.random( 4000, 8000 )
 	end
 	
-	-- Clear Skies achievement
-	if (db.actor and enemy:id() == 0) then
+	if (get_heli_health(self.st.heliObject,self.st) < 0.005) then
 		xr_statistic.inc_actor_rank(50)
 		xr_statistic.inc_actor_reputation(50)
+	end
+	
+	-- Clear Skies achievement
+	if (db.actor and enemy:id() == 0) then
 		local itm = db.actor:active_item()
 		if (itm and itm:section() == "wpn_rpg7") then
 			local health = get_heli_health(self.st.heliObject,self.st)
