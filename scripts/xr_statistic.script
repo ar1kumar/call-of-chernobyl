@@ -14,6 +14,8 @@ actor_statistic = {
 					pdas_delivered = 0,
 					heli_rocket_kills = 0,
 					artefacts_detected = 0,
+					actual_rank = 0,
+					actual_reputation = 0,
 					visited = { 
 								["k00_marsh"] = false,
 								["k01_darkscape"] = false,
@@ -249,6 +251,8 @@ function save(package)
 	package:w_u16(actor_statistic.pdas_delivered)
 	package:w_u16(actor_statistic.heli_rocket_kills)
 	package:w_u16(actor_statistic.artefacts_detected)
+	package:w_u16(actor_statistic.actual_rank)
+	package:w_u16(actor_statistic.actual_reputation)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
 	
@@ -308,6 +312,8 @@ function load(package)
 	actor_statistic.pdas_delivered 		= package:r_u16()
 	actor_statistic.heli_rocket_kills 	= package:r_u16()
 	actor_statistic.artefacts_detected 	= package:r_u16()
+	actor_statistic.actual_rank 		= package:r_u16()
+	actor_statistic.actual_reputation	= package:r_u16()
 	
 	local str = package:r_stringZ()
 	if(str~="nil") then
@@ -375,6 +381,35 @@ function inc_actor_rank(rank)
 	
 end
 
+-- Notify of increased rank.
+function notify_actor_rank_change()
+	-- Current actor rank, and rounded down to nearest hundred.
+	local current_rank 			= get_actor_rank()
+	local current_rank_rounded 	= (math.floor(((current_rank + 50) / 100) - 0.5) * 100)
+	
+	local actual_rank 			= actor_statistic.actual_rank		-- Exact value of current rank.
+	local previous_rank			= actual_rank - 500				-- Exact value of next rank.
+	local next_rank 				= actual_rank + 500				-- Exact value of previous rank.
+	
+	-- Rank values span from ±0 (Rookie) to +2500 (Legend).
+	-- Prevent notifications that rank is changed to levels which don't exist.
+	if (actual_rank <= 0 or actual_rank >= 2000) then
+		return
+	end
+	
+	-- Increase the actual rank if next one has been reached.
+	if (current_rank_rounded >= next_rank) then
+		news_manager.send_tip(db.actor, "st_rank_increased", nil, nil, nil, nil)
+		actor_statistic.actual_rank = next_rank
+		
+	-- Decrease the actual rank 'level' if current rank is too low.
+	-- It isn't intended for ranks to decrease, and doesn't in vanilla CoC.
+	elseif (current_rank_rounded < actual_rank) then
+		news_manager.send_tip(db.actor, "st_rank_decreased", nil, nil, nil, nil)
+		actor_statistic.actual_rank = previous_rank
+	end
+end
+
 -- Return the actor reputation.
 function get_actor_reputation()
 	return db.actor:character_reputation()
@@ -385,5 +420,33 @@ function inc_actor_reputation(reputation)
 	if (get_actor_reputation() + reputation <= 10000) then
 		db.actor:change_character_reputation(reputation)
 		--news_manager.send_tip(db.actor, "Reputation: ".. get_actor_reputation(), nil, "completionist", nil, nil)
+	end
+end
+
+-- Notify of increased reputation.
+function notify_actor_reputation_change()
+	-- Current actor reputation, and rounded down to nearest hundred.
+	local current_reputation 			= get_actor_reputation()
+	local current_reputation_rounded 	= (math.floor(((current_reputation + 50) / 100) - 0.5) * 100)
+	
+	local actual_reputation 			= actor_statistic.actual_reputation		-- Exact value of current reputation.
+	local previous_reputation			= actual_reputation - 500				-- Exact value of next reputation.
+	local next_reputation 				= actual_reputation + 500				-- Exact value of previous reputation.
+	
+	-- Reputation values span from -2000 (Villainous) to +2000 (Exceptional).
+	-- Prevent notifications that rank is changed to levels which don't exist.
+	if (actual_reputation <= -2000 or actual_reputation >= 2000) then
+		return
+	end
+	
+	-- Increase the actual reputation if next one has been reached.
+	if (current_reputation_rounded >= next_reputation) then
+		news_manager.send_tip(db.actor, "st_reputation_increased", nil, nil, nil, nil)
+		actor_statistic.actual_reputation = next_reputation
+		
+	-- Decrease the actual reputation 'level' if current reputation is too low.
+	elseif (current_reputation_rounded < actual_reputation) then
+		news_manager.send_tip(db.actor, "st_reputation_decreased", nil, nil, nil, nil)
+		actor_statistic.actual_reputation = previous_reputation
 	end
 end
