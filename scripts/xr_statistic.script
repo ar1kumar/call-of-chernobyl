@@ -385,41 +385,31 @@ end
 
 -- Increment the actor rank.
 function inc_actor_rank(rank)
-	db.actor:set_character_rank(get_actor_rank() + rank)
-	--news_manager.send_tip(db.actor, "Rank: ".. get_actor_rank(), nil, "completionist", nil, nil)
+	if (rank >= 0) then
+		db.actor:set_character_rank(get_actor_rank() + rank)
+		--news_manager.send_tip(db.actor, "Rank: ".. get_actor_rank(), nil, "completionist", nil, nil)
+	end
 	
 end
 
 -- Notify of increased rank.
 function notify_actor_rank_change()
 	-- Current actor rank, and rounded down to nearest hundred.
-	local current_rank 			= get_actor_rank()
-	local current_rank_rounded 	= (math.floor(((current_rank + 50) / 100) - 0.5) * 100)
+	local exact_rank 			= get_actor_rank()
+	local rounded_rank 			= (math.floor(((exact_rank + 50) / 100) - 0.5) * 100)
 	
 	local rank_value 			= actor_statistic.rank_value
 	local rank_difference		= actor_statistic.rank_difference
 	
-	local previous_rank			= ((rank_value - rank_difference) + 500)
+--	local previous_rank			= ((rank_value - rank_difference) + 500)
 	local next_rank 			= (rank_value + rank_difference)
 	
-	-- Rank values span from ±0 (Rookie) to +7500 (Legend).
-	-- Prevent notifications that rank is changed to levels which don't exist.
-	if (rank_value < 0 or rank_value > 7500) then
-		return
-	end
-	
-	-- Increase the actual rank if next one has been reached.
-	if (current_rank_rounded >= next_rank) then
+	-- Increase the current rank if next one has been reached.
+	-- Ranks should not decrease and as such no notification is given.
+	if (rounded_rank >= next_rank and rank_value > 0 and rank_value < 7500) then
 		news_manager.send_tip(db.actor, "st_rank_increased", nil, nil, nil, nil)
 		actor_statistic.rank_value = next_rank
 		actor_statistic.rank_difference = rank_difference + 500
-		
-		
-	-- Decrease the actual rank 'level' if current rank is too low.
-	-- It isn't intended for ranks to decrease, and doesn't in vanilla CoC.
-	elseif (current_rank_rounded < rank_value) then
-		news_manager.send_tip(db.actor, "st_rank_decreased", nil, nil, nil, nil)
-		actor_statistic.rank_value = previous_rank
 	end
 end
 
@@ -439,28 +429,27 @@ end
 -- Notify of increased reputation.
 function notify_actor_reputation_change()
 	-- Current actor reputation, and rounded down to nearest hundred.
-	local current_reputation 			= get_actor_reputation()
-	local current_reputation_rounded 	= (math.floor(((current_reputation + 50) / 100) - 0.5) * 100)
+	local exact_reputation 		= get_actor_reputation()
+	local rounded_reputation 	= 0
 	
-	local reputation_value 				= actor_statistic.reputation_value		-- Exact value of current reputation.
+	if (exact_reputation >= 0) then
+		rounded_reputation = (math.floor(((exact_reputation + 50) / 100) - 0.5) * 100)
+	else
+		rounded_reputation = (math.ceil(((exact_reputation - 50) / 100) + 0.5) * 100)
+	end
 	
 	-- Reputations increase and decrease in multiples of 500.
+	local reputation_value 				= actor_statistic.reputation_value		-- Exact value of current reputation.
 	local previous_reputation			= reputation_value - 500				-- Exact value of previous reputation.
 	local next_reputation 				= reputation_value + 500				-- Exact value of next reputation.
 	
-	-- Reputation values span from -2000 (Villainous) to +2000 (Exceptional).
-	-- Prevent notifications that rank is changed to levels which don't exist.
-	if (reputation_value < -2000 or reputation_value > 2000) then
-		return
-	end
-	
-	-- Increase the actual reputation if next one has been reached.
-	if (current_reputation_rounded >= next_reputation) then
+	-- Increase reputation if the next has been reached or the current cannot be sustained. Allow for a 1000 reputation point drift.
+	if ((rounded_reputation >= next_reputation or (exact_reputation > reputation_value and exact_reputation < 0)) and reputation_value < 3000) then
 		news_manager.send_tip(db.actor, "st_reputation_increased", nil, nil, nil, nil)
 		actor_statistic.reputation_value = next_reputation
-		
-	-- Decrease the actual reputation 'level' if current reputation is too low.
-	elseif (current_reputation_rounded < reputation_value) then
+	
+	-- Decrease reputation if the previous has been reached or the current cannot be sustained. Allow for a 1000 reputation point drift.
+	elseif ((rounded_reputation <= previous_reputation or (exact_reputation < reputation_value and exact_reputation > 0)) and reputation_value > -3000) then
 		news_manager.send_tip(db.actor, "st_reputation_decreased", nil, nil, nil, nil)
 		actor_statistic.reputation_value = previous_reputation
 	end
