@@ -14,8 +14,9 @@ actor_statistic = {
 					pdas_delivered = 0,
 					heli_rocket_kills = 0,
 					artefacts_detected = 0,
-					actual_rank = 0,
-					actual_reputation = 0,
+					rank_value = 0,
+					rank_difference = 500,
+					reputation_value = 0,
 					visited = { 
 								["k00_marsh"] = false,
 								["k01_darkscape"] = false,
@@ -100,8 +101,8 @@ function on_game_start()
 end
 
 function actor_on_update()
-	--notify_actor_rank_change()
-	--notify_actor_reputation_change()
+	notify_actor_rank_change()
+	notify_actor_reputation_change()
 end
 
 function on_game_load()
@@ -257,8 +258,9 @@ function save(package)
 	package:w_u16(actor_statistic.pdas_delivered)
 	package:w_u16(actor_statistic.heli_rocket_kills)
 	package:w_u16(actor_statistic.artefacts_detected)
-	package:w_u16(actor_statistic.actual_rank)
-	package:w_u16(actor_statistic.actual_reputation)
+	package:w_u16(actor_statistic.rank_value)
+	package:w_u16(actor_statistic.rank_difference)
+	package:w_u16(actor_statistic.reputation_value)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
 	
@@ -318,8 +320,9 @@ function load(package)
 	actor_statistic.pdas_delivered 		= package:r_u16()
 	actor_statistic.heli_rocket_kills 	= package:r_u16()
 	actor_statistic.artefacts_detected 	= package:r_u16()
-	actor_statistic.actual_rank 		= package:r_u16()
-	actor_statistic.actual_reputation	= package:r_u16()
+	actor_statistic.rank_value 			= package:r_u16()
+	actor_statistic.rank_difference		= package:r_u16()
+	actor_statistic.reputation_value	= package:r_u16()
 	
 	local str = package:r_stringZ()
 	if(str~="nil") then
@@ -393,26 +396,30 @@ function notify_actor_rank_change()
 	local current_rank 			= get_actor_rank()
 	local current_rank_rounded 	= (math.floor(((current_rank + 50) / 100) - 0.5) * 100)
 	
-	local actual_rank 			= actor_statistic.actual_rank		-- Exact value of current rank.
-	local previous_rank			= actual_rank - 500				-- Exact value of next rank.
-	local next_rank 			= actual_rank + 500				-- Exact value of previous rank.
+	local rank_value 			= actor_statistic.rank_value
+	local rank_difference		= actor_statistic.rank_difference
+	
+	local previous_rank			= ((rank_value - rank_difference) + 500)
+	local next_rank 			= (rank_value + rank_difference)
 	
 	-- Rank values span from ±0 (Rookie) to +7500 (Legend).
 	-- Prevent notifications that rank is changed to levels which don't exist.
-	if (actual_rank < 0 or actual_rank > 7500) then
+	if (rank_value < 0 or rank_value > 7500) then
 		return
 	end
 	
 	-- Increase the actual rank if next one has been reached.
 	if (current_rank_rounded >= next_rank) then
 		news_manager.send_tip(db.actor, "st_rank_increased", nil, nil, nil, nil)
-		actor_statistic.actual_rank = next_rank
+		actor_statistic.rank_value = next_rank
+		actor_statistic.rank_difference = rank_difference + 500
+		
 		
 	-- Decrease the actual rank 'level' if current rank is too low.
 	-- It isn't intended for ranks to decrease, and doesn't in vanilla CoC.
-	elseif (current_rank_rounded < actual_rank) then
+	elseif (current_rank_rounded < rank_value) then
 		news_manager.send_tip(db.actor, "st_rank_decreased", nil, nil, nil, nil)
-		actor_statistic.actual_rank = previous_rank
+		actor_statistic.rank_value = previous_rank
 	end
 end
 
@@ -435,24 +442,26 @@ function notify_actor_reputation_change()
 	local current_reputation 			= get_actor_reputation()
 	local current_reputation_rounded 	= (math.floor(((current_reputation + 50) / 100) - 0.5) * 100)
 	
-	local actual_reputation 			= actor_statistic.actual_reputation		-- Exact value of current reputation.
-	local previous_reputation			= actual_reputation - 500				-- Exact value of next reputation.
-	local next_reputation 				= actual_reputation + 500				-- Exact value of previous reputation.
+	local reputation_value 				= actor_statistic.reputation_value		-- Exact value of current reputation.
+	
+	-- Reputations increase and decrease in multiples of 500.
+	local previous_reputation			= reputation_value - 500				-- Exact value of previous reputation.
+	local next_reputation 				= reputation_value + 500				-- Exact value of next reputation.
 	
 	-- Reputation values span from -2000 (Villainous) to +2000 (Exceptional).
 	-- Prevent notifications that rank is changed to levels which don't exist.
-	if (actual_reputation < -2000 or actual_reputation > 2000) then
+	if (reputation_value < -2000 or reputation_value > 2000) then
 		return
 	end
 	
 	-- Increase the actual reputation if next one has been reached.
 	if (current_reputation_rounded >= next_reputation) then
 		news_manager.send_tip(db.actor, "st_reputation_increased", nil, nil, nil, nil)
-		actor_statistic.actual_reputation = next_reputation
+		actor_statistic.reputation_value = next_reputation
 		
 	-- Decrease the actual reputation 'level' if current reputation is too low.
-	elseif (current_reputation_rounded < actual_reputation) then
+	elseif (current_reputation_rounded < reputation_value) then
 		news_manager.send_tip(db.actor, "st_reputation_decreased", nil, nil, nil, nil)
-		actor_statistic.actual_reputation = previous_reputation
+		actor_statistic.reputation_value = previous_reputation
 	end
 end
