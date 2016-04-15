@@ -241,20 +241,20 @@ end
 
 function is_actor_friend(actor,npc)
 	local npc = dialogs.who_is_npc(actor,npc)
-	
+
 	local squad = get_object_squad(npc)
-	if not (squad) then 
-		return false 
+	if not (squad) then
+		return false
 	end
 
-	if not (axr_companions.allow_simulation_squads_as_companions) then 
-		return false 
+	if not (axr_companions.allow_simulation_squads_as_companions) then
+		return false
 	end
 
-	if not (axr_companions.allow_only_friends_as_companions) then 
-		return true 
-	end 
-	
+	if not (axr_companions.allow_only_friends_as_companions) then
+		return true
+	end
+
 	return npc:relation(db.actor) == game_object.friend
 end
 
@@ -289,7 +289,7 @@ function become_actor_companion(actor,npc)
 	if not (squad) then
 		return
 	end
-	
+
 	SIMBOARD:assign_squad_to_smart(squad, nil)
 
 	for k in squad:squad_members() do
@@ -303,7 +303,7 @@ end
 
 function is_hostage_task_giver(a,b)
 	local npc = dialogs.who_is_npc(a,b)
-	local t = {"simulation_task_3", "simulation_task_4", "simulation_task_5"}
+	local t = {"simulation_task_7", "simulation_task_8", "simulation_task_9", "simulation_task_10"}
 	local id = npc:id()
 	local se_obj = alife():object(id)
 	local tm = task_manager.get_task_manager()
@@ -311,12 +311,12 @@ function is_hostage_task_giver(a,b)
 	local task
 	for k,task_id in pairs(t) do
 		task = task_info[task_id]
-		if (task) and (task.task_giver_id == se_obj.group_id or task.task_giver_id == id) then 
-			return true 
+		if (task) and (task.task_giver_id == se_obj.group_id or task.task_giver_id == id) then
+			return true
 		end
 	end
 	return false
-end 
+end
 
 function is_not_hostage_task_giver(a,b)
 	return not is_hostage_task_giver(a,b)
