@@ -183,7 +183,6 @@ function generic_object_binder:death_callback(victim, who)
 	self:hit_callback(victim, 1, vector():set(0,0,0), who, "from_death_callback")
 
 	if (who:id() == db.actor:id()) then
-		xr_statistic.inc_actor_rank(5)
 		xr_statistic.inc_killed_monsters_counter()
 		xr_statistic.set_best_monster(victim)
 	end

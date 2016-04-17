@@ -133,7 +133,6 @@ function CTreasureManager:update()
 				if(sect=="true") and not v.checked then
 					level.map_remove_object_spot(self.secret_restrs[k], "treasure")
 					xr_statistic.inc_founded_secrets_counter()
-					xr_statistic.inc_actor_rank(10)
 					v.empty = nil
 					v.checked = true
 					printf("Empty secret [%s] remove map spot!", k)
@@ -250,7 +249,6 @@ function CTreasureManager:on_item_take(obj_id)
 		if(self.secrets[treasure_id].to_find==0) then
 			level.map_remove_object_spot(self.secret_restrs[treasure_id], "treasure")
 			xr_statistic.inc_founded_secrets_counter()
-			xr_statistic.inc_actor_rank(10)
 			printf("Secret [%s] now is empty!", treasure_id)
 			self.secrets[treasure_id].checked = true
 			news_manager.send_treasure(1)

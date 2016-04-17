@@ -18,7 +18,8 @@ function completionist_functor()
 	and (has_alife_info("achieved_well_dressed")) then
 		db.actor:give_info_portion("achieved_completionist")
 		news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
-		xr_statistic.inc_actor_rank(50)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.completionist.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.completionist.rpt)
 	end
 	return has_alife_info("achieved_completionist")
 end
@@ -34,7 +35,8 @@ function duga_free_functor()
 	if (has_alife_info("yan_labx16_switcher_primary_off") and has_alife_info("bar_deactivate_radar_done")) then
 		db.actor:give_info_portion("achieved_duga_free")
 		news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.duga_free.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.duga_free.rpt)
 	end
 	return has_alife_info("achieved_duga_free")
 end
@@ -50,7 +52,8 @@ function clear_skies_functor()
 	if (xr_statistic.actor_statistic.heli_rocket_kills >= 1) then
 		db.actor:give_info_portion("achieved_clear_skies")
 		news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "clear_skies", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.clear_skies.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.clear_skies.rpt)
 	end
 	return has_alife_info("achieved_clear_skies")
 end
@@ -66,7 +69,8 @@ function geologist_functor()
 	if (xr_statistic.actor_statistic.artefacts_detected >= 25) then
 		db.actor:give_info_portion("achieved_geologist")
 		news_manager.send_tip(db.actor, "st_achievement_13_unlock", nil, "geologist", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.geologist.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.geologist.rpt)
 	end
 	return has_alife_info("achieved_geologist")
 end
@@ -82,7 +86,8 @@ function heavy_pockets_functor()
 	if (db.actor:money() >= 1000000) then
 		db.actor:give_info_portion("achieved_heavy_pockets")
 		news_manager.send_tip(db.actor, "st_achievement_1_unlock", nil, "heavy_pockets", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.heavy_pockets.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.heavy_pockets.rpt)
 	end
 	return has_alife_info("achieved_heavy_pockets")
 end
@@ -98,7 +103,8 @@ function infopreneur_functor()
 	if (xr_statistic.actor_statistic.pdas_delivered >= 25) then
 		db.actor:give_info_portion("achieved_infopreneur")
 		news_manager.send_tip(db.actor, "st_achievement_3_unlock", nil, "infopreneur", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.infopreneur.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.infopreneur.rpt)
 	end
 	return has_alife_info("achieved_infopreneur")
 end
@@ -123,7 +129,8 @@ function mechanized_warfare_functor()
 	or has_alife_info("zat_a2_stalker_mechanic_upgrade_tier_3") then
 		db.actor:give_info_portion("achieved_mechanized_warfare")
 		news_manager.send_tip(db.actor, "st_achievement_7_unlock", nil, "mechanized_warfare", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.mechanized_warfare.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.mechanized_warfare.rpt)
 	end
 	return has_alife_info("achieved_mechanized_warfare")
 end
@@ -146,7 +153,8 @@ function radiotherapy_functor()
 	if xr_statistic.actor_statistic.surges >= 25 then
 		db.actor:give_info_portion("achieved_radiotherapy")
 		news_manager.send_tip(db.actor, "st_achievement_2_unlock", nil, "radiotherapy", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.radiotherapy.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.radiotherapy.rpt)
 	end
 	return has_alife_info("achieved_radiotherapy")
 end
@@ -162,7 +170,8 @@ function rag_and_bone_functor()
 	if (xr_statistic.actor_statistic.founded_secrets >= 75) then
 		db.actor:give_info_portion("achieved_rag_and_bone")
 		news_manager.send_tip(db.actor, "st_achievement_9_unlock", nil, "rag_and_bone", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.rag_and_bone.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.rag_and_bone.rpt)
 	end
 end
 
@@ -177,7 +186,8 @@ function silver_or_lead_functor()
 	if (xr_statistic.actor_statistic.killed_stalkers >= 500) then
 		db.actor:give_info_portion("achieved_silver_or_lead")
 		news_manager.send_tip(db.actor, "st_achievement_6_unlock", nil, "silver_or_lead", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.silver_or_lead.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.silver_or_lead.rpt)
 	end
 	return has_alife_info("achieved_silver_or_lead")
 end
@@ -200,7 +210,8 @@ function tourist_functor()
 		end
 		db.actor:give_info_portion("achieved_tourist")
 		news_manager.send_tip(db.actor, "st_achievement_8_unlock", nil, "tourist", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.tourist.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.tourist.rpt)
 		return true
 	end
 	if (xr_statistic.actor_visited_all_levels()) then
@@ -220,7 +231,8 @@ function well_dressed_functor()
 	if (xr_statistic.actor_statistic.killed_monsters >= 500) then
 		db.actor:give_info_portion("achieved_well_dressed")
 		news_manager.send_tip(db.actor, "st_achievement_5_unlock", nil, "well_dressed", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.well_dressed.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.well_dressed.rpt)
 	end
 	return has_alife_info("achieved_well_dressed")
 end
@@ -236,7 +248,8 @@ function wishful_thinking_functor()
 	if (has_alife_info("achieved_wishful_thinking_trigger")) then
 		db.actor:give_info_portion("achieved_wishful_thinking")
 		news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
-		xr_statistic.inc_actor_rank(25)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.wishful_thinking.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.wishful_thinking.rpt)
 	end
 	if (level.name() == "l12u_sarcofag") then
 		db.actor:give_info_portion("achieved_wishful_thinking_trigger")

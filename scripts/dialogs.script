@@ -254,8 +254,6 @@ function text_trade_npc_pda(a,b)
         if chk and tbl[pda_t] then
 			tbl[pda_t] = tbl[pda_t] + 1
             actor:transfer_item(itm,npc)
-			xr_statistic.inc_actor_rank(25)
-			xr_statistic.inc_actor_reputation(25)
             xr_statistic.inc_pdas_delivered_counter()
         end
     end
@@ -470,8 +468,7 @@ function surrender_victim_answers_2(a,b)
 		end
 	end
 
-	xr_statistic.inc_actor_rank(25)
-	xr_statistic.inc_actor_reputation(25)
+	xr_statistic.inc_help_wounded_counter()
 
 	npc:iterate_inventory(itr,npc)
 
@@ -587,8 +584,7 @@ function transfer_medkit(first_speaker, second_speaker)
 		npc:set_relation(game_object.friend,db.actor)
 	end
 
-	xr_statistic.inc_actor_rank(25)
-	xr_statistic.inc_actor_reputation(25)
+	xr_statistic.inc_help_wounded_counter()
 end
 function transfer_bandage(first_speaker, second_speaker)
 	dialogs.relocate_item_section(second_speaker, "bandage", "out")
