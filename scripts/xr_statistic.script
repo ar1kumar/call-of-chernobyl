@@ -392,17 +392,23 @@ function inc_actor_rank(rank)
 	
 end
 
+local exact_rank = nil
+local rounded_rank = nil
+local rank_value = nil
+local rank_difference = nil
+local next_rank = nil
+
 -- Notify of increased rank.
 function notify_actor_rank_change()
 	-- Current actor rank, and rounded down to nearest hundred.
-	local exact_rank 			= get_actor_rank()
-	local rounded_rank 			= (math.floor(((exact_rank + 50) / 100) - 0.5) * 100)
+	exact_rank 			= get_actor_rank()
+	rounded_rank 			= (math.floor(((exact_rank + 50) / 100) - 0.5) * 100)
 	
-	local rank_value 			= actor_statistic.rank_value
-	local rank_difference		= actor_statistic.rank_difference
+	rank_value 			= actor_statistic.rank_value
+	rank_difference		= actor_statistic.rank_difference
 	
 --	local previous_rank			= ((rank_value - rank_difference) + 500)
-	local next_rank 			= (rank_value + rank_difference)
+	next_rank 			= (rank_value + rank_difference)
 	
 	-- Increase the current rank if next one has been reached.
 	-- Ranks should not decrease and as such no notification is given.
@@ -426,11 +432,17 @@ function inc_actor_reputation(reputation)
 	end
 end
 
+local exact_reputation = nil
+local rounded_reputation = nil
+local reputation_value = nil
+local previous_reputation = nil
+local next_reputation = nil
+
 -- Notify of increased reputation.
 function notify_actor_reputation_change()
 	-- Current actor reputation, and rounded down to nearest hundred.
-	local exact_reputation 		= get_actor_reputation()
-	local rounded_reputation 	= 0
+	exact_reputation 		= get_actor_reputation()
+	rounded_reputation 	= 0
 	
 	if (exact_reputation >= 0) then
 		rounded_reputation = (math.floor(((exact_reputation + 50) / 100) - 0.5) * 100)
@@ -439,9 +451,9 @@ function notify_actor_reputation_change()
 	end
 	
 	-- Reputations increase and decrease in multiples of 500.
-	local reputation_value 				= actor_statistic.reputation_value		-- Exact value of current reputation.
-	local previous_reputation			= reputation_value - 500				-- Exact value of previous reputation.
-	local next_reputation 				= reputation_value + 500				-- Exact value of next reputation.
+	reputation_value 				= actor_statistic.reputation_value		-- Exact value of current reputation.
+	previous_reputation			= reputation_value - 500				-- Exact value of previous reputation.
+	next_reputation 				= reputation_value + 500				-- Exact value of next reputation.
 	
 	-- Increase reputation if the next has been reached or the current cannot be sustained. Allow for a 1000 reputation point drift.
 	if ((rounded_reputation >= next_reputation or (exact_reputation > reputation_value and exact_reputation < 0)) and reputation_value < 3000) then
