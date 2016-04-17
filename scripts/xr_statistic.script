@@ -145,7 +145,7 @@ function actor_on_item_take(item)
 			local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
 			if anomal_zone ~= nil then
 				anomal_zone:on_artefact_take(item)
-				inc_detected_artefacts_counter()
+				inc_artefacts_detected_counter()
 			else
 				bind_anomaly_zone.artefact_ways_by_id[item:id()] = nil
 			end
@@ -245,7 +245,7 @@ function inc_heli_rocket_kills()
 	inc_actor_rank(rank_rep.heli_rocket.rnk)
 	inc_actor_reputation(rank_rep.heli_rocket.rpt)
 end
-function inc_detected_artefacts_counter()
+function inc_artefacts_detected_counter()
 	actor_statistic.artefacts_detected = actor_statistic.artefacts_detected + 1
 	inc_actor_rank(rank_rep.detect_arts.rnk)
 	inc_actor_reputation(rank_rep.detect_arts.rpt)
