@@ -317,6 +317,12 @@ function set_best_weapon(hit_amount)
 		return
 	end
 
+	-- Trigger notifications for wounding.
+	if (hit_amount > 0) then
+		check_actor_rank_change()
+		check_actor_reputation_change()
+	end
+	
 	if not (IsWeapon(active_item)) then
 		return
 	end
