@@ -2,12 +2,15 @@
 suitable = {=check_npc_name(pri_medic_stalker)}
 active = animpoint@leader
 prior = 200
+trade = misc\trade\trade_medic.ltx
+level_spot = medic
 
 [animpoint@leader]
 cover_name = pri_a16_medic_yar
 avail_animations = animpoint_sit_normal
 combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
 out_restr = pri_a16_sr_noweap
 meet = meet
 
