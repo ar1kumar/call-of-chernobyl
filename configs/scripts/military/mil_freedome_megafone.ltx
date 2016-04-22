@@ -1,0 +1,8 @@
+[logic]
+active = ph_idle@wait
+
+[ph_idle@wait]
+on_info = {=dist_to_actor_le(100)} ph_idle@start_humor
+ 
+[ph_idle@start_humor]
+on_info = %=play_sound(megafon_mil)%
