@@ -11,6 +11,7 @@ function completionist_functor()
 	and (has_alife_info("achieved_heavy_pockets"))
 	and (has_alife_info("achieved_infopreneur"))
 	and (has_alife_info("achieved_mechanized_warfare"))
+	and (has_alife_info("achieved_patriarch"))
 	and (has_alife_info("achieved_radiotherapy"))
 	and (has_alife_info("achieved_rag_and_bone"))
 	and (has_alife_info("achieved_silver_or_lead"))
@@ -133,6 +134,23 @@ function mechanized_warfare_functor()
 		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.mechanized_warfare.rpt)
 	end
 	return has_alife_info("achieved_mechanized_warfare")
+end
+
+-- Patriarch
+function patriarch_functor()
+	if not (db.actor and db.actor.afterFirstUpdate) then
+		return false
+	end
+	if has_alife_info("achieved_patriarch") then
+		return true
+	end
+	if (db.actor:character_rank() >= 7500) then
+		db.actor:give_info_portion("achieved_patriarch")
+		news_manager.send_tip(db.actor, "st_achievement_14_unlock", nil, "patriarch", nil, nil)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.patriarch.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.patriarch.rpt)
+	end
+	return has_alife_info("achieved_patriarch")
 end
 
 -- Radiotherapy
