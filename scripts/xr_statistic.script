@@ -3,6 +3,7 @@
 
 actor_statistic = {
 					surges = 0,
+					storms = 0,
 					completed_quests = 0,
 					failed_quests = 0,
 					killed_monsters = 0,
@@ -70,6 +71,7 @@ monster_classes = {
 rank_rep = {
 			-- Gameplay mechanics.
 			surges				=	{rnk=5,		rpt=0},
+			storms				=	{rnk=5,		rpt=0},
 			quests				=	{rnk=50,	rpt=100},
 			quests_fail			=	{rnk=0,		rpt=-100},
 			monsters			=	{rnk=5,		rpt=0},
@@ -191,6 +193,11 @@ function inc_surges_counter()
 	actor_statistic.surges = actor_statistic.surges + 1
 	inc_actor_rank(rank_rep.surges.rnk)
 	inc_actor_reputation(rank_rep.surges.rpt)
+end
+function inc_storms_counter()
+	actor_statistic.storms = actor_statistic.storms + 1
+	inc_actor_rank(rank_rep.storms.rnk)
+	inc_actor_reputation(rank_rep.storms.rpt)
 end
 function inc_completed_quests_counter()
 	actor_statistic.completed_quests = actor_statistic.completed_quests + 1
@@ -341,6 +348,7 @@ function save(package)
 		return
 	end
 	package:w_u16(actor_statistic.surges)
+	package:w_u16(actor_statistic.storms)
 	package:w_u16(actor_statistic.completed_quests)
 	package:w_u16(actor_statistic.failed_quests)
 	package:w_u32(actor_statistic.killed_monsters)
@@ -403,6 +411,7 @@ function load(package)
 	end
 	actor_statistic = {}
 	actor_statistic.surges  			= package:r_u16()
+	actor_statistic.storms  			= package:r_u16()
 	actor_statistic.completed_quests 	= package:r_u16()
 	actor_statistic.failed_quests	 	= package:r_u16()
 	actor_statistic.killed_monsters  	= package:r_u32()
