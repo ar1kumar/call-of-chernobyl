@@ -172,7 +172,7 @@ function radiotherapy_functor()
 		db.actor:give_info_portion("achieved_radiotherapy")
 	end
 	
-	if xr_statistic.actor_statistic.surges >= 25 then
+	if (xr_statistic.actor_statistic.surges >= 25 and xr_statistic.actor_statistic.storms >= 25) then
 		db.actor:give_info_portion("achieved_radiotherapy")
 		news_manager.send_tip(db.actor, "st_achievement_2_unlock", nil, "radiotherapy", nil, nil)
 		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.radiotherapy.rnk)
