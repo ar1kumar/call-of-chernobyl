@@ -130,7 +130,12 @@ function on_game_start()
 
 	allow_only_friends_as_companions = ini:r_bool("main","allow_only_friends_as_companions")
 	allow_simulation_squads_as_companions = ini:r_bool("main","allow_simulation_squads_as_companions")
-	max_actor_squad_size = ini:r_float_ex("main","max_actor_squad_size") or 3
+	max_actor_squad_size = ini:r_float_ex("main","max_actor_squad_size") or 2
+	
+	-- Patriarch achievement doubles allowed squad sizes.
+	if (has_alife_info("achieved_patriarch")) then
+		max_actor_squad_size = ini:r_float_ex("main","max_actor_squad_size_patriarch") or 4
+	end
 end
 
 function companion_squad_can_teleport(squad)
