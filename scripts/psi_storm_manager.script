@@ -150,6 +150,7 @@ function CPsiStormManager:skip_psi_storm()
 	self.psi_storm_task_sect 	= ""
 	self.task_given 		= nil
 	prev_sec				= 0
+	xr_statistic.inc_storms_counter()
 	level.set_time_factor(self.game_time_factor)
 end
 
@@ -192,6 +193,7 @@ function CPsiStormManager:finish(manual)
 	self.vortexes = empty_table(self.vortexes)
 	self.stages = empty_table(self.stages)
 
+	xr_statistic.inc_storms_counter()
 	level.set_time_factor(self.game_time_factor)
 end
 
