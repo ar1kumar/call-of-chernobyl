@@ -149,6 +149,10 @@ function patriarch_functor()
 		news_manager.send_tip(db.actor, "st_achievement_14_unlock", nil, "patriarch", nil, nil)
 		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.patriarch.rnk)
 		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.patriarch.rpt)
+		
+		-- Workaround for not having to reload your save.
+		-- Allows actor to immediately recruit larger squads.
+		axr_companions.on_game_load()
 	end
 	return has_alife_info("achieved_patriarch")
 end
