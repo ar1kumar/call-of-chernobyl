@@ -107,10 +107,10 @@ function sleep_dialog:TestAndShow()
 		return
 	end
 	
-	-- Prevent sleep if an emission is currently ongoing.
-	if (xr_conditions.surge_started()) then
+	-- Prevent sleep if an emission or psi-storm currently ongoing.
+	if (xr_conditions.surge_started() or psi_storm_manager.is_started()) then
 		if not (surge_manager.actor_in_cover()) then
-			SetHudMsg(game.translate_string("st_sleep_surge"),4)
+			SetHudMsg(game.translate_string("st_sleep_event"),4)
 			return
 		end
 	end	
