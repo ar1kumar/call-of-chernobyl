@@ -498,7 +498,9 @@ end
 
 -- Increment the actor rank.
 function inc_actor_rank(rank)
-	if rank then db.actor:set_character_rank(db.actor:character_rank() + rank) end
+	if rank and ((db.actor:character_rank()+rank) <= 8000 and (db.actor:character_rank()+rank) >= 0) then
+		db.actor:set_character_rank(db.actor:character_rank() + rank)
+	end
 	check_actor_rank_change()
 --	news_manager.send_tip(db.actor, "Rank: ".. db.actor:character_rank(), nil, "rank_change", 10, nil)
 end
@@ -525,7 +527,7 @@ end
 
 -- Increment the actor reputation.
 function inc_actor_reputation(reputation)
-	if reputation and ((db.actor:character_reputation()+reputation) <= 10000 and (db.actor:character_reputation()+reputation) >= -10000) then
+	if reputation and ((db.actor:character_reputation()+reputation) <= 2500 and (db.actor:character_reputation()+reputation) >= -2500) then
 		db.actor:change_character_reputation(reputation)
 	end
 --	news_manager.send_tip(db.actor, "Reputation: ".. db.actor:character_reputation(), nil, "reputation_change", 10, nil)
