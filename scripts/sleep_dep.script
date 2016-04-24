@@ -68,10 +68,10 @@ function actor_on_item_use(item)
 	for i,j in pairs(items) do
 		if item:section() == i then
 			last_sleep = last_sleep + j
+			test_blur()
 			break
 		end
 	end
-	test_blur()
 end
 
 function actor_on_first_update()
