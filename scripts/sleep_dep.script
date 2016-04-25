@@ -1,23 +1,27 @@
 --// -----------------		sleep deprivation for Coc		---------------------
 --// author	: 	Nuor
---// version:	1.22 (alt)
+--// version:	1.23 (alt)
 --// created:	4-09-2016
---// last edit:	4-09-2016
+--// last edit:	4-24-2016
 --//------------------------------------------------------------------------------
-local force 		= 48		--// time between sleeps that triggers passing out
-local start_blur 	= 16		--// time between sleeps when vision blur starts 
-local itn_mul 		= 0.2		--// blur intensity multiplier
-local die_chance 	= 0.1		--// chance of dying if actor passes out
-local last_chk 		= 0			--// hourly update counter
-last_sleep, no_sleep = 0, 1		--// change "no_sleep" to 0 to allow sleep spam
-
+local force 					= 60		--// time between sleeps that triggers passing out
+local start_blur 				= 16		--// time between sleeps when vision blur starts 
+local itn_mul 					= 0.2		--// blur intensity multiplier
+local pwr_rate,rng_factor = -0.00065, 0.08	--// power reduction rate ,high/low range multiplier - lower is flatter
+local pwr_cyc					= 100		--// cycle time in millisec
+local caff_max					= 3			--// max energy drinks per hr
+local last_warning 				= 3			--// # of hourly warnings before passing out
+local die_chance 				= 0.01		--// chance of dying if actor passes out
+local last_chk, pwr_chk			= 0, 0		--// hourly and power update counters
+last_sleep, no_sleep, caff_chk 	= 0, 1, 0	--// change "no_sleep" to 0 to allow sleep spam
 local items = {
 	energy_drink	= -4,
 	antirad			= 2,
 	medkit			= 2,
 	medkit_army		= 3,
-	medkit_scientic = 4,
+	medkit_scientic = 3,
 	vodka			= 3,
+	vodka_script	= 3
 }
 
 function on_game_start()
@@ -34,23 +38,26 @@ function save(package)	-- sleep_dep.save -> actor_binder:save()
 	if (USE_MARSHAL) then
 		return
 	end
-	package:w_u16(last_sleep)
+	package:w_u8(last_sleep)
 	package:w_u16(last_chk)
+	package:w_u8(caff_chk)
 end
 function load(package)	-- sleep_dep.load -> actor_binder:load()
 	if (USE_MARSHAL) then
 		return
 	end
-	last_sleep  = package:r_u16()
-	last_chk 	= package:r_u16()
+	last_sleep  = package:r_u8() or 0
+	last_chk 	= package:r_u16() or 0
+	caff_chk 	= package:r_u8() or 0
 end
 --//--------------------------------------------------------------//--
 function save_state(m_data)
 	if (USE_MARSHAL) then
-		if last_sleep > 0 or last_chk > 0 then
+		if (last_sleep > 0) or (last_chk > 0) or (caff_chk > 0) then
 			m_data.sleep_deprived = m_data.sleep_deprived or {}
 			m_data.sleep_deprived["last_sleep"] = last_sleep
 			m_data.sleep_deprived["chk"] = last_chk
+			m_data.sleep_deprived["caff"] = caff_chk
 		else
 			m_data.sleep_deprived = nil
 		end
@@ -61,12 +68,19 @@ function load_state(m_data)
 	if (USE_MARSHAL) then
 		last_sleep = m_data.sleep_deprived and m_data.sleep_deprived.last_sleep or 0
 		last_chk = m_data.sleep_deprived and m_data.sleep_deprived.chk or 0
+		caff_chk = m_data.sleep_deprived and m_data.sleep_deprived.caff or 0
+		pwr_chk = m_data.sleep_deprived and m_data.sleep_deprived.power or 0
 	end
 end
 
 function actor_on_item_use(item)
+	if item:section() == "sleep_energy" then return end
 	for i,j in pairs(items) do
 		if item:section() == i then
+			if i == "energy_drink" then
+				caff_chk = caff_chk + 1
+				if caff_chk > caff_max then break end
+			end
 			last_sleep = last_sleep + j
 			test_blur()
 			break
@@ -78,7 +92,11 @@ function actor_on_first_update()
 	if last_sleep > start_blur then
 		level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
 		level.set_pp_effector_factor(999, (last_sleep-start_blur) * itn_mul)
-		SetHudMsg(game.translate_string("st_sleep_exhausted"),5)
+		if last_sleep >= (force - last_warning + 1) then
+			SetHudMsg(game.translate_string("st_sleep_exhausted_final"),5)
+		else
+			SetHudMsg(game.translate_string("st_sleep_exhausted"),4)
+		end
 	end
 end
 
@@ -89,15 +107,28 @@ function actor_on_update(b,d)
 		return
 	end
 	if db.actor:has_info("actor_is_sleeping") then
-		last_sleep = 0
+		last_sleep 	= 0
 		level.remove_pp_effector(999)
 	end
-	if (last_chk) > 0 then
+--//	drain power when exhausted	
+	if last_sleep > start_blur then
+--printf("before actor power = %s",db.actor.power)
+		if pwr_chk > 0 then
+			pwr_chk = pwr_chk - (d*level.get_time_factor())
+		else
+			db.actor.power = pwr_rate*(1+((last_sleep-start_blur)*rng_factor))
+			pwr_chk = pwr_cyc
+		end
+--printf("after actor power = %s", db.actor.power)
+	end
+--//	
+	if last_chk > 0 then
 		last_chk = last_chk - (d*level.get_time_factor())
 		return
 	end
 	last_chk = 3600*1000
 	last_sleep = last_sleep + 1
+	caff_chk = caff_chk > 1 and caff_chk - 1 or 0
 	test_blur()
 end
 
@@ -108,7 +139,11 @@ function test_blur()
 	elseif last_sleep > start_blur then
 		level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
 		level.set_pp_effector_factor(999, (last_sleep-start_blur) * itn_mul)
-		SetHudMsg(game.translate_string("st_sleep_exhausted"),5)
+		if last_sleep >= (force - last_warning + 1) then
+			SetHudMsg(game.translate_string("st_sleep_exhausted_final"),5)
+		else
+			SetHudMsg(game.translate_string("st_sleep_exhausted"),4)
+		end
 	end
 end
 
