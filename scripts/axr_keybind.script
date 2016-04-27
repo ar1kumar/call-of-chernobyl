@@ -88,7 +88,7 @@ function action.debug_select_object(p)
 					if (lvid < 4294967295) then
 						TeleportObject(DEBUG_NPC:id(),pos,lvid,db.actor:game_vertex_id())
 					else 
-						SetHudMsg("Position not on AI Map",4)
+						SetHudMsg(game.translate_string("st_invalid_position"),4)
 					end
 				end
 			end

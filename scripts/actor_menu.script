@@ -54,12 +54,14 @@ function inventory_wnd_closed()
 end
 
 function trade_wnd_opened()
+	SendScriptCallback("TrdWndOpened")
 	xr_meet_dialog_closed = false
 	--printf("---:>Trade opened")
 end
 
 function trade_wnd_closed()
 	--printf("---:>Trade closed")
+	SendScriptCallback("TrdWndClosed")
 	xr_meet_trade_closed = true
 end
 

@@ -190,7 +190,7 @@ function action_post_combat_wait:finalize()
 		xr_sound.set_sound_play(self.object:id(), "post_combat_relax")
 	end
 
-	if self.anim_started == true then
+	if self.anim_started == true and self.st.animation then
 		self.st.animation:set_state(nil, true)
 	end
 	

@@ -317,6 +317,7 @@ function options_dialog:OnApplyChanges()
 	self.owner:ShowDialog(true)
 	self:HideDialog()
 	self.owner:Show(true)
+	get_console():execute("vid_restart")
 
 	if false==self.b_restart_system_shown then
 		local opt = COptionsManager()

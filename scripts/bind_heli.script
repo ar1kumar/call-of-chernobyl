@@ -224,15 +224,17 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 		self.last_hit_snd_timeout = time_global() + math.random( 4000, 8000 )
 	end
 	
+	if (get_heli_health(self.st.heliObject,self.st) < 0.005) then
+		xr_statistic.inc_heli_kills()
+	end
+	
 	-- Clear Skies achievement
-	if (not has_alife_info("achieved_clear_skies")) then
-		if (db.actor and enemy:id() == 0) then 
-			local itm = db.actor:active_item()
-			if (itm and itm:section() == "wpn_rpg7") then
-				local health = get_heli_health(self.st.heliObject,self.st)
-				if (health <= 0.005) then
-					xr_statistic.inc_heli_rocket_kills()
-				end
+	if (db.actor and enemy:id() == 0) then
+		local itm = db.actor:active_item()
+		if (itm and itm:section() == "wpn_rpg7") then
+			local health = get_heli_health(self.st.heliObject,self.st)
+			if (health <= 0.005) then
+				xr_statistic.inc_heli_rocket_kills()
 			end
 		end
 	end

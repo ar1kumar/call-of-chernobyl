@@ -1,9 +1,10 @@
+#include "trade_discounts.ltx"
 
 [trader]
 buy_condition                            = trade_generic_buy
 buy_item_condition_factor                = 0.7
-buy_supplies                             = {=actor_community(actor_freedom) =heavy_pockets_functor} supplies_freedom_wealthy_tier_2, {=actor_community(actor_freedom)} supplies_freedom_tier_1, supplies_generic
-discounts                                = {=actor_goodwill_ge(freedom:1200)} discount_3, {=actor_goodwill_ge(freedom:1000)} discount_2, discount_1
+buy_supplies                             = supplies_generic, {=actor_community(actor_freedom)} supplies_freedom_tier_1, {=actor_community(actor_freedom) =heavy_pockets_functor} supplies_freedom_wealthy_tier_2
+discounts                                = {=actor_goodwill_ge(freedom:2000)} discount_3, {=actor_goodwill_ge(freedom:1000)} discount_2, {=actor_goodwill_ge(freedom:500)} discount_1, discount_0
 price_profile                            = default
 sell_condition                           = trade_generic_sell
 
@@ -348,14 +349,6 @@ helm_tactic                              = 1.3, 2
 merc_novice_outfit=1.1, 1.8
 monolith_novice_outfit=1.2, 1.9
 military_novice_outfit=1.1, 1.8
-
-[discount_1]
-buy                                      = 1
-sell                                     = 0.90
-
-[discount_2]
-buy                                      = 1
-sell                                     = 0.85
 
 [supplies_freedom_tier_1]
 
@@ -867,7 +860,3 @@ stalker_outfit                           = 1,	0.8
 
 ;E_HLMET
 helm_respirator                          = 1,	0.8
-
-[discount_3]
-buy                                      = 1
-sell                                     = 0.75

@@ -117,6 +117,14 @@ end
 ---------------------------------
 -- Register Callbacks
 ---------------------------------
+function on_game_load()
+	-- Patriarch achievement doubles allowed squad sizes.
+	local ini = ini_file("ai_tweaks\\axr_companions.ltx")
+	if (has_alife_info("achieved_patriarch")) then
+		max_actor_squad_size = ini:r_float_ex("main","max_actor_squad_size_patriarch") or 4
+	end
+end
+
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\axr_companions.ltx")
 	Enabled = ini:r_bool("main","enable")
@@ -127,10 +135,11 @@ function on_game_start()
 	RegisterScriptCallback("squad_on_unregister",squad_on_unregister)
 	RegisterScriptCallback("squad_can_switch_offline",squad_can_switch_offline)
 	RegisterScriptCallback("on_level_changing",on_level_changing)
+	RegisterScriptCallback("on_game_load",on_game_load)
 
 	allow_only_friends_as_companions = ini:r_bool("main","allow_only_friends_as_companions")
 	allow_simulation_squads_as_companions = ini:r_bool("main","allow_simulation_squads_as_companions")
-	max_actor_squad_size = ini:r_float_ex("main","max_actor_squad_size") or 3
+	max_actor_squad_size = ini:r_float_ex("main","max_actor_squad_size") or 2
 end
 
 function companion_squad_can_teleport(squad)
@@ -516,7 +525,7 @@ end
 function move_to_point(p)
 	local lvid
 	if (p==1) then 
-		SetHudMsg(game.translate_string("Hold then release"),8)
+		SetHudMsg(game.translate_string("st_hold_then_release"),8)
 		--_draw_part = particles_object("weapons\\light_signal")
 		_draw_part = particles_object("_samples_particles_\\flash_light")
 		--_draw_part = particles_object("static\\net_base_blue")

@@ -323,7 +323,7 @@ function enemy_group(enemy, npc, p)
 	end
 
 	local g = enemy:group()
-	local i, v = 0, 0
+
 	for i, v in pairs(p) do
 		if v == g then
 			--printf("_bp: [%s]'s enemy is from group [%d]", npc:name(), v)
@@ -335,6 +335,8 @@ end
 
 -- see above
 function is_enemy_same_group(actor,npc)
+	local st = db.storage[npc:id()]
+	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
 	if (not enemy:alive()) then
 		return false
 	end
@@ -347,7 +349,7 @@ end
 function see_pure_enemy(actor,npc)
 	local st = db.storage[npc:id()]
 	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
-	return be and be:alive() and npc:see(be) or false
+	return enemy and enemy:alive() and npc:see(enemy) or false
 end
 
 function pure_enemy_dist_le(actor,npc,p)
@@ -503,7 +505,7 @@ end
 -- !!! ÍÅÊÎÐÐÅÊÒÍÎ ÐÀÁÎÒÀÅÒ ÄËß ÎÁÜÅÊÒÎÂ Â offline'e !!!
 -- !!! ÄËß ÃÀÐÀÍÒÈÈ ÈÑÏÎËÜÇÎÂÀÒÜ one_obj_in_zone !!!
 function obj_in_zone(actor, zone, p)
-	local npc1, i, v = 0, 0, 0
+	local npc1
 	for i, v in pairs(p) do
 		npc1 = get_story_object_id(v)
 		if npc1 and zone:inside(alife():object(npc1).position) then
@@ -579,6 +581,7 @@ end
 function npc_in_zone(actor, npc, p)
 	local zone = db.zone_by_name[p[1]]
 
+	local npc_obj
 	if type(npc.id) ~= "function" then
 		npc_obj = db.storage[npc.id] and db.storage[npc.id].object
 		if zone == nil then
@@ -2702,19 +2705,39 @@ function community_arriving_dist_ge(actor,npc,p)
 	end
 	
 	return false
-end 
+end
 
+--' SP
+-- Sidor ---------------------------------------
 function trade_exchanged(actor, npc)
-	local id = npc:id()
-	return db.storage[id].trade and db.storage[id].trade.exchanged
+	local npc_id = npc:id()
+	return (db.storage[npc_id].mob_trade and db.storage[npc_id].mob_trade.exchanged) --or false
 end
 
 function trading(actor, npc)
-	local id = npc:id()
-	return db.storage[id].trade and db.storage[id].trade.trading
+	local npc_id = npc:id()
+	return (db.storage[npc_id].mob_trade and db.storage[npc_id].mob_trade.trading) --or false
 end
 
+function trade_sell_coast_b_1000(actor, npc)
+	return db.storage[npc:id()].mob_trade.sell_coast > 1000
+end
+
+function trade_sell_coast_b_0_m_1000(actor, npc)
+	return db.storage[npc:id()].mob_trade.sell_coast > 0 and db.storage[npc:id()].mob_trade.sell_coast < 1000
+end
+
+function trade_buy_coast(actor, npc)
+	return db.storage[npc:id()].mob_trade.buy_coast > 1000
+end
+
+function trade_all_money(actor, npc)
+	return db.storage[npc:id()].mob_trade.all_money > 2000
+end
+-- Sidor ---------------------------------------
+--' SP
 function npc_in_actor_community(actor,npc,p)
+	local comm = character_community(npc)
 	return string.find(character_community(db.actor),comm) ~= nil
 end 
 

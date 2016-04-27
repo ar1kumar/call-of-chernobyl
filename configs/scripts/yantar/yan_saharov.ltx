@@ -1,7 +1,7 @@
 [logic@yan_saharov]
 suitable = {=check_npc_name(yan_stalker_sakharov)} true
 active = walker
-trade = misc\trade\yan_sakharov_trade.ltx
+trade = misc\trade\trade_sakharov.ltx
 prior = 200
 can_select_weapon = false
 level_spot = trader
@@ -12,9 +12,9 @@ meet = meet
 path_walk = yan_walker_saharov_walk
 path_look = yan_walker_saharov_look
 on_info = {+yan_actor_away_saharov} camper@1
-combat_ignore_cond = true ; {=actor_enemy =check_enemy_name(actor)} false, true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
-invulnerable = true ; {!actor_enemy} true, false
+invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
@@ -23,9 +23,9 @@ aggressive = false
 
 [camper@default]
 meet = meet
-combat_ignore_cond = true ; {=actor_enemy =check_enemy_name(actor)} false, true
+combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 combat_ignore_keep_when_attacked = true
-invulnerable = true ; {!actor_enemy} true, false
+invulnerable = {!actor_enemy} true, false
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
@@ -61,6 +61,6 @@ far_victim 		= nil
 close_distance  = 2
 far_distance 	= 6
 close_snd_distance = 3
-use = true ; {=actor_enemy} false, true
+use = {=actor_enemy} false, true
 allow_break = false
 trade_enable = true

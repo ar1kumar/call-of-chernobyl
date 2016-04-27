@@ -1,9 +1,10 @@
+#include "trade_discounts.ltx"
 
 [trader]
 buy_condition                            = trade_generic_buy
 buy_item_condition_factor                = 0.7
 buy_supplies                             = supplies_generic
-discounts                                = {=actor_goodwill_ge(stalker:1200)} discount_3, {=actor_goodwill_ge(stalker:1000)} discount_2, discount_1
+discounts                                = discount_0
 price_profile                            = default
 sell_condition                           = trade_generic_sell
 
@@ -20,6 +21,9 @@ itm_gunsmith_toolkit                     = 1, 0.5
 itm_outfit_toolkit_tier_1                = 1, 0.5
 kolbasa                                  = 3,	0.5
 vodka                                    = 3,	0.8
+medkit                                   = 3,	0.5
+antirad                                  = 2,	0.65
+bandage                                  = 2,	0.55
 
 ;II_ANTIR
 itm_backpack                             = 3, 0.6
@@ -440,18 +444,6 @@ helm_tactic                              = 1.1, 2
 merc_novice_outfit=1.1, 1.8
 monolith_novice_outfit=1.2, 1.9
 military_novice_outfit=1.1, 1.8
-
-[discount_1]
-buy                                      = 1
-sell                                     = 0.90
-
-[discount_3]
-buy                                      = 1
-sell                                     = 0.75
-
-[discount_2]
-buy                                      = 1
-sell                                     = 0.85
 
 [trade_generic_buy]
 

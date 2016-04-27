@@ -8,54 +8,54 @@ local function under_faction_control_target_id(task_id)
 	local smart_id = db.actor and alun_utils.load_var(db.actor,task_id.."_id")
 	if not (smart_id) then
 		printf("task_functor.under_faction_control_target_id is nil")
-		return 
+		return
 	end
 	local sim = alife()
 	local smart = smart_id and sim:object(smart_id)
 	if not (smart) then
 		printf("task_functor.under_faction_control_target_id smart by id is nil")
-		return 
-	end 
-	
+		return
+	end
+
 	local target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
 	local se_target = target_id and sim:object(target_id)
 
 	if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
 		return target_id
-	end 
+	end
 
 	return smart_id
 end
 
 function get_squad_id_by_task_var(var_name,no_check_online)
 	local npc_id = db.actor and alun_utils.load_var(db.actor,var_name)
-	if not (npc_id) then 
-		return 
-	end 
-	
+	if not (npc_id) then
+		return
+	end
+
 	-- by default npc's id is returned instead if game_object is online
 	if not (no_check_online) then
 		local npc = npc_id and db.storage[npc_id] and db.storage[npc_id].object
-		if (npc) then 
+		if (npc) then
 			return npc_id
 		end
 	end
-	
+
 	local sim = alife()
 	local se_npc = sim:object(npc_id)
-	if not (se_npc) then 
-		return 
-	end 
-	
+	if not (se_npc) then
+		return
+	end
+
 	local squad = se_npc.group_id and se_npc.group_id ~= 65535 and sim:object(se_npc.group_id)
 	if not (squad) then
-		if (no_check_online) then 
+		if (no_check_online) then
 			return
 		end
 		return npc_id
-	end 
+	end
 
-	return squad.id	
+	return squad.id
 end
 ---------------------------------------------------------
 -- TASK FUNCTORS
@@ -63,41 +63,41 @@ end
 function general_bounty_task(task_id,field,p,task)
 	if (field == "target") then
 		if (task) then
-			if (task.stage == 1) then 
+			if (task.stage == 1) then
 				return task.task_giver_id or nil
-			end 
-			
+			end
+
 			return axr_task_manager.bounties_by_id[task_id] or nil
 		end
 	end
-end 
+end
 
 function general_fetch_task(task_id,field,p,task)
-	if not (db.actor) then 
-		return 
+	if not (db.actor) then
+		return
 	end
-	if (field == "title") then 
+	if (field == "title") then
 		local fetch = alun_utils.get_inv_name(alun_utils.load_var(db.actor,task_id.."_fetch",""))
 		local count = alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
-		if (count > 1) then 
+		if (count > 1) then
 			return strformat((game.translate_string(p) or ""),fetch .. " x" .. tostring(count))
 		end
 		return strformat(game.translate_string(p) or "",fetch)
-	elseif (field == "descr") then 
+	elseif (field == "descr") then
 		if (task.stage == 1) then
 			return game.translate_string("st_return_for_reward")
 		end
 		local fetch = alun_utils.get_inv_name(alun_utils.load_var(db.actor,task_id.."_fetch",""))
 		local count = alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
-		if (count > 1) then 
+		if (count > 1) then
 			return strformat((game.translate_string(p) or ""),fetch .. " x" .. tostring(count))
 		end
 		return strformat(game.translate_string(p) or "",fetch)
-	elseif (field == "target") then 
+	elseif (field == "target") then
 		if (task.stage == 1) then
 			local id = alun_utils.load_var(db.actor,task_id.."_target_id") or task.task_giver_id
-			if (id) then 
-				return id 
+			if (id) then
+				return id
 			end
 			local story_id = string.sub(task_id,1,string.find(task_id,"_task")-1)
 			local se_obj = get_story_se_object(story_id)
@@ -106,14 +106,14 @@ function general_fetch_task(task_id,field,p,task)
 			end
 		end
 	end
-end 
+end
 
 function general_under_faction_control(task_id,field,p,task)
 	if (field == "target") then
-		if (task and task.stage == 1 and task.task_giver_id) then 
+		if (task and task.stage == 1 and task.task_giver_id) then
 			return task.task_giver_id
 		end
-		
+
 		return under_faction_control_target_id(task_id)
 	end
 end
@@ -124,9 +124,9 @@ function yan_ecolog_semenov_task_target(task_id,field,p,task)
 		local squad = get_story_squad("yan_ecolog_semenov_squad")
 		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
 			return squad.id
-		end 
-		
-		if (task.stage >= 1) then 
+		end
+
+		if (task.stage >= 1) then
 			return squad.id
 		end
 	end
@@ -134,45 +134,45 @@ end
 
 -- Marsh
 function mar_base_stalker_barmen_task_target(task_id,field,p,task)
-	if not (db.actor) then 
-		return 
+	if not (db.actor) then
+		return
 	end
-	
-	if (task and task.stage == 1 and task.task_giver_id) then 
+
+	if (task and task.stage == 1 and task.task_giver_id) then
 		return task.task_giver_id
 	end
-		
+
 	if (task_id == "mar_base_stalker_barmen_task_1") then
 		return under_faction_control_target_id(task_id)
-	elseif (task_id == "mar_base_stalker_barmen_task_2") then 
+	elseif (task_id == "mar_base_stalker_barmen_task_2") then
 		return under_faction_control_target_id(task_id)
 	end
 end
 
 function mar_base_owl_stalker_trader_task_target(task_id,field,p)
-	if (task_id == "mar_base_owl_stalker_trader_task_1") then 
+	if (task_id == "mar_base_owl_stalker_trader_task_1") then
 		local se_npc = get_story_se_object("esc_2_12_stalker_nimble")
 		return se_npc and se_npc.id or nil
 	elseif (task_id == "mar_base_owl_stalker_trader_task_2") then
-		for id,obj in pairs(db.heli) do 
-			if (obj and obj.id) then 
+		for id,obj in pairs(db.heli) do
+			if (obj and obj.id) then
 				return id
 			end
 		end
-	elseif (task_id == "mar_base_owl_stalker_trader_task_3") then 
+	elseif (task_id == "mar_base_owl_stalker_trader_task_3") then
 		local squad = get_story_squad("ecolog_companion_task_1")
-		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
+		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
 			return squad.id
 		end
 		local n = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
-		if (n) then 
+		if (n) then
 			local anomaly = db.anomaly_by_name[n]
-			if (anomaly and anomaly.object) then 
+			if (anomaly and anomaly.object) then
 				return anomaly.object:id()
 			end
-		else 
+		else
 			local smart = SIMBOARD.smarts_by_names["mar_smart_terrain_base"]
-			if (smart) then 
+			if (smart) then
 				return smart.id
 			end
 		end
@@ -182,33 +182,33 @@ end
 -- Escape
 function esc_m_trader_task_target(task_id,field,p,task)
 	if (field == "target") then
-		if (task_id == "esc_m_trader_task_2") then
-			if (task.stage == 1) then 
+		if (task_id == "esc_m_trader_task_1") then
+			if (task.stage == 1) then
 				return task.task_giver_id
 			end
 
 			local smart = SIMBOARD.smarts_by_names["esc_smart_terrain_7_11"]
-			local target_id = alun_utils.load_var(db.actor,"esc_m_trader_task_2_target_id")
+			local target_id = alun_utils.load_var(db.actor,"esc_m_trader_task_1_target_id")
 			local se_target = target_id and alife():object(target_id)
 
 			if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
 				return target_id
-			end 
-	
+			end
+
 			return smart and smart.id or nil
 		end
 	end
-end 
+end
 
 -- Darkvalley
 function val_smart_terrain_7_4_bandit_trader_stalker_task_target(task_id,field,p,task)
-	if not (db.actor) then 
-		return 
+	if not (db.actor) then
+		return
 	end
-	
-	if (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_3") then 
+
+	if (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_3") then
 		local squad = get_story_squad("bandit_companion_task_1")
-		if (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
+		if (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
 			return squad.id
 		end
 	end
@@ -219,55 +219,55 @@ end
 
 -- Jupiter
 function jup_b6_scientist_tech_task_target(task_id,field,p,task)
-	if (task_id == "jup_b6_scientist_tech_task_1") then 
+	if (task_id == "jup_b6_scientist_tech_task_1") then
 		local squad = get_story_squad("ecolog_companion_task_2")
-		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
+		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
 			return squad.id
 		end
 		local n = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
-		if (n) then 
+		if (n) then
 			local anomaly = db.anomaly_by_name[n]
-			if (anomaly and anomaly.object) then 
+			if (anomaly and anomaly.object) then
 				return anomaly.object:id()
 			end
-		else 
+		else
 			local smart = SIMBOARD.smarts_by_names["jup_b41"]
-			if (smart) then 
+			if (smart) then
 				return smart.id
 			end
-		end	
+		end
 	end
 end
 
 -- Zaton
 function zat_b7_bandit_boss_sultan_task_target(task_id,field,p)
-	if (task_id == "zat_b7_bandit_boss_sultan_task_1") then 
+	if (task_id == "zat_b7_bandit_boss_sultan_task_1") then
 		return get_squad_id_by_task_var("zat_b7_bandit_boss_sultan_bounty_target_id") --add to axr_main remove_non_story_squads to ensure squad never removed
 	end
-end 
+end
 
--- Simulation 
+-- Simulation
 function simulation_task_target(task_id,field,p,task)
-	if not (db.actor) then 
-		return 
+	if not (db.actor) then
+		return
 	end
-	
-	if (task_id == "simulation_task_3" or task_id == "simulation_task_4" or task_id == "simulation_task_5") then
+
+	if (task_id == "simulation_task_7" or task_id == "simulation_task_8" or task_id == "simulation_task_9" or task_id == "simulation_task_10") then
 		local squad = get_story_squad("hostage_companion_task_1")
-		if not (squad and squad:clsid() == clsid.online_offline_group_s) then 
+		if not (squad and squad:clsid() == clsid.online_offline_group_s) then
 			return -- quest will auto-fail via section condition
 		end
-		
-		if (task) then 
-			if (task.stage == 0) or (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then 
+
+		if (task) then
+			if (task.stage == 0) or (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
 				return squad and squad.id
 			elseif (task.stage >= 1 or db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then
 				local id = task.task_giver_id
-				if (id) then 
-					return id 
+				if (id) then
+					return id
 				end
 			end
-		end 
+		end
 
 		return squad.id
 	end
@@ -469,7 +469,7 @@ end
 -----------------------------------------
 function kill_strelok(id,field,p)
 	local squad = get_story_squad("legendary_strelok")
-	if (squad) then 
+	if (squad) then
 		return squad.id
 	end
 end

@@ -405,7 +405,7 @@ function question_repair_item( item_name, item_condition, can, mechanic ) --( st
 	if db.actor:money() < price then
 		return game.translate_string("st_upgr_cost")..": "..price.." RU\\n"..game.translate_string("ui_inv_not_enought_money")..": "..price-db.actor:money().." RU"
 	end
-	return game.translate_string("st_upgr_cost").." "..price.." RU. "..game.translate_string("ui_inv_repair").."?"
+	return game.translate_string("st_upgr_cost").." "..price.." RU. "..game.translate_string("ui_st_inv_repair").."?"
 end
 
 function effect_upgrade_item(item,upgrade_section) -- Alundaio: called from engine (UIInventoryUpgradeWnd.cpp)
