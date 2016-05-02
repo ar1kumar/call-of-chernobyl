@@ -659,9 +659,9 @@ function sim_squad_scripted:create_npc(spawn_smart,pos,lvid,gvid)
 		
 		self.smart_id = spawn_smart.id
 	else 
-		base_spawn_position = self.position
-		base_lvi = self.m_level_vertex_id
-		base_gvi = self.m_game_vertex_id
+		base_spawn_position = pos or self.position
+		base_lvi = lvid or self.m_level_vertex_id
+		base_gvi = gvid or self.m_game_vertex_id
 	end 
 	
 	local npcs_list = {}
