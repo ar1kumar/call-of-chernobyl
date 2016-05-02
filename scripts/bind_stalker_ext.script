@@ -136,19 +136,6 @@ function actor_on_item_take(binder,item)
 	if not (db.actor) then 
 		return -- don't remove, for some reason this callback is triggered before actor is fully loaded
 	end
-	if IsArtefact(item) then
-		local artefact = item:get_artefact()
-		if (artefact) then
-			local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
-			if anomal_zone ~= nil then
-				anomal_zone:on_artefact_take(item)
-			else
-				bind_anomaly_zone.artefact_ways_by_id[item:id()] = nil
-			end
-			artefact:FollowByPath("NULL",0,vector():set(500,500,500))
-			xr_statistic.inc_founded_artefacts_counter(item:id())
-		end
-	end
 	--treasure_manager.get_treasure_manager():on_item_take(item:id()) -- disabled for coc
 	SendScriptCallback("actor_on_item_take",item)
 end
