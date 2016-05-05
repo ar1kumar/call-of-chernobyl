@@ -1515,8 +1515,8 @@ inv_grid_height                          = 2
 inv_grid_x                               = 14
 inv_grid_y                               = 10
 
-repair_min_condition                     = 0.05	                                       ;Min required condition to use
-repair_max_condition                     = 0.80	                                       ;Max required condition to use
+repair_min_condition                     = 0.00	                                       ;Min required condition to use
+repair_max_condition                     = 0.75	                                       ;Max required condition to use
 repair_add_condition                     = 0.15	                                       ;Amount of condition added to repaired item
 repair_part_bonus                        = 0.10	                                       ;Amount bonus to add_condition if parts are used
 repair_use_parts                         = true	                                       ;Allows the use of lesser conditioned weapons to be used for parts to add overall bonus to repair
@@ -1542,13 +1542,12 @@ inv_grid_height                          = 1
 inv_grid_x                               = 18
 inv_grid_y                               = 23
 
-repair_max_condition                     = 0.75	                                       ;Max required condition to use
 repair_type                              = outfit	                                       ;weapon or outfit
 
 max_uses                                 = 3
 empty_weight                             = 0.8
 
-[itm_repairkit_tier_1]:booster
+[itm_repairkit_tier_1]:itm_gunsmith_toolkit
 inv_grid_x								 = 6
 inv_grid_y								 = 7
 inv_grid_width							 = 2
@@ -1556,14 +1555,20 @@ inv_grid_height							 = 1
 inv_weight								 = 3.5
 
 cost                                     = 1500
-remove_after_use                         = false
 visual                                   = dynamics\equipments\quest\box_toolkit_1.ogf
 
 description                              = st_itm_repairkit_tier_1_descr
 inv_name                                 = st_itm_repairkit_tier_1_name
 inv_name_short                           = st_itm_repairkit_tier_1_name
 
-[itm_repairkit_tier_2]:booster
+max_uses								 = 1
+
+repair_max_condition                     = 0.99
+repair_add_condition                     = 0.20
+repair_part_bonus                        = 0.20
+repair_type                              = all
+
+[itm_repairkit_tier_2]:itm_repairkit_tier_1
 inv_grid_x								 = 8
 inv_grid_y								 = 7
 inv_grid_width							 = 2
@@ -1571,14 +1576,18 @@ inv_grid_height							 = 1
 inv_weight								 = 3
 
 cost                                     = 2000
-remove_after_use                         = false
 visual                                   = dynamics\equipments\quest\box_toolkit_2.ogf
 
 description                              = st_itm_repairkit_tier_2_descr
 inv_name                                 = st_itm_repairkit_tier_2_name
 inv_name_short                           = st_itm_repairkit_tier_2_name
 
-[itm_repairkit_tier_3]:booster
+max_uses								 = 1
+
+repair_add_condition                     = 0.25
+repair_type                              = all
+
+[itm_repairkit_tier_3]:itm_repairkit_tier_2
 inv_grid_x								 = 10
 inv_grid_y								 = 7
 inv_grid_width							 = 2
@@ -1586,12 +1595,17 @@ inv_grid_height							 = 1
 inv_weight								 = 2.5
 
 cost                                     = 2500
-remove_after_use                         = false
 visual                                   = dynamics\equipments\quest\box_toolkit_3.ogf
 
 description                              = st_itm_repairkit_tier_3_descr
 inv_name                                 = st_itm_repairkit_tier_3_name
 inv_name_short                           = st_itm_repairkit_tier_3_name
+
+max_uses								 = 1
+
+repair_add_condition                     = 0.30
+repair_type                              = all
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; For Information broker

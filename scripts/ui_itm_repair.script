@@ -33,7 +33,7 @@ function repair_ui:__init(owner,obj,section) super()
 	self.add_condition = ini:r_float_ex(section,"repair_add_condition") or 0
 	self.part_bonus = ini:r_float_ex(section,"repair_part_bonus") or 0
 	self.use_parts = ini:r_bool_ex(section,"repair_use_parts")
-	self.repair_type = ini:r_string_ex(section,"repair_type") or "weapon"
+	self.repair_type = ini:r_string_ex(section,"repair_type") or "all"
 
 	self.repair_only = alun_utils.parse_list(ini,section,"repair_only",true)
 	self.repair_refuse = alun_utils.parse_list(ini,section,"repair_refuse",true)
@@ -55,7 +55,9 @@ function repair_ui:FillList()
 
 	local function fill_list(actor,obj)
 		if (obj) and (self.repair_only and self.repair_only[obj:section()]) or (self.repair_refuse == nil) or (self.repair_refuse[obj:section()] == nil) then
-			if (self.repair_type == "weapon" and IsWeapon(obj) or ( (self.repair_type == "outfit") and (IsOutfit(obj) or obj:clsid() == 69))) then
+			if (self.repair_type == "weapon" and IsWeapon(obj))
+			or (self.repair_type == "outfit" and IsOutfit(obj))
+			or (self.repair_type == "all" and (IsWeapon(obj) or IsOutfit(obj))) then
 				local con = obj:condition()
 				if (con and con >= self.min_condition and con <= self.max_condition) then
 					self:AddItemToList(obj,self.list_box,con)
@@ -229,7 +231,7 @@ function repair_ui:OnPartsListItemClicked()
 	local sec = se_item:section_name()
 	local part_bonus = system_ini():r_float_ex(sec,"repair_part_bonus") or self.part_bonus
 	local con = math.floor((self.add_condition + part_bonus)*100)
-	self.caption_repair:SetText("+"..con.."%")
+	self.caption_repair:SetText("+"..math.floor(con).."%")
 
 	local w,h = item.width,item.height
 	if (utils.is_widescreen()) then
