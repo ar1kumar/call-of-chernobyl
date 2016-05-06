@@ -320,22 +320,29 @@ function set_best_monster(obj)
 end
 
 function set_best_weapon(hit_amount)
+	-- Weapon currently equipped.
 	local active_item = db.actor:active_item()
-	if not (active_item) then
+	
+	-- If equipped is not a weapon or does not exist, return.
+	if (not active_item) or (not IsWeapon(active_item)) then
 		return
 	end
 
 	-- Trigger notifications for wounding.
+	-- I don't think this works, needs looking at.
 	if (hit_amount > 0) then
 		check_actor_rank_change()
 		check_actor_reputation_change()
 	end
 	
-	if not (IsWeapon(active_item)) then
-		return
-	end
+	-- A section called 'parent_section' is used by AO3 and STCoP.
+	-- It tells them which weapon is the 'parent' of a modified weapon.
+	-- Example: An AK-74 with an EKP sight attach has a parent_section of 'wpn_ak74'.
+	local parent_section = alun_utils.read_from_ini(system_ini(), active_item:section(), "parent_section") or active_item:section()
 
-	weapons_table[active_item:section()] = weapons_table[active_item:section()] and weapons_table[active_item:section()] + hit_amount or hit_amount
+	-- By using this section we can have stats 'stack' for weapons regardless of attached scopes.
+	-- Of course if this section does not exist then it will just default to the weapon section name instead.
+	weapons_table[parent_section] = weapons_table[parent_section] and weapons_table[parent_section] + hit_amount or hit_amount
 
 	for sec,v in spairs(weapons_table, function(t,a,b) return t[b] < t[a] end) do
 		actor_statistic.favorite_weapon_sect = sec
