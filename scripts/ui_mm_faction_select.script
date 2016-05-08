@@ -359,11 +359,11 @@ function faction_ui:load_start_positions()
 		table.insert(self.start_table,id)
 	end
 	start_location = self.start_table[math.random(1,n)]
-	self.start_list:AddItem(game.translate_string("st_mm_faction_start_location"), 0)
+	self.start_list:AddItem(game.translate_string("st_mm_faction_random_location"), 0)
 	for i=1,#self.start_table do
 		self.start_list:AddItem(game.translate_string("ui_st_"..self.start_table[i]),i)
 	end
-	self.start_list:SetText(game.translate_string("st_mm_faction_start_location"))
+	self.start_list:SetText(game.translate_string("st_mm_faction_random_location"))
 end
 
 function faction_ui:OnCheckSet()
@@ -579,10 +579,15 @@ function faction_ui:OnStartGame()
 	end 
 	
 	local character_name = self.character_name:GetText()
-	if (character_name == "" or self.start_list:CurrentID() <= 0) then
-		-- Require a name and starting location to be entered and selected.
-		-- A warning message needs to be added to inform the player if either is absent..
+	if (character_name == "") then
+		-- Require a name to be entered.
 		return
+	end
+	
+	if (self.start_list:CurrentID() <= 0) then
+		local index = math.random(1,#self.start_table)
+		start_location = self.start_table[index]
+--		self.start_list:SetText(game.translate_string("ui_st_"..self.start_table[index]))
 	end
 	
 	if (self.ck_hardcore and self.ck_hardcore:GetCheck()) then 
