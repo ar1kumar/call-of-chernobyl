@@ -3,9 +3,14 @@ function completionist_functor()
 	if not (db.actor and db.actor.afterFirstUpdate) then
 		return false
 	end
+	
+--	news_manager.send_tip(db.actor, "GID: ".. db.actor:game_vertex_id(), nil, nil, nil, nil)
+--	news_manager.send_tip(db.actor, "LID: ".. db.actor:level_vertex_id(), nil, nil, nil, nil)
+	
 	if has_alife_info("achieved_completionist") then
 		return true
 	end
+	
 	if (has_alife_info("achieved_duga_free"))
 	and (has_alife_info("achieved_geologist"))
 	and (has_alife_info("achieved_heavy_pockets"))
