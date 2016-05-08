@@ -163,22 +163,20 @@ local function actor_on_first_update(binder,delta)
 	local faction = character_community(db.actor):sub(7)
 	
 	-- Survival mode
-	if (IsSurvivalMode() and system_ini():section_exist("survival_squad_"..faction)) then 
+	if (IsSurvivalMode() and system_ini():section_exist("survival_squad_"..faction) and start_pos) then 
 		local sim = alife()
-		if (start_pos) then
-			local squad = sim:create("survival_squad_"..faction,start_pos[3],start_pos[1],start_pos[2])
-			if (squad) then
-				squad:create_npc(nil,start_pos[3],start_pos[1],start_pos[2])
-				local se_obj,as
-				for k in squad:squad_members() do
-					se_obj = k.object or k.id and sim:object(k.id)
-					if (se_obj) then
-						SIMBOARD:setup_squad_and_group(se_obj)
-						as = se_obj:get_alife_storage(true)
-						if (as) then
-							as.companion = true 
-							as.companion_cannot_dismiss = true 
-						end
+		local squad = sim:create("survival_squad_"..faction,start_pos[3],start_pos[1],start_pos[2])
+		if (squad) then
+			squad:create_npc(nil,start_pos[3],start_pos[1],start_pos[2])
+			local se_obj,as
+			for k in squad:squad_members() do
+				se_obj = k.object or k.id and sim:object(k.id)
+				if (se_obj) then
+					SIMBOARD:setup_squad_and_group(se_obj)
+					as = se_obj:get_alife_storage(true)
+					if (as) then
+						as.companion = true 
+						as.companion_cannot_dismiss = true 
 					end
 				end
 			end
