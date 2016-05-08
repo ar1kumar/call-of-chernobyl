@@ -14,7 +14,8 @@ ACTOR_PROFILES = "character_desc_general.xml"
 ------------------
 -- on_game_load()
 ------------------
-local spawn_path
+local spawn_path, start_pos, start_location
+local loc_ini = ini_file("plugins\\faction_start_locations.ltx")
 local function on_game_load()
 	local config = axr_main.config
 	if not (config) then 
@@ -69,6 +70,7 @@ local function on_game_load()
 	
 	-- NEW FACTION
 	local faction = config:GetValue("temp","new_game_faction",3) or ""
+	
 	if (faction and faction ~= "") then
 		local supply_id = config:GetValue("temp","new_game_supplies",2) or 1
 		supply_id = supply_id > 0 and supply_id or 1
@@ -77,7 +79,13 @@ local function on_game_load()
 		config:SetValue("temp","new_game_faction")
 		need_save = true
 		
-		spawn_path = patrol("spawn_player_"..faction)
+		start_location = config:GetValue("temp","new_game_faction_position",3)
+		if start_location and start_location ~= "" then
+			set_postion_table(start_location)
+			config:SetValue("temp","new_game_faction_position")
+		else
+			spawn_path = patrol("spawn_player_"..faction)
+		end
 
 		-- faction diversity
 		if (faction ~= "monolith") then 
@@ -147,30 +155,38 @@ end
 
 local function actor_on_first_update(binder,delta)
 	if (spawn_path) then
-		-- survival mode
-		local faction = character_community(db.actor):sub(7)
-		if (IsSurvivalMode() and system_ini():section_exist("survival_squad_"..faction)) then 
-			local sim = alife()
-			local squad = sim:create("survival_squad_"..faction,spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0))
-			if (squad) then
-				squad:create_npc(nil,spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0))
-				local se_obj,as
-				for k in squad:squad_members() do
-					se_obj = k.object or k.id and sim:object(k.id)
-					if (se_obj) then
-						SIMBOARD:setup_squad_and_group(se_obj)
-						as = se_obj:get_alife_storage(true)
-						if (as) then
-							as.companion = true 
-							as.companion_cannot_dismiss = true 
-						end
+		start_pos = {}
+		start_pos[1] = spawn_path:level_vertex_id(0)
+		start_pos[2] = spawn_path:game_vertex_id(0)
+		start_pos[3] = spawn_path:point(0)
+	end
+	local faction = character_community(db.actor):sub(7)
+	
+	-- Survival mode
+	if (IsSurvivalMode() and system_ini():section_exist("survival_squad_"..faction)) then 
+		local sim = alife()
+		local squad = sim:create("survival_squad_"..faction,start_pos[3],start_pos[1],start_pos[2])
+		if (squad) then
+			squad:create_npc(nil,start_pos[3],start_pos[1],start_pos[2])
+			local se_obj,as
+			for k in squad:squad_members() do
+				se_obj = k.object or k.id and sim:object(k.id)
+				if (se_obj) then
+					SIMBOARD:setup_squad_and_group(se_obj)
+					as = se_obj:get_alife_storage(true)
+					if (as) then
+						as.companion = true 
+						as.companion_cannot_dismiss = true 
 					end
 				end
 			end
 		end
-		ChangeLevel(spawn_path:point(0),spawn_path:level_vertex_id(0),spawn_path:game_vertex_id(0),vector():set(0,0,0))
 	end
-end 
+
+	if start_pos and #start_pos == 3 then
+		ChangeLevel(start_pos[3],start_pos[1],start_pos[2],vector():set(0,0,0))
+	end
+end
 
 local function actor_on_before_death()
 	if not (USE_MARSHAL) then 
@@ -215,6 +231,12 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
 end 
 
+function set_postion_table(loc)
+	start_pos = {}
+	table.insert(start_pos,loc_ini:r_float_ex(loc, "lid"))
+	table.insert(start_pos,loc_ini:r_float_ex(loc, "gid"))
+	table.insert(start_pos,vector():set(loc_ini:r_float_ex(loc,"x"),loc_ini:r_float_ex(loc,"y"),loc_ini:r_float_ex(loc,"z")))
+end
 --------------------------------------------------------------
 -- faction_ui
 --------------------------------------------------------------
@@ -281,7 +303,12 @@ function faction_ui:InitControls(f)
 	self.scroll_v:AddWindow(self.desc_text, true)
 	
 	self:OnFactionSelect("stalker")
-	
+
+	self.start_list = xml:InitComboBox("main_dialog:list_starts", self.dialog)
+	self.start_list:SetAutoDelete(true)
+	self:Register(self.start_list, "list_starts")
+	self:load_start_positions()
+
 	if (USE_MARSHAL) then
 		xml:InitStatic("main_dialog:cap_check_hardcore",self.dialog)
 		self.ck_hardcore = xml:InitCheck("main_dialog:check_hardcore",	self.dialog)
@@ -306,7 +333,9 @@ function faction_ui:InitCallBacks(f)
 	self:AddCallback("btn_rand", ui_events.BUTTON_CLICKED, self.OnRandomize, self)
 	self:AddCallback("btn_back", ui_events.BUTTON_CLICKED, self.OnQuit, self)
 	self:AddCallback("btn_submit", ui_events.BUTTON_CLICKED, self.OnStartGame, self)
-	self:AddCallback("list_factions", ui_events.LIST_ITEM_SELECT, self.OnSelectFactionList,		self)
+	self:AddCallback("list_factions", ui_events.LIST_ITEM_SELECT, self.OnSelectFactionList,	self)
+	
+	self:AddCallback("list_starts", ui_events.LIST_ITEM_SELECT, self.OnSelectStartLocation, self)
 	
 	self:AddCallback("check_survival", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
 	self:AddCallback("check_hardcore", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
@@ -315,6 +344,26 @@ function faction_ui:InitCallBacks(f)
 	for i=1,#f do 
 		self:AddCallback("btn_"..f[i].."_inactive_select", ui_events.BUTTON_CLICKED, self["OnFaction_"..f[i]], self)
 	end
+end
+
+function faction_ui:OnSelectStartLocation()
+	start_location = self.start_table[self.start_list:CurrentID()]
+end
+
+function faction_ui:load_start_positions()
+	self.start_list:ClearList()
+	self.start_table = {}
+	local n = loc_ini:line_count(self.selected_faction.."_start_locations") or 0
+	for i=0, n-1 do
+		local result, id, value = loc_ini:r_line(self.selected_faction.."_start_locations",i,"","" )
+		table.insert(self.start_table,id)
+	end
+	start_location = self.start_table[math.random(1,n)]
+	self.start_list:AddItem(game.translate_string("st_mm_faction_start_location"), 0)
+	for i=1,#self.start_table do
+		self.start_list:AddItem(game.translate_string(self.start_table[i]),i)
+	end
+	self.start_list:SetText(game.translate_string("st_mm_faction_start_location"))
 end
 
 function faction_ui:OnCheckSet()
@@ -466,6 +515,10 @@ function faction_ui:OnFactionSelect(faction)
 	
 	self.disp_faction_name:SetText(gs("st_faction_"..faction))
 	self.desc_text:SetText(desc)
+	
+	if self.start_list then
+		self:load_start_positions()
+	end
 end
 
 function faction_ui:OnFaction_stalker()
@@ -526,8 +579,9 @@ function faction_ui:OnStartGame()
 	end 
 	
 	local character_name = self.character_name:GetText()
-	if (character_name == "") then
-		-- don't start game with no name. TODO: Add msgbox warning
+	if (character_name == "" or self.start_list:CurrentID() <= 0) then
+		-- Require a name and starting location to be entered and selected.
+		-- A warning message needs to be added to inform the player if either is absent..
 		return
 	end
 	
@@ -545,6 +599,10 @@ function faction_ui:OnStartGame()
 	
 	if (self.selected_faction) then 
 		axr_main.config:SetValue("temp","new_game_faction",self.selected_faction)
+	end
+	
+	if (start_location) then 
+		axr_main.config:SetValue("temp","new_game_faction_position",start_location)
 	end
 	
 	axr_main.config:SetValue("temp","new_game_supplies",tostring(self.supplies_id or 1))
