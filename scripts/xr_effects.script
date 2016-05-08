@@ -4154,16 +4154,18 @@ function make_a_wish(actor,npc,p)
 		give_info("actor_made_wish_immortal")
 		give_info("actor_made_wish")
 		
-		local spawn_path = patrol("spawn_player_stalker")
-		if (spawn_path) then 
-			local pos = spawn_path:point(0)
-			local lvid = spawn_path:level_vertex_id(0)
-			local gvid = spawn_path:game_vertex_id(0)
-			local gg = game_graph()
-			if (gvid and gg:valid_vertex_id(gvid)) then
-				ChangeLevel(pos,lvid,gvid,vector():set(0,0,0))
-			end
-		end
+--		local spawn_path = patrol("spawn_player_stalker")
+--		if (spawn_path) then 
+--			local pos = spawn_path:point(0)
+--			local lvid = spawn_path:level_vertex_id(0)
+--			local gvid = spawn_path:game_vertex_id(0)
+--			local gg = game_graph()
+--			if (gvid and gg:valid_vertex_id(gvid)) then
+--				ChangeLevel(pos,lvid,gvid,vector():set(0,0,0))
+--			end
+--		end
+		inc_faction_goodwill_to_actor(db.actor, nil, {"zombied", 5000})
+		ChangeLevel(vector():set(-339.50, 3.74, 262.58), 143249, 4406, vector():set(0,0,0))
 		return 
 	end
 	
