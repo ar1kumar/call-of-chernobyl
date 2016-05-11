@@ -5,12 +5,6 @@ Copyright (C) 2015 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
 
---[[
-IMPORTANT: If your addon makes changes to character_desc_general.xml, instead of altering the original, create a new one
-and link it in system.ltx. Then change ACTOR_PROFILES below:
---]]
-ACTOR_PROFILES = "character_desc_general.xml"
-
 ------------------
 -- on_game_load()
 ------------------
@@ -99,7 +93,8 @@ local function on_game_load()
 		-- set default goodwill for all factions vs. actor's new faction
 		game_relations.set_community_goodwill_for_faction("actor_"..faction)
 		
-		local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\".. ACTOR_PROFILES)
+		local actor_profiles = system_ini():r_string_ex("profiles", "actor_profiles")
+		local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\".. actor_profiles .. ".xml")
 		_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
 		if (_xml) then
 			local supplies = alun_utils.XmlGetNodeValue(_xml,"supplies")
@@ -456,7 +451,8 @@ function faction_ui:OnFactionSelect(faction)
 	
 	desc = desc .. "\\n \\n"
 	
-	local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\".. ACTOR_PROFILES)
+	local actor_profiles = system_ini():r_string_ex("profiles", "actor_profiles")
+	local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\".. actor_profiles .. ".xml")
 	_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
 	if (_xml) then
 	
