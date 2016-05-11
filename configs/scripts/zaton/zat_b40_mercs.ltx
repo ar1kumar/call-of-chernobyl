@@ -21,8 +21,8 @@ def_state_standing = hide
 [remark@zat_b40_danger_gen]
 anim = hide
 target  = story | actor
-on_info = {=see_actor} %+zat_b40_merc_combat_find_actor%
-on_info2 = {-zat_b40_call_to_fight_sad} %=play_sound(zat_b40_merc_combat) +zat_b40_call_to_fight_sad%
+;on_info = {=see_actor} %+zat_b40_merc_combat_find_actor%
+;on_info2 = {-zat_b40_call_to_fight_sad} %=play_sound(zat_b40_merc_combat) +zat_b40_call_to_fight_sad%
 on_game_timer = 600 | %+zat_b40_merc_combat_find_actor%
 
 [remark@zat_b40_warning_gen]
@@ -38,7 +38,7 @@ on_signal = theme_end | %+zat_b40_start_worning_time%
 def_state_standing = sit_knee
 out_restr = zat_surge_hide_b40
 combat_ignore_cond =  {-zat_b40_merc_in_combat} true, false
-on_info3 = {-zat_b40_call_to_fight_sad +zat_b40_merc_in_combat} %=play_sound(zat_b40_merc_combat) +zat_b40_call_to_fight_sad%
+;on_info3 = {-zat_b40_call_to_fight_sad +zat_b40_merc_in_combat} %=play_sound(zat_b40_merc_combat) +zat_b40_call_to_fight_sad%
 
 [logic@zat_b40_mercs_gen]
 suitable = {=npc_community(killer)} true
