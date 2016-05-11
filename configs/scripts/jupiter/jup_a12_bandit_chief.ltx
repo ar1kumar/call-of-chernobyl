@@ -10,7 +10,7 @@ path_look = bandit_chief_stand_look
 def_state_standing = wait_na
 combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 meet = meet@bandit_chief_stand
-on_info = {+jup_a12_chief_bandit_wait_threat_prisoner -jup_a12_stalker_prisoner_free} walker@wait_threat_prisoner, {+jup_a12_stalker_prisoner_dead} walker@stand, {+jup_a12_stalker_prisoner_free +jup_a12_stalker_prisoner_thanked_actor} walker@stand, {+jup_a12_actor_enemy_to_bandits -jup_a12_chief_bandit_wait_threat_prisoner} %+jup_a12_chief_bandit_wait_threat_prisoner%
+;on_info = {+jup_a12_chief_bandit_wait_threat_prisoner -jup_a12_stalker_prisoner_free} walker@wait_threat_prisoner, {+jup_a12_stalker_prisoner_dead} walker@stand, {+jup_a12_stalker_prisoner_free +jup_a12_stalker_prisoner_thanked_actor} walker@stand, {+jup_a12_actor_enemy_to_bandits -jup_a12_chief_bandit_wait_threat_prisoner} %+jup_a12_chief_bandit_wait_threat_prisoner%
 
 [meet@bandit_chief_stand]
 close_anim = wait_na
@@ -59,7 +59,7 @@ path_walk = bandit_chief_stand_walk
 path_look = bandit_chief_stand_look
 def_state_standing = wait_na
 meet = meet@bandit_chief_stand
-combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true
+;combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true
 out_restr = jup_a12_sr_bandit_bodyguard
 
 [death]
