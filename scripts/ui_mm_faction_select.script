@@ -29,6 +29,7 @@ local function on_game_load()
 			need_save = true
 		end
 		if (config:GetValue("temp","new_game_survival_mode",1) == true) then
+			xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"zombied", -10000})
 			alife_storage_manager.get_state().enable_survival_mode = true
 			config:SetValue("temp","new_game_survival_mode")
 			need_save = true
@@ -297,7 +298,7 @@ function faction_ui:InitControls(f)
 	self.desc_text = xml:InitTextWnd("main_dialog:description:desc_win", nil)
 	self.scroll_v:AddWindow(self.desc_text, true)
 	
-	self:OnFactionSelect("stalker")
+	self:OnFaction_stalker()
 
 	self.start_list = xml:InitComboBox("main_dialog:list_starts", self.dialog)
 	self.start_list:SetAutoDelete(true)
@@ -506,8 +507,10 @@ function faction_ui:OnFactionSelect(faction)
 		self["btn_"..self.f[i].."_inactive"]:Show(true)
 	end
 	
-	self["btn_"..faction]:Show(true)
-	self["btn_"..faction.."_inactive"]:Show(false)
+	if (self["btn_".. faction]) then
+		self["btn_"..faction]:Show(true)
+		self["btn_"..faction.."_inactive"]:Show(false)
+	end
 	
 	self.disp_faction_name:SetText(gs("st_faction_"..faction))
 	self.desc_text:SetText(desc)
@@ -544,15 +547,26 @@ end
 function faction_ui:OnFaction_monolith()
 	self:OnFactionSelect("monolith")
 end
+function faction_ui:OnFaction_zombied()
+	self:OnFactionSelect("zombied")
+end
 
 
+local zombie_mode_counter = 0;
 function faction_ui:OnKeyboard(dik, keyboard_action)
 	local res = CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
 	if res==false then
 		local bind = dik_to_bind(dik)
 		if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 			if dik == DIK_keys.DIK_ESCAPE then
+				zombie_mode_counter = 0
 				self:OnQuit()
+			elseif (dik == DIK_keys.DIK_Z) then
+				zombie_mode_counter = zombie_mode_counter + 1
+				if (zombie_mode_counter == 5) then
+					zombie_mode_counter = 0
+					self:OnFaction_zombied()
+				end
 			elseif (dik == DIK_keys.DIK_S) then 
 			end
 		end
