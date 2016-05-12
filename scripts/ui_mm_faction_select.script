@@ -552,19 +552,17 @@ function faction_ui:OnFaction_zombied()
 end
 
 
-local zombie_mode_counter = 0;
+local special_mode_counter = 0;
 function faction_ui:OnKeyboard(dik, keyboard_action)
 	local res = CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
 	if res==false then
 		local bind = dik_to_bind(dik)
 		if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 			if dik == DIK_keys.DIK_ESCAPE then
-				zombie_mode_counter = 0
 				self:OnQuit()
 			elseif (dik == DIK_keys.DIK_Z) then
-				zombie_mode_counter = zombie_mode_counter + 1
-				if (zombie_mode_counter == 5) then
-					zombie_mode_counter = 0
+				special_mode_counter = special_mode_counter + 1
+				if (special_mode_counter == 5) then
 					self:OnFaction_zombied()
 				end
 			elseif (dik == DIK_keys.DIK_S) then 
