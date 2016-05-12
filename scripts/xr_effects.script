@@ -4165,8 +4165,8 @@ function make_a_wish(actor,npc,p)
 --			end
 --		end
 
---		Teleport to Kopachy Village which is a pile of ruins and filled with zombies.
---		We have to give the player 5,000 goodwill with the zombie faction as they might be hostile.
+--		Teleports the player to a smashed open grave in the Great Swamp.
+--		Goodwill is increased with the zombied faction to ensure they aren't hostile.
 		inc_faction_goodwill_to_actor(db.actor, nil, {"zombied", 5000})
 		ChangeLevel(vector():set(266.99, 0.00, -131.07), 310937, 181, vector():set(0,0,0))
 		return 
