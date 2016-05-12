@@ -15,13 +15,52 @@ local die_chance 				= 0.01		--// chance of dying if actor passes out
 local last_chk, pwr_chk			= 0, 0		--// hourly and power update counters
 last_sleep, no_sleep, caff_chk 	= 0, 1, 0	--// change "no_sleep" to 0 to allow sleep spam
 local items = {
+
+--	Vanilla.
 	energy_drink	= -4,
 	antirad			= 2,
+	bandage			= 1
 	medkit			= 2,
 	medkit_army		= 3,
 	medkit_scientic = 3,
 	vodka			= 3,
 	vodka_script	= 3
+	
+--	"Items Addon" by 2C. (Compatibility)
+--	This might take a bit longer to do, I haven't forgotten it.
+
+--	"Itemsoup" by /sg/. (Compatibility)
+--	Booze.
+	vodka_1				= 3
+	vodka_2				= 3
+	vodka_3				= 3
+	vodka_4				= 3
+	beer_1				= 2
+	beer_2				= 2
+	beer_can_1			= 2
+	beer_can_2			= 2
+	beer_large_1		= 3
+	beer_large_2		= 3
+--	Drinks.
+	cocacola			= -2
+	guru				= -3
+	redbull				= -4
+-- Medical supplies.
+	amphetamines_1		= -3
+	amphetamines_2		= -3
+	amphetamines_3	 	= -3
+	amphetamines_4		= -3
+	bandage_israeli		= 1
+	diazepam			= 2
+--	Tobacco products.
+	cigarettes_1		= 1
+	cigarettes_2		= 1
+	cigarettes_3		= 1
+	cigarettes_russian	= 1
+	cuban				= 2
+	lucky				= 1
+	marlboro			= 1
+	
 }
 
 function on_game_start()
@@ -76,7 +115,8 @@ end
 function actor_on_item_use(item)
 	for i,j in pairs(items) do
 		if item:section() == i then
-			if i == "energy_drink" then
+--			if i == "energy_drink" then
+			if j < 0 then
 				caff_chk = caff_chk + 1
 				if caff_chk > caff_max then break end
 			end
