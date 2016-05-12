@@ -29,7 +29,6 @@ local function on_game_load()
 			need_save = true
 		end
 		if (config:GetValue("temp","new_game_survival_mode",1) == true) then
-			xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"zombied", -10000})
 			alife_storage_manager.get_state().enable_survival_mode = true
 			config:SetValue("temp","new_game_survival_mode")
 			need_save = true
@@ -160,6 +159,7 @@ local function actor_on_first_update(binder,delta)
 	
 	-- Survival mode
 	if (IsSurvivalMode() and system_ini():section_exist("survival_squad_"..faction) and start_pos) then 
+		xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"zombied", -5000})
 		local sim = alife()
 		local squad = sim:create("survival_squad_"..faction,start_pos[3],start_pos[1],start_pos[2])
 		if (squad) then
