@@ -175,8 +175,16 @@ function CSurgeManager:start(manual)
 	diff_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor())
 	--log("--->start diff_sec="..tostring(diff_sec))
 	local level_name = level.name()
-	if (level_name == "l11_hospital") or (self.indoor_levels and self.indoor_levels[level_name]) or (atmosfear and (atmosfear.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==0)) then
+	
+	
+	if (self.indoor_levels and self.indoor_levels[level_name]) or (atmosfear and (atmosfear.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==0)) then
 		self.skip_message = true
+		self:skip_surge()
+		return
+	end
+	
+	if (level_name == "l13_generators" or level_name == "l11_hospital") then
+		skip_message = false
 		self:skip_surge()
 		return
 	end
