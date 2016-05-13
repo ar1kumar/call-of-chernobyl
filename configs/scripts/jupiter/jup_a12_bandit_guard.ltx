@@ -8,21 +8,15 @@ on_death = death
 [walker@bandit_guard_stand]
 path_walk = bandit_guard_stand_walk
 path_look = bandit_guard_stand_look
-;combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {+jup_a12_bandit_guard_can_be_easily_killed -jup_a12_merc_attack_started} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
 meet = meet@guard_base
 
 [meet@guard_base]
 close_distance = 15
-close_anim = {+jup_a12_actor_has_pass_to_containers} guard_na, threat_na
-close_victim = actor
 close_snd_hello = nil
 close_snd_bye = nil
 far_distance = 45
-far_anim = {+jup_a12_actor_has_pass_to_containers} guard, threat
-far_victim = actor
 far_snd = nil
 snd_on_use = nil
-use	= {!actor_enemy !actor_has_weapon} true
 trade_enable = false
 
 [hit]
