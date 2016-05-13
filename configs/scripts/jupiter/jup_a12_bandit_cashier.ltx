@@ -7,23 +7,18 @@ suitable = {=check_npc_name(jup_a12_bandit_cashier) !surge_started} true
 [walker@wait]
 path_walk = bandit_cashier_wait_walk
 path_look = bandit_cashier_wait_look
-on_info = {+jup_a12_stalker_prisoner_free -jup_a12_stalker_prisoner_dead} walker@get_payment_wait
-on_info2 = {+jup_a12_stalker_prisoner_dead} walker@wait_after
 meet = no_meet
 
 [walker@get_payment_wait]
-path_walk = bandit_cashier_get_payment_walk
-path_look = bandit_cashier_get_payment_look
-on_info = {+jup_a12_bandit_payment_started -jup_a12_stalker_prisoner_dead} walker@get_payment
-on_info2 = {+jup_a12_stalker_prisoner_dead} walker@wait_after
+path_walk = bandit_cashier_wait_walk
+path_look = bandit_cashier_wait_look
 def_state_moving = rush
 meet = no_meet
 
 [walker@get_payment]
-path_walk = bandit_cashier_get_payment_walk
-path_look = bandit_cashier_get_payment_look
+path_walk = bandit_cashier_wait_walk
+path_look = bandit_cashier_wait_look
 meet = meet@get_payment
-on_info2 = {+jup_a12_stalker_prisoner_dead} walker@wait_after
 
 [meet@get_payment]
 meet_dialog = jup_a12_bandit_payment_dialog
