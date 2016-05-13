@@ -829,11 +829,9 @@ function CSurgeManager:update()
 							if fate=="killatend" then
 								self:kill_all_unhided()
 							else
-								if(xr_logic.pick_section_from_condlist(db.actor, nil, self.survive)~="true" and not character_community(db.actor) == "actor_monolith") then
-									if (atmosfear == nil) or not(atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_god_mode",1,false)) then
-										if not (is_actor_immune()) then 
-											self:kill_actor_at_pos(wave_pos.z)
-										end
+								if (atmosfear == nil) or not(atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_god_mode",1,false)) then
+									if not (is_actor_immune()) then 
+										self:kill_actor_at_pos(wave_pos.z)
 									end
 								end
 							end
@@ -1785,7 +1783,7 @@ function is_actor_immune()
 	if (character_community(db.actor) == "actor_monolith") then
 		return true
 	end
-	-- 'Radiotherapy' achievemeny has been unlocked.
+	-- 'Radiotherapy' achievement has been unlocked.
 	if (has_alife_info("achieved_radiotherapy")) then
 		local survive_chance = math.random()
 		if (survive_chance < 0.25) then
