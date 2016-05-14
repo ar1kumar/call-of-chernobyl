@@ -1787,8 +1787,9 @@ function is_actor_immune()
 	if (get_console():get_bool("g_god")) then
 		return true
 	end
-	-- Actor is a member of the Monolith faction.
-	if (character_community(db.actor) == "actor_monolith") then
+	-- Actor is a member of the Monolith or Zombified factions.
+	if (character_community(db.actor) == "actor_monolith")
+	or (character_community(db.actor) == "actor_zombied") then
 		return true
 	end
 	-- 'Radiotherapy' achievement has been unlocked.
