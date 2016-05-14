@@ -2,23 +2,16 @@
 active = walker@bandit_guard_stand
 suitable = {=check_npc_name(jup_a12_bandit_guard) !surge_started} true
 prior = 200
-on_hit = hit
-on_death = death
 
 [walker@bandit_guard_stand]
 path_walk = bandit_guard_stand_walk
 path_look = bandit_guard_stand_look
-meet = meet@guard_base
+on_info = {=surge_started} walker@surge
+meet = no_meet
 
-[meet@guard_base]
-close_distance = 15
-close_snd_hello = nil
-close_snd_bye = nil
-far_distance = 45
-far_snd = nil
-snd_on_use = nil
-trade_enable = false
 
-[hit]
-
-[death]
+[walker@surge]
+path_walk = bandit_guard_stand_walk
+path_look  = bandit_guard_stand_look
+on_info = {=surge_complete} walker@bandit_guard_stand
+meet = no_meet

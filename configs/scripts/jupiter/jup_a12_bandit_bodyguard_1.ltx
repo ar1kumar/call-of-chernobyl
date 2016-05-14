@@ -6,20 +6,12 @@ suitable = {=check_npc_name(sim_default_bandit_1)} true
 [walker@guard]
 path_walk = bandit_bodyguard_1_walk
 path_look = bandit_bodyguard_1_look
-meet = meet@guard
-out_restr = jup_a12_sr_bandit_bodyguard
+on_info = {=surge_started} walker@surge
+meet = no_meet
 
-[meet@guard]
-close_distance = 20
-close_anim = guard
-use	= false
 
-[walker@threat]
+[walker@surge]
 path_walk = bandit_bodyguard_1_walk
-path_look = bandit_bodyguard_1_look
-meet = meet@threat
-out_restr = jup_a12_sr_bandit_bodyguard
-
-[meet@threat]
-close_distance = 20
-use	= false
+path_look  = bandit_bodyguard_1_look
+on_info = {=surge_complete} walker@guard
+meet = no_meet

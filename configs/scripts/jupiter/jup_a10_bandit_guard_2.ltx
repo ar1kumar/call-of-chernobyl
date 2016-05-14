@@ -6,5 +6,12 @@ active = walker@jup_a10_bandit_guard_2
 [walker@jup_a10_bandit_guard_2]
 path_walk = bodyguard_2_walk
 path_look  = bodyguard_2_look
+on_info = {=surge_started} walker@surge
+meet = no_meet
 
-[remark]
+
+[walker@surge]
+path_walk = bodyguard_2_walk
+path_look  = bodyguard_2_look
+on_info = {=surge_complete} walker@jup_a10_bandit_guard_2
+meet = no_meet

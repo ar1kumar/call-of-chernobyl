@@ -1,34 +1,17 @@
 [logic@jup_a12_bandit_cashier]
 active = walker@wait
 prior = 200
-on_death = death
 suitable = {=check_npc_name(jup_a12_bandit_cashier) !surge_started} true
 
 [walker@wait]
 path_walk = bandit_cashier_wait_walk
 path_look = bandit_cashier_wait_look
+on_info = {=surge_started} walker@surge
 meet = no_meet
 
-[walker@get_payment_wait]
+
+[walker@surge]
 path_walk = bandit_cashier_wait_walk
-path_look = bandit_cashier_wait_look
-def_state_moving = rush
+path_look  = bandit_cashier_wait_look
+on_info = {=surge_complete} walker@wait
 meet = no_meet
-
-[walker@get_payment]
-path_walk = bandit_cashier_wait_walk
-path_look = bandit_cashier_wait_look
-meet = meet@get_payment
-
-[meet@get_payment]
-meet_dialog = jup_a12_bandit_payment_dialog
-trade_enable = false
-allow_break = false
-
-[walker@wait_after]
-path_walk = bandit_cashier_wait_walk
-path_look = bandit_cashier_wait_look
-combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner)} true
-meet = no_meet
-
-[death]

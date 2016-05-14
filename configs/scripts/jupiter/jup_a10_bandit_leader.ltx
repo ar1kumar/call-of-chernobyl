@@ -2,21 +2,11 @@
 suitable = {=check_npc_name(jup_a10_bandit_leader)}
 prior = 100
 active = animpoint@valet
-on_death = death
 
 [animpoint@valet]
-cover_name = jup_a10_bandit_leader_sit_animpoint
-avail_animations =  animpoint_sit_normal
-use_camp = false
-meet = meet
+meet = no_meet
+on_info = {=surge_started} walker@surge
 
-[death]
-
-[meet]
-snd_on_use 		= {-jup_a10_vano_give_task} meet_use_no_default,  {+jup_a10_back_vano} meet_use_no_default
-close_snd_hello = jup_a10_bandit_leader_hello
-close_distance  = 10
-close_anim = nil
-trade_enable	= false
-
-[animpoint@remark]
+[walker@surge]
+on_info = {=surge_complete} animpoint@valet
+meet = no_meet
