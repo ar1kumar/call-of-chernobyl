@@ -90,46 +90,51 @@ end
 -- automated ordered tasks
 -- tasks must be named <section>_task_<number>
 -- m_trader (ie. Sidorovich) use npc:name() instead
-function get_first_available_task(npc,skip,is_sim)
-	local tm = task_manager.get_task_manager()
-	local task_info = tm.task_info
-	
-	local sec
-	local st = db.storage[npc:id()]
-	if (st and st.ini and st.section_logic) then 
-		sec = st.ini:r_string_ex(st.section_logic,"task_section")
-		if (sec) then 
-			sec = sec .. "_task_"
-		end
-	end 
-	
-	if not (sec) then
-		sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
-	end 
-	
-	local task_id = sec.."1"
-	
-	local count = 1
-	while (task_manager.task_ini:section_exist(task_id)) do
-		--printf("task_id=%s skipped=%s",task_id,skipped_tasks[task_id])
-		if (skipped_tasks[task_id] ~= true and task_info[task_id] == nil and xr_conditions.has_completed_task_prerequisites(nil,nil,{task_id})) then
-			if (skip) then 
-				skipped_tasks[task_id] = true
-				return
-			else
-				if (is_sim) then 
-					local p = alun_utils.parse_list(task_manager.task_ini,task_id,"sim_communities",true)
-					if (p[character_community(npc)] == true) then 
-						return task_id
-					end
-				else 
-					return task_id
-				end
-			end
-		end
-		count = count + 1
-		task_id = sec..tostring(count)
-	end
+local skipped_tasks = {}
+function get_first_available_task(npc,skipped_id,is_sim)
+    if (skipped_id) then
+        skipped_tasks[skipped_id] = true
+        return
+    end
+    local tm = task_manager.get_task_manager()
+    local task_info = tm.task_info
+   
+    local sec
+    local st = db.storage[npc:id()]
+    if (st and st.ini and st.section_logic) then
+        sec = st.ini:r_string_ex(st.section_logic,"task_section")
+        if (sec) then
+            sec = sec .. "_task_"
+        end
+    end
+   
+    if not (sec) then
+        sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+    end
+   
+    local task_id = sec.."1"
+   
+    local count = 1
+    while (task_manager.task_ini:section_exist(task_id)) do
+        --printf("task_id=%s skipped=%s",task_id,skipped_tasks[task_id])
+        if (skipped_tasks[task_id] ~= true and task_info[task_id] == nil and xr_conditions.has_completed_task_prerequisites(nil,nil,{task_id})) then
+--          if (skip) then
+--              skipped_tasks[task_id] = true
+--              return
+--          else
+                if (is_sim) then
+                    local p = alun_utils.parse_list(task_manager.task_ini,task_id,"sim_communities",true)
+                    if (p[character_community(npc)] == true) then
+                        return task_id
+                    end
+                else
+                    return task_id
+                end
+--          end
+        end
+        count = count + 1
+        task_id = sec..tostring(count)
+    end
 end
 
 function get_first_finished_task(npc,is_sim)

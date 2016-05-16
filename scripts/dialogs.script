@@ -75,51 +75,51 @@ function text_sim_npc_has_ordered_task_to_give(a,b)
 end
 
 function text_fetch_task(a,b)
-	local npc = who_is_npc(a, b)
-	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)
-
-	if (last_task_id) then
-		while last_task_id and task_section ~= nil and task_section ~= last_task_id do
-			task_section = axr_task_manager.get_first_available_task(npc,true)
-		end
-	else
-		last_task_id = task_section
-	end
-
-	if not (task_section) then
-		last_task_id = nil
-		return game.translate_string("st_nevermind")
-	end
-
-	axr_task_manager.trigger_fetch_func(task_section)
-
-	local text = game.translate_string(task_section and axr_task_manager.get_fetch_task_description(task_section) or "st_about_fetch_task_default")
-
-	return string.format(text,_FETCH_TEXT or "") or ""
+    local npc = who_is_npc(a, b)
+    local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc)
+ 
+    if (last_task_id) then
+        while last_task_id and task_section ~= nil and task_section ~= last_task_id do
+            task_section = axr_task_manager.get_first_available_task(npc,last_task_id)
+        end
+    else
+        last_task_id = task_section
+    end
+ 
+    if not (task_section) then
+        last_task_id = nil
+        return game.translate_string("st_nevermind")
+    end
+ 
+    axr_task_manager.trigger_fetch_func(task_section)
+ 
+    local text = game.translate_string(task_section and axr_task_manager.get_fetch_task_description(task_section) or "st_about_fetch_task_default")
+ 
+    return string.format(text,_FETCH_TEXT or "") or ""
 end
 
 function text_sim_fetch_task(a,b)
-	local npc = who_is_npc(a, b)
-	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
-
-	if (last_task_id) then
-		while last_task_id and task_section ~= nil and task_section ~= last_task_id do
-			task_section = axr_task_manager.get_first_available_task(npc,true,true)
-		end
-	else
-		last_task_id = task_section
-	end
-
-	if not (task_section) then
-		last_task_id = nil
-		return game.translate_string("st_nevermind")
-	end
-
-	axr_task_manager.trigger_fetch_func(task_section)
-
-	local text = game.translate_string(task_section and axr_task_manager.get_fetch_task_description(task_section) or "st_about_fetch_task_default")
-
-	return string.format(text,_FETCH_TEXT or "") or ""
+    local npc = who_is_npc(a, b)
+    local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
+ 
+    if (last_task_id) then
+        while last_task_id and task_section ~= nil and task_section ~= last_task_id do
+            task_section = axr_task_manager.get_first_available_task(npc,last_task_id,true)
+        end
+    else
+        last_task_id = task_section
+    end
+ 
+    if not (task_section) then
+        last_task_id = nil
+        return game.translate_string("st_nevermind")
+    end
+ 
+    axr_task_manager.trigger_fetch_func(task_section)
+ 
+    local text = game.translate_string(task_section and axr_task_manager.get_fetch_task_description(task_section) or "st_about_fetch_task_default")
+ 
+    return string.format(text,_FETCH_TEXT or "") or ""
 end
 
 function text_task_finish(a,b)
@@ -158,31 +158,31 @@ function npc_sim_set_finished_task_complete(a,b)
 end
 
 function npc_give_last_task_id(a,b)
-	local npc = who_is_npc(a, b)
-	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
-	while last_task_id and task_section ~= nil and task_section ~= last_task_id do
-		task_section = axr_task_manager.get_first_available_task(npc,true,true)
-	end
-	if (last_task_id) then
-		local se_obj = npc and alife():object(npc:id())
-		local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
-		task_manager.get_task_manager():give_task(last_task_id,giver_id)
-		last_task_id = nil
-	end
+    local npc = who_is_npc(a, b)
+    local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
+    while last_task_id and task_section ~= nil and task_section ~= last_task_id do
+        task_section = axr_task_manager.get_first_available_task(npc,last_task_id,true)
+    end
+    if (last_task_id) then
+        local se_obj = npc and alife():object(npc:id())
+        local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
+        task_manager.get_task_manager():give_task(last_task_id,giver_id)
+        last_task_id = nil
+    end
 end
 
 function npc_sim_give_last_task_id(a,b)
-	local npc = who_is_npc(a, b)
-	local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
-	while last_task_id and task_section ~= nil and task_section ~= last_task_id do
-		task_section = axr_task_manager.get_first_available_task(npc,true,true)
-	end
-	if (last_task_id) then
-		local se_obj = npc and alife():object(npc:id())
-		local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
-		task_manager.get_task_manager():give_task(last_task_id,giver_id)
-		last_task_id = nil
-	end
+    local npc = who_is_npc(a, b)
+    local task_section = axr_task_manager and axr_task_manager.get_first_available_task(npc,nil,true)
+    while last_task_id and task_section ~= nil and task_section ~= last_task_id do
+        task_section = axr_task_manager.get_first_available_task(npc,last_task_id,true)
+    end
+    if (last_task_id) then
+        local se_obj = npc and alife():object(npc:id())
+        local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
+        task_manager.get_task_manager():give_task(last_task_id,giver_id)
+        last_task_id = nil
+    end
 end
 
 function npc_give_first_available_task(a,b)
@@ -200,17 +200,17 @@ function npc_sim_give_first_available_task(a,b)
 end
 
 function npc_skip_first_ordered_task(a,b)
-	if (axr_task_manager) then
-		local npc = who_is_npc(a, b)
-		axr_task_manager.get_first_available_task(npc,true)
-	end
+    if (axr_task_manager) then
+        local npc = who_is_npc(a, b)
+        axr_task_manager.get_first_available_task(npc,last_task_id)
+    end
 end
 
 function npc_sim_skip_first_ordered_task(a,b)
-	if (axr_task_manager) then
-		local npc = who_is_npc(a, b)
-		axr_task_manager.get_first_available_task(npc,true,true)
-	end
+    if (axr_task_manager) then
+        local npc = who_is_npc(a, b)
+        axr_task_manager.get_first_available_task(npc,last_task_id,true)
+    end
 end
 
 function npc_clear_skipped_tasks(a,b)
