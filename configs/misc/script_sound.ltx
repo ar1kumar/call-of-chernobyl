@@ -104,8 +104,10 @@ x16_engine1_run
 x16_engine1_stop
 x16_engine2_run
 x16_engine2_stop
+x16_grate_fall
 x16_hum_2
 x16_switch_1
+x16_brain_death
 system_message_1
 system_message_2
 system_message_3
@@ -118,7 +120,32 @@ agru_sound2
 agru_snorks
 agr_army_comandir_megafon
 agr_army_alarm
+controller_script_attack
 
+x18_sound_1
+x18_sound_2
+x18_sound_3
+x18_sound_4
+x18_sound_5
+x18_sound_6
+x18_sound_7
+x18_sound_8
+x18_sound_9
+x18_sound_10
+x18_sound_11
+x18_sound_12
+giant_underground_0
+poltergeist_die_0
+x18_firedoor
+val_patrol_prikaz
+
+rad_hat_1
+rad_hat_2
+radar_meh_on
+radar_meh_off
+switch_2
+psy_blackout
+bun_monolith_call_1
 sar_monolith_call
 
 mil_freedom_guards_warning_actor
@@ -174,6 +201,10 @@ path = ambient\x16\x16_engine2_run
 type = 3d
 path = ambient\x16\x16_engine2_stop
 
+[x16_grate_fall]
+type = 3d
+path = ambient\x16\x16_grate_fall
+
 [x16_hum_2]
 type = looped
 path = ambient\x16\x16_hum_2
@@ -181,6 +212,10 @@ path = ambient\x16\x16_hum_2
 [x16_switch_1]
 type = 3d
 path = ambient\switch_1
+
+[x16_brain_death]
+type = 3d
+path = ambient\x16\x16_brain_death
 
 [system_message_1]
 type = 3d
@@ -201,6 +236,12 @@ path = characters_voice\scenario\yantar\system_message_4
 [red_bloodsucker_growl]
 type = 3d
 path = monsters\bloodsucker\distant_growl_
+shuffle = rnd
+idle = 10,20,100
+
+[controller_script_attack]
+type = 3d
+path = monsters\controller\controller_script_attack_
 shuffle = rnd
 idle = 10,20,100
 
@@ -236,6 +277,110 @@ path = monsters\snork\snork_idle_
 shuffle = rnd
 idle = 3,5,100
 
+[x18_sound_1]
+type = 3d
+path = ambient\x18\x18_hit_8
+
+[x18_sound_2]
+type = 3d
+path = ambient\x18\x18_metal_2
+
+[x18_sound_3]
+type = 3d
+path = ambient\x18\x18_metal_3
+
+[x18_sound_4]
+type = 3d
+path = ambient\x18\x18_metal_4
+
+[x18_sound_5]
+type = 3d
+path = ambient\x18\x18_metal_5
+
+[x18_sound_6]
+type = 3d
+path = ambient\x18\x18_creak_2
+
+[x18_sound_7]
+type = 3d
+path = ambient\x18\x18_creak_1
+
+[x18_sound_8]
+type = 3d
+path = ambient\x18\x18_hit_7
+
+[x18_sound_9]
+type = 3d
+path = ambient\x18\x18_footsteps_2
+
+[x18_sound_10]
+type = 3d
+path = ambient\x18\x18_move_4
+
+[x18_sound_11]
+type = 3d
+path = ambient\x18\x18_footsteps
+
+[x18_sound_12]
+type = 3d
+path = ambient\x18\x18_move_3
+
+[giant_underground_0]
+type = 3d
+path = monsters\giant\giant_underground_0
+
+[poltergeist_die_0]
+type = 3d
+path = monsters\poltergeist\die_0
+
+[x18_firedoor]
+type = looped
+path = anomaly\fireball_idle
+
+[val_patrol_prikaz]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\val\patrol_prikaz
+shuffle = seq
+idle = 10,15,100
+
+[rad_hat_1]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\radar\rad_hat_1
+shuffle = seq
+idle = 1,1,100
+
+[rad_hat_2]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\radar\rad_hat_2
+shuffle = seq
+idle = 1,1,100
+
+[radar_meh_on]
+type = looped
+path = ambient\cooling_run
+
+[radar_meh_off]
+type = 3d
+path = ambient\cooling_stop
+
+[switch_2]
+type = 3d
+path = ambient\switch_2
+
+[psy_blackout]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = affects\psy_blackout
+shuffle = seq
+idle = 1,1,100
+
 [agr_army_comandir_megafon]
 type = 3d
 path = characters_voice\scenario\agroprom\comandir_megafon_
@@ -247,6 +392,14 @@ type = 3d
 path = characters_voice\scenario\agroprom\siren_1
 shuffle = rnd
 idle = 0,0,100
+
+[bun_monolith_call_1]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\sarcofag\monolith_call_1
+shuffle = seq
+idle = 1,1,100
 
 [sar_monolith_call]
 type = actor
