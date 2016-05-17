@@ -65,15 +65,15 @@ on_info = %=play_sound(system_message_3)%
 on_timer = 1000 | sr_idle@primary_idle %=run_cam_effector(radar_stop:2506:false)%
 
 [sr_idle@primary_idle]
-on_timer = 9000 | sr_idle@primary_idle_2 %=run_postprocess(agr_u_fade)%
+;on_timer = 9000 | sr_idle@primary_idle_2 %=run_postprocess(agr_u_fade)%
+on_timer = 9000 | sr_idle@primary_idle_3 %=disable_ui =run_postprocess(agr_u_fade)%
 
-[sr_idle@primary_idle_2]
-on_timer = 3000 | sr_idle@primary_idle_3 %=run_tutorial(yantar_dream) =disable_ui%
+;[sr_idle@primary_idle_2]
+;on_timer = 3000 | sr_idle@primary_idle_3 %=start_yantar_dream =disable_ui%
 
 [sr_idle@primary_idle_3]
-on_info  = {+yantar_find_ghost_task_start} sr_idle@primary_idle_4 %=run_cam_effector(prison_1:2508:false)%
+;on_info  = {+yantar_find_ghost_task_start} sr_idle@primary_idle_4 %=run_cam_effector(prison_1:2508:false)%
+on_timer = 5 | sr_idle@primary_idle_4 %=run_cam_effector(prison_1:2508:false)%
 
 [sr_idle@primary_idle_4]
-on_timer = 4000 | sr_idle@nil %=enable_ui%
-
-[sr_idle@nil]
+on_timer = 4000 | nil %=enable_ui%
