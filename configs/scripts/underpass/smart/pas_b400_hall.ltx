@@ -1,6 +1,17 @@
 [smart_terrain]
-sim_avail = false
-arrive_dist = 100000
+squad_id = 5
+max_population = 3
+;arrive_dist = 100000
+respawn_params = respawn@pas_b400_hall
+respawn_idle = 60000
+respawn_radius = 200
+
+[respawn@pas_b400_hall]
+spawn_chimera
+
+[spawn_chimera]
+spawn_squads = simulation_chimera
+spawn_num = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} 3, 0
 
 [exclusive]
 ;tushkano jobs
