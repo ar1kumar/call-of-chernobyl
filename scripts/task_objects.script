@@ -393,7 +393,7 @@ function CGeneralTask:save(packet)
 
 	--set_save_marker(packet, "save", false, "CGeneralTask")
 	alun_utils.w_stpk(packet,"u8",id_by_status[self.status] or 0,"CGeneralTask:id_by_status")
-	if (self.status == "completed" or self.status == "fail" or self.status == "reversed") then
+	if (self.status == "completed" or self.status == "fail") then
 		if (self.repeat_timeout) then
 			alun_utils.w_stpk(packet,"CTime",self.timeout,"CGeneralTask:repeat_timeout")
 		end
@@ -423,7 +423,7 @@ function CGeneralTask:load(packet)
 
 	--set_save_marker(packet, "load", false, "CGeneralTask")
 	self.status = status_by_id[packet:r_u8()]
-	if (self.status == "completed" or self.status == "fail" or self.status == "reversed") then
+	if (self.status == "completed" or self.status == "fail") then
 		if (self.repeat_timeout) then 
 			self.timeout = utils.r_CTime(packet) or game.get_game_time()
 		end
