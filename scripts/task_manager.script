@@ -86,10 +86,14 @@ function CRandomTask:set_task_completed(task_id)
 	end
 end
 
-function CRandomTask:set_task_failed(task_id)
+function CRandomTask:set_task_failed(task_id, cancelled)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "fail"
-		xr_statistic.inc_failed_quests_counter()
+		if not (cancelled) then
+			xr_statistic.inc_failed_quests_counter()
+		else
+			xr_statistic.inc_reversed_quests_counter()
+		end
 	end
 end
 
