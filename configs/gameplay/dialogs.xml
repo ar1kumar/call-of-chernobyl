@@ -32,7 +32,11 @@
 			</phrase>
         </phrase_list>
     </dialog>
-	
+	<!-- Nuor -->
+	<dialog id="dm_ordered_task_cancel_dialog">
+        <precondition>dialogs.actor_has_unfinished_ordered_task</precondition>
+        <init_func>dialog_manager.dm_init_dynamic_task_cancel_dialog</init_func>
+    </dialog>
 	<!-- Alundaio -->
 	<dialog id="dm_ordered_task_dialog">
 		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
