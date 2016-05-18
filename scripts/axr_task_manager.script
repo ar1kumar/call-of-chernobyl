@@ -290,7 +290,7 @@ function get_first_unfinished_task(npc,is_sim)
     local count = 1
     while (task_manager.task_ini:section_exist(task_id)) do
         --printf("get_first_unfinished_task task_id=%s",task_id)
-        if (skipped_cancel[task_id] and db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < task_manager.task_ini:r_float_ex(task_id,"stage_complete")) then
+        if (skipped_cancel[task_id] ~= true and db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < task_manager.task_ini:r_float_ex(task_id,"stage_complete")) then
             --printf("get_first_unfinished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
             if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
                 if (is_sim and task_info[task_id].task_giver_id) then
@@ -305,8 +305,8 @@ function get_first_unfinished_task(npc,is_sim)
                     return task_id
                 end
             end
-        else
-            skipped_cancel[task_id] = true
+--      else
+--          skipped_cancel[task_id] = true
         end
         count = count + 1
         task_id = sec..tostring(count)
