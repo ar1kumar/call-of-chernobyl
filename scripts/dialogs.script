@@ -234,17 +234,25 @@ end
 function text_has_cancel_ordered_task(a,b)
 	local npc = who_is_npc(a, b)
 	last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc)
-	axr_task_manager.trigger_fetch_func(last_cancel_id)
 	local text = last_cancel_id and game.translate_string(axr_task_manager.get_task_cancel_text(last_cancel_id,"title"))
-	return text and text_fetch_task(a,b) or game.translate_string("st_task_none_active")
+	if (last_cancel_id and axr_task_manager.get_fetch_task_description(last_cancel_id)) then
+		axr_task_manager.trigger_fetch_func(last_cancel_id)
+		return text and string.format(text, _FETCH_TEXT or "") or game.translate_string("st_task_none_active")
+	else
+		return text or game.translate_string("st_task_none_active")
+	end
 end
  
 function text_sim_has_cancel_ordered_task(a,b)
 	local npc = who_is_npc(a, b)
 	last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc,true)
-	axr_task_manager.trigger_fetch_func(last_cancel_id)
 	local text = last_cancel_id and game.translate_string(axr_task_manager.get_task_cancel_text(last_cancel_id,"title"))
-	return text and text_fetch_task(a,b) or game.translate_string("st_task_none_active")
+	if (last_cancel_id and axr_task_manager.get_fetch_task_description(last_cancel_id)) then
+		axr_task_manager.trigger_fetch_func(last_cancel_id)
+		return text and string.format(text, _FETCH_TEXT or "") or game.translate_string("st_task_none_active")
+	else
+		return text or game.translate_string("st_task_none_active")
+	end
 end
  
 function text_actor_excuses(a,b)
