@@ -4,6 +4,7 @@
 actor_statistic = {
 					surges = 0,
 					storms = 0,
+					cancelled_quests = 0,
 					completed_quests = 0,
 					failed_quests = 0,
 					killed_monsters = 0,
@@ -194,11 +195,19 @@ function inc_surges_counter()
 	inc_actor_rank(rank_rep.surges.rnk)
 	inc_actor_reputation(rank_rep.surges.rpt)
 end
+
 function inc_storms_counter()
 	actor_statistic.storms = actor_statistic.storms + 1
 	inc_actor_rank(rank_rep.storms.rnk)
 	inc_actor_reputation(rank_rep.storms.rpt)
 end
+
+function inc_cancelled_quests_counter()
+	actor_statistic.cancelled_quests = actor_statistic.cancelled_quests + 1
+	inc_actor_rank(rank_rep.quests_cncl.rnk)
+	inc_actor_reputation(rank_rep.quests_cncl.rpt)
+end
+
 function inc_completed_quests_counter()
 	actor_statistic.completed_quests = actor_statistic.completed_quests + 1
 	inc_actor_rank(rank_rep.quests.rnk)
@@ -356,6 +365,7 @@ function save(package)
 	end
 	package:w_u16(actor_statistic.surges)
 	package:w_u16(actor_statistic.storms)
+	package:w_u16(actor_statistic.cancelled_quests)
 	package:w_u16(actor_statistic.completed_quests)
 	package:w_u16(actor_statistic.failed_quests)
 	package:w_u32(actor_statistic.killed_monsters)
@@ -419,6 +429,7 @@ function load(package)
 	actor_statistic = {}
 	actor_statistic.surges  			= package:r_u16()
 	actor_statistic.storms  			= package:r_u16()
+	actor_statistic.cancelled_quests 	= package:r_u16()
 	actor_statistic.completed_quests 	= package:r_u16()
 	actor_statistic.failed_quests	 	= package:r_u16()
 	actor_statistic.killed_monsters  	= package:r_u32()

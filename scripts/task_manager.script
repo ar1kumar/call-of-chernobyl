@@ -79,6 +79,13 @@ function CRandomTask:give_task(task_id,task_giver_id)
 	self.task_info[task_id].task_giver_id = task_giver_id
 end
 
+function CRandomTask:set_task_cancelled(task_id)
+	if (self.task_info[task_id]) then 
+		self.task_info[task_id].forced_status = "cancelled"
+		xr_statistic.inc_cancelled_quests_counter()
+	end
+end
+
 function CRandomTask:set_task_completed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "complete"
@@ -113,7 +120,7 @@ function CRandomTask:task_complete(p1)
 	task:check_task(self)
 	if (task.forced_status == "complete") then 
 		task.last_check_task = "complete"
-	elseif (task.forced_status == "fail") then 
+	elseif (task.forced_status == "fail" or task.forced_status == "cancelled") then 
 		return false
 	end
 	if task.last_check_task == "complete" then
