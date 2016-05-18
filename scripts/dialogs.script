@@ -231,6 +231,22 @@ function actor_sim_has_unfinished_ordered_task(a,b)
     return axr_task_manager and axr_task_manager.get_first_unfinished_task(npc,true) ~= nil or false
 end
  
+--[[
+
+function text_has_cancel_ordered_task(a,b)
+    local npc = who_is_npc(a, b)
+    last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc)
+    return game.translate_string(last_cancel_id and axr_task_manager.get_task_cancel_text(last_cancel_id,"title") or "st_task_none_active")
+end
+
+function text_sim_has_cancel_ordered_task(a,b)
+    local npc = who_is_npc(a, b)
+    last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc,true)
+    return game.translate_string(last_cancel_id and axr_task_manager.get_task_cancel_text(last_cancel_id,"title") or "st_task_none_active")
+end
+
+]]
+ 
 function text_has_cancel_ordered_task(a,b)
 	local npc = who_is_npc(a, b)
 	last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc)
