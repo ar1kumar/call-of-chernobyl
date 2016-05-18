@@ -4,6 +4,7 @@
 actor_statistic = {
 					surges = 0,
 					storms = 0,
+					reversed_quests = 0,
 					completed_quests = 0,
 					failed_quests = 0,
 					killed_monsters = 0,
@@ -74,6 +75,7 @@ rank_rep = {
 			storms				=	{rnk=5,		rpt=0},
 			quests				=	{rnk=50,	rpt=75},
 			quests_fail			=	{rnk=0,		rpt=-75},
+			quests_reversed		=	{rnk=0,		rpt=-75},
 			monsters			=	{rnk=5,		rpt=0},
 			stalkers			=	{rnk=0,		rpt=0}, -- Handled in game_relations.ltx
 			found_arts			=	{rnk=5,		rpt=0},
@@ -194,11 +196,19 @@ function inc_surges_counter()
 	inc_actor_rank(rank_rep.surges.rnk)
 	inc_actor_reputation(rank_rep.surges.rpt)
 end
+
 function inc_storms_counter()
 	actor_statistic.storms = actor_statistic.storms + 1
 	inc_actor_rank(rank_rep.storms.rnk)
 	inc_actor_reputation(rank_rep.storms.rpt)
 end
+
+function inc_reversed_quests_counter()
+	actor_statistic.reversed_quests = actor_statistic.reversed_quests + 1
+	inc_actor_rank(rank_rep.quests_reversed.rnk)
+	inc_actor_reputation(rank_rep.quests_reversed.rpt)
+end
+
 function inc_completed_quests_counter()
 	actor_statistic.completed_quests = actor_statistic.completed_quests + 1
 	inc_actor_rank(rank_rep.quests.rnk)
@@ -356,6 +366,7 @@ function save(package)
 	end
 	package:w_u16(actor_statistic.surges)
 	package:w_u16(actor_statistic.storms)
+	package:w_u16(actor_statistic.reversed_quests)
 	package:w_u16(actor_statistic.completed_quests)
 	package:w_u16(actor_statistic.failed_quests)
 	package:w_u32(actor_statistic.killed_monsters)
@@ -419,6 +430,7 @@ function load(package)
 	actor_statistic = {}
 	actor_statistic.surges  			= package:r_u16()
 	actor_statistic.storms  			= package:r_u16()
+	actor_statistic.reversed_quests 	= package:r_u16()
 	actor_statistic.completed_quests 	= package:r_u16()
 	actor_statistic.failed_quests	 	= package:r_u16()
 	actor_statistic.killed_monsters  	= package:r_u32()

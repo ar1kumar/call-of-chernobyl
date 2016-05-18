@@ -106,7 +106,7 @@ function has_task_not_completed(actor,npc,p)
 		return false 
 	end 
 	
-	return task_info.status ~= "completed" and task_info.status ~= "fail"
+	return task_info.status ~= "completed" and task_info.status ~= "fail" and task_info.status ~= "reversed"
 end
 
 function has_completed_task_prerequisites(actor,npc,p)
@@ -148,7 +148,7 @@ function has_completed_task_prerequisites(actor,npc,p)
 			return false 
 		end 
 		
-		if (info[task].status ~= "completed" and info[task].status ~= "fail") then
+		if (info[task].status ~= "completed" and info[task].status ~= "fail" and info[task].status ~= "reversed") then
 			--printf("task %s not completed %s",task,info[task].status)
 			return false 
 		end	
