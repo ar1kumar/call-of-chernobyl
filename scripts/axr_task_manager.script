@@ -163,13 +163,15 @@ function get_first_finished_task(npc,is_sim)
 		if (db.actor:get_task(task_id, true) ~= nil and task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == (task_manager.task_ini:r_float_ex(task_id,"stage_complete") or 254)) then
 			--printf("get_first_finished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
 			if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
-				if (is_sim and task_info[task_id].task_giver_id) then 
-					if (npc:id() == task_info[task_id].task_giver_id) then 
-						return task_id
-					end 
-					local se_obj = alife():object(npc:id())
-					if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then 
-						return task_id
+				if (is_sim) then 
+					if (task_info[task_id].task_giver_id) then 
+						if (npc:id() == task_info[task_id].task_giver_id) then 
+							return task_id
+						end 
+						local se_obj = alife():object(npc:id())
+						if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then 
+							return task_id
+						end
 					end
 				else 
 					return task_id
@@ -293,14 +295,16 @@ function get_first_unfinished_task(npc,is_sim)
         if (skipped_cancel[task_id] ~= true and db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < task_manager.task_ini:r_float_ex(task_id,"stage_complete")) then
             --printf("get_first_unfinished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
             if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
-                if (is_sim and task_info[task_id].task_giver_id) then
-                    if (npc:id() == task_info[task_id].task_giver_id) then
-                        return task_id
-                    end
-                    local se_obj = alife():object(npc:id())
-                    if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then
-                        return task_id
-                    end
+                if (is_sim) then
+					if (task_info[task_id].task_giver_id) then
+						if (npc:id() == task_info[task_id].task_giver_id) then
+							return task_id
+						end
+						local se_obj = alife():object(npc:id())
+						if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then
+							return task_id
+						end
+					end
                 else
                     return task_id
                 end
