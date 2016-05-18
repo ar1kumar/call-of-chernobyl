@@ -148,7 +148,7 @@ function CRandomTask:task_fail(p1)
 	task:check_task(self)
 	if (task.forced_status == "fail") then
 		task.last_check_task = "fail"
-	elseif (task.forced_status == "complete") then 
+	elseif (task.forced_status == "complete" or task.forced_status == "reversed") then 
 		return false
 	end
 	if (task.last_check_task == "fail") then

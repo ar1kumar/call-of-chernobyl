@@ -170,7 +170,7 @@ function get_first_unfinished_task(npc,is_sim)
         --printf("get_first_unfinished_task task_id=%s",task_id)
         if (skipped_cancel[task_id] and db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < task_manager.task_ini:r_float_ex(task_id,"stage_complete")) then
             --printf("get_first_unfinished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
-            if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
+            if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed" and task_info[task_id].status ~= "reversed") then
                 if (is_sim and task_info[task_id].task_giver_id) then
                     if (npc:id() == task_info[task_id].task_giver_id) then
                         return task_id
@@ -216,7 +216,7 @@ function get_first_finished_task(npc,is_sim)
 	--	printf("get_first_finished_task task_id=%s",task_id)
 		if (db.actor:get_task(task_id, true) ~= nil and task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == (task_manager.task_ini:r_float_ex(task_id,"stage_complete") or 254)) then
 			--printf("get_first_finished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
-			if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
+			if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed" and task_info[task_id].status ~= "reversed") then
 				if (is_sim and task_info[task_id].task_giver_id) then 
 					if (npc:id() == task_info[task_id].task_giver_id) then 
 						return task_id
@@ -251,7 +251,7 @@ function set_cancel_task_complete(task_id)
         return
     end
  
-    task_manager.get_task_manager():set_task_failed(task_id)
+    task_manager.get_task_manager():set_task_reversed(task_id)
 end
 
 function trigger_fetch_func(task_id)
