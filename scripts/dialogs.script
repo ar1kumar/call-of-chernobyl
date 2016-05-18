@@ -288,6 +288,15 @@ function actor_skip_first_ordered_task(a,b)
         if last_cancel_id then axr_task_manager.skip_cancel(last_cancel_id) end
     end
 end
+
+function actor_sim_skip_first_ordered_task(a,b)
+	if (axr_task_manager) then
+		local npc = who_is_npc(a, b)
+		last_cancel_id = axr_task_manager and (last_cancel_id or axr_task_manager.get_first_unfinished_task(npc,true))
+		if last_cancel_id then axr_task_manager.skip_cancel(last_cancel_id) end
+		end
+end
+
  
 function npc_clear_skipped_cancel(a,b)
     if (axr_task_manager) then
