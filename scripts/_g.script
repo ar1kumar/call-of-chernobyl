@@ -683,6 +683,21 @@ function IsOutfit(o,c)
 	return c and c == clsid.equ_stalker_s
 end
 
+function IsHeadgear(o)
+	if not o then return false end
+	local headgears = {
+		["helmet_base"] = true,
+		["helm_respirator"] = true,
+		["helm_hardhat"] = true,
+		["helm_hardhat_snag"] = true,
+		["helm_protective"] = true,
+		["helm_tactic"] = true,
+		["helm_battle"] = true,
+		["helm_m40"] = true,
+	}
+	return headgears[o:section()] or false
+end
+
 function IsExplosive(o,c)
 	if not c then
 		c = o and o:clsid()
