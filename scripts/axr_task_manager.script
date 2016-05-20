@@ -322,8 +322,7 @@ function set_cancel_task_complete(task_id)
         printf("WARNING: axr_task_manager.set_cancel_task_complete: no task %s",task_id)
         return
     end
- 
-    task_manager.get_task_manager():set_task_failed(task_id, true)
+    task_manager.get_task_manager():set_task_cancelled(task_id)
 end
  
 function get_task_cancel_text(task, text)

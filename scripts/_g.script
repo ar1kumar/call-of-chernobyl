@@ -683,6 +683,13 @@ function IsOutfit(o,c)
 	return c and c == clsid.equ_stalker_s
 end
 
+function IsHeadgear(o,c)
+	if not c then
+		c = o and o:clsid()
+	end
+	return c and c == clsid.equ_helmet_s
+end
+
 function IsExplosive(o,c)
 	if not c then
 		c = o and o:clsid()

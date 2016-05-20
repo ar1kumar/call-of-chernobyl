@@ -86,16 +86,20 @@ function CRandomTask:set_task_completed(task_id)
 	end
 end
 
-function CRandomTask:set_task_failed(task_id, cancelled)
+function CRandomTask:set_task_failed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "fail"
-		if not (cancelled) then
-			xr_statistic.inc_failed_quests_counter()
-		else
-			xr_statistic.inc_reversed_quests_counter()
-		end
+		xr_statistic.inc_failed_quests_counter()
 	end
 end
+
+function CRandomTask:set_task_cancelled(task_id)
+	if (self.task_info[task_id]) then 
+		self.task_info[task_id].forced_status = "fail"
+		xr_statistic.inc_cancelled_quests_counter()
+	end
+end
+
 
 function CRandomTask:update()
 	local task

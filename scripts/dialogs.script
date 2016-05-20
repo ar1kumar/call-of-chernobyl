@@ -248,36 +248,37 @@ end
 ]]
  
 function text_has_cancel_ordered_task(a,b)
-	local npc = who_is_npc(a, b)
-	last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc)
-	local text = last_cancel_id and game.translate_string(axr_task_manager.get_task_cancel_text(last_cancel_id,"title"))
-	if (last_cancel_id and axr_task_manager.get_fetch_task_description(last_cancel_id)) then
-		local sec = alun_utils.load_var(db.actor,last_cancel_id.."_fetch")
-		if not (sec) then
-			return text or game.translate_string("st_task_none_active")
-		end
-		sec = sec .. "_fetch"
-		game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
-		return text and string.format(text, _FETCH_TEXT or "") or game.translate_string("st_task_none_active")
-	else
-		return text or game.translate_string("st_task_none_active")
-	end
+    local npc = who_is_npc(a, b)
+    last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc)
+    local text = last_cancel_id and game.translate_string(axr_task_manager.get_task_cancel_text(last_cancel_id,"title"))
+    if (last_cancel_id and axr_task_manager.get_fetch_task_description(last_cancel_id)) then
+        local sec = alun_utils.load_var(db.actor,last_cancel_id.."_fetch")
+        if not (sec) then
+            return text or game.translate_string("st_task_none_active")
+        end
+		local name = game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
+        return text and string.format(text, name or "") or game.translate_string("st_task_none_active")
+--      return text and string.format(text, _FETCH_TEXT or "") or game.translate_string("st_task_none_active")
+    else
+        return text or game.translate_string("st_task_none_active")
+    end
 end
  
 function text_sim_has_cancel_ordered_task(a,b)
-	local npc = who_is_npc(a, b)
-	last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc)
-	local text = last_cancel_id and game.translate_string(axr_task_manager.get_task_cancel_text(last_cancel_id,"title"))
-	if (last_cancel_id and axr_task_manager.get_fetch_task_description(last_cancel_id)) then
-		local sec = alun_utils.load_var(db.actor,last_cancel_id.."_fetch")
-		if not (sec) then
-			return text or game.translate_string("st_task_none_active")
-		end
-		game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
-		return text and string.format(text, _FETCH_TEXT or "") or game.translate_string("st_task_none_active")
-	else
-		return text or game.translate_string("st_task_none_active")
-	end
+    local npc = who_is_npc(a, b)
+    last_cancel_id = axr_task_manager and axr_task_manager.get_first_unfinished_task(npc, true)
+    local text = last_cancel_id and game.translate_string(axr_task_manager.get_task_cancel_text(last_cancel_id,"title"))
+    if (last_cancel_id and axr_task_manager.get_fetch_task_description(last_cancel_id)) then
+        local sec = alun_utils.load_var(db.actor,last_cancel_id.."_fetch")
+        if not (sec) then
+            return text or game.translate_string("st_task_none_active")
+        end
+		local name = game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
+        return text and string.format(text, name or "") or game.translate_string("st_task_none_active")
+--      return text and string.format(text, _FETCH_TEXT or "") or game.translate_string("st_task_none_active")
+    else
+        return text or game.translate_string("st_task_none_active")
+    end
 end
  
 function text_actor_excuses(a,b)

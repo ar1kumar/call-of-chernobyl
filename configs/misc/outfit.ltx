@@ -1271,3 +1271,84 @@ cost                                     = 9500
 upgrades                                 = up_gr_firstab_stalker_outfit, up_gr_seconab_stalker_outfit, up_gr_thirdab_stalker_outfit
 installed_upgrades                       = up_firsta_stalker_outfit, up_firstc_stalker_outfit, up_secona_stalker_outfit
 upgrade_scheme                           = upgrade_scheme_stalker_outfit
+
+;---------------------------------------------------------------------------------------------
+;		AO3 Suits NBC
+;---------------------------------------------------------------------------------------------
+
+[nbc_outfit]:outfit_base
+$spawn 			= "outfit\nbc_outfit"
+visual          = dynamics\outfit\stalker_outfit
+actor_visual	= actors\stalker_neutral\stalker_neutral_2_gp5.ogf
+player_hud_section	= actor_hud_nbc
+
+ef_equipment_type	= 3
+
+inv_name			= nbc_outfit_name
+inv_name_short		= nbc_outfit_name
+description			= nbc_outfit_description
+
+inv_weight			= 10.0
+
+inv_grid_x					= 6
+inv_grid_y					= 33
+
+upgr_icon_x		= 2170
+upgr_icon_y		= 30
+upgr_icon_width		= 310
+upgr_icon_height   	= 140
+full_icon_name		= npc_icon_stalker_outfit
+
+cost				= 13000
+full_scale_icon		= 14,11			;иконка сталкера в костюме в полный рост
+
+artefact_count                  = 1
+
+immunities_sect		= sect_nbc_outfit_immunities
+
+; LOW RESISTANCE
+burn_protection                          = 0.0833
+shock_protection                         = 0.3333
+radiation_protection                     = 0.0125
+chemical_burn_protection                 = 0.0833
+telepatic_protection                     = 0.0
+strike_protection                        = 0.1925
+explosion_protection                     = 0.1925
+wound_protection                         = 0.1925
+
+hit_fraction_actor				= 0.75
+
+bones_koeff_protection 			= actor_armor_seva
+
+control_inertion_factor = 1.2
+power_loss 			= 0.8
+
+nightvision_sect	= effector_nightvision_2
+
+helmet_avaliable	 	= false
+
+upgrades                = up_gr_firstab_stalker_outfit, up_gr_seconab_stalker_outfit, up_gr_thirdab_stalker_outfit
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_stalker_outfit
+
+[sect_nbc_outfit_immunities]
+burn_immunity				= 0.04			;коэффициенты иммунитета самого костюма
+strike_immunity				= 0.0
+shock_immunity				= 0.04
+wound_immunity				= 0.04
+radiation_immunity			= 0.0
+telepatic_immunity			= 0.0
+chemical_burn_immunity		= 0.04
+explosion_immunity			= 0.04
+fire_wound_immunity			= 0.03
+
+[sect_nbc_outfit_immunities_add]
+burn_immunity				= -0.02			;коэффициенты иммунитета самого костюма
+strike_immunity				= 0.0
+shock_immunity				= -0.02
+wound_immunity				= -0.02
+radiation_immunity			= 0.0
+telepatic_immunity			= 0.0
+chemical_burn_immunity		= -0.02
+explosion_immunity			= -0.02
+fire_wound_immunity			= -0.008
