@@ -231,7 +231,7 @@ function repair_ui:OnPartsListItemClicked()
 	local sec = se_item:section_name()
 	local part_bonus = system_ini():r_float_ex(sec,"repair_part_bonus") or self.part_bonus
 	local con = math.floor((self.add_condition + part_bonus)*100)
-	self.caption_repair:SetText("+"..math.floor(con).."%")
+	self.caption_repair:SetText("+"..con.."%")
 
 	local w,h = item.width,item.height
 	if (utils.is_widescreen()) then
@@ -293,7 +293,7 @@ function repair_ui:OnListItemClicked()
 	self.picture:SetWndPos(vector2():set(self.picture.x-w/2, self.picture.y-h/2))
 
 
-	local con = self.add_condition*100
+	local con = math.floor(self.add_condition*100)
 	self.caption_repair:SetText("+"..con.."%")
 
 	if (self.use_parts) then
