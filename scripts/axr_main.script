@@ -207,9 +207,42 @@ function on_game_start()
 		end
 	end
 	for i=1,#t do
-		printf("axr_main module added %s",t[i])
-		_G[t[i]].on_game_start()
+		printf("%s.on_game_start()",t[i])
+		_G[ t[i] ].on_game_start()
 	end
+	--]]
+	
+	--[[
+	alife_storage_manager.on_game_start()
+	ammo_aggregation.on_game_start()
+	axr_companions.on_game_start()
+	axr_keybind.on_game_start()
+	axr_task_manager.on_game_start()
+	axr_trade_manager.on_game_start()
+	axr_turn_on_campfire.on_game_start()
+	coc_treasure_manager.on_game_start()
+	dynamic_news_manager.on_game_start()
+	itms_manager.on_game_start()
+	m_mines.on_game_start()
+	mob_trade.on_game_start()
+	modules.on_game_start()
+	phantom_manager.on_game_start()
+	psi_storm_manager.on_game_start()
+	sleep_dep.on_game_start()
+	surge_manager.on_game_start()
+	survival_mode.on_game_start()
+	ui_mm_faction_select.on_game_start()
+	xr_combat_ignore.on_game_start()
+	xr_corpse_detection.on_game_start()
+	xr_danger.on_game_start()
+	xr_eat_medkit.on_game_start()
+	xr_gather_items.on_game_start()
+	xr_statistic.on_game_start()
+	xrs_debug_tools.on_game_start()
+	xrs_dyn_music.on_game_start()
+	xrs_facer.on_game_start()
+	xrs_kill_wounded.on_game_start()
+	--]]
 end
 
 -------------------

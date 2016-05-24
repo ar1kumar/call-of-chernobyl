@@ -487,6 +487,8 @@ function switch_to_section(npc, ini, section)
 	local npc_id = npc:id()
 	local active_section = db.storage[npc_id].active_section
 
+	db.storage[npc_id].overrides = cfg_get_overrides(ini, section, npc)
+	
 	if active_section == section then
 		--printf("section = [%s]3", tostring(section))
 		return false
@@ -1333,6 +1335,20 @@ end
 
 function initialize_obj(obj, st, loaded, actor, stype)
 	if not loaded then
+		-- setup job logic on first net_spawn if NPC has a gulag job
+		if stype == modules.stype_stalker or stype == modules.stype_mobile then
+			local smart = xr_gulag.get_npc_smart(obj)
+			if (smart) then
+				local npc_info = smart.npc_info[obj:id()]
+				if (npc_info and npc_info.job) then 
+					npc_info.begin_job = true
+					empty_table(db.offline_objects[obj:id()])
+					smart:setup_logic(obj)
+					return
+				end
+			end
+		end
+	
 		local sim = alife()
 		local ini_filename = sim:has_info(obj:id(),"npcx_is_companion") and "scripts\\beh_companion.ltx" or "<customdata>"
 		local ini = get_customdata_or_ini_file(obj, ini_filename)
