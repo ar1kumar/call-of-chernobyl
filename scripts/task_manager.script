@@ -94,12 +94,11 @@ function CRandomTask:set_task_failed(task_id)
 end
 
 function CRandomTask:set_task_cancelled(task_id)
-	if (self.task_info[task_id]) then 
+    if (self.task_info[task_id]) then
 		self.task_info[task_id].forced_status = "fail"
-		xr_statistic.inc_cancelled_quests_counter()
-	end
+        xr_statistic.inc_cancelled_quests_counter()
+    end
 end
-
 
 function CRandomTask:update()
 	local task
@@ -151,6 +150,19 @@ function CRandomTask:task_fail(p1)
 		task.last_check_task = "fail"
 	elseif (task.forced_status == "complete") then 
 		return false
+	--[[ In the case that eventually we may want to use on_cancel
+	elseif (task.forced_status == "cancel") then
+		xr_logic.pick_section_from_condlist(db.actor, db.actor, task.on_cancel)
+		news_manager.send_task(db.actor, "updated", task.t)
+		task.status = "fail"
+		if (task.repeat_timeout) then 
+			task.timeout = game.get_game_time()
+			task.stage = 255
+		else
+			self.task_info[p1] = nil
+		end
+		return true
+	--]]
 	end
 	if (task.last_check_task == "fail") then
 		xr_logic.pick_section_from_condlist(db.actor, db.actor, task.on_fail)

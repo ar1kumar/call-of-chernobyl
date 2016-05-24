@@ -26,8 +26,8 @@ task_complete_descr = jup_b6_scientist_tech_task_finish
 on_init = %=setup_companion_task(ecolog_companion_task_2:jup_b41) =setup_task_target_anomaly -ecolog_companion_task_2_started -ecolog_companion_task_2_force_started%
 precondition = {!squad_exist(ecolog_companion_task_1) !squad_exist(ecolog_companion_task_2)} true, false
 repeat_timeout = 259200
-on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reward_stash(true)%
-on_fail = %=fail_task_dec_goodwill(25:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2)%
+on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reward_stash(true) =reset_task_target_anomaly%
+on_fail = %=fail_task_dec_goodwill(25:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reset_task_target_anomaly%
 reward_item = af_cristall
 condlist_0 = {!squad_exist(ecolog_companion_task_2)} fail
 
