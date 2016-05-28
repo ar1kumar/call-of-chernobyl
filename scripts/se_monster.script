@@ -18,10 +18,15 @@ function se_monster:can_switch_offline()
 end
 --------------------
 function se_monster:can_switch_online()
-	if self.group_id ~= 65535 then
-		return true
-	end
-	return cse_alife_monster_base.can_switch_online(self)
+    if self.group_id ~= 65535 then
+        return true
+    end
+    --/ brute force prevent from coming online /--
+    if self.first_update and not(self.online) and (self.position:distance_to(alife():actor().position) <= ONLINE_EXCLUSION_DISTANCE) then
+        return false
+    end
+    --/-----------------------------------------/--
+    return cse_alife_monster_base.can_switch_online(self)
 end
 function se_monster:switch_online()
 	--alun_utils.debug_write(strformat("se_monster:switch_online %s",self:name()))
@@ -114,5 +119,6 @@ function se_monster:on_death(killer)
 end
 --------------------
 function se_monster:update()
+	if not self.first_update then self.first_update = true end -- new
     cse_alife_monster_base.update(self)
 end

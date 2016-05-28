@@ -303,7 +303,6 @@ function motivator_binder:death_callback(victim, who)
 
 	if who:id() == db.actor:id() then
 		xr_statistic.inc_killed_stalkers_counter()
-		xr_statistic.set_best_monster(victim)
 	end
 	
 	if (IsStalker(who) and who:alive()) then
