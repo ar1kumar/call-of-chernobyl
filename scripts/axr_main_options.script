@@ -45,7 +45,7 @@ function opt_menu_on_init(menu)
     menu.list_excl_list:ClearList()
     menu.list_excl_list:SetAutoDelete(true)
     for i,dist in pairs(excl_dist_list) do
-        menu.list_excl_list:AddItem(dist.." meters", i-1)
+        menu.list_excl_list:AddItem(dist.."m", i-1)
     end
     menu:Register(menu.list_excl_list,"list_excl_dist")
 -- 
@@ -103,7 +103,7 @@ end
 function opt_menu_on_set_values(menu,optMgr)
 	--
     if (menu.list_excl_list) then
-        menu.list_excl_list:SetText(axr_main.config:GetValue("mm_options","excl_dist",0,30).." meters")
+        menu.list_excl_list:SetText(axr_main.config:GetValue("mm_options","excl_dist",0,30).."m")
     end
     --
     for k,v in pairs(check_box_options) do
