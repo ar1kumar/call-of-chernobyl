@@ -984,6 +984,7 @@ function sim_squad_scripted:can_switch_offline()
 
 	return cse_alife_online_offline_group.can_switch_offline(self)
 end
+
 function sim_squad_scripted:can_switch_online()
     --alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
     if (not self.online and is_squad_monster[self.player_id] and not get_object_story_id(self.id)) then
