@@ -1008,7 +1008,7 @@ function sim_squad_scripted:can_switch_online()
             end
         end
     --/ brute force prevent from coming online /--
-        if self.first_update and (self.position:distance_to(alife():actor().position) <= ONLINE_EXCLUSION_DISTANCE) then
+        if self.first_update and atmosfear.valid_levels[level.name()] and (self.position:distance_to(alife():actor().position) <= ONLINE_EXCLUSION_DISTANCE) then
             return false
         end
     --/---------------------------------------/--
