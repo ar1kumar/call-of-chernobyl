@@ -20,11 +20,10 @@ function options_dialog:__init() super()
 		_st = self.xml:InitStatic("tab_gameplay:templ_item", nil)
 		
 		-- caption
-		ctrl = self.xml:InitStatic(t.cap or cap,_st)
+		ctrl = self.xml:InitStatic("tab_gameplay:cap_check_axr",_st)
 		
-		if (t.default ~= nil) then -- obviously dynamic axr option
-			ctrl:TextControl():SetText(game.translate_string("ui_mm_"..cap))
-		end 
+		-- set caption text
+		ctrl:TextControl():SetText(game.translate_string("ui_mm_"..cap))
 		
 		-- control
 		if (t.typ == "check") then
@@ -33,17 +32,19 @@ function options_dialog:__init() super()
 			elements[ctrl:TextControl():GetText()] = _st
 		
 			-- create control
-			ctrl = self.xml:InitCheck(t.tag,_st)
+			ctrl = self.xml:InitCheck(t.tag or "tab_gameplay:check_axr",_st)
 			
 			-- register for callbacks
-			self:Register(ctrl,"ck_"..cap)
+			if (t.default ~= nil) then -- obviously dynamic axr option
+				self:Register(ctrl,"ck_"..cap)
+			end
 		elseif(t.typ == "list") then 
 			-- sort by name and type
 			table.insert(lists,ctrl:TextControl():GetText())
 			elements[ctrl:TextControl():GetText()] = _st
 			
 			-- create control
-			ctrl = self.xml:InitComboBox(t.tag,_st)
+			ctrl = self.xml:InitComboBox(t.tag or "tab_gameplay:list_axr",_st)
 			
 			-- setup the list
 			if (t.list) then
@@ -53,7 +54,9 @@ function options_dialog:__init() super()
 			end
 	
 			-- register for callbacks
-			self:Register(ctrl,"lst_"..cap)
+			if (t.default ~= nil) then -- obviously dynamic axr option
+				self:Register(ctrl,"lst_"..cap)
+			end
 		end
 		
 		self.gameplay_options[cap].ctrl = ctrl
