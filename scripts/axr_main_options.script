@@ -103,7 +103,7 @@ end
 function opt_menu_on_set_values(menu,optMgr)
 	--
     if (menu.list_excl_list) then
-        menu.list_excl_list:SetText(ONLINE_EXCLUSION_DISTANCE.."m")
+        menu.list_excl_list:SetText(axr_main.config:GetValue("mm_options","excl_dist",0,30).."m")
     end
     --
     for k,v in pairs(check_box_options) do
