@@ -954,7 +954,9 @@ function sim_squad_scripted:on_unregister()
 		if smart == nil then
 			return
 		end
-		smart.already_spawned[self.respawn_point_prop_section].num = smart.already_spawned[self.respawn_point_prop_section].num - 1
+		if smart.already_spawned ~= nil and smart.already_spawned[self.respawn_point_prop_section] ~= nil then
+			smart.already_spawned[self.respawn_point_prop_section].num = smart.already_spawned[self.respawn_point_prop_section].num - 1
+		end
 	end
 	--if (USE_MARSHAL) then 
 	--	UnregisterScriptCallback("save_state",self)

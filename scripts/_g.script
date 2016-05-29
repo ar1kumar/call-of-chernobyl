@@ -11,7 +11,9 @@ end
 -- Improves performance if true, by disabling update methods for squads and smart terrains on levels not linked in configs\ai_tweaks\simulation_objects.ltx
 -- But this means simulation will only be active on actor level and linked levels everything else will remain in an idle state
 DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = true
-ONLINE_EXCLUSION_DISTANCE = axr_main.config:GetValue("mm_options","excl_dist",2,30) or 30
+
+-- Prevents a-life from spawning on the player within a certain distance.
+ONLINE_EXCLUSION_DISTANCE = tonumber(axr_main.config:GetValue("mm_options","excl_dist",0,30))
 
 -------------------------------------------------------------------------------------------------
 -- Use marshal library for saving persistent data (like xr_logic pstor)
@@ -88,7 +90,8 @@ end
 -- param 2 - Milliseconds as number
 --------------------------------------------
 function SetHudMsg(msg,n)
-	msg = tostring(msg)
+	n = n or 5
+	msg = tostring(msg) or " "
 	local hud = get_hud()
 	hud:AddCustomStatic("not_enough_money_mine", true)
 	hud:GetCustomStatic("not_enough_money_mine"):wnd():TextControl():SetTextST(msg)
@@ -497,9 +500,11 @@ end
 
 function parse_names( s )
 	local t = {}
-	for name in string.gfind( s, "([%w_\\]+)%p*" ) do
-		--for name in string.gfind( s, "%s*([^%,]+)%s*" ) do
-		table.insert( t, name )
+	if s then
+		for name in string.gfind( s, "([%w_\\]+)%p*" ) do
+			--for name in string.gfind( s, "%s*([^%,]+)%s*" ) do
+			table.insert( t, name )
+		end
 	end
 	return t
 end
