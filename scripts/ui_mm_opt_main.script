@@ -34,11 +34,6 @@ function options_dialog:__init() super()
 		
 			-- create control
 			ctrl = self.xml:InitCheck(t.tag,_st)
-			
-			if (t.default ~= nil) then -- obviously dynamic axr option
-				self.axr_options_check[cap] = ctrl
-			end 
-			
 		elseif(t.typ == "list") then 
 			-- sort by name and type
 			table.insert(lists,ctrl:TextControl():GetText())
@@ -46,11 +41,9 @@ function options_dialog:__init() super()
 			
 			-- create control
 			ctrl = self.xml:InitComboBox(t.tag,_st)
-			
-			if (t.default ~= nil) then -- obviously dynamic axr option
-				self.axr_options_list[cap] = ctrl
-			end
 		end
+		
+		self.gameplay_options[cap].ctrl = ctrl
 		
 		-- register for callbacks
 		self:Register(ctrl,"ck_"..cap)

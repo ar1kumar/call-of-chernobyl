@@ -4,9 +4,6 @@
 --- IMPORTANT! SEE opt_menu_on_init to add a new game options (new as of 5/28/2016)
 
 function opt_menu_on_init(menu)
-	menu.axr_options_check = {}
-	menu.axr_options_list = {}
-	
 	-- simply add new line and a ui_mm_<name> in ui_st_mm.xml to create a new option. Script automatically does the rest for you
 	menu.gameplay_options["debug_hud"]			= {default=false, 	debug_only=true, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
 	menu.gameplay_options["radio_mod"]			= {default=true, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
@@ -28,9 +25,14 @@ function opt_menu_on_init(menu)
     local need_save
 
     for k,v in pairs(menu.gameplay_options) do
-		if (v.default ~= nil and typ=="check") then
-			if not (axr_main.config:KeyExist("mm_options","enable_"..k)) then
-				axr_main.config:SetValue("mm_options","enable_"..k,v.default)
+		if (v.default ~= nil) then
+			if (v.typ=="check") then
+				if not (axr_main.config:KeyExist("mm_options","enable_"..k)) then
+					axr_main.config:SetValue("mm_options","enable_"..k,v.default)
+					need_save = true
+				end
+			elseif not (axr_main.config:KeyExist("mm_options",k)) then
+				axr_main.config:SetValue("mm_options",k,v.default)
 				need_save = true
 			end
 		end
@@ -42,15 +44,16 @@ function opt_menu_on_init(menu)
 end
 
 function opt_menu_on_accept(menu,optMgr,console)
-
-	for name,ctrl in pairs(menu.axr_options_check) do 
-		axr_main.config:SetValue("mm_options","enable_"..name,ctrl:GetCheck())
-	end
-
-	for name,ctrl in pairs(menu.axr_options_list) do 
-		axr_main.config:SetValue("mm_options",name,ctrl:GetText())
-	end
-   
+    for name,v in pairs(menu.gameplay_options) do
+		if (v.default ~= nil) then
+			if (v.typ=="check") then
+				axr_main.config:SetValue("mm_options","enable_"..name,v.ctrl:GetCheck())
+			elseif (v.typ=="list") then 
+				axr_main.config:SetValue("mm_options",name,v.ctrl:GetText())
+			end
+		end
+    end
+	
     if (level.present() and dynamic_news_manager) then
         if (axr_main.config:GetValue("mm_options","enable_dynamic_news",1,true) == true) then
             dynamic_news_manager.get_dynamic_news()
@@ -63,11 +66,13 @@ function opt_menu_on_accept(menu,optMgr,console)
 end
 
 function opt_menu_on_set_values(menu,optMgr)
-	for name,ctrl in pairs(menu.axr_options_check) do
-		ctrl:SetCheck(axr_main.config:GetValue("mm_options","enable_"..name,1,false))
-	end
-	
-	for name,ctrl in pairs(menu.axr_options_list) do 
-		ctrl:SetText(axr_main.config:GetValue("mm_options",name,0,"nil"))
-	end
+    for name,v in pairs(menu.gameplay_options) do
+		if (v.default ~= nil) then
+			if (v.typ=="check") then
+				v.ctrl:SetCheck(axr_main.config:GetValue("mm_options","enable_"..name,1,v.default))
+			elseif (v.typ=="list") then 
+				v.ctrl:SetText(axr_main.config:GetValue("mm_options",name,0,v.default))
+			end
+		end
+    end
 end
