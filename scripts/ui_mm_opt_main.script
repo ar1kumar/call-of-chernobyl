@@ -1,11 +1,80 @@
 class "options_dialog" (CUIScriptWnd)
 
 function options_dialog:__init() super()
-	self.m_preconditions	= {}
+	self.m_preconditions = {}
+	self.gameplay_options = {}
+	
     self:InitControls()
     self:InitCallBacks()
 	self.tab:SetActiveTab("video")
 	SendScriptCallback("opt_menu_on_init",self)
+	
+	-- auto-generate UI elements for Gameplay Tab
+	local checks, lists, elements = {}, {}, {}
+	local _st 
+	local ctrl
+	self.scroll_v:Clear()
+	
+	-- add UI elements to scroll view in specific order
+	for cap,t in pairs(self.gameplay_options) do
+		_st = self.xml:InitStatic("tab_gameplay:templ_item", nil)
+		
+		-- caption
+		ctrl = self.xml:InitStatic(t.cap or cap,_st)
+		
+		if (t.default ~= nil) then -- obviously dynamic axr option
+			ctrl:TextControl():SetText(game.translate_string("ui_mm_"..cap))
+		end 
+		
+		-- control
+		if (t.typ == "check") then
+			-- sort by name and type
+			table.insert(checks,ctrl:TextControl():GetText())
+			elements[ctrl:TextControl():GetText()] = _st
+		
+			-- create control
+			ctrl = self.xml:InitCheck(t.tag,_st)
+			
+			if (t.default ~= nil) then -- obviously dynamic axr option
+				self.axr_options_check[cap] = ctrl
+			end 
+			
+		elseif(t.typ == "list") then 
+			-- sort by name and type
+			table.insert(lists,ctrl:TextControl():GetText())
+			elements[ctrl:TextControl():GetText()] = _st
+			
+			-- create control
+			ctrl = self.xml:InitComboBox(t.tag,_st)
+			
+			if (t.default ~= nil) then -- obviously dynamic axr option
+				self.axr_options_list[cap] = ctrl
+			end
+		end
+		
+		-- register for callbacks
+		self:Register(ctrl,"ck_"..cap)
+
+		if (t.func) then
+			t.func(self,ctrl)
+		end
+	end 
+	
+	-- sort ui elements to display in alphabetical order
+	table.sort(lists)
+	table.sort(checks)
+	
+	for i=1,#lists do 
+		-- add to UIScrollView
+		self.gameplay_scroll_v:AddWindow(elements[lists[i]],true) 
+		elements[lists[i]]:SetAutoDelete(false)
+	end
+
+	for i=1,#checks do 
+		-- add to UIScrollView
+		self.gameplay_scroll_v:AddWindow(elements[checks[i]],true) 
+		elements[checks[i]]:SetAutoDelete(false)
+	end
 end
 
 function options_dialog:__finalize()

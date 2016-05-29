@@ -1,31 +1,39 @@
 -- Extensions to Game Options
 
 
--- simply add new line and a ui_mm_<name> in ui_st_mm.xml to create a new option
-local check_box_options = {
-	["debug_hud"] 			= {default=false,debug_only=true}, 
-	["radio_mod"] 			= {default=true,debug_only=false}, 
-	["mechanic_feature"] 	= {default=false,debug_only=false},
-	["heli_engine_sound"]	= {default=true,debug_only=false},
-	["heli_spawn"]			= {default=true,debug_only=false},
-	["dynamic_news"]		= {default=true,debug_only=false},
-	["sleep_deprived"]		= {default=false,debug_only=false}
-}
+--- IMPORTANT! SEE opt_menu_on_init to add a new game options (new as of 5/28/2016)
+
+function opt_menu_on_init(menu)
+	menu.axr_options_check = {}
+	menu.axr_options_list = {}
 	
-function main_menu_on_init(menu)
+	-- simply add new line and a ui_mm_<name> in ui_st_mm.xml to create a new option. Script automatically does the rest for you
+	menu.gameplay_options["debug_hud"]			= {default=false, 	debug_only=true, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
+	menu.gameplay_options["radio_mod"]			= {default=true, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
+	menu.gameplay_options["mechanic_feature"]	= {default=false, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
+	menu.gameplay_options["heli_engine_sound"]	= {default=true, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
+	menu.gameplay_options["heli_spawn"]			= {default=true, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
+	menu.gameplay_options["dynamic_news"]		= {default=true, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
+	menu.gameplay_options["sleep_deprived"]		= {default=false, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
+	menu.gameplay_options["excl_dist"]			= {default=30, 		debug_only=false, 	typ="list", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:list_axr", func=function(handler,ctrl)
+		menu.list_excl_list = ctrl
+		local excl_dist_list = {10,20,30,40,50,60,70,80,90,100,200,500}
+	    for i,dist in pairs(excl_dist_list) do
+			ctrl:AddItem(dist, i-1)
+		end
+		menu:Register(menu.list_excl_list,"list_excl_dist")
+	end}
+	
     -- axr option default config
     local need_save
-    -- -- exclusion distance list
-    if not (axr_main.config:KeyExist("mm_options","excl_dist")) then
-        axr_main.config:SetValue("mm_options","excl_dist",30)
-        need_save = true
-    end
-    --
-    for k,v in pairs(check_box_options) do
-        if not (axr_main.config:KeyExist("mm_options","enable_"..k)) then
-            axr_main.config:SetValue("mm_options","enable_"..k,v.default)
-            need_save = true
-        end
+
+    for k,v in pairs(menu.gameplay_options) do
+		if (v.default ~= nil and typ=="check") then
+			if not (axr_main.config:KeyExist("mm_options","enable_"..k)) then
+				axr_main.config:SetValue("mm_options","enable_"..k,v.default)
+				need_save = true
+			end
+		end
     end
  
     if (need_save) then
@@ -33,61 +41,15 @@ function main_menu_on_init(menu)
     end
 end
 
-function opt_menu_on_init(menu)
-    local xml = menu.xml
-    local pos
-    local y = 0
-    -- -- exclusion distance list
-    local excl_dist_list = {10,20,30,40,50,60,70,80,90,100,200,500}
-    menu.list_excl_caption = xml:InitStatic("tab_gameplay:cap_list_excl_dist_axr", menu.dlg_gameplay)
-    menu.list_excl_caption:TextControl():SetText(game.translate_string("ui_mm_excl_dist"))
-    menu.list_excl_list = xml:InitComboBox("tab_gameplay:list_excl_dist_axr",   menu.dlg_gameplay)
-    menu.list_excl_list:ClearList()
-    menu.list_excl_list:SetAutoDelete(true)
-    for i,dist in pairs(excl_dist_list) do
-        menu.list_excl_list:AddItem(dist.." meters", i-1)
-    end
-    menu:Register(menu.list_excl_list,"list_excl_dist")
--- 
-    for k,v in pairs(check_box_options) do
-        if (v.debug_only ~= true or DEV_DEBUG) then
-            if not (menu.axr_options_caption) then
-                menu.axr_options_caption = {}
-            end
-            if not (menu.axr_options_check) then
-                menu.axr_options_check = {}
-            end
-            -- caption
-            menu.axr_options_caption[k] = xml:InitStatic("tab_gameplay:cap_check_axr", menu.dlg_gameplay)
-            pos = menu.axr_options_caption[k]:GetWndPos()
-            pos.y = pos.y + y
-            menu.axr_options_caption[k]:SetWndPos(pos)
-            menu.axr_options_caption[k]:TextControl():SetText(game.translate_string("ui_mm_"..k))
-           
-            -- checkbox
-            menu.axr_options_check[k] = xml:InitCheck("tab_gameplay:check_axr", menu.dlg_gameplay)
-            pos = menu.axr_options_check[k]:GetWndPos()
-            pos.y = pos.y + y
-            menu.axr_options_check[k]:SetWndPos(pos)
-            menu:Register(menu.axr_options_check[k],"ck_"..k)
-            y = y + 25
-        end
-    end
-end
-
 function opt_menu_on_accept(menu,optMgr,console)
---
-    if (menu.list_excl_list) then
-        local num = string.match(menu.list_excl_list:GetText(),"([%d]+)%s%w")
-        ONLINE_EXCLUSION_DISTANCE = tonumber(num)
-        axr_main.config:SetValue("mm_options","excl_dist",tonumber(num))
-    end
-    --
-    for k,v in pairs(check_box_options) do
-        if (menu.axr_options_check and menu.axr_options_check[k]) then
-            axr_main.config:SetValue("mm_options","enable_"..k,menu.axr_options_check[k]:GetCheck())
-        end
-    end
+
+	for name,ctrl in pairs(menu.axr_options_check) do 
+		axr_main.config:SetValue("mm_options","enable_"..name,ctrl:GetCheck())
+	end
+
+	for name,ctrl in pairs(menu.axr_options_list) do 
+		axr_main.config:SetValue("mm_options",name,ctrl:GetText())
+	end
    
     if (level.present() and dynamic_news_manager) then
         if (axr_main.config:GetValue("mm_options","enable_dynamic_news",1,true) == true) then
@@ -101,14 +63,11 @@ function opt_menu_on_accept(menu,optMgr,console)
 end
 
 function opt_menu_on_set_values(menu,optMgr)
-	--
-    if (menu.list_excl_list) then
-        menu.list_excl_list:SetText(axr_main.config:GetValue("mm_options","excl_dist",0,30).." meters")
-    end
-    --
-    for k,v in pairs(check_box_options) do
-        if (menu.axr_options_check and menu.axr_options_check[k]) then
-            menu.axr_options_check[k]:SetCheck(axr_main.config:GetValue("mm_options","enable_"..k,1,false))
-        end
-    end
+	for name,ctrl in pairs(menu.axr_options_check) do
+		ctrl:SetCheck(axr_main.config:GetValue("mm_options","enable_"..name,1,false))
+	end
+	
+	for name,ctrl in pairs(menu.axr_options_list) do 
+		ctrl:SetText(axr_main.config:GetValue("mm_options",name,0,"nil"))
+	end
 end
