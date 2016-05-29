@@ -12,15 +12,8 @@ function opt_menu_on_init(menu)
 	menu.gameplay_options["heli_spawn"]			= {default=true, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
 	menu.gameplay_options["dynamic_news"]		= {default=true, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
 	menu.gameplay_options["sleep_deprived"]		= {default=false, 	debug_only=false, 	typ="check", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:check_axr"}
-	menu.gameplay_options["excl_dist"]			= {default=30, 		debug_only=false, 	typ="list", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:list_axr", func=function(handler,ctrl)
-		menu.list_excl_list = ctrl
-		local excl_dist_list = {10,20,30,40,50,60,70,80,90,100,200,500}
-	    for i,dist in pairs(excl_dist_list) do
-			ctrl:AddItem(dist, i-1)
-		end
-		menu:Register(menu.list_excl_list,"list_excl_dist")
-	end}
-	
+	menu.gameplay_options["excl_dist"]			= {default=30, 		debug_only=false, 	typ="list", 	cap="tab_gameplay:cap_check_axr", tag="tab_gameplay:list_axr", list={10,20,30,40,50,60,70,80,90,100,200,500}}
+
     -- axr option default config
     local need_save
 

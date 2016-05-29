@@ -34,6 +34,9 @@ function options_dialog:__init() super()
 		
 			-- create control
 			ctrl = self.xml:InitCheck(t.tag,_st)
+			
+			-- register for callbacks
+			self:Register(ctrl,"ck_"..cap)
 		elseif(t.typ == "list") then 
 			-- sort by name and type
 			table.insert(lists,ctrl:TextControl():GetText())
@@ -41,16 +44,19 @@ function options_dialog:__init() super()
 			
 			-- create control
 			ctrl = self.xml:InitComboBox(t.tag,_st)
+			
+			-- setup the list
+			if (t.list) then
+				for i,v in ipairs(t.list) do 
+					ctrl:AddItem(v,i-1)
+				end
+			end
+	
+			-- register for callbacks
+			self:Register(ctrl,"lst_"..cap)
 		end
 		
 		self.gameplay_options[cap].ctrl = ctrl
-		
-		-- register for callbacks
-		self:Register(ctrl,"ck_"..cap)
-
-		if (t.func) then
-			t.func(self,ctrl)
-		end
 	end 
 	
 	-- sort ui elements to display in alphabetical order
