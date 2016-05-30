@@ -245,6 +245,8 @@ end
 
 function get_icon_list()
 	return {
+		"ui_npc_u_actor",
+		"ui_npc_u_izgoy",
 		"ui_npc_u_nebo_2_face_1",
 		"ui_npc_u_nebo_2_face_2",
 		"ui_npc_u_nebo_2_face_3",
@@ -421,61 +423,10 @@ function get_icon_list()
 		"ui_npc_u_green_stalker_7",
 		"ui_npc_u_stalker_sv_rukzak_1",
 		"ui_npc_u_ucheniy_1_strong",
-		"ui_npc_u_nebo_2_face_1",
-		"ui_npc_u_nebo_2_face_2",
-		"ui_npc_u_nebo_2_face_3",
-		"ui_npc_u_nebo_1",
-		"ui_npc_u_nebo_2",
-		"ui_npc_u_nebo_3",
-		"ui_npc_u_nebo_2_face_4",
-		"ui_npc_u_bandit_1",
-		"ui_npc_u_bandit_2",
-		"ui_npc_u_bandit_3",
-		"ui_npc_u_bandit_3_face_2",
-		"ui_npc_u_bandit_4",
-		"ui_npc_u_bandit_3_mask",
-		"ui_npc_u_bandit_3_face_1",
-		"ui_npc_u_ucheniy_1",
-		"ui_npc_u_trader_1",
-		"ui_npc_u_lesnik_1",
-		"ui_npc_u_neutral_1",
-		"ui_npc_u_neutral_2",
-		"ui_npc_u_neutral_2_face_1",
-		"ui_npc_u_neutral_2_face_2",
-		"ui_npc_u_neutral_2_mask",
-		"ui_npc_u_neutral_3",
-		"ui_npc_u_neutral_4",
-		"ui_npc_u_dolg_1",
-		"ui_npc_u_dolg_2",
-		"ui_npc_u_dolg_2_face_1",
-		"ui_npc_u_dolg_2_mask",
-		"ui_npc_u_dolg_3",
-		"ui_npc_u_dolg_4",
-		"ui_npc_u_freedom_1",
-		"ui_npc_u_freedom_2",
-		"ui_npc_u_freedom_2_face_1",
-		"ui_npc_u_freedom_2_face_2",
-		"ui_npc_u_freedom_2_mask",
-		"ui_npc_u_freedom_3",
-		"ui_npc_u_freedom_4",
-		"ui_npc_u_merc_4",
-		"ui_npc_u_merc_2",
-		"ui_npc_u_soldier_1",
-		"ui_npc_u_soldier_2",
-		"ui_npc_u_soldier_3",
-		"ui_npc_u_soldier_4",
-		"ui_npc_u_soldier_2_face_1",
-		"ui_npc_u_monolith_2",
-		"ui_npc_u_monolith_1",
-		"ui_npc_u_monolith_3",
-		"ui_npc_u_monolith_4",
-		"ui_npc_u_dolg_2_face_2",
 		"ui_npc_u_soldier_bandana_1",
 		"ui_npc_u_soldier_bandana_3",
 		"ui_npc_u_soldier_bandana_2",
-		"ui_npc_u_soldier_bandana_4",
-		"ui_npc_u_actor",
-		"ui_npc_u_izgoy"
+		"ui_npc_u_soldier_bandana_4"
 	}
 end
 --------------------------------------------------------------
@@ -544,7 +495,7 @@ function faction_ui:InitControls(f)
 	-- Icon
 	local _st = xml:InitStatic("main_dialog:description:templ_item",nil)
 	self.char_icon = xml:InitStatic("main_dialog:description:char_icon",_st)
-	self.char_icon:InitTexture("ui_npc_small_neutral_1")
+	self.char_icon:InitTexture("ui_npc_u_actor")
 	self.scroll_v:AddWindow(_st, true)
 	
 	self.desc_text = xml:InitTextWnd("main_dialog:description:desc_win", nil)
@@ -630,7 +581,7 @@ function faction_ui:load_icon_list()
 	for i=1,#t do
 		self.icon_list:AddItem(t[i],i-1)
 	end
-	self.icon_list:SetText("ui_npc_u_neutral_1")
+	self.icon_list:SetText("ui_npc_u_actor")
 end
 
 function faction_ui:OnCheckSet()
