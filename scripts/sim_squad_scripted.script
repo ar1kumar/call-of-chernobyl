@@ -33,7 +33,6 @@ function sim_squad_scripted:__init(section) super (section)
 	self.current_target_id	= nil
 	self.assigned_target_id	= nil
 	--self.sound_manager 		= sound_manager.get_sound_manager("squad_"..self:section_name() ) -- What is this used for?
-	self.idle_time			= math.random(STAY_POINT_IDLE_MIN,STAY_POINT_IDLE_MAX)
 	self:init_squad()
 	self:set_squad_behaviour()
 	--if (USE_MARSHAL) then
@@ -60,6 +59,9 @@ function sim_squad_scripted:init_squad()
 			rel = new_relation
 		end
 	end
+	
+	self.random_targets		= sys_ini:r_string_ex(settings_id, "target_random_smart")
+	self.idle_time			= sys_ini:r_float_ex(settings_id,"idle_time") or math.random(STAY_POINT_IDLE_MIN,STAY_POINT_IDLE_MAX)	
 	
 	self.relationship		= self.relationship or rel
 	self.sympathy			= utils.cfg_get_number(sys_ini, settings_id, "sympathy", self, false, nil)
@@ -109,7 +111,19 @@ end
 
 function sim_squad_scripted:get_script_target()
 	--alun_utils.debug_write("sim_squad_scripted:get_script_target")
-	local new_target = self.scripted_target or xr_logic.pick_section_from_condlist(db.actor, self, self.action_condlist)
+	local new_target 
+	if (self.scripted_target) then 
+		new_target = self.scripted_target
+	elseif (self.random_targets) then
+		if (self.stay_time == nil or game.get_game_time():diffSec(self.stay_time) < self.idle_time) then
+			local t = alun_utils.str_explode(self.random_targets,",") 
+			new_target = t[math.random(#t)]
+		else 
+			return 
+		end
+	else
+		new_target = xr_logic.pick_section_from_condlist(db.actor, self, self.action_condlist)
+	end 
 	if (new_target == "actor") then
 		return 0 
 	end
@@ -327,11 +341,16 @@ function sim_squad_scripted:specific_update(script_target_id)
 				se_target:on_after_reach(self)
 				self.current_target_id = self.assigned_target_id
 				self.current_action = 1
-				self.stay_time = game.get_game_time()
+				
+				if (self.random_targets) then
+					self.stay_time = game.get_game_time()
+				end
 			end
 			return
 		elseif (self.current_action == 1 and self.current_target_id == self.assigned_target_id) then
-			return
+			if (self.stay_time == nil or game.get_game_time():diffSec(self.stay_time) < self.idle_time) then
+				return
+			end
 		end
 	end
 	
@@ -1125,7 +1144,7 @@ function sim_squad_scripted:get_squad_props()
 				t = t .. "Stay On Target"
 			end
 			
-			if (self.current_action == 1) then
+			if (self.current_action == 1 and self.stay_time) then
 				t = t .. " = " .. tostring(self.idle_time - game.get_game_time():diffSec(self.stay_time))
 			end
 		end
