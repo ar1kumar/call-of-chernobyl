@@ -12,7 +12,6 @@ function options_dialog:__init() super()
 	-- auto-generate UI elements for Gameplay Tab
 	local checks, lists, elements = {}, {}, {}
 	local _st 
-	local ctrl
 	self.scroll_v:Clear()
 	
 	-- add UI elements to scroll view in specific order
@@ -20,7 +19,7 @@ function options_dialog:__init() super()
 		_st = self.xml:InitStatic("tab_gameplay:templ_item", nil)
 		
 		-- caption
-		ctrl = self.xml:InitStatic("tab_gameplay:cap_check_axr",_st)
+		local ctrl = self.xml:InitStatic("tab_gameplay:cap_check_axr",_st) -- ctrl needs scoped here because we pass it to wrapper or else ref will get replaced
 		
 		-- set caption text
 		ctrl:TextControl():SetText(game.translate_string("ui_mm_"..cap))
@@ -56,6 +55,12 @@ function options_dialog:__init() super()
 			-- register for callbacks
 			if (t.default ~= nil) then -- obviously dynamic axr option
 				self:Register(ctrl,"lst_"..cap)
+				if (t.on_list_item_select) then
+					local _wrapper = function(handler) -- we need wrapper in order to pass ctrl to method
+						t.on_list_item_select(handler,ctrl)
+					end
+					self:AddCallback("lst_"..cap,ui_events.LIST_ITEM_SELECT,_wrapper,self)
+				end
 			end
 		end
 		

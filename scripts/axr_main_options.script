@@ -16,10 +16,18 @@ function opt_menu_on_init(menu)
 	
 	if (db.actor) then -- Options will only show while in-game
 		local l = ui_mm_faction_select.get_icon_list()
-		menu.gameplay_options["char_portrait"]	= {default=db.actor_binder.character_icon or l[1], debug_only=false, typ="list", list=l, func=function(handler,optMgr,ctrl)
-			db.actor_binder.character_icon = ctrl:GetText()
-			db.actor:set_character_icon(db.actor_binder.character_icon)
-		end}
+		
+		menu.gameplay_options["char_portrait"]	= {default=db.actor_binder.character_icon or l[1], debug_only=false, typ="list", list=l, 
+			on_accept=function(handler,optMgr,ctrl)
+				db.actor_binder.character_icon = ctrl:GetText()
+				db.actor:set_character_icon(db.actor_binder.character_icon)
+			end, 
+			on_list_item_select=function(handler,ctrl)
+				if (handler.char_icon) then
+					handler.char_icon:InitTexture(ctrl:GetText())
+				end
+			end
+		}
 	end 
 	
     -- axr option default config
@@ -53,8 +61,8 @@ function opt_menu_on_accept(menu,optMgr,console)
 				axr_main.config:SetValue("mm_options",name,v.ctrl:GetText())
 			end
 			
-			if (v.func) then 
-				v.func(menu,optMgr,v.ctrl)
+			if (v.on_accept) then 
+				v.on_accept(menu,optMgr,v.ctrl)
 			end
 		end
     end
@@ -77,6 +85,10 @@ function opt_menu_on_set_values(menu,optMgr)
 				v.ctrl:SetCheck(axr_main.config:GetValue("mm_options","enable_"..name,1,v.default))
 			elseif (v.typ=="list") then 
 				v.ctrl:SetText(axr_main.config:GetValue("mm_options",name,0,v.default))
+			end
+			
+			if (v.on_set_values) then 
+				v.on_set_values(menu,optMgr,v.ctrl)
 			end
 		end
     end
