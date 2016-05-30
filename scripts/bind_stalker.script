@@ -186,6 +186,10 @@ function actor_binder:update(delta)
 		self.object:activate_slot(self.loaded_active_slot or 0)
 		self.bCheckStart = nil
 		db.actor.afterFirstUpdate = true
+		
+		if (self.character_icon) then 
+			db.actor:set_character_icon(self.character_icon)
+		end
 	end
 	
 	self.task_manager:update()
@@ -358,6 +362,7 @@ function actor_binder:save_state(m_data)
 	m_data.actor_binder.active_slot = self.object:active_slot()
 	m_data.actor_binder.last_detective_achievement_spawn_time = self.last_detective_achievement_spawn_time
 	m_data.actor_binder.last_mutant_hunter_achievement_spawn_time = self.last_mutant_hunter_achievement_spawn_time
+	m_data.actor_binder.character_icon = self.character_icon
 	
 	if (sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state ~= 0 and not utils.level_changing()) then 
 		sr_psy_antenna.psy_antenna:save_state(m_data)
@@ -394,6 +399,7 @@ function actor_binder:load_state(m_data)
 	self.loaded_active_slot = m_data.actor_binder.active_slot or 0
 	self.last_detective_achievement_spawn_time = m_data.actor_binder.last_detective_achievement_spawn_time
 	self.last_mutant_hunter_achievement_spawn_time = m_data.actor_binder.last_mutant_hunter_achievement_spawn_time
+	self.character_icon = m_data.actor_binder.character_icon
 	
 	if (sr_psy_antenna.psy_antenna) then 
 		sr_psy_antenna.psy_antenna:load_state(m_data)
