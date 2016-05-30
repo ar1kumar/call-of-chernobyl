@@ -165,7 +165,7 @@ function npc_give_last_task_id(a,b)
     end
     if (last_task_id) then
         local se_obj = npc and alife():object(npc:id())
-        local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
+        local giver_id = se_obj and se_obj.id --(se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
         task_manager.get_task_manager():give_task(last_task_id,giver_id)
         last_task_id = nil
     end
@@ -179,7 +179,7 @@ function npc_sim_give_last_task_id(a,b)
     end
     if (last_task_id) then
         local se_obj = npc and alife():object(npc:id())
-        local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
+        local giver_id = se_obj and se_obj.id --(se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
         task_manager.get_task_manager():give_task(last_task_id,giver_id)
         last_task_id = nil
     end

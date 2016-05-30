@@ -45,15 +45,20 @@ local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
 	end
 end
 
---[[
 local function squad_on_npc_death(squad,se_npc,killer)
-	local npc_id = se_npc and se_npc.id
-	local st = npc_id and db.storage[npc_id]
-	if (st and st.tagged_by_actor) or (killer and (killer.id == 0 or alife():has_info(killer.id,"npcx_is_companion"))) then 
-		actor_tagged_squad_by_id[squad.id] = true
+	-- unregister ID as task giver or pass id onto squad leader if is_sim task
+	local task_info = task_manager.get_task_manager().task_info
+	for k,v in pairs(task_info) do
+		if (v.task_giver_id and v.task_giver_id == se_npc.id) then
+			if (squad:npc_count() > 0 and string.find(k,"simulation_task_")) then 
+				task_info[k].task_giver_id = squad:commander_id()
+			else 
+				task_info[k].task_giver_id = nil
+			end
+			return
+		end 
 	end
 end
---]]
 
 local skipped_tasks = {}
 local function actor_on_leave_dialog()
@@ -78,7 +83,7 @@ function on_game_start()
 	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
 	--RegisterScriptCallback("monster_on_death_callback",npc_on_death_callback)
 	RegisterScriptCallback("monster_on_hit_callback",npc_on_hit_callback)
-	--RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
+	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 	RegisterScriptCallback("actor_on_leave_dialog",actor_on_leave_dialog)
 	RegisterScriptCallback("save_state",save_state)
 	RegisterScriptCallback("load_state",load_state)
@@ -168,10 +173,12 @@ function get_first_finished_task(npc,is_sim)
 						if (npc:id() == task_info[task_id].task_giver_id) then 
 							return task_id
 						end 
+						--[[
 						local se_obj = alife():object(npc:id())
 						if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then 
 							return task_id
 						end
+						--]]
 					end
 				else 
 					return task_id
@@ -232,7 +239,7 @@ function npc_give_first_available_ordered_task(npc,is_sim)
 		return 
 	end 
 	local se_obj = npc and alife():object(npc:id())
-	local giver_id = se_obj and (se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
+	local giver_id = se_obj and se_obj.id --(se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
 	task_manager.get_task_manager():give_task(new_task,giver_id)
 end
 
@@ -301,10 +308,12 @@ function get_first_unfinished_task(npc,is_sim)
 						if (npc:id() == task_info[task_id].task_giver_id) then
 							return task_id
 						end
+						--[[
 						local se_obj = alife():object(npc:id())
 						if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then
 							return task_id
 						end
+						--]]
 					end
                 else
                     return task_id
