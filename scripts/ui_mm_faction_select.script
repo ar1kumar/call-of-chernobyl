@@ -66,6 +66,9 @@ local function on_game_load()
 	local new_character_icon = config:GetValue("temp","new_game_character_icon",3)
 	if (new_character_icon and new_character_icon ~= "") then 
 		db.actor_binder.character_icon = new_character_icon
+		
+		config:SetValue("temp","new_game_character_icon")
+		need_save = true
 	end
 	
 	-- NEW FACTION
@@ -239,17 +242,9 @@ function set_postion_table(loc)
 	table.insert(start_pos,loc_ini:r_float_ex(loc, "gid"))
 	table.insert(start_pos,vector():set(loc_ini:r_float_ex(loc,"x"),loc_ini:r_float_ex(loc,"y"),loc_ini:r_float_ex(loc,"z")))
 end
---------------------------------------------------------------
--- faction_ui
---------------------------------------------------------------
 
-class "faction_ui" (CUIScriptWnd)
-function faction_ui:__init(owner) super()
-	self.owner = owner
-	
-	self.selected_faction = nil
-	self.f = {"stalker","bandit","csky","dolg","freedom","killer","army","ecolog","monolith"}
-	self.valid_icons = {
+function get_icon_list()
+	return {
 		"ui_npc_u_nebo_2_face_1",
 		"ui_npc_u_nebo_2_face_2",
 		"ui_npc_u_nebo_2_face_3",
@@ -482,6 +477,17 @@ function faction_ui:__init(owner) super()
 		"ui_npc_u_actor",
 		"ui_npc_u_izgoy"
 	}
+end
+--------------------------------------------------------------
+-- faction_ui
+--------------------------------------------------------------
+
+class "faction_ui" (CUIScriptWnd)
+function faction_ui:__init(owner) super()
+	self.owner = owner
+	
+	self.selected_faction = nil
+	self.f = {"stalker","bandit","csky","dolg","freedom","killer","army","ecolog","monolith"}
 	
 	self:InitControls(self.f)
 	self:InitCallBacks(self.f)
@@ -620,8 +626,9 @@ end
 
 function faction_ui:load_icon_list()
 	self.icon_list:ClearList()
-	for i=1,#self.valid_icons do
-		self.icon_list:AddItem(self.valid_icons[i],i-1)
+	local t = get_icon_list()
+	for i=1,#t do
+		self.icon_list:AddItem(t[i],i-1)
 	end
 	self.icon_list:SetText("ui_npc_u_neutral_1")
 end
@@ -693,7 +700,8 @@ function faction_ui:OnRandomize()
 	
 	-- set random portrait
 	if (self.icon_list) then
-		self.icon_list:SetText(self.valid_icons[math.random(#self.valid_icons)])
+		local t = get_icon_list()
+		self.icon_list:SetText(t[math.random(#t)])
 		self.char_icon:InitTexture(self.icon_list:GetText())
 	end
 end
