@@ -361,5 +361,10 @@ function actor_item_to_slot(binder,obj)
 end 
 
 function actor_item_to_ruck(binder,obj)
-
+    if IsOutfit(obj) and (axr_main.config:GetValue("mm_options","enable_outfit_portrait",1,false) == true) then
+        local outfit = db.actor:item_in_slot(7)
+        if (outfit == nil and db.actor_binder.character_icon) then
+            db.actor:set_character_icon(db.actor_binder.character_icon)
+        end
+    end
 end
