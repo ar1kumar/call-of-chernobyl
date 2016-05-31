@@ -96,7 +96,10 @@ function actor_binder:net_destroy()
 				callback.on_use_vehicle,
 				callback.weapon_jammed,
 				callback.weapon_zoom_in,
-				callback.weapon_zoom_out
+				callback.weapon_zoom_out,
+				callback.item_to_slot,
+				callback.item_to_belt,
+				callback.item_to_ruck
 	}
 	for i=1,#t do 
 		if (t[i]) then 
@@ -134,7 +137,7 @@ function actor_binder:reinit()
 	self.st = db.storage[npc_id]
 
 	
-		local t = {
+	local t = {
 				-- vanilla
 				["inventory_info"] 			= bind_stalker_ext.actor_on_info_callback,
 				["on_item_take"] 			= bind_stalker_ext.actor_on_item_take,
@@ -155,7 +158,11 @@ function actor_binder:reinit()
 				["on_use_vehicle"]			= bind_stalker_ext.actor_on_use_vehicle,
 				["weapon_jammed"]			= bind_stalker_ext.actor_on_weapon_jammed,
 				["weapon_zoom_in"]			= bind_stalker_ext.actor_on_weapon_zoom_in,
-				["weapon_zoom_out"]			= bind_stalker_ext.actor_on_weapon_zoom_out
+				["weapon_zoom_out"]			= bind_stalker_ext.actor_on_weapon_zoom_out,
+				
+				["item_to_belt"]			= bind_stalker_ext.actor_item_to_belt,
+				["item_to_slot"]			= bind_stalker_ext.actor_item_to_slot,
+				["item_to_ruck"]			= bind_stalker_ext.actor_item_to_ruck
 	}
 	for cb,func in pairs(t) do 
 		if (callback[cb] and func) then 

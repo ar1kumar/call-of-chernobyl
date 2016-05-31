@@ -16,15 +16,35 @@ function opt_menu_on_init(menu)
 	
 	if (db.actor) then -- Options will only show while in-game
 		local l = ui_mm_faction_select.get_icon_list()
+		local selected = nil 
 		
 		menu.gameplay_options["char_portrait"]	= {default=db.actor_binder.character_icon or l[1], debug_only=false, typ="list", list=l, 
 			on_accept=function(handler,optMgr,ctrl)
-				db.actor_binder.character_icon = ctrl:GetText()
-				db.actor:set_character_icon(db.actor_binder.character_icon)
+				if (selected) then
+					db.actor_binder.character_icon = ctrl:GetText()
+					db.actor:set_character_icon(db.actor_binder.character_icon)
+				end
 			end, 
 			on_list_item_select=function(handler,ctrl)
+				selected = ctrl:GetText()
 				if (handler.char_icon) then
-					handler.char_icon:InitTexture(ctrl:GetText())
+					handler.char_icon:InitTexture(selected)
+				end
+			end
+		}
+		
+		menu.gameplay_options["outfit_portrait"]	= {default=false, 	debug_only=false, 	typ="check", 
+			on_accept=function(handler,optMgr,ctrl)
+				if (ctrl:GetCheck()) then
+					local outfit = db.actor:item_in_slot(7)
+					if (outfit) then 
+						local icon = system_ini():r_string_ex(outfit:section(),"character_icon")
+						if (icon) then 
+							db.actor:set_character_icon(icon)
+						end
+					end
+				else 
+					db.actor:set_character_icon(db.actor_binder.character_icon)
 				end
 			end
 		}
