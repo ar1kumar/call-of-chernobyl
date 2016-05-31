@@ -22,8 +22,8 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 ---------------------------------------------------------------------------------------------------------
 
 local toggle_hud_list = 	{
-							["top"]  = { "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
-							["left"] = { "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
+							["top"]  = { "feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
+							["left"] = { "actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
 							["right"] = { "planner_hud", "gulag_info_hud", "position_hud", "heli_hud", "wounded_hud","corpse_hud"}
 							}
 --------------------------------------------------------------------------------------------------
@@ -788,8 +788,32 @@ function wounded_hud_show(hud)
 	hud:display()
 end
 
+function actor_feel_touch_hud_show(hud)
+	hud:set_header("-[ACTOR FEEL TOUCH]-")
+	if (db.actor and db.actor:alive()) then
+		local itr = function(o)
+			hud:add_msg("-",o:name())
+		end
+		db.actor:iterate_feel_touch(itr)
+	end
+	hud:display()
+end 
+
 local stalker_id
 local stalker_data = {}
+
+function feel_touch_hud_show(hud)
+	local obj = get_debug_npc() or NEAREST_STALKER
+	hud:set_header("-[FEEL TOUCH]-")
+	if (obj and obj:alive()) then
+		local itr = function(o)
+			hud:add_msg("-",o:name())
+		end
+		obj:iterate_feel_touch(itr)
+	end
+	
+	hud:display()
+end 
 
 function stalker_data_hud_show(hud)
 	local obj = get_debug_npc() or NEAREST_STALKER
@@ -916,6 +940,17 @@ function planner_hud_show(hud)
 				hud:add_msg("Alife Act ID",actid)
 			end
 			
+			local anomaly_action = manager:action(stalker_ids.action_anomaly_planner)
+			local anomaly_action_planner = cast_planner(anomaly_action)
+			actid = anomaly_action_planner and anomaly_action_planner:initialized() and anomaly_action_planner:current_action_id()
+			if (actid and actid < 4294967295) then
+				name = actions_by_stalker_ids[actid] or "unknown"
+				hud:add_msg("Alife Act",name)
+				hud:add_msg("Alife Act ID",actid)
+			end
+			
+			hud:add_msg("Inside Anomaly",anomaly_action_planner:evaluator(stalker_ids.property_inside_anomaly):evaluate())
+			
 			local st = db.storage[obj:id()]
 			if (st) then
 				local sm = st.state_mgr
@@ -939,6 +974,7 @@ function planner_hud_show(hud)
 					hud:add_msg("Smartcover",sm.planner:evaluator(state_mgr_goap.properties["smartcover"]):evaluate())
 					hud:add_msg("Animstate Marker",sm.animstate.states.anim_marker)
 					hud:add_msg("Animation Marker",sm.animation.states.anim_marker)
+					
 				end
 			end
 		end
