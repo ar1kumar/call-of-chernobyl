@@ -30,6 +30,13 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	--' Вычитываем новые аут рестрикторы
 	local new_out_restr = utils.parse_names(out_restr_string)
 	
+	-- universal movement restrictions not erased on scheme switch
+	if (st.out_restrictions) then 
+		for i,v in ipairs(st.out_restrictions) do 
+			table.insert(new_out_restr,v)
+		end
+	end
+	
 	--' Узнаем про существующие аут рестрикторы
 	local old_out_restr = utils.parse_names(self.object:out_restrictions())
 
@@ -43,7 +50,7 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	--' Проверяем появились ли новые рестрикторы.
 	local ins_restr = {}  --' Тут поместим рестрикторы, которые нужно добавить
 	local del_restr = {}  --' Тут поместим рестрикторы, которые нужно удалить
-	for k,v in pairs(old_out_restr) do
+	for i,v in ipairs(old_out_restr) do
 		local exist_rest = false
 		for kk,vv in pairs(new_out_restr) do
 			if v == vv then
@@ -55,7 +62,7 @@ function Crestrictor_manager:reset_restrictions(st, section)
 			table.insert(del_restr, v)
 		end
 	end
-	for k,v in pairs(new_out_restr) do
+	for i,v in ipairs(new_out_restr) do
 		local exist_rest = false
 		for kk,vv in pairs(old_out_restr) do
 			if v == vv then
@@ -69,11 +76,11 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	end
 
 	--'Удаляем старые аут рестрикторы. апплаим новые.
-	for k,v in pairs(del_restr) do
+	for i,v in ipairs(del_restr) do
 		--printf("old out_restr [%s] deleted", v)
 		self.object:remove_restrictions(v, "")
 	end
-	for k,v in pairs(ins_restr) do
+	for i,v in ipairs(ins_restr) do
 		--printf("new out_restr [%s] added", v)
 		self.object:add_restrictions(v, "")
 	end
@@ -85,6 +92,13 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	
 	--' Вычитываем новые аут рестрикторы
 	local new_in_restr = utils.parse_names(in_restr_string)
+	
+	-- universal movement restrictions not erased on scheme switch
+	if (st.in_restrictions) then 
+		for i,v in ipairs(st.in_restrictions) do 
+			table.insert(new_in_restr,v)
+		end
+	end
 
 	--' Узнаем про существующие ИН рестрикторы
 	local old_in_restr = utils.parse_names(self.object:in_restrictions())

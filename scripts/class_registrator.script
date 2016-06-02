@@ -17,24 +17,24 @@ end
 function register(object_factory)
 
 	-- GENERAL ---------------------------------------------------------------------------------------------------------------------------
-	c_register	(object_factory, "ui_main_menu.main_menu",										"MAIN_MNU", 		"main_menu")
+	c_register	(object_factory, "ui_main_menu.main_menu",												"MAIN_MNU", 		"main_menu")
 	cs_register	(object_factory, "ce_smart_zone", 				"smart_terrain.se_smart_terrain",		"SMRTTRRN",			"smart_terrain")
 	cs_register	(object_factory, "CLevelChanger",				"se_level_changer.se_level_changer",	"LVL_CHNG", 		"level_changer_s")
 	cs_register	(object_factory, "CActor", 						"se_actor.se_actor",					"S_ACTOR",			"script_actor")
 	cs_register	(object_factory, "CAI_Stalker", 				"se_stalker.se_stalker",				"AI_STL_S", 		"script_stalker")
 	cs_register	(object_factory, "CHelicopter", 				"se_heli.se_heli",						"C_HLCP_S", 		"script_heli")
-	cs_register	(object_factory, "ce_smart_zone", 				"se_zones.se_restrictor",				"SPC_RS_S", 		"script_restr")
+	cs_register	(object_factory, "ce_smart_zone", 				"se_zones.se_restrictor",				"SPC_RS_S", 		"script_restr") -- changed from ce_smart_zone to ce_script_zone for enter_zone and exit_zone callbacks
 	cs_register	(object_factory, "CPhysicObject", 				"se_item.se_physic", 					"O_PHYS_S", 		"script_phys")
 	cs_register	(object_factory, "smart_cover_object",			"se_smart_cover.se_smart_cover",		"SMRT_C_S", 		"smartcover_s")
 	cs_register	(object_factory, "CDestroyablePhysicsObject", 	"se_item.se_physic", 					"O_DSTR_S", 		"destrphys_s")
 	cs_register	(object_factory, "hanging_lamp", 				"se_item.se_lamp", 						"SO_HLAMP", 		"hlamp_s")
-
-    cs_register	(object_factory, "CAI_Trader", 			"se_stalker.se_trader",		"AI_TRD_S", "script_trader")
+	cs_register	(object_factory, "CCar",           	 			"se_car.se_car",            			"SCRPTCAR",			"car_s")
+    cs_register	(object_factory, "CAI_Trader", 					"se_stalker.se_trader",					"AI_TRD_S", 		"script_trader")
 	-- ARTEFACTS --------------------------------------------------------------------------------------------------------------------------
 
 	cs_register (object_factory, "CElectricBall",   			"se_artefact.se_artefact",  			"SCRPTART", 		"artefact_s")
 
-    cs_register	(object_factory, "CCar",           	 			"se_car.se_car",            			"SCRPTCAR",			"car_s")
+   
 	-- MONSTERS ---------------------------------------------------------------------------------------------------------------------------
 
 	cs_register	(object_factory, "CAI_Bloodsucker",				"se_monster.se_monster",    			"SM_BLOOD",			"bloodsucker_s")
@@ -49,7 +49,7 @@ function register(object_factory)
 	cs_register	(object_factory, "CFracture",       			"se_monster.se_monster",				"SM_IZLOM",			"fracture_s")
 	cs_register	(object_factory, "CPoltergeist",    			"se_monster.se_monster",				"SM_POLTR",			"poltergeist_s")
 	cs_register	(object_factory, "CPseudoGigant",   			"se_monster.se_monster",				"SM_GIANT",			"gigant_s")
-	cs_register	(object_factory, "CZombie",         			"se_monster.se_monster",				"SM_ZOMBI",			"zombie_s")
+	cs_register	(object_factory, "CZombie",         			"se_monster.se_monster",				"AI_ZOM",			"zombie_s")
 	cs_register	(object_factory, "CSnork",          			"se_monster.se_monster",				"SM_SNORK",			"snork_s")
 	cs_register	(object_factory, "CTushkano",       			"se_monster.se_monster",				"SM_TUSHK",			"tushkano_s")
 	cs_register	(object_factory, "CTushkano",       			"se_monster.se_monster",				"SM_RAT",			"rat_s")

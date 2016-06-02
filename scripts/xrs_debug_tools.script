@@ -334,7 +334,8 @@ local function on_game_load()
 	actions_by_stalker_ids[188115] = "axr_stalker_panic"
 	actions_by_stalker_ids[188116] = "axr_radio_in_heli"
 	actions_by_stalker_ids[188117] = "axr_npc_vs_heli"
-	actions_by_stalker_ids[187118] = "axr_fight_from_cover"
+	actions_by_stalker_ids[188118] = "axr_fight_from_cover"
+	actions_by_stalker_ids[188119] = "axr_anomaly_planner-action_evade_anom"
 	actions_by_stalker_ids[90005] = "gather_items"
 	
 	-- HUD DISPLAYS
@@ -791,8 +792,11 @@ end
 function actor_feel_touch_hud_show(hud)
 	hud:set_header("-[ACTOR FEEL TOUCH]-")
 	if (db.actor and db.actor:alive()) then
-		local itr = function(o)
-			hud:add_msg("-",o:name())
+		local itr = function(id)
+			local o = id and alife():object(id)
+			if (o) then
+				hud:add_msg("-",strformat("ID=%s Name=%s",id,o:name()))
+			end
 		end
 		db.actor:iterate_feel_touch(itr)
 	end
@@ -806,8 +810,11 @@ function feel_touch_hud_show(hud)
 	local obj = get_debug_npc() or NEAREST_STALKER
 	hud:set_header("-[FEEL TOUCH]-")
 	if (obj and obj:alive()) then
-		local itr = function(o)
-			hud:add_msg("-",o:name())
+		local itr = function(id)
+			local o = id and alife():object(id)
+			if (o) then
+				hud:add_msg("-",strformat("ID=%s Name=%s",id,o:name()))
+			end
 		end
 		obj:iterate_feel_touch(itr)
 	end
@@ -1271,6 +1278,9 @@ function stalker_info_hud_show(hud)
 		
 		local dist = device().cam_pos:distance_to(near:position())
 		hud:add_msg("distance",string.format("%d (%dm)",dist*dist,dist))
+		
+		hud:add_msg("OUT RESTR",near:out_restrictions())
+		hud:add_msg("IN RESTR",near:in_restrictions())
 	end
 
 	hud:set_header("-[Stalker Info]-")
