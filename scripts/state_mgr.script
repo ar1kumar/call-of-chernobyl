@@ -589,13 +589,12 @@ function bind_manager(object)
 	local combat_action_planner = cast_planner(action)
 	combat_action_planner:remove_action(stalker_ids.action_kill_enemy_if_not_visible)
 
-	-- anomaly_planner (disable with a const false because it's busted)
-	--manager:add_evaluator(18799,property_evaluator_const(false))
-	
 	action = manager:action(stalker_ids.action_anomaly_planner)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
-	--action:add_precondition(wp(18799,true))
 
+	--local anomaly_action_planner = cast_planner(action)
+	--anomaly_action_planner:remove_action(stalker_ids.detect_anomaly)
+	 
 	action = manager:action(stalker_ids.action_danger_planner)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
 
