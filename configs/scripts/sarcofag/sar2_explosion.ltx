@@ -2,10 +2,13 @@
 active = sr_idle@wait
 
 [sr_idle@wait]
-on_info = {+sar2_monolith_end} sr_particle@explode
+on_info = {+sar2_monolith_end} sr_idle@explode
+
+[sr_idle@explode]
+on_timer = 2000| sr_particle@explode
 
 [sr_particle@explode]
-name = explosions\expl_mushroom_01
+name = _samples_particles_\effects\pm_electr_particle
 mode = 2
 path = sar_monolith_2_particle_way
 looped = true

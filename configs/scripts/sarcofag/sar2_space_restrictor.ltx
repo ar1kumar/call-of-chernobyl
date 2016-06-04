@@ -2,7 +2,6 @@
 active = sr_idle
 
 [sr_idle]
-;on_info = {+sar2_teleport_start} sr_idle@call %=sar2_scene_start%
 on_info = {+sar2_teleport_start} sr_idle@call
 
 [sr_idle@call]
@@ -11,14 +10,10 @@ on_info2 = {+sar2_monolith_end} sr_idle@dying %=aes_earthshake%
 
 [sr_idle@dying]
 on_info = %=play_sound(mon_organic_moan)%
-on_signal = sound_end | sr_idle@destroy1
+on_signal = sound_end | sr_idle@destroy
 
-[sr_idle@destroy1]
-on_info = %=play_sound(mon_explosion) =turn_off(lights_gi_r2_0000) =turn_off(lights_gi_r2_0029)%
-on_signal = sound_end | sr_idle@destroy2
-
-[sr_idle@destroy2]
-;on_timer = 100| sr_idle@nil %=destroy_object(story:sar_monolith) =destroy_object(story:sar_zone_monolith)%
-on_info = sr_idle@nil %=destroy_object(story:sar_monolith)%
+[sr_idle@destroy]
+on_info = %=destroy_object(story:sar_monolith) =play_sound(mon_explosion) =turn_off(lights_gi_r2_0000) =turn_off(lights_gi_r2_0029)%
+on_signal = sound_end | sr_idle@nil
 
 [sr_idle@nil]
