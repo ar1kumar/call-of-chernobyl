@@ -2,7 +2,7 @@
 active = sr_idle@wait
 
 [sr_idle@wait]
-on_info = {=actor_has_item(cit_doctors_key) -cit_jail_doctor_pryp_task} sr_idle@nil %+cit_jail_doctor_pryp_task =give_task(cit_doctor_task)%
+on_info = {=actor_has_item(cit_doctors_key) -cit_jail_doctor_pryp_task} sr_idle@nil %+mar_doctor_found +cit_jail_doctor_pryp_task =give_task(cit_doctor_task)%
 on_info2 = {=actor_has_item(cit_doctors_key) +cit_doctor_meet_conclusion_info} sr_idle@nil
 
 [sr_idle@nil]

@@ -12,13 +12,13 @@ locked = true
 closed = true
 tip_open = tip_door_decode
 on_info = {!actor_has_item(decoder)} ph_door@locked
-on_use = ph_door@decoding %+warlab_access_decoding%
+on_use = ph_door@decoding %+warlab_access_decoding =play_sound_looped(warlab_decoder)%
 
 [ph_door@decoding]
 locked = true
 closed = true
 tip_open = tip_door_decoding
-on_info = {+warlab_finish_decoding} ph_door@unlocked %+warlab_door_opened%
+on_info = {+warlab_finish_decoding} ph_door@unlocked %+warlab_door_opened =stop_sound_looped%
 
 [ph_door@unlocked]
 locked = false

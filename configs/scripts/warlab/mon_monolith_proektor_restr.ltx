@@ -13,15 +13,15 @@ on_info = {+warlab_door_opened} sr_idle@out %=run_postprocess(fade_in) =teleport
 ;on_timer = 7500 | %+oso_init_dialog%
 
 [sr_idle@out]
-on_timer = 1000 | {+warlab_actor_teleported} sr_idle@talk %=run_postprocess(black:3009:true)%
+on_timer = 500 | {+warlab_actor_teleported} sr_idle@talk %=run_postprocess(black:3009:true)%
 
 [sr_idle@talk]
-on_timer = 1000 | sr_idle@decided %=stop_postprocess(3009) =enable_ui +oso_init_dialog%
+on_timer = 6000 | sr_idle@decided %=stop_postprocess(3009) =enable_ui +oso_init_dialog%
 
 [sr_idle@decided]
 on_timer = 2000 | {-oso_init_dialog} sr_idle@wait_2nd_actor %=destroy_object(story:osoznanie) =run_postprocess(black:3009:true)%
 
 [sr_idle@wait_2nd_actor]
-on_info = {+sar2_monolith_end} sr_idle@nil %+warlab_actor_second_arrive%
+on_info = {+sar2_monolith_end} sr_idle@nil %+warlab_actor_second_arrive =spawn_object(artefact_monolit_ghost:oso_walk:0)%
 
 [sr_idle@nil]
