@@ -1,15 +1,20 @@
-[zone_field_radioactive]:zone_base
+[zone_field_radioactive]
 GroupControlSection	= spawn_group_zone
 $def_sphere = 15
 ;$prefetch 		= 16
 class			= ZS_RADIO
-script_binding 	= ;not needed!
 hit_impulse_scale	= .01
 effective_radius	= 1.00 ;размер радиуса в процентах от оригинального, где действует зона
 postprocess		= postprocess_rad
 
 ef_anomaly_type			= 3
 ef_weapon_type			= 15
+
+;----------- Zone Base        -----------------------
+idle_light_volumetric 	= false
+idle_light_shadow		= true
+pick_dof_effector		= false
+idle_light_r1			= true
 
 ;----------- Anomaly settings -----------------------
 max_start_power		= 0
