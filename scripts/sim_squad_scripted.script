@@ -118,14 +118,7 @@ function sim_squad_scripted:get_script_target()
 	if (self.scripted_target) then 
 		new_target = self.scripted_target
 	elseif (self.random_targets) then
-		if (self:section_name() == "mar_smart_terrain_doc_squad") then 
-			printf("yes")
-		end
 		if (self.current_action == 0 and self.assigned_target_id == nil) then 
-		
-			if (self:section_name() == "mar_smart_terrain_doc_squad") then 
-				printf("yes set")
-			end
 			new_target = self.random_targets[math.random(#self.random_targets)]
 		else 
 			return self.assigned_target_id
