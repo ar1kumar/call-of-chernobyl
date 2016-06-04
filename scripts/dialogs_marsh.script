@@ -25,3 +25,9 @@ function ecolog_companion_task_1_give_reward(a,b)
 	xr_effects.inc_faction_goodwill_to_actor(db.actor, nil, {"killer", 25})
 end
 
+-- transfer key from doctor
+function take_key(first_speaker, second_speaker)
+    dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "cit_doctors_key")
+	task_manager.get_task_manager():give_task("cit_doctor_task")
+end
+

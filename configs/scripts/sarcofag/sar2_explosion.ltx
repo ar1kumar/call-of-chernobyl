@@ -1,0 +1,14 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+sar2_monolith_end} sr_particle@explode
+
+[sr_particle@explode]
+name = explosions\expl_mushroom_01
+mode = 2
+path = sar_monolith_2_particle_way
+looped = true
+on_timer = 5000| sr_idle@nil
+
+[sr_idle@nil]

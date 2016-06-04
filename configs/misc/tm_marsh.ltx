@@ -195,3 +195,27 @@ target_functor = general_fetch_task
 task_complete_descr = mar_base_stalker_tech_task_3_fetch_finish
 on_complete = %+mar_base_stalker_tech_upgrade_tier_3 =complete_task_inc_goodwill(50:csky) =reward_money(1000) =remove_fetch_item(mar_base_stalker_tech_task_3_fetch) =inc_task_stage(mar_base_stalker_tech_task_3)%
 precondition = {+mar_base_stalker_tech_upgrade_tier_2 -mar_base_stalker_tech_upgrade_tier_3} true, false
+
+;--------------------------------------------------------------------------------------------------
+; FIND DOCTOR TASK-
+
+[mar_find_doctor_task]
+icon = ui_iconsTotal_doctor_meet
+prior = 104
+storyline = true
+title = mar_doctor_task
+target = nil
+descr = mar_doctor_task_0
+condlist_0 = {+mar_doctor_found} complete
+
+;--------------------------------------------------------------------------------------------------
+; DOCTOR PRIPYAT TASK-
+
+[cit_doctor_task]
+icon = ui_iconsTotal_doctor_meet
+prior = 104
+storyline = true
+title = cit_doctor_task
+target = {+cit_jail_doctor_pryp_task -pri_actor_in_hotel} pri_hotel_zone, {+pri_actor_in_hotel -pri_actor_in_hiding_place} pri_decoder_room_door
+descr = {+cit_jail_doctor_pryp_task -pri_actor_in_hotel} cit_doctor_task_1, {+pri_actor_in_hotel -pri_actor_in_hiding_place} cit_doctor_task_2, {+pri_actor_in_hiding_place -pri_monolith_decoder_got} cit_doctor_task_3
+condlist_0 = {+pri_monolith_decoder_got} complete

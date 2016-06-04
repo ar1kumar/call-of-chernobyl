@@ -98,6 +98,7 @@ yan_stalker_sakharov_farewell
 brain_scorcher_rumble
 radar_drone
 radar_thunder
+gen_noos_tunnel
 
 x16_psy_loop
 x16_engine1_run
@@ -137,14 +138,26 @@ x18_sound_12
 giant_underground_0
 poltergeist_die_0
 x18_firedoor
+val_patrol_prikaz
 
 rad_hat_1
 rad_hat_2
 radar_meh_on
 radar_meh_off
 switch_2
+psy_blackout
 bun_monolith_call_1
+bun_patrol_prikaz
 sar_monolith_call
+sar2_monolith_call
+mon_organic_moan
+mon_explosion
+warlab_oso
+
+mon_monolith_damaged
+mon_monolith_heavy_damaged
+mon_monolith_alarm
+mon_monolith_recharged
 
 mil_freedom_guards_warning_actor
 
@@ -178,6 +191,10 @@ path = ambient\radar_1
 [radar_thunder]
 type = looped
 path = ambient\radar_2
+
+[gen_noos_tunnel]
+type = looped
+path = ambient\noos_tunnel_1
 
 [x16_psy_loop]
 type = looped
@@ -335,6 +352,14 @@ path = monsters\poltergeist\die_0
 type = looped
 path = anomaly\fireball_idle
 
+[val_patrol_prikaz]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\val\patrol_prikaz
+shuffle = seq
+idle = 10,15,100
+
 [rad_hat_1]
 type = actor
 actor_stereo = true
@@ -363,6 +388,22 @@ path = ambient\cooling_stop
 type = 3d
 path = ambient\switch_2
 
+[psy_blackout]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = affects\psy_blackout
+shuffle = seq
+idle = 1,1,100
+
+[bun_patrol_prikaz]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\bun\patrol_prikaz
+shuffle = seq
+idle = 1,1,100
+
 [agr_army_comandir_megafon]
 type = 3d
 path = characters_voice\scenario\agroprom\comandir_megafon_
@@ -390,6 +431,50 @@ npc_prefix = false
 path = characters_voice\scenario\sarcofag\monolith_call_
 shuffle = rnd
 idle = 10,15,100
+
+[sar2_monolith_call]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\sarcofag\monolith_call_1
+shuffle = rnd
+idle = 30,60,100
+
+[mon_organic_moan]
+type = 3d
+path = ambient\organic_moan1
+
+[mon_explosion]
+type = 3d
+path = ambient\mon_explosion
+
+[warlab_oso]
+type = looped
+path = ambient\os_1
+
+[mon_monolith_damaged]
+type = 3d
+path = characters_voice\scenario\sarcofag\monolith_damaged
+shuffle = rnd
+idle = 0,0,100
+
+[mon_monolith_heavy_damaged]
+type = 3d
+path = characters_voice\scenario\sarcofag\monolith_heavy_damaged
+shuffle = rnd
+idle = 0,0,100
+
+[mon_monolith_alarm]
+type = 3d
+path = characters_voice\scenario\sarcofag\monolith_alarm
+shuffle = rnd
+idle = 0,0,100
+
+[mon_monolith_recharged]
+type = 3d
+path = characters_voice\scenario\sarcofag\monolith_recharged
+shuffle = rnd
+idle = 0,0,100
 
 [mil_freedom_guards_warning_actor]
 type = npc

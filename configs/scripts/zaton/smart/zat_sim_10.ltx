@@ -11,8 +11,8 @@ spawn_hostile_bandit
 
 [spawn_hostile_killer]
 spawn_squads = merc_sim_squad_advanced
-spawn_num = {=is_faction_enemy_to_actor(killer)} 1, 0
+spawn_num = {=is_faction_enemy_to_actor(killer) +bar_deactivate_radar_done} 1, 0
 
 [spawn_hostile_bandit]
 spawn_squads = bandit_sim_squad_advanced
-spawn_num = {=is_faction_enemy_to_actor(bandit)} 1, 0
+spawn_num = {=is_faction_enemy_to_actor(bandit) +bar_deactivate_radar_done} 1, 0

@@ -1,0 +1,10 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_actor_inside = {+cit_jail_doctor_pryp_task} sr_idle@task  %+pri_actor_in_hotel%
+
+[sr_idle@task]
+on_info = {=actor_has_item(decoder) =actor_has_item(pri_decoder_documents)} sr_idle@nil %+pri_monolith_decoder_got +pri_documents_warlab_task =give_task(sar_warlab) =give_task(sar_monolith_destroy)%
+
+[sr_idle@nil]

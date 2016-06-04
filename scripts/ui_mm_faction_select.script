@@ -93,6 +93,7 @@ local function on_game_load()
 		-- faction diversity
 		if (faction ~= "monolith") then 
 			task_manager.get_task_manager():give_task("turn_off_brain_scorcher")
+            task_manager.get_task_manager():give_task("mar_find_doctor_task")
 		else 
 			give_info("bar_deactivate_radar_done") -- disables brain scorcher
 		end
@@ -273,7 +274,7 @@ function get_icon_list()
 		"ui_inGame2_duty_2_old",
 		"ui_inGame2_duty_bala",
 		"ui_inGame2_dutygas_2",
-		"ui_inGame2_ecolog_white",
+        "ui_inGame2_ecolog_white",
 		"ui_inGame2_ecolog_orange",
 		"ui_inGame2_ecolog_blue",
 		"ui_inGame2_ecolog_green",

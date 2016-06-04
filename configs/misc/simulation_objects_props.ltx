@@ -73,6 +73,12 @@ csky 		= 2
 surge 		= 1
 sim_avail 	= true
 
+[mar_smart_terrain_doc]:default_base
+sim_avail 	= false
+
+[mar_smart_terrain_doc_2]:default_base
+sim_avail 	= false
+
 ;---------	SIMULATION	--------
 ;sim smarties
 
@@ -230,6 +236,12 @@ sim_avail = false
 
 [ecolog_companion_task_1]:default_squad
 sim_avail = true 
+
+[mar_smart_terrain_doc_squad]:default_squad
+sim_avail = false
+
+[mar_smart_terrain_doc_dog_squad]:default_squad
+sim_avail = false
 
 ;--------- <<  ESCAPE >> ----------------
 ;---------	SIMULATION	--------
@@ -607,13 +619,20 @@ sim_avail = false
 
 ;---------	AGROPROM UNDERGROUND SMART TERRAINS	--------
 [agr_u_bandits]:default_territory
-sim_avail = false
+sim_avail = {+agr_u_bandits_dead} true, false
+lair 		= 1
+stalker		= 1
+army		= 1
+bandit		= 1
 
 [agr_u_bloodsucker]:default_lair
 sim_avail = {+agru_add_reward} true, false
 
 [agr_u_bloodsucker_2]:default_lair
 sim_avail = {+agru_add_reward_1} true, false
+territory 	= 1
+stalker		= 1
+army		= 1
 
 [agr_u_monsters]:default_lair
 sim_avail = {+agru_controller_death} true, false
@@ -739,6 +758,10 @@ freedom 	= 1
 ;---------	LAB X-18 SMART TERRAINS	--------
 [dar_angar]:default_lair
 sim_avail = {+dar_military_scout_squad_killed} true, false
+army		= 1
+ecolog		= 1
+stalker 	= 1 
+territory 	= 1
 
 [dar_control_poltergeist]:default_lair
 sim_avail = {+dar_military_scout_squad_killed} true, false
@@ -757,6 +780,10 @@ sim_avail = false
 
 [dar_smart_snork]:default_lair
 sim_avail = {+dar_military_scout_squad_killed} true, false
+army		= 1
+ecolog		= 1
+stalker 	= 1 
+territory 	= 1
 
 ;---------	LAB X-18 UNIQUE SQUADS	--------
 [dar_angar_gigant_squad]:default_squad
@@ -978,9 +1005,19 @@ sim_avail = false
 ;----------- << LAB X-16 SMARTIES >> ------------
 [x162_st_burer]:default_lair
 sim_avail = {+yan_kill_brain_done} true, false
+monolith 	= 1 
+ecolog 		= 1
+stalker		= 1
+army 		= 1
+territory 	= 1
 
 [x162_st_gigant]:default_lair
 sim_avail = {+yan_kill_brain_done} true, false
+monolith 	= 1 
+ecolog 		= 1
+stalker		= 1
+army 		= 1
+territory 	= 1
 
 [x162_st_snork]:default_lair
 sim_avail = {+yan_kill_brain_done} true, false
@@ -1392,9 +1429,20 @@ sim_avail 	= false
 
 [bun2_st_bloodsucker]:default_lair
 sim_avail 	= {+bar_deactivate_radar_done} true, false
+monolith 	= 1 
+ecolog 		= 1
+stalker		= 1
+army		= 1
+territory 	= 1
 
 [bun2_tushkano_lair]:default_lair
 sim_avail 	= {+bar_deactivate_radar_done} true, false
+monolith 	= 1 
+ecolog 		= 1
+stalker		= 1
+army		= 1
+territory 	= 1
+
 
 ;---------	BUNKER-LAB X-10 UNIQUE SQUADS	--------
 [bun_krovosos_nest_squad]:default_squad
@@ -1523,7 +1571,11 @@ army 		= 1
 
 [sar_monolith_general]:default_territory
 sim_avail = {+sar_secret_door_find} true, false
-lair = 1
+monolith 	= 1 
+stalker		= 1
+army		= 1
+ecolog		= 1
+lair 		= 1
 
 [sar_monolith_sklad]:default_territory
 sim_avail = {+sar_secret_door_find} true, false
@@ -1534,6 +1586,11 @@ sim_avail = {+sar_secret_door_find} true, false
 
 [sar_monolith_bloodsuckers]:default_lair
 sim_avail = {+sar_secret_door_find} true, false
+monolith 	= 1 
+stalker		= 1
+army		= 1
+ecolog		= 1
+territory	= 1
 
 [sar_monolith_general_squad]:default_squad
 sim_avail = false
@@ -1544,10 +1601,19 @@ sim_avail = false
 ;----------- << MONOLITH CONTROL >> ------------
 [sar_monolith_guard]:default_territory
 sim_avail = {+sar_monolith_generator_find} true, false
-lair = 1
+monolith 	= 1 
+stalker		= 1
+army		= 1
+ecolog		= 1
+lair 		= 1
 
 [sar_monolith_zombies]:default_lair
 sim_avail = {+sar_monolith_generator_find} true, false
+monolith 	= 1 
+stalker		= 1
+army		= 1
+ecolog		= 1
+territory 	= 1
 
 [sar_monolith_guard_squad]:default_squad
 sim_avail = false
@@ -3041,10 +3107,10 @@ sim_avail = true
 [pri_a28_evac]:default_territory
 sim_avail = true
 
-
 ;Lab X-8
 [lx8_smart_terrain]:default_territory
 sim_avail = {+lx8_actor_in_lab +actor_left_labx8} true, false
+all  = 1
 lair = 1
 
 [lx8_snork_down_squad]:default_squad
@@ -3052,7 +3118,6 @@ sim_avail = false
 
 [lx8_snork_up_squad]:default_squad
 sim_avail = false
-
 
 [lx8_burers_squad]:default_squad
 sim_avail = false
@@ -3072,6 +3137,8 @@ sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, 
 
 [pas_b400_track]:default_lair
 sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+all			= 1
+territory 	= 1
 
 [pas_b400_downstairs]:default_lair
 sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
@@ -3081,6 +3148,8 @@ sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, 
 
 [pas_b400_hall]:default_lair
 sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+all			= 1
+territory 	= 1
 
 [pas_b400_way]:default_lair
 sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false

@@ -1,0 +1,15 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+warlab_access_decoding} sr_timer %+warlab_start_teleport%
+
+[sr_timer]
+type = dec
+start_value = 30000
+on_value = 27000|%+warlab_monolith_spawn1%| 23000|%+warlab_monolith_spawn2%| 19000|%+warlab_monolith_spawn3%| 15000|%+warlab_monolith_spawn4%| 11000|%+warlab_monolith_spawn5%|  8000|%+warlab_monolith_spawn6%| 6000|%+warlab_monolith_spawn7%| 5000|%+warlab_monolith_spawn8 +warlab_end_teleport%| 0| sr_idle@oso_spawner %+warlab_finish_decoding%
+
+[sr_idle@oso_spawner]
+on_info = {+warlab_finish_decoding +warlab_door_opened +warlab_actor_teleported} sr_idle@nil %=spawn_object(osoznanie:oso_walk:0)%
+
+[sr_idle@nil]

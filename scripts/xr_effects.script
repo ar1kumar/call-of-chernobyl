@@ -4352,8 +4352,8 @@ function yan_gluk (actor, npc)
 	local sound_obj_l		= xr_sound.get_safe_sound_object( [[affects\psy_blackout_l]] )
     local sound_obj_r		= xr_sound.get_safe_sound_object( [[affects\psy_blackout_r]] )
         
-	sound_obj_l:play_no_feedback(actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
-	sound_obj_r:play_no_feedback(actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
+	sound_obj_l:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
+	sound_obj_r:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
 	level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
 end
 
@@ -4377,8 +4377,8 @@ function x18_gluk (actor, npc)
         local sound_obj_r		= xr_sound.get_safe_sound_object( [[affects\psy_blackout_r]] )
         local snd_obj			= xr_sound.get_safe_sound_object( [[affects\tinnitus3a]] )
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
-		sound_obj_l:play_no_feedback(actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
-		sound_obj_r:play_no_feedback(actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
+		sound_obj_l:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
+		sound_obj_r:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
 	level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
 end
 
@@ -4393,6 +4393,27 @@ end
 function end_radar_dream(actor, npc)
 	db.actor:give_info_portion("bun_patrol_start")
 end
+
+---------------------------------------------------------
+-- Sarcofag2
+---------------------------------------------------------
+
+function aes_earthshake (npc)
+	local snd_obj = xr_sound.get_safe_sound_object([[ambient\earthquake]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+	level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
+    --set_postprocess ("scripts\\earthshake.ltx")
+end
+
+function oso_init_dialod ()
+	-- local oso = level_object_by_sid(osoznanie)
+	-- db.actor:run_talk_dialog(oso)
+end
+
+function warlab_stop_particle(actor, npc, p)
+	db.actor:stop_particles("anomaly2\\control_monolit_holo", "link")
+end
+
 function play_snd_from_obj(actor, npc, p)
 	if p[1] and p[2] then
 		local snd_obj = xr_sound.get_safe_sound_object(p[2])

@@ -1055,3 +1055,77 @@ quest_item                               = true
 
 max_uses                                 = 255
 remove_after_use                         = false
+
+
+[pri_decoder_documents]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\quest_items\decoder_documents"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= equipments\item_document_01.ogf
+radius				= 1
+;script_binding		= stalker.object_init
+quest_item			= true
+story_id            = pri_decoder_documents
+
+description			= pri_decoder_docs_conclusion_txt
+
+inv_name			= item_docs_hiden_pri_desc
+inv_name_short		= item_docs_hiden_pri_name
+inv_weight			= 0
+
+inv_grid_width     = 2
+inv_grid_height    = 1
+inv_grid_x         = 18
+inv_grid_y         = 24
+cost				= 0
+
+[cit_doctors_key]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\quest_items\cit_doctors_key"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= dynamics\equipments\quest\key.ogf
+radius				= 1
+;script_binding		= stalker.object_init
+quest_item			= true
+story_id            = cit_doctors_key
+
+inv_name			= cit_doctors_key_name
+inv_name_short		= cit_doctors_key_short_desc
+inv_weight			= 0
+description			= cit_doctors_key_desc
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 13
+inv_grid_y         = 3
+cost			   = 0
+
+[decoder]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\quest_items\decoder"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= equipments\item_decoder.ogf
+radius				= 1
+;script_binding		= stalker.object_init
+quest_item			= true
+story_id            = decoder
+
+description			= item_decoder_desc
+
+inv_name			= item_decoder_name	
+inv_name_short		= item_decoder_name
+inv_weight			= 0
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 19
+inv_grid_y			= 6
+cost				= 50

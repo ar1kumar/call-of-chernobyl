@@ -1,0 +1,10 @@
+[logic]
+active = sr_idle@wait
+ 
+[sr_idle@wait]
+on_info = {+warlab_deactivate_generators_done} sr_idle@psy_sound %=play_sound(brain_scorcher_rumble)%
+
+[sr_idle@psy_sound]
+on_timer  = 2000 | sr_idle@nil %=play_sound(psy_blackout)%
+
+[sr_idle@nil]

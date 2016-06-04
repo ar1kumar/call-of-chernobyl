@@ -306,13 +306,13 @@ end
 
 if file then -- check the specified file:
 
-       -- printf("LuaCheck: `%s'", file)
+        printf("LuaCheck: `%s'", file)
 
 
 
-        -- local luacExePath = escape(os.getenv('LUA_JIT') .. '\\luac.exe')
+        -- local luacExePath = escape(os.getenv('LUA_DEV') .. '\\luac.exe')
 
-        local luacExePath = escape('C:\\Program Files (x86)\\LuaJit\\luac5.1.exe')
+        local luacExePath = escape('%LUA_DEV%\\luac.exe')
 
 
 
@@ -368,9 +368,7 @@ if file then -- check the specified file:
 
         errorCount = tonumber(errorCount)
 
-		if (errorCount > 0) then
-			printf("%d syntax error(s) found.", errorCount)
-		end
+        printf("%d syntax error(s) found.", errorCount)
 
 
 
