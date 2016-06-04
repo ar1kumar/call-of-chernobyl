@@ -118,10 +118,17 @@ function sim_squad_scripted:get_script_target()
 	if (self.scripted_target) then 
 		new_target = self.scripted_target
 	elseif (self.random_targets) then
+		if (self:section_name() == "mar_smart_terrain_doc_squad") then 
+			printf("yes")
+		end
 		if (self.current_action == 0 and self.assigned_target_id == nil) then 
+		
+			if (self:section_name() == "mar_smart_terrain_doc_squad") then 
+				printf("yes set")
+			end
 			new_target = self.random_targets[math.random(#self.random_targets)]
 		else 
-			return self.id
+			return self.assigned_target_id
 		end
 	else
 		new_target = xr_logic.pick_section_from_condlist(db.actor, self, self.action_condlist)
@@ -338,15 +345,16 @@ function sim_squad_scripted:specific_update(script_target_id)
 	
 	if (self.current_action) then
 		-- If current action is not finished, then return
-		if (self.current_action == 0) then 
+		if (self.current_action == 0) then
+			if not (self.online) then
+				TeleportSquad(self,se_target.position,se_target.m_level_vertex_id,se_target.m_game_vertex_id)
+			end
 			if (se_target:am_i_reached(self)) then
 				se_target:on_after_reach(self)
 				self.current_target_id = self.assigned_target_id
 				self.current_action = 1
 				
-				if (self.random_targets) then
-					self.stay_time = game.get_game_time()
-				end
+				self.stay_time = game.get_game_time()
 			end
 			return
 		elseif (self.current_action == 1 and self.current_target_id == self.assigned_target_id) then
@@ -1135,9 +1143,7 @@ function sim_squad_scripted:get_squad_props()
 		local assigned_target = self.assigned_target_id and alife():object(self.assigned_target_id)
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
 
-		local t = ""
-		t = t .. ""
-		t = t .. "%s\\n\\n%s\\n\\nnpcs=%s\\n\\ncurrent_target=%s\\nassigned_target=%s\\n\\n"
+		local t = "%s\\n\\n%s\\n\\nnpcs=%s\\n\\ncurrent_target=%s\\nassigned_target=%s\\n\\n"
 		t = strformat(t,self.disabled and "[disabled]" or "",self:name(),self:npc_count(),self.current_target_id == 0 and "actor" or current_target and current_target:name(),self.assigned_target_id == 0 and "actor" or assigned_target and assigned_target:name())
 
 		if (self.current_action) then
@@ -1148,7 +1154,7 @@ function sim_squad_scripted:get_squad_props()
 			end
 			
 			if (self.current_action == 1 and self.stay_time) then
-				t = t .. " = " .. tostring(self.idle_time - game.get_game_time():diffSec(self.stay_time))
+				t = strformat("%s = %s (%s)",t,tostring(self.idle_time - game.get_game_time():diffSec(self.stay_time)),self.idle_time)
 			end
 		end
 
