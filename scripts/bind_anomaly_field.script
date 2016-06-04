@@ -39,7 +39,9 @@ function anomaly_field_binder:net_spawn(server_object)
 		eRestrictorTypeOut		   = u8(5),
 	--]]
 	
-	self.object:set_restrictor_type(4)
+	if (get_console():get_bool("ai_die_in_anomaly") == true) then
+		self.object:set_restrictor_type(4)
+	end
 	
 	return true
 end
