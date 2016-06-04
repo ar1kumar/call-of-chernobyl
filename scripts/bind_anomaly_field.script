@@ -29,6 +29,7 @@ function anomaly_field_binder:net_spawn(server_object)
 	db.add_obj(self.object)
 	fields_by_names[self.object:name()] = self
 	
+	-- TODO: Figure out a way to reset restrictor shape to anomaly radius so that movement restrictor properly avoids anomalies
 	--[[
 		eDefaultRestrictorTypeNone = u8(0),
 		eDefaultRestrictorTypeOut  = u8(1),
