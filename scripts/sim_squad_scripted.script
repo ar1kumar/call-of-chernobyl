@@ -60,7 +60,10 @@ function sim_squad_scripted:init_squad()
 		end
 	end
 	
-	self.random_targets		= sys_ini:r_string_ex(settings_id, "target_random_smart")
+	local s	= sys_ini:r_string_ex(settings_id, "target_random_smart")
+	if (s) then
+		self.random_targets = alun_utils.str_explode(s,",") 
+	end
 	self.idle_time			= sys_ini:r_float_ex(settings_id,"idle_time") or math.random(STAY_POINT_IDLE_MIN,STAY_POINT_IDLE_MAX)	
 	
 	self.relationship		= self.relationship or rel
@@ -115,11 +118,10 @@ function sim_squad_scripted:get_script_target()
 	if (self.scripted_target) then 
 		new_target = self.scripted_target
 	elseif (self.random_targets) then
-		if (self.stay_time == nil or game.get_game_time():diffSec(self.stay_time) < self.idle_time) then
-			local t = alun_utils.str_explode(self.random_targets,",") 
-			new_target = t[math.random(#t)]
+		if (self.current_action == 0 and self.assigned_target_id == nil) then 
+			new_target = self.random_targets[math.random(#self.random_targets)]
 		else 
-			return 
+			return self.id
 		end
 	else
 		new_target = xr_logic.pick_section_from_condlist(db.actor, self, self.action_condlist)
@@ -354,6 +356,7 @@ function sim_squad_scripted:specific_update(script_target_id)
 		end
 	end
 	
+	self.assigned_target_id = nil
 	self.current_target_id = nil
 	self.current_action = 0
 	
@@ -1092,7 +1095,7 @@ function sim_squad_scripted:show()
 	end
 	local spot = ""
 
-	if (axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
+	if (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
 		if (DEV_DEBUG_HOLD_ACTION_1) then 
 			if (self.assigned_target_id ~= nil and smart_terrain.nearest_to_actor_smart.id == self.assigned_target_id) then 
 				spot = "storyline_task_location"
@@ -1128,7 +1131,7 @@ function sim_squad_scripted:show()
 end
 
 function sim_squad_scripted:get_squad_props()
-	if (axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
+	if (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
 		local assigned_target = self.assigned_target_id and alife():object(self.assigned_target_id)
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
 
@@ -1151,15 +1154,9 @@ function sim_squad_scripted:get_squad_props()
 
 		return t
 	else
-		return ""
+		return game.translate_string(self.player_id)
 	end
 end
-
---[[
-function sim_squad_scripted:get_squad_props()
-	return game.translate_string(self.player_id)
-end
---]]
 
 --***********************************************************************************************
 --*										SIMULATION_TARGET_SQUAD									*
