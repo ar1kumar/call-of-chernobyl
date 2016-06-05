@@ -102,6 +102,8 @@ function action.debug_test(p)
 		return 
 	end 
 	if (p==1) then 
+	
+		xr_effects.disable_generator_zones()
 		-- RELEASES TASK GIVER FOR ALL TASKS WITH task_giver_id; useful for testing how a task works when giver is dead
 		--[[
 		local debug_task_infos = task_manager.get_task_manager().task_info

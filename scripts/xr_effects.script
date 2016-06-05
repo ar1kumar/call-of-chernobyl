@@ -4461,3 +4461,33 @@ function show_health(actor,npc,p)
 		end		
 	end
 end 
+
+
+function disable_monolith_zones(actor,npc,p)
+	local remove_sections = {
+		["zone_monolith"] = true
+	}
+	local sim = alife()
+	for i=1,65534 do 
+		local se_obj = sim:object(i)
+		if (se_obj and remove_sections[se_obj:section_name()]) then 
+			sim:release(se_obj,true)
+		end	
+	end
+end 
+
+function disable_generator_zones(actor,npc,p)
+	local remove_sections = {
+		["generator_torrid"] = true,
+		["generator_dust"] = true,
+		["generator_electra"] = true,
+		["generator_dust_static"] = true
+	}
+	local sim = alife()
+	for i=1,65534 do 
+		local se_obj = sim:object(i)
+		if (se_obj and remove_sections[se_obj:section_name()]) then 
+			sim:release(se_obj,true)
+		end	
+	end
+end

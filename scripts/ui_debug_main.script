@@ -57,7 +57,9 @@ function get_spawn_table(name)
 				"zone_mine_field",
 				"zone_mine_field_soc",
 				"zone_no_gravity",
-				"zone_teleport"
+				"zone_teleport",
+				"zone_hvatalka",
+				"zone_studen"
 		}
 	elseif (name == "Artefacts") then
 		return {
@@ -1427,7 +1429,7 @@ function debug_ui:OnButton_create_clicked()
 			data.shapes[1] = {}
 			data.shapes[1].shtype = 0
 			data.shapes[1].offset = vector():set(0,0,0)
-			data.shapes[1].radius = 5
+			data.shapes[1].radius = 10
 			stpk_utils.set_anom_zone_data(data,se_obj)
 		end
 	end
