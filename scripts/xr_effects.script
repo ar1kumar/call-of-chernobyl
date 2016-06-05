@@ -920,7 +920,7 @@ function teleport_npc_lvid(actor,npc,p)
 	end
 	local position = level.vertex_position(vid)
 	if (p[2]) then
-		local obj = get_story_object_id(p[2])
+		local obj = get_story_object(p[2])
 		if (obj) then
 			obj:set_npc_position(position)
 		end
@@ -939,7 +939,7 @@ function teleport_npc_pos(actor,npc,p)
 	end
 
 	if (p[4]) then
-		local obj = get_story_object_id(p[4])
+		local obj = get_story_object(p[4])
 		if (obj) then
 			obj:set_npc_position(pos)
 		end
@@ -4352,8 +4352,8 @@ function yan_gluk (actor, npc)
 	local sound_obj_l		= xr_sound.get_safe_sound_object( [[affects\psy_blackout_l]] )
     local sound_obj_r		= xr_sound.get_safe_sound_object( [[affects\psy_blackout_r]] )
         
-	sound_obj_l:play_no_feedback(actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
-	sound_obj_r:play_no_feedback(actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
+	sound_obj_l:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
+	sound_obj_r:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
 	level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
 end
 
@@ -4377,8 +4377,8 @@ function x18_gluk (actor, npc)
         local sound_obj_r		= xr_sound.get_safe_sound_object( [[affects\psy_blackout_r]] )
         local snd_obj			= xr_sound.get_safe_sound_object( [[affects\tinnitus3a]] )
 		snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
-		sound_obj_l:play_no_feedback(actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
-		sound_obj_r:play_no_feedback(actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
+		sound_obj_l:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set(-1, 0, 1), 1.0)
+		sound_obj_r:play_no_feedback(db.actor, sound_object.s2d, 0, vector():set( 1, 0, 1), 1.0)
 	level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
 end
 
@@ -4393,6 +4393,31 @@ end
 function end_radar_dream(actor, npc)
 	db.actor:give_info_portion("bun_patrol_start")
 end
+
+function end_warlab_dream(actor, npc)
+	db.actor:give_info_portion("end_warlab_dream")
+end
+
+---------------------------------------------------------
+-- Sarcofag2
+---------------------------------------------------------
+
+function aes_earthshake (npc)
+	local snd_obj = xr_sound.get_safe_sound_object([[ambient\earthquake]])
+	snd_obj:play_no_feedback(db.actor, sound_object.s2d, 0, vector(), 1.0)
+	level.add_cam_effector("camera_effects\\earthquake.anm", 1974, false, "")
+    --set_postprocess ("scripts\\earthshake.ltx")
+end
+
+function oso_init_dialod ()
+	-- local oso = level_object_by_sid(osoznanie)
+	-- db.actor:run_talk_dialog(oso)
+end
+
+function warlab_stop_particle(actor, npc, p)
+	db.actor:stop_particles("anomaly2\\control_monolit_holo", "link")
+end
+
 function play_snd_from_obj(actor, npc, p)
 	if p[1] and p[2] then
 		local snd_obj = xr_sound.get_safe_sound_object(p[2])
@@ -4421,3 +4446,18 @@ function erase_pstor_ctime(actor,npc,p)
 	
 	xr_logic.save_ctime(db.actor,p[1],nil)
 end
+
+-- Shows progress bar health for last hit enemy with db.storage[id].show_health = true
+-- param 1: Story ID 
+-- param 2: true or false; default is true. True will set db.storage[id].show_health = true while false will remove custom static from screen
+function show_health(actor,npc,p)
+	if (p[2] == "false") then
+		ui_enemy_health.cs_remove()
+	else
+		local id = get_story_object_id(p[1])
+		local st = db.storage[id]
+		if (st) then 
+			st.show_health = true
+		end		
+	end
+end 
