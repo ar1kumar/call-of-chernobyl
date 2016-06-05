@@ -1,3 +1,9 @@
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
 [animpoint@bar_visitors_animp_gen]
 reach_movement = walk_noweap
 use_camp = false
@@ -412,3 +418,37 @@ turn_on_campfire = true
 cover_name = bar_visitors_animpoint_kamp9
 use_camp = true
 turn_on_campfire = true
+
+;Arnie
+[logic@bar_arena_manager]
+active = walker@bar_arena_manager
+suitable = {=check_npc_name(bar_arena_manager)} true
+prior = 200
+
+[walker@bar_arena_manager]:walker@generic
+path_walk = bar_arena_manager_walk
+path_look = bar_arena_manager_look
+meet = meet@bar_arena_manager
+
+[meet@bar_arena_manager]
+use = true
+close_anim = wait
+
+;Liolik
+[logic@bar_arena_guard]
+active = walker@bar_arena_guard
+suitable = {=check_npc_name(bar_arena_guard)} true
+prior = 200
+
+[walker@bar_arena_guard]:walker@generic
+path_walk = bar_arena_guard_walk
+path_look = bar_arena_guard_look
+meet = meet@bar_arena_guard
+
+[meet@bar_arena_guard]
+close_distance = 2
+close_victim = actor
+close_anim = guard
+use			    = false
+use_wpn		    = false
+abuse           = false

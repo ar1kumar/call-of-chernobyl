@@ -2845,3 +2845,47 @@ end
 function heavy_pockets_functor(actor,npc,p)
 	return has_alife_info("achieved_heavy_pockets")
 end
+
+------------------------------------------------------------------------------------
+-- Special functions for ARENA
+------------------------------------------------------------------------------------
+function bar_arena_actor_inside(actor,npc)
+	local t = db.zone_by_name["bar_arena_waiter"]
+	if t and db.actor then
+		if t:inside(db.actor:position()) then
+			return true
+		end
+	end
+	return false
+end
+
+function bar_arena_actor_fight(actor,npc)
+	local t = db.zone_by_name["bar_arena_sr"]
+	local tt = db.zone_by_name["bar_arena_waiter"]
+	if t and tt and db.actor then
+		if t:inside(db.actor:position()) and
+		   not tt:inside(db.actor:position())
+		then
+			return true
+		end
+	end
+	return false
+end
+
+function bar_arena_actor_outside(actor,npc)
+	local t = db.zone_by_name["bar_arena_waiter_out"]
+	if t and db.actor then
+		if t:inside(db.actor:position()) then
+			return true
+		end
+	end
+	return false
+end
+
+-- проверка, что актер мертв
+function actor_dead(actor, npc)
+    if db.actor and not db.actor:alive() then
+	    return true
+	end
+	return false
+end
