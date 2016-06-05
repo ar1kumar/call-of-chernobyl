@@ -131,6 +131,13 @@ function CreateTimeEvent(ev_id,act_id,timer,f,...)
 		ev_queue[ev_id].__size = ev_queue[ev_id].__size + 1
 	end
 end
+function RemoveTimeEvent(ev_id,act_id)
+	if (ev_queue[ev_id] and ev_queue[ev_id][act_id]) then 
+		ev_queue[ev_id][act_id] = nil
+		ev_queue[ev_id].__size = ev_queue[ev_id].__size - 1
+	end
+end
+
 function ProcessEventQueue(force)
 	if has_alife_info("sleep_active") then
 		return 
