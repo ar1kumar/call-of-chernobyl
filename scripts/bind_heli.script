@@ -202,7 +202,7 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	end 
 	
 	self.heli_fire.enemy = enemy
-	self.heli_fire:update_hit()
+	--self.heli_fire:update_hit()
 	
 	if self.st.hit then
 		xr_logic.issue_event( self.object, self.st.hit, "hit_callback", self.object, power, nil, enemy, nil )
@@ -238,6 +238,8 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 			end
 		end
 	end
+	
+	SendScriptCallback("heli_on_hit_callback",self.object,power,nil,enemy,nil)
 end
 
 function heli_binder:on_point( distance, position, path_idx )

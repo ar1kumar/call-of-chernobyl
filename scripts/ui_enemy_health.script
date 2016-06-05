@@ -1,0 +1,63 @@
+--[[
+ui_enemy_health allows the ability to show health progress of last hit enemy if they have db.storage[id].show_health = true
+
+author: Alundaio
+--]]
+
+local progress = nil
+
+function on_game_start()
+	RegisterScriptCallback("monster_on_hit_callback",on_hit)
+	RegisterScriptCallback("npc_on_hit_callback",on_hit)
+	RegisterScriptCallback("heli_on_hit_callback",on_hit)
+end 
+
+function on_hit(obj,power,dir,who,bi)
+	if (who == nil or who:id() ~= 0) then 
+		return 
+	end
+	
+	local st = db.storage[obj:id()]
+	if not (st) then 
+		return 
+	end 
+	
+	if not (st.show_health) then
+		-- show health progress for all objects hit by actor if option is enabled
+		if (axr_main.config:GetValue("mm_options","enable_show_enemy_health",1,false) == false) then
+			return 
+		end
+	end
+	
+	local hud = get_hud()
+	local cs = hud:GetCustomStatic("cs_enemy_health") 
+	if (cs == nil) then 
+		hud:AddCustomStatic("cs_enemy_health", true)
+		local xml = CScriptXmlInit()
+		xml:ParseFile("ui_enemy_health.xml")
+		cs = hud:GetCustomStatic("cs_enemy_health")
+		local w = cs:wnd()
+		progress = xml:InitProgressBar("enemy_health", w)
+	end
+	
+	local is_heli = IsHelicopter(nil,obj:clsid())
+	local v = is_heli and obj:GetfHealth() or obj.health or 0
+
+	if (v > 0.005) then 
+		progress:Show(true)
+		progress:SetProgressPos(v*100)
+		cs:wnd():TextControl():SetText(is_heli and "Helicopter" or obj:character_name())
+	else
+		progress = nil
+		hud:RemoveCustomStatic("cs_enemy_health")
+	end
+end
+
+function cs_remove()
+	progress = nil
+	local hud = get_hud()
+	local cs = hud:GetCustomStatic("cs_enemy_health") 
+	if (cs) then
+		hud:RemoveCustomStatic("cs_enemy_health")
+	end
+end

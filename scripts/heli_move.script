@@ -125,6 +125,7 @@ function heli_move:reset_scheme( loading )
 			self.heli_fire:update_enemy_state()
 		end
 		self:update_movement_state()
+		--[[
         if self.a.show_health then
             self.heli_fire:cs_remove()
             self.heli_fire.show_health = true
@@ -133,6 +134,10 @@ function heli_move:reset_scheme( loading )
             self.heli_fire.show_health = false
             self.heli_fire:cs_remove()
         end
+		--]]
+		-- new universal way to show enemy health
+		db.storage[self.object:id()].show_health = self.a.show_health
+
         self.heliObject:UseFireTrail(self.a.fire_trail)
 	end
 end

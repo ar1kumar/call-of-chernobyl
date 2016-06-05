@@ -920,7 +920,7 @@ function teleport_npc_lvid(actor,npc,p)
 	end
 	local position = level.vertex_position(vid)
 	if (p[2]) then
-		local obj = get_story_object_id(p[2])
+		local obj = get_story_object(p[2])
 		if (obj) then
 			obj:set_npc_position(position)
 		end
@@ -939,7 +939,7 @@ function teleport_npc_pos(actor,npc,p)
 	end
 
 	if (p[4]) then
-		local obj = get_story_object_id(p[4])
+		local obj = get_story_object(p[4])
 		if (obj) then
 			obj:set_npc_position(pos)
 		end
@@ -4446,3 +4446,18 @@ function erase_pstor_ctime(actor,npc,p)
 	
 	xr_logic.save_ctime(db.actor,p[1],nil)
 end
+
+-- Shows progress bar health for last hit enemy with db.storage[id].show_health = true
+-- param 1: Story ID 
+-- param 2: true or false; default is true. True will set db.storage[id].show_health = true while false will remove custom static from screen
+function show_health(actor,npc,p)
+	if (p[2] == "false") then
+		ui_enemy_health.cs_remove()
+	else
+		local id = get_story_object_id(p[1])
+		local st = db.storage[id]
+		if (st) then 
+			st.show_health = true
+		end		
+	end
+end 

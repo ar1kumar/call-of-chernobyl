@@ -505,10 +505,11 @@ end
 -- !!! НЕКОРРЕКТНО РАБОТАЕТ ДЛЯ ОБЬЕКТОВ В offline'e !!!
 -- !!! ДЛЯ ГАРАНТИИ ИСПОЛЬЗОВАТЬ one_obj_in_zone !!!
 function obj_in_zone(actor, zone, p)
-	local npc1
+	local sim = alife()
 	for i, v in pairs(p) do
-		npc1 = get_story_object_id(v)
-		if npc1 and zone:inside(alife():object(npc1).position) then
+		local id = get_story_object_id(v)
+		local se_obj = id and alife():object_by_id(id)
+		if se_obj and zone:inside(se_obj.position) then
 			return true
 		end
 	end
@@ -539,20 +540,21 @@ end
 -- * параметр не обязателен
 function one_obj_in_zone(actor, zone, p)
 	--local def_offline = (p[2] ~= "false") -- default (true) result if npc in offline
-	local obj1 = get_story_object_id(p[1])
-
-	if obj1 then -- npc is online
-		return zone:inside(alife():object(obj1).position)
+	local id = get_story_object_id(p[1])
+	local se_obj = id and alife():object(id)
+	if se_obj then -- npc is online
+		return zone:inside(se_obj.position)
 	else -- npc is offline
 		return (p[2] ~= "false") -- default (true) result if npc in offline
 	end
 end
 
 function story_obj_in_zone_by_name (actor, npc, p)
-	local obj = get_story_object_id(p[1])
+	local id = get_story_object_id(p[1])
+	local se_obj = id and alife():object(id)
 	local zone = db.zone_by_name[p[2]]
-	if obj and zone then -- npc is online
-		return zone:inside(alife():object(obj).position)
+	if se_obj and zone then -- npc is online
+		return zone:inside(se_obj.position)
 	end
 	return false
 end
@@ -752,14 +754,11 @@ end
 -- TODO: исправить ситуацию, когда выдается неправильный результат для обьектов, которые
 --       не успели проспавниться.
 function is_alive_all(actor, npc, p)
-	local npc1
+	local sim = alife()
 	for i, v in pairs(p) do
-		npc1 = get_story_object_id(v)
-		if npc1 == nil then
-			return false
-		end
-		npc1 = alife():object(npc1)
-		if npc1 and (not IsStalker(npc1) or not npc1:alive()) then
+		local id = get_story_object_id(v)
+		local se_obj = id and sim:object(id)
+		if se_obj and (not IsStalker(nil,se_obj:clsid()) or not se_obj:alive()) then
 			return false
 		end
 	end
@@ -770,14 +769,11 @@ end
 -- TODO: исправить ситуацию, когда выдается неправильный результат для обьектов, которые
 --       не успели проспавниться.
 function is_alive_one(actor, npc, p)
-	local npc1
+	local sim = alife()
 	for i, v in pairs(p) do
-		npc1 = get_story_object_id(v)
-		if npc1 == nil then
-			return false
-		end
-		npc1 = alife():object(npc1)
-		if npc1 and IsStalker(npc1) and npc1:alive() then
+		local id = get_story_object_id(v)
+		local se_obj = id and sim:object(id)
+		if se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() then
 			return true
 		end
 	end
@@ -788,23 +784,22 @@ end
 -- TODO: исправить ситуацию, когда выдается неправильный результат для обьектов, которые
 --       не успели проспавниться.
 function is_alive(actor, npc, p)
-	local npc1
-
+	local id
 	if npc == nil or (p and p[1]) then
-		npc1 = get_story_object_id(p[1])
+		id = get_story_object_id(p[1])
 	elseif (type(npc.id) == "number") then
-		npc1 = npc.id
+		id = npc.id
 	else
-		npc1 = npc:id()
+		id = npc:id()
 	end
 
 	if npc1 == nil then
 		return false
 	end
 
-	npc1 = alife():object(npc1)
+	local se_obj = id and alife():object(id)
 
-	if npc1 and IsStalker(npc1) and npc1:alive() then
+	if se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() then
 		return true
 	end
 
@@ -1599,11 +1594,9 @@ function check_bloodsucker_state(actor, npc, p)
 end
 
 function dist_to_story_obj_ge(actor, npc, p)
-	local story_id = p and p[1]
-	local story_obj_id = get_story_object_id(story_id)
-	if story_obj_id == nil then return true end
-	local se_obj = alife():object(story_obj_id)
-	return se_obj.position:distance_to(db.actor:position()) > p[2]
+	local id = db.actor and p and get_story_object_id(p[1])
+	local se_obj = id and alife():object(id)
+	return se_obj and se_obj.position:distance_to(db.actor:position()) > tonumber(p[2]) or false
 end
 
 function actor_has_nimble_weapon(actor, npc)

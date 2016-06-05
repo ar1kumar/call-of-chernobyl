@@ -959,7 +959,8 @@ function cfg_get_npc_and_zone(ini, section, field, npc)
 	if t then
 		local sim = alife()
 		if sim then
-			local se_obj = sim:object(get_story_object_id(t.v1))
+			local id = get_story_object_id(t.v1)
+			local se_obj = id and sim:object(id)
 			if se_obj then
 				t.npc_id = se_obj.id
 			else
