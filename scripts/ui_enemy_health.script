@@ -58,6 +58,13 @@ function on_hit(obj,power,dir,who,bi)
 			end
 		end
 		cs:wnd():TextControl():SetText(text)
+		
+		-- Auto-remove Custom Static after 30s unless hit again
+		RemoveTimeEvent("ui_enemy_health","remove_cs")
+		local function remove_me()
+			cs_remove()
+		end
+		CreateTimeEvent("ui_enemy_health","remove_cs",30*level.get_time_factor(),remove_me)
 	else
 		progress = nil
 		hud:RemoveCustomStatic("cs_enemy_health")
