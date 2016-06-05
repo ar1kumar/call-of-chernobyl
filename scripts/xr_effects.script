@@ -4455,7 +4455,7 @@ function show_health(actor,npc,p)
 		ui_enemy_health.cs_remove()
 	else
 		local id = get_story_object_id(p[1])
-		local st = db.storage[id]
+		local st = id and db.storage[id]
 		if (st) then 
 			st.show_health = true
 		end		
