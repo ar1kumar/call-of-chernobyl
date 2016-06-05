@@ -5,6 +5,7 @@ author: Alundaio
 --]]
 
 local progress = nil
+local last_id = nil
 
 function on_game_start()
 	RegisterScriptCallback("monster_on_hit_callback",on_hit)
@@ -13,10 +14,6 @@ function on_game_start()
 end 
 
 function on_hit(obj,power,dir,who,bi)
-	if (who == nil or who:id() ~= 0) then 
-		return 
-	end
-	
 	local st = db.storage[obj:id()]
 	if not (st) then 
 		return 
@@ -27,6 +24,20 @@ function on_hit(obj,power,dir,who,bi)
 		if (axr_main.config:GetValue("mm_options","enable_show_enemy_health",1,false) == false) then
 			return 
 		end
+	end
+	
+	-- in case object dies by something other than actor
+	if (last_id and last_id == obj:id()) then 
+		local cls = obj:clsid()
+		local is_heli = IsHelicopter(nil,cls)
+		local v = is_heli and obj:get_helicopter():GetfHealth() or obj.health or 0
+		if (v <= 0.005) then
+			cs_remove()
+		end
+	end
+	
+	if (who == nil or who:id() ~= 0) then 
+		return 
 	end
 	
 	local hud = get_hud()
@@ -60,18 +71,21 @@ function on_hit(obj,power,dir,who,bi)
 		cs:wnd():TextControl():SetText(text)
 		
 		-- Auto-remove Custom Static after 30s unless hit again
-		RemoveTimeEvent("ui_enemy_health","remove_cs")
+		RemoveTimeEvent("ui_enemy_health","cs_remove")
 		local function remove_me()
 			cs_remove()
 		end
-		CreateTimeEvent("ui_enemy_health","remove_cs",30*level.get_time_factor(),remove_me)
+		CreateTimeEvent("ui_enemy_health","cs_remove",30*level.get_time_factor(),remove_me)
+		last_id = obj:id()
 	else
+		last_id = nil
 		progress = nil
 		hud:RemoveCustomStatic("cs_enemy_health")
 	end
 end
 
 function cs_remove()
+	last_id = nil
 	progress = nil
 	local hud = get_hud()
 	local cs = hud:GetCustomStatic("cs_enemy_health") 
