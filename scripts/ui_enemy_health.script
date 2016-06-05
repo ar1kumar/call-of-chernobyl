@@ -40,13 +40,24 @@ function on_hit(obj,power,dir,who,bi)
 		progress = xml:InitProgressBar("enemy_health", w)
 	end
 	
-	local is_heli = IsHelicopter(nil,obj:clsid())
-	local v = is_heli and obj:GetfHealth() or obj.health or 0
-
+	local cls = obj:clsid()
+	local is_heli = IsHelicopter(nil,cls)
+	local v = is_heli and obj:get_helicopter():GetfHealth() or obj.health or 0
 	if (v > 0.005) then 
 		progress:Show(true)
 		progress:SetProgressPos(v*100)
-		cs:wnd():TextControl():SetText(is_heli and "Helicopter" or obj:character_name())
+		local text = ""
+		if (is_heli) then 
+			text = "Helicopter"
+		elseif (IsStalker(nil,cls)) then 
+			text = obj:character_name()
+		else 
+			local sid = get_object_story_id(obj:id())
+			if (sid) then 
+				text = game.translate_string(sid)
+			end
+		end
+		cs:wnd():TextControl():SetText(text)
 	else
 		progress = nil
 		hud:RemoveCustomStatic("cs_enemy_health")
