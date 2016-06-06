@@ -1,3 +1,16 @@
+-- npcs and trade and repair
+function npc_is_trader(a,b)
+    local npc = who_is_npc(a, b)
+    get_hud():HideActorMenu()
+    npc:start_trade(db.actor)
+end
+ 
+function npc_is_tech(a,b)
+    local npc = who_is_npc(a,b)
+    get_hud():HideActorMenu()
+    npc:start_upgrade(db.actor)
+end
+
 -- Dynamic Ordered Task dialog
 -- AVAILABLE TASKS
 function generate_available_tasks(a,b)
