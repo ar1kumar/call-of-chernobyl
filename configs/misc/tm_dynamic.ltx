@@ -31,7 +31,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_1_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 on_complete = %=reward_item_cost_mult_and_remove(simulation_task_1_fetch:1) =reward_stash(true) =remove_fetch_item(simulation_task_1_fetch) =inc_task_stage(simulation_task_1) =pstor_reset(simulation_task_1_fetch)%
 on_fail = %=pstor_reset(simulation_task_1_fetch)%
 reward_item = ammo_5.56x45_ap:ammo_5.56x45_ap:ammo_12x70_buck:ammo_12x70_buck
@@ -58,7 +58,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_2_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 on_complete = %=reward_item_cost_mult_and_remove(simulation_task_2_fetch:2.5) =reward_stash(true) =remove_fetch_item(simulation_task_2_fetch) =inc_task_stage(simulation_task_2) =pstor_reset(simulation_task_2_fetch)%
 on_fail = %=pstor_reset(simulation_task_2_fetch)%
 condlist_0 = {!task_giver_alive(simulation_task_2)} fail
@@ -84,7 +84,7 @@ repeat_timeout = 259200
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_3_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 on_complete = %=reward_item_cost_mult_and_remove(simulation_task_3_fetch:6:6) =reward_stash(true) =inc_task_stage(simulation_task_3)%
 reward_item = ammo_9x39_ap:ammo_9x39_ap:ammo_9x39_ap:ammo_5.56x45_ap:ammo_5.56x45_ap
 condlist_0 = {!task_giver_alive(simulation_task_3)} fail
@@ -109,7 +109,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_4_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 repeat_timeout = 259200
 on_complete = %=complete_task_inc_goodwill(50:stalker) =remove_fetch_item(simulation_task_4_fetch) =reward_stash(true) =inc_task_stage(simulation_task_4)%
 on_fail = %=fail_task_dec_goodwill(25:stalker)%
@@ -136,7 +136,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_5_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 repeat_timeout = 259200
 on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(simulation_task_5_fetch:1.2) =reward_stash(true) =inc_task_stage(simulation_task_5)%
 on_fail = %=fail_task_dec_goodwill(25:stalker)%
@@ -162,7 +162,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_6_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 repeat_timeout = 259200
 on_complete = %=reward_item_cost_mult_and_remove(simulation_task_6_fetch:1.5) =reward_stash(true) =inc_task_stage(simulation_task_6)%
 condlist_0 = {!task_giver_alive(simulation_task_6)} fail
@@ -277,7 +277,7 @@ title = simulation_task_11_name
 descr = simulation_task_11_text
 job_descr = simulation_task_11_about
 task_complete_descr = simulation_task_11_finish
-precondition = {=random_chance(25)} true, false
+precondition = true
 repeat_timeout = 259200
 status_functor = bounty_task
 target_functor = general_bounty_task
@@ -300,7 +300,7 @@ title = simulation_task_12_name
 descr = simulation_task_12_text
 job_descr = simulation_task_12_about
 task_complete_descr = simulation_task_12_finish
-precondition = {=random_chance(25)} true, false
+precondition = true
 repeat_timeout = 259200
 status_functor = bounty_task
 target_functor = general_bounty_task
@@ -332,7 +332,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_13_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 on_complete = %=reward_item_cost_mult_and_remove(simulation_task_13_fetch:1) =reward_stash(true) =remove_fetch_item(simulation_task_13_fetch) =inc_task_stage(simulation_task_13) =pstor_reset(simulation_task_13_fetch)%
 on_fail = %=pstor_reset(simulation_task_13_fetch)%
 reward_item = ammo_9x39_pab9:ammo_9x39_pab9:ammo_5.45x39_ap:ammo_vog-25
@@ -359,7 +359,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_14_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 on_complete = %=reward_item_cost_mult_and_remove(simulation_task_14_fetch:1) =reward_stash(true) =remove_fetch_item(simulation_task_14_fetch) =inc_task_stage(simulation_task_14) =pstor_reset(simulation_task_14_fetch)%
 on_fail = %=pstor_reset(simulation_task_14_fetch)%
 reward_item = ammo_5.45x39_ap:ammo_5.45x39_fmj:ammo_5.45x39_fmj:ammo_9x19_pbp
@@ -385,7 +385,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_15_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 repeat_timeout = 259200
 on_complete = %=complete_task_inc_goodwill(50:army) =remove_fetch_item(simulation_task_15_fetch) =reward_stash(true) =inc_task_stage(simulation_task_15)%
 on_fail = %=fail_task_dec_goodwill(25:army)%
@@ -412,7 +412,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = simulation_task_16_fetch_finish
-precondition = {=random_chance(60)} true, false
+precondition = true
 repeat_timeout = 259200
 on_complete = %=complete_task_inc_goodwill(50:bandit) =reward_item_cost_mult_and_remove(simulation_task_16_fetch:2) =reward_stash(true) =inc_task_stage(simulation_task_16)%
 on_fail = %=fail_task_dec_goodwill(25:bandit)%
@@ -431,7 +431,7 @@ title = simulation_task_17_name
 descr = simulation_task_17_text
 job_descr = simulation_task_17_about
 task_complete_descr = simulation_task_17_finish
-precondition = {=random_chance(25)} true, false
+precondition = true
 repeat_timeout = 259200
 status_functor = bounty_task
 target_functor = general_bounty_task
@@ -455,7 +455,7 @@ title = simulation_task_18_name
 descr = simulation_task_18_text
 job_descr = simulation_task_18_about
 task_complete_descr = simulation_task_18_finish
-precondition = {=random_chance(25)} true, false
+precondition = true
 repeat_timeout = 259200
 status_functor = bounty_task
 target_functor = general_bounty_task

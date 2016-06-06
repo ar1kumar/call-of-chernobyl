@@ -26,7 +26,7 @@ job_descr = mil_smart_terrain_7_10_freedom_trader_stalker_task_1_about
 fetch_descr = mil_smart_terrain_7_10_freedom_trader_stalker_task_1_fetch_about
 fetch_func = %=setup_generic_fetch_task(mil_smart_terrain_7_10_freedom_trader_stalker_task_1_fetch:12:mutant_part_boar_chop:mutant_part_dog_meat:mutant_part_flesh_meat:mutant_part_psevdodog_meat:mutant_part_tushkano_meat)%
 stage_complete = 1
-; precondition = {=random_chance(25)} true, false
+; precondition = true
 repeat_timeout = 259200
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
@@ -89,7 +89,7 @@ title = mil_smart_terrain_7_7_freedom_leader_stalker_task_3_name
 descr = mil_smart_terrain_7_7_freedom_leader_stalker_task_3_text
 job_descr = mil_smart_terrain_7_7_freedom_leader_stalker_task_3_about
 task_complete_descr = mil_smart_terrain_7_7_freedom_leader_stalker_task_3_finish
-precondition = {=random_chance(25)} true, false
+precondition = true
 repeat_timeout = 259200
 status_functor = bounty_task
 target_functor = general_bounty_task
@@ -109,7 +109,7 @@ title = mil_smart_terrain_7_7_freedom_leader_stalker_task_4_name
 descr = mil_smart_terrain_7_7_freedom_leader_stalker_task_4_text
 job_descr = mil_smart_terrain_7_7_freedom_leader_stalker_task_4_about
 task_complete_descr = mil_smart_terrain_7_7_freedom_leader_stalker_task_4_finish
-precondition = {=random_chance(25)} true, false
+precondition = true
 repeat_timeout = 259200
 status_functor = bounty_task
 target_functor = general_bounty_task
@@ -136,7 +136,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mil_smart_terrain_7_7_freedom_leader_stalker_task_5_fetch_finish
-; precondition = {=random_chance(25)} true, false
+; precondition = true
 repeat_timeout = 259200
 on_complete = %=complete_task_inc_goodwill(50:freedom) =reward_item_cost_mult_and_remove(mil_smart_terrain_7_7_freedom_leader_stalker_task_5_fetch:1.2) =reward_stash(true) =inc_task_stage(mil_smart_terrain_7_7_freedom_leader_stalker_task_5)%
 on_fail = %=fail_task_dec_goodwill(25:freedom)%

@@ -52,7 +52,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = zat_a2_stalker_barmen_task_2_fetch_finish
-; precondition = {=random_chance(25)} true, false
+; precondition = true
 repeat_timeout = 259200
 on_complete = %=reward_random_money(4500:12000) =reward_stash(true) =remove_fetch_item(zat_a2_stalker_barmen_task_2_fetch) =inc_task_stage(zat_a2_stalker_barmen_task_2)%
 reward_item = vodka
@@ -75,7 +75,7 @@ target_functor = general_bounty_task
 stage_complete = 1
 on_init = %=on_init_bounty_hunt(zat_a2_stalker_barmen_task_3:army)%
 on_complete = %=reward_stash(true) =inc_task_stage(zat_a2_stalker_barmen_task_3)%
-precondition = {=random_chance(25)} true, false
+precondition = true
 reward_item = af_baloon:vodka
 
 
@@ -90,7 +90,7 @@ title = zat_b7_bandit_boss_sultan_task_1_name
 descr = zat_b7_bandit_boss_sultan_task_1_text
 job_descr = zat_b7_bandit_boss_sultan_task_1_about
 task_complete_descr = zat_b7_bandit_boss_sultan_task_1_finish
-precondition = {=random_chance(75)} true, false
+precondition = true
 repeat_timeout = 86400
 status_functor = bounty_task
 target_functor = general_bounty_task

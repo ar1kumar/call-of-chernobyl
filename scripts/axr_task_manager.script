@@ -4,6 +4,9 @@
 
 --actor_tagged_squad_by_id = {}
 bounties_by_id = {}
+available_tasks = {}
+ongoing_tasks = {} 
+finished_tasks = {}
 -----------------------------------------------------------------------------
 --								PRIVATE
 -----------------------------------------------------------------------------
@@ -60,11 +63,6 @@ local function squad_on_npc_death(squad,se_npc,killer)
 	end
 end
 
-local skipped_tasks = {}
-local function actor_on_leave_dialog()
-	empty_table(skipped_tasks)
-end 
-
 local function save_state(m_data)
 	m_data.bounties_by_id = bounties_by_id
 end 
@@ -81,10 +79,8 @@ end
 function on_game_start()
 	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
 	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
-	--RegisterScriptCallback("monster_on_death_callback",npc_on_death_callback)
 	RegisterScriptCallback("monster_on_hit_callback",npc_on_hit_callback)
 	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
-	RegisterScriptCallback("actor_on_leave_dialog",actor_on_leave_dialog)
 	RegisterScriptCallback("save_state",save_state)
 	RegisterScriptCallback("load_state",load_state)
 end
@@ -95,12 +91,83 @@ end
 -- automated ordered tasks
 -- tasks must be named <section>_task_<number>
 -- m_trader (ie. Sidorovich) use npc:name() instead
-local skipped_tasks = {}
-function get_first_available_task(npc,skipped_id,is_sim)
-    if (skipped_id) then
-        skipped_tasks[skipped_id] = true
-        return
+function generate_available_tasks(npc,is_sim)
+	local id = npc:id()
+	if not (available_tasks[id]) then 
+		available_tasks[id] = {}
+	else
+		clear_table(available_tasks[id])
+	end
+	
+    local tm = task_manager.get_task_manager()
+    local task_info = tm.task_info
+   
+    local sec
+    local st = db.storage[npc:id()]
+	
+	-- Randomly not offer any quests at all for sim npcs
+	if (is_sim and st.dyn_quest_rand == nil) then 
+		if (math.random() < 0.3) then 
+			st.dyn_quest_rand = "nil"
+			return
+		end
+	end
+	
+    if (st and st.ini and st.section_logic) then
+        sec = st.ini:r_string_ex(st.section_logic,"task_section")
+        if (sec) then
+            sec = sec .. "_task_"
+        end
     end
+   
+    if not (sec) then
+        sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
+    end
+   
+    local task_id = sec.."1"
+   
+	local t
+    local count = 1
+    while (task_manager.task_ini:section_exist(task_id)) do
+        --printf("task_id=%s skipped=%s",task_id,skipped_tasks[task_id])
+        if (task_info[task_id] == nil and xr_conditions.has_completed_task_prerequisites(nil,nil,{task_id})) then
+			if (is_sim) then
+				local p = alun_utils.parse_list(task_manager.task_ini,task_id,"sim_communities",true)
+				if (p[character_community(npc)] == true) then
+					if not (t) then 
+						t = {} 
+					end
+					
+					if (st.dyn_quest_rand == task_id) then
+						table.insert(available_tasks[id],task_id)
+						return
+					elseif (st.dyn_quest_rand == nil) then
+						table.insert(t,task_id)
+					end
+				end
+			else
+				table.insert(available_tasks[id],task_id)
+			end
+        end
+        count = count + 1
+        task_id = sec..tostring(count)
+    end
+	
+	-- randomize available tasks from sim npcs and only offer 1 job; remembing this job until NPC go offline
+	if (t and #t > 0) then
+		st.dyn_quest_rand = t[math.random(#t)]
+		table.insert(available_tasks[id],st.dyn_quest_rand)
+	end
+end
+
+function generate_ongoing_tasks(npc,is_sim)
+	local id = npc:id()
+	if not (ongoing_tasks[id]) then 
+		ongoing_tasks[id] = {}
+	else
+		clear_table(ongoing_tasks[id])
+	end
+	
     local tm = task_manager.get_task_manager()
     local task_info = tm.task_info
    
@@ -121,28 +188,32 @@ function get_first_available_task(npc,skipped_id,is_sim)
    
     local count = 1
     while (task_manager.task_ini:section_exist(task_id)) do
-        --printf("task_id=%s skipped=%s",task_id,skipped_tasks[task_id])
-        if (skipped_tasks[task_id] ~= true and task_info[task_id] == nil and xr_conditions.has_completed_task_prerequisites(nil,nil,{task_id})) then
---          if (skip) then
---              skipped_tasks[task_id] = true
---              return
---          else
+		if (db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < (task_manager.task_ini:r_float_ex(task_id,"stage_complete") or 255)) then
+            if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
                 if (is_sim) then
-                    local p = alun_utils.parse_list(task_manager.task_ini,task_id,"sim_communities",true)
-                    if (p[character_community(npc)] == true) then
-                        return task_id
-                    end
+					if (task_info[task_id].task_giver_id) then
+						if (npc:id() == task_info[task_id].task_giver_id) then
+							table.insert(ongoing_tasks[id],task_id)
+						end
+					end
                 else
-                    return task_id
+                    table.insert(ongoing_tasks[id],task_id)
                 end
---          end
+            end
         end
         count = count + 1
         task_id = sec..tostring(count)
     end
 end
 
-function get_first_finished_task(npc,is_sim)
+function generate_finished_tasks(npc,is_sim)
+	local id = npc:id()
+	if not (finished_tasks[id]) then 
+		finished_tasks[id] = {}
+	else
+		clear_table(finished_tasks[id])
+	end
+	
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
 	
@@ -164,40 +235,22 @@ function get_first_finished_task(npc,is_sim)
 	
 	local count = 1
 	while (task_manager.task_ini:section_exist(task_id)) do
-	--	printf("get_first_finished_task task_id=%s",task_id)
 		if (db.actor:get_task(task_id, true) ~= nil and task_info[task_id] and task_info[task_id].stage ~= nil and task_info[task_id].stage == (task_manager.task_ini:r_float_ex(task_id,"stage_complete") or 255)) then
-			--printf("get_first_finished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
 			if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
 				if (is_sim) then 
 					if (task_info[task_id].task_giver_id) then 
 						if (npc:id() == task_info[task_id].task_giver_id) then 
-							return task_id
+							table.insert(finished_tasks[id],task_id)
 						end 
-						--[[
-						local se_obj = alife():object(npc:id())
-						if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then 
-							return task_id
-						end
-						--]]
 					end
 				else 
-					return task_id
+					table.insert(finished_tasks[id],task_id)
 				end
 			end
 		end
 		count = count + 1
 		task_id = sec..tostring(count)
 	end
-end
-
-function set_finished_task_complete(npc,is_sim)
-	local task_id = get_first_finished_task(npc,is_sim)
-	if not (task_id) then
-		printf("WARNING: axr_task_manager.set_finished_task_complete: no task %s",task_id)
-		return 
-	end 
-
-	task_manager.get_task_manager():set_task_completed(task_id)
 end
 
 function trigger_fetch_func(task_id)
@@ -208,18 +261,6 @@ function trigger_fetch_func(task_id)
 	end
 end 
 
-function get_task_job_description(task)
-	return task_manager.task_ini:r_string_ex(task,"job_descr")
-end 
-
-function get_fetch_task_description(task)
-	return task_manager.task_ini:r_string_ex(task,"fetch_descr")
-end 
-
-function get_task_complete_text(task)
-	return task_manager.task_ini:r_string_ex(task,"task_complete_descr")
-end
-
 function is_task_on_complete_stage(task)
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
@@ -227,24 +268,6 @@ function is_task_on_complete_stage(task)
 		return false 
 	end 
 	return task_info[task_id].stage ~= nil and task_info[task_id].stage == (task_manager.task_ini:r_float_ex(task,"stage_complete") or 255)
-end
-
-function npc_has_task_to_give(npc,is_sim)
-	return get_first_available_task(npc,nil,is_sim) ~= nil
-end
-
-function npc_give_first_available_ordered_task(npc,is_sim)
-	local new_task = get_first_available_task(npc,nil,is_sim)
-	if not (new_task) then 
-		return 
-	end 
-	local se_obj = npc and alife():object(npc:id())
-	local giver_id = se_obj and se_obj.id --(se_obj.group_id ~= 65535 and se_obj.group_id or se_obj.id)
-	task_manager.get_task_manager():give_task(new_task,giver_id)
-end
-
-function clear_skipped_tasks()
-	empty_table(skipped_tasks)
 end
 
 function is_task_giver_valid(task)
@@ -265,80 +288,4 @@ function is_task_giver_valid(task)
 	end
 
 	return true
-end
-
--- Task reversal
-local skipped_cancel = {}
-function skip_cancel(skipped_id)
-    if (skipped_id) then
-        skipped_cancel[skipped_id] = true
-    end
-    return
-end
-
-function get_first_unfinished_task(npc,is_sim)
-    local tm = task_manager.get_task_manager()
-    local task_info = tm.task_info
-   
-    local sec
-    local st = db.storage[npc:id()]
-    if (st and st.ini and st.section_logic) then
-        sec = st.ini:r_string_ex(st.section_logic,"task_section")
-        if (sec) then
-            sec = sec .. "_task_"
-        end
-        --printf("sec = %s")
-    end
-   
-    if not (sec) then
-        sec = is_sim and "simulation_task_" or npc:section() ~= "m_trader" and npc:section().."_task_" or npc:name().."_task_"
-    end
- 
-    local task_id = sec.."1"
-   
-    local count = 1
-    while (task_manager.task_ini:section_exist(task_id)) do
-        --printf("get_first_unfinished_task task_id=%s",task_id)
---      if (skipped_cancel[task_id] ~= true and db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < task_manager.task_ini:r_float_ex(task_id,"stage_complete")) then
-		if (skipped_cancel[task_id] ~= true and db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < (task_manager.task_ini:r_float_ex(task_id,"stage_complete") or 255)) then
-            --printf("get_first_unfinished_task task_id=%s is_sim=%s is_giver=%s",task_id,is_sim,alun_utils.load_var(npc,task_id.."_is_giver"))
-            if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
-                if (is_sim) then
-					if (task_info[task_id].task_giver_id) then
-						if (npc:id() == task_info[task_id].task_giver_id) then
-							return task_id
-						end
-						--[[
-						local se_obj = alife():object(npc:id())
-						if (se_obj and se_obj.group_id ~= 65535 and se_obj.group_id == task_info[task_id].task_giver_id) then
-							return task_id
-						end
-						--]]
-					end
-                else
-                    return task_id
-                end
-            end
---      else
---          skipped_cancel[task_id] = true
-        end
-        count = count + 1
-        task_id = sec..tostring(count)
-    end
-end
- 
-function set_cancel_task_complete(task_id)
-    if not (task_id) then
-        printf("WARNING: axr_task_manager.set_cancel_task_complete: no task %s",task_id)
-        return
-    end
-    task_manager.get_task_manager():set_task_cancelled(task_id)
-end
- 
-function get_task_cancel_text(task, text)
-    return task_manager.task_ini:r_string_ex(task, text)
-end
- 
-function clear_skipped_cancel()
-    empty_table(skipped_cancel)
 end
