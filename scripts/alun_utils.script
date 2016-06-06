@@ -701,23 +701,6 @@ function debug_write(output,trace)
 	end 
 end
 
-function str_format(str,...)
-	if not (str) then
-		return
-	end
-	local p = {...}
-	local rep
-	local new_str = ""
-	for k,v in pairs(p) do
-		rep = str_explode(v,"=")
-
-		if (rep[1] and rep[2]) then
-			str = str:gsub("("..tostring(rep[1])..")",tostring(rep[2]))
-		end
-	end
-	return str
-end
-
 function is_trader(...)
 	local p = {...}
 	if p[1]:character_community() == "trader" or p[1]:clsid() == clsid.script_trader or p[1]:clsid() == clsid.trader then

@@ -439,10 +439,7 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 						npc:give_info_portion(infop.name)
 					else
 						if not ( has_alife_info(infop.name)  ) then
-							actor:give_info_portion(infop.name)
-							--if (xrs_debug_tools and xrs_debug_tools.actor_info) then
-							--	xrs_debug_tools.actor_info[infop.name] = true
-							--end
+							give_info(infop.name)
 						end
 					end
 				else
@@ -452,9 +449,6 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 						if has_alife_info(infop.name) then
 							--printf("*INFO [disabled]*: npc='%s' id='%s'", actor:name(),infop.name)
 							disable_info(infop.name)
-							--if (xrs_debug_tools and xrs_debug_tools.actor_info) then
-							--	xrs_debug_tools.actor_info[infop.name] = nil
-							--end
 						end
 					end
 				end
@@ -493,7 +487,7 @@ function switch_to_section(npc, ini, section)
 		--printf("section = [%s]3", tostring(section))
 		return false
 	end
-
+	
 	--printf("[%s] switch to section [%s] %s", npc:name(), tostring(section), device():time_global())
 
 	if active_section then

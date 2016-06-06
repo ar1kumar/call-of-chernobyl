@@ -23,8 +23,8 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 
 local toggle_hud_list = 	{
 							["top"]  = { "feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
-							["left"] = { "actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
-							["right"] = { "planner_hud", "gulag_info_hud", "position_hud", "heli_hud", "wounded_hud","corpse_hud"}
+							["left"] = { "arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
+							["right"] = { "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
 							}
 --------------------------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ function hud_tool:__init(custom_static)
 end
 
 function hud_tool:add_msg(text,value,...)
-	self.msg = self.msg..str_format(text..": %s\\n",value)
+	self.msg = self.msg..strformat(text..": %s\\n",value)
 end
 
 function hud_tool:set_header(header)
@@ -378,8 +378,6 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_hit_callback",actor_on_hit_callback)
 	--RegisterScriptCallback("on_level_changing",on_level_changing)
 	
-	actor_info = {}
-
 	local sect = "plugin"
 	position_file = alun_utils.read_from_ini(ini,"plugin","file_save_position_info","string","positional_info.txt")
 
@@ -808,12 +806,12 @@ local stalker_data = {}
 
 function feel_touch_hud_show(hud)
 	local obj = get_debug_npc() or NEAREST_STALKER
-	hud:set_header("-[FEEL TOUCH]-")
+	hud:set_header(strformat("-[FEEL TOUCH for %s]-",obj and obj:name()))
 	if (obj and obj:alive()) then
 		local itr = function(id)
 			local o = id and alife():object(id)
 			if (o) then
-				hud:add_msg("-",strformat("ID=%s Name=%s",id,o:name()))
+				hud:add_msg("",strformat("ID=%s Name=%s",id,o:name()))
 			end
 		end
 		obj:iterate_feel_touch(itr)
@@ -989,6 +987,19 @@ function planner_hud_show(hud)
 	hud:display()
 end
 
+function arena_hud_show(hud) 
+	hud:set_header("-[Arena Debugger]-")
+	for name,zone in pairs(db.zone_by_name) do 
+		if (string.find(name,"arena")) then 
+			local st = db.storage[zone:id()]
+			if (st and st.active_section and st.active_section ~= "nil") then
+				hud:add_msg(zone:name(),strformat("ini=%s active_section=%s",st.ini_filename ~= "<custom_data>" and st.ini_filename or "",st.active_section))
+			end
+		end
+	end
+	hud:display()
+end
+
 function position_hud_show(hud)
 	if not (db.actor) then 
 		return 
@@ -1059,6 +1070,12 @@ function position_hud_show(hud)
 		end
 	end
 	hud:add_msg("GameObject IDs",_g_o_count)
+	
+	for name,zone in pairs(db.zone_by_name) do 
+		if (zone:inside(db.actor:position())) then
+			hud:add_msg("InsideZone",strformat("name=%s active_section=%s",zone:name(),db.storage[zone:id()] and db.storage[zone:id()].active_section))
+		end
+	end 
 	
 	hud:display()
 end
@@ -1635,13 +1652,6 @@ end
 
 --[[	Misc. Functions
 --]]
-
-function str_format(text,...)
-	if not (text) then return end
-	local i = 0
-	local p = {...}
-	return string.gsub(text,"%%s",function(a) i = i + 1 return tostring(p[i]) end)
-end
 
 function give_game_news(t,d)
 	if db.actor then
