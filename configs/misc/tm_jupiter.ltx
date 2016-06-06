@@ -50,7 +50,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = jup_b6_scientist_tech_task_2_fetch_finish
-; precondition = {=random_chance(25)} true, false
+; precondition = true
 repeat_timeout = 604800
 on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =reward_stash(true) =remove_fetch_item(jup_b6_scientist_tech_task_2_fetch) =inc_task_stage(jup_b6_scientist_tech_task_2)%
 on_fail = %=fail_task_dec_goodwill(25:ecolog:csky)%
@@ -90,7 +90,7 @@ title = jup_b220_trapper_task_2_name
 descr = jup_b220_trapper_task_2_text
 job_descr = jup_b220_trapper_task_2_about
 task_complete_descr = jup_b220_trapper_task_2_finish
-precondition = {=random_chance(25)} true, false
+precondition = true
 repeat_timeout = 259200
 status_functor = bounty_task
 target_functor = general_bounty_task
@@ -138,7 +138,7 @@ job_descr = jup_b220_trapper_task_4_about
 fetch_descr = jup_b220_trapper_task_4_fetch_about
 fetch_func = %=setup_rare_mutant_fetch_task(jup_b220_trapper_task_4_fetch)%
 stage_complete = 1
-; precondition = {=random_chance(25)} true, false
+; precondition = true
 repeat_timeout = 259200
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task

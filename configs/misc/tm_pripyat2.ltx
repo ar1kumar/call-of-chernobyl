@@ -44,7 +44,7 @@ title = pri_monolith_monolith_trader_stalker_task_2_name
 descr = pri_monolith_monolith_trader_stalker_task_2_text
 job_descr = pri_monolith_monolith_trader_stalker_task_2_about
 task_complete_descr = pri_monolith_monolith_trader_stalker_task_2_finish
-precondition = {=random_chance(25)} true, false
+precondition = true
 repeat_timeout = 172800
 status_functor = bounty_task
 target_functor = general_bounty_task
@@ -71,7 +71,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = pri_monolith_monolith_trader_stalker_task_3_fetch_finish
-; precondition = {=random_chance(25)} true, false
+; precondition = true
 repeat_timeout = 172800
 on_complete = %=complete_task_inc_goodwill(50:monolith) =reward_item_cost_mult_and_remove(pri_monolith_monolith_trader_stalker_task_3_fetch:1.2) =reward_stash(true) =inc_task_stage(pri_monolith_monolith_trader_stalker_task_3)%
 on_fail = %=fail_task_dec_goodwill(25:monolith)%
@@ -92,7 +92,7 @@ job_descr = pri_monolith_monolith_trader_stalker_task_4_about
 fetch_descr = pri_monolith_monolith_trader_stalker_task_4_fetch_about
 fetch_func = %=setup_generic_fetch_task(pri_monolith_monolith_trader_stalker_task_4_fetch:12:mutant_part_boar_chop:mutant_part_dog_meat:mutant_part_flesh_meat:mutant_part_psevdodog_meat:mutant_part_tushkano_meat)%
 stage_complete = 1
-; precondition = {=random_chance(25)} true, false
+; precondition = true
 repeat_timeout = 172800
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
@@ -141,7 +141,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = pri_monolith_monolith_trader_stalker_task_6_fetch_finish
-; precondition = {=random_chance(25)} true, false
+; precondition = true
 repeat_timeout = 172800
 on_complete = %=reward_random_money(4000:12000) =complete_task_inc_goodwill(50:monolith) =reward_stash(true) =remove_fetch_item(pri_monolith_monolith_trader_stalker_task_6_fetch) =inc_task_stage(pri_monolith_monolith_trader_stalker_task_6)%
 on_fail = %=fail_task_dec_goodwill(25:monolith)%

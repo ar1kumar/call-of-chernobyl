@@ -13,7 +13,7 @@ function opt_menu_on_init(menu)
 	menu.gameplay_options["heli_spawn"]			= {default=true, 	debug_only=false, 	typ="check"}
 	menu.gameplay_options["dynamic_news"]		= {default=true, 	debug_only=false, 	typ="check"}
 	menu.gameplay_options["sleep_deprived"]		= {default=false, 	debug_only=false, 	typ="check"}
-	menu.gameplay_options["excl_dist"]			= {default=30, 		debug_only=false, 	typ="list", list={10,20,30,40,50,60,70,80,90,100,200,500}}
+	menu.gameplay_options["excl_dist"]			= {default=30, 		debug_only=false, 	typ="list", list={0,10,20,30,40,50,60,70,80,90,100,200,500}}
 	
 	if (db.actor) then -- Options will only show while in-game
 		local l = ui_mm_faction_select.get_icon_list()

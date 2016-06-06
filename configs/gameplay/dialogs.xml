@@ -10,7 +10,7 @@
         <precondition>dialog_manager.uni_dialog_precond</precondition>
         <init_func>dialog_manager.init_new_dialog</init_func>
     </dialog>
-	<!------------- hostage_companion_task_1 ----------->
+	<!-- hostage_companion_task_1 -->
 	<dialog id="hostage_companion_task_1_dialog">
         <phrase_list>
 		    <phrase id="0">
@@ -32,33 +32,32 @@
 			</phrase>
         </phrase_list>
     </dialog>
-	<!-- Nuor -->
-    <dialog id="dm_ordered_task_cancel_dialog">
-        <precondition>dialogs.actor_has_unfinished_ordered_task</precondition>
-        <init_func>dialog_manager.dm_init_dynamic_task_cancel_dialog</init_func>
-    </dialog>
-    <dialog id="dm_sim_ordered_task_cancel_dialog">
-        <precondition>dialogs.actor_sim_has_unfinished_ordered_task</precondition>
-        <init_func>dialog_manager.dm_init_sim_dynamic_task_cancel_dialog</init_func>
-    </dialog>
 	<!-- Alundaio -->
 	<dialog id="dm_ordered_task_dialog">
 		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
         <init_func>dialog_manager.dm_init_dynamic_task_dialog</init_func>
     </dialog>	
-	<dialog id="dm_ordered_task_completed_dialog">
-		<precondition>dialogs.actor_has_finished_ordered_task</precondition>
-        <init_func>dialog_manager.dm_init_dynamic_task_completed_dialog</init_func>
-    </dialog>
 	<dialog id="dm_sim_ordered_task_dialog">
 		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
-		<!-- <precondition>dialogs.npc_sim_has_ordered_task_to_give</precondition> -->
         <init_func>dialog_manager.dm_init_sim_dynamic_task_dialog</init_func>
+    </dialog>
+	<dialog id="dm_ordered_task_completed_dialog">
+		<precondition>dialogs.actor_has_finished_task</precondition>
+        <init_func>dialog_manager.dm_init_dynamic_task_completed_dialog</init_func>
     </dialog>	
 	<dialog id="dm_sim_ordered_task_completed_dialog">
-		<precondition>dialogs.actor_sim_has_finished_ordered_task</precondition>
+		<precondition>dialogs.sim_actor_has_finished_task</precondition>
         <init_func>dialog_manager.dm_init_sim_dynamic_task_completed_dialog</init_func>
     </dialog>
+	<dialog id="dm_ordered_task_cancel_dialog">
+        <precondition>dialogs.actor_has_ongoing_task</precondition>
+        <init_func>dialog_manager.dm_init_dynamic_task_cancel_dialog</init_func>
+    </dialog>
+    <dialog id="dm_sim_ordered_task_cancel_dialog">
+        <precondition>dialogs.sim_actor_has_ongoing_task</precondition>
+        <init_func>dialog_manager.dm_init_sim_dynamic_task_cancel_dialog</init_func>
+    </dialog>
+	
 	<dialog id="dm_broker_dialog">
         <init_func>dialog_manager.dm_init_dynamic_broker_dialog</init_func>
     </dialog>
