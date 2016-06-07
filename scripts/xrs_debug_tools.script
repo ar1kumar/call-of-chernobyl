@@ -188,14 +188,6 @@ local function actor_on_update()
 		collectgarbage("step",STEP)
 	end
 
-	if (debug_god) then
-		db.actor.health = 1
-		db.actor.bleeding = 1
-		db.actor.psy_health = 1
-		db.actor.radiation = -1
-		db.actor.power = 1
-	end
-
 	if (crow_fun) then
 		local crow = level.object_by_id(crow_fun)
 		db.actor:set_actor_position(crow:position())
@@ -233,12 +225,6 @@ local function actor_on_update()
 	_G["xrs_debug_tools"][top_hud.."_show"](hud_display_top)
 	_G["xrs_debug_tools"][left_hud.."_show"](hud_display_left)
 	_G["xrs_debug_tools"][right_hud.."_show"](hud_display_right)
-end
-
-local function actor_on_hit_callback(binder,npc,amount,local_direction,who,bone_index)
-	if (debug_god) then
-		db.actor.health = 1
-	end
 end
 
 local function on_game_load()
@@ -388,7 +374,6 @@ function on_game_start()
 	RegisterScriptCallback("on_game_load",on_game_load)
 	RegisterScriptCallback("actor_on_update",actor_on_update)
 	RegisterScriptCallback("main_menu_on_keyboard",main_menu_on_keyboard)
-	RegisterScriptCallback("actor_on_hit_callback",actor_on_hit_callback)
 	--RegisterScriptCallback("on_level_changing",on_level_changing)
 	
 	local sect = "plugin"
