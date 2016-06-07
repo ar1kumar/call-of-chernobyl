@@ -57,12 +57,19 @@ function PsyAntenna:destroy				()
 	self.sound_obj_right:stop()
 	self.sound_obj_left:stop()
 	level.set_snd_volume				(self.snd_volume)
-	get_hud():enable_fake_indicators(false)
+	local hud = get_hud()
+	if (hud) then
+		hud:enable_fake_indicators(false)
+	end
 end
 function PsyAntenna:construct			()
 end
 function PsyAntenna:update_psy_hit(dt)
 	local hud = get_hud()
+	if not (hud) then
+		return 
+	end 
+	
 	local custom_static = hud:GetCustomStatic("cs_psy_danger")
 	if self.hit_intensity > 0.0001 then
 		if custom_static == nil and not self.no_static then
@@ -74,6 +81,7 @@ function PsyAntenna:update_psy_hit(dt)
 			hud:RemoveCustomStatic("cs_psy_danger")
 		end
 	end
+
 	if time_global() - self.hit_time > self.hit_freq then
 		self.hit_time					= time_global()
 
@@ -92,10 +100,10 @@ function PsyAntenna:update_psy_hit(dt)
 			psy_hit.draftsman 			= db.actor
 			local hit_value = ((power <= 1) and power) or 1
 			if self.hit_type == "chemical" then
-				get_hud():update_fake_indicators(2, hit_value)
+				hud:update_fake_indicators(2, hit_value)
 				psy_hit.type = hit.chemical_burn
 			else
-				get_hud():update_fake_indicators(3, hit_value)
+				hud:update_fake_indicators(3, hit_value)
 				psy_hit.type = hit.telepatic
 			end
 
@@ -350,7 +358,10 @@ function action_psy_antenna:zone_enter()
 	psy_antenna.global_state = state_inside
 
 	--включаем фейковый индикатор хита.
-	get_hud():enable_fake_indicators(true)
+	local hud = get_hud()
+	if (hud) then
+		hud:enable_fake_indicators(true)
+	end
 
 	psy_antenna.sound_intensity_base = psy_antenna.sound_intensity_base + self.st.intensity
 	psy_antenna.mute_sound_threshold = psy_antenna.mute_sound_threshold + self.st.mute_sound_threshold
@@ -382,7 +393,10 @@ function action_psy_antenna:zone_leave()
 	psy_antenna.global_state = state_outside
 	
 	--выключаем фейковый индикатор хита.
-	get_hud():enable_fake_indicators(false)
+	local hud = get_hud()
+	if (hud) then
+		hud:enable_fake_indicators(false)
+	end
 
 	psy_antenna.sound_intensity_base = psy_antenna.sound_intensity_base - self.st.intensity
 	psy_antenna.mute_sound_threshold = psy_antenna.mute_sound_threshold - self.st.mute_sound_threshold

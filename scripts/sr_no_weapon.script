@@ -45,9 +45,11 @@ function action_no_weapon:update( delta )
 	self:switch_state( actor )
 
 	local hud = get_hud()
-	local custom_static = hud:GetCustomStatic("can_use_weapon_now")
-	if custom_static ~= nil and game.get_game_time():diffSec(self.inited_time) > 30 then
-		hud:RemoveCustomStatic("can_use_weapon_now")
+	if (hud) then
+		local custom_static = hud:GetCustomStatic("can_use_weapon_now")
+		if custom_static ~= nil and game.get_game_time():diffSec(self.inited_time) > 30 then
+			hud:RemoveCustomStatic("can_use_weapon_now")
+		end
 	end
 end
 

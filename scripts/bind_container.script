@@ -29,7 +29,10 @@ function calculate_weight(se_inv_box,base)
 		for i,item in ipairs(transfer) do
 			inv_box:transfer_item(item,db.actor)
 		end
-		get_hud():HideActorMenu() -- this is needed or item won't be removed
+		local hud = get_hud()
+		if (hud) then
+			hud:HideActorMenu() -- this is needed or item won't be removed
+		end
 		--inv_box:use(db.actor)
 	end
 	
@@ -41,7 +44,10 @@ local function use_container(id,pid)
 	if (box) then
 		--level.map_add_object_spot(id, "ui_pda2_actor_box_location", "st_ui_pda_actor_box") -- debug
 		curBoxID = pid
-		get_hud():HideActorMenu()
+		local hud = get_hud()
+		if (hud) then
+			hud:HideActorMenu()
+		end
 		box:use(db.actor)
 		return true -- destroy timed event
 	end 

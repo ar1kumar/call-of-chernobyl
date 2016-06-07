@@ -923,6 +923,9 @@ end
 
 function CSurgeManager:displayIndicators(power)
 	local hud = get_hud()
+	if not (hud) then 
+		return 
+	end
 	local indik
 	if power>=0.8 then indik="red"
 	elseif power>=0.6 then indik="orange"

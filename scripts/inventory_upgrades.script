@@ -50,8 +50,10 @@ function lend_item_for_repair(itm,mechanic_name,rt)
 		RepairItemList[mechanic_name][itm:id()] = {gt = game.get_game_time(), rt = rt}
 
 		local hud = get_hud()
-		hud:HideActorMenu()
-		--hud:UpdateActorMenu()
+		if (hud) then
+			hud:HideActorMenu()
+			--hud:UpdateActorMenu()
+		end
 	end
 end
 

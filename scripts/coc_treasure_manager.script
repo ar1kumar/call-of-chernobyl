@@ -45,7 +45,10 @@ end
 local function actor_on_item_take_from_box(box,itm)
 	if (caches[box:id()] == true and box:is_inv_box_empty()) then
 		caches[box:id()] = false
-		get_hud():HideActorMenu()
+		local hud = get_hud()
+		if (hud) then
+			hud:HideActorMenu()
+		end
 		level.map_remove_object_spot(box:id(), "treasure")
 		xr_statistic.inc_founded_secrets_counter()
 		news_manager.send_treasure(1)

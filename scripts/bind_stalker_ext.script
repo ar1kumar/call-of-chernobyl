@@ -63,10 +63,12 @@ function actor_on_update(binder,delta)
 	-- Check HudMsg
 	if (ShowMessageTime) then
 		local hud = get_hud()
-		local custom_static = hud:GetCustomStatic("not_enough_money_mine")
-		if custom_static ~= nil and tg > ShowMessageTime then
-			hud:RemoveCustomStatic("not_enough_money_mine")
-			ShowMessageTime = nil
+		if (hud) then
+			local custom_static = hud:GetCustomStatic("not_enough_money_mine")
+			if custom_static ~= nil and tg > ShowMessageTime then
+				hud:RemoveCustomStatic("not_enough_money_mine")
+				ShowMessageTime = nil
+			end
 		end
 	end
 

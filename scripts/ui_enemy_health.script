@@ -41,6 +41,10 @@ function on_hit(obj,power,dir,who,bi)
 	end
 	
 	local hud = get_hud()
+	if not (hud) then 
+		return 
+	end
+	
 	local cs = hud:GetCustomStatic("cs_enemy_health") 
 	if (cs == nil) then 
 		hud:AddCustomStatic("cs_enemy_health", true)
@@ -88,7 +92,7 @@ function cs_remove()
 	last_id = nil
 	progress = nil
 	local hud = get_hud()
-	local cs = hud:GetCustomStatic("cs_enemy_health") 
+	local cs = hud and hud:GetCustomStatic("cs_enemy_health") 
 	if (cs) then
 		hud:RemoveCustomStatic("cs_enemy_health")
 	end

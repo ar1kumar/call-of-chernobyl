@@ -46,7 +46,10 @@ local hud_display_right
 -- Class to create hud tools
 class "hud_tool"
 function hud_tool:__init(custom_static)
-	get_hud():AddCustomStatic(custom_static,true)
+	local hud = get_hud() 
+	if (hud) then
+		hud:AddCustomStatic(custom_static,true)
+	end
 	self.custom_static = custom_static
 	self.header = ""
 	self.msg = ""
@@ -66,7 +69,7 @@ function hud_tool:display(disable)
 	end 
 	
 	local hud = get_hud()
-	local cus = hud:GetCustomStatic(self.custom_static)
+	local cus = hud and hud:GetCustomStatic(self.custom_static)
 	if (cus) then
 		cus:wnd():TextControl():SetText(self.msg)
 		self.msg = self.header and self.header .."\\n" or ""
@@ -75,7 +78,7 @@ end
 
 function hud_tool:clear()
 	local hud = get_hud()
-	local cus = hud:GetCustomStatic(self.custom_static)
+	local cus = hud and hud:GetCustomStatic(self.custom_static)
 	if (cus) then
 		cus:wnd():TextControl():SetText("")
 	end

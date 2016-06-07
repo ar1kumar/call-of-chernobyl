@@ -1,14 +1,19 @@
 -- npcs and trade and repair
 function npc_is_trader(a,b)
     local npc = who_is_npc(a, b)
-    get_hud():HideActorMenu()
-    npc:start_trade(db.actor)
+	local hud = get_hud()
+	if (hud) then
+		hud:HideActorMenu()
+		npc:start_trade(db.actor)
+	end
 end
  
 function npc_is_tech(a,b)
     local npc = who_is_npc(a,b)
-    get_hud():HideActorMenu()
-    npc:start_upgrade(db.actor)
+	if (hud) then
+		hud:HideActorMenu()
+		npc:start_upgrade(db.actor)
+	end
 end
 
 -- Dynamic Ordered Task dialog
@@ -178,8 +183,10 @@ end
 -- This function allows Player to see NPC inventory as if it was a corpse
 function free_trade_with_npc(a,b)
 	local npc = who_is_npc(a, b)
-	get_hud():HideActorMenu()
-	npc:use(db.actor)
+	if (hud) then
+		hud:HideActorMenu()
+		npc:use(db.actor)
+	end
 end
 
 -- Dynamic Broker dialog

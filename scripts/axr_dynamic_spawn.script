@@ -105,7 +105,9 @@ function actor_on_item_take_from_box(box,obj)
 
 	if (box:is_inv_box_empty()) then
 		local hud = get_hud()
-		hud:HideActorMenu()
+		if (hud) then
+			hud:HideActorMenu()
+		end
 		level.map_remove_object_spot(box:id(), "treasure")
 		--story_objects.get_story_objects_registry():unregister_by_story_id(sid)
 		--alife():release(alife():object(box:id()),true)

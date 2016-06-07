@@ -705,19 +705,21 @@ function cc_display_normal(cc_id, showtime, color)
 	local tmpl = colors[color]
 	local tmpls = tmpl .. "_shadow"
 	local hud = get_hud()
-	hud:AddCustomStatic(tmpls, true)
-	local custom_static_shadow = hud:GetCustomStatic(tmpls)
-	hud:AddCustomStatic(tmpl, true)
-	local custom_static = hud:GetCustomStatic(tmpl)
-	if custom_static_shadow ~= nil then
-		custom_static_shadow:wnd():TextControl():SetTextST(cc_id)
-		custom_static_shadow.m_endTime = time_ccend
+	if (hud) then
+		hud:AddCustomStatic(tmpls, true)
+		local custom_static_shadow = hud:GetCustomStatic(tmpls)
+		hud:AddCustomStatic(tmpl, true)
+		local custom_static = hud:GetCustomStatic(tmpl)
+		if custom_static_shadow ~= nil then
+			custom_static_shadow:wnd():TextControl():SetTextST(cc_id)
+			custom_static_shadow.m_endTime = time_ccend
+		end
+		if custom_static ~= nil then
+			custom_static:wnd():TextControl():SetTextST(cc_id)
+			custom_static.m_endTime = time_ccend
+		end
+		if color <= #cc_on then cc_on[color] = time_ccend * 1000 end
 	end
-	if custom_static ~= nil then
-		custom_static:wnd():TextControl():SetTextST(cc_id)
-		custom_static.m_endTime = time_ccend
-	end
-	if color <= #cc_on then cc_on[color] = time_ccend * 1000 end
 end
 
 local msgtypes = {"st_tip", "st_memo", "st_sending_msg", ""}

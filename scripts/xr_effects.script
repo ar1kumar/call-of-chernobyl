@@ -496,8 +496,10 @@ function disable_ui(actor, npc, p)
 	level.disable_input()
 	level.hide_indicators_safe()
 	local hud = get_hud()
-	hud:HideActorMenu()
-	hud:HidePdaMenu()
+	if (hud) then
+		hud:HideActorMenu()
+		hud:HidePdaMenu()
+	end
 	disable_actor_nightvision(nil,nil)
 	disable_actor_torch(nil,nil)
 end
@@ -519,8 +521,10 @@ function disable_ui_only(actor, npc)
 	level.disable_input()
 	level.hide_indicators_safe()
 	local hud = get_hud()
-	hud:HideActorMenu()
-	hud:HidePdaMenu()
+	if (hud) then
+		hud:HideActorMenu()
+		hud:HidePdaMenu()
+	end
 	disable_actor_nightvision(nil,nil)
 end
 
@@ -592,8 +596,10 @@ function disable_ui_inventory(actor, npc)
 	end
 
 	local hud = get_hud()
-	hud:HidePdaMenu()
-	hud:HideActorMenu()
+	if (hud) then
+		hud:HidePdaMenu()
+		hud:HideActorMenu()
+	end
 end
 
 function enable_ui(actor, npc, p)
@@ -2737,21 +2743,25 @@ end
 function add_cs_text(actor, npc, p)
 	if p[1] then
 		local hud = get_hud()
-		local cs_text = hud:GetCustomStatic("text_on_screen_center")
-		if cs_text then
-			hud:RemoveCustomStatic("text_on_screen_center")
+		if (hud) then
+			local cs_text = hud:GetCustomStatic("text_on_screen_center")
+			if cs_text then
+				hud:RemoveCustomStatic("text_on_screen_center")
+			end
+			hud:AddCustomStatic("text_on_screen_center", true)
+			cs_text = hud:GetCustomStatic("text_on_screen_center")
+			cs_text:wnd():TextControl():SetText(game.translate_string(p[1]))
 		end
-		hud:AddCustomStatic("text_on_screen_center", true)
-		cs_text = hud:GetCustomStatic("text_on_screen_center")
-		cs_text:wnd():TextControl():SetText(game.translate_string(p[1]))
 	end
 end
 
 function del_cs_text(actor, npc, p)
 	local hud = get_hud()
-	cs_text = hud:GetCustomStatic("text_on_screen_center")
-	if cs_text then
-		hud:RemoveCustomStatic("text_on_screen_center")
+	if (hud) then
+		cs_text = hud:GetCustomStatic("text_on_screen_center")
+		if cs_text then
+			hud:RemoveCustomStatic("text_on_screen_center")
+		end
 	end
 end
 

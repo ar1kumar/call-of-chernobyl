@@ -154,8 +154,10 @@ function loot_ui:FillList()
 		self:ShowDialog(true)
 	else
 		local hud = get_hud()
-		hud:AddCustomStatic("can_use_weapon_now", true)
-		hud:GetCustomStatic("can_use_weapon_now"):wnd():TextControl():SetTextST("Nothing useful")
+		if (hud) then
+			hud:AddCustomStatic("can_use_weapon_now", true)
+			hud:GetCustomStatic("can_use_weapon_now"):wnd():TextControl():SetTextST("Nothing useful")
+		end
 		itms_manager.ShowMessage = true
 		itms_manager.ShowMessageInit = game.get_game_time()
 		itms_manager.ShowMessageTime = 20

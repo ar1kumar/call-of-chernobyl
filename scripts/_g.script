@@ -1,11 +1,3 @@
--- DEVELOPER NOTES:
---[[	Here I will relay important info to people
-	
-	1. If you use AddDialogToRender make sure you remove it on actor net destroy or it can cause issues on next game load, like after actor dies
-
-
---]]
-
 if (jit == nil) then
 	profiler.setup_hook	()
 end
@@ -97,8 +89,10 @@ end
 function SetHudMsg(msg,n)
 	msg = tostring(msg)
 	local hud = get_hud()
-	hud:AddCustomStatic("not_enough_money_mine", true)
-	hud:GetCustomStatic("not_enough_money_mine"):wnd():TextControl():SetTextST(msg)
+	if (hud) then
+		hud:AddCustomStatic("not_enough_money_mine", true)
+		hud:GetCustomStatic("not_enough_money_mine"):wnd():TextControl():SetTextST(msg)
+	end
 	bind_stalker_ext.ShowMessageTime = time_global() + n*1000
 end
 
@@ -1277,22 +1271,25 @@ function in_time_interval(val1, val2)
 end
 
 function show_all_ui(show)
-		local hud = get_hud()
+	local hud = get_hud()
+	if not (hud) then 
+		return 
+	end
 	if(show) then
-			level.show_indicators()
+		level.show_indicators()
 --	    db.actor:restore_weapon()
-			db.actor:disable_hit_marks(false)
-			hud:show_messages()
+		db.actor:disable_hit_marks(false)
+		hud:show_messages()
 	else
-			if db.actor:is_talking() then
-					db.actor:stop_talk()
-			end
-			level.hide_indicators_safe()
-			hud:HideActorMenu()
-			hud:HidePdaMenu()
-			hud:hide_messages()
+		if db.actor:is_talking() then
+			db.actor:stop_talk()
+		end
+		level.hide_indicators_safe()
+		hud:HideActorMenu()
+		hud:HidePdaMenu()
+		hud:hide_messages()
 --	    db.actor:hide_weapon()
-			db.actor:disable_hit_marks(true)
+		db.actor:disable_hit_marks(true)
 	end
 end
 
@@ -1368,10 +1365,13 @@ function run_dynamic_element(folder,close_inv)
    if close_inv==false then
       folder:ShowDialog(true)
    elseif close_inv==true then
-      folder:ShowDialog(true)
-      get_hud():HideActorMenu()
-      get_hud():HidePdaMenu()
-      level.show_weapon(false)
+		folder:ShowDialog(true)
+		local hud = get_hud()
+		if (hud) then
+			hud:HideActorMenu()
+			hud:HidePdaMenu()
+		end
+		level.show_weapon(false)
    else
       folder:ShowDialog(true)
    end
