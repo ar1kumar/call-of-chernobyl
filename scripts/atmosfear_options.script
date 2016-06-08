@@ -8,13 +8,15 @@
 	-- removed fallout manager
 --------------------------------------------------------------------------------
 
-config = alun_utils.cfg_file(getFS():update_path('$game_data$', '').."atmosfear_options.ini",true)
+config = nil
 
 
 
 class "af_options_dialog" (CUIScriptWnd)
 function af_options_dialog:__init() super()
 
+	config = alun_utils.cfg_file(getFS():update_path('$game_data$', '').."atmosfear_options.ini",true)
+	
 	local function file_exists(name)
 	   local f=io.open(name,"r")
 	   if f~=nil then f:close() return true else return false end
