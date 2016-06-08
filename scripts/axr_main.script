@@ -202,7 +202,8 @@ function on_game_start()
 	for	it=0, f_cnt-1 do
 		local file = flist:GetAt(it)
 		local file_name = file:NameShort()
-		if not (ignore[file_name]) then
+		--printf("%s size=%s",file_name,file:Size())
+		if (file:Size() > 0 and ignore[file_name] ~= true) then
 			file_name = file_name:sub(0,file_name:len()-7)
 			if (_G[file_name] and _G[file_name].on_game_start) then
 				table.insert(t,file_name) -- load all scripts first
