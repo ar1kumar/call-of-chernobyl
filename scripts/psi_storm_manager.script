@@ -60,7 +60,7 @@ function CPsiStormManager:initialize()
 	end 
 	
 	if not (self._delta) then 
-		local freq = atmosfear_options and atmosfear_options.config and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",2,24) or 24
+		local freq = atmosfear_options.config and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",2,24) or 24
 		self._delta = math.random(math.floor(freq/2)*3600, freq*3600)
 	end
 	
@@ -118,7 +118,7 @@ function CPsiStormManager:new_psi_storm_time(reset)
 	end
 	self.last_psi_storm_time 	= game.get_game_time()
 	
-	local freq = atmosfear_options and atmosfear_options.config and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",2,24) or 24
+	local freq = atmosfear_options.config and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_psi_storm_freq",2,24) or 24
 	self._delta = math.random(math.floor(freq/2)*3600, freq*3600)
 
 	local g_time = game.get_game_time()
