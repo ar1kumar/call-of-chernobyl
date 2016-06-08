@@ -22,7 +22,7 @@ function se_monster:can_switch_online()
         return true
     end
     --/ brute force prevent from coming online /--
-    if self.first_update and atmosfear.valid_levels[level.name()] and not(self.online) and (self.position:distance_to(alife():actor().position) <= axr_main.config:GetValue("mm_options","excl_dist",2,30)) then
+    if self.first_update and level_weathers.valid_levels[level.name()] and not(self.online) and (self.position:distance_to(alife():actor().position) <= axr_main.config:GetValue("mm_options","excl_dist",2,30)) then
         return false
     end
     --/-----------------------------------------/--

@@ -10,12 +10,11 @@
 
 config = nil
 
-
-
 class "af_options_dialog" (CUIScriptWnd)
 function af_options_dialog:__init() super()
 
-	config = alun_utils.cfg_file(getFS():update_path('$game_data$', '').."atmosfear_options.ini",true)
+	config = config or alun_utils.cfg_file(getFS():update_path('$game_data$', '').."atmosfear_options.ini",true)
+	level_weathers.atmosfear_init()
 	
 	local function file_exists(name)
 	   local f=io.open(name,"r")
@@ -32,7 +31,7 @@ function af_options_dialog:__init() super()
 	local need_save
 
 	if (not self.default_settings:SectionExist("atmosfear_default_parameters")) then
-		for level,v in pairs(atmosfear.valid_levels) do
+		for level,v in pairs(level_weathers.valid_levels) do
 			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_default_parameters","opt_"..level.."_period_good_length",random_choice(4,6,8))
@@ -149,7 +148,7 @@ function af_options_dialog:__init() super()
 	end
 
 	if (not self.default_settings:SectionExist("atmosfear_preset_length_short")) then
-		for level,v in pairs(atmosfear.valid_levels) do
+		for level,v in pairs(level_weathers.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_length_short",level.."_period_good_length",3)
 			self.default_settings:SetValue("atmosfear_preset_length_short",level.."_period_bad_length",3)
 		end
@@ -157,7 +156,7 @@ function af_options_dialog:__init() super()
 	end
 
 	if (not self.default_settings:SectionExist("atmosfear_preset_length_long")) then
-		for level,v in pairs(atmosfear.valid_levels) do
+		for level,v in pairs(level_weathers.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_length_long",level.."_period_good_length",3)
 			self.default_settings:SetValue("atmosfear_preset_length_long",level.."_period_bad_length",3)
 		end
@@ -165,7 +164,7 @@ function af_options_dialog:__init() super()
 	end
 
 	if (not self.default_settings:SectionExist("atmosfear_preset_length_default")) then
-		for level,v in pairs(atmosfear.valid_levels) do
+		for level,v in pairs(level_weathers.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_length_default",level.."_period_good_length",random_choice(4,6,8))
 			self.default_settings:SetValue("atmosfear_preset_length_default",level.."_period_bad_length",random_choice(4,6,8))
 		end
@@ -181,7 +180,7 @@ function af_options_dialog:__init() super()
 	end
 
 	if (not self.default_settings:SectionExist("atmosfear_preset_balance_bad")) then
-		for level,v in pairs(atmosfear.valid_levels) do
+		for level,v in pairs(level_weathers.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_balance_bad",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_preset_balance_bad",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 		end
@@ -189,7 +188,7 @@ function af_options_dialog:__init() super()
 	end
 
 	if (not self.default_settings:SectionExist("atmosfear_preset_balance_good")) then
-		for level,v in pairs(atmosfear.valid_levels) do
+		for level,v in pairs(level_weathers.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_balance_good",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_preset_balance_good",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 		end
@@ -197,7 +196,7 @@ function af_options_dialog:__init() super()
 	end
 
 	if (not self.default_settings:SectionExist("atmosfear_preset_balance_default")) then
-		for level,v in pairs(atmosfear.valid_levels) do
+		for level,v in pairs(level_weathers.valid_levels) do
 			self.default_settings:SetValue("atmosfear_preset_balance_default",level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:SetValue("atmosfear_preset_balance_default",level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 		end
@@ -511,7 +510,7 @@ end
 
 function af_options_dialog:SetCurrentValues()
 
-	for level,v in pairs(atmosfear.valid_levels) do
+	for level,v in pairs(level_weathers.valid_levels) do
 		self:SetComboValue(level.."_period_good", config:GetValue("atmosfear_current_parameters","opt_"..level.."_period_good",0,"clear_foggy"))
 		self:SetComboValue(level.."_period_bad", config:GetValue("atmosfear_current_parameters","opt_"..level.."_period_bad",0,"rainy"))
 		self:SetRadioValue(level.."_period_good_length", config:GetValue("atmosfear_current_parameters","opt_"..level.."_period_good_length",0,"6"))
@@ -545,7 +544,7 @@ end
 
 function af_options_dialog:SetDefaultValues()
 
-	for level,v in pairs(atmosfear.valid_levels) do
+	for level,v in pairs(level_weathers.valid_levels) do
 		self:SetComboValue(level.."_period_good", self.default_settings:GetValue("atmosfear_default_parameters","opt_"..level.."_period_good",0,"clear_foggy"))
 		self:SetComboValue(level.."_period_bad", self.default_settings:GetValue("atmosfear_default_parameters","opt_"..level.."_period_bad",0,"rainy"))
 		self:SetRadioValue(level.."_period_good_length", self.default_settings:GetValue("atmosfear_default_parameters","opt_"..level.."_period_good_length",0,"6"))
@@ -694,7 +693,7 @@ end
 function af_options_dialog:OnBtnAccept()
 
 	local update_period
-	for level,v in pairs(atmosfear.valid_levels) do
+	for level,v in pairs(level_weathers.valid_levels) do
 		self:SetComboOption(level.."_period_good",false)
 		self:SetComboOption(level.."_period_bad",false)
 
@@ -941,7 +940,7 @@ function af_opt_weather:InitControls(x, y, xml, handler)
 	end
 	
 	local k = 0
-	for level_name,v in pairs(atmosfear.valid_levels) do
+	for level_name,v in pairs(level_weathers.valid_levels) do
 		k = k + 1
 		_st = xml:InitStatic("weather_dialog:templ_item", nil)
 		_el=xml:InitStatic("weather_dialog:div_1", _st)

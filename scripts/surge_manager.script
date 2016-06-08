@@ -77,7 +77,7 @@ end
 function CSurgeManager:initialize()
 	--[[
 	self.levels_respawn = empty_table(self.levels_respawn)
-	for level,v in pairs(atmosfear.valid_levels) do
+	for level,v in pairs(level_weathers.valid_levels) do
 		self.levels_respawn[level] = false
 	end
 	--]]
@@ -177,7 +177,7 @@ function CSurgeManager:start(manual)
 	local level_name = level.name()
 	
 	
-	if (self.indoor_levels and self.indoor_levels[level_name]) or (atmosfear and (atmosfear.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==0)) then
+	if (self.indoor_levels and self.indoor_levels[level_name]) or (atmosfear and (level_weathers.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==0)) then
 		self.skip_message = true
 		self:skip_surge()
 		return
@@ -246,7 +246,7 @@ function CSurgeManager:skip_surge()
 
 	--[[
 	self.levels_respawn = empty_table(self.levels_respawn)
-	for level,v in pairs(atmosfear.valid_levels) do
+	for level,v in pairs(level_weathers.valid_levels) do
 		self.levels_respawn[level] = true
 	end
 	--]]
@@ -284,7 +284,7 @@ function CSurgeManager:end_surge(manual)
 
 	--[[
 	self.levels_respawn = empty_table(self.levels_respawn)
-	for level,v in pairs(atmosfear.valid_levels) do
+	for level,v in pairs(level_weathers.valid_levels) do
 		self.levels_respawn[level] = true
 	end
 	--]]
@@ -459,7 +459,7 @@ function CSurgeManager:update()
 		local rnd_sound=math.ceil(math_random(4000)/1000)
 		prev_sec = diff_sec
 		local level_name = level.name()
-		if (level_name == "l11_hospital") or (self.indoor_levels and self.indoor_levels[level_name]) or (atmosfear and (atmosfear.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==0)) then
+		if (level_name == "l11_hospital") or (self.indoor_levels and self.indoor_levels[level_name]) or (atmosfear and (level_weathers.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1)==0)) then
 			--printf("Surge stopped because of level!")
 			self:end_surge()
 			return
@@ -1047,7 +1047,7 @@ end
 function CSurgeManager:respawn_artefacts_and_replace_anomaly_zone()
 	--[[
 	local lvl_nm = level.name()
-	if(atmosfear.valid_levels[lvl_nm]) then
+	if(level_weathers.valid_levels[lvl_nm]) then
 		self.levels_respawn[lvl_nm] = false
 	end
 	--]]
@@ -1437,7 +1437,7 @@ function CSurgeManager:kill_all_unhided()
 	
 	-- don't kill actor if he isn't only a valid level
 	local actor_level = sim:level_name(game_graph():vertex(sim:actor().m_game_vertex_id):level_id())
-	if (self.indoor_levels and self.indoor_levels[actor_level] or atmosfear and atmosfear.valid_levels[actor_level] ~= true) then 
+	if (self.indoor_levels and self.indoor_levels[actor_level] or atmosfear and level_weathers.valid_levels[actor_level] ~= true) then 
 		return 
 	end
 	

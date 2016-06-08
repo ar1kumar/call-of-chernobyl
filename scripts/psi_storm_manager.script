@@ -93,7 +93,7 @@ function CPsiStormManager:start(manual)
 
 	diff_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor())
 	local level_name = level.name()
-	if(level_name == "l11_hospital" or atmosfear.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==0) then
+	if(level_name == "l11_hospital" or level_weathers.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==0) then
 		self:skip_psi_storm()
 		return
 	end
@@ -233,7 +233,7 @@ function CPsiStormManager:update()
 	if(prev_sec~=diff_sec) then
 		prev_sec = diff_sec
 		local level_name = level.name()
-		if(level_name == "l11_hospital" or atmosfear.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==0) then
+		if(level_name == "l11_hospital" or level_weathers.valid_levels[level_name] ~= true or atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==0) then
 			self:finish()
 			return
 		end
