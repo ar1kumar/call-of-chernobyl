@@ -15,7 +15,7 @@ function create()
 	force 					= 60				--// time between sleeps that triggers passing out
 	start_blur 				= 16				--// time between sleeps when vision blur starts 
 	itn_mul 				= 0.2				--// blur intensity multiplier
-	pwr_rate,rng_factor 	= -0.0065, 0.08		--// power reduction rate ,high/low range multiplier - lower is flatter
+	pwr_rate,rng_factor 	= -0.00065, 0.08		--// power reduction rate ,high/low range multiplier - lower is flatter
 	caff_max				= 3					--// max energy drinks per hr
 	last_warning 			= 3					--// # of hourly warnings before passing out
 	die_chance 				= 0.01				--// chance of dying if actor passes out
@@ -142,7 +142,6 @@ function save_state(m_data)
 		m_data.sleep_deprived["last_sleep"] = last_sleep
 		m_data.sleep_deprived["chk"] = last_chk
 		m_data.sleep_deprived["caff"] = caff_chk
-		m_data.sleep_deprived["power"] = pwr_chk
 	end
 end
 
@@ -151,7 +150,6 @@ function load_state(m_data)
 		last_sleep = m_data.sleep_deprived and m_data.sleep_deprived.last_sleep or 0
 		last_chk = m_data.sleep_deprived and m_data.sleep_deprived.chk or nil
 		caff_chk = m_data.sleep_deprived and m_data.sleep_deprived.caff or 0
-		pwr_chk = m_data.sleep_deprived and m_data.sleep_deprived.power or nil
 	end
 end
 
@@ -191,11 +189,12 @@ function actor_on_update(b,d)
 	
 	--//	drain power when exhausted	
 	if last_sleep > start_blur then
-		if (pwr_chk == nil or game.get_game_time():diffSec(pwr_chk) >= 1) then 
+		local tg = time_global()
+		if (pwr_chk == nil or tg > pwr_chk) then 
 			if (db.actor.power > 0) then
 				db.actor.power = pwr_rate*(1+((last_sleep-start_blur)*rng_factor))
 			end
-			pwr_chk = game.get_game_time()
+			pwr_chk = tg+1000
 		end
 	end
 
