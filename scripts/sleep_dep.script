@@ -5,7 +5,7 @@
 --// last edit:	4-24-2016
 --//------------------------------------------------------------------------------
 last_sleep, no_sleep, caff_chk 	= nil,nil,nil -- to change defaults, edit below in 'create' function
-local items,force,start_blur,itn_mul,pwr_rate,rng_factor,pwr_cyc,caff_max,last_warning,die_chance,last_chk,pwr_chk
+local items,force,start_blur,itn_mul,pwr_rate,rng_factor,caff_max,last_warning,die_chance,last_chk,pwr_chk
 	
 function create()
 	last_sleep 				= 0
@@ -15,8 +15,7 @@ function create()
 	force 					= 60				--// time between sleeps that triggers passing out
 	start_blur 				= 16				--// time between sleeps when vision blur starts 
 	itn_mul 				= 0.2				--// blur intensity multiplier
-	pwr_rate,rng_factor 	= -0.00065, 0.08	--// power reduction rate ,high/low range multiplier - lower is flatter
-	pwr_cyc					= 100				--// cycle time in millisec
+	pwr_rate,rng_factor 	= -0.0065, 0.08		--// power reduction rate ,high/low range multiplier - lower is flatter
 	caff_max				= 3					--// max energy drinks per hr
 	last_warning 			= 3					--// # of hourly warnings before passing out
 	die_chance 				= 0.01				--// chance of dying if actor passes out
@@ -192,8 +191,10 @@ function actor_on_update(b,d)
 	
 	--//	drain power when exhausted	
 	if last_sleep > start_blur then
-		if (pwr_chk == nil or game.get_game_time():diffSec(pwr_chk) >= 3600) then 
-			db.actor.power = pwr_rate*(1+((last_sleep-start_blur)*rng_factor))
+		if (pwr_chk == nil or game.get_game_time():diffSec(pwr_chk) >= 1) then 
+			if (db.actor.power > 0) then
+				db.actor.power = pwr_rate*(1+((last_sleep-start_blur)*rng_factor))
+			end
 			pwr_chk = game.get_game_time()
 		end
 	end
