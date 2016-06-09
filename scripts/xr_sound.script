@@ -14,15 +14,19 @@ function set_sound_play(npc_id, sound, faction, point)
 	if sound == nil then
 		return
 	end
+	
 	if sound_theme.theme[sound] == nil then
 		printf("set_sound_play. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
 		return
 	end
+	
 	local snd_theme = sound_theme.theme[sound]
 	if snd_theme.class_id == "looped_sound" then
 		printf("You trying to play sound [%s] which type is looped", sound)
 	end
-		if sound_table[npc_id] == nil or snd_theme.play_always == true then
+	
+	
+	if sound_table[npc_id] == nil or snd_theme.play_always == true then
 		if sound_table[npc_id] ~= nil then
 			--printf("sound table not nil")
 			if(sound_table[npc_id].reset~=nil) then
@@ -33,32 +37,23 @@ function set_sound_play(npc_id, sound, faction, point)
 				--printf("sound="..sound)
 			end
 		end
-		--printf("PLAY. theme[%s] object[%s]", tostring(sound), npc_id)
-				if snd_theme:play(npc_id, faction, point) then
-			--printf("PLAY2. theme[%s] object[%s]", tostring(sound), npc_id)
-		 	--' fill table
+		printf("PLAY1. theme[%s] object[%s] class_id=%s", tostring(sound), npc_id,snd_theme.class_id)
+		if snd_theme:play(npc_id, faction, point) then
+			printf("PLAY2. theme[%s] object[%s] class_id=%s", tostring(sound), npc_id,snd_theme.class_id)
+			--' fill table
 			sound_table[npc_id] = snd_theme
 		end
-		else
-		--printf("xr_sound: cannot play sound [%s] because i'm [%s] already play snd [%s]",tostring(sound), npc_id, sound_table[npc_id].path)
-		return sound_table[npc_id].snd_obj
 	end
 	return sound_table[npc_id] and sound_table[npc_id].snd_obj
 end
 
 function update(npc_id)
-		if sound_table[npc_id] then
---		local t = type(sound_table[npc_id])
-		if not(sound_table[npc_id]:is_playing(npc_id)) then
---		if(t=="string") or not(sound_table[npc_id]:is_playing(npc_id)) then
---	        if(t=="string") then
---				sound_table[npc_id] = sound_theme.theme[sound_table[npc_id]]
---			end
-
-					--printf("SOUND_CALLBACK from [%s] sound_path [%s]",npc_id,sound_table[npc_id].path)
-					sound_table[npc_id]:callback(npc_id)
-					sound_table[npc_id] = nil
-		end
+	if not sound_table[npc_id] then
+		return 
+	end
+	if not(sound_table[npc_id]:is_playing(npc_id)) then
+		sound_table[npc_id]:callback(npc_id)
+		sound_table[npc_id] = nil
 	end
 end
 

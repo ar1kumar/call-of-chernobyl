@@ -36,9 +36,7 @@ for %%f in (.\*.script) do (
 
         "%LUA_DEV%\lua.exe" "%cd%\LuaCheck.lua" "%%f"
 
-rem        if %errorlevel% neq 0 pause
-		   if NOT ["%errorlevel%"]==["0"] pause
-
+        if %errorlevel% neq 0 pause
 )
 
 goto end
