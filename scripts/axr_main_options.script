@@ -5,14 +5,39 @@
 
 function opt_menu_on_init(menu)
 	-- simply add new line and a ui_mm_<name> in ui_st_mm.xml to create a new option. Script automatically does the rest for you
+	-- debug_hud
 	menu.gameplay_options["debug_hud"]			= {default=false, 	debug_only=true, 	typ="check"}
+	-- show_enemy_health
 	menu.gameplay_options["show_enemy_health"]	= {default=false, 	debug_only=true, 	typ="check"}
+	-- radio_mod
 	menu.gameplay_options["radio_mod"]			= {default=true, 	debug_only=false, 	typ="check"}
+	-- mechanic_feature
 	menu.gameplay_options["mechanic_feature"]	= {default=false, 	debug_only=false, 	typ="check"}
+	-- heli_engine_sound
 	menu.gameplay_options["heli_engine_sound"]	= {default=true, 	debug_only=false, 	typ="check"}
+	-- heli_spawn
 	menu.gameplay_options["heli_spawn"]			= {default=true, 	debug_only=false, 	typ="check"}
-	menu.gameplay_options["dynamic_news"]		= {default=true, 	debug_only=false, 	typ="check"}
-	menu.gameplay_options["sleep_deprived"]		= {default=false, 	debug_only=false, 	typ="check"}
+	-- dynamic_news
+	menu.gameplay_options["dynamic_news"]		= {default=true, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
+		if (level.present() and dynamic_news_manager) then 
+			if (ctrl:GetCheck()) then 
+				dynamic_news_manager.get_dynamic_news()
+			else
+				dynamic_news_manager.destroy_dynamic_news()
+			end
+		end	
+	end}
+	-- sleep_deprived
+	menu.gameplay_options["sleep_deprived"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
+		if (level.present() and sleep_dep) then
+			if (ctrl:GetCheck()) then
+				sleep_dep.create()
+			else 
+				sleep_dep.destroy()
+			end
+		end
+	end}
+	-- excl_dist
 	menu.gameplay_options["excl_dist"]			= {default=30, 		debug_only=false, 	typ="list", list={0,10,20,30,40,50,60,70,80,90,100,200,500}}
 	
 	if (db.actor) then -- Options will only show while in-game
@@ -89,15 +114,6 @@ function opt_menu_on_accept(menu,optMgr,console)
 			end
 		end
     end
-	
-    if (level.present() and dynamic_news_manager) then
-        if (axr_main.config:GetValue("mm_options","enable_dynamic_news",1,true) == true) then
-            dynamic_news_manager.get_dynamic_news()
-        else
-            dynamic_news_manager.destroy_dynamic_news()
-        end
-    end
- 
     axr_main.config:Save()
 end
 

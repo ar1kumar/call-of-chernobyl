@@ -4,90 +4,94 @@
 --// created:	4-09-2016
 --// last edit:	4-24-2016
 --//------------------------------------------------------------------------------
-local force 					= 60		--// time between sleeps that triggers passing out
-local start_blur 				= 16		--// time between sleeps when vision blur starts 
-local itn_mul 					= 0.2		--// blur intensity multiplier
-local pwr_rate,rng_factor = -0.00065, 0.08	--// power reduction rate ,high/low range multiplier - lower is flatter
-local pwr_cyc					= 100		--// cycle time in millisec
-local caff_max					= 3			--// max energy drinks per hr
-local last_warning 				= 3			--// # of hourly warnings before passing out
-local die_chance 				= 0.01		--// chance of dying if actor passes out
-local last_chk, pwr_chk			= 0, 0		--// hourly and power update counters
-last_sleep, no_sleep, caff_chk 	= 0, 1, 0	--// change "no_sleep" to 0 to allow sleep spam
-local items = {
+last_sleep, no_sleep, caff_chk 	= nil,nil,nil -- to change defaults, edit below in 'create' function
+local items,force,start_blur,itn_mul,pwr_rate,rng_factor,pwr_cyc,caff_max,last_warning,die_chance,last_chk,pwr_chk
+	
+function create()
+	last_sleep 				= 0
+	no_sleep 				= 1 				--// change "no_sleep" to 0 to allow sleep spam
+	caff_chk 				= 0	
+	
+	force 					= 60				--// time between sleeps that triggers passing out
+	start_blur 				= 16				--// time between sleeps when vision blur starts 
+	itn_mul 				= 0.2				--// blur intensity multiplier
+	pwr_rate,rng_factor 	= -0.00065, 0.08	--// power reduction rate ,high/low range multiplier - lower is flatter
+	pwr_cyc					= 100				--// cycle time in millisec
+	caff_max				= 3					--// max energy drinks per hr
+	last_warning 			= 3					--// # of hourly warnings before passing out
+	die_chance 				= 0.01				--// chance of dying if actor passes out
+	--last_chk, pwr_chk		= 0, 0				--// hourly and power update counters
 
---	Vanilla.
---	Alcoholic drinks.
-	vodka				= 3,
-	vodka_script		= 3,
---	Energy drinks.
-	energy_drink		= -4,
---	Medical supplies.
-	antirad				= 2,
-	bandage				= 1,
-	drug_anabiotic		= 2,
-	drug_antidot		= 2,
-	drug_coagulant		= 2,
-	drug_psy_blockade	= 2,
-	drug_radioprotector	= 2,
-	medkit				= 2,
-	medkit_army			= 3,
-	medkit_scientic 	= 4,
-	medkit_script		= 2,
-	
------------------------------
-	
---	"Items Addon" by 2C. (Compatibility)
---	Alcoholic drinks.
-	beer				= 2,
-	medo				= 3,
---	Energy drinks.
-	mbk					= -4,
-	wild_drink			= -2,
---	Medical supplies
-	drug_cat_eye		= 2,
-	drug_engine			= -4,	-- LSD
-	bio_bandage			= 2,
-	medkit_elite		= 4,
-	psy_complex			= 2,
-	
------------------------------
+	items = {
+	--	Vanilla.
+	--	Alcoholic drinks.
+		vodka				= 3,
+		vodka_script		= 3,
+	--	Energy drinks.
+		energy_drink		= -4,
+	--	Medical supplies.
+		antirad				= 2,
+		bandage				= 1,
+		drug_anabiotic		= 2,
+		drug_antidot		= 2,
+		drug_coagulant		= 2,
+		drug_psy_blockade	= 2,
+		drug_radioprotector	= 2,
+		medkit				= 2,
+		medkit_army			= 3,
+		medkit_scientic 	= 4,
+		medkit_script		= 2,
+		
+	-----------------------------
+		
+	--	"Items Addon" by 2C. (Compatibility)
+	--	Alcoholic drinks.
+		beer				= 2,
+		medo				= 3,
+	--	Energy drinks.
+		mbk					= -4,
+		wild_drink			= -2,
+	--	Medical supplies
+		drug_cat_eye		= 2,
+		drug_engine			= -4,	-- LSD
+		bio_bandage			= 2,
+		medkit_elite		= 4,
+		psy_complex			= 2,
+		
+	-----------------------------
 
---	"Item Soup" by /sg/. (Compatibility)
---	Alcoholic drinks.
-	vodka_1				= 3,
-	vodka_2				= 3,
-	vodka_3				= 3,
-	vodka_4				= 3,
-	beer_1				= 2,
-	beer_2				= 2,
-	beer_can_1			= 2,
-	beer_can_2			= 2,
-	beer_large_1		= 3,
-	beer_large_2		= 3,
---	Energy drinks.
-	cocacola			= -2,
-	guru				= -3,
-	redbull				= -4,
---	Medical supplies.
-	amphetamines_1		= -3,
-	amphetamines_2		= -3,
-	amphetamines_3	 	= -3,
-	amphetamines_4		= -3,
-	bandage_israeli		= 1,
-	diazepam			= 2,
---	Tobacco products.
-	cigarettes_1		= 1,
-	cigarettes_2		= 1,
-	cigarettes_3		= 1,
-	cigarettes_russian	= 1,
-	cuban				= 2,
-	lucky				= 1,
-	marlboro			= 1
-	
-}
-
-function on_game_start()
+	--	"Item Soup" by /sg/. (Compatibility)
+	--	Alcoholic drinks.
+		vodka_1				= 3,
+		vodka_2				= 3,
+		vodka_3				= 3,
+		vodka_4				= 3,
+		beer_1				= 2,
+		beer_2				= 2,
+		beer_can_1			= 2,
+		beer_can_2			= 2,
+		beer_large_1		= 3,
+		beer_large_2		= 3,
+	--	Energy drinks.
+		cocacola			= -2,
+		guru				= -3,
+		redbull				= -4,
+	--	Medical supplies.
+		amphetamines_1		= -3,
+		amphetamines_2		= -3,
+		amphetamines_3	 	= -3,
+		amphetamines_4		= -3,
+		bandage_israeli		= 1,
+		diazepam			= 2,
+	--	Tobacco products.
+		cigarettes_1		= 1,
+		cigarettes_2		= 1,
+		cigarettes_3		= 1,
+		cigarettes_russian	= 1,
+		cuban				= 2,
+		lucky				= 1,
+		marlboro			= 1
+	}	
 	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
 	RegisterScriptCallback("actor_on_update",actor_on_update)
 	RegisterScriptCallback("actor_on_item_use",actor_on_item_use)
@@ -95,14 +99,33 @@ function on_game_start()
 		RegisterScriptCallback("save_state",save_state)
 		RegisterScriptCallback("load_state",load_state)
 	end
+end 
+
+function destroy()
+	UnregisterScriptCallback("actor_on_first_update",actor_on_first_update)
+	UnregisterScriptCallback("actor_on_update",actor_on_update)
+	UnregisterScriptCallback("actor_on_item_use",actor_on_item_use)
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",save_state)
+		UnregisterScriptCallback("load_state",load_state)
+	end
+	alife_storage_manager.get_state().sleep_deprived = nil
+end 
+
+function on_game_start()
+	if (axr_main.config:GetValue("mm_options","enable_sleep_deprived",1,false) == false) then
+		return 
+	end
+	create()
 end
+
 ----// add to bind_stalker or bind_stalker_ext save/load if used. //--
 function save(package)	-- sleep_dep.save -> actor_binder:save()
 	if (USE_MARSHAL) then
 		return
 	end
 	package:w_u8(last_sleep)
-	package:w_u16(last_chk)
+	--package:w_u16(last_chk)
 	package:w_u8(caff_chk)
 end
 function load(package)	-- sleep_dep.load -> actor_binder:load()
@@ -110,29 +133,26 @@ function load(package)	-- sleep_dep.load -> actor_binder:load()
 		return
 	end
 	last_sleep  = package:r_u8() or 0
-	last_chk 	= package:r_u16() or 0
+	--last_chk 	= package:r_u16() or 0
 	caff_chk 	= package:r_u8() or 0
 end
 --//--------------------------------------------------------------//--
 function save_state(m_data)
 	if (USE_MARSHAL) then
-		if (last_sleep > 0) or (last_chk > 0) or (caff_chk > 0) then
-			m_data.sleep_deprived = m_data.sleep_deprived or {}
-			m_data.sleep_deprived["last_sleep"] = last_sleep
-			m_data.sleep_deprived["chk"] = last_chk
-			m_data.sleep_deprived["caff"] = caff_chk
-		else
-			m_data.sleep_deprived = nil
-		end
+		m_data.sleep_deprived = m_data.sleep_deprived or {}
+		m_data.sleep_deprived["last_sleep"] = last_sleep
+		m_data.sleep_deprived["chk"] = last_chk
+		m_data.sleep_deprived["caff"] = caff_chk
+		m_data.sleep_deprived["power"] = pwr_chk
 	end
 end
 
 function load_state(m_data)
 	if (USE_MARSHAL) then
 		last_sleep = m_data.sleep_deprived and m_data.sleep_deprived.last_sleep or 0
-		last_chk = m_data.sleep_deprived and m_data.sleep_deprived.chk or 0
+		last_chk = m_data.sleep_deprived and m_data.sleep_deprived.chk or nil
 		caff_chk = m_data.sleep_deprived and m_data.sleep_deprived.caff or 0
---		pwr_chk = m_data.sleep_deprived and m_data.sleep_deprived.power or 0
+		pwr_chk = m_data.sleep_deprived and m_data.sleep_deprived.power or nil
 	end
 end
 
@@ -164,32 +184,26 @@ function actor_on_first_update()
 end
 
 function actor_on_update(b,d)
-	if (axr_main and axr_main.config)
-	  and not (axr_main.config:GetValue("mm_options","enable_sleep_deprived",1,false)) then
-		last_sleep = no_sleep
-		return
-	end
+	--printf("last_chk=%s last_sleep=%s",last_chk and game.get_game_time():diffSec(last_chk) or "nil",last_sleep)
 	if db.actor:has_info("actor_is_sleeping") then
 		last_sleep 	= 0
 		level.remove_pp_effector(999)
 	end
---//	drain power when exhausted	
+	
+	--//	drain power when exhausted	
 	if last_sleep > start_blur then
---printf("before actor power = %s",db.actor.power)
-		if pwr_chk > 0 then
-			pwr_chk = pwr_chk - (d*level.get_time_factor())
-		else
+		if (pwr_chk == nil or game.get_game_time():diffSec(pwr_chk) >= 3600) then 
 			db.actor.power = pwr_rate*(1+((last_sleep-start_blur)*rng_factor))
-			pwr_chk = pwr_cyc
+			pwr_chk = game.get_game_time()
 		end
---printf("after actor power = %s", db.actor.power)
 	end
---//	
-	if last_chk > 0 then
-		last_chk = last_chk - (d*level.get_time_factor())
-		return
+
+	if (last_chk and game.get_game_time():diffSec(last_chk) < 3600) then 
+		return 
 	end
-	last_chk = 3600*1000
+	
+	last_chk = game.get_game_time()
+		
 	last_sleep = last_sleep + 1
 	caff_chk = caff_chk > 1 and caff_chk - 1 or 0
 	test_blur()

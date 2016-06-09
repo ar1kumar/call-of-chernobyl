@@ -4603,17 +4603,21 @@ function bar_arena_actor_dead(actor, npc)
 end
 
 --NEW ARENA
-local function transfer_object_item(item)
-    out_object:transfer_item(item, in_object)
-end
+
 
 function bar_arena_teleport (actor, npc)
 
+	-- TODO: THIS NEED FIXED 
+	--[[
 	inv_box_1 = level_object_by_sid (bar_arena_inventory_box)
 
 	out_object = db.actor
     in_object  = inv_box_1
+	local function transfer_object_item(item)
+		out_object:transfer_item(item, in_object)
+	end
 	db.actor:inventory_for_each(transfer_object_item) 
+	--]]
 
 	local spawn_items = {}	
 
@@ -4693,15 +4697,18 @@ end
 
 function bar_arena_teleport_2 (actor, npc)
 
-	  level.add_pp_effector ("blink.ppe", 234, false)				
+	level.add_pp_effector ("blink.ppe", 234, false)				
+
+	db.actor:set_actor_position(patrol("t_walk_2"):point(0))
+	local dir = patrol("t_look_2"):point(0):sub(patrol("t_walk_2"):point(0))
+	db.actor:set_actor_direction(-dir:getH())
 	
-		db.actor:set_actor_position(patrol("t_walk_2"):point(0))
-		local dir = patrol("t_look_2"):point(0):sub(patrol("t_walk_2"):point(0))
-		db.actor:set_actor_direction(-dir:getH())
-	
+	--TODO: This needs fixed
+	--[[
 	inv_box_2 = level_object_by_sid (bar_arena_inventory_box_2)
 
 	out_object = db.actor
     in_object  = inv_box_2
 	db.actor:inventory_for_each(transfer_object_item) 
+	--]]
 end

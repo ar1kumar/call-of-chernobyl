@@ -150,7 +150,7 @@ function callback_set(name,func,userdata)
 			local function wrapper(...)
 				func(userdata,...)
 			end
-			intercepts[name][userdata] = wrapper
+			intercepts[name][func] = wrapper
 		else
 			intercepts[name][func] = func
 		end
