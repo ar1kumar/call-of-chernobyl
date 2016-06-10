@@ -91,11 +91,10 @@ local function on_game_load()
 		end
 
 		-- faction diversity
-		if (faction ~= "monolith") then 
-			task_manager.get_task_manager():give_task("turn_off_brain_scorcher")
-            task_manager.get_task_manager():give_task("mar_find_doctor_task")
-		else 
+		if (faction == "monolith") then 
 			give_info("bar_deactivate_radar_done") -- disables brain scorcher
+		else 
+            task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
 		end
 		
 		db.actor:set_character_community("actor_"..faction, 0, 0)
