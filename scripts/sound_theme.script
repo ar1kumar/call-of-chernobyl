@@ -175,7 +175,7 @@ function npc_sound:callback(npc_id)
 		st[st.active_scheme].signals["sound_end"] = true
 	end
 end
-function npc_sound:play(npc_id, faction, point, msg)
+function npc_sound:play(npc_id, faction, point, sound)
 	--alun_utils.debug_write(strformat("npc_sound:play npc_id=%s faction=%s msg=%s",npc_id,faction,msg))
 	local npc = db.storage[npc_id] and db.storage[npc_id].object
 
@@ -227,6 +227,10 @@ function npc_sound:play(npc_id, faction, point, msg)
 	end
 	local table_id = self.played_id + 1
 	local snd = self.sound_path[npc_id][table_id]
+	if not (snd) then 
+		printf("sound_theme.npc_sound:play() snd is nil! %s",sound)
+		return
+	end
 	-- проверка на существование звука дублирующего основной по ПДА. Если он есть то играть его.
 	if snd and npc:position():distance_to_sqr(db.actor:position()) >= 100 and getFS():exist("$game_sounds$", snd.."_pda.ogg") ~= nil then
 		if self.pda_snd_obj ~= nil and self.pda_snd_obj:playing() then
@@ -483,7 +487,7 @@ function actor_sound:is_playing ()
 		return false
 	end
 end
-function actor_sound:play(npc, faction, point, msg)
+function actor_sound:play(npc, faction, point, sound)
 	--printf("PLAY ACTOR SOUND")
 	if not self.can_play_sound then
 		printf("self.can_play_sound == false")
@@ -504,6 +508,10 @@ function actor_sound:play(npc, faction, point, msg)
 		return false
 	end
 	local snd = self.sound[self.played_id]
+	if not (snd) then 
+		printf("sound_theme.actor_sound:play() snd is nil! %s",sound)
+		return
+	end
 	self.snd_obj = sound_object(snd)
 	self.snd_obj.volume = 0.8
 	self.snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
@@ -656,8 +664,13 @@ function object_sound:__init(snd_ini, section)
 	end
 end
 function object_sound:callback(npc_id)
-	self.played_time = time_global()
-	self.idle_time = math.random(self.min_idle, self.max_idle) * 1000
+	if not (self.cooldown) then 
+		self.cooldown = {}
+	end
+	if not (self.cooldown[npc_id]) then 
+		self.cooldown[npc_id] = time_global() + math.random(self.min_idle, self.max_idle) * 1000
+	end
+
 	self.snd_obj = nil
 	self.can_play_sound[npc_id] = true
 
@@ -666,9 +679,12 @@ function object_sound:callback(npc_id)
 
 	local st = db.storage[npc_id]
 	if not (st) then 
+		printf("object_sound:callback st is nil! how?")
 		return 
 	end 
+	
 	--printf("START object_sound:callback() %s scheme=%s st=%s signals=%s",st.object and st.object:name(),st.active_scheme,st[st.active_scheme],st[st.active_scheme].signals)
+
 	if st.active_scheme == nil then
 		return
 	end
@@ -681,7 +697,6 @@ function object_sound:callback(npc_id)
 	else
 		st[st.active_scheme].signals["sound_end"] = true
 	end
-	
 	--printf("END object_sound:callback() %s",st.object and st.object:name())
 end
 function object_sound:is_playing ()
@@ -692,28 +707,34 @@ function object_sound:is_playing ()
 	end
 end
 function object_sound:play(obj_id, faction, point,sound)
-	local obj = db.storage[obj_id] and db.storage[obj_id].object or level.object_by_id(obj_id)
+	local obj = db.storage[obj_id] and db.storage[obj_id].object -- or level.object_by_id(obj_id)
 	if obj == nil then
 		return false
 	end
 
-	--printf("object_sound:play() sound=%s %s[%s]",sound,obj:name(),obj_id)
+	--printf("START object_sound:play() sound=%s %s[%s] can_play=%s",sound,obj:name(),obj_id,self.can_play_sound[obj_id] ~= false and true)
+	
 	if self.can_play_sound[obj_id] == false then 
 		return false 
 	end
 
-	if self.played_time ~= nil and time_global() - self.played_time < self.idle_time then
-		return false
+	if (self.cooldown) then 
+		if (self.cooldown[obj_id] and time_global() < self.cooldown[obj_id]) then 
+			--return false
+		end 
+		self.cooldown[obj_id] = nil
 	end
-	self.played_time = nil
-		--' Выбор звука, который играть.
+	
 	self.played_id = self:select_next_sound()
 	if self.played_id == -1 then
-		--' Пропускаем.
 		return false
 	end
 	--printf("object played_id = %s", self.played_id)
 	local snd = self.sound[self.played_id]
+	if not (snd) then 
+		printf("sound_theme.object_sound:play() snd is nil! %s",sound)
+		return 
+	end
 	if snd and obj:position():distance_to_sqr(db.actor:position()) >= 5 and getFS():exist("$game_sounds$", snd.."_pda.ogg") ~= nil  then
 		self.pda_snd_obj = sound_object(snd.."_pda")
 		self.pda_snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
@@ -721,7 +742,7 @@ function object_sound:play(obj_id, faction, point,sound)
 	end
 	self.snd_obj = sound_object(snd)
 	self.snd_obj:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
-	local snd_st, num_copy = string.gsub(snd, "\\", "_")
+	--local snd_st, num_copy = string.gsub(snd, "\\", "_")
 --[[
 	if game.translate_string(snd_st) ~= snd_st then
 		local hud_demo = get_hud()
@@ -736,45 +757,31 @@ function object_sound:play(obj_id, faction, point,sound)
 ]]
 	self.can_play_sound[obj_id] = false
 
-	--printf("before closecaption")
 	if not closecaption.sound(snd, self.snd_obj:length(), obj, faction, point, 0) then
 		news_manager.send_sound(nil, faction, point, snd)
 	end
-	--printf("after closecaption")
+	
+	--printf("END object_sound:play() sound=%s %s[%s]",sound,obj:name(),obj_id)
 	return true
 end
 function object_sound:select_next_sound()
 	local sound_table_size = #self.sound
 	if self.shuffle == "rnd" then
-		if sound_table_size == 1 then
-			return 1
-		end
-		if self.played_id ~= nil then
-			local played_id = math.random(1,sound_table_size - 1)
-			if played_id >= self.played_id then
-				return played_id + 1
-			end
-			return played_id
-		end
 		return math.random(1,sound_table_size)
-	end
-	if self.shuffle == "seq" then
-		if self.played_id == -1 then
+	elseif self.shuffle == "seq" then
+		if (self.played_id == nil) then 
+			return 1
+		elseif (self.played_id == -1) then
+			return -1
+		elseif (self.played_id < sound_table_size) then 
+			return self.played_id + 1
+		else 
 			return -1
 		end
+	elseif self.shuffle == "loop" then
 		if self.played_id == nil then
 			return 1
-		end
-		if self.played_id < sound_table_size then
-			return self.played_id + 1
-		end
-		return -1
-	end
-	if self.shuffle == "loop" then
-		if self.played_id == nil then
-			return 1
-		end
-		if self.played_id < sound_table_size then
+		elseif self.played_id < sound_table_size then
 			return self.played_id + 1
 		end
 		return 1

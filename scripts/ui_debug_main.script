@@ -1330,11 +1330,20 @@ function debug_ui:FillEditorList(name)
 end
 
 function debug_ui:FillLevelList()
+	local s,t = {},{}
 	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 	for i,level in pairs(levels) do
+		local ts = game.translate_string(level)
+		table.insert(s,ts)
+		t[ts] = level
+	end
+	
+	table.sort(s) 
+	
+	for i,lvl_name in ipairs(s) do 
 		local _itm = set_list_text(22)
-		_itm.sect:SetText(game.translate_string(level))
-		_itm.name = level
+		_itm.sect:SetText(lvl_name)
+		_itm.name = t[lvl_name]
 		self.levels_list:AddExistingItem(_itm)
 	end
 end 
@@ -1927,8 +1936,8 @@ function debug_ui_spawner:InitControls(x, y, xml, owner)
 	--owner:Register(owner.smarts_list, "list_smarts")
 
 	-- Set defaults
-	owner.sections_list:SetText("Spawn Sections")
-	--owner:FillList("Weapons (Rifle)")
+	owner.sections_list:SetText(owner.sections_list:GetTextOf(0))
+	owner:FillList(owner.sections_list:GetTextOf(0))
 
 	------------------------- manual input 
 	xml:InitStatic("tab_spawner:cap_spawn", self)
@@ -2078,9 +2087,8 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	owner.editor_icon = xml:InitStatic("tab_editor:icon",self)
 	
 	-- Set defaults
-	owner.editor_sections_list:SetText("Weapons (Rifle)")
-	owner:FillEditorList("Weapons (Rifle)")
-	
+	owner.editor_sections_list:SetText(owner.editor_sections_list:GetTextOf(0))
+	owner:FillEditorList(owner.editor_sections_list:GetTextOf(0))
 	
 	-------
 	xml:InitStatic("tab_editor:cap_w", self)
