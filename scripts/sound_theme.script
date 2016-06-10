@@ -634,7 +634,7 @@ function object_sound:__init(snd_ini, section)
 	self.rnd = tonumber(interval[3])
 	self.sound = {}
 	self.snd_obj = nil
-	self.can_play_sound = true
+	self.can_play_sound = {}
 	self.section = section
 	self.played_id = nil
 	self.faction = utils.cfg_get_string(snd_ini, section, "faction", nil, false, "", "")
@@ -659,16 +659,20 @@ function object_sound:callback(npc_id)
 	self.played_time = time_global()
 	self.idle_time = math.random(self.min_idle, self.max_idle) * 1000
 	self.snd_obj = nil
-	self.can_play_sound = true
+	self.can_play_sound[npc_id] = true
 
 --	printf("object_sound:callback for object !!!!!!!!")
 --	get_hud():RemoveCustomStatic("cs_subtitles_object")
 
-	local st   = db.storage[npc_id]
+	local st = db.storage[npc_id]
+	if not (st) then 
+		return 
+	end 
+	--printf("START object_sound:callback() %s scheme=%s st=%s signals=%s",st.object and st.object:name(),st.active_scheme,st[st.active_scheme],st[st.active_scheme].signals)
 	if st.active_scheme == nil then
 		return
 	end
-	if st[st.active_scheme].signals == nil then
+	if not (st[st.active_scheme] and st[st.active_scheme].signals) then
 		return
 	end
 	if self.played_id == #self.sound and self.shuffle ~= "rnd" then
@@ -677,6 +681,8 @@ function object_sound:callback(npc_id)
 	else
 		st[st.active_scheme].signals["sound_end"] = true
 	end
+	
+	--printf("END object_sound:callback() %s",st.object and st.object:name())
 end
 function object_sound:is_playing ()
 	if(self.snd_obj~=nil) then
@@ -685,13 +691,16 @@ function object_sound:is_playing ()
 		return false
 	end
 end
-function object_sound:play(obj_id, faction, point)
+function object_sound:play(obj_id, faction, point,sound)
 	local obj = db.storage[obj_id] and db.storage[obj_id].object or level.object_by_id(obj_id)
 	if obj == nil then
 		return false
 	end
-	--printf("object_sound:play() %s[%s]",obj:name(),obj_id)
-	if not self.can_play_sound then return false end
+
+	--printf("object_sound:play() sound=%s %s[%s]",sound,obj:name(),obj_id)
+	if self.can_play_sound[obj_id] == false then 
+		return false 
+	end
 
 	if self.played_time ~= nil and time_global() - self.played_time < self.idle_time then
 		return false
@@ -725,7 +734,7 @@ function object_sound:play(obj_id, faction, point)
 		self.custom_static_demo:wnd():SetTextST(snd_st)
 	end
 ]]
-	self.can_play_sound = false
+	self.can_play_sound[obj_id] = false
 
 	--printf("before closecaption")
 	if not closecaption.sound(snd, self.snd_obj:length(), obj, faction, point, 0) then

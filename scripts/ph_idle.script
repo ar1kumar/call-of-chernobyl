@@ -11,7 +11,7 @@ function action_idle:__init(obj, storage)
 end
 function action_idle:reset_scheme()
 	--printf("_hr: action_idle:reset_scheme: self.object:name()='%s'", self.object:name())
-	
+	self.st.signals = empty_table(self.st.signals)
 	self.object:set_nonscript_usable(self.st.nonscript_usable)
 end
 function action_idle:update(delta)
@@ -74,4 +74,6 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.tips  = utils.cfg_get_string(ini, section, "tips", npc, false, "", "")
 	
 	npc:set_tip_text(st.tips)
+	
+	st.signals = {}
 end
