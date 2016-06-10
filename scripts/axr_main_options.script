@@ -123,8 +123,8 @@ function opt_menu_on_set_values(menu,optMgr)
 			if (v.typ=="check") then
 				v.ctrl:SetCheck(axr_main.config:GetValue("mm_options","enable_"..name,1,v.default))
 			elseif (v.typ=="list") then 
-				--v.ctrl:SetText(axr_main.config:GetValue("mm_options",name,0,v.default))
-				v.ctrl:SetText(v.ctrl:GetTextOf(0))
+				v.ctrl:SetText(axr_main.config:GetValue("mm_options",name,0,v.default))
+				--v.ctrl:SetText(v.ctrl:GetTextOf(0))
 			end
 			
 			if (v.on_set_values) then 

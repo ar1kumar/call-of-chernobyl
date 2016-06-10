@@ -1625,14 +1625,14 @@ function se_smart_terrain:try_respawn()
 		end
 				
 		for k,v in pairs(self.respawn_params) do
-			if (self.already_spawned[k] and self.already_spawned[k].num) then
+			if (v.num and self.already_spawned[k] and self.already_spawned[k].num) then
 				if (self.faction_controlled == nil) or (self.faction ~= nil and v.faction == self.faction) then 
 					if tonumber(xr_logic.pick_section_from_condlist(db.actor, self,v.num)) > self.already_spawned[k].num then
 						table.insert(available_sects,k)
 					end
 				end
 			else 
-				log("ERROR: %s Incorrect Respawn Params. already_spawned[%s]=%s already_spawned[%s].num=%s",self:name(),k,type(self.already_spawned[k]),self.already_spawned[k] and self.already_spawned[k].num)
+				log("ERROR: %s Incorrect Respawn Params. respawn_params[%s].num=%s already_spawned[%s]=%s already_spawned[%s].num=%s",self:name(),k,v.num,k,type(self.already_spawned[k]),self.already_spawned[k] and self.already_spawned[k].num)
 			end
 		end
 		

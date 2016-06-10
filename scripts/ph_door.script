@@ -309,7 +309,30 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.no_force  = utils.cfg_get_bool(ini, section, "no_force", npc, false, false)
 	
 	st.not_for_npc  = utils.cfg_get_bool(ini, section, "not_for_npc", npc, false, false)
-	if (npc:get_visual_name() == "dynamics\\door\\shkaf_work_01_door") then 
+	
+	local not_for_npcs = { 
+		["dynamics\\door\\bookcase_village_50x90_ph_door_l"] = true,
+		["dynamics\\door\\bookcase_village_50x90_ph_door_r"] = true,
+		["dynamics\\door\\box_wooden_01_door"] = true,
+		["dynamics\\door\\cabinet_child_45x80_01_door"] = true,
+		["dynamics\\door\\cabinet_child_350x200_01_door"] = true,
+		["dynamics\\door\\cabinet_village_140x210_ph_door_l"] = true,
+		["dynamics\\door\\cabinet_village_140x210_ph_door_r"] = true,
+		["dynamics\\door\\codedoor_key"] = true,
+		["dynamics\\door\\codedoor_left"] = true,
+		["dynamics\\door\\codedoor_right"] = true,
+		["dynamics\\door\\door_locker"] = true,
+		["dynamics\\door\\safe_01_ph_door"] = true,
+		["dynamics\\door\\shelf_metal_160x200_door_l"] = true,
+		["dynamics\\door\\shelf_metal_160x200_door_r"] = true,
+		["dynamics\\door\\shkaf_lab_01_door_l"] = true,
+		["dynamics\\door\\shkaf_lab_01_door_r"] = true,
+		["dynamics\\door\\shkaf_work_01_door"] = true,
+		["dynamics\\door\\shop_fridge_1_door_l"] = true,
+		["dynamics\\door\\shop_fridge_1_door_r"] = true,
+		["dynamics\\door\\shop_fridge_2_door"] = true
+	}
+	if (not_for_npcs[npc:get_visual_name()]) then 
 		st.not_for_npc = true
 	end
 
@@ -346,7 +369,7 @@ end
 function try_to_open_door(npc,opened_doors)
 	local npc_position = npc:position()
 	for id,position in pairs(db.level_doors) do
-		if (db.storage[id].ph_door and npc_position:distance_to_sqr(position) <= 5) then
+		if (db.storage[id].ph_door and npc_position:distance_to_sqr(position) <= 3) then
 			local action = db.storage[id].ph_door.door_action					
 			if action.st.not_for_npc == false and action.st.closed == true then
 				action:use_callback()
@@ -361,7 +384,7 @@ function try_to_close_door(npc, doors)
 	local closed_doors = {}
 	for id, v in pairs(doors) do
 		if (db.storage[id].ph_door) then 
-			if (npc_position:distance_to_sqr(db.level_doors[id]) > 5) then
+			if (npc_position:distance_to_sqr(db.level_doors[id]) > 3) then
 				local action = db.storage[id].ph_door.door_action					
 				if action.st.not_for_npc == false and action.st.closed ~= true then
 					action:use_callback()

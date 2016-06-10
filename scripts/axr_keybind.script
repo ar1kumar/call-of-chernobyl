@@ -7,6 +7,8 @@ local keybinds = {
 					["companion_cycle_combat_mode"] = "DIK_NUMPAD1",
 					["companion_cycle_move_mode"] 	= "DIK_NUMPAD2",
 					["companion_move_to_point"] 	= "DIK_NUMPAD3",
+					["companion_cycle_stealth"] 	= "DIK_NUMPAD4",
+					["companion_cycle_looting"] 	= "DIK_NUMPAD5",
 					["debug_demo_record"]			= "DIK_NUMPAD0",
 					["debug_select_object"] 		= "DIK_NUMPAD9",
 					--["debug_attachment_ui"] 		= "DIK_INSERT",
@@ -32,6 +34,43 @@ end
 
 function action.companion_move_to_point(p)
 	axr_companions.move_to_point(p)
+end
+
+function action.companion_cycle_stealth(p)
+	for id,squad in pairs(axr_companions.companion_squads) do 
+		if (squad and squad.commander_id) then
+			for k in squad:squad_members() do
+				if not (xrs_kill_wounded.hostage_list[k.id]) then
+					st = db.storage[k.id]
+					local member = st and st.object
+					if (member and member:alive()) then
+						if ( npc:has_info("npcx_beh_hide_in_cover") ) then
+							npc:disable_info_portion("npcx_beh_hide_in_cover")
+						else
+							npc:give_info_portion("npcx_beh_hide_in_cover")
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function action.companion_cycle_looting(p)
+	for id,squad in pairs(axr_companions.companion_squads) do 
+		if (squad and squad.commander_id) then
+			for k in squad:squad_members() do
+				if not (xrs_kill_wounded.hostage_list[k.id]) then
+					st = db.storage[k.id]
+					local member = st and st.object
+					if (member and member:alive()) then
+						axr_companions.switch_companion_gather_items(member)
+						axr_companions.switch_companion_loot_corpses(member)
+					end
+				end
+			end
+		end
+	end
 end
 
 function action.debug_demo_record(p)

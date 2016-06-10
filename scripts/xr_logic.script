@@ -523,7 +523,7 @@ function try_switch_to_another_section(npc, st, actor)
 	end
 
 	if not l then
-		printf("Can't find script switching information in storage, scheme '%s'", db.storage[npc:id()].active_scheme)
+		printf("%s Can't find script switching information in storage, scheme '%s'",npc:name(),db.storage[npc:id()].active_scheme)
 		return
 	end
 
