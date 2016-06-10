@@ -1,0 +1,31 @@
+-- Info-Portion Switches
+--[[
+
+Parses a condition list when info given to actor 
+
+ex. ["info1"] = "%-info2 +info3%"
+
+When 'info1' is given to actor, 'info2' will be disabled and 'info3' will be given
+
+advanced example:
+
+["info1"] = "{=some_xr_condition(value)} %+info2%"
+
+--]]
+
+local info_switches = {
+	["ui_pda"]	 					= "%-ui_pda_hide%",
+	["ui_pda_hide"]					= "%-ui_pda%",
+	["ui_car_body"]					= "%-ui_car_body_hide%",
+	["ui_car_body_hide"]			= "%-ui_car_body%"
+}
+
+local function actor_on_info_callback(actor,info)
+	if (info_switches[info]) then
+		xr_logic.pick_section_from_condlist(actor,actor,alun_utils.parse_condlist(info_switches[info]))
+	end
+end
+
+function on_game_start()
+	RegisterScriptCallback("actor_on_info_callback",actor_on_info_callback)
+end
