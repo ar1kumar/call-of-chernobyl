@@ -426,9 +426,14 @@ function action_patrol:on_place()
 	end
 end
 function action_patrol:hit_callback(obj, amount, local_direction, who, bone_index)
+	--[[
+	if (bone_index == "from_death_callback") then 
+		return 
+	end
 	if (obj and amount > 0 and who and (IsStalker(who) or IsMonster(who)) and who:alive()) then
 		obj:enable_memory_object(who,true)
 	end
+	--]]
 end
 ----------------------------------------------------------------------------------------------------------------------
 -- BINDER

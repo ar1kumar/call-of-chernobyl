@@ -339,7 +339,7 @@ function motivator_binder:death_callback(victim, who)
 
 	release_body_manager.get_release_body_manager():moving_dead_body(victim)
 	
-	if (who) and (IsStalker(who) or IsMonster(who)) then
+	if (who and bone_index ~= "from_death_callback") and (IsStalker(who) or IsMonster(who)) then
 		-- Start [Alundaio]
 		SendScriptCallback("npc_on_death_callback",victim,who)
 		db.storage[id].death_time = game.get_game_time()
