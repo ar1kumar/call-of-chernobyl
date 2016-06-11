@@ -35,17 +35,28 @@
     <!------------- old arena ---------->
     <dialog id="bar_arena_manager_start">
         <phrase_list>
+            <phrase id="61">
+                <text>bar_arena_man_start_41</text>
+            </phrase>
+		    <phrase id="6">
+                <text></text>
+                <precondition>dialogs_bar.arena_has_reward</precondition>
+                <action>dialogs_bar.new_arena_give_reward</action>
+                <next>61</next>
+            </phrase>
             <phrase id="51">
+				<give_info>bar_arena_reset</give_info>
                 <text>bar_arena_manager_start_51</text>
             </phrase>
             <phrase id="5">
                 <text />
-                <give_info>bar_arena_reset</give_info>
+				<precondition>dialogs_bar.arena_hasnt_reward</precondition>
                 <has_info>bar_arena_actor_lose</has_info>
                 <next>51</next>
             </phrase>
             <phrase id="0">
                 <text />
+				<next>6</next>
                 <next>1</next>
                 <next>2</next>
                 <next>3</next>
@@ -54,17 +65,20 @@
             </phrase>
             <phrase id="1">
                 <text />
+				<precondition>dialogs_bar.arena_hasnt_reward</precondition>
                 <precondition>dialogs_bar.arena_not_empty</precondition>
                 <dont_has_info>bar_arena_start</dont_has_info>
                 <dont_has_info>bar_arena_actor_victory</dont_has_info>
                 <dont_has_info>bar_arena_actor_lose</dont_has_info>
                 <next>11</next>
             </phrase>
+
             <phrase id="11">
                 <text>bar_arena_manager_start_11</text>
             </phrase>
             <phrase id="2">
                 <text />
+				<precondition>dialogs_bar.arena_hasnt_reward</precondition>
                 <dont_has_info>bar_arena_actor_victory</dont_has_info>
                 <dont_has_info>bar_arena_actor_lose</dont_has_info>
                 <has_info>bar_arena_start</has_info>
@@ -75,6 +89,7 @@
             </phrase>
             <phrase id="3">
                 <text />
+				<precondition>dialogs_bar.arena_hasnt_reward</precondition>
                 <precondition>dialogs_bar.arena_empty</precondition>
                 <dont_has_info>bar_arena_start</dont_has_info>
                 <dont_has_info>bar_arena_actor_victory</dont_has_info>
@@ -86,6 +101,7 @@
             </phrase>
             <phrase id="4">
                 <text />
+				<precondition>dialogs_bar.arena_hasnt_reward</precondition>
                 <action>dialogs_bar.arena_give_reward</action>
                 <has_info>bar_arena_actor_victory</has_info>
                 <next>41</next>
@@ -549,68 +565,6 @@
                 <has_info>bar_arena_fight_2_done</has_info>
                 <next>131</next>
                 <next>132</next>
-            </phrase>
-        </phrase_list>
-    </dialog>
-    <dialog id="bar_arena_man_start">
-        <phrase_list>
-            <phrase id="5">
-                <text></text>
-                <precondition>dialogs_bar.arena_hasnt_reward</precondition>
-                <has_info>bar_arena_rank_false</has_info>
-                <next>51</next>
-            </phrase>
-            <phrase id="11">
-                <text>bar_arena_man_start_11</text>
-            </phrase>
-            <phrase id="21">
-                <text>bar_arena_man_start_21</text>
-            </phrase>
-            <phrase id="31">
-                <text>bar_arena_man_start_31</text>
-            </phrase>
-            <phrase id="51">
-                <text>bar_arena_man_start_51</text>
-            </phrase>
-            <phrase id="0">
-                <text></text>
-                <next>1</next>
-                <next>2</next>
-                <next>3</next>
-                <next>4</next>
-                <next>5</next>
-            </phrase>
-            <phrase id="1">
-                <text></text>
-                <precondition>dialogs_bar.arena_hasnt_reward</precondition>
-                <dont_has_info>bar_arena_pause</dont_has_info>
-                <dont_has_info>bar_arena_fight_8_done</dont_has_info>
-                <dont_has_info>bar_arena_rank_false</dont_has_info>
-                <next>11</next>
-            </phrase>
-            <phrase id="2">
-                <text></text>
-                <precondition>dialogs_bar.arena_hasnt_reward</precondition>
-                <dont_has_info>bar_arena_rank_false</dont_has_info>
-                <has_info>bar_arena_pause</has_info>
-                <next>21</next>
-            </phrase>
-            <phrase id="3">
-                <text></text>
-                <precondition>dialogs_bar.arena_hasnt_reward</precondition>
-                <precondition>dialogs_bar.arena_rank_check_false</precondition>
-                <dont_has_info>bar_arena_rank_false</dont_has_info>
-                <has_info>bar_arena_fight_8_done</has_info>
-                <next>31</next>
-            </phrase>
-            <phrase id="41">
-                <text>bar_arena_man_start_41</text>
-            </phrase>
-            <phrase id="4">
-                <text></text>
-                <precondition>dialogs_bar.arena_has_reward</precondition>
-                <action>dialogs_bar.new_arena_give_reward</action>
-                <next>41</next>
             </phrase>
         </phrase_list>
     </dialog>
