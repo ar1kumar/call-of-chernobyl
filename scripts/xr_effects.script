@@ -4705,4 +4705,12 @@ function bar_arena_teleport_2 (actor, npc)
 		end
 		db.actor:inventory_for_each(transfer_object_item)
 	end
+	
+	xr_zones.purge_arena_items("bar_arena")
+end
+
+function purge_zone(actor,npc,p)
+	if (p and p[1]) then
+		xr_zones.purge_arena_items(p[1])
+	end
 end
