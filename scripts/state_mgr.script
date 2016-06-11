@@ -366,6 +366,10 @@ function state_manager:__init(npc)
 	self.pos_direction_applied = false
 end
 function state_manager:set_state(state_name, callback, timeout, target, extra)
+	if (DEV_DEBUG and db.storage[self.npc:id()].debug_state) then 
+		state_name = db.storage[self.npc:id()].debug_state
+	end
+	
 	--alun_utils.debug_write("state_manager:set_state "..state_name)
 	if state_lib.states[state_name] == nil then
 		printf("ERROR: ILLEGAL SET STATE CALLED!!! %s for %s", tostring(state_name), self.npc:name())

@@ -2199,6 +2199,7 @@ function debug_ui_attach:__init(owner, binds) super()
 	
 	-- TODO:
 	-- NOT IMPLEMENTED FULLY YET
+	--[[
 	self.weapons = xml:InitComboBox("wnd_attach_editor:form:list_weapons", self.form)
 	self:Register(self.weapons, "weapon_list")
 	self:AddCallback("weapon_list", ui_events.LIST_ITEM_SELECT,	self.OnWeaponListSelect,self)
@@ -2206,7 +2207,7 @@ function debug_ui_attach:__init(owner, binds) super()
 	local valid_ids = {13,14,15} -- Weapon spawn tables only
 	
 	for n=1,#valid_ids do 
-		local slist = get_spawn_table(id_to_spawn_table[valid_ids[n]])
+		local slist = get_spawn_table(id_to_spawn_table[ valid_ids[n] ])
 		if (slist) then 
 			local cnt = 0
 			for i=1,#slist do
@@ -2216,7 +2217,18 @@ function debug_ui_attach:__init(owner, binds) super()
 				end
 			end
 		end
-	end 
+	end
+	--]]
+	
+	self.anim_states = xml:InitComboBox("wnd_attach_editor:form:list_states", self.form)
+	self:Register(self.anim_states, "state_list")
+	self:AddCallback("state_list", ui_events.LIST_ITEM_SELECT,	self.OnStateListSelect,self)
+	
+	cnt = 0
+	for state,t in pairs(state_lib.states) do 
+		self.anim_states:AddItem(state,cnt)
+		cnt = cnt + 1
+	end
 end
 function debug_ui_attach:__finalize()
 
@@ -2255,6 +2267,22 @@ function debug_ui_attach:OnAttachListSelect()
 		end
 	end
 end
+
+function debug_ui_attach:OnStateListSelect()
+	local state = self.anim_states:GetText()
+	if not (state and state ~= "") then 
+		return 
+	end
+	
+	local npc = xrs_debug_tools.get_debug_npc() or xrs_debug_tools.NEAREST_STALKER
+	if not (npc and npc:id() ~= 0) then
+		return 
+	end
+	
+	db.storage[npc:id()].debug_state = state
+	state_mgr.set_state(npc, state,nil, nil, nil, { fast_set = true })
+end 
+
 function debug_ui_attach:OnWeaponListSelect()
 	self._last = "weapon"
 	for i=1,#self.flds do
