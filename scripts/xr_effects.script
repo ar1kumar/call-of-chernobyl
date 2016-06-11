@@ -4605,7 +4605,11 @@ end
 --NEW ARENA
 
 function bar_arena_teleport (actor, npc)
-
+	local hud = get_hud()
+	if (hud) then
+		hud:HideActorMenu()
+	end
+	
 	local box = get_story_object("bar_arena_inventory_box")
 	if (box) then
 		local function transfer_object_item(item)
@@ -4687,13 +4691,12 @@ function bar_arena_weapon_slot (actor,npc,p)
 end
 
 function bar_arena_teleport_2 (actor, npc)
-
-	level.add_pp_effector ("blink.ppe", 234, false)				
-
-	db.actor:set_actor_position(patrol("t_walk_2"):point(0))
-	local dir = patrol("t_look_2"):point(0):sub(patrol("t_walk_2"):point(0))
-	db.actor:set_actor_direction(-dir:getH())
+	local hud = get_hud()
+	if (hud) then
+		hud:HideActorMenu()
+	end
 	
+	-- remove items from actor given to him by arena
 	local box = get_story_object("bar_arena_inventory_box_2")
 	if (box) then
 		local function transfer_object_item(item)
@@ -4702,7 +4705,23 @@ function bar_arena_teleport_2 (actor, npc)
 		db.actor:inventory_for_each(transfer_object_item)
 	end
 	
+	-- purge all marked items
 	xr_zones.purge_arena_items("bar_arena")
+	
+	level.add_pp_effector ("blink.ppe", 234, false)				
+
+	db.actor:set_actor_position(patrol("t_walk_2"):point(0))
+	local dir = patrol("t_look_2"):point(0):sub(patrol("t_walk_2"):point(0))
+	db.actor:set_actor_direction(-dir:getH())
+	
+	-- give actor back his items that were taken
+	local box = get_story_object("bar_arena_inventory_box")
+	if (box) then
+		local function transfer_object_item(box,item)
+			box:transfer_item(item, db.actor)
+		end
+		box:iterate_inventory_box(transfer_object_item,box)
+	end
 end
 
 function purge_zone(actor,npc,p)
