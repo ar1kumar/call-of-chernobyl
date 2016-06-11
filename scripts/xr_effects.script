@@ -4608,10 +4608,10 @@ function bar_arena_teleport (actor, npc)
 
 	local box = get_story_object("bar_arena_inventory_box")
 	if (box) then
-		local function transfer_object_item(actor,item)
+		local function transfer_object_item(item)
 			db.actor:transfer_item(item, box)
 		end
-		db.actor:iterate_inventory(transfer_object_item,db.actor)
+		db.actor:inventory_for_each(transfer_object_item)
 	end
 
 	local spawn_items = {}	
@@ -4687,11 +4687,7 @@ function bar_arena_weapon_slot (actor,npc,p)
 end
 
 function bar_arena_teleport_2 (actor, npc)
-	local hud = get_hud()
-	if (hud) then
-		hud:HideActorMenu()
-	end
-				
+
 	level.add_pp_effector ("blink.ppe", 234, false)				
 
 	db.actor:set_actor_position(patrol("t_walk_2"):point(0))
@@ -4700,10 +4696,10 @@ function bar_arena_teleport_2 (actor, npc)
 	
 	local box = get_story_object("bar_arena_inventory_box_2")
 	if (box) then
-		local function transfer_object_item(actor,item)
-			box:transfer_item(item, db.actor)
+		local function transfer_object_item(item)
+			db.actor:transfer_item(item, box)
 		end
-		box:iterate_inventory_box(transfer_object_item,box)
+		db.actor:inventory_for_each(transfer_object_item)
 	end
 	
 	xr_zones.purge_arena_items("bar_arena")
