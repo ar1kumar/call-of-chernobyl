@@ -1,16 +1,18 @@
 function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_name)
 	--printf("DEBUG: enable_scripts: npc:name()=%s", npc:name())
 	
-	if not (npc) then 
+	if not (npc) then
 		abort("configure_schemes: NPC IS NIL!")
 		return
-	end 
+	end
 	
 	local npc_id = npc:id()
 	local st = db.storage[npc_id]
-	if not (st) then 
-		return 
+	if not (st) then
+		return
 	end
+	
+	st.job_ini = nil
 
 	-- если какая-то схема была до этого активна, деактивировать её
 	if st.active_section then
@@ -20,10 +22,10 @@ function configure_schemes(npc, ini, ini_filename, stype, section_logic, gulag_n
 	local actual_ini
 	local actual_ini_filename
 	if not (ini:section_exist(section_logic)) then
-		if (ini_filename == "<customdata>") then 
+		if (ini_filename == "<customdata>") then
 			actual_ini_filename = ini_filename
 			actual_ini = ini
-		else 
+		else
 			actual_ini_filename = ini_filename
 			actual_ini = ini
 			printf("ERROR: xr_logic.configure_schemes: object '%s': unable to find section '%s' in '%s' gulag_name=%s", npc:name(), section_logic, ini_filename,gulag_name)
@@ -85,7 +87,7 @@ end
 
 -- Вызывается биндером с целью определить первую активную схему
 function determine_section_to_activate(npc, ini, section_logic, actor)
-	if not (ini) then 
+	if not (ini) then
 		return "nil"
 	end
 	if not ini:section_exist(section_logic) then
@@ -137,8 +139,8 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 	if not (ini) then
 		callstack()
 		printf("activate_by_section: INI is nil! npc=%s section=%s",npc and npc:name(),section)
-		return 
-	end 
+		return
+	end
 	
 	if loading == nil then
 		callstack()
@@ -172,7 +174,7 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 			reset_generic_schemes_on_scheme_switch(npc, "nil", "nil")
 			db.storage[npc_id].active_section = nil
 			db.storage[npc_id].active_scheme = nil
-			return 
+			return
 		end
 		section = t.section
 	end
@@ -186,9 +188,9 @@ function activate_by_section(npc, ini, section, gulag_name, loading)
 		printf("object '%s': unable to determine scheme name from section name '%s'", npc:name(), section)
 	end
 	
-	if not (db.storage[npc_id].stype and schemes_by_stype[db.storage[npc_id].stype][scheme]) then 
+	if not (db.storage[npc_id].stype and schemes_by_stype[db.storage[npc_id].stype][scheme]) then
 		printf("ERROR: %s trying to use a scheme not intended for stype scheme=%s stype=%s",npc:name(),scheme,db.storage[npc_id].stype)
-		return 
+		return
 	end
 
 	-- Загрузить оверрайды:
@@ -244,12 +246,12 @@ function assign_storage_and_bind(npc,ini,scheme,section,temp)
 		db.storage[id][scheme] = {}
 		db.storage[id][scheme].npc = npc
 
-		if not (_G[schemes[scheme]] and _G[schemes[scheme]].add_to_binder) then 
+		if not (_G[schemes[scheme]] and _G[schemes[scheme]].add_to_binder) then
 			callstack()
 			printf("ERROR: no scheme found in schemes table or scheme has no add_to_binder function! scheme = %s",scheme)
 		end
 		
-		if (temp) then 
+		if (temp) then
 			temp.needs_configured = true
 		end
 		
@@ -269,7 +271,7 @@ end
 function subscribe_action_for_events(npc, storage, new_action)
 	--printf("DEBUG: registering new action for reset event scheme=%s npc=%s",scheme, npc and npc:name())
 	
-	if not (storage) then 
+	if not (storage) then
 		callstack()
 		printf("ERROR: subscribe_action_for_events storage is nil!")
 	end
@@ -514,16 +516,16 @@ function cond_name(cond, etalon)
 end
 
 function try_switch_to_another_section(npc, st, actor)
-	local l = st.logic
-	local npc_id = npc:id()
-
 	if not actor then
 		--printf("try_switch_to_another_section(): error in implementation of scheme '%s': actor is nil", st.scheme)
 		return
 	end
 
+	local l = st.logic
+	local npc_id = npc:id()
+	
 	if not l then
-		printf("%s Can't find script switching information in storage, scheme '%s'",npc:name(),db.storage[npc:id()].active_scheme)
+		--printf("DEBUG: %s Can't find script switching information in storage, scheme=%s ini=%s",npc:name(),db.storage[npc_id].active_scheme,db.storage[npc_id].job_ini or db.storage[npc_id].ini_filename)
 		return
 	end
 
@@ -871,11 +873,11 @@ function cfg_get_condlist(ini, section, field, npc)
 end
 
 function cfg_get_switch_conditions(ini, section, npc)
-	local lst = {}
 	if not ini:section_exist(tostring(section)) then
-		--printf("cfg get switch cond: section %s does not exist!",section)
+		--printf("DEBUG: cfg get switch cond: [%s] section %s does not exist! ini=%s",npc and npc:name(),section,db.storage[npc:id()].job_ini or db.storage[npc:id()].ini_filename)
 		return
 	end
+	local lst = {}
 	local line_count = ini:line_count(section)
 
 	local function add_conditions(func, cond)
@@ -1020,9 +1022,9 @@ function pstor_store(obj, varname, val)
 
 	local npc_id = type(obj) == "number" and obj or type(obj.id) == "function" and obj:id() or obj.id
 
-	if not (db.storage[npc_id]) then 
-		return 
-	end 
+	if not (db.storage[npc_id]) then
+		return
+	end
 	
 	if not (db.storage[npc_id].pstor) then
 		db.storage[npc_id].pstor = {}
@@ -1071,9 +1073,9 @@ function save_ctime(obj,varname,val)
 
 	local npc_id = type(obj) == "number" and obj or type(obj.id) == "function" and obj:id() or obj.id
 
-	if not (db.storage[npc_id]) then 
-		return 
-	end 
+	if not (db.storage[npc_id]) then
+		return
+	end
 	
 	if not (db.storage[npc_id].pstor_ctime) then
 		db.storage[npc_id].pstor_ctime = {}
@@ -1171,15 +1173,15 @@ function pstor_load_all(obj, reader)
 
 	db.storage[npc_id].pstor = db.storage[npc_id].pstor or {}
 	
-	if (reader:r_elapsed() <= 0) then 
-		return 
-	end 
+	if (reader:r_elapsed() <= 0) then
+		return
+	end
 	
 	local ctr = reader:r_u32()
 
 	for i = 1, ctr do
-		if (reader:r_elapsed() <= 0) then 
-			return 
+		if (reader:r_elapsed() <= 0) then
+			return
 		end
 		local varname = reader:r_stringZ()
 		local tn = reader:r_u8()
@@ -1200,8 +1202,8 @@ function pstor_load_all(obj, reader)
 	ctr = reader:r_u32()
 
 	for i = 1, ctr do
-		if (reader:r_elapsed() <= 0) then 
-			return 
+		if (reader:r_elapsed() <= 0) then
+			return
 		end
 		local varname = reader:r_stringZ()
 		db.storage[npc_id].pstor_ctime[varname] = utils.r_CTime(reader)
@@ -1209,7 +1211,7 @@ function pstor_load_all(obj, reader)
 end
 
 function save_obj(obj, packet)
-	if not (obj) then 
+	if not (obj) then
 		callstack()
 		error("xr_logic:save_obj obj is nil!")
 		return
@@ -1242,7 +1244,7 @@ function save_obj(obj, packet)
 end
 
 function load_obj(obj, reader)
-	if not (obj) then 
+	if not (obj) then
 		callstack()
 		error("xr_logic:load_obj obj is nil!")	
 		return
@@ -1250,9 +1252,9 @@ function load_obj(obj, reader)
 	set_save_marker(reader, "load", false, "object "..obj:name())
 	local npc_id = obj:id()
 	local st = db.storage[npc_id]
-	if not (st) then 
+	if not (st) then
 		error(strformat("load_obj st is nil for %s",obj and obj:name()))
-	end 
+	end
 	
 	local job_ini = reader:r_stringZ()
 	if job_ini == "" then
@@ -1272,7 +1274,6 @@ function load_obj(obj, reader)
 	if active_section == "" then
 		active_section = "nil"
 	end
-
 
 	local gulag_name = reader:r_stringZ()
 	if (gulag_name == "nil") then
@@ -1329,46 +1330,25 @@ function get_customdata_or_ini_file(npc, filename)
 end
 
 function initialize_obj(obj, st, loaded, actor, stype)
-	if not loaded then
-		-- setup job logic on first net_spawn if NPC has a gulag job
-		if stype == modules.stype_stalker or stype == modules.stype_mobile then
-			local smart = xr_gulag.get_npc_smart(obj)
-			if (smart) then
-				local npc_info = smart.npc_info[obj:id()]
-				if (npc_info and npc_info.job) then 
-					npc_info.begin_job = true
-					empty_table(db.offline_objects[obj:id()])
-					smart:setup_logic(obj)
-					return
-				end
+	-- setup job logic on first net_spawn if NPC has a gulag job
+	if stype == modules.stype_stalker or stype == modules.stype_mobile then
+		local smart = xr_gulag.get_npc_smart(obj)
+		if (smart) then
+			local npc_info = smart.npc_info[obj:id()]
+			if (npc_info and npc_info.job) then
+				npc_info.begin_job = true
+				empty_table(db.offline_objects[obj:id()])
+				smart:setup_logic(obj)
+				return
 			end
 		end
-	
-		local sim = alife()
-		local ini_filename = sim:has_info(obj:id(),"npcx_is_companion") and "scripts\\beh_companion.ltx" or "<customdata>"
-		local ini = get_customdata_or_ini_file(obj, ini_filename)
-		ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, "logic", "")
-		local sect = xr_logic.determine_section_to_activate(obj, ini, "logic", actor)
-		xr_logic.activate_by_section(obj, ini, sect,  st.gulag_name, false)
-		local relation = utils.cfg_get_string(ini, "logic", "relation", obj, false, "")
-		if(relation~=nil) then
-			obj:set_relation(game_object[relation], db.actor)
-		end
-		local sympathy = utils.cfg_get_number(ini, "logic", "sympathy", obj, false)
-		if(sympathy~=nil) then
-			obj:set_sympathy(sympathy)
-		end
-	else
-		local ini_filename = st.loaded_ini_filename
-		if ini_filename then
-			local ini = get_customdata_or_ini_file(obj, ini_filename)
-			ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, st.loaded_section_logic, st.loaded_gulag_name)
-			--printf( "initialize_obj: loaded, gulag_name %s", tostring(st.loaded_gulag_name))
-			xr_logic.activate_by_section(obj, ini, st.loaded_active_section, st.loaded_gulag_name, true)
-		end
-
---		if st.active_scheme then
---			issue_event(obj, db.storage[obj:id()][st.active_scheme], "load")
---		end
 	end
+		
+	local sim = alife()
+	local ini_filename = sim:has_info(obj:id(),"npcx_is_companion") and "scripts\\beh_companion.ltx" or st.loaded_ini_filename or "<customdata>"
+	local ini = get_customdata_or_ini_file(obj, ini_filename)
+	ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, st.loaded_section_logic or "logic", st.loaded_gulag_name or "")
+	
+	local section = st.loaded_active_section or xr_logic.determine_section_to_activate(obj, ini, "logic", actor)
+	xr_logic.activate_by_section(obj, ini, section, st.loaded_gulag_name or "", true)
 end
