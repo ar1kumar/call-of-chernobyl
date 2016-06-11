@@ -4682,12 +4682,8 @@ function bar_arena_teleport (actor, npc)
 	
 end
 
-function bar_arena_weapon_slot ()
-	if	has_alife_info("bar_arena_fight_1") then  
-		db.actor:activate_slot(1)
-	else 
-		db.actor:activate_slot(2)
-	end
+function bar_arena_weapon_slot (actor,npc,p)
+	db.actor:activate_slot(tonumber(p[1]) or 1)
 end
 
 function bar_arena_teleport_2 (actor, npc)
