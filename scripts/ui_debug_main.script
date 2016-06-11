@@ -2224,10 +2224,16 @@ function debug_ui_attach:__init(owner, binds) super()
 	self:Register(self.anim_states, "state_list")
 	self:AddCallback("state_list", ui_events.LIST_ITEM_SELECT,	self.OnStateListSelect,self)
 	
-	cnt = 0
-	for state,t in pairs(state_lib.states) do 
-		self.anim_states:AddItem(state,cnt)
-		cnt = cnt + 1
+	t = clear_table(t) or {}
+	
+	for state,_ in pairs(state_lib.states) do 
+		table.insert(t,state)
+	end
+	
+	table.sort(t)
+	
+	for i=1,#t do 
+		self.anim_states:AddItem(t[i],#t-1)
 	end
 end
 function debug_ui_attach:__finalize()
