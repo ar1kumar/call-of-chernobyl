@@ -2895,16 +2895,18 @@ end
 
 function bar_actor_rank_stalker (actor,npc)
 	local actor = db.actor
-	if actor:character_rank() > 300 then
+	if actor:character_rank() > 1499 then
 		return true
 	end
+	return false
 end
 
 function bar_actor_rank_veteran (actor,npc)
 	local actor = db.actor
-	if actor:character_rank() > 600 then
+	if actor:character_rank() > 2999 then
 		return true
 	end
+	return false
 end
 
 function bar_arena_fight_3_end ()
