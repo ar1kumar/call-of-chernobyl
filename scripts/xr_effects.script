@@ -195,11 +195,11 @@ function reward_stash(actor,npc,p)
 	if (p and p[1] ~= "true") or (math.random() <= 0.5) then
 		local bonus
 		local rnd = math.random(100)
-		if (rnd <= 10) then 	-- 10% Chance
+		if (rnd <= 20) then 	-- 20% Chance
 			bonus = {"itm_repairkit_tier_3"}
-		elseif (rnd <= 30) then	-- 20% Chance
+		elseif (rnd <= 50) then	-- 30% Chance
 			bonus = {"itm_repairkit_tier_2"}
-		elseif (rnd <= 70) then	-- 40% Chance
+		elseif (rnd <= 90) then	-- 40% Chance
 			bonus = {"itm_repairkit_tier_1"}
 		end
 		coc_treasure_manager.create_random_stash(nil,nil,bonus)
