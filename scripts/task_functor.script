@@ -78,7 +78,7 @@ function general_fetch_task(task_id,field,p,task)
 	end
 	if (field == "title") then
 		local fetch = alun_utils.get_inv_name(alun_utils.load_var(db.actor,task_id.."_fetch",""))
-		local count = alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
+		local count = fetch and alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
 		if (count > 1) then
 			return strformat((game.translate_string(p) or ""),fetch .. " x" .. tostring(count))
 		end
@@ -88,7 +88,7 @@ function general_fetch_task(task_id,field,p,task)
 			return game.translate_string("st_return_for_reward")
 		end
 		local fetch = alun_utils.get_inv_name(alun_utils.load_var(db.actor,task_id.."_fetch",""))
-		local count = alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
+		local count = fetch and alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
 		if (count > 1) then
 			return strformat((game.translate_string(p) or ""),fetch .. " x" .. tostring(count))
 		end
