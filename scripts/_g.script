@@ -595,13 +595,11 @@ function empty_table(t)
 end
 
 function stop_play_sound(obj)
-	if (IsStalker(obj) and obj:alive() == true) then
-		obj:set_sound_mask(-1)
-		obj:set_sound_mask(0)
-	else 
-		obj:set_sound_mask(-1)
-		obj:set_sound_mask(0)	
+	if (IsStalker(obj) and not obj:alive()) then
+		return 
 	end
+	obj:set_sound_mask(-1)
+	obj:set_sound_mask(0)
 end
 
 -- Печатает таблицу как дерево.
