@@ -3,12 +3,14 @@
 
 -- keybind_name = default
 -- To add new keybinds, simplay add name here and default keypress. Then make an action.<name> function for it. Param passed is true if pressed or false if released
+-- In engine there has been 15 custom dik binds made for script use (ie. kCUSTOM1 to kCUSTOM15)
+-- This allows the ability to set the keybind through game options or console instead. Otherwise use DIK_keys and value will be stored in axr_options.ini
 local keybinds = {
-					["companion_cycle_combat_mode"] = "DIK_NUMPAD1",
-					["companion_cycle_move_mode"] 	= "DIK_NUMPAD2",
-					["companion_move_to_point"] 	= "DIK_NUMPAD3",
-					["companion_cycle_stealth"] 	= "DIK_NUMPAD4",
-					["companion_cycle_looting"] 	= "DIK_NUMPAD5",
+					["companion_cycle_combat_mode"] = "kCUSTOM1",
+					["companion_cycle_move_mode"] 	= "kCUSTOM2",
+					["companion_move_to_point"] 	= "kCUSTOM3",
+					["companion_cycle_stealth"] 	= "kCUSTOM4",
+					["companion_cycle_looting"] 	= "kCUSTOM5",
 					["debug_demo_record"]			= "DIK_NUMPAD0",
 					["debug_select_object"] 		= "DIK_NUMPAD9",
 					["debug_attachment_ui"] 		= "DIK_INSERT",
@@ -16,6 +18,7 @@ local keybinds = {
 					--["debug_reload_game"]			= "DIK_END",
 					["debug_hold_action"]			= "DIK_NUMPAD8"
 }
+
 local action = {}
 ------------------------------------------------------------------
 -- Keypress actions
@@ -237,24 +240,43 @@ end
 -------------------------------------------
 local function on_key_release(key)
 	for k,v in pairs(keybinds) do 
-		if (action[k] and key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then 
-			action[k](0)
+		if (action[k]) then 
+			if (key_bindings[v]) then 
+				if (key_bindings[v] == dik_to_bind(key)) then 
+					action[k](0)
+				end
+			elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then
+				action[k](0)
+			end
 		end
 	end 
 end
 
 local function on_key_press(key)
+	--printf("kCUSTOM1=%s key=%s dik_to_bind=%s",key_bindings.kCUSTOM1,key,dik_to_bind(key))
 	for k,v in pairs(keybinds) do 
-		if (action[k] and key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then 
-			action[k](1)
+		if (action[k]) then 
+			if (key_bindings[v]) then 
+				if (key_bindings[v] == dik_to_bind(key)) then 
+					action[k](1)
+				end
+			elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then
+				action[k](1)
+			end
 		end
 	end 
 end
 
 local function on_key_hold(key)
 	for k,v in pairs(keybinds) do 
-		if (action[k] and key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then 
-			action[k](2)
+		if (action[k]) then 
+			if (key_bindings[v]) then 
+				if (key_bindings[v] == dik_to_bind(key)) then 
+					action[k](2)
+				end
+			elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then
+				action[k](2)
+			end
 		end
 	end 
 end
