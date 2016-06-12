@@ -274,14 +274,11 @@ function wishful_thinking_functor()
 	if (has_alife_info("achieved_wishful_thinking")) then
 		return true
 	end
-	if (has_alife_info("achieved_wishful_thinking_trigger")) then
+	if (has_alife_info("sar2_monolith_end")) then
 		db.actor:give_info_portion("achieved_wishful_thinking")
 		news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
 		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.wishful_thinking.rnk)
 		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.wishful_thinking.rpt)
-	end
-	if (level.name() == "l12u_sarcofag") then
-		db.actor:give_info_portion("achieved_wishful_thinking_trigger")
 	end
 	return has_alife_info("achieved_wishful_thinking")
 end
