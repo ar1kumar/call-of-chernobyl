@@ -281,6 +281,16 @@ if (marshal) then
 	end
 	getmetatable(game.CTime()).__persist = game_CTime___persist
 end
+
+-- debug to find objects that shouldn't be calling game_object:alive()
+--[[
+game_object.alive = function(self)
+	callstack()
+	printf("alive %s",self:name())
+	local se_obj = alife():object(self:id())
+	return se_obj:alive()
+end
+--]]
 --------------------------------------------------------------------
 function empty(t)
 	if not (t) then 

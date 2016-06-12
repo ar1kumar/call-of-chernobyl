@@ -424,8 +424,10 @@ end
 
 function switch_companion_gather_items(npc)
 	if ( npc:has_info("npcx_beh_gather_items") ) then
+		SetHudMsg(game.translate_string("st_disable_looting"),8)
 		npc:disable_info_portion("npcx_beh_gather_items")
 	else
+		SetHudMsg(game.translate_string("st_enable_looting"),8)
 		npc:give_info_portion("npcx_beh_gather_items")
 	end
 end
