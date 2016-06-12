@@ -101,93 +101,57 @@ function CRandomTask:set_task_cancelled(task_id)
 end
 
 function CRandomTask:update()
-	local task
 	for k,v in pairs(self.task_info) do
-		task = self.task_info[k]
-		if (task.timeout and game.get_game_time():diffSec(task.timeout) > task.repeat_timeout) then 
-			self.task_info[k] = nil
+		local tsk = self.task_info[k]
+		tsk:check_task(self)
+		if (tsk.timeout and game.get_game_time():diffSec(tsk.timeout) > tsk.repeat_timeout) then
+			if not (db.actor:get_task(k,true)) then -- don't remove if engine task object still exist
+				self.task_info[k] = nil
+			end
 		end
 	end
 end 
 
 --' Проверяем, не выполнен ли таск
 function CRandomTask:task_complete(p1)
-	local task = self.task_info[p1]
-	if task == nil then
+	local tsk = self.task_info[p1]
+	if tsk == nil then
+		printf("ERROR: CRandomTask:task_complete %s task is nil!",p1)
+		return true
+	end
+	
+	if (tsk.forced_status == "complete") then
+		tsk.forced_status = nil
+		tsk.last_check_task = "complete"
+	elseif (tsk.forced_status == "fail") then 
 		return false
 	end
 	
-	task:check_task(self)
-	if (task.forced_status == "complete") then 
-		task.last_check_task = "complete"
-	elseif (task.forced_status == "fail") then 
-		return false
-	end
-	if task.last_check_task == "complete" then
-		xr_logic.pick_section_from_condlist(db.actor, db.actor, task.on_complete)
-		task:give_reward()
-		task.status = "completed"
-		if (task.repeat_timeout) then 
-			task.timeout = game.get_game_time()
-			task.stage = 255
-		else 
-			self.task_info[p1] = nil
-		end
-		return true
-	else
-		return false
-	end
-end
---' Проверяем, не профейлен ли таск
-function CRandomTask:task_fail(p1)
-	local task = self.task_info[p1]
-	if task == nil then
-		return false
-	end
-	
-	task:check_task(self)
-	if (task.forced_status == "fail") then
-		task.last_check_task = "fail"
-	elseif (task.forced_status == "complete") then 
-		return false
-	--[[ In the case that eventually we may want to use on_cancel
-	elseif (task.forced_status == "cancel") then
-		xr_logic.pick_section_from_condlist(db.actor, db.actor, task.on_cancel)
-		news_manager.send_task(db.actor, "updated", task.t)
-		task.status = "fail"
-		if (task.repeat_timeout) then 
-			task.timeout = game.get_game_time()
-			task.stage = 255
-		else
-			self.task_info[p1] = nil
-		end
-		return true
-	--]]
-	end
-	if (task.last_check_task == "fail") then
-		xr_logic.pick_section_from_condlist(db.actor, db.actor, task.on_fail)
-		news_manager.send_task(db.actor, "fail", task.t)
-		task.status = "fail"
-		if (task.repeat_timeout) then 
-			task.timeout = game.get_game_time()
-			task.stage = 255
-		else
-			self.task_info[p1] = nil
-		end
-		return true
-	elseif (task.last_check_task == "reversed") then
-		xr_logic.pick_section_from_condlist(db.actor, db.actor, task.on_reversed)
-		news_manager.send_task(db.actor, "reversed", task.t)
-		task.status = "normal"
+	if tsk.last_check_task == "complete" then
 		return true
 	end
 	return false
 end
-
-function CRandomTask:task_callback(task, status)
-
+--' Проверяем, не профейлен ли таск
+function CRandomTask:task_fail(p1)
+	local tsk = self.task_info[p1]
+	if tsk == nil then
+		printf("ERROR: CRandomTask:task_fail %s task is nil!",p1)
+		return false
+	end
+	
+	if (tsk.forced_status == "fail") then
+		tsk.forced_status = nil
+		tsk.last_check_task = "fail"
+	elseif (tsk.forced_status == "complete") then 
+		return false
+	end
+	
+	if (tsk.last_check_task == "fail") then
+		return true
+	end
+	return false
 end
-
 
 function get_task_manager()
 	if random_task == nil then
@@ -202,7 +166,41 @@ end
 function task_fail(p1)
 	return get_task_manager():task_fail(p1)
 end
-function task_callback(_task, state)
+function task_callback(tsk, state)
+	local tm = get_task_manager()
+	local id = tsk:get_id()
+	
+	local rtask = tm.task_info[id]
+	if not (rtask) then
+		return 
+	end 
+	
+	--printf("task_callback %s state=%s",id,state == task.fail and "fail" or state == task.completed and "complete" or state)
+	if (state == task.fail) then
+		news_manager.send_task(db.actor, "fail", tsk)
+		xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_fail)
+		rtask.status = "fail"
+		if (rtask.repeat_timeout) then
+			rtask.t = nil
+			rtask.timeout = game.get_game_time()
+			rtask.stage = 255
+		else
+			tm.task_info[id] = nil
+		end
+	elseif (state == task.completed) then 
+		xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_complete)
+		rtask:give_reward()
+		rtask.status = "completed"
+		if (rtask.repeat_timeout) then
+			rtask.t = nil
+			rtask.timeout = game.get_game_time()
+			rtask.stage = 255
+		else 
+			tm.task_info[id] = nil
+		end
+	else 
+	
+	end
 end
 
 function clear_task_manager()
@@ -234,6 +232,13 @@ function load_state(m_data)
 		local obj = task_objects.CGeneralTask(task_id)
 		if (obj:load_state(m_data) == true) then
 			tm.task_info[task_id] = obj
+			--[[
+			local t = db.actor and db.actor:get_task(obj.id,true)
+			if (t) then
+				t:add_complete_func("task_manager.task_complete")
+				t:add_fail_func("task_manager.task_fail")
+			end
+			--]]
 		end
 	end
 	

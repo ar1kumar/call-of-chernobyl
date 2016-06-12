@@ -78,7 +78,7 @@ function send_tip(actor, news_id, timeout, sender, showtime, sender_id)
 					end
 				end
 				-- в других случаях только на смерть
-				if npc:alive() == 1 then
+				if not npc:alive() then
 					printf("[PDA]Cannot send tips [%s], sender is dead", tostring(news_id))
 					return false
 				end
@@ -192,7 +192,7 @@ local action_descr_by_type = {
 								updated = "general_update_task"
 							 }
 
-function send_task(actor, type, task)
+function send_task(actor, type, tsk)
 	if db.actor == nil then
 		return false
 	end
@@ -202,8 +202,8 @@ function send_task(actor, type, task)
 	end
 	xr_sound.set_sound_play(db.actor:id(), "pda_task")
 	local news_caption = game.translate_string(action_descr_by_type[type])
-	local news_text = game.translate_string(task:get_title())
-	local icon = task:get_icon_name()
+	local news_text = game.translate_string(tsk:get_title())
+	local icon = tsk:get_icon_name()
 	if(icon==nil) then
 		icon = "ui_iconsTotal_storyline"
 	end
