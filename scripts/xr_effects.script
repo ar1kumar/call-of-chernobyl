@@ -1379,6 +1379,7 @@ function restore_health(actor, npc)
 end
 
 function make_enemy(actor, npc, p)
+	--[[
 	if p == nil then printf("Invalid parameter in function 'hit_npc_from_npc'!!!!") end
 	local h = hit()
 	local hitted_npc = npc
@@ -1392,6 +1393,17 @@ function make_enemy(actor, npc, p)
 	h.power = 0.03
 	h.impulse = 0.03
 	hitted_npc:hit(h)
+	--]]
+	local npc1 = get_story_object(p[1])
+	if not (npc1) then 
+		return 
+	end 
+	local npc2 = get_story_object(p[2])
+	if not (npc2) then 
+		return 
+	end
+	npc1:set_relation(game_object.enemy,npc2)
+	npc2:set_relation(game_object.enemy,npc1)
 end
 
 function sniper_fire_mode(actor, npc, p)
