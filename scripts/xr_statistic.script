@@ -72,8 +72,9 @@ monster_classes = {
 
 rank_rep = {
 			-- Gameplay mechanics.
-			arena_s				=	{rnk=100,	rpt=200},
-			arena_m				=	{rnk=50,	rpt=100},
+			arena_chal			=	{rnk=50,	rpt=100},
+			arena_boro			=	{rnk=50,	rpt=100},
+			arena_trad			=	{rnk=100,	rpt=200},
 			surges				=	{rnk=5,		rpt=0},
 			storms				=	{rnk=5,		rpt=0},
 			quests				=	{rnk=50,	rpt=100},
@@ -274,16 +275,23 @@ function inc_help_wounded_counter()
 	inc_actor_rank(rank_rep.wounded.rnk)
 	inc_actor_reputation(rank_rep.wounded.rpt)
 end
-function inc_arena_battles_counter(challenge)
+function inc_arena_battles_counter(mode)
 	actor_statistic.arena_battles = actor_statistic.arena_battles + 1
-	if (challenge) then
-		-- Versus a mutant. (Challenge)
-		inc_actor_rank(rank_rep.arena_m.rnk)
-		inc_actor_reputation(rank_rep.arena_m.rpt)
-	else
-		-- Versus a stalker. (Traditional)
-		inc_actor_rank(rank_rep.arena_s.rnk)
-		inc_actor_reputation(rank_rep.arena_s.rpt)
+	-- Invalid.
+	if (mode == nil) then
+		return
+	-- Challenge arena.
+	elseif (mode == "challenge") then
+		inc_actor_rank(rank_rep.arena_chal.rnk)
+		inc_actor_reputation(rank_rep.arena_chal.rpt)
+	-- Traditional arena.
+	elseif (mode == "traditional") then
+		inc_actor_rank(rank_rep.arena_trad.rnk)
+		inc_actor_reputation(rank_rep.arena_trad.rpt)
+	-- Borovos' arena.
+	elseif (mode == "borovos") then
+		inc_actor_rank(rank_rep.arena_boro.rnk)
+		inc_actor_reputation(rank_rep.arena_boro.rpt)
 	end
 end
 
