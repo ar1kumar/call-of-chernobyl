@@ -21,6 +21,7 @@ actor_statistic = {
 					help_wounded = 0,
 					actual_rank = 0,
 					actual_reputation = 0,
+					arena_battles = 0,
 					visited = { 
 								["k00_marsh"] = false,
 								["k01_darkscape"] = false,
@@ -71,6 +72,8 @@ monster_classes = {
 
 rank_rep = {
 			-- Gameplay mechanics.
+			arena_s				=	{rnk=100,	rpt=200},
+			arena_m				=	{rnk=50,	rpt=100},
 			surges				=	{rnk=5,		rpt=0},
 			storms				=	{rnk=5,		rpt=0},
 			quests				=	{rnk=50,	rpt=100},
@@ -271,6 +274,18 @@ function inc_help_wounded_counter()
 	inc_actor_rank(rank_rep.wounded.rnk)
 	inc_actor_reputation(rank_rep.wounded.rpt)
 end
+function inc_arena_battles_counter(challenge)
+	actor_statistic.arena_battles = actor_statistic.arena_battles + 1
+	if (challenge) then
+		-- Versus a mutant. (Challenge)
+		inc_actor_rank(rank_rep.arena_m.rnk)
+		inc_actor_reputation(rank_rep.arena_m.rpt)
+	else
+		-- Versus a stalker. (Traditional)
+		inc_actor_rank(rank_rep.arena_s.rnk)
+		inc_actor_reputation(rank_rep.arena_s.rpt)
+	end
+end
 
 function set_best_monster(obj)
 	if not IsMonster(obj) then
@@ -359,6 +374,7 @@ function save(package)
 	if (USE_MARSHAL) then
 		return
 	end
+	package:w_u16(actor_statistic.arena_battles)
 	package:w_u16(actor_statistic.surges)
 	package:w_u16(actor_statistic.storms)
 	package:w_u16(actor_statistic.completed_quests)
@@ -423,11 +439,12 @@ function load(package)
 		return
 	end
 	actor_statistic = {}
+	actor_statistic.arena_battles  		= package:r_u16()
 	actor_statistic.surges  			= package:r_u16()
 	actor_statistic.storms  			= package:r_u16()
 	actor_statistic.completed_quests 	= package:r_u16()
 	actor_statistic.failed_quests	 	= package:r_u16()
-	actor_statistic.cancelled_quests	 	= package:r_u16()
+	actor_statistic.cancelled_quests	= package:r_u16()
 	actor_statistic.killed_monsters  	= package:r_u32()
 	actor_statistic.killed_stalkers  	= package:r_u32()
 	actor_statistic.founded_secrets  	= package:r_u16()
