@@ -295,7 +295,7 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 				self.OnButton_return_game()
 			end
 		elseif (dik == DIK_keys.DIK_F5 and level.present()) then
-			if (db.actor and db.actor:alive()) or (IsGameTypeSingle() ~= true) then
+			if (db.actor and db.actor:alive()) then
 				local console = get_console()
 				local fname = user_name() .. " - quicksave"
 				console:execute("save " .. fname)
