@@ -21,6 +21,7 @@ actor_statistic = {
 					help_wounded = 0,
 					actual_rank = 0,
 					actual_reputation = 0,
+					arena_battles = 0,
 					visited = { 
 								["k00_marsh"] = false,
 								["k01_darkscape"] = false,
@@ -71,6 +72,9 @@ monster_classes = {
 
 rank_rep = {
 			-- Gameplay mechanics.
+			arena_chal			=	{rnk=50,	rpt=100},
+			arena_boro			=	{rnk=75,	rpt=150},
+			arena_trad			=	{rnk=100,	rpt=200},
 			surges				=	{rnk=5,		rpt=0},
 			storms				=	{rnk=5,		rpt=0},
 			quests				=	{rnk=50,	rpt=100},
@@ -100,7 +104,7 @@ rank_rep = {
 			silver_or_lead		=	{rnk=25,	rpt=0},
 			tourist				=	{rnk=25,	rpt=0},
 			well_dressed		=	{rnk=25,	rpt=0},
-			wishful_thinking	=	{rnk=1000,	rpt=1000}, -- Getting this is a huge feat.
+			wishful_thinking	=	{rnk=500,	rpt=1000}, -- Getting this is a huge feat.
 }
 
 weapons_table = {}
@@ -271,6 +275,25 @@ function inc_help_wounded_counter()
 	inc_actor_rank(rank_rep.wounded.rnk)
 	inc_actor_reputation(rank_rep.wounded.rpt)
 end
+function inc_arena_battles_counter(mode)
+	actor_statistic.arena_battles = actor_statistic.arena_battles + 1
+	-- Invalid.
+	if (mode == nil) then
+		return
+	-- Challenge arena.
+	elseif (mode == "challenge") then
+		inc_actor_rank(rank_rep.arena_chal.rnk)
+		inc_actor_reputation(rank_rep.arena_chal.rpt)
+	-- Traditional arena.
+	elseif (mode == "traditional") then
+		inc_actor_rank(rank_rep.arena_trad.rnk)
+		inc_actor_reputation(rank_rep.arena_trad.rpt)
+	-- Borovos' arena.
+	elseif (mode == "borovos") then
+		inc_actor_rank(rank_rep.arena_boro.rnk)
+		inc_actor_reputation(rank_rep.arena_boro.rpt)
+	end
+end
 
 function set_best_monster(obj)
 	if not IsMonster(obj) then
@@ -359,6 +382,7 @@ function save(package)
 	if (USE_MARSHAL) then
 		return
 	end
+	package:w_u16(actor_statistic.arena_battles)
 	package:w_u16(actor_statistic.surges)
 	package:w_u16(actor_statistic.storms)
 	package:w_u16(actor_statistic.completed_quests)
@@ -423,11 +447,12 @@ function load(package)
 		return
 	end
 	actor_statistic = {}
+	actor_statistic.arena_battles  		= package:r_u16()
 	actor_statistic.surges  			= package:r_u16()
 	actor_statistic.storms  			= package:r_u16()
 	actor_statistic.completed_quests 	= package:r_u16()
 	actor_statistic.failed_quests	 	= package:r_u16()
-	actor_statistic.cancelled_quests	 	= package:r_u16()
+	actor_statistic.cancelled_quests	= package:r_u16()
 	actor_statistic.killed_monsters  	= package:r_u32()
 	actor_statistic.killed_stalkers  	= package:r_u32()
 	actor_statistic.founded_secrets  	= package:r_u16()
@@ -516,7 +541,7 @@ function inc_actor_rank(rank)
 		db.actor:set_character_rank(db.actor:character_rank() + rank)
 	end
 	check_actor_rank_change()
---	news_manager.send_tip(db.actor, "Rank: ".. db.actor:character_rank(), nil, "rank_change", 10, nil)
+--	news_manager.send_tip(db.actor, "Rank: ".. db.actor:character_rank(), nil, "rank_change", nil, nil)
 end
 
 -- Check for actor rank change.
@@ -532,9 +557,9 @@ function check_actor_rank_change()
 		old = old + 1
 	end
 	if old > new then
-		news_manager.send_tip(db.actor, "st_rank_decreased", nil, "rank_change", 10, nil)
+		news_manager.send_tip(db.actor, "st_rank_decreased", nil, "rank_change", nil, nil)
 	elseif new > old then
-		news_manager.send_tip(db.actor, "st_rank_increased", nil, "rank_change", 10, nil)
+		news_manager.send_tip(db.actor, "st_rank_increased", nil, "rank_change", nil, nil)
 	end
 	actor_statistic.actual_rank = current_rank
 end
@@ -544,7 +569,7 @@ function inc_actor_reputation(reputation)
 	if reputation and ((db.actor:character_reputation()+reputation) <= 2500 and (db.actor:character_reputation()+reputation) >= -2500) then
 		db.actor:change_character_reputation(reputation)
 	end
---	news_manager.send_tip(db.actor, "Reputation: ".. db.actor:character_reputation(), nil, "reputation_change", 10, nil)
+--	news_manager.send_tip(db.actor, "Reputation: ".. db.actor:character_reputation(), nil, "reputation_change", nil, nil)
 	check_actor_reputation_change()
 end
 
@@ -561,9 +586,9 @@ function check_actor_reputation_change()
 		old = old + 1
 	end
 	if old > new then
-		news_manager.send_tip(db.actor, "st_reputation_decreased", nil, "reputation_change", 10, nil)
+		news_manager.send_tip(db.actor, "st_reputation_decreased", nil, "reputation_change", nil, nil)
 	elseif new > old then
-		news_manager.send_tip(db.actor, "st_reputation_increased", nil, "reputation_change", 10, nil)
+		news_manager.send_tip(db.actor, "st_reputation_increased", nil, "reputation_change", nil, nil)
 	end
 	actor_statistic.actual_reputation = current_reputation
  end
