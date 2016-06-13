@@ -40,6 +40,9 @@ function opt_menu_on_init(menu)
 	-- excl_dist
 	menu.gameplay_options["excl_dist"]			= {default=30, 		debug_only=false, 	typ="list", list={0,10,20,30,40,50,60,70,80,90,100,200,500}}
 	
+	-- quicksave_cnt
+	menu.gameplay_options["quicksave_cnt"]		= {default=5, 		debug_only=false, 	typ="list", list={1,5,10,20}}
+	
 	if (db.actor) then -- Options will only show while in-game
 		local l = ui_mm_faction_select.get_icon_list()
 		local selected = nil 
