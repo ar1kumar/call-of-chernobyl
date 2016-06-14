@@ -1228,41 +1228,17 @@ function se_smart_terrain:get_smart_props()
 end
 
 function se_smart_terrain:show()
-	local tg = time_global()
-	if(self.showtime~=nil) and (self.showtime+200>=tg) then
-		return
-	end
-	self.showtime = tg
-
-	if (self.props and self.props.lair > 0 and has_alife_info("adventurer_skill_tier_1") and level.map_has_object_spot(self.id,"alife_presentation_faction_monster") == 0) then 
-		level.map_add_object_spot(self.id,"alife_presentation_faction_monster","Mutant lair")
-		return 
-	end 
-	
-	if not (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
-		return 
-	end
-	
-	local player = self.player_name
-	local spot = "neutral"
-
-	if self.sim_avail == nil or xr_logic.pick_section_from_condlist(db.actor or alife():actor(), self, self.sim_avail) == "true" then
-		spot = "friend"
-	else
-		spot = "enemy"
-	end
-
-	local level = level
-	if(self.smrt_showed_spot==spot) then
-		level.map_change_spot_hint(self.id, "alife_presentation_smart_default".."_"..self.smrt_showed_spot, self:get_smart_props())
-		return
-	end
-
-		if(self.smrt_showed_spot~=nil) then
-		level.map_remove_object_spot(self.id, "alife_presentation_smart_default_"..self.smrt_showed_spot)
+	if (axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
+		if (level.map_has_object_spot(self.id,"alife_presentation_smart_default_neutral") == 0) then
+			level.map_add_object_spot(self.id, "alife_presentation_smart_default_neutral", self:get_smart_props())
+		else
+			level.map_change_spot_hint(self.id, "alife_presentation_smart_default_neutral", self:get_smart_props())
 		end
-	level.map_add_object_spot(self.id, "alife_presentation_smart_default_"..spot, self:get_smart_props())
-		self.smrt_showed_spot = spot
+	else
+		if (level.map_has_object_spot(self.id,"alife_presentation_smart_default_neutral") ~= 0) then 
+			level.map_remove_object_spot(self.id, "alife_presentation_smart_default_neutral")
+		end
+	end
 end
 
 function se_smart_terrain:hide()

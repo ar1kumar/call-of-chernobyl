@@ -402,7 +402,7 @@ function save_state(id,m_data)
 		m_data.xr_logic = {}
 	end
 	m_data.xr_logic[id] = {}
-	m_data.xr_logic[id].job_ini = st.job_ini
+	--m_data.xr_logic[id].job_ini = st.job_ini
 	m_data.xr_logic[id].ini_filename = st.ini_filename
 	m_data.xr_logic[id].section_logic = st.section_logic
 	m_data.xr_logic[id].active_section = st.active_section
@@ -422,7 +422,7 @@ function load_state(id,m_data)
 	db.storage[id] = db.storage[id] or {}
 	local st = db.storage[id]	
 	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
-	st.job_ini = m_data.xr_logic[id].job_ini
+	--st.job_ini = m_data.xr_logic[id].job_ini
 	st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
 	st.loaded_section_logic = m_data.xr_logic[id].section_logic
 	st.loaded_active_section = m_data.xr_logic[id].active_section or "nil"
