@@ -413,7 +413,7 @@ function move_mgr:update_movement_state()
 	self.__climb_enabled = nil
 	--]]
 
-	state_mgr.set_state(self.object, self.cur_state_moving)
+	state_mgr.set_state(self.object, self.cur_state_moving,nil, nil, nil, { fast_set = true})
 end
 
 function move_mgr:update_standing_state(look_pos, snd)
