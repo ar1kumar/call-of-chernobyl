@@ -29,6 +29,7 @@ function anomaly_field_binder:net_spawn(server_object)
 	db.add_obj(self.object)
 	fields_by_names[self.object:name()] = self
 	
+	--[[ don't enable unless you realize that engine AI schemes to deal with anomalies is stupid and will not be supported
 	-- MAY CAUSE HUGE FPS DROP ON COP MAPS
 	--[[
 		eDefaultRestrictorTypeNone = u8(0),
@@ -50,6 +51,7 @@ function anomaly_field_binder:net_spawn(server_object)
 			self.object:set_restrictor_type(2)
 		end
 	end
+	--]]
 	
 	return true
 end
