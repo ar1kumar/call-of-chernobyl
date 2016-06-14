@@ -1310,10 +1310,12 @@ function get_customdata_or_ini_file(npc, filename)
 		end
 	elseif string.find( filename, "*" ) == 1 then
 		-- динамический ltx
+		--[[ obsolete?
 		if st.job_ini ~= nil then
 			--printf("custom_data_or_ini:job_ini!!!")
 			return ini_file(st.job_ini)
 		end
+		--]]
 		--printf("custom_data_or_ini:4!!!")
 		
 		local gname = string.sub(filename, 2)
