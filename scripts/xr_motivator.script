@@ -358,7 +358,7 @@ function motivator_binder:use_callback(obj, who)
 	if not obj:alive() then
 		return
 	end
-	inventory_upgrades.need_victim(obj)
+	inventory_upgrades.victim_id = obj:id()
 	xr_meet.notify_on_use(obj, who)
 	dialog_manager.disabled_phrases[obj:id()] = nil
 	dialog_manager.RandomVal = math.random(1,3)

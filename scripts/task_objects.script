@@ -252,7 +252,7 @@ function CGeneralTask:give_reward()
 
 	-- Награду можно выдать двумя методами: от нпс или просто свалитьс неба. Если не найден НПС, с которым мы в диалоге, то просто валим с неба
 
-	local npc = inventory_upgrades.victim
+	local npc = inventory_upgrades.victim_id and db.storage[inventory_upgrades.victim_id] and db.storage[inventory_upgrades.victim_id].object
 	if not (npc) then
 		return 
 	end
