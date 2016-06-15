@@ -47,10 +47,10 @@ function action.companion_cycle_stealth(p)
 					st = db.storage[k.id]
 					local member = st and st.object
 					if (member and member:alive()) then
-						if ( npc:has_info("npcx_beh_hide_in_cover") ) then
-							npc:disable_info_portion("npcx_beh_hide_in_cover")
+						if ( member:has_info("npcx_beh_hide_in_cover") ) then
+							member:disable_info_portion("npcx_beh_hide_in_cover")
 						else
-							npc:give_info_portion("npcx_beh_hide_in_cover")
+							member:give_info_portion("npcx_beh_hide_in_cover")
 						end
 					end
 				end

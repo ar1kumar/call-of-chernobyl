@@ -8,6 +8,8 @@ if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
 end
 
+get_console():execute("ai_die_in_anomaly 0")
+
 -- Improves performance if true, by disabling update methods for squads and smart terrains on levels not linked in configs\ai_tweaks\simulation_objects.ltx
 -- But this means simulation will only be active on actor level and linked levels everything else will remain in an idle state
 DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = true
@@ -1162,7 +1164,7 @@ function set_save_marker(p, mode, check, prefix)
 		if mode == "save" then
 			save_marker_result[prefix] = p:w_tell() or 0
 			if p:w_tell() > 16000 then
-				abort("You are saving too much")
+				abort("ERROR: You are saving too much")
 			end
 		else
 			save_marker_result[prefix] = p:r_tell() or 0
@@ -1171,7 +1173,7 @@ function set_save_marker(p, mode, check, prefix)
 	end 
 	
 	if not (save_marker_result[prefix]) then 
-		abort("set_save_marker:%s: Trying to check without marker mode=%s",prefix,mode)
+		abort("ERROR set_save_marker:%s: Trying to check without marker mode=%s",prefix,mode)
 		if (mode == "save") then
 			p:w_u16(0)
 		elseif (mode == "load") then
@@ -1183,14 +1185,14 @@ function set_save_marker(p, mode, check, prefix)
 	if mode == "save" then
 		local dif = p:w_tell() - save_marker_result[prefix]
 		if dif >= 8000 then
-			printf("set_save_marker:%s: WARNING! may be this is problem save point dif=%s",prefix,dif)
+			printf("ERROR set_save_marker:%s: WARNING! may be this is problem save point dif=%s",prefix,dif)
 		end
 		p:w_u16(dif)
 	else
 		local c_dif = p:r_tell() - save_marker_result[prefix]
 		local dif = p:r_u16()
 		if dif ~= c_dif then
-			printf("set_save_marker:%s: INCORRECT LOAD dif=%s c_dif=%s", prefix, dif, c_dif)
+			printf("ERROR set_save_marker:%s: INCORRECT LOAD dif=%s c_dif=%s", prefix, dif, c_dif)
 		end
 	end
 	
