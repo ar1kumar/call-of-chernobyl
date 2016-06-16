@@ -1365,12 +1365,14 @@ function CALifeUpdateManager__on_before_change_level(packet)
 end 
 
 ----- TEST REMOVE ME 
-function test_functor1_use_item(itm)
-	printf("used1 item %s",itm and itm:section())
+function use1_functor(itm)
+	printf("use1_functor item %s",itm and itm:section())
+	return  "use_me_bitch"
 end 
 
-function test_functor2_use_item(itm)
-	printf("used2 item %s",itm and itm:section())
+function use1_action_functor(itm)
+	printf("use1_action_functor item %s",itm and itm:section())
+	return true
 end
 
 -- 'Запуск динамического окна.

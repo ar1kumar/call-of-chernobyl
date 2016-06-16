@@ -999,12 +999,14 @@ function sim_squad_scripted:can_switch_offline()
 			--printf("forced online %s",current_target:name())
 			return false
 		end
+	--[[
 	else 
 		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
 		if (se_target and se_target.online and se_target.dist_to_actor and se_target.dist_to_actor <= 150) then
 			--printf("force online %s",self:name())
 			return false
 		end
+	--]]
 	end
 
 	return cse_alife_online_offline_group.can_switch_offline(self)
@@ -1012,32 +1014,37 @@ end
 
 function sim_squad_scripted:can_switch_online()
     --alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
-    if (not self.online and is_squad_monster[self.player_id] and not get_object_story_id(self.id)) then
-        -- Check for exiled zones
-        local zone
-        for i,name in pairs(exiled_zones) do
-            zone = db.zone_by_name[name]
-            if (zone and zone:inside(self.position)) then
-                return false
-            end
+    if (not self.online and not get_object_story_id(self.id)) then
+	
+		local dist = axr_main.config:GetValue("mm_options","excl_dist",2,0)
+	    if (dist > 0 and db.actor) then 
+			if (self.first_update and level_weathers.valid_levels[level.name()] and self.position:distance_to(db.actor:position()) <= dist) then
+				return false
+			end
         end
-        if (self.current_action == 0) then
-            if (self.player_id == "monster_predatory_day" and not in_time_interval(22,5)) then
-                return false
-            elseif (self.player_id == "monster_predatory_night" and not in_time_interval(5,22)) then
-                --printf("%s not allowed to come online",self:name())
-                return false
-            elseif (self.player_id == "monster_zombied_day" and not in_time_interval(22,5)) then
-                return false
-            elseif (self.player_id == "monster_zombied_night" and not in_time_interval(5,22)) then
-                return false
-            end
-        end
-    --/ brute force prevent from coming online /--
-        if self.first_update and level_weathers.valid_levels[level.name()] and (self.position:distance_to(alife():actor().position) <= axr_main.config:GetValue("mm_options","excl_dist",2,30)) then
-            return false
-        end
-    --/---------------------------------------/--
+		
+		if (is_squad_monster[self.player_id]) then
+			-- Check for exiled zones
+			local zone
+			for i,name in pairs(exiled_zones) do
+				zone = db.zone_by_name[name]
+				if (zone and zone:inside(self.position)) then
+					return false
+				end
+			end
+			if (self.current_action == 0) then
+				if (self.player_id == "monster_predatory_day" and not in_time_interval(22,5)) then
+					return false
+				elseif (self.player_id == "monster_predatory_night" and not in_time_interval(5,22)) then
+					--printf("%s not allowed to come online",self:name())
+					return false
+				elseif (self.player_id == "monster_zombied_day" and not in_time_interval(22,5)) then
+					return false
+				elseif (self.player_id == "monster_zombied_night" and not in_time_interval(5,22)) then
+					return false
+				end
+			end
+		end
     end
     return cse_alife_online_offline_group.can_switch_online(self)
 end
@@ -1045,11 +1052,11 @@ function sim_squad_scripted:switch_offline()
 	cse_alife_online_offline_group.switch_offline(self)
 end
 function sim_squad_scripted:switch_online()
-	cse_alife_online_offline_group.switch_online(self)
-	--if (dev_debug) then
-		--printf("sim_squad_scripted:switch_online() [%s]",self:name())
+	if (dev_debug) then
+		printf("sim_squad_scripted:switch_online() [%s]",self:name())
 		--get_console():execute("flush")
-	--end
+	end
+	cse_alife_online_offline_group.switch_online(self)
 end
 
 --***********************************************************************************************

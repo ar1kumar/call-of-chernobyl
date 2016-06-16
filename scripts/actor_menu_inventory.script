@@ -1,0 +1,25 @@
+
+
+-- called from engine!
+--[[
+ Refers to when an icon is dragged onto another icon in Actor Inventory Menu
+ 
+ passed parameters:
+	itm1 is the object being dragged; may be nil
+	itm2 is the object the item is being dragged onto; may be nil
+	from_slot is the number value of the slot itm1 is being dragged from; 255 is invalid
+	to_slot is the number value of the slot itm2 is occupying;  255 is invalid 
+	
+from_slot and to_slot values:
+	0 = inventory bag
+	1 = belt
+	2 = slot 2
+	3 = slot 3 
+	4 = outfit slot 
+	5 = helmet slot 
+	6 = detector slot 
+	
+--]]
+function CUIActorMenu_OnItemDropped(itm1,itm2,from_slot,to_slot)
+	printf("itm1=%s itm2=%s from_slot=%s to_slot=%s",itm1 and itm1:name(),itm2 and itm2:name(),from_slot,to_slot)
+end

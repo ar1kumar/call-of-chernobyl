@@ -8,8 +8,7 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 ------------------
 -- on_game_load()
 ------------------
-local spawn_path, start_pos, start_location
-local loc_ini = ini_file("plugins\\faction_start_locations.ltx")
+local spawn_path, start_pos, start_location, loc_ini
 local function on_game_load()
 	local config = axr_main.config
 	if not (config) then 
@@ -84,7 +83,7 @@ local function on_game_load()
 		
 		start_location = config:GetValue("temp","new_game_faction_position",3)
 		if start_location and start_location ~= "" then
-			set_postion_table(start_location)
+			set_position_table(start_location)
 			config:SetValue("temp","new_game_faction_position")
 		else
 			spawn_path = patrol("spawn_player_"..faction)
@@ -236,7 +235,11 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
 end 
 
-function set_postion_table(loc)
+function set_position_table(loc)
+	if not (loc_ini) then 
+		loc_ini = ini_file("plugins\\faction_start_locations.ltx")
+	end 
+	
 	start_pos = {}
 	table.insert(start_pos,loc_ini:r_float_ex(loc, "lid"))
 	table.insert(start_pos,loc_ini:r_float_ex(loc, "gid"))
@@ -471,6 +474,11 @@ end
 function faction_ui:load_start_positions()
 	self.start_list:ClearList()
 	self.start_table = {}
+	
+	if not (loc_ini) then 
+		loc_ini = ini_file("plugins\\faction_start_locations.ltx")
+	end 
+	
 	local n = loc_ini:line_count(self.selected_faction.."_start_locations") or 0
 	for i=0, n-1 do
 		local result, id, value = loc_ini:r_line(self.selected_faction.."_start_locations",i,"","" )
