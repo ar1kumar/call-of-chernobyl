@@ -2,26 +2,26 @@
 -- Modified by Alundaio
 
 actor_statistic = {
-					surges = 0,
-					storms = 0,
-					completed_quests = 0,
-					failed_quests = 0,
-					cancelled_quests = 0,
-					killed_monsters = 0,
-					killed_stalkers = 0,
-					founded_secrets = 0,
-					artefacts_founded = 0,
-					best_monster = nil,
-					favorite_weapon_sect = nil,
-					best_monster_rank = 0,
-					pdas_delivered = 0,
-					heli_kills = 0,
-					heli_rocket_kills = 0,
-					artefacts_detected = 0,
-					help_wounded = 0,
 					actual_rank = 0,
 					actual_reputation = 0,
 					arena_battles = 0,
+					artefacts_detected = 0,
+					artefacts_founded = 0,
+					best_monster = nil,
+					best_monster_rank = 0,
+					favorite_weapon_sect = nil,
+					founded_secrets = 0,
+					heli_kills = 0,
+					heli_rocket_kills = 0,
+					help_wounded = 0,
+					killed_monsters = 0,
+					killed_stalkers = 0,
+					pdas_delivered = 0,
+					storms = 0,
+					surges = 0,
+					tasks_cancelled = 0,
+					tasks_completed = 0,
+					tasks_failed = 0,
 					visited = { 
 								["k00_marsh"] = false,
 								["k01_darkscape"] = false,
@@ -86,8 +86,8 @@ rank_rep = {
 			detect_arts			=	{rnk=5,		rpt=0},
 			secrets				=	{rnk=10,	rpt=0},
 			pdas				=	{rnk=25,	rpt=50},
-			heli				=	{rnk=50,	rpt=75},
-			heli_rocket			=	{rnk=25,	rpt=25},
+			heli				=	{rnk=50,	rpt=50},
+			heli_rocket			=	{rnk=50,	rpt=50},
 			wounded				=	{rnk=25,	rpt=50},
 			
 			-- Achievements
@@ -205,20 +205,20 @@ function inc_storms_counter()
 	inc_actor_rank(rank_rep.storms.rnk)
 	inc_actor_reputation(rank_rep.storms.rpt)
 end
-function inc_completed_quests_counter()
-	actor_statistic.completed_quests = actor_statistic.completed_quests + 1
+function inc_tasks_completed_counter()
+	actor_statistic.tasks_completed = actor_statistic.tasks_completed + 1
 	inc_actor_rank(rank_rep.quests.rnk)
 	inc_actor_reputation(rank_rep.quests.rpt)
 end
 
-function inc_failed_quests_counter()
-	actor_statistic.failed_quests = actor_statistic.failed_quests + 1
+function inc_tasks_failed_counter()
+	actor_statistic.tasks_failed = actor_statistic.tasks_failed + 1
 	inc_actor_rank(rank_rep.quests_fail.rnk)
 	inc_actor_reputation(rank_rep.quests_fail.rpt)
 end
 
-function inc_cancelled_quests_counter()
-	actor_statistic.cancelled_quests = actor_statistic.cancelled_quests + 1
+function inc_tasks_cancelled_counter()
+	actor_statistic.tasks_cancelled = actor_statistic.tasks_cancelled + 1
 	inc_actor_rank(rank_rep.quests_cancel.rnk)
 	inc_actor_reputation(rank_rep.quests_cancel.rpt)
 end
@@ -385,9 +385,9 @@ function save(package)
 	package:w_u16(actor_statistic.arena_battles)
 	package:w_u16(actor_statistic.surges)
 	package:w_u16(actor_statistic.storms)
-	package:w_u16(actor_statistic.completed_quests)
-	package:w_u16(actor_statistic.failed_quests)
-	package:w_u16(actor_statistic.cancelled_quests)
+	package:w_u16(actor_statistic.tasks_completed)
+	package:w_u16(actor_statistic.tasks_failed)
+	package:w_u16(actor_statistic.tasks_cancelled)
 	package:w_u32(actor_statistic.killed_monsters)
 	package:w_u32(actor_statistic.killed_stalkers)
 	package:w_u16(actor_statistic.founded_secrets)
@@ -450,9 +450,9 @@ function load(package)
 	actor_statistic.arena_battles  		= package:r_u16()
 	actor_statistic.surges  			= package:r_u16()
 	actor_statistic.storms  			= package:r_u16()
-	actor_statistic.completed_quests 	= package:r_u16()
-	actor_statistic.failed_quests	 	= package:r_u16()
-	actor_statistic.cancelled_quests	= package:r_u16()
+	actor_statistic.tasks_completed 	= package:r_u16()
+	actor_statistic.tasks_failed	 	= package:r_u16()
+	actor_statistic.tasks_cancelled	= package:r_u16()
 	actor_statistic.killed_monsters  	= package:r_u32()
 	actor_statistic.killed_stalkers  	= package:r_u32()
 	actor_statistic.founded_secrets  	= package:r_u16()
