@@ -11,15 +11,27 @@
 	to_slot is the number value of the slot itm2 is occupying;  255 is invalid 
 	
 from_slot and to_slot values:
-	0 = inventory bag
-	1 = belt
-	2 = slot 2
-	3 = slot 3 
-	4 = outfit slot 
-	5 = helmet slot 
-	6 = detector slot 
+		iInvalid			= 0
+		iActorSlot			= 1
+		iActorBag			= 2
+		iActorBelt			= 3
+
+		iActorTrade			= 4
+		iPartnerTradeBag	= 5
+		iPartnerTrade		= 6
+		iDeadBodyBag		= 7
+		iQuickSlot			= 8
+		iTrashSlot			= 9
 	
 --]]
 function CUIActorMenu_OnItemDropped(itm1,itm2,from_slot,to_slot)
 	printf("itm1=%s itm2=%s from_slot=%s to_slot=%s",itm1 and itm1:name(),itm2 and itm2:name(),from_slot,to_slot)
+	
+	SendScriptCallback("CUIActorMenu_OnItemDropped",itm1,itm2,from_slot,to_slot)
+	
+	if (from_slot == to_slot) then -- should be here at the end
+		return false 
+	end 
+	
+	return true
 end
