@@ -82,21 +82,21 @@ end
 function CRandomTask:set_task_completed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "complete"
-		xr_statistic.inc_completed_quests_counter()
+		xr_statistic.inc_tasks_completed_counter()
 	end
 end
 
 function CRandomTask:set_task_failed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "fail"
-		xr_statistic.inc_failed_quests_counter()
+		xr_statistic.inc_tasks_failed_counter()
 	end
 end
 
 function CRandomTask:set_task_cancelled(task_id)
     if (self.task_info[task_id]) then
 		self.task_info[task_id].forced_status = "fail"
-        xr_statistic.inc_cancelled_quests_counter()
+        xr_statistic.inc_tasks_cancelled_counter()
     end
 end
 
