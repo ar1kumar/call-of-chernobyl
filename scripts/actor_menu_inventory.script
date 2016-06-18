@@ -7,21 +7,25 @@
  passed parameters:
 	itm1 is the object being dragged; may be nil
 	itm2 is the object the item is being dragged onto; may be nil
-	from_slot is the number value of the slot itm1 is being dragged from; 255 is invalid
-	to_slot is the number value of the slot itm2 is occupying;  255 is invalid 
+	from_slot is the number value of the slot itm1 is being dragged from;  0 or EDDListType.iInvalid is invalid 
+	to_slot is the number value of the slot itm2 is occupying;  0 or EDDListType.iInvalid is invalid 
 	
 from_slot and to_slot values:
-		iInvalid			= 0
-		iActorSlot			= 1
-		iActorBag			= 2
-		iActorBelt			= 3
+		EDDListType.iInvalid			= 0
+		EDDListType.iActorSlot			= 1
+		EDDListType.iActorBag			= 2
+		EDDListType.iActorBelt			= 3
 
-		iActorTrade			= 4
-		iPartnerTradeBag	= 5
-		iPartnerTrade		= 6
-		iDeadBodyBag		= 7
-		iQuickSlot			= 8
-		iTrashSlot			= 9
+		EDDListType.iActorTrade			= 4
+		EDDListType.iPartnerTradeBag	= 5
+		EDDListType.iPartnerTrade		= 6
+		EDDListType.iDeadBodyBag		= 7
+		EDDListType.iQuickSlot			= 8
+		EDDListType.iTrashSlot			= 9
+		
+ex. if (to_slot == EDDListType.iActorSlot) then 
+		printf("dragging item to slot!")
+	end
 	
 --]]
 function CUIActorMenu_OnItemDropped(itm1,itm2,from_slot,to_slot)
@@ -31,9 +35,15 @@ function CUIActorMenu_OnItemDropped(itm1,itm2,from_slot,to_slot)
 		SendScriptCallback("CUIActorMenu_OnItemDropped",itm1,itm2,from_slot,to_slot)
 	end
 	
-	if (from_slot == to_slot) then -- should be here at the end
-		return false 
-	end 
-	
 	return true
+end
+
+-- called from engine!
+function CUIActorMenu_OnItemFocusReceive(itm)
+	SendScriptCallback("CUIActorMenu_OnItemFocusReceive",itm)
+end
+
+-- called from engine!
+function CUIActorMenu_OnItemFocusLost(itm)
+	SendScriptCallback("CUIActorMenu_OnItemFocusLost",itm)
 end
