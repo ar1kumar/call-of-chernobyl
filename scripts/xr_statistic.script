@@ -23,6 +23,7 @@ actor_statistic = {
 					tasks_completed = 0,
 					tasks_failed = 0,
 					visited = { 
+								["jupiter"] = false,
 								["k00_marsh"] = false,
 								["k01_darkscape"] = false,
 								["k02_trucks_cemetery"] = false,
@@ -43,9 +44,17 @@ actor_statistic = {
 								["l12_stancia"] = false,
 								["l12_stancia_2"] = false,
 								["l13_generators"] = false,
-								["jupiter"] = false,
 								["pripyat"] = false,
-								["zaton"] = false
+								["zaton"] = false,
+								["jupiter_underground"] = false,
+								["labx8"] = false,
+								["l03u_agr_underground"] = false,
+								["l04u_labx18"] = false,
+								["l08u_brainlab"] = false,
+								["l10u_bunker"] = false,
+								["l12u_control_monolith"] = false,
+								["l12u_sarcofag"] = false,
+								["l13u_warlab"] = false,
 						}
 				}
 
@@ -77,15 +86,15 @@ rank_rep = {
 			arena_trad			=	{rnk=100,	rpt=200},
 			surges				=	{rnk=5,		rpt=0},
 			storms				=	{rnk=5,		rpt=0},
-			quests				=	{rnk=50,	rpt=100},
-			quests_fail			=	{rnk=0,		rpt=-100},
-			quests_cancel		=	{rnk=0,		rpt=-100},
+			tasks				=	{rnk=50,	rpt=100},
+			tasks_fail			=	{rnk=0,		rpt=-100},
+			tasks_cancel		=	{rnk=0,		rpt=-100},
 			monsters			=	{rnk=5,		rpt=0},
 			stalkers			=	{rnk=0,		rpt=0}, -- Handled in game_relations.ltx
 			found_arts			=	{rnk=5,		rpt=0},
 			detect_arts			=	{rnk=5,		rpt=0},
 			secrets				=	{rnk=10,	rpt=0},
-			pdas				=	{rnk=25,	rpt=50},
+			pdas				=	{rnk=10,	rpt=20},
 			heli				=	{rnk=50,	rpt=50},
 			heli_rocket			=	{rnk=50,	rpt=50},
 			wounded				=	{rnk=25,	rpt=50},
@@ -104,7 +113,7 @@ rank_rep = {
 			silver_or_lead		=	{rnk=25,	rpt=0},
 			tourist				=	{rnk=25,	rpt=0},
 			well_dressed		=	{rnk=25,	rpt=0},
-			wishful_thinking	=	{rnk=500,	rpt=1000}, -- Getting this is a huge feat.
+			wishful_thinking	=	{rnk=25,	rpt=0},
 }
 
 weapons_table = {}
@@ -207,20 +216,20 @@ function inc_storms_counter()
 end
 function inc_tasks_completed_counter()
 	actor_statistic.tasks_completed = actor_statistic.tasks_completed + 1
-	inc_actor_rank(rank_rep.quests.rnk)
-	inc_actor_reputation(rank_rep.quests.rpt)
+	inc_actor_rank(rank_rep.tasks.rnk)
+	inc_actor_reputation(rank_rep.tasks.rpt)
 end
 
 function inc_tasks_failed_counter()
 	actor_statistic.tasks_failed = actor_statistic.tasks_failed + 1
-	inc_actor_rank(rank_rep.quests_fail.rnk)
-	inc_actor_reputation(rank_rep.quests_fail.rpt)
+	inc_actor_rank(rank_rep.tasks_fail.rnk)
+	inc_actor_reputation(rank_rep.tasks_fail.rpt)
 end
 
 function inc_tasks_cancelled_counter()
 	actor_statistic.tasks_cancelled = actor_statistic.tasks_cancelled + 1
-	inc_actor_rank(rank_rep.quests_cancel.rnk)
-	inc_actor_reputation(rank_rep.quests_cancel.rpt)
+	inc_actor_rank(rank_rep.tasks_cancel.rnk)
+	inc_actor_reputation(rank_rep.tasks_cancel.rpt)
 end
 
 function inc_killed_monsters_counter()
