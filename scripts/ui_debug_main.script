@@ -316,6 +316,7 @@ function get_spawn_table(name)
 --				"explosive_barrel",
 --				"explosive_mobiltank",
 --				"explosive_dinamit",
+
 				"grenade_f1",
 				"grenade_rgd5",
 				"grenade_gd-05",
@@ -1470,11 +1471,10 @@ function debug_ui:OnEditorTriggerAddonSectionSelection()
 	end
 	
 	local scope_sec = section
-	local ind = self.addon_list:CurrentID()
-	if (self._addons[ind] == "scope" and self._scopes[ind]) then 
-		local s = ini:r_string_ex(self._scopes[ind],self._addons[ind].."_name")
+	if (self._addons[addon_sec] == "scope" and self._scopes[addon_sec]) then 
+		local s = ini:r_string_ex(self._scopes[addon_sec],self._addons[addon_sec].."_name")
 		addon_sec = s or addon_sec
-		scope_sec = self._scopes[ind] or section
+		scope_sec = self._scopes[addon_sec] or section
 	end 
 	
 	local scale = 0.75
@@ -1493,8 +1493,8 @@ function debug_ui:OnEditorTriggerAddonSectionSelection()
 	local addon_x2 = addon_x1 + addon_w
 	local addon_y2 = addon_y1 + addon_h
 	
-	local offset_x = ini:r_float_ex(scope_sec,self._addons[ind].."_x") or 0
-	local offset_y = ini:r_float_ex(scope_sec,self._addons[ind].."_y") or 0
+	local offset_x = ini:r_float_ex(scope_sec,self._addons[addon_sec].."_x") or 0
+	local offset_y = ini:r_float_ex(scope_sec,self._addons[addon_sec].."_y") or 0
 	
 	self.editor_icon_addon:InitTexture("ui\\ui_icon_equipment")
 	self.editor_icon_addon:SetTextureRect(Frect():set(addon_x1,addon_y1,addon_x2,addon_y2))
@@ -1578,94 +1578,45 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	self.icon_square:SetWndPos(vector2():set( pos.x+x1/4 , pos.y+y1/4 ))
 	self.icon_square:SetWndSize(vector2():set(w/4,h/4))
 	
+	self.editor_icon_addon:SetTextureRect(Frect():set(0,0,0,0))
+	self.fld_addon_offset_x:SetText("")
+	self.fld_addon_offset_y:SetText("")
+	
 	-- attachments
 	local silencer = ini:r_string_ex(section,"silencer_name")
 	local grenade_launcher = ini:r_string_ex(section,"grenade_launcher_name")
 	
-	local ind = 1
 	if (silencer and ini:section_exist(silencer)) then
-		self.addon_list:AddItem(silencer,ind)
-		self._addons[ind] = "silencer"
-		ind = ind + 1
+		self.addon_list:AddItem(silencer)
+		self._addons[silencer] = "silencer"
 	end 
 	
 	if (grenade_launcher and ini:section_exist(grenade_launcher)) then 
-		self.addon_list:AddItem(grenade_launcher,ind)
-		self._addons[ind] = "grenade_launcher"
-		ind = ind + 1
+		self.addon_list:AddItem(grenade_launcher)
+		self._addons[grenade_launcher] = "grenade_launcher"
 	end 
 	
 	local scopes = alun_utils.parse_list(ini,section,"scopes_sect")
 	if (scopes and #scopes > 0) then
 		for k,v in pairs(scopes) do
-			self.addon_list:AddItem(v,ind)
-			self._scopes[ind] = v
-			self._addons[ind] = "scope"
-			ind = ind + 1
+			self.addon_list:AddItem(v)
+			self._scopes[v] = v
+			self._addons[v] = "scope"
 		end
 	end 
 	
-	-- findmenow
 	local cnt = 1
 	local layer = ini:r_string_ex(section,"1icon_layer")
 	while (layer ~= nil) do 
-		self.addon_list:AddItem(layer,ind)
-		self._addons[ind] = cnt.."icon_layer"
+		self.addon_list:AddItem(layer)
+		self.addon_list:SetText(layer)
+		self._addons[layer] = cnt.."icon_layer"
 		cnt = cnt + 1
-		ind = ind + 1
 		layer = ini:r_string_ex(section,cnt.."icon_layer")
+		if (layer == nil) then 
+			self:OnEditorTriggerAddonSectionSelection()
+		end
 	end
-	
-	self.editor_icon_addon:SetTextureRect(Frect():set(0,0,0,0))
-	self.fld_addon_offset_x:SetText("")
-	self.fld_addon_offset_y:SetText("")
---[[
-	local name = self.addon_list:GetText()
-	if not (name and name ~= "Select Addon Type") then
-		return 
-	end 
-	
-	local scopes = name == "scope" and alun_utils.parse_list(ini,section,"scopes_sect")
-	local scope_sec = section
-	if (scopes and #scopes > 0) then 
-		scope_sec = scopes[1]
-	end 
-	
-	local addon_sec = alun_utils.read_from_ini(ini,scope_sec,name.."_name","string")
-	if not (addon_sec and ini:section_exist(addon_sec)) then
-		return 
-	end
-	
-	local addon_inv_grid_width = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_width","float",0)
-	local addon_inv_grid_height = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_height","float",0)
-	local addon_inv_grid_x = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_x","float",0)
-	local addon_inv_grid_y = alun_utils.read_from_ini(ini,addon_sec,"inv_grid_y","float",0)
-
-	local addon_x1 = addon_inv_grid_x*50
-	local addon_y1 = addon_inv_grid_y*50
-
-	local addon_w = addon_inv_grid_width*50
-	local addon_h = addon_inv_grid_height*50
-
-	local addon_x2 = addon_x1 + addon_w
-	local addon_y2 = addon_y1 + addon_h
-	
-	local offset_x = alun_utils.read_from_ini(ini,scope_sec,name.."_x","float",0)
-	local offset_y = alun_utils.read_from_ini(ini,scope_sec,name.."_y","float",0)
-	
-	self.editor_old_offset_x = offset_x
-	self.editor_old_offset_y = offset_y
-	
-	self.editor_icon_addon:InitTexture("ui\\ui_icon_equipment")
-	self.editor_icon_addon:SetTextureRect(Frect():set(addon_x1,addon_y1,addon_x2,addon_y2))
-	self.editor_icon_addon:SetWndSize(vector2():set(addon_w*scale,addon_h*scale))
-	
-	pos = self.editor_icon:GetWndPos()
-	self.editor_icon_addon:SetWndPos(vector2():set(pos.x+offset_x*scale,pos.y+offset_y*scale))
-	
-	self.fld_addon_offset_x:SetText(tostring(offset_x))
-	self.fld_addon_offset_y:SetText(tostring(offset_y))
---]]
 end 
 
 function debug_ui:OnEditIconX()
@@ -1803,16 +1754,14 @@ function debug_ui:OnEditorSave()
 		return 
 	end
 	
-	local ind = self.addon_list:CurrentID()
-	local addon_sec = self.addon_list:GetTextOf(ind)
+	local addon_sec = self.addon_list:GetText()
 	if (addon_sec == nil or addon_sec == "" or addon_sec == "Select Attachment") then
 		addon_sec = nil
 		self.need_save_offset_x = nil
 		self.need_save_offset_y = nil
-		ind = 0
 	end
 	
-	local search_sec = self._addons[ind] == "scope" and self._scopes[ind] or section
+	local search_sec = self._addons[addon_sec] == "scope" and self._scopes[addon_sec] or section
 	
 	local function file_exists(path)
 		return io.open(path) ~= nil
@@ -1849,10 +1798,10 @@ function debug_ui:OnEditorSave()
 					ltx = alun_utils.cfg_file(fullpath)
 					if (ltx) then
 						if (self.need_save_offset_x) then
-							ltx:SetValue(search_sec,self._addons[ind].."_x",offset_x)
+							ltx:SetValue(search_sec,self._addons[addon_sec].."_x",offset_x)
 						end 
 						if (self.need_save_offset_y) then
-							ltx:SetValue(search_sec,self._addons[ind].."_y",offset_y)
+							ltx:SetValue(search_sec,self._addons[addon_sec].."_y",offset_y)
 						end
 						ltx:SaveExt()
 					else 
@@ -2099,6 +2048,7 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	owner.editor_sections_list:SetText(owner.editor_sections_list:GetTextOf(0))
 	owner:FillEditorList(owner.editor_sections_list:GetTextOf(0))
 	
+
 	-------
 	xml:InitStatic("tab_editor:cap_w", self)
 	owner.fld_icon_width = xml:InitEditBox("tab_editor:fld_w", self)
