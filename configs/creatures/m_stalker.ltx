@@ -73,26 +73,26 @@ cl_run_fwd_0				=	1,	  0.2,	    1,       0.4,     1
 ;Note that improper values, no matter how high transparency_threshold will result in stalkers shooting at walls
 
 [stalker_vision_free]
-min_view_distance   		= 0.4				; min range of cone based on eye_range
+min_view_distance   		= 0.3				; min range of cone based on eye_range
 max_view_distance	 		= 0.8				; max range of cone based on eye_range
 visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
 always_visible_distance 	= 0					;Distance object is always considered visible (float)
 time_quant					= 0.005				;step increment to for sight calculations
 decrease_value				= 0.1 				;Decrease over time to overall threshold
 velocity_factor		     	= 0.4				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
-luminocity_factor			= 0.70				;Low value = easier to see at night
+luminocity_factor			= 0.65				;Low value = easier to see at night
 transparency_threshold	 	= 0.3 			    ;Low value = easier to see through objects
 still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 [stalker_vision_danger]
-min_view_distance   		= 0.7				; min range of cone based on eye_range
+min_view_distance   		= 0.3				; min range of cone based on eye_range
 max_view_distance	 		= 1.0				; max range of cone based on eye_range
 visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
 always_visible_distance 	= 0					;Distance object is always considered visible (float)
-time_quant					= 0.0052			;step increment to for sight calculations
+time_quant					= 0.0050			;step increment to for sight calculations
 decrease_value				= 0.1				;Decrease over time to overall threshold
 velocity_factor		     	= 0.5				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
-luminocity_factor			= 0.70				;Low value = easier to see at night
+luminocity_factor			= 0.30				;Low value = easier to see at night
 transparency_threshold	 	= 0.3				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
 still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
