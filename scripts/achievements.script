@@ -23,6 +23,7 @@ function completionist_functor()
 	and (has_alife_info("achieved_silver_or_lead"))
 	and (has_alife_info("achieved_tourist"))
 	and (has_alife_info("achieved_well_dressed")) then
+	and (has_alife_info("achieved_wishful_thinking")) then
 		db.actor:give_info_portion("achieved_completionist")
 		news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
 		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.completionist.rnk)
@@ -279,9 +280,7 @@ function wishful_thinking_functor()
 		news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
 		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.wishful_thinking.rnk)
 		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.wishful_thinking.rpt)
-		-- Achievement reward.
-		xr_statistic.inc_actor_rank(250)
-		xr_statistic.inc_actor_reputation(500)
+		alife():create("af_oasis_heart", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
 	end
 	return has_alife_info("achieved_wishful_thinking")
 end
