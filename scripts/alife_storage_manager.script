@@ -50,10 +50,7 @@ function CALifeStorageManager_before_save(fname)
 			sim:release(se_obj,true)
 		end
 	end
-end 
-
--- called from engine!
-function CALifeStorageManager_save(fname)
+	
 	if not (USE_MARSHAL) then 
 		return 
 	end
@@ -105,6 +102,11 @@ function CALifeStorageManager_save(fname)
 	printf("axr_main: saving custom data %s",path)
 	savegame:write(data)
 	savegame:close()
+end 
+
+-- called from engine!
+function CALifeStorageManager_save(fname)
+
 end 
 
 -- called from engine

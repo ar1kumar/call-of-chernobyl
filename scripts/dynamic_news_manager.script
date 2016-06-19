@@ -88,9 +88,9 @@ end
 function DynamicNewsManager:destroy()
 	RemoveTimeEvent("DynamicNewsManager","NewsTick")
 	RemoveTimeEvent("DynamicNewsManager","TickSpecialEvent")
-	UnregisterScriptCallback("monster_on_death_callback", self.monster_on_death_callback, self)
-	--UnregisterScriptCallback("monster_on_net_spawn", self.monster_on_net_spawn, self)	
-	UnregisterScriptCallback("npc_on_death_callback", self.npc_on_death_callback, self)
+	UnregisterScriptCallback("monster_on_death_callback", self.monster_on_death_callback)
+	--UnregisterScriptCallback("monster_on_net_spawn", self.monster_on_net_spawn)	
+	UnregisterScriptCallback("npc_on_death_callback", self.npc_on_death_callback)
 end
 
 function DynamicNewsManager:NewsTick()

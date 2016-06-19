@@ -22,6 +22,10 @@ function actor_binder:__init (obj) super(obj)
 	bind_stalker_ext.actor_on_init(self)
 	
 	self.weather_manager = level_weathers.get_weather_manager()
+	
+	if (USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end 
 	--alun_utils.debug_write("actor init end")
 end
 
@@ -123,6 +127,10 @@ function actor_binder:net_destroy()
 	bind_stalker_ext.actor_on_net_destroy(self)
 
 	object_binder.net_destroy(self)
+	
+	if (USE_MARSHAL) then 
+		UnregisterScriptCallback("save_state",self.save_state)
+	end 
 	
 	--alun_utils.debug_write("actor net destroy end")
 end
@@ -266,7 +274,6 @@ function actor_binder:save(packet)
 			alun_utils.save_var(db.actor,"heli_enemy_flag",false)
 			SendScriptCallback("on_level_changing")
 		end
-		self:save_state(alife_storage_manager.get_state())
 		return
 	end
 	--alun_utils.debug_write("--------------- actor_binder:save -------- Start")
@@ -307,7 +314,7 @@ function actor_binder:load(reader)
 	object_binder.load(self, reader)
 	set_save_marker(reader, "load", true, "actor_binder")
 	if (USE_MARSHAL) then
-		self:load_state(alife_storage_manager.get_state())
+		self:load_state(alife_storage_manager.get_state()) -- fake because binder not ready when load_state callback is really made
 		bind_stalker_ext.actor_on_load(self,reader)
 		return
 	end

@@ -15,6 +15,10 @@ local last_update = 0 -- combat
 class "generic_object_binder" (object_binder)
 function generic_object_binder:__init(obj) super(obj)
 	self.loaded = false
+	
+	if (USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 
 function generic_object_binder:reinit()
@@ -345,6 +349,11 @@ function generic_object_binder:net_destroy()
 	db.storage[self.object:id()] = nil
 	
 	object_binder.net_destroy(self)
+	
+	if (USE_MARSHAL) then 
+		UnregisterScriptCallback("save_state",self.save_state)
+	end
+	
 	--alun_utils.debug_write("generic_object_binder:net_destroy END")
 end
 
@@ -366,9 +375,6 @@ function generic_object_binder:save(packet)
 	object_binder.save(self, packet)
 	set_save_marker(packet, "save", true, "generic_object_binder")
 	if (USE_MARSHAL) then
-		if (self.object) then 
-			save_state(self.object:id(),alife_storage_manager.get_state())
-		end
 		return 
 	end
 	--alun_utils.debug_write("\n-------bind_monster save start------ "..self.object:name(),true)
@@ -392,8 +398,9 @@ function generic_object_binder:load(reader)
 	--alun_utils.debug_write("\n--------bind monster load END -------"..self.object:name())
 end
 -----------------------------------------------------------------------------------------------------------------
-function save_state(id,m_data)
+function generic_object_binder:save_state(m_data)
 	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
+	local id = self.object and self.object:id()
 	local st = id and db.storage[id]
 	if not (st) then
 		return

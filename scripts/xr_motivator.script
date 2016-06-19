@@ -3,6 +3,9 @@ function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
 	self.opened_doors = {}
 	self.first_update = false
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
@@ -232,6 +235,10 @@ function motivator_binder:net_destroy()
 	db.delete_enemy(self.object)
 	
 	object_binder.net_destroy(self)
+	
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self.save_state)
+	end
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
@@ -478,9 +485,6 @@ function motivator_binder:save(packet)
 	set_save_marker(packet, "save", true, "motivator_binder")
 	
 	if (USE_MARSHAL) then
-		if (self.object) then
-			save_state(self.object:id(),alife_storage_manager.get_state())
-		end
 		return 
 	end
 	
@@ -502,7 +506,7 @@ function motivator_binder:load(reader)
 	
 	if (USE_MARSHAL) then
 		if (self.object) then
-			load_state(self.object:id(),alife_storage_manager.get_state())
+			load_state(self.object:id(),alife_storage_manager.get_state()) -- fake because binder not ready when real load_state made
 		end
 		return 
 	end
@@ -535,8 +539,9 @@ function AddToMotivator(npc)
 end
 
 ----------------------------------------------------------------------------------
-function save_state(id,m_data)
+function motivator_binder:save_state(m_data)
 	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",self.object:name()))
+	local id = self.object and self.object:id()
 	local st = id and db.storage[id]
 	if not (st) then 
 		return

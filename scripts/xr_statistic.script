@@ -308,52 +308,29 @@ function set_best_monster(obj)
 	if not IsMonster(obj) then
 		return 
 	end
+	
+	local s_obj = alife():object(obj:id())
+	if not (s_obj) then 
+		return 
+	end 
+	
+	local rank = s_obj:rank() or 1
+	
+	if (rank <= actor_statistic.best_monster_rank) then 
+		return 
+	end
+	
 	local community = monster_classes[get_clsid(obj)]
 	if not(community) then
 		printf("Statistic ERROR: cannot find monster class for [%s] clsid [%s]", obj:name(), tostring(get_clsid(obj)))
 		return
 	end
-	local s_obj = alife():object(obj:id())
-	if(s_obj) then
-		local rank = s_obj:rank()
-		if(community=="flesh") then
-			if(rank==3) then
-				community = community.."_strong"
-			else
-				community = community.."_weak"
-			end
-		elseif(community=="poltergeist") then
-			if(rank==12) then
-				community = community.."_flame"
-			else
-				community = community.."_tele"
-			end
-		elseif(community=="boar") then
-			if(rank==6) then
-				community = community.."_strong"
-			else
-				community = community.."_weak"
-			end
-		elseif(community=="pseudodog" or community=="psy_dog") then
-			if(rank==13) then
-				community = community.."_strong"
-			else
-				community = community.."_weak"
-			end
-		elseif(community=="bloodsucker") then
-			if(rank==16) then
-				community = community.."_strong"
-			elseif(rank==15) then
-				community = community.."_normal"
-			else
-				community = community.."_weak"
-			end
-		end
-		if(rank>actor_statistic.best_monster_rank) then
-			actor_statistic.best_monster_rank = rank
-			actor_statistic.best_monster = community
-		end
-	end
+	
+	local spec_rank = system_ini():r_string_ex(obj:section(),"spec_rank") or "normal"
+	community = community .. "_" .. spec_rank
+
+	actor_statistic.best_monster_rank = rank
+	actor_statistic.best_monster = community
 end
 
 function set_best_weapon(hit_amount)
@@ -375,7 +352,7 @@ function set_best_weapon(hit_amount)
 	-- A section called 'parent_section' is used by AO3 and STCoP.
 	-- It tells them which weapon is the 'parent' of a modified weapon.
 	-- Example: An AK-74 with an EKP sight attach has a parent_section of 'wpn_ak74'.
-	local parent_section = alun_utils.read_from_ini(system_ini(), active_item:section(), "parent_section") or active_item:section()
+	local parent_section = system_ini():r_string_ex(active_item:section(), "parent_section") or active_item:section()
 
 	-- By using this section we can have stats 'stack' for weapons regardless of attached scopes.
 	-- Of course if this section does not exist then it will just default to the weapon section name instead.
