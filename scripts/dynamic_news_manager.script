@@ -337,6 +337,7 @@ function DynamicNewsManager:GossipBounty()
 		local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
 		
 		local s = {	"I just seen %s, %s. I heard someone put a bounty on his head.", 
+					"I heard that someone put a bounty on %s's head",
 					"Anyone know what's up with %s lately? He's been hanging around %s. It's almost like he is hiding from someone.",
 					"I heard Sidorovich is looking for %s. I just saw him %s."
 		}
@@ -366,6 +367,7 @@ function DynamicNewsManager:RadioInHeli(sender,who)
 	local r = math.random(1,2)
 	if (r == 1) then
 		local s = {	"Requesting chopper assistance. Bogey located %s.",  
+					"Requesting air support to our location; we need backup.",
 					"Enemy seen %s. Air assistance needed, over.",
 					"Ground to 'Airhog', we need backup ASAP!",
 		}

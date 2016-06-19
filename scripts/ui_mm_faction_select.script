@@ -9,7 +9,7 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 -- on_game_load()
 ------------------
 local spawn_path, start_pos, start_location, loc_ini
-local function on_game_load()
+local function on_game_load(binder)
 	local config = axr_main.config
 	if not (config) then 
 		return 
@@ -101,53 +101,43 @@ local function on_game_load()
 		-- set default goodwill for all factions vs. actor's new faction
 		game_relations.set_community_goodwill_for_faction("actor_"..faction)
 		
-		local actor_profiles = system_ini():r_string_ex("profiles", "actor_profiles")
-		local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\".. actor_profiles .. ".xml")
-		_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
-		if (_xml) then
-			local supplies = alun_utils.XmlGetNodeValue(_xml,"supplies")
-			if (supplies) then 
-				supplies = alun_utils.str_explode(supplies,"\\n")
-				local ini = system_ini()
-				local sim = alife()
-				for i=2,#supplies do
-					local p = alun_utils.str_explode(supplies[i],",")
-					local sec = alun_utils.str_explode(p[1],"=")
-					if (ini:section_exist(sec[1])) then
-						sec[2] = sec[2] and tonumber(sec[2]) or 1
-						for ii=1,sec[2] do
-							sim:create(sec[1],db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
-						end
-					end
-				end
-				
-				supplies = alun_utils.XmlGetNodeValue(_xml,"loadout_"..supply_id)
-				if (supplies) then 
-					supplies = alun_utils.str_explode(supplies,"\\n")
-					for i=1,#supplies do
-						local p = alun_utils.str_explode(supplies[i],",")
-						local sec = alun_utils.str_explode(p[1],"=")
-						if (ini:section_exist(sec[1])) then
-							sec[2] = sec[2] and tonumber(sec[2]) or 1
-							for ii=1,sec[2] do
-								sim:create(sec[1],db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+		-- money and loadout 
+		local money_max
+		local loadout = config:GetValue("temp","new_game_loadout",3)
+		if (loadout and loadout ~= "") then 
+			config:SetValue("temp","new_game_loadout")
+			need_save = true
+			db.actor_binder.character_icon = new_character_icon
+			local ini = system_ini()
+			local sim = alife()
+			local t = alun_utils.str_explode(loadout,",")
+			for i=1,#t do 
+				local kv_pair = alun_utils.str_explode(t[i],"=")
+				if (kv_pair[1]) then
+					kv_pair[2] = tonumber(kv_pair[2]) or 1
+					if (kv_pair[1] == "money") then
+						money_max = kv_pair[2]
+					elseif (ini:section_exist(kv_pair[1])) then 
+						--if (ammo_section[kv_pair[1]]) then 
+						--	create_ammo(kv_pair[1],db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),0,kv_pair[2])
+						--else
+							for ii=1,kv_pair[2] do
+								sim:create(kv_pair[1],db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),0)
 							end
-						end
+						--end
 					end
 				end
 			end
-			
-			local data = stpk_utils.get_actor_data(se_actor)
-			if (data) then
-				local money_max = alun_utils.XmlGetNodeAttribute(_xml,"money","max")
-				if (money_max) then
-					money_max = tonumber(money_max)
-					data.money = money_max
-				end		
+		end
 		
-				data.specific_character = "actor_"..faction
-				stpk_utils.set_actor_data(data,se_actor)
-			end
+		local data = stpk_utils.get_actor_data(se_actor)
+		if (data) then
+			if (money_max) then
+				data.money = money_max
+			end		
+	
+			data.specific_character = "actor_"..faction
+			stpk_utils.set_actor_data(data,se_actor)
 		end
 	end 
 	
@@ -355,6 +345,7 @@ class "faction_ui" (CUIScriptWnd)
 function faction_ui:__init(owner) super()
 	self.owner = owner
 	
+	self.ini = ini_file("plugins\\faction_loadouts.ltx")
 	self.selected_faction = nil
 	self.f = {"stalker","bandit","csky","dolg","freedom","killer","army","ecolog","monolith"}
 	
@@ -536,8 +527,6 @@ function faction_ui:OnCheckSet()
 end
 
 function faction_ui:OnRandomize()
-	self.supplies_id = math.random(1,10)
-	
 	local faction = random_choice("stalker","bandit","csky","ecolog","army","monolith","dolg","freedom","killer")
 	self:OnFactionSelect(faction)
 	
@@ -600,55 +589,54 @@ function faction_ui:OnFactionSelect(faction)
 		end
 	end
 	
-	self.supplies_id = self.supplies_id or 1
+	local sys_ini = system_ini()
 	
 	desc = desc .. "\\n \\n"
 	
-	local actor_profiles = system_ini():r_string_ex("profiles", "actor_profiles")
-	local _xml = alun_utils.XmlParser:loadFile(getFS():update_path('$game_config$', '').."gameplay\\".. actor_profiles .. ".xml")
-	_xml = alun_utils.XmlFindNodeWithAttribute(_xml,"specific_character","id","actor_"..faction)
-	if (_xml) then
-	
-		local money_max = alun_utils.XmlGetNodeAttribute(_xml,"money","max")
-		if (money_max) then
-			desc = desc .. "%c[0,245,245,220]Money: %c[0,188,210,238]".. money_max .. " RU\\n \\n"
-		end
-		
-		local supplies = alun_utils.XmlGetNodeValue(_xml,"supplies")
-		if (supplies) then 
-			desc = desc .. "%c[0,245,245,220]Equipment:\\n"
+	self.default_loadout = alun_utils.collect_sections(self.ini,{faction,math.random(1,5)})
+	local weapon = alun_utils.collect_section(self.ini,"choose_only_one")
+	weapon = weapon[math.random(#weapon)]
 
-			supplies = alun_utils.str_explode(supplies,"\\n")
-			local ini = system_ini()
-			for i=2,#supplies do
-				local sec = alun_utils.str_explode(supplies[i],"=")
-				if (ini:section_exist(sec[1])) then
-					local itm_name = gs(ini:r_string_ex(sec[1],"inv_name") or "")
-					sec[2] = sec[2] and tonumber(sec[2]) or 1
-					if (sec[2] > 1) then 
-						desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(sec[2]).."\\n"
+	local ammo = sys_ini:r_string_ex(weapon,"ammo_class")
+	ammo = alun_utils.str_explode(ammo,",")
+	ammo = ammo[math.random(#ammo)]
+
+	self.default_loadout[weapon] = 1
+	self.default_loadout[ammo] = 2
+
+	local money = alun_utils.str_explode(self.default_loadout["money"],",")
+	money = money[math.random(#money)]
+	self.default_loadout["money"] = money
+
+	desc = desc .. "%c[0,245,245,220]Money: %c[0,188,210,238]".. self.default_loadout["money"] .. " RU\\n \\n"
+	desc = desc .. "%c[0,245,245,220]Equipment:\\n"
+	
+	self.loadout_str = strformat("money = %s,",self.default_loadout["money"])
+	
+	for section, amt in pairs(self.default_loadout) do 
+		if (section ~= "money" and sys_ini:section_exist(section)) then
+			local itm_name = gs(sys_ini:r_string_ex(section,"inv_name") or "")
+			amt = amt == "" and {1} or alun_utils.str_explode(amt,",")
+			amt = tonumber(amt[math.random(#amt)]) or 0
+			if (amt > 0) then
+				if (amt > 1) then 
+					if (ammo_section[section]) then 
+						local box_size = (sys_ini:r_float_ex(section, "box_size") or 1) * amt
+						desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(box_size).."\\n"
+					else
+						desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(amt).."\\n"
+					end
+					self.loadout_str = strformat("%s %s = %s,",self.loadout_str,section,amt) 
+				else
+					if (ammo_section[section]) then 
+						local box_size = (sys_ini:r_float_ex(section, "box_size") or 1) * amt
+						desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(box_size).."\\n"
 					else
 						desc = desc .. "   %c[0,188,210,238]".. itm_name .."\\n"
-					end
+					end						
+					self.loadout_str = strformat("%s %s = %s,",self.loadout_str,section,amt) 
 				end
 			end
-			
-			supplies = alun_utils.XmlGetNodeValue(_xml,"loadout_"..tostring(self.supplies_id or 1))
-			if (supplies) then
-				supplies = alun_utils.str_explode(supplies,"\\n")
-				for i=1,#supplies do
-					local sec = alun_utils.str_explode(supplies[i],"=")
-					if (ini:section_exist(sec[1])) then
-						local itm_name = gs(ini:r_string_ex(sec[1],"inv_name") or "")
-						sec[2] = sec[2] and tonumber(sec[2]) or 1
-						if (sec[2] > 1) then 
-							desc = desc .. "   %c[0,188,210,238]".. itm_name .. " %c[0,245,245,220]x"..tostring(sec[2]).."\\n"
-						else
-							desc = desc .. "   %c[0,188,210,238]".. itm_name .."\\n"
-						end
-					end
-				end
-			end			
 		end
 	end
 	
@@ -768,6 +756,10 @@ function faction_ui:OnStartGame()
 	
 	if (start_location) then 
 		axr_main.config:SetValue("temp","new_game_faction_position",start_location)
+	end
+	
+	if (self.loadout_str) then
+		axr_main.config:SetValue("temp","new_game_loadout",self.loadout_str)
 	end
 	
 	axr_main.config:SetValue("temp","new_game_character_icon",self.icon_list:GetText())
