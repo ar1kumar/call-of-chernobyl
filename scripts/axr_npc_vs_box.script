@@ -43,7 +43,7 @@ function evaluator_npc_vs_box:evaluate()
 	local itr = function(id)
 		if not (ret) then
 			local obj = id and db.storage[id] and db.storage[id].object 
-			if (obj and is_box[obj:get_visual_name()]) then
+			if (obj and is_box[obj:get_visual_name()] and obj:position():distance_to_sqr(npc:position()) < 3) then
 				ret = true
 			end
 		end

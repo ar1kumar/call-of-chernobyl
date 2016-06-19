@@ -119,11 +119,6 @@ end
 
 function generic_physics_binder:net_save_relevant()
 	--printf("generic_physics_binder:net_save_relevant(): self.object:name()='%s'", self.object:name())
-	
-	if ("SCRPTCAR" == system_ini():r_string_ex(self.object:section(),"class")) then 
-		return false 
-	end 
-	
 	return true
 end
 
