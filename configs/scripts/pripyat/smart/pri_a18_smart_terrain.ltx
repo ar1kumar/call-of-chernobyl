@@ -3,10 +3,15 @@ squad_id = 24
 max_population = 1
 respawn_params = respawn@pri_a18   
 respawn_idle = 60000
-respawn_radius = 200
+respawn_radius = 200
 
 [respawn@pri_a18]
 spawn_monolith
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 1, 0
 
 [spawn_monolith]
 spawn_squads = monolith_sim_squad_advanced

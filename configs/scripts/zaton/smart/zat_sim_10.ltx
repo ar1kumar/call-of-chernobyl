@@ -3,11 +3,16 @@ squad_id = 26
 max_population = 2
 respawn_params = respawn@zat_sim_10
 respawn_idle = 60000
-respawn_radius = 200
+respawn_radius = 200
 
 [respawn@zat_sim_10]
 spawn_hostile_killer
 spawn_hostile_bandit
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 1, 0
 
 [spawn_hostile_killer]
 spawn_squads = merc_sim_squad_advanced

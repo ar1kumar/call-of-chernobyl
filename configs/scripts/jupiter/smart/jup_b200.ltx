@@ -3,12 +3,16 @@ squad_id = 9
 max_population = 2
 respawn_params = respawn@jup_b200   
 respawn_idle = 60000
-respawn_radius = 200
+respawn_radius = 200
 
 [respawn@jup_b200]
 spawn_freedom@advanced
 spawn_freedom@veteran
+spawn_zombied
 
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 1, 0
 
 [spawn_freedom@advanced]
 spawn_squads =  freedom_sim_squad_advanced, freedom_sim_squad_advanced, freedom_sim_squad_novice

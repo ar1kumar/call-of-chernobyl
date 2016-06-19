@@ -4,10 +4,15 @@ max_population = 1
 squad_id = 27
 respawn_params = respawn@pri_a15
 respawn_idle = 60000
-respawn_radius = 200
+respawn_radius = 200
 
 [respawn@pri_a15]
 stalker_sim_squad
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 1, 0
 
 [stalker_sim_squad]
 spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_veteran
