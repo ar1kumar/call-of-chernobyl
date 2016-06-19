@@ -1605,6 +1605,17 @@ function debug_ui:OnEditorTriggerSectionSelection()
 		end
 	end 
 	
+	-- findmenow
+	local cnt = 1
+	local layer = ini:r_string_ex(section,"1icon_layer")
+	while (layer ~= nil) do 
+		self.addon_list:AddItem(layer,ind)
+		self._addons[ind] = cnt.."icon_layer"
+		cnt = cnt + 1
+		ind = ind + 1
+		layer = ini:r_string_ex(section,cnt.."icon_layer")
+	end
+	
 	self.editor_icon_addon:SetTextureRect(Frect():set(0,0,0,0))
 	self.fld_addon_offset_x:SetText("")
 	self.fld_addon_offset_y:SetText("")
