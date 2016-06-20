@@ -190,7 +190,10 @@ end
 --------------------------------------------------------------------------------------------------------------------
 function on_game_start()
 	local ignore = { 
-		["_g.script"] = true,
+		["_G.script"] = true,
+		["class_registrator.script"] = true,
+		["game_registrator.script"] = true,
+		["ui_registrator.script"] = true,
 		["ce_new_attachable_item.script"] = true,
 		["ce_new_game_dm.script"] = true,
 		["sim_faction_brain_human.script"] = true,

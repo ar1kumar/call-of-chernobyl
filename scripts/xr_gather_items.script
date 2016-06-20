@@ -303,7 +303,7 @@ function eva_gather_itm:find_valid_item()
 		if not (IsWeapon(itm)) then 
 			return false 
 		end
-		if (npc:best_weapon() and IsWeapon(npc:best_weapon())) then 
+		if (IsWeapon(npc:active_item())) then 
 			return false 
 		end
 	end
@@ -358,7 +358,7 @@ function eva_gather_itm:evaluate()
 		return false
 	end
 
-	if (IsWeapon(npc:best_weapon()) and npc:best_enemy()) then
+	if (npc:best_enemy() and IsWeapon(npc:active_item())) then
 		return false
 	end
 	

@@ -1,0 +1,18 @@
+
+-- called from engine!
+function update_best_weapon(npc,cur_wpn)
+	--[[ test
+	local bw
+	local function itr(npc,wpn)
+		if (IsPistol(nil,wpn:clsid()) and not npc:marked_dropped(wpn)) then 
+			bw = wpn
+			return true
+		end
+		return false
+	end
+	npc:iterate_inventory(itr,npc)
+	
+	return bw
+	--]]
+end
+

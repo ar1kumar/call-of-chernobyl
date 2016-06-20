@@ -139,8 +139,8 @@ function eva_kill_wounded:find_target()
 			self.st.vertex_id = nil
 			self.st.vertex_position = nil 
 			self.st.timer = nil
-			local bw = npc:best_weapon()
-			if (bw and npc:active_item() and npc:active_item():id() == bw:id()) then 
+			local bw = npc:active_item() and npc:best_weapon()
+			if (bw and npc:active_item():id() == bw:id()) then 
 				npc:set_item(object.idle,bw)
 			end
 			return true 
@@ -171,7 +171,7 @@ function eva_kill_wounded:evaluate()
 		return false 
 	end 
 
-	if not (npc:best_weapon()) then 
+	if not (npc:active_item()) then 
 		return false 
 	end
 	

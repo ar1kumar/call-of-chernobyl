@@ -51,7 +51,7 @@ end
 
 function weapon_locked(npc)
 	--alun_utils.debug_write("weapon_locked")
-	local bw = npc:best_weapon()
+	local bw = npc:active_item()
 	if not (bw) then
 		return false
 	end
