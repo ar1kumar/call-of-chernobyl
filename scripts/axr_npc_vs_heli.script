@@ -432,3 +432,14 @@ end
 function npc_add_precondition(action)
 	action:add_precondition(world_property(evaid,false))
 end
+
+function is_under_npc_vs_heli(npc)
+	local mgr = npc:motivation_action_manager()
+
+	if not mgr:initialized() then
+		return false
+	end
+
+	local current_action_id = mgr:current_action_id()
+	return current_action_id == actid
+end

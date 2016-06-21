@@ -83,8 +83,7 @@ function msg_box_ui:OnMsgOk()
 		-- allow vehicles to teleport too
 		local car = db.actor:get_attached_vehicle()
 		if (car) then
-			--car:force_set_position(pos or point and point:point(0))
-			TeleportObject(car:id(),pos or point and point:point(0),point and point:level_vertex_id(0),point and point:game_vertex_id(0))
+			car:force_set_position(pos or point and point:point(0))
 		else
 			db.actor:set_actor_position(pos or point and point:point(0))
 		end

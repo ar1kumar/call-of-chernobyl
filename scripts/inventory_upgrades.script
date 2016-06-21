@@ -443,8 +443,9 @@ function effect_repair_item( item_name, item_condition)
 	local function itr(actor,itm)
 		if (itm and itm:section() == item_name and itm:condition() == item_condition) then
 			item = itm
-			return
+			return true
 		end
+		return false
 	end
 
 	db.actor:iterate_inventory(itr,db.actor)

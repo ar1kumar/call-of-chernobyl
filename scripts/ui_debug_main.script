@@ -1543,13 +1543,13 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	self.addon_list:AddItem("Select Attachment",0) -- default
 	self.addon_list:SetText("Select Attachment")
 	-----------------------
-	local scale = 0.75
-	
 	local inv_grid_width = ini:r_float_ex(section,"inv_grid_width") or 0
 	local inv_grid_height = ini:r_float_ex(section,"inv_grid_height") or 0
 	local inv_grid_x = ini:r_float_ex(section,"inv_grid_x") or 0
 	local inv_grid_y = ini:r_float_ex(section,"inv_grid_y") or 0
 
+	local scale = 1.0 - (inv_grid_width * 0.052)
+	
 	self.editor_old_x = inv_grid_x
 	self.editor_old_y = inv_grid_y
 	self.editor_old_w = inv_grid_width
@@ -1567,9 +1567,14 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	self.editor_icon:InitTexture("ui\\ui_icon_equipment")
 	self.editor_icon:SetTextureRect(Frect():set(x1,y1,x2,y2))
 	self.editor_icon:SetWndSize(vector2():set(w*scale,h*scale))
-	local xcor = w > 250 and (-32*scale) or w < 100 and (64*scale) or w < 200 and (48*scale) or 0
-	local ycor = h == 50 and (32*scale) or h == 150 and (-32*scale) or 0
-	self.editor_icon:SetWndPos(vector2():set( 230 + xcor, 45 + ycor ))
+	
+	
+	local pos = self.editor_icon_back:GetWndPos()
+	self.editor_icon:SetWndPos(vector2():set(pos.x+(self.editor_icon_back:GetWidth()/2)-(w*scale)/2,pos.y+(self.editor_icon_back:GetHeight()/2)-(h*scale)/2))
+	
+	--local xcor = w > 250 and (-32*scale) or w < 100 and (64*scale) or w < 200 and (48*scale) or (-10*scale)
+	--local ycor = h == 50 and (32*scale) or h == 150 and (-32*scale) or 0
+	--self.editor_icon:SetWndPos(vector2():set( 230 + xcor, 45 + ycor ))
 	
 	self.fld_icon_x:SetText(tostring(inv_grid_x))
 	self.fld_icon_y:SetText(tostring(inv_grid_y))
@@ -1577,7 +1582,7 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	self.fld_icon_width:SetText(tostring(inv_grid_width))
 	self.fld_icon_height:SetText(tostring(inv_grid_height))
 	
-	local pos = self.ui_icon_equipment:GetWndPos()
+	pos = self.ui_icon_equipment:GetWndPos()
 	self.icon_square:SetWndPos(vector2():set( pos.x+x1/4 , pos.y+y1/4 ))
 	self.icon_square:SetWndSize(vector2():set(w/4,h/4))
 	
