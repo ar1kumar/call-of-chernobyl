@@ -1,3 +1,13 @@
+function AddToMotivator(npc)
+	if (db.storage[npc:id()]) then 
+		printf("ERROR AddToMotivator storage already exists for object!!! how?")
+	end
+	if alife() then
+		npc:bind_object(this.motivator_binder(npc))
+	end
+end
+
+-- CScriptGameObject Binder for CAIStalker
 class "motivator_binder" (object_binder)
 function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
@@ -530,12 +540,6 @@ function motivator_binder:hear_callback(npc, who_id, sound_type, sound_position,
 		return
 	end
 	xr_hear.hear_callback(npc, who_id, sound_type, sound_position, sound_power)
-end
-
-function AddToMotivator(npc)
-	if alife() then
-		npc:bind_object(this.motivator_binder(npc))
-	end
 end
 
 ----------------------------------------------------------------------------------

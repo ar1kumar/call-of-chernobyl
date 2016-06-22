@@ -1472,11 +1472,9 @@ function debug_ui:OnEditorTriggerAddonSectionSelection()
 	end
 	
 	local _type = self._addons[addon_sec]
-	local scope_sec = section
+	local scope_sec = self._scopes[addon_sec] or section
 	if (self._addons[addon_sec] == "scope" and self._scopes[addon_sec]) then 
-		local s = ini:r_string_ex(self._scopes[addon_sec],self._addons[addon_sec].."_name")
-		addon_sec = s or addon_sec
-		scope_sec = self._scopes[addon_sec] or section
+		addon_sec = ini:r_string_ex(self._scopes[addon_sec],self._addons[addon_sec].."_name") or addon_sec
 	end 
 	
 	local scale = 0.75
