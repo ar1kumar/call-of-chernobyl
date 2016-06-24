@@ -6,6 +6,6 @@ on_info = {-warlab_deactivate_generators_done} %=play_sound_looped(gen_noos_tunn
 on_info2 = {+warlab_deactivate_generators_done} sr_idle@off
 
 [sr_idle@off]
-on_game_timer = 1 | sr_idle@nil %=stop_sound_looped =destroy_object(story:gen_generator_dust_static) =destroy_object(story:gen_generator_dust_static_0000) =destroy_object(story:gen_generator_dust_static_0001) =destroy_object(story:gen_generator_dust_static_0002) =destroy_object(story:gen_generator_electra) =destroy_object(story:gen_generator_electra_0000) =destroy_object(story:gen_generator_electra_0001) =destroy_object(story:gen_generator_electra_0002) =destroy_object(story:gen_generator_torrid) =destroy_object(story:gen_generator_torrid_0000) =destroy_object(story:gen_generator_torrid_0001) =destroy_object(story:gen_generator_torrid_0002) =destroy_object(story:gen_zone_field_psychic_weak)%
+on_info = sr_idle@nil %=stop_sound_looped =disable_generator_zones =destroy_object(story:gen_zone_field_psychic_weak)%
 
 [sr_idle@nil]
