@@ -96,7 +96,7 @@ function generate_available_tasks(npc,is_sim)
 	if not (available_tasks[id]) then 
 		available_tasks[id] = {}
 	else
-		clear_table(available_tasks[id])
+		empty_table(available_tasks[id])
 	end
 	
     local tm = task_manager.get_task_manager()
@@ -165,7 +165,7 @@ function generate_ongoing_tasks(npc,is_sim)
 	if not (ongoing_tasks[id]) then 
 		ongoing_tasks[id] = {}
 	else
-		clear_table(ongoing_tasks[id])
+		empty_table(ongoing_tasks[id])
 	end
 	
     local tm = task_manager.get_task_manager()
@@ -211,7 +211,7 @@ function generate_finished_tasks(npc,is_sim)
 	if not (finished_tasks[id]) then 
 		finished_tasks[id] = {}
 	else
-		clear_table(finished_tasks[id])
+		empty_table(finished_tasks[id])
 	end
 	
 	local tm = task_manager.get_task_manager()

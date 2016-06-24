@@ -128,7 +128,7 @@ end
 --[[
 function turn_on_campfires_by_smart_name(smart_name,use_rand)
 	local smart_campfires = db.campfire_table_by_smart_names[smart_name]
-	if smart_campfires ~= nil and not empty(smart_campfires) then
+	if smart_campfires ~= nil and not is_empty(smart_campfires) then
 		for k,v in pairs (smart_campfires) do
 			if (v.object) then
 				if (render_get_dx_level() == 655361) then 
@@ -145,7 +145,7 @@ end
 
 function turn_off_campfires_by_smart_name(smart_name,use_rand)
 	local smart_campfires = db.campfire_table_by_smart_names[smart_name]
-	if smart_campfires ~= nil and not empty(smart_campfires) then
+	if smart_campfires ~= nil and not is_empty(smart_campfires) then
 		for k,v in pairs (smart_campfires) do
 			if (math.random(100) < 20) then
 				-- shouldn't be needed with Open Xray because of DX11 lighting fix

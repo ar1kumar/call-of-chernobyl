@@ -971,7 +971,7 @@ function debug_ui:SendOutput(txt,...)
 end
 
 function debug_ui:SendOutputList(list,start,finish)
-	if not (list and not empty(list)) then
+	if not (list and not is_empty(list)) then
 		return
 	end
 
@@ -2188,7 +2188,7 @@ function debug_ui_attach:__init(owner, binds) super()
 	self:Register(self.anim_states, "state_list")
 	self:AddCallback("state_list", ui_events.LIST_ITEM_SELECT,	self.OnStateListSelect,self)
 	
-	t = clear_table(t) or {}
+	t = empty_table(t) or {}
 	
 	for state,_ in pairs(state_lib.states) do 
 		table.insert(t,state)

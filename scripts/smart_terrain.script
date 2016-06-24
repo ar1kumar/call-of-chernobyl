@@ -940,11 +940,11 @@ function se_smart_terrain:save_state(m_data)
 		m_data.smart_terrains[self:name()].npc_info[id].need_job = info.need_job
 	end
 
-	if not (empty(self.dead_time)) then
+	if not (is_empty(self.dead_time)) then
 		m_data.smart_terrains[self:name()].dead_time = self.dead_time
 	end
 
-	if not (empty(self.already_spawned)) then
+	if not (is_empty(self.already_spawned)) then
 		m_data.smart_terrains[self:name()].already_spawned = self.already_spawned
 	end
 
@@ -1593,7 +1593,7 @@ function se_smart_terrain:try_respawn()
 	if self.last_respawn_update == nil or curr_time:diffSec(self.last_respawn_update) > self.respawn_idle then
 		self.last_respawn_update = curr_time
 		
-		clear_table(available_sects)
+		empty_table(available_sects)
 		
 		-- check self.faction
 		if not (self.faction) then 

@@ -292,7 +292,7 @@ game_object.alive = function(self)
 end
 --]]
 --------------------------------------------------------------------
-function empty(t)
+function is_empty(t)
 	if not (t) then 
 		return true 
 	end 
@@ -584,7 +584,7 @@ function vector_rotate_y(v, angle)
 end
 
 -- очистка таблицы.
-function clear_table (t)
+function empty_table (t)
 	while #t > 0 do
 		t[#t] = nil
 	end
@@ -593,10 +593,6 @@ end
 function empty_table(t)
 	if not (t) then
 		return {}
-	end
-	if (type(t) ~= "table") then
-		printf("_G.empty_table: trying to empty non-table %s",t)
-		return
 	end
 	for k,v in pairs(t) do
 		t[k] = nil

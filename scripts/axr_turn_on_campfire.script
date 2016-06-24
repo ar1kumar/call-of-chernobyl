@@ -115,7 +115,7 @@ function eva_turn_on_campfire:find_valid_target()
 	end
 
 	local campfires = db.campfire_table_by_smart_names[smart:name()]
-	if (campfires == nil or empty(campfires)) then
+	if (campfires == nil or is_empty(campfires)) then
 		return false
 	end
 	

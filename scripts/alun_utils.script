@@ -1239,7 +1239,7 @@ end
 
 function cfg_file:GetKeys(sec)
 	if (self.root and self.root[sec]) then
-		t={}
+		local t={}
 		for k,v in pairs(self.root[sec]) do 
 			if (k ~= "_____link") then 
 				t[k] = v
@@ -1357,18 +1357,20 @@ function cfg_file:Save()
 			str = str .. "\n[" .. section .. "]"
 		end
 
-		if (self.root["_____link"]) then 
-			str = str .. ":" .. self.root["_____link"] .. "\n"
+		if (self.root[section]["_____link"]) then 
+			str = str .. ":" .. self.root[section]["_____link"] .. "\n"
 		else 
 			str = str .. "\n"
 		end 
 
 		for ii, key in pairs(_s[section]) do
-			val = self.root[section][key]
-			if (val == "") then
-				str = str .. key .. "\n"
-			else
-				str = str .. key .. " = " .. tostring(val) .. "\n"
+			if (key ~= "_____link") then
+				val = self.root[section][key]
+				if (val == "") then
+					str = str .. key .. "\n"
+				else
+					str = str .. key .. " = " .. tostring(val) .. "\n"
+				end
 			end
 		end 
 	end 

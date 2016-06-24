@@ -65,14 +65,14 @@ function CALifeStorageManager_before_save(fname)
 	for id,t in pairs(db.storage) do
 		if (t and type(t) == "table") then
 			if (t.pstor) then
-				if not (empty(t.pstor)) then
+				if not (is_empty(t.pstor)) then
 					m_data.pstor_all[id] = t.pstor
 				end
 			end
 	
 			-- serialization with game.CTime.__persist
 			if (t.pstor_ctime) then
-				if not (empty(t.pstor_ctime)) then
+				if not (is_empty(t.pstor_ctime)) then
 					m_data.pstor_ctime[id] = t.pstor_ctime
 				end
 			end
@@ -83,7 +83,7 @@ function CALifeStorageManager_before_save(fname)
 	
 	-- clean out se_stalker table of empty tables
 	for k,v in pairs(m_data.se_stalker) do 
-		if (empty(v)) then 
+		if (is_empty(v)) then 
 			v = nil 
 		end
 	end

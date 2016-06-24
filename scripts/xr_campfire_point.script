@@ -59,7 +59,7 @@ function action_point_campfire:activate_scheme()
 	local vid,look
 	if (self.st.smart) then
  		local fires = db.campfire_table_by_smart_names[self.st.smart]
-		if (fires and not empty(fires)) then
+		if (fires and not is_empty(fires)) then
 			local campfire
 			local t = {}
 			local function create_campfire_point(pos,dir)
