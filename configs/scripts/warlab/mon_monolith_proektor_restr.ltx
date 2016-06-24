@@ -22,6 +22,14 @@ on_timer = 6000 | sr_idle@decided %=stop_postprocess(3009) =enable_ui +oso_init_
 on_timer = 2000 | {-oso_init_dialog} sr_idle@wait_2nd_actor %=destroy_object(story:osoznanie) =run_postprocess(black:3009:true)%
 
 [sr_idle@wait_2nd_actor]
-on_info = {+sar2_monolith_end} sr_idle@nil %=stop_postprocess(3009) +warlab_actor_second_arrive =spawn_object(artefact_monolit_ghost:oso_walk:0)%
+on_info = {+sar2_monolith_end} sr_idle@wait_gen_off %=stop_postprocess(3009) +warlab_actor_second_arrive =spawn_object(artefact_monolit_ghost:oso_walk:0)%
+
+[sr_idle@wait_gen_off]
+on_info = {+warlab_deactivate_generators_done} sr_idle@destroy_holo %=destroy_object(story:artefact_monolit_ghost) =play_sound(mon_explosion) =stop_sound_looped%
+
+[sr_idle@destroy_holo]
+on_info = {=story_object_exist(warlab_light_alarm_glass_0017)} %=destroy_object(story:warlab_light_alarm_glass_0017)%
+on_info2 = {=story_object_exist(warlab_light_alarm_glass_0026)} %=destroy_object(story:warlab_light_alarm_glass_0026)%
+on_info3 = {!story_object_exist(warlab_light_alarm_glass_0017) !story_object_exist(warlab_light_alarm_glass_0026)} sr_idle@nil
 
 [sr_idle@nil]
