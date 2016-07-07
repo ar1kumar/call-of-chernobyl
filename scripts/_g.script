@@ -1136,7 +1136,6 @@ ammo_section["ammo_8.58x70_jsp"] = true
 ammo_section["ammo_8.58x70_ap"] = true
 ammo_section["ammo_m134"] = true
 
-quest_section = {}
 -- преобразует строку в соответствии со значением
 function get_param_string(src_string , obj)
 	--printf("src_string is [%s] obj name is [%s]", tostring(src_string), obj:name())
@@ -1357,17 +1356,6 @@ function CALifeUpdateManager__on_before_change_level(packet)
 		end	
 	end
 end 
-
------ TEST REMOVE ME 
-function use1_functor(itm)
-	printf("use1_functor item %s",itm and itm:section())
-	return  "use_me_bitch"
-end 
-
-function use1_action_functor(itm)
-	printf("use1_action_functor item %s",itm and itm:section())
-	return true
-end
 
 -- 'Запуск динамического окна.
 function run_dynamic_element(folder,close_inv)

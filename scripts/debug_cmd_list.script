@@ -151,8 +151,83 @@ function cmd.char_desc(me,txt,owner,p)
 	return "char_desc:= scanning complete"
 end 
 
+-- print
+function cmd.print(me,txt,owner,p)
+	local wrd = check_and_set_help(me,txt,owner,"[_G]")
+	if not (wrd) then return end
+	
+	if (wrd == "_G" or wrd == "_g") then 
+		local list = { f={}, t={}, u={}, b={}, n={}, s={}, unknown={} }
+		
+		local msg = ""
+		for k,v in pairs(_G) do 
+			if (type(v) == "userdata") then 
+				table.insert(list.u,k)
+			elseif (type(v) == "function") then 
+				table.insert(list.f,k)
+			elseif (type(v) == "boolean") then 
+				table.insert(list.b,k)
+			elseif (type(v) == "number") then 
+				table.insert(list.n,k)
+			elseif (type(v) == "string") then 
+				table.insert(list.s,k)
+			elseif (type(v) == "table") then 
+				table.insert(list.t,k)
+			else 
+				table.insert(list.unknown,k)
+			end
+		end
+		
+		for k,v in pairs(list) do 
+			table.sort(v)
+		end
+		
+		msg = msg .. "\n\nNUMBER" .. "\n"
+		for i=1,#list.n do
+			msg = msg .. list.n[i] .. " = " .. tostring(_G[list.n[i]]) .. "\n"
+		end
+		
+		msg = msg .. "\n\nBOOLEAN" .. "\n"
+		for i=1,#list.b do
+			msg = msg .. list.b[i] .. " = " .. tostring(_G[list.b[i]]) .. "\n"
+		end		
+		
+		msg = msg .. "\n\nSTRING" .. "\n"
+		for i=1,#list.s do
+			msg = msg .. list.s[i] .. " = " .. _G[list.s[i]] .. "\n"
+		end
+		
+		msg = msg .. "\n\nTABLE" .. "\n"
+		for i=1,#list.t do
+			msg = msg .. list.t[i] .. "\n"
+		end
+	
+		msg = msg .. "\n\nFUNCTION" .. "\n"
+		for i=1,#list.f do
+			msg = msg .. list.f[i] .. "\n"
+		end
+		
+		msg = msg .. "\n\nUSERDATA" .. "\n"
+		for i=1,#list.u do
+			msg = msg .. list.u[i] .. "\n"
+		end
+		
+		msg = msg .. "\n\nUNKNOWN" .. "\n"
+		for i=1,#list.unknown do
+			msg = msg .. list.unknown[i] .. "\n"
+		end
+		
+		local file = io.open("debug_print.txt","w")
+		file:write(msg)
+		file:close()
+		return "print:= output sent to debug_print.txt"
+	end 
+	
+	return "print:= incorrect subcommands. Type 'print help'"
+end 
+
 -- reload_system_ini
-function cmd.reload_system_ini(me,text,owner,p)
+function cmd.reload_system_ini(me,txt,owner,p)
 	if (reload_system_ini) then 
 		reload_system_ini()
 		return "reload_system_ini:= success"

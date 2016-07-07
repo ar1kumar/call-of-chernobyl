@@ -575,15 +575,11 @@ function relocate_item_section(victim, section, type, amount)
 		for i = 1, amount do
 			if type == "in" then
 			--' Трансферить нужно только квестовые предметы.
-				if quest_section[section] == true and victim ~= nil and victim:object(section) ~= nil then
-					victim:transfer_item(victim:object(section), db.actor)
-				else
-					alife():create(section,
-								db.actor:position(),
-							db.actor:level_vertex_id(),
-							db.actor:game_vertex_id(),
-							db.actor:id())
-				end
+				--if quest_section[section] == true and victim ~= nil and victim:object(section) ~= nil then
+				--	victim:transfer_item(victim:object(section), db.actor)
+				--else
+					alife():create(section,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+				--end
 			elseif type == "out" then
 				if victim == nil then
 					printf("Couldn't relocate item to NULL")
