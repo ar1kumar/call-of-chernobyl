@@ -1560,10 +1560,7 @@ end
 
 function actor_on_load(binder,packet)
 	--printf("actor on load")
-	if not (SurgeManager) then 
-		SurgeManager = CSurgeManager()
-	end 
-	local mgr = SurgeManager
+	local mgr = get_surge_manager()
 	if not (mgr._state_loaded) then 
 		mgr:initialize()
 		mgr._state_loaded = true
@@ -1608,7 +1605,7 @@ function save_state(m_data)
 	--alun_utils.debug_write("SurgeManager:save_state BEFORE")
 	m_data.SurgeManager = {}
 
-	local mgr = SurgeManager
+	local mgr = get_surge_manager()
 	if not (mgr._state_loaded) then 
 		mgr:initialize()
 		mgr._state_loaded = true
@@ -1637,7 +1634,7 @@ function load_state(m_data)
 		return
 	end
 	--alun_utils.debug_write("SurgeManager:load_state BEFORE")
-	local mgr = SurgeManager
+	local mgr = get_surge_manager()
 	mgr:initialize()
 	mgr.finished = m_data.SurgeManager.finished
 	mgr.started = m_data.SurgeManager.started
@@ -1674,33 +1671,33 @@ end
 
 --------------------------------------------------------------------------------
 function start_surge(p)
-	SurgeManager:start(true)
+	get_surge_manager():start(true)
 end
 
 function actor_in_cover()
-	return SurgeManager.actor_in_cover == true
+	return get_surge_manager().actor_in_cover == true
 end
 
 function npc_in_cover(npc)
-	return SurgeManager:pos_in_cover(npc:position())
+	return get_surge_manager():pos_in_cover(npc:position())
 end
 
 function job_in_surge_cover(se_obj,job)
 	if not (job.alife_task) then 
 		return false 
 	end 
-	return SurgeManager:pos_in_cover(job.alife_task:position())
+	return get_surge_manager():pos_in_cover(job.alife_task:position())
 end
 
 function stop_surge()
-	if(SurgeManager.started) then
-		SurgeManager:end_surge(true)
+	if(get_surge_manager().started) then
+		get_surge_manager():end_surge(true)
 	end
 end
 
 function get_task_descr()
 	local descr = ""
-	if(SurgeManager.actor_in_cover) then
+	if(get_surge_manager().actor_in_cover) then
 		descr = game.translate_string("hide_from_surge_descr_2_a")
 	else
 		descr = game.translate_string("hide_from_surge_descr_1_a")
@@ -1709,45 +1706,47 @@ function get_task_descr()
 end
 
 function get_task_target()
-	if (SurgeManager.actor_in_cover) then
+	local mgr = get_surge_manager()
+	if (mgr.actor_in_cover) then
 		return nil
 	end
-	return SurgeManager.best_cover and SurgeManager.best_cover:id()
+	return mgr.best_cover and mgr.best_cover:id()
 end
 
 function set_surge_message(mess)
-	SurgeManager.surge_message = mess
+	get_surge_manager().surge_message = mess
 end
 
 function set_surge_task(task)
-	SurgeManager.surge_task_sect = task
+	get_surge_manager().surge_task_sect = task
 end
 
 function is_started()
-	return SurgeManager and SurgeManager.started
+	return get_surge_manager().started
 end
 
 function is_killing_all()
-	if(SurgeManager.started and SurgeManager.ui_disabled) then
+	local mgr = get_surge_manager()
+	if(mgr.started and mgr.ui_disabled) then
 		return true
 	end
 	return false
 end
 
 function is_finished()
-	return SurgeManager == nil and true or SurgeManager.finished == true
+	return SurgeManager == nil and true or get_surge_manager().finished == true
 end
 
 function is_loaded()
-	return SurgeManager and SurgeManager._state_loaded == true
+	return get_surge_manager()._state_loaded == true
 end
 
 function resurrect_skip_message()
-	SurgeManager.skip_message = false
+	get_surge_manager().skip_message = false
 end
 
 function sound_started()
-	return SurgeManager.started and SurgeManager.blowout_sound
+	return get_surge_manager().started and get_surge_manager().blowout_sound
 end
 
 function can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)
