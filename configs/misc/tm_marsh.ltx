@@ -201,7 +201,7 @@ precondition = {+mar_base_stalker_tech_upgrade_tier_2 -mar_base_stalker_tech_upg
 
 [mar_find_doctor_task]
 icon = ui_iconsNpc_doctor
-prior = 104
+prior = 109
 storyline = true
 title = mar_doctor_task
 target = nil
@@ -213,9 +213,75 @@ condlist_0 = {+mar_doctor_found} complete
 
 [cit_doctor_task]
 icon = ui_iconsNpc_strelok
-prior = 104
+prior = 102
 storyline = true
 title = cit_doctor_task
 target = {+cit_jail_doctor_pryp_task -pri_actor_in_hotel} pri_hotel_zone, {+pri_actor_in_hotel -pri_actor_in_hiding_place} pri_decoder_room_door, {+pri_actor_in_hiding_place} pri_decoder_room_door
 descr = {+cit_jail_doctor_pryp_task -pri_actor_in_hotel} cit_doctor_task_1, {+pri_actor_in_hotel -pri_actor_in_hiding_place} cit_doctor_task_2, {+pri_actor_in_hiding_place -pri_monolith_decoder_got} cit_doctor_task_3
 condlist_0 = {+pri_monolith_decoder_got} complete
+
+;--------------------------------------------------------------------------------------------------
+; DOCTOR LAB TASKS-
+
+[main_1_search_agr_ug]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 108
+storyline = true
+title = st_main_1_search_agr_ug_name
+descr = st_main_1_search_agr_ug_text
+target = agr_space_restrictor_to_agr_ug_1
+condlist_0 = {=actor_has_item(main_story_1_quest_case)} complete
+
+[main_2_search_labx18]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 107
+storyline = true
+title = st_main_2_search_labx18_name
+descr = st_main_2_search_labx18_text
+target = val_space_restrictor_to_labx18
+condlist_0 = {=actor_has_item(main_story_2_lab_x18_documents)} complete
+
+[main_3_search_labx16]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 106
+storyline = true
+title = st_main_3_search_labx16_name
+descr = st_main_3_search_labx16_text
+target = yan_space_restrictor_to_x16
+condlist_0 = {=actor_has_item(main_story_3_lab_x16_documents)} complete
+
+[main_4_search_labx10]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 105
+storyline = true
+title = st_main_4_search_labx10_name
+descr = st_main_4_search_labx10_text
+target = rad_space_restrictor_to_bunker
+condlist_0 = {=actor_has_item(main_story_4_lab_x10_documents)} complete
+
+[main_5_search_labx8]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 104
+storyline = true
+title = st_main_5_search_labx8_name
+descr = st_main_5_search_labx8_text
+target = pri_space_restrictor_to_labx8
+condlist_0 = {=actor_has_item(main_story_5_lab_x8_documents)} complete
+
+[main_6_search_jup_ug]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 103
+storyline = true
+title = st_main_6_search_jup_ug_name
+descr = st_main_6_search_jup_ug_text
+target = jupiter_space_restrictor_to_jupiter_ug
+condlist_0 = {=actor_has_item(main_story_6_jup_ug_documents)} complete
+
+[main_7_search_mon_con]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 101
+storyline = true
+title = st_main_7_search_mon_con_name
+descr = st_main_7_search_mon_con_text
+target = aes2_space_restrictor_to_secret_lab
+condlist_0 = {=actor_has_item(main_story_7_mon_con_documents)} complete
