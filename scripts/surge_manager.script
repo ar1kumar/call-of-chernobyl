@@ -40,20 +40,13 @@ local currentPPEfactor = 0.001
 
 
 local function actor_on_update(binder,delta)
-	SurgeManager:update()
-end
-
-local function actor_on_init(binder)
-	get_surge_manager()
+	if (SurgeManager) then
+		SurgeManager:update()
+	end
 end
 
 function on_game_start()
-	if not (USE_MARSHAL) then
-		RegisterScriptCallback("actor_on_load",this.actor_on_load)
-		RegisterScriptCallback("actor_on_save",this.actor_on_save)
-	end
 	RegisterScriptCallback("actor_on_update",actor_on_update)
-	RegisterScriptCallback("actor_on_init",actor_on_init)
 end
 	
 class "CSurgeManager"

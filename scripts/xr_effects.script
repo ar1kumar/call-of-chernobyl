@@ -1886,17 +1886,17 @@ function spawn_object_in(actor, obj, p)
 --	local box = alife():object(target_name)
 --	if(box==nil) then
 
-	printf("trying to find object %s", tostring(p[2]))
+	printf("xr_effects.spawn_object_in trying to find object %s", tostring(p[2]))
 
 	local target_obj_id = get_story_object_id(p[2])
 	if target_obj_id ~= nil then
 		box = alife():object(target_obj_id)
 		if box == nil then
-			printf("There is no such object %s", p[2])
+			printf("xr_effects.spawn_object_in There is no such object %s", p[2])
 		end
 		alife():create(spawn_sect,vector(),0,0,target_obj_id)
 	else
-		printf("object is nil %s", tostring(p[2]))
+		printf("xr_effects.spawn_object_in object is nil %s", tostring(p[2]))
 	end
 end
 

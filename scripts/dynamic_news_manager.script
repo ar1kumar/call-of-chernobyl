@@ -406,6 +406,10 @@ function DynamicNewsManager:DeathBySurge(victim,who,comm)
 end
 
 function DynamicNewsManager:DeathByStalker(victim,who,comm)
+	local cls = dynamic_news_helper.GetWeaponClass(who)
+	if (cls == 1 or cls == 9) then 
+		return false
+	end
 	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]Found %s. %s.",victim:character_name(),game.translate_string(comm),dynamic_news_helper.GetPointDescription(victim),dynamic_news_helper.GetWeaponDescription(victim,1))
 	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se="Died:",It="gr"})
 	return true

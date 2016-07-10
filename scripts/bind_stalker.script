@@ -21,8 +21,6 @@ function actor_binder:__init (obj) super(obj)
 
 	bind_stalker_ext.actor_on_init(self)
 	
-	self.weather_manager = level_weathers.get_weather_manager()
-	
 	if (USE_MARSHAL) then 
 		RegisterScriptCallback("save_state",self.save_state,self)
 	end 
@@ -45,6 +43,8 @@ function actor_binder:net_spawn(data)
 	db.add_actor(self.object)
 	db.add_enemy(self.object)
 
+	level_weathers.get_weather_manager():reset()
+	
 	db.actor.deimos_intensity = self.deimos_intensity
 	self.deimos_intensity = nil
 	if self.st.disable_input_time == nil then
@@ -58,7 +58,6 @@ function actor_binder:net_spawn(data)
 	self.loaded = false
 
 	bind_stalker_ext.actor_on_net_spawn(self)
-	self.weather_manager:reset()
 	
 	--alun_utils.debug_write("actor net spawn end")
 	
@@ -214,9 +213,6 @@ function actor_binder:update(delta)
 	
 	game_stats.update (delta, self.object)
 
-	-- апдейт погоды
-	self.weather_manager:update()
-
 	--' Апдейт саундменеджера
 	xr_sound.update(self.object:id())
 
@@ -257,6 +253,8 @@ function actor_binder:update(delta)
 		return
 	end
 	self.last_update = tg + 3000
+	
+	level_weathers.get_weather_manager():update()
 
 	pda.fill_sleep_zones()
 	treasure_manager.get_treasure_manager():update()
@@ -288,7 +286,7 @@ function actor_binder:save(packet)
 	alun_utils.w_stpk(packet,"CTime",self.st.disable_input_time, "disable input time")
 
 	xr_logic.pstor_save_all(self.object, packet)
-	self.weather_manager:save(packet)
+	level_weathers.get_weather_manager():save(packet)
 	
 	sr_psy_antenna.save( packet )
 
@@ -335,7 +333,7 @@ function actor_binder:load(reader)
 	self.st.disable_input_time = utils.r_CTime(reader,"bind_stalker")
 
 	xr_logic.pstor_load_all(self.object, reader)
-	self.weather_manager:load(reader)
+	level_weathers.get_weather_manager():load(reader)
 
 	sr_psy_antenna.load(reader)
 	SIMBOARD.simulation_started = reader:r_bool()

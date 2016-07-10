@@ -10,6 +10,9 @@
 -- actor_on_init
 -------------------
 function actor_on_init(binder)
+	level_weathers.get_weather_manager()
+	surge_manager.get_surge_manager()
+	psi_storm_manager.get_psi_storm_manager()
 	SendScriptCallback("actor_on_init",binder)
 end 
 

@@ -1302,6 +1302,7 @@ end
 ------------------------------------------------------------------------------------------------------
 -- ENGINE EXPORTS!!!
 ------------------------------------------------------------------------------------------------------
+get_console():execute("r__clear_models_on_unload 0")
 function CALifeUpdateManager__on_before_change_level(packet)
 --[[
 	C++:
@@ -1324,6 +1325,13 @@ function CALifeUpdateManager__on_before_change_level(packet)
 	local lvid = packet:r_u32()
 	packet:r_vec3(pos)
 	packet:r_vec3(angle)
+	
+	-- crazy hack to help prevent crash on Trucks Cemetery
+	local gg = game_graph()
+	if (gg:valid_vertex_id(gvid) and alife():level_name(gg:vertex(gvid):level_id()) == "k02_trucks_cemetery") then
+		log("k02_trucks_cemetery hack r__clear_models_on_unload 1")
+		get_console():execute("r__clear_models_on_unload 1")
+	end
 	
 	--printf("CALifeUpdateManager__on_before_change_level pos=%s gvid=%s lvid=%s angle=%s",pos,gvid,lvid,angle)
 	
