@@ -1,6 +1,6 @@
 --// Coc rewrite of Dunin ammo aggregation by Nuor
 
-local ammo						--repack ammo table
+local ammo	= {}					--repack ammo table
 
 function on_game_start()
 	RegisterScriptCallback("actor_on_item_take", actor_on_item_take)
@@ -29,8 +29,8 @@ function actor_on_update()
 	if ammo then
 		for section, size in pairs(ammo) do
 			repack_ammo(section, size)
+			ammo[section] = nil
 		end
-		ammo = nil
 	end
 end
 

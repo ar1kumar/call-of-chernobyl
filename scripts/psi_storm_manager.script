@@ -207,6 +207,10 @@ end
 -- ###############################################################################################
 
 function CPsiStormManager:update()
+	if not (self._state_loaded) then 
+		self:initialize()
+	end 
+	
 	if not(self.started) then
 		local g_time = game.get_game_time()
 		if(self.time_forwarded) then
