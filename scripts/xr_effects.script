@@ -4742,3 +4742,10 @@ function purge_zone(actor,npc,p)
 		xr_zones.purge_arena_items(p[1])
 	end
 end
+
+function clear_weather(actor,npc,p)
+	local wm = level_weathers.get_weather_manager()
+	wm.current_state = "clear"
+	--wm.next_state = "clear"
+	wm:select_weather(true)
+end
