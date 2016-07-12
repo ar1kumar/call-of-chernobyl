@@ -21,7 +21,7 @@ function on_hit(obj,power,dir,who,bi)
 	
 	if not (st.show_health) then
 		-- show health progress for all objects hit by actor if option is enabled
-		if (axr_main.config:GetValue("mm_options","enable_show_enemy_health",1,false) == false) then
+		if (axr_main.config:r_value("mm_options","enable_show_enemy_health",1,false) == false) then
 			return 
 		end
 	end

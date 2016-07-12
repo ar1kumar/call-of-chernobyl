@@ -24,7 +24,7 @@ function destroy_dynamic_news()
 end
 
 function on_game_start()
-	if (axr_main.config:GetValue("mm_options","enable_dynamic_news",1,true) == false) then
+	if (axr_main.config:r_value("mm_options","enable_dynamic_news",1,true) == false) then
 		return 
 	end
 		
@@ -98,7 +98,7 @@ function DynamicNewsManager:NewsTick()
 		return false
 	end 
 	
-	if (axr_main.config:GetValue("mm_options","enable_dynamic_news",1,true) == false) then
+	if (axr_main.config:r_value("mm_options","enable_dynamic_news",1,true) == false) then
 		return true
 	end
 	
@@ -126,7 +126,7 @@ function DynamicNewsManager:NewsTick()
 end
 
 function DynamicNewsManager:TickSpecialEvent()
-	if (axr_main.config:GetValue("mm_options","enable_dynamic_news",1,true) == false) then
+	if (axr_main.config:r_value("mm_options","enable_dynamic_news",1,true) == false) then
 		return true
 	end
 	

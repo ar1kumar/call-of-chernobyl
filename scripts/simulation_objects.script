@@ -3,7 +3,7 @@ local alife, game_graph, pairs = alife, game_graph, pairs
 
 local sim_objects_registry = nil
 local props_ini = ini_file("misc\\simulation_objects_props.ltx")
-config = alun_utils.cfg_file(getFS():update_path('$game_config$', '').."ai_tweaks\\simulation_objects.ltx")
+config = ini_file_ex("ai_tweaks\\simulation_objects.ltx")
 
 local ALLOW_NPC_LEVEL_TRANSITION = true
 
@@ -179,7 +179,7 @@ function evaluate_prior(target, squad)
 			local level_name = sim:level_name(gg:vertex(squad.m_game_vertex_id):level_id())
 			local target_level_name = sim:level_name(gg:vertex(target.m_game_vertex_id):level_id())
 
-			if not (config:SectionExist(level_name) and string.find(config:GetValue(level_name,"target_maps",0,""),target_level_name)) then
+			if not (config:section_exist(level_name) and string.find(config:r_value(level_name,"target_maps",0,""),target_level_name)) then
 				return 0
 			end
 			--]]

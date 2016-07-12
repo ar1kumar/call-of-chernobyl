@@ -266,32 +266,40 @@ end
 
 -- Parse ini file and store all phrases and their parameters into phrase table
 function fill_phrase_table()
-	local ini = alun_utils.cfg_file(getFS():update_path('$game_config$', '').."misc\\dialog_manager.ltx")
-	local category, val, temp_table
-	for section,t in pairs(ini.root) do
-		val = ini.root[section]["category"]
-		category = (val == "hello" or val == "anomalies" or val == "place" or val == "job" or val == "information" or val == "tips") and val or "default"
-		if (category ~= "default") then
-			temp_table = {}
+	local cfg = ini_file_ex("misc\\dialog_manager.ltx")
+	local function itr(section)
+		local val = cfg:r_value(section,"category") or "default"
+		local category = (val == "hello" or val == "anomalies" or val == "place" or val == "job" or val == "information" or val == "tips") and val or "default"
+		if (category ~= "default") then 
+			local temp_table = {}
 			temp_table.info = {}
 			temp_table.id = tostring(get_id())
 			temp_table.name = section
-			temp_table.npc_community = ini.root[section]["npc_community"] and parse_names(ini.root[section]["npc_community"]) or "not_set"
-			temp_table.actor_community = ini.root[section]["actor_community"] and parse_names(ini.root[section]["actor_community"]) or "not_set"
-			temp_table.level = ini.root[section]["level"] and parse_names(ini.root[section]["level"]) or "not_set"
-			temp_table.once = ini.root[section]["once"] == "true" and "true" or ini.root[section]["once"] == "false" and "false" or "always"
-			temp_table.wounded = ini.root[section]["wounded"] == "true" and "true" or "false"
+			
+			local temp = cfg:r_value(section,"npc_community")
+			temp_table.npc_community = temp and parse_names(temp) or "not_set"
+			
+			temp = cfg:r_value(section,"actor_community")
+			temp_table.actor_community = temp and parse_names(temp) or "not_set"
+			
+			temp = cfg:r_value(section,"level")
+			temp_table.level = temp and parse_names(temp) or "not_set"
+			
+			temp_table.once = tostring(cfg:r_value(section,"once",1)) or "always"
+			temp_table.wounded = tostring(cfg:r_value(section,"wounded",1)) or "false"
 
-			if (ini.root[section]["info"]) then
-				xr_logic.parse_infop1(temp_table.info, ini.root[section]["info"])
+			temp = cfg:r_value(section,"info")
+			if (temp and temp ~= "") then
+				xr_logic.parse_infop1(temp_table.info, temp)
 			end
 
-			temp_table.smart = ini.root[section]["smart"] or ""
-
+			temp_table.smart = cfg:r_value(section,"smart") or ""
 
 			phrase_table[category][temp_table.id] = temp_table
 		end
-	end
+	end 
+	
+	cfg.ini:section_for_each(itr)
 end
 
 -- Initialize npc start dialog

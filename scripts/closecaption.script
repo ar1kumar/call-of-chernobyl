@@ -16,10 +16,10 @@ local ini
 local function opt_menu_on_accept(menu,opt,con)
 	local tabs = {["none"] = 0, ["storyonly"] = 1, ["all"] = 2}
 	local rcap = tabs[menu.tab_captioning:GetActiveId()]
-	ini:SetValue("closecaption","cc_npc",(rcap > 0))
-	ini:SetValue("closecaption","cc_vrb",(rcap > 1))
-	ini:SetValue("closecaption","cc_icc",menu.check_closedcaptions:GetCheck())
-	ini:Save()
+	ini:w_value("closecaption","cc_npc",(rcap > 0))
+	ini:w_value("closecaption","cc_vrb",(rcap > 1))
+	ini:w_value("closecaption","cc_icc",menu.check_closedcaptions:GetCheck())
+	ini:save()
 end
 
 local function opt_menu_on_init(menu)
@@ -40,9 +40,9 @@ end
 local function opt_menu_on_set_values(menu,opt)
 	local tabs = {"none", "storyonly", "all"}
 
-	local cc_npc = ini:GetValue("closecaption","cc_npc",1,false)
-	local cc_vrb = ini:GetValue("closecaption","cc_vrb",1,false)
-	local cc_icc = ini:GetValue("closecaption","cc_icc",1,false)
+	local cc_npc = ini:r_value("closecaption","cc_npc",1,false)
+	local cc_vrb = ini:r_value("closecaption","cc_vrb",1,false)
+	local cc_icc = ini:r_value("closecaption","cc_icc",1,false)
 
 	menu.tab_captioning:SetActiveTab(tabs[(cc_npc and 1 or 0) * (cc_vrb and 2 or 1) + 1])
 	menu.check_closedcaptions:SetCheck(cc_icc == true)
@@ -62,11 +62,11 @@ end
 -- called directly from axr_main
 function main_menu_on_init()
 	ini = axr_main.config
-	if not (ini:SectionExist("closecaption")) then
-		ini:SetValue("closecaption","cc_npc",true)	-- Display subtitles of scenario sounds in-game
-		ini:SetValue("closecaption","cc_vrb",false) -- Display more subtitles of NPC sentences in-game
-		ini:SetValue("closecaption","cc_icc",false) -- Display closed captions of sound effects in-game
-		ini:Save()
+	if not (ini:section_exist("closecaption")) then
+		ini:w_value("closecaption","cc_npc",true)	-- Display subtitles of scenario sounds in-game
+		ini:w_value("closecaption","cc_vrb",false) -- Display more subtitles of NPC sentences in-game
+		ini:w_value("closecaption","cc_icc",false) -- Display closed captions of sound effects in-game
+		ini:save()
 	end
 
 	RegisterScriptCallback("opt_menu_on_set_values",opt_menu_on_set_values)
@@ -466,9 +466,9 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 		end
 	end
 
-	local cc_npc = ini:GetValue("closecaption","cc_npc",1,false)
-	local cc_vrb = ini:GetValue("closecaption","cc_vrb",1,false)
-	local cc_icc = ini:GetValue("closecaption","cc_icc",1,false)
+	local cc_npc = ini:r_value("closecaption","cc_npc",1,false)
+	local cc_vrb = ini:r_value("closecaption","cc_vrb",1,false)
+	local cc_icc = ini:r_value("closecaption","cc_icc",1,false)
 
 	if cc_npc == true then
 		local current_time = time_global()
@@ -838,7 +838,7 @@ function cc_npc_disabled()
 			return
 		end
 	end
-	return ini:GetValue("closecaption","cc_npc",1,false) ~= true
+	return ini:r_value("closecaption","cc_npc",1,false) ~= true
 end
 
 function is_cc_npc_enabled()
@@ -848,7 +848,7 @@ function is_cc_npc_enabled()
 			return
 		end
 	end
-	return ini:GetValue("closecaption","cc_npc",1,false) == true
+	return ini:r_value("closecaption","cc_npc",1,false) == true
 end
 
 function get_game_version()	-- detect real game version

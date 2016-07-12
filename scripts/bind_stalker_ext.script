@@ -33,7 +33,7 @@ function actor_on_net_spawn()
 	end
 	--]]
 	
-	if (axr_main.config:GetValue("mm_options","enable_heli_spawn",1,true) == false) then 
+	if (axr_main.config:r_value("mm_options","enable_heli_spawn",1,true) == false) then 
 		for k,v in pairs(se_heli.se_helicopters) do 
 			alife():release(v,true)
 		end
@@ -353,7 +353,7 @@ function actor_item_to_belt(binder,obj)
 end 
 
 function actor_item_to_slot(binder,obj)
-	if (axr_main.config:GetValue("mm_options","enable_outfit_portrait",1,false) == true) then
+	if (axr_main.config:r_value("mm_options","enable_outfit_portrait",1,false) == true) then
 		local outfit = db.actor:item_in_slot(7)
 		if (outfit and outfit:id() == obj:id()) then 
 			local icon = system_ini():r_string_ex(outfit:section(),"character_icon")
@@ -367,7 +367,7 @@ function actor_item_to_slot(binder,obj)
 end 
 
 function actor_item_to_ruck(binder,obj)
-    if IsOutfit(obj) and (axr_main.config:GetValue("mm_options","enable_outfit_portrait",1,false) == true) then
+    if IsOutfit(obj) and (axr_main.config:r_value("mm_options","enable_outfit_portrait",1,false) == true) then
         local outfit = db.actor:item_in_slot(7)
         if (outfit == nil and db.actor_binder.character_icon) then
             db.actor:set_character_icon(db.actor_binder.character_icon)

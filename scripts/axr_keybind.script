@@ -245,7 +245,7 @@ local function on_key_release(key)
 				if (key_bindings[v] == dik_to_bind(key)) then 
 					action[k](0)
 				end
-			elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then
+			elseif (key == DIK_keys[axr_main.config:r_value("global_keybinds",k,0,"")]) then
 				action[k](0)
 			end
 		end
@@ -260,7 +260,7 @@ local function on_key_press(key)
 				if (key_bindings[v] == dik_to_bind(key)) then 
 					action[k](1)
 				end
-			elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then
+			elseif (key == DIK_keys[axr_main.config:r_value("global_keybinds",k,0,"")]) then
 				action[k](1)
 			end
 		end
@@ -274,7 +274,7 @@ local function on_key_hold(key)
 				if (key_bindings[v] == dik_to_bind(key)) then 
 					action[k](2)
 				end
-			elseif (key == DIK_keys[axr_main.config:GetValue("global_keybinds",k,0,"")]) then
+			elseif (key == DIK_keys[axr_main.config:r_value("global_keybinds",k,0,"")]) then
 				action[k](2)
 			end
 		end
@@ -288,13 +288,13 @@ function on_game_start()
 	
 	local need_save
 	for k,v in pairs(keybinds) do 
-		if not (axr_main.config:KeyExist("global_keybinds",k)) then 
-			axr_main.config:SetValue("global_keybinds",k,v)
+		if not (axr_main.config:line_exist("global_keybinds",k)) then 
+			axr_main.config:w_value("global_keybinds",k,v)
 			need_save = true
 		end
 	end 
 	
 	if (need_save) then
-		axr_main.config:Save()
+		axr_main.config:save()
 	end
 end 

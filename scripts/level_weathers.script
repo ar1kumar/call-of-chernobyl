@@ -22,38 +22,38 @@ function atmosfear_init()
 		end
 	end
 	
-	if (not atmosfear_options.config:SectionExist("atmosfear_current_parameters")) then
+	if (not atmosfear_options.config:section_exist("atmosfear_current_parameters")) then
 		for level,v in pairs(valid_levels) do
-			atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
-			atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
-			atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_"..level.."_period_good_length",random_choice(4,6,8))
-			atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_"..level.."_period_bad_length",random_choice(4,6,8))
+			atmosfear_options.config:w_value("atmosfear_current_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+			atmosfear_options.config:w_value("atmosfear_current_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
+			atmosfear_options.config:w_value("atmosfear_current_parameters","opt_"..level.."_period_good_length",random_choice(4,6,8))
+			atmosfear_options.config:w_value("atmosfear_current_parameters","opt_"..level.."_period_bad_length",random_choice(4,6,8))
 		end
 
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_enable_blowout",1)
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_blowout_freq",48)
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_blowout_fate","turntozombie")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_blowout_warning","radio_siren")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_blowout_task","give")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_enable_fallout",1)
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_fallout_freq",12)
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_fallout_fate","poison")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_fallout_warning","siren")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_fallout_task","give")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_enable_psi_storm",1)
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_psi_storm_freq",24)
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_psi_storm_fate","kill")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_psi_storm_warning","siren")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_psi_storm_task","give")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_enable_blowout",1)
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_blowout_freq",48)
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_blowout_fate","turntozombie")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_blowout_warning","radio_siren")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_blowout_task","give")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_enable_fallout",1)
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_fallout_freq",12)
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_fallout_fate","poison")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_fallout_warning","siren")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_fallout_task","give")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_enable_psi_storm",1)
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_psi_storm_freq",24)
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_psi_storm_fate","kill")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_psi_storm_warning","siren")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_psi_storm_task","give")
 
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_moon_phase","8days")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_night_brightness","slight")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_moon_phase","8days")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_night_brightness","slight")
 
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_weather_balance_presets","balance_default")
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_weather_length_presets","length_default")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_weather_balance_presets","balance_default")
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_weather_length_presets","length_default")
 
-		atmosfear_options.config:SetValue("atmosfear_current_parameters","opt_god_mode","false")
-		atmosfear_options.config:Save()
+		atmosfear_options.config:w_value("atmosfear_current_parameters","opt_god_mode","false")
+		atmosfear_options.config:save()
 	end
 end 
 
@@ -150,7 +150,7 @@ function WeatherManager:__init()
 	self.thunder_index=1
 	self.distant_storm_prob = 0.5
 	
-	atmosfear_options.config = atmosfear_options.config or alun_utils.cfg_file(getFS():update_path('$game_data$', '').."atmosfear_options.ini",true)
+	atmosfear_options.config = atmosfear_options.config or ini_file_ex("atmosfear_options.ltx",true)
 	atmosfear_init()
 end
 
@@ -227,10 +227,10 @@ function WeatherManager:get_next_period_change_hour(period)
 	end
 
 	if period=="good" then
-		local len = atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_good_length",2,6)
+		local len = atmosfear_options.config:r_value("atmosfear_current_parameters","opt_"..level_name.."_period_good_length",2,6)
 		hour = math.random(math.ceil(len*2/3),len)+self.last_period_change_hour+1
 	else
-		local len = atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_bad_length",2,6)
+		local len = atmosfear_options.config:r_value("atmosfear_current_parameters","opt_"..level_name.."_period_bad_length",2,6)
 		hour = math.random(math.ceil(len*2/3),len)+self.last_period_change_hour+1
 	end
 	if hour>23 then
@@ -246,7 +246,7 @@ function WeatherManager:change_period()
 	local diff_s = math.floor(surge_manager.SurgeManager._delta - g_time:diffSec(surge_manager.SurgeManager.last_surge_time))
 	local diff_p = psi_storm_manager and math.floor(psi_storm_manager.PsiStormManager._delta - g_time:diffSec(psi_storm_manager.PsiStormManager.last_psi_storm_time)) or 0
 
-	if (diff_s<7200 and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_blowout",2,1) ==1) or (diff_p<7200 and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==1) or level.is_wfx_playing() then
+	if (diff_s<7200 and atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_blowout",2,1) ==1) or (diff_p<7200 and atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==1) or level.is_wfx_playing() then
 		self.pre_blowout_period=true
 		self.next_period_change_hour=self.next_period_change_hour+1
 		if self.next_period_change_hour>23 then
@@ -423,7 +423,7 @@ function WeatherManager:get_moon_phase()
 	if h >=12 then
 		day = day+1
 	end
-	local moon = atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_moon_phase",0,"8days")
+	local moon = atmosfear_options.config:r_value("atmosfear_current_parameters","opt_moon_phase",0,"8days")
 	local phase
 	if moon=="28days" then
 		phase = math.floor(math.mod(day,28)/3.5)
@@ -452,7 +452,7 @@ function WeatherManager:select_weather(now)
 			weather = weather.."_pre_blowout"
 			self.pre_blowout_period=false
 		else
-			local period = level_name and atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_"..level_name.."_period_"..self.period)
+			local period = level_name and atmosfear_options.config:r_value("atmosfear_current_parameters","opt_"..level_name.."_period_"..self.period)
 			if not (period) then
 				printf("level_weathers: opt_%s_peroid_%s does not exist in atmosfear_current_parameters",level_name,self.period)
 				period = "clear"
@@ -475,7 +475,7 @@ function WeatherManager:select_weather(now)
 			--self.debugMessages[4]:SetText("self.state["..weather.."].current_state="..tostring(self.state[weather].current_state))
 		end
 		local st=self.state[weather]
-		weather_section_name="af3_"..atmosfear_options.config:GetValue("atmosfear_current_parameters","opt_night_brightness").."_"..st.current_state
+		weather_section_name="af3_"..atmosfear_options.config:r_value("atmosfear_current_parameters","opt_night_brightness").."_"..st.current_state
 		if st.current_state=="clear" or st.current_state=="partly" then
 			weather_section_name = weather_section_name.."_"..self:get_moon_phase()
 		end

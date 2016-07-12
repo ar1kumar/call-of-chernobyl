@@ -176,7 +176,7 @@ function sim_squad_scripted:update()
 				-- Disable any squad that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
 				if (level ~= actor_level) and (self:commander_id() and not sim:has_info(self:commander_id(),"npcx_is_companion")) then
 					local sfind = string.find
-					if not (sfind(simulation_objects.config:GetValue(actor_level,"target_maps",0,""),level)) then
+					if not (sfind(simulation_objects.config:r_value(actor_level,"target_maps",0,""),level)) then
 						if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
 							SIMBOARD.squads[self.id] = nil
 							if (self.smart_id) then
@@ -1016,7 +1016,7 @@ function sim_squad_scripted:can_switch_online()
     --alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
     if (not self.online and not get_object_story_id(self.id)) then
 	
-		local dist = axr_main.config:GetValue("mm_options","excl_dist",2,0)
+		local dist = axr_main.config:r_value("mm_options","excl_dist",2,0)
 	    if (dist > 0 and db.actor) then 
 			if (self.first_update and level_weathers.valid_levels[level.name()] and self.position:distance_to(db.actor:position()) <= dist) then
 				return false
@@ -1103,7 +1103,7 @@ function sim_squad_scripted:show()
 	end
 	local spot = ""
 
-	if (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
+	if (DEV_DEBUG and axr_main.config:r_value("mm_options","enable_debug_hud",1,false) == true) then
 		if (DEV_DEBUG_HOLD_ACTION_1) then 
 			if (self.assigned_target_id ~= nil and smart_terrain.nearest_to_actor_smart.id == self.assigned_target_id) then 
 				spot = "storyline_task_location"
@@ -1139,7 +1139,7 @@ function sim_squad_scripted:show()
 end
 
 function sim_squad_scripted:get_squad_props()
-	if (DEV_DEBUG and axr_main.config:GetValue("mm_options","enable_debug_hud",1,false) == true) then
+	if (DEV_DEBUG and axr_main.config:r_value("mm_options","enable_debug_hud",1,false) == true) then
 		local assigned_target = self.assigned_target_id and alife():object(self.assigned_target_id)
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
 

@@ -107,7 +107,7 @@ local function try_to_reach_target(heli,se_obj,heliObject,se_target)
 		return 
 	end
 	
-	heliObject:TurnEngineSound(axr_main.config:GetValue("mm_options","enable_heli_engine_sound",1,false))
+	heliObject:TurnEngineSound(axr_main.config:r_value("mm_options","enable_heli_engine_sound",1,false))
 	
 	local vel = db.storage[se_obj.id].combat.max_velocity or 30
 	heliObject:SetMaxVelocity(vel)

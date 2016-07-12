@@ -20,21 +20,21 @@ local function on_game_load(binder)
 	
 	-- IRONMAN MODE
 	if (USE_MARSHAL) then
-		if (config:GetValue("temp","new_game_hardcore_mode",1) == true) then 
+		if (config:r_value("temp","new_game_hardcore_mode",1) == true) then 
 			-- shitty way to make a uuid but should be good enough to track the same saves
 			math.randomseed(os.time())
 			alife_storage_manager.get_state().uuid = GAME_VERSION .. "_" .. tostring(math.random(100)) .. tostring(math.random()) .. tostring(math.random(1000))
-			config:SetValue("temp","new_game_hardcore_mode")
+			config:w_value("temp","new_game_hardcore_mode")
 			need_save = true
 		end
-		if (config:GetValue("temp","new_game_survival_mode",1) == true) then
+		if (config:r_value("temp","new_game_survival_mode",1) == true) then
 			alife_storage_manager.get_state().enable_survival_mode = true
-			config:SetValue("temp","new_game_survival_mode")
+			config:w_value("temp","new_game_survival_mode")
 			need_save = true
 		end
 		local con = get_console()
-		if (config:GetValue("temp","new_game_hardcore_aim_mode",1) == true) then 
-			config:SetValue("temp","new_game_hardcore_aim_mode")
+		if (config:r_value("temp","new_game_hardcore_aim_mode",1) == true) then 
+			config:w_value("temp","new_game_hardcore_aim_mode")
 			need_save = true
 			con:execute("ai_aim_max_angle 20.0")
 			con:execute("ai_aim_min_angle 17.0")
@@ -49,9 +49,9 @@ local function on_game_load(binder)
 	end 
 	
 	-- NEW CHARACTER NAME
-	local new_character_name = config:GetValue("temp","new_game_character_name",3) or ""
+	local new_character_name = config:r_value("temp","new_game_character_name",3) or ""
 	if (new_character_name and new_character_name ~= "") then 
-		config:SetValue("temp","new_game_character_name")
+		config:w_value("temp","new_game_character_name")
 		need_save = true
 		
 		local data = stpk_utils.get_actor_data(se_actor)
@@ -62,29 +62,29 @@ local function on_game_load(binder)
 	end
 	
 	-- NEW CHARACTER ICON 
-	local new_character_icon = config:GetValue("temp","new_game_character_icon",3)
+	local new_character_icon = config:r_value("temp","new_game_character_icon",3)
 	if (new_character_icon and new_character_icon ~= "") then 
 		db.actor_binder.character_icon = new_character_icon
 		
-		config:SetValue("temp","new_game_character_icon")
+		config:w_value("temp","new_game_character_icon")
 		need_save = true
 	end
 	
 	-- NEW FACTION
-	local faction = config:GetValue("temp","new_game_faction",3) or ""
+	local faction = config:r_value("temp","new_game_faction",3) or ""
 	
 	if (faction and faction ~= "") then
-		local supply_id = config:GetValue("temp","new_game_supplies",2) or 1
+		local supply_id = config:r_value("temp","new_game_supplies",2) or 1
 		supply_id = supply_id > 0 and supply_id or 1
 		
-		config:SetValue("temp","new_game_supplies")
-		config:SetValue("temp","new_game_faction")
+		config:w_value("temp","new_game_supplies")
+		config:w_value("temp","new_game_faction")
 		need_save = true
 		
-		start_location = config:GetValue("temp","new_game_faction_position",3)
+		start_location = config:r_value("temp","new_game_faction_position",3)
 		if start_location and start_location ~= "" then
 			set_position_table(start_location)
-			config:SetValue("temp","new_game_faction_position")
+			config:w_value("temp","new_game_faction_position")
 		else
 			spawn_path = patrol("spawn_player_"..faction)
 		end
@@ -103,9 +103,9 @@ local function on_game_load(binder)
 		
 		-- money and loadout 
 		local money_max
-		local loadout = config:GetValue("temp","new_game_loadout",3)
+		local loadout = config:r_value("temp","new_game_loadout",3)
 		if (loadout and loadout ~= "") then 
-			config:SetValue("temp","new_game_loadout")
+			config:w_value("temp","new_game_loadout")
 			need_save = true
 			db.actor_binder.character_icon = new_character_icon
 			local ini = system_ini()
@@ -142,7 +142,7 @@ local function on_game_load(binder)
 	end 
 	
 	if (need_save) then 
-		config:Save()
+		config:save()
 	end
 end
 
@@ -739,36 +739,36 @@ function faction_ui:OnStartGame()
 	end
 	
 	if (self.ck_hardcore and self.ck_hardcore:GetCheck()) then 
-		axr_main.config:SetValue("temp","new_game_hardcore_mode",true)
+		axr_main.config:w_value("temp","new_game_hardcore_mode",true)
 	end 
 	
 	if (self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck()) then 
-		axr_main.config:SetValue("temp","new_game_hardcore_aim_mode",true)
+		axr_main.config:w_value("temp","new_game_hardcore_aim_mode",true)
 	end
 	
 	if (self.ck_survival and self.ck_survival:GetCheck()) then 
-		axr_main.config:SetValue("temp","new_game_survival_mode",true)
+		axr_main.config:w_value("temp","new_game_survival_mode",true)
 	end 
 	
 	if (self.selected_faction) then 
-		axr_main.config:SetValue("temp","new_game_faction",self.selected_faction)
+		axr_main.config:w_value("temp","new_game_faction",self.selected_faction)
 	end
 	
 	if (start_location) then 
-		axr_main.config:SetValue("temp","new_game_faction_position",start_location)
+		axr_main.config:w_value("temp","new_game_faction_position",start_location)
 	end
 	
 	if (self.loadout_str) then
-		axr_main.config:SetValue("temp","new_game_loadout",self.loadout_str)
+		axr_main.config:w_value("temp","new_game_loadout",self.loadout_str)
 	end
 	
-	axr_main.config:SetValue("temp","new_game_character_icon",self.icon_list:GetText())
+	axr_main.config:w_value("temp","new_game_character_icon",self.icon_list:GetText())
 	
-	axr_main.config:SetValue("temp","new_game_supplies",tostring(self.supplies_id or 1))
+	axr_main.config:w_value("temp","new_game_supplies",tostring(self.supplies_id or 1))
 	
 	-- Store info in temp config so it can be read on next game load
-	axr_main.config:SetValue("temp","new_game_character_name",character_name)
-	axr_main.config:Save()
+	axr_main.config:w_value("temp","new_game_character_name",character_name)
+	axr_main.config:save()
 	
 	-- Start the game
 	self.owner:StartGame()

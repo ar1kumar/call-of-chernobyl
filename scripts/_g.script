@@ -264,7 +264,7 @@ function TeleportSquad(squad,pos,lvid,gvid)
 end 
 
 function IsSurvivalMode()
-	return axr_main.config and axr_main.config:GetValue("temp","new_game_survival_mode",1) == true or alife_storage_manager.get_state().enable_survival_mode == true
+	return axr_main.config and axr_main.config:r_value("temp","new_game_survival_mode",1) == true or alife_storage_manager.get_state().enable_survival_mode == true
 end
 --------------------------------------------------------------------
 -- Serialization of userdata for Marshal Library
@@ -1399,4 +1399,86 @@ function ini_file:r_bool_ex(s,k)
 end
 function ini_file:r_float_ex(s,k)
 	return self:section_exist(s) and self:line_exist(s,k) and self:r_float(s,k) or nil
+end
+
+-----------------------------------------
+-- New INI wrapper to replace alun_utils.cfg_file
+class "ini_file_ex"
+function ini_file_ex:__init(fname,advanced_mode)
+	self.fname = getFS():update_path('$game_config$', '')..fname
+	self.ini = ini_file(fname)
+	
+	if (advanced_mode) then 
+		self.ini:set_override_names(true)
+		self.ini:set_readonly(false)
+		self.ini:save_at_end(true)
+	end
+end
+
+function ini_file_ex:save()
+	self.ini:save_as(self.fname)
+end
+
+function ini_file_ex:r_value(section,key,typ,def)
+	if (typ == 1) then
+		return self.ini:r_string_ex(section,key) == "true" or def
+	elseif (typ == 2) then
+		return tonumber(self.ini:r_string_ex(section,key)) or def
+	end
+	return self.ini:r_string_ex(section,key) or def
+end
+
+function ini_file_ex:w_value(section,key,val,comment)
+	self.ini:w_string(section,key,val ~= nil and tostring(val) or "",comment ~= nil and tostring(comment) or "")
+end
+
+function ini_file_ex:collect_section(section)
+	local _t = {}
+
+	local n = self.ini:section_exist(section) and self.ini:line_count(section) or 0
+	if (n > 0) then
+		for i = 0,n-1 do
+			local res,id,val = self.ini:r_line(section,i,"","")
+			_t[id] = val
+		end
+	end
+
+	return _t
+end 
+
+function ini_file_ex:get_sections(keytable)
+	local t = {}
+	local function itr(section)
+		if (keytable) then 
+			t[section] = true 
+		else 
+			table.insert(t,section)
+		end
+	end
+	self.ini:section_for_each(itr)
+	return t
+end
+
+function ini_file_ex:remove_line(section,key)
+	self.ini:remove_line(section,key)
+end
+
+function ini_file_ex:section_exist(section)
+	return self.ini:section_exist(section)
+end
+
+function ini_file_ex:line_exist(section,key)
+	return self.ini:section_exist(section) and self.ini:line_exist(section,key)
+end
+
+function ini_file_ex:r_string_ex(s,k)
+	return self.ini:r_string_ex(s,k)
+end
+
+function ini_file_ex:r_bool_ex(s,k)
+	return self.ini:r_string_ex(s,k) == "true" or false
+end 
+
+function ini_file_ex:r_float_ex(s,k)
+	return tonumber(self.ini:r_string_ex(s,k))
 end

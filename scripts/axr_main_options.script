@@ -87,19 +87,19 @@ function opt_menu_on_init(menu)
     for k,v in pairs(menu.gameplay_options) do
 		if (v.default ~= nil) then
 			if (v.typ=="check") then
-				if not (axr_main.config:KeyExist("mm_options","enable_"..k)) then
-					axr_main.config:SetValue("mm_options","enable_"..k,v.default)
+				if not (axr_main.config:line_exist("mm_options","enable_"..k)) then
+					axr_main.config:w_value("mm_options","enable_"..k,v.default)
 					need_save = true
 				end
-			elseif not (axr_main.config:KeyExist("mm_options",k)) then
-				axr_main.config:SetValue("mm_options",k,v.default)
+			elseif not (axr_main.config:line_exist("mm_options",k)) then
+				axr_main.config:w_value("mm_options",k,v.default)
 				need_save = true
 			end
 		end
     end
  
     if (need_save) then
-        axr_main.config:Save()
+        axr_main.config:save()
     end
 end
 
@@ -107,9 +107,9 @@ function opt_menu_on_accept(menu,optMgr,console)
     for name,v in pairs(menu.gameplay_options) do
 		if (v.default ~= nil) then
 			if (v.typ=="check") then
-				axr_main.config:SetValue("mm_options","enable_"..name,v.ctrl:GetCheck())
+				axr_main.config:w_value("mm_options","enable_"..name,v.ctrl:GetCheck())
 			elseif (v.typ=="list") then 
-				axr_main.config:SetValue("mm_options",name,v.ctrl:GetText())
+				axr_main.config:w_value("mm_options",name,v.ctrl:GetText())
 			end
 			
 			if (v.on_accept) then 
@@ -117,16 +117,16 @@ function opt_menu_on_accept(menu,optMgr,console)
 			end
 		end
     end
-    axr_main.config:Save()
+    axr_main.config:save()
 end
 
 function opt_menu_on_set_values(menu,optMgr)
     for name,v in pairs(menu.gameplay_options) do
 		if (v.default ~= nil) then
 			if (v.typ=="check") then
-				v.ctrl:SetCheck(axr_main.config:GetValue("mm_options","enable_"..name,1,v.default))
+				v.ctrl:SetCheck(axr_main.config:r_value("mm_options","enable_"..name,1,v.default))
 			elseif (v.typ=="list") then 
-				v.ctrl:SetText(axr_main.config:GetValue("mm_options",name,0,v.default))
+				v.ctrl:SetText(axr_main.config:r_value("mm_options",name,0,v.default))
 				--v.ctrl:SetText(v.ctrl:GetTextOf(0))
 			end
 			

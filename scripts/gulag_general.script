@@ -970,7 +970,7 @@ local function init_beh_jobs(smart,stalker_jobs,gname)
 
  	local name, job_ltx
 	local i = 1
-	while beh_ini:SectionExist(gname.."_beh_"..i) do
+	while beh_ini:section_exist(gname.."_beh_"..i) do
 		name = gname.."_beh_"..i
 		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 13})
 
@@ -985,7 +985,8 @@ meet = meet@generic_lager
 
 			job_ltx = strformat(job_ltx,name,name,name)
 
-			for key,val in pairs (beh_ini.root[name]) do
+			local _root = beh_ini:collect_section(name)
+			for key,val in pairs (_root) do
 				job_ltx = job_ltx .. key .. " = " .. val .. "\n"
 			end
 
@@ -996,7 +997,7 @@ meet = meet@generic_lager
 
 	-- Beh Surge
 	i = 1
-	while beh_ini:SectionExist(gname.."_beh_surge_"..i) do
+	while beh_ini:section_exist(gname.."_beh_surge_"..i) do
 		name = gname.."_beh_surge_"..i
 		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 14})
 
@@ -1010,8 +1011,8 @@ meet = meet@generic_lager
 ]]
 
 			job_ltx = strformat(job_ltx,name,name,name)
-
-			for key,val in pairs (beh_ini.root[name]) do
+			local _root = beh_ini:collect_section(name)
+			for key,val in pairs (_root) do
 				job_ltx = job_ltx .. key .. " = " .. val .. "\n"
 			end
 
@@ -1022,7 +1023,7 @@ meet = meet@generic_lager
 
 	-- Beh Trader
 	i = 1
-	while beh_ini:SectionExist(gname.."_beh_trade_"..i) do
+	while beh_ini:section_exist(gname.."_beh_trade_"..i) do
 		name = gname.."_beh_trade_"..i
 		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 15})
 
@@ -1036,8 +1037,8 @@ meet = meet@generic_lager
 ]]
 
 			job_ltx = strformat(job_ltx,name,name,name)
-
-			for key,val in pairs (beh_ini.root[name]) do
+			local _root = beh_ini:collect_section(name)
+			for key,val in pairs (_root) do
 				job_ltx = job_ltx .. key .. " = " .. val .. "\n"
 			end
 
@@ -1289,9 +1290,7 @@ function load_job(smart)
 	ids = 0
 
 	if not (beh_ini) then
-		if (file_exists(getFS():update_path('$game_config$', '').."beh_gulag_jobs.ltx")) then
-			beh_ini = alun_utils.cfg_file(getFS():update_path('$game_config$', "beh_gulag_jobs.ltx"))
-		end
+		beh_ini = ini_file_ex("beh_gulag_jobs.ltx")
 	end
 
 	local gname = smart:name()
