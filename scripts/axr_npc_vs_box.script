@@ -91,6 +91,15 @@ function action_npc_vs_box:execute()
 		return 
 	end
 	
+	self.st.__tmr = self.st.__tmr or time_global()+8000
+	if (time_global() > self.st.__tmr) then 
+		local se_obj = alife():object(obj:id())
+		if (se_obj) then 
+			alife():release(se_obj,true)
+		end
+		self.st.__tmr = nil
+	end
+	
 	self.object:set_mental_state(anim.danger)
 	--self.object:set_body_state(move.crouch)
 	self.object:set_movement_type(move.stand)
