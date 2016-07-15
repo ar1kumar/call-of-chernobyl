@@ -31,6 +31,7 @@ goto end
  
 
 :scan_dir
+echo Scanning...
 
 for %%f in (.\*.script) do (
 
@@ -38,7 +39,7 @@ for %%f in (.\*.script) do (
 
         if %errorlevel% neq 0 pause
 )
-
+echo Finished!
 goto end
 
  

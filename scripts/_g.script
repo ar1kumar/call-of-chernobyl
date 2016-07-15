@@ -1403,16 +1403,14 @@ end
 
 -----------------------------------------
 -- New INI wrapper to replace alun_utils.cfg_file
+-- for older scripts using alun_utils.cfg_file rename with something like Npp:
+-- GetValue was changed to r_value 
+-- SetValue was changed to w_value
+
 class "ini_file_ex"
-function ini_file_ex:__init(fname,advanced_mode)
-	self.fname = getFS():update_path('$game_config$', '')..fname
-	self.ini = ini_file(fname)
-	
-	if (advanced_mode) then 
-		self.ini:set_override_names(true)
-		self.ini:set_readonly(false)
-		self.ini:save_at_end(true)
-	end
+function ini_file_ex:__init(fname,advanced_mode,fspath)
+	self.fname = getFS():update_path(fspath or '$game_config$', '')..fname
+	self.ini = ini_file(fname,not advanced_mode,true,advanced_mode,true)
 end
 
 function ini_file_ex:save()

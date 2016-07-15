@@ -138,7 +138,7 @@ if arg and #arg > 0 then
 
         elseif string.ends(file, "lua_help.script") then
 
-                print("skipping: 'lua_help.script'")
+                --print("skipping: 'lua_help.script'")
 
                 os.exit(-2)
 
@@ -305,11 +305,6 @@ end
 
 
 if file then -- check the specified file:
-
-        printf("LuaCheck: `%s'", file)
-
-
-
         -- local luacExePath = escape(os.getenv('LUA_DEV') .. '\\luac.exe')
 
         local luacExePath = escape('%LUA_DEV%\\luac.exe')
@@ -368,7 +363,10 @@ if file then -- check the specified file:
 
         errorCount = tonumber(errorCount)
 
-        printf("%d syntax error(s) found.", errorCount)
+		
+		if (errorCount > 0) then 
+			printf("%s: %d syntax error(s) found.",file, errorCount)
+		end
 
 
 
