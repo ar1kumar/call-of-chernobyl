@@ -114,6 +114,10 @@ end
 
 --' Проверяем, не выполнен ли таск
 function CRandomTask:task_complete(p1)
+	if (db.actor == nil or device().precache_frame > 1) then 
+		return false 
+	end 
+	
 	local tsk = self.task_info[p1]
 	if tsk == nil then
 		printf("ERROR: CRandomTask:task_complete %s task is nil!",p1)
@@ -134,6 +138,10 @@ function CRandomTask:task_complete(p1)
 end
 --' Проверяем, не профейлен ли таск
 function CRandomTask:task_fail(p1)
+	if (db.actor == nil or device().precache_frame > 1) then 
+		return false 
+	end 
+	
 	local tsk = self.task_info[p1]
 	if tsk == nil then
 		printf("ERROR: CRandomTask:task_fail %s task is nil!",p1)

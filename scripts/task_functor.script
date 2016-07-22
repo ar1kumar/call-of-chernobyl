@@ -279,11 +279,8 @@ end
 ==================================================================
 --]]
 
-function condlist(id, field, p)
-	local cond_string = p
-
-	local parsed_condlist = xr_logic.parse_condlist(nil, "task", "task_condlist", cond_string)
-	return xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, parsed_condlist)
+function condlist(id, field, cond_string)
+	return xr_logic.pick_section_from_condlist(db.actor, nil, xr_logic.parse_condlist(nil, "task", "task_condlist", cond_string) )
 end
 
 function zat_b29_adv_title(id, field, p)
@@ -361,23 +358,10 @@ end
 --' Функторы цели квеста (должны возвращать id персонажа)
 --'*************************************************************************************
 
-function target_condlist(task_id, field, p)
-	local cond_string = p
-
+function target_condlist(task_id, field, cond_string)
 	local parsed_condlist = xr_logic.parse_condlist(nil, "task", "task_condlist", cond_string)
-	local value = xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, parsed_condlist)
-
-	if value == nil then
-		return nil
-	end
-
-	local target_obj_id = get_story_object_id(value)
-
-	if target_obj_id == nil then
-	--	printf("There is no object with story_id %s", value)
-	end
-
-	return target_obj_id
+	local value = xr_logic.pick_section_from_condlist(db.actor, nil, parsed_condlist)
+	return value and get_story_object_id(value)
 end
 
 function zat_b29_adv_target(task_id, field, p)

@@ -46,7 +46,7 @@ function CGeneralTask:__init(id)
 
 	self.target			= task_ini:r_string_ex(id,"target")
 	self.target_functor	= task_ini:r_string_ex(id,"target_functor") or "target_condlist"
-	self.status_functor = task_ini:r_string_ex(id,"status_functor") or ""
+	self.status_functor = task_ini:r_string_ex(id,"status_functor")
 	self.current_target = nil
 
 	self.icon			= task_ini:r_string_ex(id,"icon") or "ui_pda2_mtask_overlay"
