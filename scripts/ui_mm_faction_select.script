@@ -93,7 +93,23 @@ local function on_game_load(binder)
 		if (faction == "monolith") then 
 			give_info("bar_deactivate_radar_done") -- disables brain scorcher
 		else 
-            task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
+			-- STORY MODE 
+			if (config:r_value("temp","new_game_story_mode",1) == true) then
+				-- only give the story line to stalker, duty, freedom, csky or ecolog
+				local story_factions = { 
+										["stalker"] = true,
+										["dolg"] = true,
+										["freedom"] = true, 
+										["csky"] = true,
+										["ecolog"] = true 
+				}
+				if (story_factions[faction]) then
+					task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
+				end
+				task_manager.get_task_manager():give_task("turn_off_brain_scorcher")
+			else 
+				give_info("bar_deactivate_radar_done") -- disables brain scorcher
+			end
 		end
 		
 		db.actor:set_character_community("actor_"..faction, 0, 0)
@@ -423,6 +439,10 @@ function faction_ui:InitControls(f)
 	self:load_icon_list()
 	
 	if (USE_MARSHAL) then
+		xml:InitStatic("main_dialog:cap_check_story",self.dialog)
+		self.ck_story = xml:InitCheck("main_dialog:check_story",	self.dialog)
+		self:Register(self.ck_story,"check_story")
+		
 		xml:InitStatic("main_dialog:cap_check_hardcore",self.dialog)
 		self.ck_hardcore = xml:InitCheck("main_dialog:check_hardcore",	self.dialog)
 		self:Register(self.ck_hardcore,"check_hardcore")
@@ -437,7 +457,8 @@ function faction_ui:InitControls(f)
 		
 		self.ck_states = { 	["ck_survival"] = false, 
 							["ck_hardcore"] = false, 
-							["ck_hardcore_aim"] = false 
+							["ck_hardcore_aim"] = false ,
+							["ck_story"] = false
 		}
 	end
 end 
@@ -451,6 +472,7 @@ function faction_ui:InitCallBacks(f)
 	self:AddCallback("list_starts", ui_events.LIST_ITEM_SELECT, self.OnSelectStartLocation, self)
 	self:AddCallback("list_icon", ui_events.LIST_ITEM_SELECT, self.OnSelectPortrait, self)
 	
+	self:AddCallback("check_story", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
 	self:AddCallback("check_survival", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
 	self:AddCallback("check_hardcore", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
 	self:AddCallback("check_hardcore_aim", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
@@ -521,7 +543,7 @@ function faction_ui:OnCheckSet()
 		end
 	end
 	
-	if (self[ck]:GetCheck()) then
+	if (self[ck] and self[ck]:GetCheck()) then
 		self.desc_text:SetText(game.translate_string("st_mm_"..ck.."_desc"))
 	end
 end
@@ -741,6 +763,10 @@ function faction_ui:OnStartGame()
 	if (self.ck_hardcore and self.ck_hardcore:GetCheck()) then 
 		axr_main.config:w_value("temp","new_game_hardcore_mode",true)
 	end 
+	
+	if (self.ck_story and self.ck_story:GetCheck()) then 
+		axr_main.config:w_value("temp","new_game_story_mode",true)
+	end
 	
 	if (self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck()) then 
 		axr_main.config:w_value("temp","new_game_hardcore_aim_mode",true)
