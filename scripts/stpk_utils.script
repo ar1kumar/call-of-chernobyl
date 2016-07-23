@@ -1336,7 +1336,7 @@ end
 
 -- cse_alife_object_hanging_lamp_properties
 function parse_cse_alife_object_hanging_lamp_properties_packet(ret,stpk)
-	ret.main_color = stpk:r_s32()
+	ret.main_color = stpk:r_u32()
 	ret.main_brightness = stpk:r_float()
 	ret.main_color_animator = stpk:r_stringZ()
 	ret.main_range = stpk:r_float()
@@ -1354,14 +1354,14 @@ function parse_cse_alife_object_hanging_lamp_properties_packet(ret,stpk)
 	ret.glow_texture = stpk:r_stringZ()
 	ret.glow_radius = stpk:r_float()
 	ret.ambient_bone = stpk:r_stringZ()
-	ret.cse_alife_object_hanging_lamp__unk1_f32 = stpk:r_float()
-	ret.cse_alife_object_hanging_lamp__unk2_f32 = stpk:r_float()
-	ret.cse_alife_object_hanging_lamp__unk3_f32 = stpk:r_float()
+	ret.volumetric_quality = stpk:r_float()
+	ret.volumetric_intensity = stpk:r_float()
+	ret.volumetric_distance = stpk:r_float()
 	return ret
 end
 
 function fill_cse_alife_object_hanging_lamp_properties_packet(ret,stpk)
-	stpk:w_s32(ret.main_color)
+	stpk:w_u32(ret.main_color)
 	stpk:w_float(ret.main_brightness)
 	stpk:w_stringZ(ret.main_color_animator)
 	stpk:w_float(ret.main_range)
@@ -1379,9 +1379,9 @@ function fill_cse_alife_object_hanging_lamp_properties_packet(ret,stpk)
 	stpk:w_stringZ(ret.glow_texture)
 	stpk:w_float(ret.glow_radius)
 	stpk:w_stringZ(ret.ambient_bone)
-	stpk:w_float(ret.cse_alife_object_hanging_lamp__unk1_f32)
-	stpk:w_float(ret.cse_alife_object_hanging_lamp__unk2_f32)
-	stpk:w_float(ret.cse_alife_object_hanging_lamp__unk3_f32)
+	stpk:w_float(ret.volumetric_quality)
+	stpk:w_float(ret.volumetric_intensity)
+	stpk:w_float(ret.volumetric_distance)
 end
 
 -- cse_alife_inventory_box_properties
