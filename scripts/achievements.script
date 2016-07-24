@@ -60,7 +60,9 @@ function duga_free_functor()
 	-- Monolith & Zombies don't have story mode.
 	-- Silently give the player the achievement.
 	if (character_community(db.actor) == "actor_monolith")
-	or (character_community(db.actor) == "actor_zombied") then
+	or (character_community(db.actor) == "actor_zombied")
+	-- Prevents the achievement pop-up if story mode is disabled.
+	or (has_alife_info("story_mode_disabled")) then
 		db.actor:give_info_portion("achieved_duga_free")
 		return true
 	end

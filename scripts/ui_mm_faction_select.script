@@ -111,6 +111,7 @@ local function on_game_load(binder)
 				task_manager.get_task_manager():give_task("turn_off_brain_scorcher")
 				task_manager.get_task_manager():give_task("turn_off_brain_machine")
 			else 
+				give_info("story_mode_disabled") -- silently trips the duga free achievement.
 				give_info("bar_deactivate_radar_done") -- disables brain scorcher
 				give_info("yan_labx16_switcher_primary_off") -- disables miracle machine
 			end
