@@ -32,23 +32,6 @@ function completionist_functor()
 	return has_alife_info("achieved_completionist")
 end
 
--- Duga Free
-function duga_free_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
-		return false
-	end
-	if has_alife_info("achieved_duga_free") then
-		return true
-	end
-	if (has_alife_info("yan_labx16_switcher_primary_off") and has_alife_info("bar_deactivate_radar_done")) then
-		db.actor:give_info_portion("achieved_duga_free")
-		news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.duga_free.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.duga_free.rpt)
-	end
-	return has_alife_info("achieved_duga_free")
-end
-
 -- Clear Skies
 function clear_skies_functor()
 	if not (db.actor and db.actor.afterFirstUpdate) then
@@ -64,6 +47,31 @@ function clear_skies_functor()
 		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.clear_skies.rpt)
 	end
 	return has_alife_info("achieved_clear_skies")
+end
+
+-- Duga Free
+function duga_free_functor()
+	if not (db.actor and db.actor.afterFirstUpdate) then
+		return false
+	end
+	if has_alife_info("achieved_duga_free") then
+		return true
+	end
+	-- Monolith & Zombies don't have story mode.
+	-- Silently give the player the achievement.
+	if (character_community(db.actor) == "actor_monolith")
+	or (character_community(db.actor) == "actor_zombied") then
+		db.actor:give_info_portion("achieved_duga_free")
+		return true
+	end
+	
+	if (has_alife_info("yan_labx16_switcher_primary_off") and has_alife_info("bar_deactivate_radar_done")) then
+		db.actor:give_info_portion("achieved_duga_free")
+		news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
+		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.duga_free.rnk)
+		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.duga_free.rpt)
+	end
+	return has_alife_info("achieved_duga_free")
 end
 
 -- Geologist
@@ -173,11 +181,12 @@ function radiotherapy_functor()
 		return true 
 	end
 	
-	-- Monolith are always immune to emissions.
+	-- Monolith & Zombies are immune to emissions.
 	-- Silently give the player the achievement.
 	if (character_community(db.actor) == "actor_monolith")
 	or (character_community(db.actor) == "actor_zombied") then
 		db.actor:give_info_portion("achieved_radiotherapy")
+		return true
 	end
 	
 	if (xr_statistic.actor_statistic.surges >= 25 and xr_statistic.actor_statistic.storms >= 25) then

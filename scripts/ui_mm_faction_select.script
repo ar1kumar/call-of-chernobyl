@@ -88,28 +88,31 @@ local function on_game_load(binder)
 		else
 			spawn_path = patrol("spawn_player_"..faction)
 		end
-
-		-- faction diversity
-		if (faction == "monolith") then 
+		
+		-- Disable psi-fields for Monolith & Zombified player starts.
+		if (faction == "monolith" or faction == "zombied") then 
 			give_info("bar_deactivate_radar_done") -- disables brain scorcher
-		else 
+			give_info("yan_labx16_switcher_primary_off") -- disables miracle machine
+		else
 			-- STORY MODE 
 			if (config:r_value("temp","new_game_story_mode",1) == true) then
-				-- only give the story line to stalker, duty, freedom, csky or ecolog
+				-- only give the story line to factions in this table.
 				local story_factions = { 
-										["stalker"] = true,
-										["dolg"] = true,
-										["freedom"] = true, 
-										["csky"] = true,
-										["ecolog"] = true,
-										["killer"] = true
+					["stalker"] = true,
+					["dolg"] = true,
+					["freedom"] = true, 
+					["csky"] = true,
+					["ecolog"] = true,
+					["killer"] = true
 				}
 				if (story_factions[faction]) then
 					task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
 				end
 				task_manager.get_task_manager():give_task("turn_off_brain_scorcher")
+				task_manager.get_task_manager():give_task("turn_off_brain_machine")
 			else 
 				give_info("bar_deactivate_radar_done") -- disables brain scorcher
+				give_info("yan_labx16_switcher_primary_off") -- disables miracle machine
 			end
 		end
 		
