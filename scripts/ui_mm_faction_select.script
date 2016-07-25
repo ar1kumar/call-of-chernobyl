@@ -107,9 +107,9 @@ local function on_game_load(binder)
 				}
 				if (story_factions[faction]) then
 					task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
+					task_manager.get_task_manager():give_task("turn_off_brain_scorcher") -- brain scorcher quest
+					task_manager.get_task_manager():give_task("turn_off_brain_machine") -- miracle machine quest
 				end
-				task_manager.get_task_manager():give_task("turn_off_brain_scorcher")
-				task_manager.get_task_manager():give_task("turn_off_brain_machine")
 			else 
 				give_info("story_mode_disabled") -- silently trips the duga free achievement.
 				give_info("bar_deactivate_radar_done") -- disables brain scorcher
