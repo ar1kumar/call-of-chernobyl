@@ -1296,7 +1296,8 @@ function make_zombied(id)
 	end
 
 	-- create zombied stalker in it's place
-	sim:create(zombie_type,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id)
+	--TODO: FIX ME. Apparently causes issues now. st.section = nil
+	--sim:create(zombie_type,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id)
 
 	-- release stalker
 	sim:release(se_obj,true)
