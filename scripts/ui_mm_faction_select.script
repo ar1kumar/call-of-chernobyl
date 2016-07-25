@@ -89,32 +89,26 @@ local function on_game_load(binder)
 			spawn_path = patrol("spawn_player_"..faction)
 		end
 		
-		-- Disable psi-fields for Monolith & Zombified player starts.
-		if (faction == "monolith" or faction == "zombied") then 
-			give_info("bar_deactivate_radar_done") -- disables brain scorcher
-			give_info("yan_labx16_switcher_primary_off") -- disables miracle machine
+		
+		-- Only give the story quests to factions in this table.
+		local story_factions = { 
+			["csky"] = true,
+			["dolg"] = true,
+			["ecolog"] = true,
+			["freedom"] = true, 
+			["killer"] = true,
+			["stalker"] = true,
+		}
+		
+		-- Enable the story quests, or disable their components depending on player choice and faction.
+		if (config:r_value("temp","new_game_story_mode",1) == true and story_factions[faction]) then
+			task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
+			task_manager.get_task_manager():give_task("turn_off_brain_scorcher") -- brain scorcher quest
+			task_manager.get_task_manager():give_task("turn_off_brain_machine") -- miracle machine quest
 		else
-			-- STORY MODE 
-			if (config:r_value("temp","new_game_story_mode",1) == true) then
-				-- only give the story line to factions in this table.
-				local story_factions = { 
-					["stalker"] = true,
-					["dolg"] = true,
-					["freedom"] = true, 
-					["csky"] = true,
-					["ecolog"] = true,
-					["killer"] = true
-				}
-				if (story_factions[faction]) then
-					task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
-					task_manager.get_task_manager():give_task("turn_off_brain_scorcher") -- brain scorcher quest
-					task_manager.get_task_manager():give_task("turn_off_brain_machine") -- miracle machine quest
-				end
-			else 
-				give_info("story_mode_disabled") -- silently trips the duga free achievement.
-				give_info("bar_deactivate_radar_done") -- disables brain scorcher
-				give_info("yan_labx16_switcher_primary_off") -- disables miracle machine
-			end
+			give_info("story_mode_disabled") -- silently trips the duga free achievement.
+			give_info("yan_labx16_switcher_primary_off") -- disables miracle mach
+			give_info("bar_deactivate_radar_done") -- disables brain scorcher
 		end
 		
 		db.actor:set_character_community("actor_"..faction, 0, 0)
