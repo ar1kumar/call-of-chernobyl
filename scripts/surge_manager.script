@@ -487,10 +487,10 @@ function CSurgeManager:update()
 							if not (utils.npc_in_zone(db.actor,"zat_a2_sr_noweap")) then
 								xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_surge_phase_1")
 							end
-						elseif (level.name()=="jupiter") then
-							if not (utils.npc_in_zone(db.actor,"jup_a6_sr_noweap")) then
-								xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_surge_phase_1")
-							end
+						--elseif (level.name()=="jupiter") then
+							--if not (utils.npc_in_zone(db.actor,"jup_a6_sr_noweap")) then
+							--	xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_surge_phase_1")
+							--end
 						elseif (level.name() == "pripyat" and not has_alife_info("pri_b305_fifth_cam_end")) then
 							if not (utils.npc_in_zone(db.actor,"pri_a16_sr_noweap")) then
 								xr_sound.set_sound_play(db.actor:id(), "pri_a17_kovalsky_surge_phase_1")
@@ -1732,7 +1732,7 @@ function is_killing_all()
 end
 
 function is_finished()
-	return SurgeManager == nil and true or get_surge_manager().finished == true
+	return not get_surge_manager().started
 end
 
 function is_loaded()
