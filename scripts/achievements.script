@@ -1,298 +1,566 @@
--- Completionist
-function completionist_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+---------------------------------
+----- Written by Darryl123 ------
+---------------------------------
+
+-------------------------
+----- Miscellaneous -----
+-------------------------
+
+-- Check if achievements can be unlocked.
+function can_unlock()
+	if (db.actor and db.actor.afterFirstUpdate) then
+		return true
+	else
 		return false
 	end
-	
---	Easy way to get GID and LID. Use 'rs_cam_pos on' to get camera coordinates.
---	news_manager.send_tip(db.actor, "GID: ".. db.actor:game_vertex_id(), nil, nil, nil, nil)
---	news_manager.send_tip(db.actor, "LID: ".. db.actor:level_vertex_id(), nil, nil, nil, nil)
-	
-	if has_alife_info("achieved_completionist") then
-		return true
-	end
-	
-	 -- If an achievement is not obtainable in story mode then it is not required.
-	if (has_alife_info("achieved_duga_free"))
-	and (has_alife_info("achieved_geologist"))
-	and (has_alife_info("achieved_heavy_pockets"))
-	and (has_alife_info("achieved_infopreneur"))
-	and (has_alife_info("achieved_mechanized_warfare"))
-	and (has_alife_info("achieved_patriarch"))
-	and (has_alife_info("achieved_radiotherapy"))
-	and (has_alife_info("achieved_rag_and_bone"))
-	and (has_alife_info("achieved_silver_or_lead"))
-	and (has_alife_info("achieved_tourist"))
-	and (has_alife_info("achieved_well_dressed"))
-	and (has_alife_info("achieved_wishful_thinking") or has_alife_info("story_mode_disabled")) then
-		db.actor:give_info_portion("achieved_completionist")
-		news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.completionist.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.completionist.rpt)
-	end
-	return has_alife_info("achieved_completionist")
 end
 
--- Clear Skies
+--------------------
+----- Functors -----
+--------------------
+
+-- Clear Skies.
+-- Currently not unlockable.
 function clear_skies_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
-	if has_alife_info("achieved_clear_skies") then
+	-- Check if it is already unlocked.
+	if (has_alife_info("achieved_clear_skies")) then
 		return true
 	end
-	if (xr_statistic.actor.heli_kills >= 3 or xr_statistic.actor_statistic.heli_rocket_kills >= 1) then
-		db.actor:give_info_portion("achieved_clear_skies")
-		news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "clear_skies", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.clear_skies.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.clear_skies.rpt)
+	-- Unlock the achievement.
+	if (clear_skies_requirements()) then
+		clear_skies_rewards()
+		return true
 	end
-	return has_alife_info("achieved_clear_skies")
 end
 
--- Duga Free
+-- Completionist.
+function completionist_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_alife_info("achieved_completionist")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (completionist_requirements()) then
+		completionist_rewards()
+		return true
+	end
+end
+
+-- Duga Free.
 function duga_free_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
-	if has_alife_info("achieved_duga_free") then
+	-- Check if it is already unlocked.
+	if (has_alife_info("achieved_duga_free")) then
 		return true
 	end
-	-- Monolith & Zombies don't have story mode.
-	-- Silently give the player the achievement.
-	if (character_community(db.actor) == "actor_monolith")
-	or (character_community(db.actor) == "actor_zombied")
-	-- Prevents the achievement pop-up if story mode is disabled.
-	or (has_alife_info("story_mode_disabled")) then
-		db.actor:give_info_portion("achieved_duga_free")
+	-- Unlock the achievement.
+	if (duga_free_requirements()) then
+		duga_free_rewards()
 		return true
 	end
-	
-	if (has_alife_info("yan_labx16_switcher_primary_off") and has_alife_info("bar_deactivate_radar_done")) then
-		db.actor:give_info_portion("achieved_duga_free")
-		news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.duga_free.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.duga_free.rpt)
-	end
-	return has_alife_info("achieved_duga_free")
 end
 
--- Geologist
+-- Geologist.
 function geologist_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
+	-- Check if it is already unlocked.
 	if (has_alife_info("achieved_geologist")) then
 		return true
 	end
-	if (xr_statistic.actor_statistic.artefacts_detected >= 25) then
-		db.actor:give_info_portion("achieved_geologist")
-		news_manager.send_tip(db.actor, "st_achievement_13_unlock", nil, "geologist", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.geologist.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.geologist.rpt)
+	-- Unlock the achievement.
+	if (geologist_requirements()) then
+		geologist_rewards()
+		return true
 	end
-	return has_alife_info("achieved_geologist")
 end
 
--- Heavy Pockets
+-- Heavy Pockets.
 function heavy_pockets_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
+	-- Check if it is already unlocked.
 	if (has_alife_info("achieved_heavy_pockets")) then
 		return true
 	end
-	if (db.actor:money() >= 1000000) then
-		db.actor:give_info_portion("achieved_heavy_pockets")
-		news_manager.send_tip(db.actor, "st_achievement_1_unlock", nil, "heavy_pockets", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.heavy_pockets.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.heavy_pockets.rpt)
+	-- Unlock the achievement.
+	if (heavy_pockets_requirements()) then
+		heavy_pockets_rewards()
+		return true
 	end
-	return has_alife_info("achieved_heavy_pockets")
 end
 
--- Infopreneur
+-- Infopreneur.
 function infopreneur_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
-	if has_alife_info("achieved_infopreneur") then
+	-- Check if it is already unlocked.
+	if (has_alife_info("achieved_infopreneur")) then
 		return true
 	end
-	if (xr_statistic.actor_statistic.pdas_delivered >= 25) then
-		db.actor:give_info_portion("achieved_infopreneur")
-		news_manager.send_tip(db.actor, "st_achievement_3_unlock", nil, "infopreneur", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.infopreneur.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.infopreneur.rpt)
+	-- Unlock the achievement.
+	if (infopreneur_requirements()) then
+		infopreneur_rewards()
+		return true
 	end
-	return has_alife_info("achieved_infopreneur")
 end
 
--- Mechanized Warfare
+-- Mechanized Warfare.
 function mechanized_warfare_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
-	if has_alife_info("achieved_mechanized_warfare") then
+	-- Check if it is already unlocked.
+	if (has_alife_info("achieved_mechanized_warfare")) then
 		return true
 	end
-	if has_alife_info("agr_smart_terrain_1_6_army_mechanic_stalker_upgrade_tier_3")
-	or has_alife_info("bar_visitors_stalker_mechanic_upgrade_tier_3")
-	or has_alife_info("cit_killers_merc_mechanic_stalker_upgrade_tier_3")
-	or has_alife_info("val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_3")
-	or has_alife_info("esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_3")
-	or has_alife_info("jup_b217_stalker_tech_upgrade_tier_3")
-	or has_alife_info("mar_base_stalker_tech_upgrade_tier_3")
-	or has_alife_info("mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_3")
-	or has_alife_info("pri_monolith_monolith_mechanic_stalker_upgrade_tier_3")
-	or has_alife_info("zat_a2_stalker_mechanic_upgrade_tier_3") then
-		db.actor:give_info_portion("achieved_mechanized_warfare")
-		news_manager.send_tip(db.actor, "st_achievement_7_unlock", nil, "mechanized_warfare", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.mechanized_warfare.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.mechanized_warfare.rpt)
+	-- Unlock the achievement.
+	if (mechanized_warfare_requirements()) then
+		mechanized_warfare_rewards()
+		return true
 	end
-	return has_alife_info("achieved_mechanized_warfare")
 end
 
--- Patriarch
+-- Patriarch.
 function patriarch_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
-	if has_alife_info("achieved_patriarch") then
+	-- Check if it is already unlocked.
+	if (has_alife_info("achieved_patriarch")) then
 		return true
 	end
-	if (db.actor:character_rank() >= 7500) then
-		db.actor:give_info_portion("achieved_patriarch")
-		news_manager.send_tip(db.actor, "st_achievement_14_unlock", nil, "patriarch", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.patriarch.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.patriarch.rpt)
-		
-		-- Workaround for not having to reload your save.
-		-- Allows actor to immediately recruit larger squads.
-		axr_companions.on_game_load()
+	-- Unlock the achievement.
+	if (patriarch_requirements()) then
+		patriarch_rewards()
+		return true
 	end
-	return has_alife_info("achieved_patriarch")
 end
 
--- Radiotherapy
+-- Radiotherapy.
 function radiotherapy_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
-	if has_alife_info("achieved_radiotherapy") then 
-		return true 
-	end
-	
-	-- Monolith & Zombies are immune to emissions.
-	-- Silently give the player the achievement.
-	if (character_community(db.actor) == "actor_monolith")
-	or (character_community(db.actor) == "actor_zombied") then
-		db.actor:give_info_portion("achieved_radiotherapy")
+	-- Check if it is already unlocked.
+	if (has_alife_info("achieved_radiotherapy")) then
 		return true
 	end
-	
-	if (xr_statistic.actor_statistic.surges >= 25 and xr_statistic.actor_statistic.storms >= 25) then
-		db.actor:give_info_portion("achieved_radiotherapy")
-		news_manager.send_tip(db.actor, "st_achievement_2_unlock", nil, "radiotherapy", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.radiotherapy.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.radiotherapy.rpt)
+	-- Unlock the achievement.
+	if (radiotherapy_requirements()) then
+		radiotherapy_rewards()
+		return true
 	end
-	return has_alife_info("achieved_radiotherapy")
 end
 
--- Rag and Bone
+-- Rag and Bone.
 function rag_and_bone_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
+	-- Check if it is already unlocked.
 	if (has_alife_info("achieved_rag_and_bone")) then
 		return true
 	end
-	if (xr_statistic.actor_statistic.founded_secrets >= 75) then
-		db.actor:give_info_portion("achieved_rag_and_bone")
-		news_manager.send_tip(db.actor, "st_achievement_9_unlock", nil, "rag_and_bone", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.rag_and_bone.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.rag_and_bone.rpt)
+	-- Unlock the achievement.
+	if (rag_and_bone_requirements()) then
+		rag_and_bone_rewards()
+		return true
 	end
 end
 
--- Silver or Lead
+-- Silver or Lead.
 function silver_or_lead_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
+	-- Check if it is already unlocked.
 	if (has_alife_info("achieved_silver_or_lead")) then
 		return true
 	end
-	if (xr_statistic.actor_statistic.killed_stalkers >= 500) then
-		db.actor:give_info_portion("achieved_silver_or_lead")
-		news_manager.send_tip(db.actor, "st_achievement_6_unlock", nil, "silver_or_lead", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.silver_or_lead.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.silver_or_lead.rpt)
+	-- Unlock the achievement.
+	if (silver_or_lead_requirements()) then
+		silver_or_lead_rewards()
+		return true
 	end
-	return has_alife_info("achieved_silver_or_lead")
 end
 
--- Tourist
+-- Tourist.
 function tourist_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
-	-- Use of a second infoportion delays the achievement.
-	-- Without it the news tip appears before the load screen closes.
-	-- This causes the sound effect to not work, and the tip to appear
-	-- on-screen for only quarter to a half of the expected time.
+	-- Check if it is already unlocked.
 	if (has_alife_info("achieved_tourist")) then
 		return true
 	end
-	if (has_alife_info("achieved_tourist_trigger")) then
-		for i=1,3 do
-			coc_treasure_manager.create_random_stash(nil, "Curious stash", nil, 10)
-		end
-		db.actor:give_info_portion("achieved_tourist")
-		news_manager.send_tip(db.actor, "st_achievement_8_unlock", nil, "tourist", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.tourist.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.tourist.rpt)
+	-- Unlock the achievement.
+	if (has_alife_info("achieved_tourist_delay")) then
+		tourist_rewards()
 		return true
 	end
-	if (xr_statistic.actor_visited_all_levels()) then
-		db.actor:give_info_portion("achieved_tourist_trigger")
+	-- A second infoportion delays the achievement.
+	-- Without this it often unlocks during level transition.
+	if (tourist_requirements()) then
+		give_info_portion("achieved_tourist_delay")
+		return true
 	end
-	return has_alife_info("achieved_tourist")
 end
 
--- Well Dressed
+-- Well Dressed.
 function well_dressed_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
+	-- Check if it is already unlocked.
 	if (has_alife_info("achieved_well_dressed")) then
 		return true
 	end
-	if (xr_statistic.actor_statistic.killed_monsters >= 500) then
-		db.actor:give_info_portion("achieved_well_dressed")
-		news_manager.send_tip(db.actor, "st_achievement_5_unlock", nil, "well_dressed", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.well_dressed.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.well_dressed.rpt)
+	-- Unlock the achievement.
+	if (well_dressed_requirements()) then
+		well_dressed_rewards()
+		return true
 	end
-	return has_alife_info("achieved_well_dressed")
 end
 
--- Wishful Thinking
+-- Wishful Thinking.
 function wishful_thinking_functor()
-	if not (db.actor and db.actor.afterFirstUpdate) then
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
 		return false
 	end
+	-- Check if it is already unlocked.
 	if (has_alife_info("achieved_wishful_thinking")) then
 		return true
 	end
-	if (has_alife_info("sar2_monolith_end")) then
-		db.actor:give_info_portion("achieved_wishful_thinking")
-		news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
-		xr_statistic.inc_actor_rank(xr_statistic.rank_rep.wishful_thinking.rnk)
-		xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.wishful_thinking.rpt)
-		alife():create("af_oasis_heart", db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
+	-- Unlock the achievement.
+	if (wishful_thinking_requirements()) then
+		wishful_thinking_rewards()
+		return true
 	end
-	return has_alife_info("achieved_wishful_thinking")
+end
+
+------------------------
+----- Requirements -----
+------------------------
+
+-- Clear Skies.
+-- Currently not unlockable.
+-- Requires 3 helicopters killed, or just one with an RPG-7.
+function clear_skies_requirements()
+	return (
+				(xr_statistic.actor.heli_kills >= 3)
+			 or (xr_statistic.actor_statistic.heli_rocket_kills >= 1)
+		)
+end
+
+-- Completionist.
+-- Requires all other achievements to be unlocked.
+-- Exception to 'Duga Free' if story mode is disabled.
+-- Exception to 'Radiotherapy' if Monolith or Zombified player.
+-- Exception to 'Wishful Thinking' if story mode is disabled.
+function completionist_requirements()
+	return (
+				(has_alife_info("achieved_duga_free") or has_alife_info("story_mode_disabled"))
+			and (has_alife_info("achieved_geologist"))
+			and (has_alife_info("achieved_heavy_pockets"))
+			and (has_alife_info("achieved_infopreneur"))
+			and (has_alife_info("achieved_mechanized_warfare"))
+			and (has_alife_info("achieved_patriarch"))
+			and (has_alife_info("achieved_radiotherapy")
+				 or character_community(db.actor) == "actor_monolith"
+				 or character_community(db.actor) == "actor_zombied")
+			and (has_alife_info("achieved_rag_and_bone"))
+			and (has_alife_info("achieved_silver_or_lead"))
+			and (has_alife_info("achieved_tourist"))
+			and (has_alife_info("achieved_well_dressed"))
+			and (has_alife_info("achieved_wishful_thinking") or has_alife_info("story_mode_disabled"))
+		)
+end
+
+-- Duga Free.
+-- Requires story mode, and that the Miracle Machine and Brain Scorcher are disabled.
+function duga_free_requirements()
+	return (
+			not (has_alife_info("story_mode_disabled"))
+			and (has_alife_info("yan_labx16_switcher_primary_off"))
+			and (has_alife_info("bar_deactivate_radar_done"))
+		)
+end
+
+-- Geologist.
+-- Requires 25 artefacts be detected by the player.
+function geologist_requirements()
+	return (
+				(xr_statistic.actor_statistic.artefacts_detected >= 25)
+		)
+end
+
+-- Heavy Pockets.
+-- Requires player to possess 1,000,000 RU.
+function heavy_pockets_requirements()
+	return (
+				(db.actor:money() >= 1000000)
+		)	
+end
+
+-- Infopreneur.
+-- Requires player to deliver 25 PDAs.
+function infopreneur_requirements()
+	return (
+				(xr_statistic.actor_statistic.pdas_delivered >= 25)
+		)
+end
+
+-- Mechanized Warfare.
+-- Requires a mechanic to own all tools.
+function mechanized_warfare_requirements()
+	return (
+				(has_alife_info("agr_smart_terrain_1_6_army_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("bar_visitors_stalker_mechanic_upgrade_tier_3"))
+			 or (has_alife_info("cit_killers_merc_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("jup_b217_stalker_tech_upgrade_tier_3"))
+			 or (has_alife_info("mar_base_stalker_tech_upgrade_tier_3"))
+			 or (has_alife_info("mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("pri_monolith_monolith_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("zat_a2_stalker_mechanic_upgrade_tier_3"))
+		)
+end
+
+-- Patriarch.
+-- Requires rank of 'Legend' be reached.
+function patriarch_requirements()
+	return (
+				(db.actor:character_rank() >= 7500)
+		)
+end
+
+-- Radiotherapy.
+-- Requires 25 emissions and 25 psi-storms to be survived.
+-- Requires the player not be in the Monolith of Zombified factions.
+function radiotherapy_requirements()
+	return (
+				(not character_community(db.actor) == "actor_monolith")
+			and (not character_community(db.actor) == "actor_zombied")
+			and (xr_statistic.actor_statistic.surges >= 25)
+			and (xr_statistic.actor_statistic.storms >= 25)
+		)
+end
+
+-- Rag and Bone.
+-- Requires 75 stashes be found and looted.
+function rag_and_bone_requirements()
+	return (
+				(xr_statistic.actor_statistic.founded_secrets >= 75)
+		)
+end
+
+-- Silver or Lead.
+-- Requires player to kill 500 stalkers.
+function silver_or_lead_requirements()
+	return (
+				(xr_statistic.actor_statistic.killed_stalkers >= 500)
+		)
+end
+
+-- Tourist.
+-- Requires player to visit all levels.
+function tourist_requirements()
+	return (
+				(xr_statistic.actor_visited_all_levels())
+		)
+end
+
+-- Well Dressed.
+-- Requires player to kill 500 mutants.
+function well_dressed_requirements()
+	return (
+				(xr_statistic.actor_statistic.killed_monsters >= 500)
+		)
+end
+
+-- Wishful Thinking.
+-- Requires player to destroy the Wish Granter.
+function wishful_thinking_requirements()
+	return (
+			not (has_alife_info("story_mode_disabled"))
+			and (has_alife_info("sar2_monolith_end"))
+		)
+end
+
+-------------------
+----- Rewards -----
+-------------------
+
+-- Clear Skies.
+-- Currently not unlockable.
+-- Reputation and rank point increase.
+function clear_skies_rewards()
+	db.actor:give_info_portion("achieved_clear_skies")
+	news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "clear_skies", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.clear_skies.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.clear_skies.rpt)
+end
+
+-- Completionist.
+-- Reputation and rank point increase.
+function completionist_rewards()
+	db.actor:give_info_portion("achieved_completionist")
+	news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.completionist.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.completionist.rpt)
+end
+
+-- Duga Free.
+-- Yantar & Radar psi-fields disabled.
+-- Reputation and rank point increase.
+function duga_free_rewards()
+	db.actor:give_info_portion("achieved_duga_free")
+	news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.duga_free.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.duga_free.rpt)
+end
+
+-- Geologist.
+-- Increased spawn chance of artefacts.
+-- Reputation and rank point increase.
+function geologist_rewards()
+	db.actor:give_info_portion("achieved_geologist")
+	news_manager.send_tip(db.actor, "st_achievement_13_unlock", nil, "geologist", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.geologist.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.geologist.rpt)
+end
+
+-- Heavy Pockets.
+-- Traders sell cheaper and rarer goods.
+-- Reputation and rank point increase.
+function heavy_pockets_rewards()
+	db.actor:give_info_portion("achieved_heavy_pockets")
+	news_manager.send_tip(db.actor, "st_achievement_1_unlock", nil, "heavy_pockets", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.heavy_pockets.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.heavy_pockets.rpt)
+end
+
+-- Infopreneur.
+-- Money received for delivering PDAs increased.
+-- Reputation and rank point increase.
+function infopreneur_rewards()
+	db.actor:give_info_portion("achieved_infopreneur")
+	news_manager.send_tip(db.actor, "st_achievement_3_unlock", nil, "infopreneur", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.infopreneur.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.infopreneur.rpt)
+end
+
+-- Mechanized Warfare.
+-- A mechanic can now fully upgrade equipment.
+-- Reputation and rank point increase.
+function mechanized_warfare_rewards()
+	db.actor:give_info_portion("achieved_mechanized_warfare")
+	news_manager.send_tip(db.actor, "st_achievement_7_unlock", nil, "mechanized_warfare", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.mechanized_warfare.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.mechanized_warfare.rpt)
+end
+
+-- Patriarch.
+-- Larger sized squads can be recruited.
+-- Reputation and rank point increase.
+function patriarch_rewards()
+	db.actor:give_info_portion("achieved_patriarch")
+	news_manager.send_tip(db.actor, "st_achievement_14_unlock", nil, "patriarch", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.patriarch.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.patriarch.rpt)
+	
+	-- Works around needing to save and reload.
+	-- Allows larger squads to be recruited immediately.
+	axr_companions.on_game_load()
+end
+
+-- Radiotherapy.
+-- 25% chance of surviving emissions and psi-vortices.
+-- Reputation and rank point increase.
+function radiotherapy_rewards()
+	db.actor:give_info_portion("achieved_radiotherapy")
+	news_manager.send_tip(db.actor, "st_achievement_2_unlock", nil, "radiotherapy", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.radiotherapy.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.radiotherapy.rpt)
+end
+
+-- Rag and Bone.
+-- Random chance of better loot in task reward stashes.
+-- Reputation and rank point increase.
+function rag_and_bone_rewards()
+	db.actor:give_info_portion("achieved_rag_and_bone")
+	news_manager.send_tip(db.actor, "st_achievement_9_unlock", nil, "rag_and_bone", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.rag_and_bone.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.rag_and_bone.rpt)
+end
+
+-- Silver or Lead.
+-- 33% chance of a second stash from surrendering stalkers.
+-- Reputation and rank point increase.
+function silver_or_lead_rewards()
+	db.actor:give_info_portion("achieved_silver_or_lead")
+	news_manager.send_tip(db.actor, "st_achievement_6_unlock", nil, "silver_or_lead", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.silver_or_lead.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.silver_or_lead.rpt)
+end
+
+-- Tourist.
+-- 3 "Curious stashes" are revealed.
+-- Reputation and rank point increase.
+function tourist_rewards()
+	for i=1,3 do
+		coc_treasure_manager.create_random_stash(nil, "Curious stash", nil, 15)
+	end
+	db.actor:give_info_portion("achieved_tourist")
+	news_manager.send_tip(db.actor, "st_achievement_8_unlock", nil, "tourist", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.tourist.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.tourist.rpt)
+end
+
+-- Well Dressed.
+-- 20% chance of extra parts when field dressing mutants.
+-- Reputation and rank point increase.
+function well_dressed_rewards()
+	db.actor:give_info_portion("achieved_well_dressed")
+	news_manager.send_tip(db.actor, "st_achievement_5_unlock", nil, "well_dressed", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.well_dressed.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.well_dressed.rpt)
+end
+
+-- Wishful Thinking.
+-- Spawns the 'Heart of the Oasis' artefact in a stash.
+-- Reputation and rank point increase.
+function wishful_thinking_rewards()
+	coc_treasure_manager.create_random_stash(nil, "Curious stash", "af_oasis_heart", 15)
+	db.actor:give_info_portion("achieved_wishful_thinking")
+	news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.wishful_thinking.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.wishful_thinking.rpt)
 end
