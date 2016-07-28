@@ -32,6 +32,8 @@ function af_options_dialog:__init() super()
 	local need_save
 
 	if (not self.default_settings:section_exist("atmosfear_default_parameters")) then
+		self:loadDefaultConsoleSettings()
+		
 		for level,v in pairs(level_weathers.valid_levels) do
 			self.default_settings:w_value("atmosfear_default_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			self.default_settings:w_value("atmosfear_default_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
