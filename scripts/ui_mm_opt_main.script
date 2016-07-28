@@ -146,9 +146,6 @@ function options_dialog:InitControls()
 
 	self.b_restart_system_shown	= false
 	self.timer					= nil
-	
-	-- refuse to use DX8 because it is broken
-	--self.combo_renderer:disable_id(0)
 end
 
 function options_dialog:SetCurrentValues()
@@ -282,10 +279,6 @@ function options_dialog:OnBtnAccept()
 
 	opt:OptionsPostAccept()
 	
-	if (atmosfear_options) then 
-		atmosfear_options.af_options_dialog.loadDefaultConsoleSettings()
-	end
-
 	console:execute("cfg_save")
 end
 
