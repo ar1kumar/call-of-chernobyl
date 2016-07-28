@@ -1032,7 +1032,9 @@ function sim_squad_scripted:can_switch_online()
 					return false
 				end
 			end
-			--if (self.current_action == 0) then
+
+			-- Invalid levels are underground. This code below is only for mutants in above-ground levels.
+			if (level_weathers.valid_levels[level.name()]) then
 				local hour = level.get_time_hours()
 				if (self.player_id == "monster_predatory_day") then 
 					-- Monster will not come online during the hours of (9PM till 5AM)
@@ -1055,7 +1057,7 @@ function sim_squad_scripted:can_switch_online()
 						return false 
 					end
 				end
-			--end
+			end
 		end
     end
     return cse_alife_online_offline_group.can_switch_online(self)
