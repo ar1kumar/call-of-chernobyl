@@ -54,6 +54,8 @@ local function on_game_load(binder)
 		config:w_value("temp","new_game_character_name")
 		need_save = true
 		
+		new_character_name = new_character_name:gsub("_"," ")
+		
 		local data = stpk_utils.get_actor_data(se_actor)
 		if (data) then
 			data.character_name = new_character_name
@@ -793,7 +795,7 @@ function faction_ui:OnStartGame()
 	axr_main.config:w_value("temp","new_game_supplies",tostring(self.supplies_id or 1))
 	
 	-- Store info in temp config so it can be read on next game load
-	axr_main.config:w_value("temp","new_game_character_name",character_name)
+	axr_main.config:w_value("temp","new_game_character_name", character_name:gsub(" ","_") )
 	axr_main.config:save()
 	
 	-- Start the game
