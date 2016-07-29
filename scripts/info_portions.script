@@ -33,10 +33,33 @@ local info_switches = {
 
 }
 
-local function actor_on_info_callback(actor,info)
+local function proceed()
+	if not (db.actor) then 
+		return 
+	end
+	if not	has_alife_info("warlab_password_info") then
+		if 	has_alife_info("main_1_search_agr_ug_task_done") and
+			has_alife_info("main_2_search_labx18_task_done") and
+			has_alife_info("main_3_search_labx16_task_done") and
+			has_alife_info("main_4_search_labx10_task_done") and
+			has_alife_info("main_5_search_labx8_task_done") and
+			has_alife_info("main_6_search_jup_ug_task_done") and
+			has_alife_info("main_7_search_mon_con_task_done") and
+			has_alife_info("pri_monolith_decoder_got") and
+			has_alife_info("pri_documents_warlab_task")
+		then
+			db.actor:give_info_portion("warlab_password_info")
+			task_manager.get_task_manager():give_task("sar_warlab")
+			task_manager.get_task_manager():give_task("sar_monolith_destroy")
+		end
+	end
+end
+
+local function actor_on_info_callback(actor,info,obj)
 	if (info_switches[info]) then
 		xr_logic.pick_section_from_condlist(actor,actor,alun_utils.parse_condlist(info_switches[info]))
 	end
+	proceed(obj)
 end
 
 function on_game_start()
