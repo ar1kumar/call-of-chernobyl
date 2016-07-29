@@ -20,7 +20,7 @@ local function under_faction_control_target_id(task_id)
 	local target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
 	local se_target = target_id and sim:object(target_id)
 
-	if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
+	if (se_target and smart.position:distance_to_sqr(se_target.position) > 4225) then
 		return target_id
 	end
 
@@ -191,7 +191,7 @@ function esc_m_trader_task_target(task_id,field,p,task)
 			local target_id = alun_utils.load_var(db.actor,"esc_m_trader_task_1_target_id")
 			local se_target = target_id and alife():object(target_id)
 
-			if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
+			if (se_target and smart.position:distance_to_sqr(se_target.position) > 4225) then
 				return target_id
 			end
 
@@ -208,7 +208,7 @@ function val_smart_terrain_7_4_bandit_trader_stalker_task_target(task_id,field,p
 
 	if (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_3") then
 		local squad = get_story_squad("bandit_companion_task_1")
-		if (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
+		if (squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
 			return squad.id
 		end
 	end
@@ -221,7 +221,7 @@ end
 function jup_b6_scientist_tech_task_target(task_id,field,p,task)
 	if (task_id == "jup_b6_scientist_tech_task_1") then
 		local squad = get_story_squad("ecolog_companion_task_2")
-		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
+		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
 			return squad.id
 		end
 		local n = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
@@ -259,7 +259,7 @@ function simulation_task_target(task_id,field,p,task)
 		end
 
 		if (task) then
-			if (task.stage == 0) or (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
+			if (task.stage == 0) or (squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
 				return squad and squad.id
 			elseif (task.stage >= 1 or db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then
 				local id = task.task_giver_id
