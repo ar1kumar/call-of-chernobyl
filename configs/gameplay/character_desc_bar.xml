@@ -5,7 +5,7 @@
 	<!-------------------------- BARMAN ------------------------>
     <specific_character id="bar_visitors_barman_stalker_trader" team_default = "1">
 		<name>bar_barmen_name</name>
-		<icon>ui_npc_u_barman</icon>
+		<icon>ui_inGame2_barman</icon>
 		<map_icon x="1" y="4"></map_icon>
 		<bio>bar_barmen_bio</bio>
 
@@ -80,6 +80,40 @@
 
 #include "gameplay\character_criticals_4.xml"
 #include "gameplay\character_dialogs.xml"
+	</specific_character>
+	
+		<!---------------------------VORONIN---------------------->
+	<specific_character id="bar_dolg_leader" team_default = "1">
+		<name>bar_voronin_name</name>
+		<icon>ui_npc_u_stalker_do_komandir</icon>
+		<map_icon x="0" y="0"></map_icon>
+		<bio>bar_voronin_bio</bio>
+
+		<class>bar_dolg_leader</class>
+		<community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<money min="5000" max="10000" infinitive="0"></money>
+
+		<rank>918</rank>
+		<reputation>0</reputation>
+ 
+		<visual>actors\dolg\stalker_do_komandir</visual>
+		<snd_config>characters_voice\human_01\dolg\</snd_config>
+		<crouch_type>0</crouch_type>
+
+		<supplies>
+			[spawn] \n
+			wpn_sig220 \n
+			ammo_11.43x23_hydro \n	
+			wpn_val \n
+			ammo_9x39_pab9 = 1 \n
+#include "gameplay\character_food.xml" \n
+#include "gameplay\character_drugs.xml"
+		</supplies>
+		
+#include "gameplay\character_criticals_6.xml"
+		
+	    <start_dialog>hello_dialog</start_dialog>
+		<actor_dialog>actor_break_dialog</actor_dialog>
 	</specific_character>
 
 	<!-------------------------- KITSENKO ------------------------>
@@ -188,7 +222,7 @@
 		<!--------------------------- PETRENKO ---------------------->
 	<specific_character id="bar_dolg_general_petrenko_stalker" team_default = "1">
 		<name>bar_petrenko_name</name>
-		<icon>ui_npc_u_stalker_do_balon_3</icon>
+		<icon>ui_inGame2_petrenko</icon>
 		<map_icon x="0" y="0"></map_icon>
 		<bio>bar_petrenko_bio</bio>
 
@@ -224,7 +258,7 @@
 <!------------ bar_visitors_stalker_mechanic ---------------------------->
 <specific_character id="bar_visitors_stalker_mechanic" team_default = "1">
     <name>bar_visitors_stalker_mechanic_name</name>
-    <icon>ui_npc_bar_visitors_stalker_mechanic</icon>
+    <icon>ui_inGame2_dolg_tech</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
 
@@ -253,7 +287,7 @@
     <!-- ******************* ARENA ********************** -->
 	<specific_character id="bar_arena_manager" team_default = "1">
 		<name>bar_arny_name</name>
-		<icon>ui_npc_u_stalker_neytral_balon_6</icon>
+		<icon>ui_inGame2_arnie</icon>
 		<map_icon x="1" y="6"></map_icon>
 		<bio>Опытный сталкер. Детальная информация отсутствует.</bio>
 
