@@ -374,3 +374,17 @@ function actor_item_to_ruck(binder,obj)
         end
     end
 end
+
+function actor_on_weapon_magazine_empty(binder,wpn,ammo_total)
+	--printf("weapon_no_ammo wpn=%s ammo_total=%s",wpn and wpn:name(),ammo_total)
+	SendScriptCallback("actor_on_weapon_no_ammo",wpn,ammo_total)
+end
+
+function actor_on_weapon_reload(binder,wpn,ammo_total)
+	SendScriptCallback("actor_on_weapon_reload",wpn,ammo_total)
+end	
+
+function actor_on_hud_animation_end(binder,item,section,motion,state,slot)
+	printf("hud_animation_end [%s] sec=%s motion=%s state=%s slot=%s",item and item:name(),section,motion,state,slot)
+	SendScriptCallback("actor_on_hud_animation_end",item,section,motion,state,slot)
+end

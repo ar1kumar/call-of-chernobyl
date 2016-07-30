@@ -19,7 +19,9 @@ config = ini_file_ex("axr_options.ltx",true)
 -- All unused callbacks will have their table deleted from intercepts (see on_game_load for implementation)
 local intercepts = {
 	-- _g.script
-
+	on_before_item_use			= {},
+	actor_on_before_hit			= {},
+	
 	-- actor_menu_inventory.script 
 	CUIActorMenu_OnItemDropped		= {},
 	CUIActorMenu_OnItemFocusReceive = {},
@@ -96,7 +98,8 @@ local intercepts = {
 	actor_on_net_destroy		= {},
 	actor_on_first_update		= {},
 	actor_on_update				= {},
-	--actor_on_weapon_no_ammo		= {},	-- TODO: Export from engine instead
+	actor_on_weapon_no_ammo		= {},
+	actor_on_weapon_reload		= {},
 	actor_on_weapon_zoom_in		= {},
 	actor_on_weapon_zoom_out	= {},
 	actor_on_item_take			= {},
@@ -114,6 +117,7 @@ local intercepts = {
 	actor_on_attach_vehicle		= {},
 	actor_on_detach_vehicle		= {},
 	actor_on_use_vehicle		= {},
+	actor_on_hud_animation_end  = {},
 	
 	-- pda.script
 	actor_on_leave_dialog		= {},
@@ -200,7 +204,6 @@ function on_game_start()
 		["sim_faction_brain_mutant.script"] = true,
 		["ce_switcher.script"] = true,
 		["axr_main.script"] = true,
-		["atmosfear.script"] = true, -- incase ppl still have it in since it was removed
 		["lua_help.script"] = true,
 		["rx_gl.script"] = true
 	}
