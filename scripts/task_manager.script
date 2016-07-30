@@ -82,14 +82,12 @@ end
 function CRandomTask:set_task_completed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "complete"
-		xr_statistic.inc_tasks_completed_counter()
 	end
 end
 
 function CRandomTask:set_task_failed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "fail"
-		xr_statistic.inc_tasks_failed_counter()
 	end
 end
 
@@ -195,6 +193,7 @@ function task_callback(tsk, state)
 		else
 			tm.task_info[id] = nil
 		end
+		xr_statistic.inc_tasks_failed_counter()
 	elseif (state == task.completed) then 
 		xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_complete)
 		rtask:give_reward()
@@ -206,6 +205,7 @@ function task_callback(tsk, state)
 		else 
 			tm.task_info[id] = nil
 		end
+		xr_statistic.inc_tasks_completed_counter()
 	else 
 	
 	end
