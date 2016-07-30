@@ -81,6 +81,40 @@
 #include "gameplay\character_criticals_4.xml"
 #include "gameplay\character_dialogs.xml"
 	</specific_character>
+	
+		<!---------------------------VORONIN---------------------->
+	<specific_character id="bar_dolg_leader" team_default = "1">
+		<name>bar_voronin_name</name>
+		<icon>ui_npc_u_stalker_do_komandir</icon>
+		<map_icon x="0" y="0"></map_icon>
+		<bio>bar_voronin_bio</bio>
+
+		<class>bar_dolg_leader</class>
+		<community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<money min="5000" max="10000" infinitive="0"></money>
+
+		<rank>918</rank>
+		<reputation>0</reputation>
+ 
+		<visual>actors\dolg\stalker_do_komandir</visual>
+		<snd_config>characters_voice\human_01\dolg\</snd_config>
+		<crouch_type>0</crouch_type>
+
+		<supplies>
+			[spawn] \n
+			wpn_sig220 \n
+			ammo_11.43x23_hydro \n	
+			wpn_val \n
+			ammo_9x39_pab9 = 1 \n
+#include "gameplay\character_food.xml" \n
+#include "gameplay\character_drugs.xml"
+		</supplies>
+		
+#include "gameplay\character_criticals_6.xml"
+		
+	    <start_dialog>hello_dialog</start_dialog>
+		<actor_dialog>actor_break_dialog</actor_dialog>
+	</specific_character>
 
 	<!-------------------------- KITSENKO ------------------------>
 	<specific_character id="bar_zastava_2_commander" team_default = "1">
