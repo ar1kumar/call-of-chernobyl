@@ -82,21 +82,19 @@ end
 function CRandomTask:set_task_completed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "complete"
-		xr_statistic.inc_tasks_completed_counter()
 	end
 end
 
 function CRandomTask:set_task_failed(task_id)
 	if (self.task_info[task_id]) then 
 		self.task_info[task_id].forced_status = "fail"
-		xr_statistic.inc_tasks_failed_counter()
 	end
 end
 
 function CRandomTask:set_task_cancelled(task_id)
     if (self.task_info[task_id]) then
 		self.task_info[task_id].forced_status = "fail"
-        xr_statistic.inc_tasks_cancelled_counter()
+		self.task_info[task_id].cancelled_by_actor = true
     end
 end
 
@@ -188,7 +186,16 @@ function task_callback(tsk, state)
 		news_manager.send_task(db.actor, "fail", tsk)
 		xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_fail)
 		rtask.status = "fail"
+		
+		if (rtask.cancelled_by_actor) then
+			xr_statistic.inc_tasks_cancelled_counter()
+		else
+			xr_statistic.inc_tasks_failed_counter()
+		end
+		
 		if (rtask.repeat_timeout) then
+			rtask.cancelled_by_actor = nil
+			rtask.forced_status = nil
 			rtask.t = nil
 			rtask.timeout = game.get_game_time()
 			rtask.stage = 255
@@ -199,15 +206,17 @@ function task_callback(tsk, state)
 		xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_complete)
 		rtask:give_reward()
 		rtask.status = "completed"
+		xr_statistic.inc_tasks_completed_counter()
+		
 		if (rtask.repeat_timeout) then
+			rtask.cancelled_by_actor = nil
+			rtask.forced_status = nil
 			rtask.t = nil
 			rtask.timeout = game.get_game_time()
 			rtask.stage = 255
 		else 
 			tm.task_info[id] = nil
 		end
-	else 
-	
 	end
 end
 
