@@ -6,11 +6,6 @@
 
 -- Current Action: 0 - Reach Target | 1 - Stay Point
 
--- Zone space_restrictors monster squads are not allowed to switch_online inside
-local exiled_zones = {
---	"bar_mutant_exile_zone"
-}
-
 local STAY_POINT_IDLE_MIN = 2*60*60
 local STAY_POINT_IDLE_MAX = 8*60*60
 
@@ -32,7 +27,6 @@ function sim_squad_scripted:__init(section) super (section)
 	self.current_action 	= nil
 	self.current_target_id	= nil
 	self.assigned_target_id	= nil
-	--self.sound_manager 		= sound_manager.get_sound_manager("squad_"..self:section_name() ) -- What is this used for?
 	self:init_squad()
 	self:set_squad_behaviour()
 	--if (USE_MARSHAL) then
@@ -422,8 +416,9 @@ function sim_squad_scripted:generic_update()
 	self.current_action = nil
 
 	-- Find a new target
-	local target = SIMBOARD:get_squad_target(self)
+	local target = SIMBOARD:get_squad_target(self) or self:find_open_smart()
 	if not (target) then
+		--printf("no target %s",self:name())
 		self:on_reach_target(self)
 		return 
 	end
@@ -1013,54 +1008,65 @@ function sim_squad_scripted:can_switch_offline()
 end
 
 function sim_squad_scripted:can_switch_online()
-    --alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
-    if (not self.online and not get_object_story_id(self.id)) then
-	
-		local dist = axr_main.config:r_value("mm_options","excl_dist",2,0)
-	    if (dist > 0 and db.actor) then 
-			if (self.first_update and level_weathers.valid_levels[level.name()] and self.position:distance_to(db.actor:position()) <= dist) then
-				return false
-			end
-        end
-		
-		if (is_squad_monster[self.player_id]) then
-			-- Check for exiled zones
-			local zone
-			for i,name in pairs(exiled_zones) do
-				zone = db.zone_by_name[name]
-				if (zone and zone:inside(self.position)) then
-					return false
-				end
-			end
 
-			-- Invalid levels are underground. This code below is only for mutants in above-ground levels.
-			if (level_weathers.valid_levels[level.name()]) then
-				local hour = level.get_time_hours()
-				if (self.player_id == "monster_predatory_day") then 
-					-- Monster will not come online during the hours of (9PM till 5AM)
-					if (hour <= 5 or hour >= 22) then
-						return false 
-					end
-				elseif (self.player_id == "monster_zombied_day") then 
-					-- Monster will not come online during the hours of (7PM till 5AM)
-					if (hour <= 5 or hour >= 19) then
-						return false 
-					end
-				elseif (self.player_id == "monster_predatory_night") then 
-					-- Monster will not come online during the hours of (5AM till 7PM)
-					if (hour >= 5 and hour <= 19) then
-						return false 
-					end
-				elseif (self.player_id == "monster_zombied_night") then 
-					-- Monster will not come online during the hours of (5AM till 7PM)
-					if (hour >= 5 and hour <= 19) then
-						return false 
-					end
+	-- important to check with inherited method first if it's okay to switch online, otherwise this leads to
+	-- crash saying 'object with ID already exists' when returning false and object is already online
+	if not cse_alife_online_offline_group.can_switch_online(self) then 
+		return false 
+	end 
+	
+	-- squad already online
+	if (self.online) then 
+		return true
+	end
+	
+	-- companions
+	if (axr_companions.companion_squads[self.id]) then 
+		return true 
+	end
+	
+	-- always come online in underground level
+	if not (level_weathers.valid_levels[level.name()]) then
+		return true
+	end
+	
+    --alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
+			
+    if (not get_object_story_id(self.id)) then
+	
+		if (is_squad_monster[self.player_id]) then
+			local hour = level.get_time_hours()
+			if (self.player_id == "monster_predatory_day") then 
+				-- Monster will not come online during the hours of (9PM till 5AM)
+				if (hour <= 5 or hour >= 22) then
+					return false 
+				end
+			elseif (self.player_id == "monster_zombied_day") then 
+				-- Monster will not come online during the hours of (7PM till 5AM)
+				if (hour <= 5 or hour >= 19) then
+					return false 
+				end
+			elseif (self.player_id == "monster_predatory_night") then 
+				-- Monster will not come online during the hours of (5AM till 7PM)
+				if (hour >= 5 and hour <= 19) then
+					return false 
+				end
+			elseif (self.player_id == "monster_zombied_night") then 
+				-- Monster will not come online during the hours of (5AM till 7PM)
+				if (hour >= 5 and hour <= 19) then
+					return false 
 				end
 			end
 		end
+		
+		if (db.actor) then
+			local dist = axr_main.config:r_value("mm_options","excl_dist",2) or 0
+			if (dist > 0 and self.position:distance_to(db.actor:position()) <= dist) then
+				return false
+			end
+		end
     end
-    return cse_alife_online_offline_group.can_switch_online(self)
+    return true
 end
 function sim_squad_scripted:switch_offline()
 	cse_alife_online_offline_group.switch_offline(self)
