@@ -103,7 +103,7 @@ local function on_game_load(binder)
 		}
 		
 		-- Enable the story quests, or disable their components depending on player choice and faction.
-		if (config:r_value("temp","new_game_story_mode",1) == true and story_factions[faction]) then
+		if (config:r_value("temp","new_game_story_mode",1) == true and story_factions[faction] and not has_alife_info("story_mode_disabled")) then
 			task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
 			task_manager.get_task_manager():give_task("turn_off_brain_scorcher") -- brain scorcher quest
 			task_manager.get_task_manager():give_task("turn_off_brain_machine") -- miracle machine quest
