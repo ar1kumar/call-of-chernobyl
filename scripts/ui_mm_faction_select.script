@@ -762,36 +762,14 @@ function faction_ui:OnStartGame()
 --		self.start_list:SetText(game.translate_string("ui_st_"..self.start_table[index]))
 	end
 	
-	if (self.ck_hardcore and self.ck_hardcore:GetCheck()) then 
-		axr_main.config:w_value("temp","new_game_hardcore_mode",true)
-	end 
-	
-	if (self.ck_story and self.ck_story:GetCheck()) then 
-		axr_main.config:w_value("temp","new_game_story_mode",true)
-	end
-	
-	if (self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck()) then 
-		axr_main.config:w_value("temp","new_game_hardcore_aim_mode",true)
-	end
-	
-	if (self.ck_survival and self.ck_survival:GetCheck()) then 
-		axr_main.config:w_value("temp","new_game_survival_mode",true)
-	end 
-	
-	if (self.selected_faction) then 
-		axr_main.config:w_value("temp","new_game_faction",self.selected_faction)
-	end
-	
-	if (start_location) then 
-		axr_main.config:w_value("temp","new_game_faction_position",start_location)
-	end
-	
-	if (self.loadout_str) then
-		axr_main.config:w_value("temp","new_game_loadout",self.loadout_str)
-	end
-	
+	axr_main.config:w_value("temp","new_game_hardcore_mode",self.ck_hardcore and self.ck_hardcore:GetCheck() and true or nil)
+	axr_main.config:w_value("temp","new_game_story_mode",self.ck_story and self.ck_story:GetCheck() and true or nil)
+	axr_main.config:w_value("temp","new_game_hardcore_aim_mode",self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck() and true or nil)
+	axr_main.config:w_value("temp","new_game_survival_mode",self.ck_survival and self.ck_survival:GetCheck() and true or nil)
+	axr_main.config:w_value("temp","new_game_faction",self.selected_faction or nil)
+	axr_main.config:w_value("temp","new_game_faction_position",start_location or nil)
+	axr_main.config:w_value("temp","new_game_loadout",self.loadout_str or nil)
 	axr_main.config:w_value("temp","new_game_character_icon",self.icon_list:GetText())
-	
 	axr_main.config:w_value("temp","new_game_supplies",tostring(self.supplies_id or 1))
 	
 	-- Store info in temp config so it can be read on next game load
