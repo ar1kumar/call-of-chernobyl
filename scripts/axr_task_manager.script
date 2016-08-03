@@ -188,19 +188,22 @@ function generate_ongoing_tasks(npc,is_sim)
    
     local count = 1
     while (task_manager.task_ini:section_exist(task_id)) do
-		if (db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < (task_manager.task_ini:r_float_ex(task_id,"stage_complete") or 255)) then
-            if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
-                if (is_sim) then
-					if (task_info[task_id].task_giver_id) then
-						if (npc:id() == task_info[task_id].task_giver_id) then
-							table.insert(ongoing_tasks[id],task_id)
+		local task_can_be_cancelled = task_manager.task_ini:r_bool_ex(task_id,"can_cancel") == false and false or true
+		if (task_can_be_cancelled) then
+			if (db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < (task_manager.task_ini:r_float_ex(task_id,"stage_complete") or 255)) then
+				if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
+					if (is_sim) then
+						if (task_info[task_id].task_giver_id) then
+							if (npc:id() == task_info[task_id].task_giver_id) then
+								table.insert(ongoing_tasks[id],task_id)
+							end
 						end
+					else
+						table.insert(ongoing_tasks[id],task_id)
 					end
-                else
-                    table.insert(ongoing_tasks[id],task_id)
-                end
-            end
-        end
+				end
+			end
+		end
         count = count + 1
         task_id = sec..tostring(count)
     end
