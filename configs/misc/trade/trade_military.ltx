@@ -1,13 +1,10 @@
 #include "trade_discounts.ltx"
-#define rep "=actor_goodwill_ge"
-#define fct "army"
-#define act "actor_army"
 
 [trader]
 buy_condition                            = trade_generic_buy
 buy_item_condition_factor                = 0.7
-buy_supplies                             = {=actor_community(#act) =heavy_pockets_functor} supplies_heavy_pockets, supplies_generic
-discounts                                = {#rep(#fct:2000)} dsc_pos10, {#rep(#fct:1800)} dsc_pos9, {#rep(#fct:1600)} dsc_pos8, {#rep(#fct:1400)} dsc_pos7, {#rep(#fct:1200)} dsc_pos6, {#rep(#fct:1000)} dsc_pos5, {#rep(#fct:800)} dsc_pos4, {#rep(#fct:600)} dsc_pos3, {#rep(#fct:400)} dsc_pos2, {#rep(#fct:200)} dsc_pos1, {#rep(#fct:-200)} dsc_neg1, {#rep(#fct:-400)} dsc_neg2, {#rep(#fct:-600)} dsc_neg3, {#rep(#fct:-800)} dsc_neg4, {#rep(#fct:-1000)} dsc_neg5, {#rep(#fct:-1200)} dsc_neg6, {#rep(#fct:-1400)} dsc_neg7, {#rep(#fct:-1600)} dsc_neg8, {#rep(#fct:-1800)} dsc_neg9, {#rep(#fct:-2000)} dsc_neg10, dsc_0
+buy_supplies                             = {=actor_community(actor_army) =heavy_pockets_functor} supplies_heavy_pockets, supplies_generic
+discounts                                = {=actor_goodwill_ge(army:2000)} dsc_pos10, {=actor_goodwill_ge(army:1800)} dsc_pos9, {=actor_goodwill_ge(army:1600)} dsc_pos8, {=actor_goodwill_ge(army:1400)} dsc_pos7, {=actor_goodwill_ge(army:1200)} dsc_pos6, {=actor_goodwill_ge(army:1000)} dsc_pos5, {=actor_goodwill_ge(army:800)} dsc_pos4, {=actor_goodwill_ge(army:600)} dsc_pos3, {=actor_goodwill_ge(army:400)} dsc_pos2, {=actor_goodwill_ge(army:200)} dsc_pos1, {=actor_goodwill_ge(army:-200)} dsc_neg1, {=actor_goodwill_ge(army:-400)} dsc_neg2, {=actor_goodwill_ge(army:-600)} dsc_neg3, {=actor_goodwill_ge(army:-800)} dsc_neg4, {=actor_goodwill_ge(army:-1000)} dsc_neg5, {=actor_goodwill_ge(army:-1200)} dsc_neg6, {=actor_goodwill_ge(army:-1400)} dsc_neg7, {=actor_goodwill_ge(army:-1600)} dsc_neg8, {=actor_goodwill_ge(army:-1800)} dsc_neg9, {=actor_goodwill_ge(army:-2000)} dsc_neg10, dsc_0
 price_profile                            = default
 sell_condition                           = trade_generic_sell
 
