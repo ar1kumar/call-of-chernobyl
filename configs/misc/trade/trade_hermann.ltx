@@ -1,10 +1,11 @@
 #include "trade_discounts.ltx"
 #define rep "=actor_goodwill_ge"
 #define fct "ecolog"
+#define act "actor_ecolog"
 
 [trader]
 buy_condition                            = trade_generic_buy
-buy_supplies                             = {#rep(#fct:500)} supplies_advanced, {#rep(#fct:1000)} supplies_anobiotik, {#rep(#fct:2000)} supplies_advanced_anobiotik, supplies_generic
+buy_supplies                             = {=actor_community(#act) =heavy_pockets_functor} supplies_heavy_pockets, supplies_generic
 discounts                                = {#rep(#fct:2000)} dsc_pos10, {#rep(#fct:1800)} dsc_pos9, {#rep(#fct:1600)} dsc_pos8, {#rep(#fct:1400)} dsc_pos7, {#rep(#fct:1200)} dsc_pos6, {#rep(#fct:1000)} dsc_pos5, {#rep(#fct:800)} dsc_pos4, {#rep(#fct:600)} dsc_pos3, {#rep(#fct:400)} dsc_pos2, {#rep(#fct:200)} dsc_pos1, {#rep(#fct:-200)} dsc_neg1, {#rep(#fct:-400)} dsc_neg2, {#rep(#fct:-600)} dsc_neg3, {#rep(#fct:-800)} dsc_neg4, {#rep(#fct:-1000)} dsc_neg5, {#rep(#fct:-1200)} dsc_neg6, {#rep(#fct:-1400)} dsc_neg7, {#rep(#fct:-1600)} dsc_neg8, {#rep(#fct:-1800)} dsc_neg9, {#rep(#fct:-2000)} dsc_neg10, dsc_0
 price_profile                            = ecolog
 sell_condition                           = trade_generic_sell
@@ -376,48 +377,6 @@ merc_novice_outfit=0.5, 0.3
 monolith_novice_outfit=0.5, 0.3
 military_novice_outfit=0.5, 0.3
 
-[supplies_anobiotik]
-
-;S_FOOD
-drug_anabiotic                           = 1, 1
-
-[supplies_advanced_anobiotik]
-
-;DET_ELIT
-detector_elite                           = 1,	0.0001
-
-;DET_SCIE
-detector_scientific                      = 2, 1
-
-;S_FOOD
-antirad                                  = 1, 0.8
-bandage                                  = 1, 0.8
-drug_anabiotic                           = 1, 1
-drug_antidot                             = 2, 0.5
-drug_coagulant                           = 2, 0.5
-drug_psy_blockade                        = 2, 0.45
-drug_radioprotector                      = 2, 0.5
-medkit                                   = 2, 0.8
-medkit_scientic                          = 3, 0.8
-
-[supplies_advanced]
-
-;DET_ELIT
-detector_elite                           = 1,	0.0001
-
-;DET_SCIE
-detector_scientific                      = 2,	1
-
-;S_FOOD
-antirad                                  = 1, 0.8
-bandage                                  = 1, 0.8
-drug_antidot                             = 1, 0.4
-drug_coagulant                           = 1, 0.4
-drug_psy_blockade                        = 2, 0.35
-drug_radioprotector                      = 1, 0.4
-medkit                                   = 2, 0.8
-medkit_scientic                          = 3, 0.8
-
 [buy_tier_2]
 
 ;ARTEFACT
@@ -788,3 +747,5 @@ helm_tactic                              = 1.2, 1.9
 merc_novice_outfit=1.1, 1.8
 monolith_novice_outfit=1.2, 1.9
 military_novice_outfit=1.1, 1.8
+
+[supplies_heavy_pockets]

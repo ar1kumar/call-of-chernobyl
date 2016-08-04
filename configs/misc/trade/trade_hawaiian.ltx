@@ -1,11 +1,12 @@
 #include "trade_discounts.ltx"
 #define rep "=actor_goodwill_ge"
 #define fct "freedom"
+#define act "actor_freedom"
 
 [trader]
 buy_condition                            = trade_generic_buy
 buy_item_condition_factor                = 0.7
-buy_supplies                             = {=actor_community(actor_freedom)} supplies_freedom_tier_1, {=actor_community(actor_freedom) =heavy_pockets_functor} supplies_freedom_wealthy_tier_2, supplies_generic
+buy_supplies                             = {=actor_community(#act) =heavy_pockets_functor} supplies_heavy_pockets, supplies_generic
 discounts                                = {#rep(#fct:2000)} dsc_pos10, {#rep(#fct:1800)} dsc_pos9, {#rep(#fct:1600)} dsc_pos8, {#rep(#fct:1400)} dsc_pos7, {#rep(#fct:1200)} dsc_pos6, {#rep(#fct:1000)} dsc_pos5, {#rep(#fct:800)} dsc_pos4, {#rep(#fct:600)} dsc_pos3, {#rep(#fct:400)} dsc_pos2, {#rep(#fct:200)} dsc_pos1, {#rep(#fct:-200)} dsc_neg1, {#rep(#fct:-400)} dsc_neg2, {#rep(#fct:-600)} dsc_neg3, {#rep(#fct:-800)} dsc_neg4, {#rep(#fct:-1000)} dsc_neg5, {#rep(#fct:-1200)} dsc_neg6, {#rep(#fct:-1400)} dsc_neg7, {#rep(#fct:-1600)} dsc_neg8, {#rep(#fct:-1800)} dsc_neg9, {#rep(#fct:-2000)} dsc_neg10, dsc_0
 price_profile                            = default
 sell_condition                           = trade_generic_sell
@@ -352,67 +353,6 @@ merc_novice_outfit=1.1, 1.8
 monolith_novice_outfit=1.2, 1.9
 military_novice_outfit=1.1, 1.8
 
-[supplies_freedom_tier_1]
-
-;DET_ADVA
-detector_advanced                        = 1,	0.0001
-
-;DET_ELIT
-detector_elite                           = 2,	1
-
-;S_FOOD
-antirad                                  = 1, 0.8
-bandage                                  = 3, 0.8
-drug_antidot                             = 1, 0.3
-drug_booster                             = 1, 0.3
-drug_coagulant                           = 1, 0.3
-drug_psy_blockade                        = 1, 0.25
-drug_radioprotector                      = 1, 0.3
-medkit                                   = 2, 0.8
-medkit_scientic                          = 2, 0.8
-
-;AMMO_S
-ammo_11.43x23_fmj                        = 4,	0.7
-ammo_12x76_zhekan                        = 4,	0.7
-ammo_5.45x39_ap                          = 1,	0.0001
-ammo_5.56x45_ap                          = 4,	0.5
-ammo_5.56x45_ss190                       = 6,	0.7
-ammo_9x18_fmj                            = 4,	0.7
-ammo_9x19_fmj                            = 6,	0.7
-ammo_9x19_pbp                            = 4,	0.7
-
-;WP_SCOPE
-wpn_addon_scope                          = 1,	0.5
-wpn_addon_scope_susat                    = 1,	0.8
-wpn_addon_scope_susat_night              = 1,	0.5
-wpn_addon_scope_susat_x1.6               = 1,	0.5
-wpn_addon_scope_x2.7                     = 1,	0.5
-
-;WP_SILEN
-wpn_addon_silencer                       = 2,	0.5
-
-;WP_AK74
-wpn_abakan                               = 1,	0.0001
-wpn_ak74u                                = 1,	0.1
-wpn_lr300                                = 1,	0.8
-
-;WP_HPSA
-wpn_hpsa                                 = 1,	0.1
-
-;WP_PM
-wpn_fort                                 = 1,	0.1
-
-;WP_SVD
-wpn_svd                                  = 1,	0.5
-
-;E_STLK
-svoboda_scientific_outfit                = 1, 0.25
-svoboda_light_outfit                     = 1, 0.65
-svoboda_novice_outfit                    = 1, 0.75
-
-;E_HLMET
-helm_respirator                          = 1,	0.4
-
 [trade_generic_buy]
 
 ;TORCH_S
@@ -755,7 +695,7 @@ merc_novice_outfit=0.5, 0.3
 monolith_novice_outfit=0.5, 0.3
 military_novice_outfit=0.5, 0.3
 
-[supplies_freedom_wealthy_tier_2]
+[supplies_heavy_pockets]
 
 ;S_FOOD
 medkit_army                              = 2, 0.8
