@@ -1,10 +1,12 @@
 #include "trade_discounts.ltx"
+#define rep "=actor_goodwill_ge"
+#define fct "dolg"
 
 [trader]
 buy_condition                            = trade_generic_buy
 buy_item_condition_factor                = 0.7
 buy_supplies                             = supplies_generic
-discounts                                = {=actor_goodwill_ge(dolg:2000)} discount_3, {=actor_goodwill_ge(dolg:1000)} discount_2, {=actor_goodwill_ge(dolg:500)} discount_1, discount_0
+discounts                                = {#rep(#fct:2000)} dsc_pos10, {#rep(#fct:1800)} dsc_pos9, {#rep(#fct:1600)} dsc_pos8, {#rep(#fct:1400)} dsc_pos7, {#rep(#fct:1200)} dsc_pos6, {#rep(#fct:1000)} dsc_pos5, {#rep(#fct:800)} dsc_pos4, {#rep(#fct:600)} dsc_pos3, {#rep(#fct:400)} dsc_pos2, {#rep(#fct:200)} dsc_pos1, {#rep(#fct:-200)} dsc_neg1, {#rep(#fct:-400)} dsc_neg2, {#rep(#fct:-600)} dsc_neg3, {#rep(#fct:-800)} dsc_neg4, {#rep(#fct:-1000)} dsc_neg5, {#rep(#fct:-1200)} dsc_neg6, {#rep(#fct:-1400)} dsc_neg7, {#rep(#fct:-1600)} dsc_neg8, {#rep(#fct:-1800)} dsc_neg9, {#rep(#fct:-2000)} dsc_neg10, dsc_0
 price_profile                            = default
 sell_condition                           = trade_generic_sell
 
