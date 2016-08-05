@@ -1,6 +1,6 @@
 [logic]
 ;active = ph_idle@system_idle
-active = sr_idle@system_idle
+active = {+story_mode_disabled} sr_idle@nil, sr_idle@system_idle
 
 ;[ph_idle@system_idle]
 ;on_info = {+yan_labx16_switcher_1_off -yan_labx16_switcher_1_end} ph_sound@switcher_1, {-story_mode_disabled, +yan_labx16_switcher_primary_off} ph_sound@primary_off %=yan_gluk%
@@ -40,7 +40,7 @@ active = sr_idle@system_idle
 ;on_timer = 4000 | nil %=enable_ui%
 
 [sr_idle@system_idle]
-on_info = {+yan_labx16_switcher_1_off -yan_labx16_switcher_1_end} sr_idle@switcher_1, {-story_mode_disabled, +yan_labx16_switcher_primary_off} sr_idle@primary_off %=yan_gluk%
+on_info = {+yan_labx16_switcher_1_off -yan_labx16_switcher_1_end} sr_idle@switcher_1, {+yan_labx16_switcher_primary_off} sr_idle@primary_off %=yan_gluk%
 on_info2 = {+yan_labx16_switcher_2_off -yan_labx16_switcher_2_end} sr_idle@switcher_2
 on_info3 = {+yan_labx16_switcher_3_off -yan_labx16_switcher_3_end} sr_idle@switcher_3 , {+yan_labx16_switcher_primary_try} sr_idle@switcher_primary
 
