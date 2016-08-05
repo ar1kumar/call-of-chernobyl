@@ -99,9 +99,17 @@ local function on_game_load(binder)
 			task_manager.get_task_manager():give_task("turn_off_brain_scorcher") -- brain scorcher quest
 			task_manager.get_task_manager():give_task("turn_off_brain_machine") -- miracle machine quest
 		else
-			give_info("story_mode_disabled") -- used for achievement compatibility.
-			give_info("yan_labx16_switcher_primary_off") -- turn off miracle machine
-			give_info("bar_deactivate_radar_done") -- turn off brain scorcher
+			-- Compatibility with many story-specific mechanics.
+			give_info("story_mode_disabled")
+			
+			-- Turns off the Miracle Machine.
+			give_info("yan_labx16_switcher_1_off")
+			give_info("yan_labx16_switcher_2_off")
+			give_info("yan_labx16_switcher_3_off")
+			give_info("yan_labx16_switcher_primary_off")
+			
+			-- Tuns off the Brain Scorcher.
+			give_info("bar_deactivate_radar_done")
 		end
 		config:w_value("temp","new_game_story_mode") -- clear value
 		
