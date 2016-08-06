@@ -1,5 +1,8 @@
 [logic]
-active = {+story_mode_disabled} sr_idle@nil, sr_idle@ready
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@ready
 
 [sr_idle@ready]
 on_actor_in_zone = dar_close_door_zone | sr_idle@wait_assault %+dar_door3_closed%

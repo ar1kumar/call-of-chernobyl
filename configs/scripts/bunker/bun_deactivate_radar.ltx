@@ -1,5 +1,8 @@
 [logic]
-active = {+story_mode_disabled} sr_idle@nil, sr_idle@wait
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@wait
  
 [sr_idle@wait]
 on_info = {=actor_community(actor_monolith)} sr_idle@nil
