@@ -99,7 +99,7 @@ function actor_on_item_take_from_box(box,obj)
 	end
 
 	local sid = story_objects.get_story_objects_registry():get_story_id(box:id())
-	if not (secret_stashes[sid]) then
+	if not (sid and secret_stashes[sid]) then
 		return
 	end
 

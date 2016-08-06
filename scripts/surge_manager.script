@@ -487,14 +487,12 @@ function CSurgeManager:update()
 							if not (utils.npc_in_zone(db.actor,"zat_a2_sr_noweap")) then
 								xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_surge_phase_1")
 							end
-						--elseif (level.name()=="jupiter") then
-							--if not (utils.npc_in_zone(db.actor,"jup_a6_sr_noweap")) then
-							--	xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_surge_phase_1")
-							--end
-						elseif (level.name() == "pripyat" and not has_alife_info("pri_b305_fifth_cam_end")) then
-							if not (utils.npc_in_zone(db.actor,"pri_a16_sr_noweap")) then
-								xr_sound.set_sound_play(db.actor:id(), "pri_a17_kovalsky_surge_phase_1")
+						elseif (level.name()=="jupiter") then
+							if not (utils.npc_in_zone(db.actor,"jup_a6_sr_noweap")) then
+								xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_phase_1")
 							end
+						elseif (level.name() == "l03_agroprom") then
+							xr_sound.set_sound_play(db.actor:id(), "kovalsky_surge_phase_1")
 						end
 					end
 					self:launch_rockets()
@@ -545,8 +543,8 @@ function CSurgeManager:update()
 						xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_surge_phase_2")
 					elseif(level.name()=="jupiter" and not utils.npc_in_zone(db.actor,"jup_a6_sr_noweap")) then
 						xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_phase_2")
-					elseif (level.name() == "pripyat" and not has_alife_info("pri_b305_fifth_cam_end") and not utils.npc_in_zone(db.actor,"pri_a16_sr_noweap")) then
-						xr_sound.set_sound_play(db.actor:id(), "pri_a17_kovalsky_surge_phase_2")
+					elseif (level.name() == "l03_agroprom") then
+						xr_sound.set_sound_play(db.actor:id(), "kovalsky_surge_phase_2")
 					end
 				end
 				self.second_message_given = true
@@ -674,8 +672,8 @@ function CSurgeManager:update()
 						xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_after_surge")
 					elseif(level.name()=="jupiter"and not utils.npc_in_zone(db.actor,"jup_a6_sr_noweap")) then
 						xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_after_surge")
-					elseif (level.name() == "pripyat" and not has_alife_info("pri_b305_fifth_cam_end") and not utils.npc_in_zone(db.actor,"pri_a16_sr_noweap")) then
-						xr_sound.set_sound_play(db.actor:id(), "pri_a17_kovalsky_after_surge")
+					elseif (level.name() == "l03_agroprom") then
+						xr_sound.set_sound_play(db.actor:id(), "kovalsky_after_surge")
 					end
 				end
 				--self.debugMessages[2]:SetText("end message at: "..tostring(diff_sec))
