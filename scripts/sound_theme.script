@@ -45,12 +45,7 @@ function npc_sound:__init(snd_ini, section)
 	self.faction = snd_ini:r_string_ex(section,"faction") or ""
 	self.point = snd_ini:r_string_ex(section,"point") or ""
 	self.msg = snd_ini:r_string_ex(section,"message") or ""
-
-	local avail_communities = parse_names(snd_ini:r_string_ex(section,"avail_communities") or "csky, trader, stalker, ecolog, bandit, dolg, freedom, army, zombied, monolith, killer")
-	self.avail_communities = {}
-	for k,v in pairs(avail_communities) do
- 		self.avail_communities[v] = true
- 	end
+	self.avail_communities = snd_ini:line_exist(section,"avail_communities") and alun_utils.parse_list(snd_ini,section,"avail_communities",true) or nil
 end
 
 function npc_sound:reset(npc_id)
@@ -923,7 +918,7 @@ function init_npc_sound(npc)
 	for k,v in pairs(theme) do
 		if v.init_npc then
 			--printf("checking %s for %s (%s)", v.section, npc:name(), character_community(npc))
-			if v.avail_communities[character_community(npc)] then
+			if (v.avail_communities == nil or v.avail_communities[character_community(npc)]) then
 				if (v.story_ids == nil or v.story_ids[story_objects.get_story_objects_registry():get_story_id(npc:id()) or ""]) then
 					v:init_npc(npc)
 				end
