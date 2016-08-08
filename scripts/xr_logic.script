@@ -114,6 +114,7 @@ function determine_section_to_activate(npc, ini, section_logic, actor)
 		if not active_section then
 			printf("object '%s': section '%s': section 'active' has no conditionless else clause",
 				npc:name(), section_logic)
+			active_section = "nil"
 		end
 	end
 	return active_section
