@@ -45,7 +45,7 @@ local function arrived_to_smart(obj, smart)
 	local obj_gv, obj_pos = gg:vertex(obj.m_game_vertex_id), obj.position
 	local smart_gv = gg:vertex(smart.m_game_vertex_id)
 	
-	if obj_gv:level_id() ~= smart_gv:level_id() then
+	if (obj_gv:level_id() ~= smart_gv:level_id() or alife():level_name(obj_gv:level_id()) ~= level.name())then
 		return false 
 	end
 	
@@ -1573,16 +1573,18 @@ function se_smart_terrain:try_respawn()
 		return 
 	end
 	
-	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
-	
-	if (self.online and self.dist_to_actor) then
-		if (self.dist_to_actor^2 < self.respawn_radius) then
+	if not (self.online) then 
+		if (self.respawn_only_level) then
 			return
 		end
-	elseif (self.respawn_only_level) then
+	end 
+	
+	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
+	
+	if (self.dist_to_actor and self.dist_to_actor^2 < self.respawn_radius) then
 		return
 	end
-		
+
 	if self.sim_avail ~= nil and xr_logic.pick_section_from_condlist(db.actor, self, self.sim_avail) ~= "true" then return end
 
 	--[[
