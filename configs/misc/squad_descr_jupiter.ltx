@@ -1,5 +1,20 @@
 ; «десь содержатс€ дескрипшены сквадов, которые потом можно создавать использу€ спец функции.
 
+;COC Jup A6
+[jup_a6_freedom_trader_ashot_squad]:online_offline_group
+faction = freedom
+npc = jup_a6_freedom_trader_ashot
+target_smart = jup_a6
+spawn_point = jup_b4_spawn_point
+story_id = jup_a6_freedom_trader_ashot_squad
+
+[jup_b19_freedom_yar_squad]:online_offline_group
+faction = freedom
+npc = jup_b19_freedom_yar                                                                                                   
+target_smart = jup_a6 
+spawn_point = jup_a6_spawn_point
+story_id = jup_b19_freedom_yar_squad
+
 ;----------------------------- B208 ----------------------------------------
 
 [jup_b208_burers_squad]:online_offline_group
@@ -105,13 +120,7 @@ target_smart = {+jup_b4_duty_go_home} jup_a6:nil, {+jup_b4_duty_go_home_alone} j
 spawn_point = jup_b4_spawn_point
 story_id = jup_b4_squad_duty
 
-[jup_b4_squad_duty_leader]:online_offline_group
-faction = dolg
-relationship = neutral
-npc = jup_b4_monolith_squad_leader_duty_skin
-target_smart = {+jup_b4_duty_go_home} jup_a6, {+jup_b4_duty_go_home_alone} jup_a6, jup_b4 
-spawn_point = jup_b4_spawn_point
-story_id = jup_b4_squad_duty_leader
+
 
 [jup_b4_squad_freedom]:online_offline_group
 faction = freedom
@@ -468,16 +477,6 @@ spawn_point = jup_b202_snag_wounded_look
 story_id = jup_b202_bandit_squad
 
 ;----------------------- B19----------------------------------------
-
-[jup_b19_freedom_yar_squad]:online_offline_group
-faction = freedom
-relationship = neutral
-npc = jup_b19_freedom_yar                                                                                                   
-target_smart = {+jup_b19_destroy_yar -jup_b19_yar_switch_smart_terrain} jup_b19, jup_a6 
-spawn_point = {+jup_b19_destroy_yar -jup_b19_yar_switch_smart_terrain} jup_b19_freedom_yar_spawn_point_kopachy, jup_a6_spawn_point
-story_id = jup_b19_freedom_yar_squad
-always_arrived = true
-
 
 [jup_b19_kopatci_zombied_squad]:online_offline_group
 faction = zombied
