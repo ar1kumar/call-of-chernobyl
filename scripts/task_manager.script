@@ -184,13 +184,15 @@ function task_callback(tsk, state)
 	--printf("task_callback %s state=%s",id,state == task.fail and "fail" or state == task.completed and "complete" or state)
 	if (state == task.fail) then
 		news_manager.send_task(db.actor, "fail", tsk)
-		xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_fail)
+		
 		rtask.status = "fail"
 		
 		if (rtask.cancelled_by_actor) then
 			xr_statistic.inc_tasks_cancelled_counter()
+			xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_cancel)
 		else
 			xr_statistic.inc_tasks_failed_counter()
+			xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_fail)
 		end
 		
 		if (rtask.repeat_timeout) then

@@ -239,6 +239,20 @@ function jup_b6_scientist_tech_task_target(task_id,field,p,task)
 	end
 end
 
+function jup_b19_freedom_yar_task_target(task_id,field,p,task)
+	if (task_id == "jup_b19_freedom_yar_task_1") then 
+		if (task) then 
+			local squad
+			if (task.stage == 0) then 
+				squad = get_story_squad("jup_a6_freedom_trader_ashot_squad")
+			elseif (task.stage == 1) then 
+				squad = get_story_squad("jup_b19_freedom_yar_squad")
+			end	
+			return squad and squad.id or nil
+		end
+	end
+end 
+
 -- Zaton
 function zat_b7_bandit_boss_sultan_task_target(task_id,field,p)
 	if (task_id == "zat_b7_bandit_boss_sultan_task_1") then

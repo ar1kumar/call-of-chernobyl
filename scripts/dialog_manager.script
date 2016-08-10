@@ -92,6 +92,13 @@ function add_script_dialog(p_id,id,phrase_id,cond,act)
 end
 
 -----------------------------------------------------
+-- Dynamic Ashot and Yar Dialog
+-----------------------------------------------------
+function dm_ashot_and_yar(a,b)
+	local npc = dialogs.who_is_npc(a,b)
+	
+end
+-----------------------------------------------------
 -- Dynamic task Dialog
 -----------------------------------------------------
 function dm_init_dynamic_task_dialog(dialog)
@@ -210,6 +217,18 @@ function dm_init_dynamic_broker_dialog(dialog)
 							add_dialog(5,1111,"dm_universal_actor_exit_thanks")								-- Actor
 
 			add_dialog(1,1111,"dm_universal_actor_exit") 													-- Actor
+end
+
+-----------------------------------------------------
+-- Dynamic Yar and Ashot Dialog
+-----------------------------------------------------
+function dm_init_dynamic_ashot_and_yar_dialog(dialog)
+	saved_dialog = dialog
+
+	add_dialog("",0,"jup_b19_freedom_yar_task_1_dm_query")
+
+	local script = add_dialog(0,1,"should not see this")
+	script:SetScriptText("dialogs_jupiter.dm_ashot_and_yar_generate_dialog")
 end
 
 -----------------------------------------------------

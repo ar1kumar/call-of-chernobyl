@@ -1,3 +1,49 @@
+------ CoC Jup A6 Ashot and Yar 
+function dm_ashot_and_yar_generate_dialog(a,b)
+	local npc = dialogs.who_is_npc(a,b)
+	local sid = story_objects.get_story_objects_registry():get_story_id(npc:id())
+	local text 
+	local target_name = ""
+	
+	if (sid == "jup_b19_freedom_yar") then 
+		text = { 	"You go %s to get his fat ass over here.",
+					"This is placeholder for Yar"
+		}
+		target_name = game.translate_string("jup_a6_freedom_trader_ashot_name")
+		
+		local task = task_manager.get_task_manager().task_info["jup_b19_freedom_yar_task_1"]
+		if (task) then 
+			task.stage = 0
+		end
+	elseif (sid == "jup_a6_freedom_trader_ashot") then 
+		text = { 	"If %s wants it, tell him to go over here and take it from me.",
+					"This is placeholder for Ashot"
+		}
+		target_name = game.translate_string("jup_b19_freedom_yar_name")
+		
+		local task = task_manager.get_task_manager().task_info["jup_b19_freedom_yar_task_1"]
+		if (task) then 
+			task.stage = 1
+		end
+	end
+	
+	-- returns random text. Replaces %s in the string with message target's character name
+	return strformat (text[math.random(#text)],target_name)
+end
+
+function is_message_receiver(a,b)
+	local npc = dialogs.who_is_npc(a,b)
+	
+	local task = task_manager.get_task_manager().task_info["jup_b19_freedom_yar_task_1"]
+	if not (task) then 
+		return false 
+	end 
+	
+	local sid = story_objects.get_story_objects_registry():get_story_id(npc:id())
+		
+	return sid == "jup_a6_freedom_trader_ashot" and task.stage == 0 or sid == "jup_b19_freedom_yar" and task.stage == 1 or false
+end
+
 ------ ecolog_companion_task_2
 
 function ecolog_companion_task_2_complete(a,b)

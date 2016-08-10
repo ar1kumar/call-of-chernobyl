@@ -69,6 +69,7 @@ function CGeneralTask:__init(id)
 	self.on_complete = xr_logic.parse_condlist(nil, "task_manager", "condlist", task_ini:r_string_ex(id,"on_complete") or "")
 	self.on_fail = xr_logic.parse_condlist(nil, "task_manager", "condlist", task_ini:r_string_ex(id,"on_fail") or "")
 	self.on_reversed = xr_logic.parse_condlist(nil, "task_manager", "condlist", task_ini:r_string_ex(id,"on_reversed") or "")
+	self.on_cancel = xr_logic.parse_condlist(nil, "task_manager", "condlist", task_ini:r_string_ex(id,"on_cancel") or "")
 	
 	--' Награды за квест
 	-- IMPORTANT ONLY USE THESE WHEN YOU COMPLETE TASK WHILE IN DIALOG!!!
