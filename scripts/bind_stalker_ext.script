@@ -83,6 +83,7 @@ function actor_on_update(binder,delta)
 		db.actor.radiation = -1
 	end
 	
+	--[[ enable if you need it
 	local torch = db.actor:object("device_torch")
 	if (torch and not actor_light and torch:torch_enabled()) then
 		actor_light = true
@@ -93,6 +94,7 @@ function actor_on_update(binder,delta)
 			SendScriptCallback("actor_on_torch_disabled")
 		end
 	end
+	--]]
 	
 	--[[ Prevents actor from falling below map (works just commented out because not needed)
 	local vid = db.actor:level_vertex_id()
@@ -115,7 +117,6 @@ end
 -------------------
 -- actor_on_weapon_no_ammo(wpn)
 -------------------
--- TODO: add in engine
 function actor_on_weapon_no_ammo(binder,wpn)
 	SendScriptCallback("actor_on_weapon_no_ammo",wpn)
 end
@@ -367,7 +368,7 @@ function actor_item_to_slot(binder,obj)
 end 
 
 function actor_item_to_ruck(binder,obj)
-    if IsOutfit(obj) and (axr_main.config:r_value("mm_options","enable_outfit_portrait",1,false) == true) then
+    if (axr_main.config:r_value("mm_options","enable_outfit_portrait",1,false) == true) and IsOutfit(obj) then
         local outfit = db.actor:item_in_slot(7)
         if (outfit == nil and db.actor_binder.character_icon) then
             db.actor:set_character_icon(db.actor_binder.character_icon)
