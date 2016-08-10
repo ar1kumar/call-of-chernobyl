@@ -141,26 +141,21 @@ function motivator_binder:net_spawn(sobject)
 	if (db.offline_objects[id] and db.offline_objects[id].level_vertex_id) then
 		force_set_position = level.vertex_position(db.offline_objects[id].level_vertex_id)
 		db.offline_objects[id].level_vertex_id = nil
-	else
-		-- spawn npc at spawn_point for squad
-		if (db.spawned_vertex_by_id[id]) then
-			force_set_position = level.vertex_position(db.spawned_vertex_by_id[id])
-			db.spawned_vertex_by_id[id] = nil
-		end
-		-- spawn at job alife task position if they have a job
-		if (sobject.m_smart_terrain_id ~= 65535) then
-			local smart = alife():object(sobject.m_smart_terrain_id)
-			if (smart and not smart.disabled) then
-				if not (smart.arriving_npc[id]) then
-					if (smart.npc_info[id]) then
-						if not (smart.npc_info[id].job) then
-							smart:select_npc_job(smart.npc_info[id],true)
-						end
-						if (smart.npc_info[id].job) then
-							--alun_utils.debug_write(strformat("xr_movtivator: npc=%s job=%s",self.object:name(),smart.npc_info[id].job.section))
-							local smart_task = smart.npc_info[id].job.alife_task
-							force_set_position = smart_task and smart_task:position() or nil
-						end
+	elseif (db.spawned_vertex_by_id[id]) then
+		force_set_position = level.vertex_position(db.spawned_vertex_by_id[id])
+		db.spawned_vertex_by_id[id] = nil
+	elseif (sobject.m_smart_terrain_id ~= 65535) then
+		local smart = alife():object(sobject.m_smart_terrain_id)
+		if (smart and not smart.disabled) then
+			if not (smart.arriving_npc[id]) then
+				if (smart.npc_info[id]) then
+					if not (smart.npc_info[id].job) then
+						smart:select_npc_job(smart.npc_info[id],true)
+					end
+					if (smart.npc_info[id].job) then
+						--alun_utils.debug_write(strformat("xr_movtivator: npc=%s job=%s",self.object:name(),smart.npc_info[id].job.section))
+						local smart_task = smart.npc_info[id].job.alife_task
+						force_set_position = smart_task and smart_task:position() or nil
 					end
 				end
 			end
