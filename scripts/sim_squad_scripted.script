@@ -1059,7 +1059,7 @@ function sim_squad_scripted:can_switch_online()
 			end
 		end
 		
-		if (db.actor) then
+		if (db.actor and db.spawned_vertex_by_id[self:commander_id()] == nil) then
 			local dist = axr_main.config:r_value("mm_options","excl_dist",2) or 0
 			if (dist > 0 and self.position:distance_to(db.actor:position()) <= dist) then
 				return false
