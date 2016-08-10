@@ -924,7 +924,7 @@ end
 
 --[[
 function se_smart_terrain:save_state(m_data)
-	alun_utils.debug_write(strformat("se_smart_terrain:save_state BEFORE %s %s",self:name(),self.id))
+	--alun_utils.debug_write(strformat("se_smart_terrain:save_state BEFORE %s %s",self:name(),self.id))
 	
 	printf("m_data.smart_terrains = %s name=%s",m_data.smart_terrains ~= nil,self:name())
 	m_data.smart_terrains[self:name()] = {}
@@ -956,7 +956,7 @@ function se_smart_terrain:save_state(m_data)
 
 	m_data.smart_terrains[self:name()].last_respawn_update = self.last_respawn_update
 
-	alun_utils.debug_write(strformat("se_smart_terrain:save_state AFTER %s",self:name()))
+	--alun_utils.debug_write(strformat("se_smart_terrain:save_state AFTER %s",self:name()))
 end
 
 function se_smart_terrain:load_state(m_data)
