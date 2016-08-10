@@ -23,7 +23,7 @@ on_game_timer = 86400 | sr_idle@order_ready
 ;on_timer = 2000 | sr_idle@order_ready
 
 [sr_idle@order_ready]
-on_info = {=dist_to_actor_ge(10)} sr_idle@final %+esc_2_12_order_ready_task +esc_2_12_order_ready =play_sound(nimble_order_ready)%
+on_info = {=dist_to_actor_ge(10)} sr_idle@final %+esc_2_12_order_ready_task +esc_2_12_order_ready =play_sound(esc_nimble_order_ready)%
 
 [sr_idle@final]
 on_info =| {-esc_2_12_order_in_process} sr_idle@waiting_order %-esc_2_12_order_ready_task%
