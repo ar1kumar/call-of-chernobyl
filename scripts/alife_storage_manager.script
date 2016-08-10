@@ -119,7 +119,7 @@ function CALifeStorageManager_load(fname)
 	
 	--alun_utils.debug_write(strformat("CALifeStorageManager_load %s",path))
 	
-	local savegame = io.open(path,"rb+")
+	local savegame = io.open(path,"rb")
 	if not (savegame) then
 		return
 	end
@@ -140,6 +140,8 @@ function CALifeStorageManager_load(fname)
 	--alun_utils.print_table(m_data,"m_data_on_load ("..path..")")
 
 	SendScriptCallback("load_state",m_data)
+	
+	--alun_utils.debug_write(strformat("CALifeStorageManager_load END"))
 end
 
 function get_state()
