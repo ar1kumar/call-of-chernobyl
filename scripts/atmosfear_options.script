@@ -804,13 +804,14 @@ end
 
 function loadDefaultConsoleSettings()
 	local console=get_console()
-	console:execute("r2_dof_far 800")
 	console:execute("r2_dof -0.400000,1.400000,500.000000")
+	console:execute("r2_dof_far 800")
 	console:execute("r2_dof_kernel 2")
 	console:execute("r2_dof_sky 0")
 	console:execute("r2_exp_donttest_shad off")
 	console:execute("r2_gi off")
 	console:execute("r2_ls_bloom_fast off")
+	console:execute("r2_ls_bloom_threshold 1")
 	console:execute("r2_sun_depth_far_bias -0.00002")
 	console:execute("r2_sun_depth_far_scale 1")
 	console:execute("r2_sun_depth_near_bias 0.00007")
@@ -831,7 +832,6 @@ function loadDefaultConsoleSettings()
 	console:execute("r2_tonemap_amount 1")
 	console:execute("r2_tonemap_lowlum 0.4")
 	console:execute("r2_tonemap_middlegray 1.1")
-	console:execute("r2_ls_bloom_threshold 1")
 end
 
 --######################################################################################################################
