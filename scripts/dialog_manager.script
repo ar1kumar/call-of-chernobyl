@@ -209,13 +209,12 @@ function dm_init_dynamic_broker_dialog(dialog)
 
 	add_dialog("",0,"st_broker_query") 																		-- Actor
 		add_dialog(0,1,"st_broker_npc_start_"..math.random(1,3)) 											-- NPC
-			add_script_dialog(1,2,"dialogs.text_actor_has_pda","dialogs.condition_actor_has_pda") 			-- Actor
+			add_script_dialog(1,2,"dialogs.text_actor_has_valuable_item","dialogs.condition_actor_has_valuable_item") -- Actor
 				add_dialog(2,3,"st_broker_npc_answer_pda_query") 											-- NPC
 					add_dialog(3,4,"st_broker_give_pda") 													-- Actor
 						add_script_dialog(4,5,"dialogs.text_trade_npc_pda") 								-- NPC
 							add_dialog(5,0,"st_broker_query_more")											-- Actor
 							add_dialog(5,1111,"dm_universal_actor_exit_thanks")								-- Actor
-
 			add_dialog(1,1111,"dm_universal_actor_exit") 													-- Actor
 end
 
