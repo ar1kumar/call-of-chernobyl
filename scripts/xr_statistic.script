@@ -99,6 +99,12 @@ rank_rep = {
 			heli_rocket			=	{rnk=50,	rpt=50},
 			wounded				=	{rnk=25,	rpt=50},
 			
+			-- Gain/loss based on faction relations.
+			-- Used instead of 'stalkers' or game_relations.ltx
+			killed_enemy		=	{rnk=0,		rpt=50},
+			killed_friend		=	{rnk=0,		rpt=-200},
+			killed_neutral		=	{rnk=0,		rpt=-100},
+			
 			-- Achievements
 			completionist 		=	{rnk=50,	rpt=0},
 			clear_skies			=	{rnk=25,	rpt=0},
@@ -149,6 +155,7 @@ taken_artefacts = {}
 function on_game_start()
 	RegisterScriptCallback("on_game_load",on_game_load)
 	RegisterScriptCallback("actor_on_item_take",actor_on_item_take)
+	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
 	init_ranks_reps()
 end
 
@@ -302,6 +309,33 @@ function inc_arena_battles_counter(mode)
 		inc_actor_rank(rank_rep.arena_boro.rnk)
 		inc_actor_reputation(rank_rep.arena_boro.rpt)
 	end
+end
+
+function npc_on_death_callback(victim,who)
+	if (not who or not victim) then return end
+	
+	local npc_faction = character_community(victim)
+	local actor_faction = character_community(who)
+	
+	-- Kiled a friendly NPC.
+	if (xr_conditions.is_factions_friends(nil, nil, { npc_faction, actor_faction })) then
+		inc_actor_rank(rank_rep.killed_friend.rnk)
+		inc_actor_reputation(rank_rep.killed_friend.rpt)
+--		printf("killed friendly")
+	
+	-- Killed an enemy NPC.
+	elseif (xr_conditions.is_factions_enemies(nil, nil, { npc_faction, actor_faction })) then
+		inc_actor_rank(rank_rep.killed_enemy.rnk)
+		inc_actor_reputation(rank_rep.killed_enemy.rpt)
+--		printf("killed enemy")
+	
+	-- Killed a neutral NPC.
+	else
+		inc_actor_rank(rank_rep.killed_neutral.rnk)
+		inc_actor_reputation(rank_rep.killed_neutral.rpt)
+--		printf("killed neutral")
+	end
+	
 end
 
 function set_best_monster(obj)
