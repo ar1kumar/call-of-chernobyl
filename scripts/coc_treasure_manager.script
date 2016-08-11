@@ -13,10 +13,9 @@ local function on_game_load()
 		return
 	end
 
-	local se_obj
 	local sim = alife()
 	for i=1, 65535 do
-		se_obj = sim:object(i)
+		local se_obj = sim:object(i)
 		if (se_obj) then
 			if (se_obj:clsid() == clsid.inventory_box_s) then
 				caches[se_obj.id] = false
@@ -29,7 +28,7 @@ local function on_game_load()
 	end
 
 	for i=1, math.floor(caches_count/2) do
-		create_random_stash(true,"stash")
+		create_random_stash(false,"stash")
 	end
 	
 	-- remove all unused stashes from the list
@@ -80,6 +79,10 @@ local function load_state(data)
 	data.coc_treasure_manager.caches_count = nil
 	data.coc_treasure_manager.caches = nil
 end
+
+local function physic_object_on_use_callback(box,who)
+	try_spawn_treasure(box)
+end
 ------------------------------------------------------------------------------------------------------------------
 --							ON GAME START
 ------------------------------------------------------------------------------------------------------------------
@@ -88,6 +91,7 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_item_take_from_box",actor_on_item_take_from_box)
 	RegisterScriptCallback("save_state",save_state)
 	RegisterScriptCallback("load_state",load_state)
+	RegisterScriptCallback("physic_object_on_use_callback",physic_object_on_use_callback)
 end
 
 -------------------------------------------------------------------------------------------------------------------
@@ -151,9 +155,6 @@ function create_random_stash(no_spot,hint,bonus_items,bonus_lottery)
 			return
 		end
 	end
-
-	-- switch cache true, indicating it has treasure
-	caches[id] = true
 
 	-- create map spot
 	if (no_spot ~= true and level.map_has_object_spot(id,"treasure") == 0) then
@@ -226,13 +227,31 @@ function create_random_stash(no_spot,hint,bonus_items,bonus_lottery)
 			max_roll = 1
 		end
 	until (max_weight <= 0)
+	
+	caches[id] = table.concat(spawned_item,",")
+end
 
-	local sec,se_obj,data,ammos,ct,ammo_type,ammo_section
+function try_spawn_treasure(box)
+	local id = box:id()
+	
+	printf("[%s] %s",caches[id])
+
+	if not (caches[id]) then 
+		return 
+	end 
+
+	if not (type(caches[id]) == "string") then 
+		return
+	end 
+	
+	local spawned_item = alun_utils.str_explode(caches[id],",")
+	local sec,data,ammos,ct,ammo_type,ammo_section
 	local ini = system_ini()
+	local sim = alife()
 	for i=1,#spawned_item do
 		sec = spawned_item[i]
 		if (sec ~= "" and ini:section_exist(sec)) then
-			se_obj = sim:create(sec,se_box.position,0,0,id)
+			local se_obj = sim:create(sec,box:position(),0,0,id)
 			if (IsWeapon(nil,se_obj:clsid())) then
 				--printf("coc_treasure_manager: item is fa")
 				data = stpk_utils.get_weapon_data(se_obj)
@@ -271,8 +290,8 @@ function create_random_stash(no_spot,hint,bonus_items,bonus_lottery)
 			printf("coc_treasure_manager.script: invalid section %s",sec)
 		end
 	end
-
-	return id
+	
+	caches[id] = true
 end
 
 function save(pk)

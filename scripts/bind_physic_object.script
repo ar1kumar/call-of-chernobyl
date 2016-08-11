@@ -3,15 +3,17 @@
 ----------------------------------------------------------------------------------------------------
 
 function init(obj)
+	if obj:clsid() == clsid.inventory_box_s then
+		obj:bind_object(generic_physics_binder(obj))
+		return
+	end
+		
 	local ini = obj:spawn_ini()
 	if not (ini and ini:section_exist("logic")) then
-		if obj:clsid() ~= clsid.inventory_box then
-			return
-		end
+		return
 	end
 
-	local new_binder = generic_physics_binder(obj)
-	obj:bind_object(new_binder)
+	obj:bind_object(generic_physics_binder(obj))
 end
 
 ---------------------------------------------------------------------------------------------
