@@ -66,11 +66,11 @@ function dist_to_task_target_anomaly_le(actor,npc,p)
 end 
 
 function has_task_target_anomaly(actor,npc,p)
-	return alun_utils.load_var(db.actor,"task_target_anomaly") ~= nil
+	return db.actor and alun_utils.load_var(db.actor,"task_target_anomaly") ~= nil
 end
 
 function actor_has_companion_slot(actor,npc,p)
-	return alun_utils.load_var(db.actor,p[1] or "task_companion_slot_1") == nil
+	return db.actor and alun_utils.load_var(db.actor,p[1] or "task_companion_slot_1") == nil
 end 
 
 --param 1 dist 
@@ -120,7 +120,7 @@ function has_completed_task_prerequisites(actor,npc,p)
 		if (precond == "false") then 
 			return false 
 		end 
-		if (xr_logic.pick_section_from_condlist(db.actor, npc, precond) == "false") then 
+		if (db.actor and xr_logic.pick_section_from_condlist(db.actor, npc, precond) == "false") then 
 			return false 
 		end
 	end
@@ -470,7 +470,7 @@ function see_npc(actor, npc, p)
 end
 
 function actor_see_npc(actor, npc)
-	return db.actor:see(npc)
+	return db.actor and db.actor:see(npc)
 end
 
 function npc_in_actor_frustum(actor, npc)
@@ -560,6 +560,9 @@ function story_obj_in_zone_by_name (actor, npc, p)
 end
 
 function actor_in_zone(actor, npc, p)
+	if not (db.actor) then 
+		return false 
+	end
 	local zone
 	for i=1,#p do
 		if (db.zone_by_name[p[1]]) then 
@@ -574,8 +577,8 @@ function actor_in_zone(actor, npc, p)
 end
 
 function actor_out_zone(actor, npc, p)
-	local zone = db.zone_by_name[p[1]]
-	if zone == nil then
+	local zone = db.actor ~= nil and db.zone_by_name[p[1]]
+	if not (zone) then
 		return false
 	end
 	return not utils.npc_in_zone(db.actor, db.zone_by_name[p[1]])
@@ -969,7 +972,7 @@ end
 
 function has_actor_enemy(actor, npc)
 	local best_enemy = npc:best_enemy()
-	return best_enemy ~= nil and best_enemy:id() == db.actor:id()
+	return db.actor and best_enemy ~= nil and best_enemy:id() == db.actor:id()
 end
 
 function see_enemy(actor, npc)
@@ -1033,7 +1036,7 @@ end
 function is_faction_enemy_to_actor(actor, npc, p)
 	if(p[1]~=nil) then
 --        return db.actor:community_goodwill(p[1])<-1000
-		return relation_registry.community_goodwill(p[1], db.actor:id())<=-1000
+		return db.actor and relation_registry.community_goodwill(p[1], db.actor:id())<=-1000
 	else
 		return false
 	end
@@ -1042,7 +1045,7 @@ end
 function is_faction_friend_to_actor(actor, npc, p)
 	if(p[1]~=nil) then
 --		return db.actor:community_goodwill(p[1])>1000
-		return relation_registry.community_goodwill(p[1], db.actor:id())>=1000
+		return db.actor and relation_registry.community_goodwill(p[1], db.actor:id())>=1000
 	else
 		return false
 	end
@@ -1112,7 +1115,7 @@ end
 function actor_active_detector(actor, npc, p)
 	local detector_section = p and p[1]
 	if detector_section == nil then printf("Wrong parameters in function 'actor_active_detector'") end
-	local actor_detector = db.actor:active_detector()
+	local actor_detector = db.actor and db.actor:active_detector()
 	return (actor_detector ~= nil) and actor_detector:section() == detector_section
 end
 
@@ -1527,7 +1530,7 @@ function distance_to_obj_ge(actor, npc, p)
 	local npc_id = get_story_object_id(p[1])
 	local npc1 = npc_id and alife():object(npc_id)
 	if npc1 then
-		return db.actor:position():distance_to_sqr(npc1.position) >= p[2]*p[2]
+		return db.actor ~= nil and db.actor:position():distance_to_sqr(npc1.position) >= p[2]*p[2]
 	end
 	return false
 end
@@ -1536,7 +1539,7 @@ function distance_to_obj_le(actor, npc, p)
 	local npc_id = get_story_object_id(p[1])
 	local npc1 = npc_id and alife():object(npc_id)
 	if npc1 then
-		return db.actor:position():distance_to_sqr(npc1.position) < p[2]*p[2]
+		return db.actor ~= nil and db.actor:position():distance_to_sqr(npc1.position) < p[2]*p[2]
 	end
 	return false
 end
@@ -1555,7 +1558,7 @@ function active_item(actor, npc, p)
 end
 
 function actor_nomove_nowpn()
-	local itm = db.actor:active_item()
+	local itm = db.actor ~= nil and db.actor:active_item()
 	if not (itm) then 
 		return true 
 	end
@@ -1776,7 +1779,7 @@ function zat_b29_anomaly_has_af(actor, npc, p)
 
 	for k,v in pairs(anomal_zone.artefact_ways_by_id) do
 		if alife():object(tonumber(k)) and af_name == alife():object(tonumber(k)):section_name() then
-			db.actor:give_info_portion(az_name)
+			give_info(az_name)
 			return true
 		end
 	end
@@ -1834,7 +1837,7 @@ function pas_b400_actor_far_forward(actor, npc)
 	local fwd_obj = get_story_object("pas_b400_fwd")
 
 	if fwd_obj then
-		if distance_between(fwd_obj, db.actor) > distance_between(fwd_obj, npc) then
+		if (db.actor and distance_between(fwd_obj, db.actor) > distance_between(fwd_obj, npc)) then
 			return false
 		end
 	else
@@ -1867,7 +1870,7 @@ function pas_b400_actor_far_backward(actor, npc)
 	local bwd_obj = get_story_object("pas_b400_bwd")
 
 	if bwd_obj then
-		if distance_between(bwd_obj, db.actor) > distance_between(bwd_obj, npc) then
+		if (db.actor and distance_between(bwd_obj, db.actor) > distance_between(bwd_obj, npc)) then
 			return false
 		end
 	else
@@ -2126,6 +2129,9 @@ end
 
 -- Returns true if calling NPC has the surrender flag to actor
 function npc_surrendered(actor,npc,p)
+	if not (db.actor) then 
+		return false 
+	end
 	local st = db.storage[npc:id()]
 	return st and st.victim_surrender == db.actor:id() or false
 end
@@ -2264,6 +2270,9 @@ function squad_hit_by_smart(actor,npc,p)
 end
 
 function actor_look_away(actor,npc)
+	if not (db.actor) then 
+		return false 
+	end
 	if (not db.actor:see(npc) or (alun_utils.angle_diff(db.actor:direction(), db.actor:position():sub(npc:position()))<90 and npc:position():distance_to(db.actor:position()) > 2.5) or npc:position():distance_to(db.actor:position())>100) then
 		return true
 	end
@@ -2282,7 +2291,7 @@ function companion_at_index(actor,npc,p)
 	if (p == nil or p[1] == nil) then
 		return false
 	end
-	local id = alun_utils.load_var(db.actor,"companion_"..p[1],nil)
+	local id = db.actor ~= nil and alun_utils.load_var(db.actor,"companion_"..p[1],nil)
 	return id and id == npc:id() or false
 end
 
@@ -2301,7 +2310,7 @@ function squad_on_actor_map(actor,npc,p)
 		return false
 	end
 	local gg = game_graph()
-	return gg:vertex(db.actor:game_vertex_id()):level_id() == gg:vertex(squad.m_game_vertex_id):level_id()
+	return gg:vertex(alife():actor().m_game_vertex_id):level_id() == gg:vertex(squad.m_game_vertex_id):level_id()
 end
 
 -- Returns true if squad commander's active section equals param 1
@@ -2729,10 +2738,13 @@ end
 --' SP
 function npc_in_actor_community(actor,npc,p)
 	local comm = character_community(npc)
-	return string.find(character_community(db.actor),comm) ~= nil
+	return db.actor and string.find(character_community(db.actor),comm) ~= nil
 end 
 
 function actor_community(actor,npc,p)
+	if not (db.actor) then 
+		return false 
+	end
 	for i=1,#p do
 		if (character_community(db.actor) == p[i]) then 
 			return true 
@@ -2743,7 +2755,7 @@ end
 
 function actor_goodwill_ge(actor,npc,p)
 	if (p[1] and p[2]) then
-		return relation_registry.community_goodwill(p[1], db.actor:id()) >= tonumber(p[2])
+		return db.actor and relation_registry.community_goodwill(p[1], db.actor:id()) >= tonumber(p[2])
 	end
 	return false
 end
@@ -2894,16 +2906,14 @@ end
 ------------------------------------------------------------------------------------
 
 function bar_actor_rank_stalker (actor,npc)
-	local actor = db.actor
-	if actor:character_rank() > 1499 then
+	if db.actor and db.actor:character_rank() > 1499 then
 		return true
 	end
 	return false
 end
 
 function bar_actor_rank_veteran (actor,npc)
-	local actor = db.actor
-	if actor:character_rank() > 2999 then
+	if db.actor and db.actor:character_rank() > 2999 then
 		return true
 	end
 	return false
