@@ -396,7 +396,7 @@ function se_smart_terrain:register_npc(obj)
 	if (arrived_to_smart(obj, self)) then
 		self.npc_info[obj.id] = self:fill_npc_info(obj)
 		self.dead_time = empty_table(self.dead_time)
-		self:select_npc_job(self.npc_info[obj.id])
+		self:select_npc_job(self.npc_info[obj.id],true)
 	else
 		self.arriving_npc[obj.id]  = obj
 	end
@@ -596,6 +596,16 @@ function se_smart_terrain:clear_job(id,rem)
 		if (rem) then
 			self.npc_info[id] = nil
 		end
+	end
+end 
+
+function se_smart_terrain:force_assign_arrived_job(id)
+	local se_obj = self.arriving_npc[id]
+	if (se_obj) then 
+		if (arrived_to_smart(se_obj,self)) then 
+			self.npc_info[id] = self:fill_npc_info(se_obj)
+			self.arriving_npc[id] = nil
+		end 	
 	end
 end 
 
