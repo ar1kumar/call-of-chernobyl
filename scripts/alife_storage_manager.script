@@ -92,7 +92,12 @@ function CALifeStorageManager_before_save(fname)
 		return 
 	end
 		
-	local path = getFS():update_path('$game_saves$', '') .. fname:sub(0,-6):lower() .. ".scoc"
+	local path = getFS():update_path('$game_saves$', '')
+	
+	lfs.mkdir(path) -- incase savegame folder doesn't exist yet
+	
+	path = path .. fname:sub(0,-6):lower() .. ".scoc"
+	
 	local savegame = io.open(path,"wb+")
 	if not (savegame) then
 		return 
