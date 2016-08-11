@@ -551,7 +551,7 @@ end
 
 ----------------------------------------------------------------------------------
 function motivator_binder:save_state(m_data)
-	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",id))
 	local id = self.object and self.object:id()
 	local st = id and db.storage[id]
 	if not (st) then 
@@ -573,7 +573,7 @@ function motivator_binder:save_state(m_data)
 	trade_manager.save_state(id,m_data)
 	
 	db.storage[id].pstor = db.storage[id].pstor or {}
-	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",id))
 end 
 
 function load_state(id,m_data)
@@ -582,7 +582,7 @@ function load_state(id,m_data)
 	end
 	db.storage[id] = db.storage[id] or {}
 	local st = db.storage[id]
-	--alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",id))
 	--st.job_ini = m_data.xr_logic[id].job_ini
 	st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
 	st.loaded_section_logic = m_data.xr_logic[id].section_logic
@@ -603,5 +603,5 @@ function load_state(id,m_data)
 		db.storage[id].pstor_ctime = m_data.pstor_ctime[id]
 		m_data.pstor_ctime[id] = nil
 	end
-	--alun_utils.debug_write(strformat("motivator_binder:load_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_binder:load_state %s AFTER",id))
 end 

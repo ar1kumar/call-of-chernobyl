@@ -238,7 +238,7 @@ local function on_game_load()
 		local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 		if (levels[i]) then 
 			alun_utils.save_var(db.actor,"debug_warpall",i)
-			get_console():execute("flush")
+			--get_console():execute("flush")
 			JumpToLevel(levels[i])
 		else
 			alun_utils.save_var(db.actor,"debug_warpall",nil)
@@ -353,7 +353,7 @@ local function on_level_changing()
 	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 	if (levels[i]) then 
 		alun_utils.save_var(db.actor,"debug_warpall",i)
-		get_console():execute("flush")
+		--get_console():execute("flush")
 		JumpToLevel(i)
 	else
 		alun_utils.save_var(db.actor,"debug_warpall",nil)

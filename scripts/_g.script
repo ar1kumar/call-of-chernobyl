@@ -358,6 +358,7 @@ function printf(fmt,...)
 	
 	if (log) then 
 		log(fmt)
+		--get_console():execute("flush")
 	else 
 		get_console():execute("load ~#debug msg:"..fmt)
 	end	
