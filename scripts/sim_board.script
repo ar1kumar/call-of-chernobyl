@@ -183,10 +183,9 @@ function simulation_board:create_squad(spawn_smart, sq_id)
 	squad:create_npc(spawn_smart)
 	self:assign_squad_to_smart(squad, spawn_smart.id)
 
-	local se_obj
 	local sim = alife()
 	for k in squad:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 			-- Alundaio

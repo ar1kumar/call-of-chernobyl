@@ -326,7 +326,7 @@ function interpret_spawn_data(sections)
 		secret_stashes = {}
 	end
 
-	local sec,section,pos,lvid,gvid,lvl,se_obj
+	local sec,section,pos,lvid,gvid,lvl
 	local data,t,enable,on_info
 	for i=1, #sections do
 		sec = sections[i]
@@ -347,7 +347,7 @@ function interpret_spawn_data(sections)
 				gvid = tonumber(t.game_vertex_id)
 
 				if (section and pos and lvid and gvid) then
-					se_obj = alife():create(section,pos,lvid,gvid)
+					local se_obj = alife():create(section,pos,lvid,gvid)
 
 					-- set dynamic name
 					se_obj.dynamic_name = sec

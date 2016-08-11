@@ -388,9 +388,8 @@ end
 function kill_strelok(task,task_id)
 	local squad = get_story_squad("legendary_strelok")
 	if (squad) then
-		local se_obj
 		for k in squad:squad_members() do
-			se_obj = alife():object(k.id)
+			local se_obj = alife():object(k.id)
 			if (se_obj and not se_obj:alive()) then 
 				return "complete"
 			end 

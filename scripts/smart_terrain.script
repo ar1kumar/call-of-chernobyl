@@ -404,7 +404,7 @@ end
 
 function se_smart_terrain:only_faction_on_jobs(faction)
 	for id,npc_info in pairs(self.npc_info) do
-		se_obj = npc_info.se_obj
+		local se_obj = npc_info.se_obj
 		local comm = se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:community()
 		if (comm and comm ~= zombied and comm ~= faction) then
 			return false
@@ -634,10 +634,9 @@ function se_smart_terrain:update_jobs()
 	local gg = game_graph()
 	self.level_id = self.level_id or gg:vertex(self.m_game_vertex_id):level_id()
 	
-	local se_obj
 	-- Update Jobs for existing NPCs
 	for id,npc_info in pairs(self.npc_info) do
-		se_obj = npc_info.se_obj
+		local se_obj = npc_info.se_obj
 		if (se_obj) then
 			if (self.level_id == gg:vertex(se_obj.m_game_vertex_id):level_id()) then
 				self:select_npc_job(npc_info)

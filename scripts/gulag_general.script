@@ -244,9 +244,8 @@ local function precond_collector(se_obj, smart, job)
 
 	local detectors = { "detector_simple", "detector_advanced", "detector_elite", "detector_scientific" }
 
-	local obj
 	for k,v in pairs(detectors) do
-		obj = npc:object(v)
+		local obj = npc:object(v)
 		if obj ~= nil then
 			return true
 		end

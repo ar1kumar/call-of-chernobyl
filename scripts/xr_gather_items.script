@@ -222,11 +222,11 @@ function eva_gather_itm:find_valid_item()
 
 	local size = #self.st.memory
 	if (size == 0) then
-		local obj,obj_id
+		local obj_id
 
 		self.st.cstackprevent = true
 		for o in npc:memory_visible_objects() do
-			obj = o and o:object()
+			local obj = o and o:object()
 			if (obj) then
 				obj_id = obj:id()
 				if (loot_table[obj:section()] ~= nil) then

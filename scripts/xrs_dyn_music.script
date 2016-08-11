@@ -166,9 +166,9 @@ function get_theme_state()
 		FadeTo_ambient = ambient_vol
 	end
 
-	local has_enemy,npc
+	local has_enemy
 	for id,v in pairs(xr_combat_ignore.fighting_with_actor_npcs) do
-		npc = db.storage[id] and db.storage[id].object
+		local npc = db.storage[id] and db.storage[id].object
 		if (npc and IsStalker(npc)) then
 			has_enemy = true
 			break

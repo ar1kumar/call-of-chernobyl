@@ -196,9 +196,9 @@ local function actor_on_first_update(binder,delta)
 		local squad = sim:create("survival_squad_"..faction,start_pos[3],start_pos[1],start_pos[2])
 		if (squad) then
 			squad:create_npc(nil,start_pos[3],start_pos[1],start_pos[2])
-			local se_obj,as
+			local as
 			for k in squad:squad_members() do
-				se_obj = k.object or k.id and sim:object(k.id)
+				local se_obj = k.object or k.id and sim:object(k.id)
 				if (se_obj) then
 					SIMBOARD:setup_squad_and_group(se_obj)
 					as = se_obj:get_alife_storage(true)

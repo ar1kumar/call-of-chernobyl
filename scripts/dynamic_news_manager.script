@@ -238,8 +238,8 @@ function DynamicNewsManager:FindSpeakerNoVictim(who,same_as_who,not_in_combat)
 	local t = {}
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
-			st = db.storage[db.OnlineStalkers[i]]
-			npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
+			local st = db.storage[db.OnlineStalkers[i]]
+			local npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
 			if (npc and IsStalker(npc,npc:clsid()) and npc:alive() and not get_object_story_id(db.OnlineStalkers[i])) then
 				if (not_in_combat == nil) or (not_in_combat == true and not npc:best_enemy()) or (not_in_combat ~= true) then
 					comm_sender = npc:character_community()
@@ -263,8 +263,8 @@ function DynamicNewsManager:FindSpeaker(victim,who,same_as_victim,same_as_who,no
 	local t = {}
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
-			st = db.storage[db.OnlineStalkers[i]]
-			npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
+			local st = db.storage[db.OnlineStalkers[i]]
+			local npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
 			if (npc and IsStalker(npc,npc:clsid()) and npc:alive() and not get_object_story_id(db.OnlineStalkers[i])) then
 				if (not_in_combat == nil) or (not_in_combat == true and not npc:best_enemy()) or (not_in_combat ~= true) then
 					comm_sender = npc:character_community()
@@ -292,8 +292,8 @@ function DynamicNewsManager:FindSpeakerWithEnemy(victim,who,same_as_victim,same_
 	local t = {}
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
-			st = db.storage[db.OnlineStalkers[i]]
-			npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
+			local st = db.storage[db.OnlineStalkers[i]]
+			local npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
 			if (npc and IsStalker(npc,npc:clsid()) and npc:alive() and not get_object_story_id(db.OnlineStalkers[i]) and npc:best_enemy()) then
 				comm_sender = npc:character_community()
 				if (same_as_victim == nil) or (same_as_victim == true and comm_sender == comm) or (same_as_victim == false and comm_sender ~= comm) then
@@ -707,8 +707,8 @@ function DynamicNewsManager:BuildSentenceStalkerEnemy(victim,who,mn,mx)
 	local c = 0
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
-			st = db.storage[db.OnlineStalkers[i]]
-			npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
+			local st = db.storage[db.OnlineStalkers[i]]
+			local npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
 			if (npc and IsStalker(npc,npc:clsid()) and npc:alive() and not get_object_story_id(db.OnlineStalkers[i])) then
 				local comm = npc:character_community()
 				if (comm == comm_who) then

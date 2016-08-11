@@ -125,9 +125,8 @@ function set_squad_goodwill_to_npc(npc, squad_id, new_goodwill)
 		if not (se_npc) then 
 			return 
 		end
-		local se_obj
 		for k in squad:squad_members() do
-			se_obj = k.object or k.id and sim:object(k.id)
+			local se_obj = k.object or k.id and sim:object(k.id)
 			if (se_obj) then
 				se_obj:force_set_goodwill(goodwill, npc:id())
 				se_npc:force_set_goodwill(goodwill, k.id)
@@ -142,9 +141,8 @@ function set_squad_community_goodwill(squad_id, community, new_goodwill)
 	local goodwill = tonumber(new_relation) or new_relation == "enemy" and -1000 or new_relation == "friend" and 1000 or 0
 	local squad = squad_id and (get_story_squad(squad_id) or alife():object(squad_id))
 	if squad then
-		local obj
 		for k in squad:squad_members() do
-			obj = db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id)
+			local obj = db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id)
 			if(obj) then
 				obj:set_community_goodwill(community, goodwill)
 			end
@@ -184,10 +182,9 @@ function check_all_squad_members(squad_name, relation)
 	if db.actor == nil then return false end
 	local goodwill = tonumber(relation) or relation == "enemy" and -1000 or relation == "friend" and 1000 or 0
 	local is_enemy
-	local obj
 	for k in squad:squad_members() do
 		is_enemy = nil
-		obj = db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id)
+		local obj = db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id)
 		if (goodwill == -1000) then
 			is_enemy = obj and obj:general_goodwill(db.actor)<=ENEMIES
 		else

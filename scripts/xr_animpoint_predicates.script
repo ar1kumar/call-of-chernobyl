@@ -101,11 +101,9 @@ function animpoint_predicate_roast(id,camp)
 		if (smart) then
 			local fires = db.campfire_table_by_smart_names[smart:name()]
 			if (fires) then
-				local lobi = level.object_by_id
-				local obj
 				for id,binder in pairs(fires) do
 					if (binder.object and binder.campfire and binder.campfire:is_on()) then
-						obj = lobi(id)
+						local obj = level.object_by_id(id)
 						if (obj and obj:position():distance_to_sqr(npc:position()) <= 7) then
 							return true
 						end

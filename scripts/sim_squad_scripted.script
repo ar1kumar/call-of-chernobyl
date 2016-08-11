@@ -357,9 +357,8 @@ function sim_squad_scripted:specific_update(script_target_id)
 	
 	se_target:on_reach_target(self)
 	
-	local se_obj
 	for k in self:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 		end
@@ -429,10 +428,9 @@ function sim_squad_scripted:generic_update()
 	
 	target:on_reach_target(self)
 	
-	local se_obj
 	local sim = alife()
 	for k in self:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 		end
@@ -452,13 +450,12 @@ function sim_squad_scripted:remove_squad()
 	end
 
 	local sim = alife()
-	local se_obj, obj
 	for id,v in pairs(squad_npcs) do
-		obj = db.storage[id] and db.storage[id].object
+		local obj = db.storage[id] and db.storage[id].object
 		if (obj and obj:is_talking()) then
 			obj:stop_talk()
 		end
-		se_obj = sim:object(id)
+		local se_obj = sim:object(id)
 		if se_obj then
 			self:unregister_member(id)
 			sim:release(se_obj,true)
@@ -529,10 +526,9 @@ function sim_squad_scripted:assign_smart(smart,old_smart_id)
 		self.smart_id = smart.id
 	end
 	
-	local se_obj
 	local sim = alife()
 	for k in self:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			if (old_smart) then
 				if (smart == nil or smart.id ~= old_smart_id) then
@@ -552,11 +548,9 @@ function sim_squad_scripted:check_invulnerability()
 		return
 	end
 	local invulnerability = xr_logic.pick_section_from_condlist(db.actor, self, self.invulnerability) == "true"
-	local npc_st
-	local npc
 	for k in self:squad_members() do
-		npc_st = db.storage[k.id]
-		npc = npc_st and npc_st.ini and npc_st.object
+		local npc_st = db.storage[k.id]
+		local npc = npc_st and npc_st.ini and npc_st.object
 		if (npc) then
 			if npc:invulnerable() ~= invulnerabilty and utils.cfg_get_string(npc_st.ini, npc_st.active_section, "invulnerable", npc, false, "", nil) == nil  then
 				npc:invulnerable(invulnerability)
@@ -591,9 +585,8 @@ function sim_squad_scripted:set_location_types(new_smart_name)
 	else
 		self:set_location_types_section("squad_terrain")
 
-		local se_obj
 		for k,v in pairs(simulation_objects.get_sim_obj_registry().objects) do
-			se_obj = sim:object(k)
+			local se_obj = sim:object(k)
 			if (se_obj and se_obj:clsid() == clsid.smart_terrain) then
 				local props_base = se_obj.props and se_obj.props["base"]
 				if (props_base and tonumber(props_base) == 0) then
@@ -714,10 +707,10 @@ function sim_squad_scripted:create_npc(spawn_smart,pos,lvid,gvid)
 	if not (spawn_smart) then 
 		local smart = self.smart_id and db.smart_terrain_by_id[self.smart_id]
 		if (smart) then
-			local id, se_obj
+			local id 
 			for i=1, #npcs_list do 
 				id = npcs_list[i]
-				se_obj = id and alife():object(id)
+				local se_obj = id and alife():object(id)
 				if (se_obj) then 
 					smart:register_npc(se_obj)
 					SIMBOARD:setup_squad_and_group(se_obj)
@@ -829,9 +822,8 @@ end
 
 function sim_squad_scripted:has_detector()
 	local sim = alife()
-	local se_obj
 	for k in self:squad_members() do
-		se_obj = sim:object(k.id)
+		local se_obj = sim:object(k.id)
 		if se_obj and se_obj:has_detector() then
 			return true
 		end

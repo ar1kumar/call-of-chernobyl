@@ -54,7 +54,7 @@ function motivator_binder:reinit()
 end
 ----------------------------------------------------------------------------------------------------------------------
 function motivator_binder:net_spawn(sobject)
-	alun_utils.debug_write(strformat("\n----%s:net_spawn()---%s visual=%s",self.object:name(),self.object:character_name(),self.object:get_visual_name()),true)
+	--alun_utils.debug_write(strformat("\n----%s:net_spawn()---%s visual=%s",self.object:name(),self.object:character_name(),self.object:get_visual_name()),true)
 	if not object_binder.net_spawn(self, sobject) then
 		return false
 	end
@@ -151,7 +151,7 @@ function motivator_binder:net_spawn(sobject)
 		-- Expedite arrival and job assignment
 		if (sobject.m_smart_terrain_id ~= 65535) then
 			local smart = alife():object(sobject.m_smart_terrain_id)
-			alun_utils.debug_write(strformat("xr_movtivator: npc=%s smart=%s",self.object:name(),smart and smart:name()))
+			--alun_utils.debug_write(strformat("xr_movtivator: npc=%s smart=%s",self.object:name(),smart and smart:name()))
 			
 			if (smart and not smart.disabled) then
 				smart:force_assign_arrived_job(id)
@@ -160,7 +160,7 @@ function motivator_binder:net_spawn(sobject)
 						smart:select_npc_job(smart.npc_info[id],true)
 					end
 					if (smart.npc_info[id].job) then
-						alun_utils.debug_write(strformat("xr_movtivator: npc=%s job=%s",self.object:name(),smart.npc_info[id].job.section))
+						--alun_utils.debug_write(strformat("xr_movtivator: npc=%s job=%s",self.object:name(),smart.npc_info[id].job.section))
 						local smart_task = smart.npc_info[id].job.alife_task
 						force_set_position = smart_task and smart_task:position() or force_set_position or nil
 					end

@@ -1594,9 +1594,8 @@ function corpse_hud_show(hud)
 	local count = 0
 	if (corpses) then
 		local id
-		local obj
 		for id,v in pairs(corpses) do
-			obj = type(v) == "table" and v.id and level.object_by_id(v.id) or level.object_by_id(id)
+			local obj = type(v) == "table" and v.id and level.object_by_id(v.id) or level.object_by_id(id)
 			if (obj) then
 				if (xr_corpse_detection.has_valuable_loot and xr_corpse_detection.has_valuable_loot(obj)) then
 					hud:add_msg("",obj:name().."  HasLoot = "..tostring(xr_corpse_detection.has_valuable_loot(obj)))--  DeathTime = "..time_global()-obj:death_time())

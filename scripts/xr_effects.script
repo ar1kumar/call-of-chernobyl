@@ -134,7 +134,7 @@ function on_init_bounty_hunt(actor,npc,p)
 	
 	local valid_targets = {}
 	local sim = alife()
-	local se_obj,comm
+	local comm
 	local sfind = string.find
 	
 	local faction_lookup = {}
@@ -143,7 +143,7 @@ function on_init_bounty_hunt(actor,npc,p)
 	end 
 	
 	for i=1,65534 do 
-		se_obj = sim:object(i)
+		local se_obj = sim:object(i)
 		-- find random sim stalker
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and sfind(se_obj:section_name(),"sim_default") and get_object_story_id(i) == nil) and (se_obj.group_id == nil or se_obj.group_id == 65535 or get_object_story_id(se_obj.group_id) == nil) then
 			comm = alife_character_community(se_obj)
@@ -250,9 +250,9 @@ function setup_companion_task(actor,npc,p)
 	
 	squad:create_npc(smart)
 	squad:set_squad_relation()
-	local se_obj,as
+	local as
 	for k in squad:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 			as = se_obj:get_alife_storage(true)
@@ -1079,8 +1079,8 @@ function give_item(actor, npc, p)
 	else
 		npc_id = npc:id()
 	end
-	npc = alife():object(npc_id)
-	local pos, lv_id, gv_id, npc_id = npc.position, npc.m_level_vertex_id, npc.m_game_vertex_id, npc.id
+	local se_npc = alife():object(npc_id)
+	local pos, lv_id, gv_id, npc_id = se_npc.position, se_npc.m_level_vertex_id, se_npc.m_game_vertex_id, se_npc.id
 	alife():create(p[1], pos, lv_id, gv_id, npc_id)
 end
 
@@ -1523,9 +1523,8 @@ function turn_off_underpass_lamps(actor, npc)
 							["pas_b400_lamp_way_green"] = true,
 							["pas_b400_lamp_way_flash"] = true,
 						}
-	local obj
 	for k,v in pairs(lamps_table) do
-		obj = get_story_object(k)
+		local obj = get_story_object(k)
 
 		if obj then
 			obj:get_hanging_lamp():turn_off()
@@ -1538,9 +1537,8 @@ end
 
 ---Выключение динамической лампочки (hanging_lamp)
 function turn_off(actor, npc, p)
-	local obj
 	for k,v in pairs(p) do
-		obj = get_story_object(v)
+		local obj = get_story_object(v)
 
 		if not obj then
 			printf("TURN_OFF. Target object with story_id [%s] does not exist", v)
@@ -1557,9 +1555,8 @@ end
 
 ---Включение динамической лампочки (hanging_lamp)
 function turn_on(actor, npc, p)
-	local obj
 	for k,v in pairs(p) do
-		obj = get_story_object(v)
+		local obj = get_story_object(v)
 
 		if not obj then
 			printf("TURN_ON [%s]. Target object does not exist", npc:name())
@@ -3204,7 +3201,7 @@ function jup_b10_spawn_drunk_dead_items(actor, npc, p)
 end
 
 function pick_artefact_from_anomaly(actor, npc, p)
-	local npc
+	local se_obj
 	local az_name = p and p[2]
 	local af_name = p and p[3]
 	local af_id
@@ -3222,8 +3219,8 @@ function pick_artefact_from_anomaly(actor, npc, p)
 		if npc_id == nil then
 			printf("Couldn't relocate item to NULL in function 'pick_artefact_from_anomaly!'")
 		end
-		npc = alife():object(npc_id)
-		if npc and (not IsStalker(npc) or not npc:alive()) then
+		se_obj = alife():object(npc_id)
+		if se_obj and (not IsStalker(nil,se_obj:clsid()) or not se_obj:alive()) then
 			printf("Couldn't relocate item to NULL (dead or not stalker) in function 'pick_artefact_from_anomaly!'")
 		end
 	end
@@ -3259,7 +3256,7 @@ function pick_artefact_from_anomaly(actor, npc, p)
 	anomal_zone:on_artefact_take(af_obj)
 
 	alife():release(af_obj, true)
-	give_item(db.actor, npc, {af_name, p[1]})
+	give_item(db.actor, se_obj, {af_name, p[1]})
 --	alife():create(af_name,
 --		npc.position,
 --		npc.level_vertex_id,

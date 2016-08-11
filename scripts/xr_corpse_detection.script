@@ -270,12 +270,11 @@ function evaluator_corpse:find_valid_target()
 	local size = #self.a.memory
 	if (size == 0) then
 		local i = 0
-		local obj
 
 		self.a.cstackprevent = true
 
 		for o in npc:memory_visible_objects() do
-			obj = o and o:object()
+			local obj = o and o:object()
 			if (obj and (IsStalker(obj) or IsMonster(obj)) and obj:alive() ~= true) then
 				i = i + 1
 				table.insert(self.a.memory,obj:id())
