@@ -153,12 +153,9 @@ function motivator_binder:net_spawn(sobject)
 			local smart = alife():object(sobject.m_smart_terrain_id)
 			--alun_utils.debug_write(strformat("xr_movtivator: npc=%s smart=%s",self.object:name(),smart and smart:name()))
 			
-			if (smart and not smart.disabled) then
+			if (smart and not smart.disabled and not smart.need_init_npc) then
 				smart:force_assign_arrived_job(id)
 				if (smart.npc_info[id]) then
-					if not (smart.npc_info[id].job) then
-						smart:select_npc_job(smart.npc_info[id],true)
-					end
 					if (smart.npc_info[id].job) then
 						--alun_utils.debug_write(strformat("xr_movtivator: npc=%s job=%s",self.object:name(),smart.npc_info[id].job.section))
 						local smart_task = smart.npc_info[id].job.alife_task
@@ -325,10 +322,6 @@ function motivator_binder:death_callback(victim, who)
 
 	stalker_generic.remove_level_spot(victim, self.st)
 
-	if who:id() == db.actor:id() then
-		xr_statistic.inc_killed_stalkers_counter()
-	end
-	
 	if (IsStalker(who) and who:alive()) then
 		local count = xr_logic.pstor_retrieve(who,"s_kill_count") or 0
 		if (count >= 255) then 

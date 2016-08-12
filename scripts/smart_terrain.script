@@ -1147,11 +1147,9 @@ function se_smart_terrain:init_npc_after_load()
 		self.arriving_npc[id] = sim:object(id) or nil
 	end
 	
-	local sobj
-
 	-- validate and fill saved npc_info; find job by saved uid
 	for id, info in pairs(self.load_info) do
-		sobj = sim:object(id)
+		local sobj = sim:object(id)
 		local cls = sobj and sobj:clsid()
 		if (cls) and (IsStalker(nil,cls) or IsMonster(nil,cls) or IsHelicopter(nil,cls)) then
 			local new_info = self:fill_npc_info(sobj)

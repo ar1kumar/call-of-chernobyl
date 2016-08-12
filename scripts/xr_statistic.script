@@ -312,7 +312,10 @@ function inc_arena_battles_counter(mode)
 end
 
 function npc_on_death_callback(victim,who)
-	if (not who or not victim) then return end
+	if not (who and victim) then return end
+	if not (who:id() == 0) then return end -- killer is not actor
+	
+	inc_killed_stalkers_counter()
 	
 	local npc_faction = character_community(victim)
 	local actor_faction = character_community(who)
