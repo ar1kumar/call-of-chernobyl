@@ -145,6 +145,16 @@ function action.debug_test(p)
 	end 
 	if (p==1) then 
 	
+		if (db.actor) then 
+			local wpn = db.actor:active_item()
+			if (wpn and IsWeapon(wpn)) then 
+				local se_wpn = alife():object(wpn:id())
+				if (se_wpn) then 
+					alife():clone_weapon(se_wpn,se_wpn:section_name(),se_wpn.position,se_wpn.m_level_vertex_id,se_wpn.m_game_vertex_id,0)
+				end
+			end
+		end
+		
 		--xr_effects.disable_generator_zones()
 		-- RELEASES TASK GIVER FOR ALL TASKS WITH task_giver_id; useful for testing how a task works when giver is dead
 		--[[
@@ -178,25 +188,7 @@ function action.debug_test(p)
 		end
 		--]]
 	
-		-- test
-		--[[
-		local function spawn_in_front_quadrant(sec)
-			local base_point = db.actor:level_vertex_id()
-			local dist = math.random(15,25)
-			local dir = device().cam_dir
-			local spawn_lvid, ang, new_dir
-			while (spawn_lvid == nil or spawn_lvid >= 4294967295 or dist <= 1) do
-				ang = math.random(-50,50)
-				new_dir = vector_rotate_y(utils.vector_copy_by_val(dir),ang)
-				spawn_lvid = level.vertex_in_direction(base_point, new_dir, dist)
-				dist = dist - 2
-			end
-			if (spawn_lvid and spawn_lvid < 4294967295) then
-				alife():create(sec,level.vertex_position(spawn_lvid),spawn_lvid,db.actor:game_vertex_id())
-			end
-		end
-		
-		spawn_in_front_quadrant("wpn_pm")
+
 		--]]
 		
 	end

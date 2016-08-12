@@ -376,10 +376,6 @@ function animation:add_anim(anim, state)
 --		printf("%s no pos", npc:name())
 		npc:add_animation(anim, true, true)
 	else
-		if self.mgr.animation_direction == nil then
-			printf("Animation direction missing")
-		end
-
 		-- —юда передаетс€ дирекшн (единичный вектор. нужно его перевести в вектор ротейшнов по кост€м)
 		local rot_y = -math.deg(math.atan2(self.mgr.animation_direction.x, self.mgr.animation_direction.z))
 

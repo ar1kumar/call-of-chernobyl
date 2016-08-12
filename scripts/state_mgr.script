@@ -363,7 +363,6 @@ function state_manager:__init(npc)
 
 	self.animation_position = nil
 	self.animation_direction = nil
-	self.pos_direction_applied = false
 end
 function state_manager:set_state(state_name, callback, timeout, target, extra)
 	if (DEV_DEBUG and db.storage[self.npc:id()].debug_state) then 
@@ -404,27 +403,24 @@ function state_manager:set_state(state_name, callback, timeout, target, extra)
 		self.npc:special_danger_move(danger_move)
 	end
 
+	self.pos_direction_applied = nil
+	self.animation_position = nil
+	self.animation_direction = nil
+	self.fast_set = nil
+		
 	if (extra) then
 		self.fast_set = extra.fast_set
 
-		if (not self.pos_direction_applied) then
+		if not (self.pos_direction_applied) then
 			self.animation_position 	= extra.animation_position
 			self.animation_direction 	= extra.animation_direction
-			self.pos_direction_applied 	= false
 		elseif (self.animation_position and extra.animation_position and not utils.vector_cmp(self.animation_position, extra.animation_position)) then
 			self.animation_position 	= extra.animation_position
 			self.animation_direction 	= extra.animation_direction
-			self.pos_direction_applied 	= false
 		elseif (self.animation_direction and extra.animation_direction and not utils.vector_cmp(self.animation_direction, extra.animation_direction)) then
 			self.animation_position 	= extra.animation_position
 			self.animation_direction 	= extra.animation_direction
-			self.pos_direction_applied 	= false
 		end
-	else
-		self.animation_position = nil
-		self.animation_direction = nil
-		self.pos_direction_applied = false
-		self.fast_set = nil
 	end
 
 	if (callback) then
