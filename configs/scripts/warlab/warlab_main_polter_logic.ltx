@@ -43,9 +43,10 @@ combat_ignore_keep_when_attacked = false
 invulnerable = false
 on_info = %=polter_actor_ignore(false)%
 on_info2 = %=show_health(warlab_main_poltergeist_1:true)%
+on_info3 = {+warlab_poltergeist_dead} %=show_health(warlab_main_poltergeist_1:false)%
 
 [mob_death@1]
-on_info = %+warlab_poltergeist_dead =show_health(warlab_main_poltergeist_1:false)%
+on_info = %+warlab_poltergeist_dead =play_sound(warlab_entity_deaths_1)%
 
 
 [logic@warlab_tele_polter]
@@ -111,7 +112,7 @@ aggressive = true
 on_info = %=show_health(warlab_main_psysucker:true)%
 
 [mob_death@2]
-on_info = %+warlab_psysucker_dead =show_health(warlab_main_psysucker:false)%
+on_info = %+warlab_psysucker_dead =show_health(warlab_main_psysucker:false) =play_sound(warlab_entity_deaths_2)%
 
 
 [logic@warlab_psycontroller]
@@ -130,4 +131,4 @@ aggressive = true
 on_info = %=show_health(warlab_main_psycontroller:true)%
 
 [mob_death@3]
-on_info = %+warlab_main_polter_dead =show_health(warlab_main_psycontroller:false)%
+on_info = %+warlab_main_polter_dead =show_health(warlab_main_psycontroller:false) =play_sound(warlab_entity_deaths_3)%
