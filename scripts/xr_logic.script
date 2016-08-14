@@ -738,8 +738,9 @@ function parse_condlist(npc, section, field, src)
 
 	--printf("_bp: src = %s", src)
 
-	if not (src) then
-		printf("npc=%s section=%s field=%s src=%s",npc:name(),section,field,src)
+	if (src == nil or type(src) == "boolean") then
+		callstack()
+		printf("ERROR!! xr_logic.parse_condlist npc=%s section=%s field=%s src=%s",npc:name(),section,field,src)
 		return
 	end
 

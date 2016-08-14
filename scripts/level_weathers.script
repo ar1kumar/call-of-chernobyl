@@ -23,8 +23,6 @@ function atmosfear_init()
 	end
 	
 	if (not atmosfear_options.config:section_exist("atmosfear_current_parameters")) then
-		get_console():execute("cfg_load " .. getFS():update_path('$game_config$', '').."rspec_default.ltx")
-		
 		for level,v in pairs(valid_levels) do
 			atmosfear_options.config:w_value("atmosfear_current_parameters","opt_"..level.."_period_good",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))
 			atmosfear_options.config:w_value("atmosfear_current_parameters","opt_"..level.."_period_bad",random_choice("clear","clear_foggy","foggy","foggy_rainy","rainy","stormy"))

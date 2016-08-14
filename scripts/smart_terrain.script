@@ -656,12 +656,6 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 
 					npc_id = self.npc_by_job_section[itr_job.section]
 					
-					-- Found a job with npc_id but npc isn't on the job, remove it
-					if (npc_id == npc_info.se_obj.id and npc_info.job ~= itr_job) then
-						self.npc_by_job_section[itr_job.section] = nil
-						npc_id = nil
-					end
-					
 					-- Check empty job
 					--if (npc_id == nil or npc_id == npc_info.se_obj.id) then
 					if (npc_id == nil) then
@@ -1405,15 +1399,26 @@ function setup_gulag_and_logic_on_spawn(obj, st, se_obj, stype, loaded)
 	-- Expedite arrival and job assignment
 	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and sim:object(se_obj.m_smart_terrain_id)
 	if (smart) then
+		--[[
 		if (smart.arriving_npc[se_obj.id] and arrived_to_smart(se_obj,smart)) then 
 			smart.npc_info[se_obj.id] = smart:fill_npc_info(se_obj)
 			smart.arriving_npc[se_obj.id] = nil
+			npc_info.begin_job = true
+			empty_table(db.offline_objects[se_obj.id])
 			smart:select_npc_job(smart.npc_info[se_obj.id],true)
 		end 
+		--]]
 		local npc_info = smart.npc_info[se_obj.id]
-		if (npc_info) then
-			npc_info.begin_job = false
-			return
+		if (npc_info) then 
+			if not (npc_info.job) then
+				smart:select_npc_job(smart.npc_info[se_obj.id],true)
+				return
+			elseif (npc_info.job) then
+				npc_info.begin_job = true
+				empty_table(db.offline_objects[se_obj.id])
+				smart:setup_logic(obj)
+				return
+			end
 		end
 	end
 

@@ -12,6 +12,13 @@ add a on_game_start function
 
 -- axr_options.ini
 config = ini_file_ex("axr_options.ltx",true)
+
+-- load default rspec when axr_options created first time
+if not (config:section_exist("temp")) then
+	get_console():execute("cfg_load " .. getFS():update_path('$game_config$', '').."rspec_default.ltx")
+	config:w_value("temp","rspec_default","true")
+	config:save()
+end
 -------------------------------------------------------------------------------------------------
 
 -- Valid Callbacks (named intercepts to avoid namespace conflicts)

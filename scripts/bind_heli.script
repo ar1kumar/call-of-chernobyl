@@ -39,8 +39,8 @@ function heli_binder:reinit()
 
 	--printf( "heli_binder:reinit()" )
 
-	db.storage[self.object:id()] = {}
-	self.st = db.storage[self.object:id()]
+	self.st = {}
+	db.storage[self.object:id()] = self.st
 
 	self.st.heliObject = self.object:get_helicopter()
 
@@ -213,7 +213,9 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 		else 
 			db.storage[enemy_id].heli_enemy_flag = true
 		end
-		db.storage[self.object:id()].hitted_by = enemy_id
+		if (db.storage[self.object:id()]) then
+			db.storage[self.object:id()].hitted_by = enemy_id
+		end
 	end
 	
 	-- пилоты ругаются по рации
