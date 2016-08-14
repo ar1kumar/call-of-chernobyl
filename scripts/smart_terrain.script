@@ -656,6 +656,12 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 
 					npc_id = self.npc_by_job_section[itr_job.section]
 					
+					-- Found a job with npc_id but npc isn't on the job, remove it
+					if (npc_id == npc_info.se_obj.id and npc_info.job ~= itr_job) then
+						self.npc_by_job_section[itr_job.section] = nil
+						npc_id = nil
+					end
+					
 					-- Check empty job
 					--if (npc_id == nil or npc_id == npc_info.se_obj.id) then
 					if (npc_id == nil) then
@@ -668,15 +674,6 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 									npc_info.current_index = 1
 								end
 							end
-						--[[
-						else
-							-- Found a job with npc_id but npc isn't on the job, remove it
-							if (npc_id == npc_info.se_obj.id and npc_info.job ~= itr_job) then
-								self.npc_by_job_section[itr_job.section] = nil
-							end
-							-- Rest of jobs in table will be lower priority, so reset index
-							npc_info.current_index = 1
-						--]]
 						end
 					end
 				end
