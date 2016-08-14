@@ -313,7 +313,7 @@ end
 
 function npc_on_death_callback(victim,who)
 	if not (who and victim) then return end
-	if not (who:id() == 0) then return end -- killer is not actor
+	if not (who:id() == db.actor:id()) then return end
 	
 	inc_killed_stalkers_counter()
 	
