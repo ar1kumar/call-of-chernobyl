@@ -276,8 +276,8 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.lookout_min_time		= ini:r_float_ex(section,"lookout_min_time") or 6
 	st.lookout_max_time		= ini:r_float_ex(section,"lookout_max_time") or 10
 	st.exit_body_state		= ini:r_string_ex(section,"exit_body_state") or "stand"
-	st.use_precalc_cover 	= ini:r_bool_ex(section,"use_precalc_cover") or false
-	st.use_in_combat	 	= ini:r_bool_ex(section,"use_in_combat") or false
+	st.use_precalc_cover 	= ini:r_bool_ex(section,"use_precalc_cover",false)
+	st.use_in_combat	 	= ini:r_bool_ex(section,"use_in_combat",false)
 	st.weapon_type	 		= ini:r_string_ex(section,"weapon_type")
 	st.moving  				= ini:r_string_ex(section,"def_state_moving") or "sneak"
 	st.sound_idle			= ini:r_string_ex(section,"sound_idle")

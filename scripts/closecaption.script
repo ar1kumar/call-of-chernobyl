@@ -786,9 +786,9 @@ function read_cc_ini()
 	cc_npc = load_variable("cc_npc", 0)
 	if cc_npc == 0 then
 		local ini = ini_file("misc\\closecaption.ltx")
-		cc_npc = ini:r_bool_ex(cc, "cc_ingame_npc") or false
-		cc_vrb = ini:r_bool_ex(cc, "cc_ingame_vrb") or false
-		cc_icc = ini:r_bool_ex(cc, "cc_ingame_cc") or false
+		cc_npc = ini:r_bool_ex(cc, "cc_ingame_npc",false)
+		cc_vrb = ini:r_bool_ex(cc, "cc_ingame_vrb",false)
+		cc_icc = ini:r_bool_ex(cc, "cc_ingame_cc",false)
 
 		db.cc_npc = cc_npc
 		db.cc_vrb = cc_vrb

@@ -167,7 +167,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)		
 	st.path_main = utils.prefix_r_string(ini,section,"path_main",gulag_name)
-	st.wakeable	 = ini:r_bool_ex(section,"wakeable") or false 
+	st.wakeable	 = ini:r_bool_ex(section,"wakeable",false) 
 
 	st.path_walk = nil -- Будут инициализированы в reset(), сейчас пути могут быть еще не загружены.
 	st.path_walk_info = nil

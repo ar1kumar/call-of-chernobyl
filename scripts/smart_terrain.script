@@ -186,8 +186,8 @@ function se_smart_terrain:read_params()
 	self.faction_controlled 	= ini:r_string_ex("smart_terrain","faction_controlled")
 	self.max_population 		= tonumber(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, xr_logic.parse_condlist(nil, "smart_terrain", "max_population", ini:r_string_ex("smart_terrain","max_population") or ""))) or 0
 	self.respawn_idle 			= ini:r_float_ex("smart_terrain","respawn_idle") or 43200
-	self.respawn_only_level 	= ini:r_bool_ex("smart_terrain","respawn_only_level") or false
-	self.respawn_only_smart 	= ini:r_bool_ex("smart_terrain","respawn_only_smart") or false
+	self.respawn_only_level 	= ini:r_bool_ex("smart_terrain","respawn_only_level",false)
+	self.respawn_only_smart 	= ini:r_bool_ex("smart_terrain","respawn_only_smart",false)
 	self.respawn_point 			= false
 	self.respawn_radius  		= ini:r_float_ex("smart_terrain","respawn_radius") or 40000
 	self.safe_restr				= ini:r_string_ex("smart_terrain","safe_restr")	-- npc with jobs inside are invulnerable

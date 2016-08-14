@@ -179,7 +179,7 @@ function set_scheme(npc, ini, scheme, section)--, gulag_name)
 	st.logic        = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
 	st.anim_global 				= ini:r_string_ex(section,"anim_global")
-	st.can_talk                 = ini:r_bool_ex(section, "can_talk") or true
+	st.can_talk                 = ini:r_bool_ex(section,"can_talk",true)
 	st.tip_text                 = ini:r_string_ex(section,"tip_text") or "character_use"
 	if st.tip_text == nil then
 		st.tip_text = ""

@@ -11,8 +11,8 @@ local alife, level = alife, level
 --------------------
 
 local ini = ini_file("ai_tweaks\\xr_help_wounded.ltx")
-local HelpInCombat = ini:r_bool_ex("settings","help_in_combat") or true
-local UseNewAnim = ini:r_bool_ex("settings","use_new_anim") or true
+local HelpInCombat = ini:r_bool_ex("settings","help_in_combat",true)
+local UseNewAnim = ini:r_bool_ex("settings","use_new_anim",true)
 local AnimCombat = ini:r_float_ex("settings","anim_combat_type") or 2
 local AnimFree = ini:r_float_ex("settings","anim_free_type") or 1
 local AlwaysHelpDistance = ini:r_float_ex("settings","always_help_distance") or 900

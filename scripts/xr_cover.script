@@ -171,7 +171,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 		printf("There is no path_center or smart in xr_cover.")
 	end
 
-	st.use_attack_direction = ini:r_bool_ex(section,"use_attack_direction") or true
+	st.use_attack_direction = ini:r_bool_ex(section,"use_attack_direction",true)
 
 	st.radius_min = ini:r_float_ex(section,"radius_min") or 3
 	st.radius_max = ini:r_float_ex(section,"radius_max") or 7

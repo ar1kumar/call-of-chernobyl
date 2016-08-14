@@ -20,13 +20,13 @@ function npc_sound:__init(snd_ini, section)
 	--alun_utils.debug_write("npc_sound:__init %s",section)
 	self.class_id = "npc_sound"
 		--' Параметры вычитывания звука
-	self.prefix = snd_ini:r_bool_ex(section,"npc_prefix") or false
+	self.prefix = snd_ini:r_bool_ex(section,"npc_prefix",false)
 	self.path = snd_ini:r_string_ex(section,"path") or ""
 	self.shuffle = snd_ini:r_string_ex(section,"shuffle") or "rand"
-	self.group_snd = snd_ini:r_bool_ex(section,"group_snd") or false
-	self.play_always = snd_ini:r_bool_ex(section,"play_always") or false
-	self.is_combat_sound = snd_ini:r_bool_ex(section,"is_combat_sound") or false
-	self.dont_save = snd_ini:r_bool_ex(section,"dont_save") or false
+	self.group_snd = snd_ini:r_bool_ex(section,"group_snd",false)
+	self.play_always = snd_ini:r_bool_ex(section,"play_always",false)
+	self.is_combat_sound = snd_ini:r_bool_ex(section,"is_combat_sound",false)
+	self.dont_save = snd_ini:r_bool_ex(section,"dont_save",false)
 	self.story_ids = snd_ini:line_exist(section,"story_ids") and alun_utils.parse_list(snd_ini,section,"story_ids",true) or nil
 	self.section = section
 	--' Хранит параметры звука для каждого NPC
@@ -412,11 +412,11 @@ class "actor_sound"
 function actor_sound:__init(snd_ini, section)
 	self.class_id = "actor_sound"
 		--' Параметры вычитывания звука
-	self.stereo = snd_ini:r_bool_ex(section,"actor_stereo") or false
-	self.prefix = snd_ini:r_bool_ex(section,"npc_prefix") or false
+	self.stereo = snd_ini:r_bool_ex(section,"actor_stereo",false)
+	self.prefix = snd_ini:r_bool_ex(section,"npc_prefix",false)
 	self.path = snd_ini:r_string_ex(section,"path") or ""
 	self.shuffle = snd_ini:r_string_ex(section,"shuffle") or "rnd"
-	self.play_always = snd_ini:r_bool_ex(section,"play_always") or false
+	self.play_always = snd_ini:r_bool_ex(section,"play_always",false)
 	self.section = section
 	self.played_id = nil
 	if self.prefix then

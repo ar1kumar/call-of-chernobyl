@@ -72,9 +72,9 @@ function heli_combat:__init( object, heliObject )
 
 	self.section_changed       = false
 	
-	self.combat_use_rocket = ltx:r_bool_ex(section,"combat_use_rocket") or false
-	self.combat_use_mgun   = ltx:r_bool_ex(section,"combat_use_mgun") or true
-	self.actor_always_enemy= ltx:r_bool_ex(section,"actor_always_enemy") or false
+	self.combat_use_rocket = ltx:r_bool_ex(section,"combat_use_rocket",false)
+	self.combat_use_mgun   = ltx:r_bool_ex(section,"combat_use_mgun",true)
+	self.actor_always_enemy= ltx:r_bool_ex(section,"actor_always_enemy",false)
 	
 	self.max_velocity      = self.default_velocity
 	self.safe_altitude     = self.default_safe_altitude + self.level_max_y
@@ -239,9 +239,9 @@ end
 
 function heli_combat:read_custom_data( ini, section )
 	local sys_ini = system_ini()
-	self.combat_use_rocket = utils.cfg_get_bool  ( ini, section, "combat_use_rocket", self.object, false) or utils.cfg_get_bool( sys_ini, self.object:section(), "combat_use_rocket", self.object, false) or false
-	self.combat_use_mgun   = utils.cfg_get_bool  ( ini, section, "combat_use_mgun",   self.object, false) or utils.cfg_get_bool( sys_ini, self.object:section(), "combat_use_mgun", self.object, false) or false
-	self.actor_always_enemy   = utils.cfg_get_bool  ( ini, section, "actor_always_enemy",   self.object, false) or utils.cfg_get_bool( sys_ini, self.object:section(), "actor_always_enemy", self.object, false) or false
+	self.combat_use_rocket = ini:r_bool_ex(section,"combat_use_rocket") or sys_ini:r_bool_ex(section,"combat_use_rocket",false) 
+	self.combat_use_mgun   = ini:r_bool_ex(section,"combat_use_mgun") or sys_ini:r_bool_ex(section,"combat_use_mgun",false)
+	self.actor_always_enemy   = ini:r_bool_ex(section,"actor_always_enemy") or sys_ini:r_bool_ex(section,"actor_always_enemy",false)
 	
 	--	self.combat_ignore     = utils.cfg_get_bool  ( ini, section, "combat_ignore",     self.object, false, false )
 
@@ -252,12 +252,11 @@ function heli_combat:read_custom_data( ini, section )
 		self.combat_ignore = nil
 	end
 
-	local combat_enemy     = ini:r_string_ex(section,"combat_enemy")
+	local combat_enemy = ini:r_string_ex(section,"combat_enemy")
 	self:set_enemy_from_custom_data( combat_enemy )
 
-	self.max_velocity      = utils.cfg_get_number( ini, section, "combat_velocity",      self.object, false, self.default_velocity )
-	self.safe_altitude     = utils.cfg_get_number( ini, section, "combat_safe_altitude", self.object, false,
-	                                               self.default_safe_altitude ) + self.level_max_y
+	self.max_velocity      = ini:r_float_ex(section,"combat_velocity") or self.default_velocity
+	self.safe_altitude     = (ini:r_float_ex(section,"combat_safe_altitude") or self.default_safe_altitude) + self.level_max_y
 
 	self.section_changed   = true
 end

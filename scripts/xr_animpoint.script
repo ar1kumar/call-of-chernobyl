@@ -470,7 +470,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic	  		= xr_logic.cfg_get_switch_conditions(ini, section, npc)
 	st.cover_name		= ini:r_string_ex(section,"cover_name") or "$script_id$_cover"
-	st.use_camp 		= ini:r_bool_ex(section,"use_camp") or true
+	st.use_camp 		= ini:r_bool_ex(section,"use_camp",true)
 	st.reach_distance	= ini:r_float_ex(section,"reach_distance") or 0.8
 	st.reach_movement = xr_logic.parse_condlist(db.actor, "animpoint", "reach_movement", ini:r_string_ex(section,"reach_movement") or "walk")
 	st.reach_distance = st.reach_distance*st.reach_distance

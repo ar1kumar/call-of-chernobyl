@@ -204,7 +204,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.team      = utils.prefix_r_string(ini,section,"team",gulag_name)
 	st.sound_idle= ini:r_string_ex(section,"sound_idle")
-	st.use_camp  = ini:r_bool_ex(section,"use_camp") or false
+	st.use_camp  = ini:r_bool_ex(section,"use_camp",false)
 
 	st.suggested_state = {}
 	st.suggested_state.standing = ini:r_string_ex(section,"def_state_standing")

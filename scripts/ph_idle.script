@@ -68,7 +68,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
 	st.hit_on_bone = utils.parse_data_1v(npc, ini:r_string_ex(section,"hit_on_bone"))
-	st.nonscript_usable = ini:r_bool_ex(section,"nonscript_usable") or false
+	st.nonscript_usable = ini:r_bool_ex(section,"nonscript_usable",false)
 	st.on_use    = xr_logic.cfg_get_condlist(ini, section, "on_use", npc)
 	
 	st.tips  = ini:r_string_ex(section,"tips") or ""

@@ -541,7 +541,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	end
 
 	st.formation 	= ini:r_string_ex(section,"formation")
-	st.silent		= ini:r_bool_ex(section,"silent") or false
+	st.silent		= ini:r_bool_ex(section,"silent",false)
 	if st.formation == nil then
 		 st.formation = "back"
 	end
@@ -558,7 +558,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.path_walk_info = nil --'Будут инициализированы в reset(), сейчас пути могут быть еще
 	st.path_look_info = nil --'не загружены.
 
-	st.commander = ini:r_bool_ex(section,"commander") or false
+	st.commander = ini:r_bool_ex(section,"commander",false)
 
 	st.patrol_key = st.path_name
 

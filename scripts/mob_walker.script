@@ -282,7 +282,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.logic     		= xr_logic.cfg_get_switch_conditions(ini, section, npc)
 	st.state           	= mob_state_mgr.get_state(ini, section, npc)
-	st.no_reset        	= ini:r_bool_ex(section,"no_reset") or false
+	st.no_reset        	= ini:r_bool_ex(section,"no_reset",false)
 	st.path_walk       	= utils.prefix_r_string(ini,section,"path_walk",gulag_name)
 	st.path_look       	= utils.prefix_r_string(ini,section,"path_look",gulag_name)
 

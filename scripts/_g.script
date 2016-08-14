@@ -1445,7 +1445,9 @@ function ini_file.r_string_ex(ini,s,k)
 		return res
 	end
 end
-function ini_file.r_bool_ex(ini,s,k)
+
+-- only one that can return a default value because def needs returned only on nil, not on false
+function ini_file.r_bool_ex(ini,s,k,def)
 	if not (ini_cache[ini]) then 
 		ini_cache[ini] = {}
 	end 
@@ -1458,11 +1460,15 @@ function ini_file.r_bool_ex(ini,s,k)
 	if (ini_cache[ini][key]) then 
 		--printf("res=%s",ini_cache[ini][key])
 		return ini_cache[ini][key]
-	else 
-		local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_bool(s,k) or nil
-		if (res == nil) then 
-			return 
+	else
+		if not (ini:section_exist(s) and ini:line_exist(s,k)) then 
+			return def
 		end
+		local v = ini:r_string(s,k)
+		if (v == nil) then
+			return def 
+		end
+		local res = v == "true"
 		ini_cache[ini][key] = res 
 		return res
 	end
@@ -1519,7 +1525,7 @@ function ini_file_ex:__init(fname,advanced_mode)
 	if (advanced_mode) then 
 		self.ini:set_override_names(true)
 		self.ini:set_readonly(false)
-		self.ini:save_at_end(true)
+		--self.ini:save_at_end(true)
 	end
 end
 
@@ -1527,13 +1533,17 @@ function ini_file_ex:save()
 	self.ini:save_as(self.fname)
 end
 
-function ini_file_ex:r_value(section,key,typ,def)
-	if (typ == 1) then
-		return self:r_string_ex(section,key) == "true" or def
-	elseif (typ == 2) then
-		return tonumber(self:r_string_ex(section,key)) or def
+function ini_file_ex:r_value(s,k,typ,def)
+	if not (self.ini:section_exist(s) and self.ini:line_exist(s,k)) then 
+		return def 
 	end
-	return self:r_string_ex(section,key) or def
+	if (typ == 1) then
+		local v = self.ini:r_string(s,k)
+		return v == nil and def or v == "true"
+	elseif (typ == 2) then
+		return tonumber(self.ini:r_string(s,k)) or nil
+	end
+	return self.ini:r_string(s,k) or def
 end
 
 function ini_file_ex:w_value(section,key,val,comment)
@@ -1583,8 +1593,12 @@ function ini_file_ex:r_string_ex(s,k)
 	return self.ini:section_exist(s) and self.ini:line_exist(s,k) and self.ini:r_string(s,k) or nil
 end
 
-function ini_file_ex:r_bool_ex(s,k)
-	return self.ini:section_exist(s) and self.ini:line_exist(s,k) and self.ini:r_string(s,k) == "true" or self.ini:r_string(s,k) == "false" and false or nil
+function ini_file_ex:r_bool_ex(s,k,def)
+	if not(self.ini:section_exist(s) and self.ini:line_exist(s,k)) then 
+		return def
+	end
+	local v = self.ini:r_string(s,k)
+	return v == nil and def or v == "true"
 end 
 
 function ini_file_ex:r_float_ex(s,k)

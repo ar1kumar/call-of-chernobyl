@@ -174,7 +174,7 @@ function set_scheme (obj, ini, scheme, section, gulag_name)
     st.name         = ini:r_string_ex(section,"name")
     st.path         = ini:r_string_ex(section,"path")
     st.mode         = ini:r_float_ex(section,"mode")
-    st.looped       = ini:r_bool_ex(section,"looped") or false
+    st.looped       = ini:r_bool_ex(section,"looped",false)
     if st.path == nil or st.path == "" then
        abort ("SR_PARTICLE : invalid path name")
     end

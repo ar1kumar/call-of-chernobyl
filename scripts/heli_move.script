@@ -400,7 +400,7 @@ function set_scheme( npc, ini, scheme, section, gulag_name)
 	a.logic = xr_logic.cfg_get_switch_conditions( ini, section, npc )
 
 	local st = db.storage[npc:id()]
-	a.retreat_mode = ini:r_bool_ex(section,"retreat_mode")
+	a.retreat_mode = ini:r_bool_ex(section,"retreat_mode",false)
 	
 	if not (retreat_mode) then
 		a.path_move  = utils.prefix_r_string(ini,section,"path_move",gulag_name)
@@ -418,17 +418,17 @@ function set_scheme( npc, ini, scheme, section, gulag_name)
     a.max_rocket_dist   = ini:r_float_ex(section,"max_rocket_attack_dist") or 0
     a.min_mgun_dist     = ini:r_float_ex(section,"min_mgun_attack_dist") or 0
     a.min_rocket_dist   = ini:r_float_ex(section,"min_rocket_attack_dist") or 0
-	a.use_rocket        = ini:r_bool_ex(section, "use_rocket") or st.combat and st.combat.combat_use_rocket
-	a.use_mgun          = ini:r_bool_ex(section, "use_mgun") or st.combat and st.combat.combat_use_mgun
-	a.engine_sound      = ini:r_bool_ex(section, "engine_sound") or true
+	a.use_rocket        = ini:r_bool_ex(section, "use_rocket",st.combat and st.combat.combat_use_rocket or false)  
+	a.use_mgun          = ini:r_bool_ex(section, "use_mgun",st.combat and st.combat.combat_use_mgun or false)
+	a.engine_sound      = ini:r_bool_ex(section, "engine_sound",false)
 	a.upd_vis           = ini:r_float_ex(section,"upd_vis") or 10
-	a.stop_fire         = ini:r_bool_ex(section, "stop_fire") or false
-	a.show_health       = ini:r_bool_ex(section, "show_health") or false
-    a.fire_trail        = ini:r_bool_ex(section, "fire_trail") or false
+	a.stop_fire         = ini:r_bool_ex(section, "stop_fire",false)
+	a.show_health       = ini:r_bool_ex(section, "show_health",false)
+    a.fire_trail        = ini:r_bool_ex(section, "fire_trail",false)
 	
-	st.invulnerable = ini:r_bool_ex(section, "invulnerable") or false
-    st.immortal     = ini:r_bool_ex(section, "immortal") or false
-    st.mute         = ini:r_bool_ex(section, "mute") or false
+	st.invulnerable = ini:r_bool_ex(section, "invulnerable",false)
+    st.immortal     = ini:r_bool_ex(section, "immortal",false)
+    st.mute         = ini:r_bool_ex(section, "mute",false)
 	
 	a.path_end = xr_logic.parse_condlist(npc, section, "path_end", ini:r_string_ex(section,"path_end") or "nil")
 	

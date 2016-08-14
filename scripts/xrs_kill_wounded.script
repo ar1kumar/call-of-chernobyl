@@ -10,7 +10,7 @@ actid = 188112
 ----------------------------------------------------------------------------------------------------------------------
 hostage_list = {}
 local ini = ini_file("ai_tweaks\\xrs_kill_wounded.ltx")
-local Enable = ini:r_bool_ex("settings","enable") or false
+local Enable = ini:r_bool_ex("settings","enable",false)
 local ActorKillWoundedChance = Enable and ini:r_float_ex("settings","actor_cause_surrender_chance") or 0.25
 local ActorKillWoundedMaxDist = Enable and ini:r_float_ex("settings","actor_cause_surrender_max_dist") or 7
 local MinDistanceRunState = Enable and ini:r_float_ex("settings","state_run_min_distance") or 8

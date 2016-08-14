@@ -23,29 +23,21 @@ end
 ----------------------------------------------------------------------------------------------------
 function mob_jump:reset_scheme()
     printf("Jump: reset_scheme: %s", self.object:name())
-	xr_logic.mob_capture		(self.object, true)
+	xr_logic.mob_capture(self.object, true)
 
 	-- reset signals
-	self.st.signals				= {}
+	self.st.signals	= {}
 	
 	-- initialize jump point
-	self.jump_path				= nil
-	if self.st.jump_path_name then
-		self.jump_path = patrol(self.st.jump_path_name)
-	else 
-		self.st.jump_path_name = "[not defined]"
-	end
+	self.jump_path = self.st.jump_path_name and patrol(self.st.jump_path_name)
 
 	if not self.jump_path then
-		abort("object '%s': unable to find jump_path '%s' on the map",
-				self.object:name(), self.st.jump_path_name)
+		abort("object '%s': unable to find jump_path '%s' on the map",self.object:name(), self.st.jump_path_name)
 	end
 
-	
 	self.point = vector().add(self.jump_path:point(0), self.st.offset)
 
 	self.state_current  = STATE_START_LOOK
-	
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -104,12 +96,20 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	storage.logic			= xr_logic.cfg_get_switch_conditions(ini, section, npc)
 	
 	storage.jump_path_name	= utils.prefix_r_string(ini,section,"path_jump",gulag_name)
+	
+	if not level.patrol_path_exists(storage.jump_path_name) then
+		storage.jump_path_name = ini:r_string_ex(section,"path_jump")
+		if not (level.patrol_path_exists(storage.jump_path_name)) then
+			printf("Error: mob_jump: patrol path %s does not exist",storage.jump_path_name)
+		end
+	end 
+		
 	storage.ph_jump_factor	= ini:r_string_ex(section,"ph_jump_factor") or 1.8
 	
 	local offset_str		= ini:r_string_ex(section,"offset")
 	if (offset_str) then
 		local elems	= parse_names(offset_str)
-		vector():set(tonumber(elems[1]) or 0, tonumber(elems[2]) or 0, tonumber(elems[3]) or 0)
+		storage.offset = vector():set(tonumber(elems[1]) or 0, tonumber(elems[2]) or 0, tonumber(elems[3]) or 0)
 	else 
 		storage.offset = vector():set(0,0,0)
 	end

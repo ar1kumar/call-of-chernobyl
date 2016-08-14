@@ -1209,12 +1209,12 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	if st.usable == nil then
 	    st.path_walk        = utils.prefix_r_string(ini,section,"path_walk",gulag_name)
 	    st.path_fire        = utils.prefix_r_string(ini,section,"path_fire",gulag_name)
-	    st.auto_fire        = ini:r_bool_ex(section,"auto_fire") or false
+	    st.auto_fire        = ini:r_bool_ex(section,"auto_fire",false)
 	    st.fire_time        = ini:r_float_ex(section,"fire_time") or def_min_fire_time
 	    st.fire_rep         = ini:r_string_ex(section,"fire_repeat")
 	    st.fire_range       = ini:r_float_ex(section,"fire_range") or def_fire_range
 	    st.fire_target      = ini:r_string_ex(section,"target") or "points"
-	    st.fire_track_target= ini:r_bool_ex(section,"track_target") or false
+	    st.fire_track_target= ini:r_bool_ex(section,"track_target",false)
 
 	    st.on_target_vis    = xr_logic.cfg_get_string_and_condlist(ini, section, "on_target_vis", npc)
 	    st.on_target_nvis   = xr_logic.cfg_get_string_and_condlist(ini, section, "on_target_nvis", npc)
@@ -1222,12 +1222,12 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	    st.path_walk_info   = nil -- Будут инициализированы в reset(), сейчас пути могут быть еще не загружены.
 	    st.path_fire_info   = nil
 	else
-	    st.show_tips    = ini:r_bool_ex(section,"show_tips") or true
+	    st.show_tips    = ini:r_bool_ex(section,"show_tips",true)
 	    st.tip_use      = ini:r_string_ex(section,"tip_use") or "tip_car_use"
 	    st.tip_locked   = ini:r_string_ex(section,"tip_locked") or "tip_car_locked"
 	end
 
-	st.invulnerable     = ini:r_bool_ex(section,"invulnerable") or false
+	st.invulnerable     = ini:r_bool_ex(section,"invulnerable",false)
 	st.headlights       = ini:r_string_ex(section,"headlights") or "off"
 	st.on_death_info    = ini:r_string_ex(section,"on_death_info")
 end

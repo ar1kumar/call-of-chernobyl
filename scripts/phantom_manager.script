@@ -50,7 +50,7 @@ local function monster_on_update(npc,st)
 		return 
 	end
 	
-	local can_spawn = sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state == 1 or system_ini():r_bool_ex(npc:section(),"can_spawn_phantom")
+	local can_spawn = sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state == 1 or system_ini():r_bool_ex(npc:section(),"can_spawn_phantom",false)
 	if not (can_spawn) then 
 		return
 	end 

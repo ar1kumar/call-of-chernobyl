@@ -51,7 +51,7 @@ function CGeneralTask:__init(id)
 
 	self.icon			= task_ini:r_string_ex(id,"icon") or "ui_pda2_mtask_overlay"
 	self.prior			= task_ini:r_float_ex(id,"prior") or 0
-	self.storyline		= task_ini:r_bool_ex(id,"storyline") or false
+	self.storyline		= task_ini:r_bool_ex(id,"storyline",false)
 
 	self.repeat_timeout	= task_ini:r_float_ex(id,"repeat_timeout")
 	self.timeout = nil
@@ -107,7 +107,7 @@ function CGeneralTask:__init(id)
 	end 
 	
 	self.current_target = self.target_functor and task_functor[self.target_functor](self.id, "target", self.target,self)
-	self.dont_send_update_news = task_ini:r_bool_ex(id,"dont_send_update_news") or false
+	self.dont_send_update_news = task_ini:r_bool_ex(id,"dont_send_update_news",false)
 end
 
 function CGeneralTask:get_title()

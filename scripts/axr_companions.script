@@ -127,7 +127,7 @@ end
 
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\axr_companions.ltx")
-	Enabled = ini:r_bool_ex("main","enable") or false
+	Enabled = ini:r_bool_ex("main","enable",false)
 	if not (Enabled) then return end
 	RegisterScriptCallback("npc_on_fighting_actor",on_fighting_actor)
 	RegisterScriptCallback("squad_on_update",squad_on_update)
@@ -137,8 +137,8 @@ function on_game_start()
 	RegisterScriptCallback("on_level_changing",on_level_changing)
 	RegisterScriptCallback("on_game_load",on_game_load)
 
-	allow_only_friends_as_companions = ini:r_bool_ex("main","allow_only_friends_as_companions") or false
-	allow_simulation_squads_as_companions = ini:r_bool_ex("main","allow_simulation_squads_as_companions") or false
+	allow_only_friends_as_companions = ini:r_bool_ex("main","allow_only_friends_as_companions",false)
+	allow_simulation_squads_as_companions = ini:r_bool_ex("main","allow_simulation_squads_as_companions",false)
 	max_actor_squad_size = ini:r_float_ex("main","max_actor_squad_size") or 2
 end
 

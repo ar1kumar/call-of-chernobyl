@@ -489,10 +489,10 @@ function init_wounded(npc, ini, section, st, scheme)
 		st.syndata		= utils.parse_syn_data(npc, ini:r_string_ex(section,"syndata") or def.syndata)
 		st.help_dialog	= ini:r_string_ex(section,"help_dialog") or def.help_dialog
 		st.help_start_dialog = ini:r_string_ex(section,"help_start_dialog")
-		st.use_medkit   = ini:r_bool_ex(section,"use_medkit") or def.use_medkit
-		st.autoheal		= ini:r_bool_ex(section,"autoheal") or true
-		st.enable_talk	= ini:r_bool_ex(section,"enable_talk") or true
-		st.not_for_help	= ini:r_bool_ex(section,"not_for_help") or def.not_for_help
+		st.use_medkit   = ini:r_bool_ex(section,"use_medkit",def.use_medkit)
+		st.autoheal		= ini:r_bool_ex(section,"autoheal",true)
+		st.enable_talk	= ini:r_bool_ex(section,"enable_talk",true)
+		st.not_for_help	= ini:r_bool_ex(section,"not_for_help",def.not_for_help)
 	end
 
 	-- флажок, что функция хотя бы раз вызывалась

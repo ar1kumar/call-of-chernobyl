@@ -481,8 +481,8 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.mute_sound_threshold   = ini:r_float_ex(section,"mute_sound_threshold") or 0
 
-	st.no_static 	= ini:r_bool_ex(section,"no_static") or false
-	st.no_mumble 	= ini:r_bool_ex(section,"no_mumble") or false
+	st.no_static 	= ini:r_bool_ex(section,"no_static",false)
+	st.no_mumble 	= ini:r_bool_ex(section,"no_mumble",false)
 	st.hit_type	 	= ini:r_string_ex(section,"hit_type") or "wound"
 	st.hit_freq 	= ini:r_float_ex(section,"hit_freq") or 5000
 end

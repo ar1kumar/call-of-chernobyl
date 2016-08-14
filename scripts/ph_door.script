@@ -324,21 +324,21 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 		["dynamics\\door\\shop_fridge_2_door"] = true
 	}
 	
-	st.closed    			= ini:r_bool_ex(section,"closed") or false
+	st.closed    			= ini:r_bool_ex(section,"closed",false)
 	st.hit_on_bone 			= utils.parse_data_1v(npc, ini:r_string_ex(section,"hit_on_bone") or "")
-	st.locked    			= ini:r_bool_ex(section,"locked") or false
-	st.no_force  			= ini:r_bool_ex(section,"no_force") or false
+	st.locked    			= ini:r_bool_ex(section,"locked",false)
+	st.no_force  			= ini:r_bool_ex(section,"no_force",false)
 	st.not_for_npc  		= ini:r_bool_ex(section,"not_for_npc") or not_for_npcs[npc:get_visual_name()] or false
 	st.on_use    			= xr_logic.cfg_get_condlist(ini, section, "on_use", npc)
-	st.show_tips 			= ini:r_bool_ex(section,"show_tips") or true
-	st.slider 				= ini:r_bool_ex(section,"slider") or false
+	st.show_tips 			= ini:r_bool_ex(section,"show_tips",true)
+	st.slider 				= ini:r_bool_ex(section,"slider",false)
 	st.snd_close_start 		= ini:r_string_ex(section,"snd_close_start") or "trader_door_close_start"
 	st.snd_close_stop  		= ini:r_string_ex(section,"snd_close_stop") or "trader_door_close_stop"
 	st.snd_open_start  		= ini:r_string_ex(section,"snd_open_start") or "trader_door_open_start"
 	st.tip_close 			= ini:r_string_ex(section,"tip_close") or "tip_door_close"
 	st.tip_open  			= ini:r_string_ex(section,"tip_open") or "tip_door_open"		
 	st.tip_unlock  			= ini:r_string_ex(section,"tip_open") or "tip_door_locked"
-	st.unlock_for_npc   	= ini:r_bool_ex(section,"unlock_for_npc") or false	
+	st.unlock_for_npc   	= ini:r_bool_ex(section,"unlock_for_npc",false)	
 	
 	if (st.unlock_for_npc and npc:is_door_locked_for_npc()) then 
  		npc:unlock_door_for_npc()

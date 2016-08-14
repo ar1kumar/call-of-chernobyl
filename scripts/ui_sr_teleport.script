@@ -27,7 +27,7 @@ function msg_box_ui:__init(obj,disable_msg,item) super()
 	enable = enable and xr_logic.pick_section_from_condlist(db.actor,obj,xr_logic.parse_condlist(obj,"enable",self.name,enable))
 
 	if (enable ~= "true") then
-		local reject_on_disable = ini:r_bool_ex(self.name,"reject_on_disabled") or false
+		local reject_on_disable = ini:r_bool_ex(self.name,"reject_on_disabled",false)
 		if (reject_on_disable) then
 			local warning = ini:r_string_ex(self.name,"warning")
 			if (warning) then
@@ -71,14 +71,14 @@ function msg_box_ui:OnMsgOk()
 		level.add_pp_effector("black.ppe", 1313, false)
 	end
 	
-	if (ini:r_bool_ex(self.name,"autosave")) then
+	if (ini:r_bool_ex(self.name,"autosave",false)) then
 		xr_effects.scenario_autosave(nil,nil,{ini:r_string_ex(self.name,"hint") or "moving"})
 	end
 	
 	local p = pos and alun_utils.str_explode(pos,",")
 	pos = p and vector():set(tonumber(p[1]),tonumber(p[2]),tonumber(p[3]))
 
-	local allow_car = ini:r_bool_ex(self.name,"allow_vehicle") or true
+	local allow_car = ini:r_bool_ex(self.name,"allow_vehicle",true)
 	if (allow_car) then
 		-- allow vehicles to teleport too
 		local car = db.actor:get_attached_vehicle()

@@ -64,7 +64,7 @@ function sim_squad_scripted:init_squad()
 	self.sympathy			= sys_ini:r_float_ex(settings_id,"sympathy")
 	self.show_spot			= xr_logic.parse_condlist(self, "show_spot", "show_spot", sys_ini:r_string_ex(settings_id,"show_spot") or "false")
 
-	self.always_arrived		= sys_ini:r_bool_ex(settings_id,"always_arrived") or false
+	self.always_arrived		= sys_ini:r_bool_ex(settings_id,"always_arrived",false)
 	self:set_location_types_section("stalker_terrain")
 	self:set_squad_sympathy()
 end
@@ -552,7 +552,7 @@ function sim_squad_scripted:check_invulnerability()
 		local npc_st = db.storage[k.id]
 		local npc = npc_st and npc_st.ini and npc_st.active_section and npc_st.object or nil
 		if (npc) then
-			if npc:invulnerable() ~= invulnerabilty and npc_st.ini:r_bool_ex(npc_st.active_section,"invulnerable") then
+			if npc:invulnerable() ~= invulnerabilty and npc_st.ini:r_bool_ex(npc_st.active_section,"invulnerable",false) then
 				npc:invulnerable(invulnerability)
 			end
 		end

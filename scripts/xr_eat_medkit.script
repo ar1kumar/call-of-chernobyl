@@ -11,14 +11,14 @@ local eating = {}
 
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\xr_eat_medkit.ltx")
-	local enabled = ini:r_bool_ex("plugin","enable") or false
+	local enabled = ini:r_bool_ex("plugin","enable",false)
 	if not (enabled) then ini = nil return end
 	RegisterScriptCallback("npc_on_update",npc_update)
 
 	local sect = "plugin"
 	eating.exc_comms = alun_utils.parse_list(ini,sect,"excluded_communities",true)
-	eating.ic = ini:r_bool_ex(sect,"in_combat") or false
-	eating.oc = ini:r_bool_ex(sect,"out_combat") or false
+	eating.ic = ini:r_bool_ex(sect,"in_combat",false)
+	eating.oc = ini:r_bool_ex(sect,"out_combat",false)
 	eating.max_h = (ini:r_float_ex(sect,"medkit_health") or 50)/100
 	eating.min_b = ini:r_float_ex(sect,"bandage_bleeding") or 0.2
 	eating.medkits = alun_utils.parse_list(ini,sect,"medkits")

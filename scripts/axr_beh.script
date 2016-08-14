@@ -158,7 +158,7 @@ local function init_custom_data(npc, ini, section, st, scheme)
 	st.path_end 			= xr_logic.parse_condlist(npc, section, "path_end", ini:r_string_ex(section,"keep_distance") or "nil")
 	st.sound_idle			= xr_logic.parse_condlist(npc, section, "sound_idle", 	ini:r_string_ex(section, "sound_idle") or "nil")
 	
-	st.use_camp		= ini:r_bool_ex(section,"use_camp") or false
+	st.use_camp		= ini:r_bool_ex(section,"use_camp",false)
 
 	st.signals 			= {}
 

@@ -22,7 +22,7 @@ local facer_sets = {}
 local Enabled
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\xrs_facer.ltx")
-	Enabled = ini:r_bool_ex("plugin","enable") or false
+	Enabled = ini:r_bool_ex("plugin","enable",false)
 	if not (Enabled) then return end
 
 	if (state_mgr.combat_action_ids) then
@@ -48,9 +48,9 @@ function on_game_start()
 										k_actor = (ini:r_float_ex(v,"k_actor","float") or 1),
 										k_friend = (ini:r_float_ex(v,"k_friend","float") or 0.3),
 										min_delay = (ini:r_float_ex(v,"min_delay","float") or 1400),
-										enable_vs_actor = (ini:r_bool_ex(v,"enable_vs_actor") or true),
-										enable_vs_stalker = (ini:r_bool_ex(v,"enable_vs_stalker") or true),
-										enable_vs_monster = (ini:r_bool_ex(v,"enable_vs_monster") or true)
+										enable_vs_actor = (ini:r_bool_ex(v,"enable_vs_actor",true)),
+										enable_vs_stalker = (ini:r_bool_ex(v,"enable_vs_stalker",true)),
+										enable_vs_monster = (ini:r_bool_ex(v,"enable_vs_monster",true))
 									}
 		end
 	end

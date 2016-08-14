@@ -81,10 +81,10 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	storage.logic				= xr_logic.cfg_get_switch_conditions(ini, section, npc)
 	storage.state				= mob_state_mgr.get_state(ini, section, npc)
 	storage.home				= utils.prefix_r_string(ini,section,"path_home",gulag_name)
-	storage.gulag_point			= ini:r_bool_ex(section,"gulag_point") or false
+	storage.gulag_point			= ini:r_bool_ex(section,"gulag_point",false)
 	storage.home_min_radius		= ini:r_float_ex(section,"home_min_radius") or 10
 	storage.home_mid_radius		= ini:r_float_ex(section,"home_mid_radius") or 25
 	storage.home_max_radius		= ini:r_float_ex(section,"home_max_radius") or 70
-	storage.aggressive			= ini:r_bool_ex(section,"aggressive") or false
+	storage.aggressive			= ini:r_bool_ex(section,"aggressive",false)
 end
 
