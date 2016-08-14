@@ -347,6 +347,7 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 	local is_npc_info
 
 	if not( condlist ) then
+		callstack()
 		printf("ERROR object '%s' : condition list is nil! %s",npc:name())
 		return
 	end
@@ -731,18 +732,14 @@ end
 --   2 = { infop_check = { 1 = {"infop3" = true}, 2 = {"infop4" = false} }, infop_set = {}, section = "section2" },
 -- }
 function parse_condlist(npc, section, field, src)
-	local lst = {}
-
-	-- 1) –азбиваем на разделенные зап€тыми части:
-	local at, to, infop_check_lst, remainings, infop_set_lst, newsect
-
-	--printf("_bp: src = %s", src)
-
 	if (src == nil or type(src) == "boolean") then
 		callstack()
 		printf("ERROR!! xr_logic.parse_condlist npc=%s section=%s field=%s src=%s",npc:name(),section,field,src)
 		return
 	end
+	
+	local lst = {}
+	local at, to, infop_check_lst, remainings, infop_set_lst, newsect
 
 	local n = 1
 	for fld in string.gfind(src, "%s*([^,]+)%s*") do
