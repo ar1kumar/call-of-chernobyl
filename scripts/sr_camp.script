@@ -66,11 +66,11 @@ class "CCampManager"
 function CCampManager:__init(object, ini)
 	self.object = object
 	self.ini = ini
-	local stories = utils.cfg_get_string(ini, "camp", "stories", nil, false, "", "test_story")
+	local stories = ini:r_string_ex("camp", "stories") or "test_story"
 		self.story_table = parse_names(stories)
-	local guitars = utils.cfg_get_string(ini, "camp", "guitar_themes", nil, false, "", "test_guitar")
+	local guitars = ini:r_string_ex("camp", "guitar_themes") or "test_guitar"
 		self.guitar_table = parse_names(guitars)
-	local harmonicas = utils.cfg_get_string(ini, "camp", "harmonica_themes", nil, false, "", "test_harmonica")
+	local harmonicas = ini:r_string_ex("camp", "harmonica_themes") or "test_harmonica"
 		self.harmonica_table = parse_names(harmonicas)
 	self.npc = {}
 	self.schemes = {}

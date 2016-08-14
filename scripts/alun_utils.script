@@ -110,11 +110,11 @@ function read_from_ini(ini,section,line,var_type,default,caller)
 
 	if (section and line and ini:section_exist(section) and ini:line_exist(section,line)) then
 		if (var_type == "bool") then
-			return ini:r_bool(section,line)
+			return ini:r_bool_ex(section,line)
 		elseif (var_type == "string") then
-			return ini:r_string(section,line)
+			return ini:r_string_ex(section,line)
 		elseif (var_type == "float") then
-			return ini:r_float(section,line)
+			return ini:r_float_ex(section,line)
 		else
 			return ini:r_string_wq(section,line)
 		end

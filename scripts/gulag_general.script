@@ -1222,7 +1222,7 @@ mute 			  = false
 end
 
 local function add_exclusive_job(smart,sect, work_field, smart_ini, job_table)
-	local work = utils.cfg_get_string(smart_ini, sect, work_field, nil, false, "")
+	local work = smart_ini:r_string_ex(sect,work_field)
 	if not (work) then
 		return
 	end
@@ -1235,13 +1235,15 @@ local function add_exclusive_job(smart,sect, work_field, smart_ini, job_table)
 	end
 
 	local job_ini_file = ini_file(ini_path)
+	
+	local lsec = "logic@"..work_field
 
-	local new_prior = utils.cfg_get_number(job_ini_file, "logic@"..work_field, "prior", nil , false, 45)
-	local job_suitable = utils.cfg_get_string(job_ini_file, "logic@"..work_field, "suitable", smart, false, "")
-	local is_monster = utils.cfg_get_bool(job_ini_file, "logic@"..work_field, "monster_job", smart, false, false)
-	local is_heli = utils.cfg_get_bool(job_ini_file, "logic@"..work_field, "heli_job", smart, false, false)
-	local prefix = utils.cfg_get_string(job_ini_file, "logic@"..work_field, "prefix_name", smart, false, "")
-	local active_section = utils.cfg_get_string(job_ini_file, "logic@"..work_field, "active", smart, false, "")
+	local new_prior = job_ini_file:r_float_ex(lsec,"prior") or 100
+	local job_suitable = job_ini_file:r_string_ex(lsec,"suitable") or "true"
+	local is_monster = job_ini_file:r_bool_ex(lsec,"monster_job") or false
+	local is_heli = job_ini_file:r_bool_ex(lsec,"heli_job") or false
+	local prefix = job_ini_file:r_string_ex(lsec,"prefix_name")
+	local active_section = job_ini_file:r_string_ex(lsec,"active") or "nil"
 	local scheme = utils.get_scheme_by_section(active_section)
 	local job_type = job_type_by_scheme[scheme]
 
@@ -1251,13 +1253,13 @@ local function add_exclusive_job(smart,sect, work_field, smart_ini, job_table)
 	end
 
 	if scheme == "mob_home" then
-		if utils.cfg_get_bool(job_ini_file, active_section, "gulag_point", smart, false, false) then
+		if (job_ini_file:r_bool_ex(active_section,"gulag_point")) then
 			job_type = "point_job"
 		end
 	end
 
 	if not (job_suitable) then
-		local new_job = {section = "logic@"..work_field, ini_path = ini_path, ltx = job_ini_file, job_type = job_type, prior = new_prior, prefix_name = prefix, exclusive = true}
+		local new_job = {section = lsec, ini_path = ini_path, ltx = job_ini_file, job_type = job_type, prior = new_prior, prefix_name = prefix, exclusive = true}
 		if (is_monster) then
 			rawset(smart.monster_jobs,#smart.monster_jobs+1,new_job)
 		elseif (is_heli) then 
@@ -1269,9 +1271,9 @@ local function add_exclusive_job(smart,sect, work_field, smart_ini, job_table)
 		return
 	end
 
-	local condlist = xr_logic.parse_condlist(smart, "logic@"..work_field, "suitable", job_suitable)
+	local condlist = xr_logic.parse_condlist(smart, lsec, "suitable", job_suitable)
 
-	local new_job = {section = "logic@"..work_field, ini_path = ini_path, ltx = job_ini_file, job_type = job_type, prior = new_prior, precondition_params = { condlist = condlist },	precondition_function = precond_exclusive, prefix_name = prefix, exclusive = true}
+	local new_job = {section = lsec, ini_path = ini_path, ltx = job_ini_file, job_type = job_type, prior = new_prior, precondition_params = { condlist = condlist },	precondition_function = precond_exclusive, prefix_name = prefix, exclusive = true}
 	if (is_monster) then
 		rawset(smart.monster_jobs,#smart.monster_jobs+1,new_job)
 	elseif (is_heli) then 

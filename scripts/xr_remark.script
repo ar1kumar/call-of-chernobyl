@@ -196,15 +196,15 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
-	st.snd_anim_sync = utils.cfg_get_bool(ini, section, "snd_anim_sync", npc, false)
+	st.snd_anim_sync = ini:r_bool_ex(section,"snd_anim_sync") or false
 
-	st.snd			= utils.cfg_get_string(ini, section, "snd", npc, false, "", nil)
-	st.anim			= xr_logic.parse_condlist(npc, "anim", "anim", utils.cfg_get_string(ini, section, "anim", npc, false, "", "wait"))
-	st.tips_id		= utils.cfg_get_string(ini, section, "tips", npc, false, "")
+	st.snd			= ini:r_string_ex(section,"snd")
+	st.anim			= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "wait")
+	st.tips_id		= ini:r_string_ex(section,"tips")
 	if st.tips_id then
-		st.sender	= utils.cfg_get_string(ini, section, "tips_sender", npc, false, "")
+		st.sender	= ini:r_string_ex(section,"tips_sender")
 	end
-	st.target = utils.cfg_get_string          (ini, section,   "target",          npc, false, "", "nil")
+	st.target = ini:r_string_ex(section,"target") or "nil"
 	st.target_id = nil
 	st.target_position = nil
 end

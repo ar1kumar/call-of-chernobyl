@@ -34,7 +34,7 @@ end
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
-	local death_section = utils.cfg_get_string (ini, section, "on_death", npc, false, "")
+	local death_section = ini:r_string_ex(section,"on_death")
 	if (death_section) then
 		local st = xr_logic.assign_storage_and_bind(npc,ini,"death",death_section,temp)
 	end
@@ -46,16 +46,16 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 end
 
 function reset_generic_scheme(npc,scheme,section,stype,st)
-	local death_section = utils.cfg_get_string(st.ini, st.section_logic, "on_death", npc, false, "")
+	local death_section = st.ini:r_string_ex(st.section_logic,"on_death")
 	if death_section then
 		if not st.ini:section_exist(death_section) then
 			abort("There is no section [%s] for npc [%s]", death_section, npc:name())
 		end
-		local tmp = utils.cfg_get_string(st.ini, death_section, "on_info", npc, false, "")
+		local tmp = st.ini:r_string_ex(death_section,"on_info")
 		if tmp then
 			st.death.info = xr_logic.parse_condlist(npc, death_section, "death", tmp)
 		end
-		tmp = utils.cfg_get_string(st.ini, death_section, "on_info2", npc, false, "")
+		tmp = st.ini:r_string_ex(death_section,"on_info2")
 		if tmp then
 			st.death.info2 = xr_logic.parse_condlist(npc, death_section, "death", tmp)
 		end

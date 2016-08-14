@@ -178,26 +178,26 @@ function set_scheme(npc, ini, scheme, section)--, gulag_name)
 	local st        = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic        = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
-	st.anim_global    = utils.cfg_get_string(ini, section, "anim_global", npc, true,  "")
-	st.can_talk                  = utils.cfg_get_bool(ini,   section, "can_talk",    npc, false, true)
-	st.tip_text                  = utils.cfg_get_string(ini, section, "tip_text",    npc, false, "", "character_use")
+	st.anim_global 				= ini:r_string_ex(section,"anim_global")
+	st.can_talk                 = ini:r_bool_ex(section, "can_talk") or true
+	st.tip_text                 = ini:r_string_ex(section,"tip_text") or "character_use"
 	if st.tip_text == nil then
 		st.tip_text = ""
 	end
 	npc:set_tip_text(st.tip_text)
 
 	if (ini:line_exist( section, "sound_phrase")) then
-		st.anim_head        = utils.cfg_get_string(ini, section, "anim_head", npc, false, "")
-		st.sound_phrase        = utils.cfg_get_string(ini, section, "sound_phrase", npc, false, "")
+		st.anim_head	= ini:r_string_ex(section,"anim_head")
+		st.sound_phrase	= ini:r_string_ex(section,"sound_phrase")
 	else
-		st.anim_head        = nil
-		st.sound_phrase        = nil
+		st.anim_head	= nil
+		st.sound_phrase	= nil
 	end
 
 	--' check if play once animation
 	st.play_once = false
 	if (ini:line_exist( section, "on_signal")) then
-		local str = utils.cfg_get_string(ini, section, "on_signal", npc, false, "")
+		local str = ini:r_string_ex(section,"on_signal")
 		local par = utils.parse_params(str)
 
 		if par[1] == "animation_end" then

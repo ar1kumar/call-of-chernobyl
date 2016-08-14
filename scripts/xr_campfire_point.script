@@ -237,12 +237,12 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, "campfire_point", section,temp)
 	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
-	st.sound_idle= utils.cfg_get_string(ini, section, "sound_idle",npc, false, "")
-	st.smart = utils.cfg_get_string(ini, section, "smart", npc, false, "")
-	st.anim	= xr_logic.parse_condlist(npc, "anim", "anim", utils.cfg_get_string(ini, section, "anim", npc, false, "", "hide"))
-	st.reach_movement = xr_logic.parse_condlist(npc, "reach_movement", "reach_movement", utils.cfg_get_string(ini, section, "reach_movement", npc, false, "", "patrol"))
+	st.sound_idle= ini:r_string_ex(section,"sound_idle")
+	st.smart = ini:r_string_ex(section,"smart")
+	st.anim	= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "hide")
+	st.reach_movement = xr_logic.parse_condlist(npc, "reach_movement", "reach_movement", ini:r_string_ex(section,"reach_movement") or "patrol")
 
-	local use_camp = xr_logic.parse_condlist(npc, "use_camp", "use_camp", utils.cfg_get_string(ini, section, "use_camp", npc, false, "", "false"))
+	local use_camp = xr_logic.parse_condlist(npc, "use_camp", "use_camp", ini:r_string_ex(section,"use_camp") or "true")
 	st.use_camp = xr_logic.pick_section_from_condlist(db.actor, npc, use_camp) == "true"
 end
 

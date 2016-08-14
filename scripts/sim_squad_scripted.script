@@ -39,12 +39,12 @@ function sim_squad_scripted:init_squad()
 	local sys_ini			= system_ini()
 	local settings_id 		= self:section_name()
 	
-	self.player_id 			= utils.cfg_get_string(sys_ini, settings_id, "faction", self, true, "")
-	self.action_condlist	= xr_logic.parse_condlist(self, "assign_action", "target_smart", utils.cfg_get_string(sys_ini, settings_id, "target_smart", self, false, "", ""))
-	self.death_condlist		= xr_logic.parse_condlist(self, "death_condlist", "on_death", utils.cfg_get_string(sys_ini, settings_id, "on_death", self, false, "", ""))
-	self.invulnerability	= xr_logic.parse_condlist(self, "invulnerability", "invulnerability", utils.cfg_get_string(sys_ini, settings_id, "invulnerability", self, false, "", ""))
+	self.player_id 			= sys_ini:r_string_ex(settings_id,"faction") or "stalker"
+	self.action_condlist	= xr_logic.parse_condlist(self, "assign_action", "target_smart", sys_ini:r_string_ex(settings_id,"target_smart") or "")
+	self.death_condlist		= xr_logic.parse_condlist(self, "death_condlist", "on_death", sys_ini:r_string_ex(settings_id,"on_death") or "")
+	self.invulnerability	= xr_logic.parse_condlist(self, "invulnerability", "invulnerability", sys_ini:r_string_ex(settings_id,"invulnerability") or "")
 	
-	local rel 				= utils.cfg_get_string(sys_ini, settings_id, "relationship", self, false, nil)
+	local rel 				= sys_ini:r_string_ex(settings_id,"relationship")
 	self.relationship_condlist = rel and xr_logic.parse_condlist(self, settings_id, "relationship",rel)
 	
 	if (self.relationship_condlist) then 
@@ -61,10 +61,10 @@ function sim_squad_scripted:init_squad()
 	self.idle_time			= sys_ini:r_float_ex(settings_id,"idle_time") or math.random(STAY_POINT_IDLE_MIN,STAY_POINT_IDLE_MAX)	
 	
 	self.relationship		= self.relationship or rel
-	self.sympathy			= utils.cfg_get_number(sys_ini, settings_id, "sympathy", self, false, nil)
-	self.show_spot			= xr_logic.parse_condlist(self, "show_spot", "show_spot", utils.cfg_get_string(sys_ini, settings_id, "show_spot", self, false, "", "false"))
+	self.sympathy			= sys_ini:r_float_ex(settings_id,"sympathy")
+	self.show_spot			= xr_logic.parse_condlist(self, "show_spot", "show_spot", sys_ini:r_string_ex(settings_id,"show_spot") or "false")
 
-	self.always_arrived		= utils.cfg_get_bool(sys_ini, settings_id, "always_arrived", self, false)
+	self.always_arrived		= sys_ini:r_bool_ex(settings_id,"always_arrived") or false
 	self:set_location_types_section("stalker_terrain")
 	self:set_squad_sympathy()
 end
@@ -81,14 +81,14 @@ end
 function sim_squad_scripted:set_squad_behaviour()
 	--alun_utils.debug_write("sim_squad_scripted:set_squad_behaviour")
 	self.behaviour		= {}
-	local behaviour_section = utils.cfg_get_string(system_ini(), self:section_name(), "behaviour", self, false, "", self.player_id)
+	local behaviour_section = system_ini():r_string_ex(self:section_name(),"behaviour") or self.player_id
 	if not squad_behaviour_ini:section_exist(behaviour_section) then
 		printf("There is no section ["..behaviour_section.."] in 'misc\\squad_behaviours.ltx'")
 	end
 	local n = squad_behaviour_ini:line_count(behaviour_section)
 	local result, prop_name, prop_condlist
 	for j=0,n-1 do
-		result, prop_name, prop_condlist = squad_behaviour_ini:r_line(behaviour_section,j,"","")
+		result, prop_name, prop_condlist = squad_behaviour_ini:r_line_ex(behaviour_section,j,"","")
 		self.behaviour[prop_name] = tonumber(prop_condlist)
 	end
 end
@@ -550,9 +550,9 @@ function sim_squad_scripted:check_invulnerability()
 	local invulnerability = xr_logic.pick_section_from_condlist(db.actor, self, self.invulnerability) == "true"
 	for k in self:squad_members() do
 		local npc_st = db.storage[k.id]
-		local npc = npc_st and npc_st.ini and npc_st.object
+		local npc = npc_st and npc_st.ini and npc_st.active_section and npc_st.object or nil
 		if (npc) then
-			if npc:invulnerable() ~= invulnerabilty and utils.cfg_get_string(npc_st.ini, npc_st.active_section, "invulnerable", npc, false, "", nil) == nil  then
+			if npc:invulnerable() ~= invulnerabilty and npc_st.ini:r_bool_ex(npc_st.active_section,"invulnerable") then
 				npc:invulnerable(invulnerability)
 			end
 		end
@@ -561,7 +561,7 @@ end
 
 function sim_squad_scripted:set_location_types_section (section)
 	if locations_ini:section_exist(section) then
-		local result, id, value	= locations_ini:r_line(section,0,"","")
+		local result, id, value	= locations_ini:r_line_ex(section,0,"","")
 		self:add_location_type(id)
 	end
 end
@@ -606,7 +606,7 @@ function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_i
 		return
 	end 
 	
-	local custom_data = utils.cfg_get_string(spawn_sections_ltx, spawn_section, "custom_data", self, false, "", "default_custom_data.ltx")
+	local custom_data = spawn_sections_ltx:r_string_ex(spawn_section,"custom_data") or "default_custom_data.ltx"
 	if custom_data ~= "default_custom_data.ltx" then
 		printf("INCORRECT npc_spawn_section USED [%s]. You cannot use npc with custom_data in squads", spawn_section)
 	end
@@ -631,18 +631,18 @@ function sim_squad_scripted:create_npc(spawn_smart,pos,lvid,gvid)
 	--alun_utils.debug_write("sim_squad_scripted:create_npc")
 	local ini = system_ini()
 	local settings_id = self:section_name()
-	local spawn_sections = utils.parse_names(utils.cfg_get_string(ini, settings_id, "npc", self, false, "", ""))
+	local spawn_sections = utils.parse_names(ini:r_string_ex(settings_id, "npc") or "")
 	
 	local spawn_point, base_spawn_position, base_lvi, base_gvi, spawn_vid
 	if (spawn_smart) then 
-		spawn_point = utils.cfg_get_string(ini, settings_id, "spawn_point", self, false, "","self") or utils.cfg_get_string(spawn_smart.ini, "smart_terrain", "spawn_point", self, false,"","self")
+		spawn_point = ini:r_string_ex(settings_id,"spawn_point") or spawn_smart.ini:r_string_ex(settings_id,"spawn_point") or "self"
 		spawn_point = xr_logic.parse_condlist(self, "spawn_point", "spawn_point", spawn_point)
 		spawn_point = xr_logic.pick_section_from_condlist(db.actor, self, spawn_point)
 		
 		base_spawn_position = spawn_smart.position
 		base_lvi = spawn_smart.m_level_vertex_id
 		base_gvi = spawn_smart.m_game_vertex_id
-		spawn_vid = alun_utils.read_from_ini(ini,settings_id,"spawn_vid","string",nil) or alun_utils.read_from_ini(spawn_smart.ini,"smart_terrain","spawn_vid","string",nil)
+		spawn_vid = ini:r_string_ex(settings_id,"spawn_vid")or spawn_smart.ini:r_string_ex(settings_id,"spawn_vid")
 		spawn_vid = spawn_vid and xr_logic.pick_section_from_condlist(db.actor,self, xr_logic.parse_condlist(self,"spawn_vid","spawn_vid",spawn_vid))
 		
 		if (spawn_vid) then
@@ -683,11 +683,11 @@ function sim_squad_scripted:create_npc(spawn_smart,pos,lvid,gvid)
 		end
 	end
 
-	local random_spawn = utils.cfg_get_string(ini, settings_id, "npc_random", self, false, "",nil)
+	local random_spawn = ini:r_string_ex(settings_id,"npc_random")
 	if random_spawn ~= nil then
 		random_spawn = utils.parse_names(random_spawn)
 
-		local count = alun_utils.read_from_ini(ini,settings_id,"npc_in_squad","string","1,2")
+		local count = ini:r_string_ex(settings_id,"npc_in_squad") or "1,2"
 		count = alun_utils.str_explode(count,",")
 		count[1] = count[1] and tonumber(count[1])
 		count[2] = count[2] and tonumber(count[2]) or count[1]

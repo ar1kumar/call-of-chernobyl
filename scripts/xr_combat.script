@@ -62,7 +62,7 @@ end
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
-	temp.section = utils.cfg_get_string(ini, section, "on_combat", npc, false, "") or section
+	temp.section = ini:r_string_ex(section,"on_combat") or section
 	temp.is_zombied = character_community(npc) == "zombied"
 	
 	local st = xr_logic.assign_storage_and_bind(npc,ini,scheme,temp.section,temp)

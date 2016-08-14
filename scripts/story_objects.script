@@ -84,7 +84,7 @@ function check_spawn_ini_for_story_id(se_obj)
 
 	--printf("checking obj[%s] for story_id!!!",se_obj:name())
 	local spawn_ini = se_obj:spawn_ini()
-	if spawn_ini:section_exist("story_object") then
+	if (spawn_ini and spawn_ini:section_exist("story_object")) then
 		local result, id, value
 		result, id, value	= spawn_ini:r_line("story_object",0,"","")
 		if id ~= "story_id" then
@@ -96,9 +96,9 @@ function check_spawn_ini_for_story_id(se_obj)
 		sor:register(se_obj.id , value)
 		return
 	end
-	spawn_ini = system_ini()
+
 	local spawn_sect = se_obj:section_name()
-	local story_id = utils.cfg_get_string(spawn_ini, spawn_sect, "story_id", nil, false, "", nil)
+	local story_id = system_ini():r_string_ex(spawn_sect,"story_id")
 	if story_id ~= nil then
 		sor:register(se_obj.id , story_id)
 		return

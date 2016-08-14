@@ -545,37 +545,37 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
-	st.path_walk = utils.cfg_get_string(ini, section, "path_walk", npc, true, gulag_name)
-	st.path_look = utils.cfg_get_string(ini, section, "path_look", npc, true, gulag_name)
+	st.path_walk = utils.prefix_r_string(ini,section,"path_walk",gulag_name)
+	st.path_look = utils.prefix_r_string(ini,section,"path_look",gulag_name)
 
 	if st.path_walk == st.path_look then
 		abort("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
 	end
 
-	st.sniper = utils.cfg_get_bool(ini, section, "sniper", npc, false)
-	st.no_retreat = utils.cfg_get_bool(ini, section, "no_retreat", npc, false)
-	st.shoot = utils.cfg_get_string(ini, section, "shoot", npc, false, "", "always")
-	st.sniper_anim = utils.cfg_get_string(ini, section, "sniper_anim", npc, false, "hide_na")
+	st.sniper = ini:r_bool_ex(section,"sniper") or false 
+	st.no_retreat = ini:r_bool_ex(section,"no_retreat") or false
+	st.shoot = ini:r_string_ex(section,"shoot") or "always"
+	st.sniper_anim = ini:r_string_ex(section,"sniper_anim") or "hide_na"
 	if st.sniper == true and st.no_retreat == true then
 		_G.abort("ERROR: NPC [%s] Section [%s]. No_retreat not available for SNIPER.", npc:name(), section)
 	end
 
-	st.radius = utils.cfg_get_number(ini, section, "radius", npc, false, 20)
+	st.radius = ini:r_float_ex(section,"radius") or 20
 	st.suggested_state = {}
-	st.suggested_state.moving = utils.cfg_get_string(ini, section, "def_state_moving", npc, false, "")
-	st.suggested_state.moving_fire = utils.cfg_get_string(ini, section, "def_state_moving_fire", npc, false, "")
-	st.suggested_state.campering = utils.cfg_get_string(ini, section, "def_state_campering", npc, false, "")
-	st.suggested_state.standing = utils.cfg_get_string(ini, section, "def_state_standing", npc, false, "", st.suggested_state.campering)
-	st.suggested_state.campering_fire = utils.cfg_get_string(ini, section, "def_state_campering_fire", npc, false, "")
-	st.scantime_free = utils.cfg_get_number(ini, section, "scantime_free", npc, false, 60000)
-	st.attack_sound = utils.cfg_get_string(ini, section, "attack_sound", npc, false, "", "fight_attack")
+	st.suggested_state.moving = ini:r_string_ex(section,"def_state_moving")
+	st.suggested_state.moving_fire = ini:r_string_ex(section,"def_state_moving_fire")
+	st.suggested_state.campering = ini:r_string_ex(section,"def_state_campering")
+	st.suggested_state.standing = ini:r_string_ex(section,"def_state_standing") or st.suggested_state.campering
+	st.suggested_state.campering_fire = ini:r_string_ex(section,"def_state_campering_fire")
+	st.scantime_free = ini:r_float_ex(section,"scantime_free") or 60000
+	st.attack_sound = ini:r_string_ex(section,"attack_sound") or "fight_attack"
 
 	if st.attack_sound == "false" then
 		st.attack_sound = nil
 	end
 
 	-- Время забывания врага
-	st.idle = utils.cfg_get_number(ini, section, "enemy_idle", npc, false, 60000)
+	st.idle = ini:r_float_ex(section,"enemy_idle") or 60000
 	st.post_enemy_wait = 5000 -- время, которое мы ждем врага, смотря в его последнюю позицию.
 	st.enemy_disp = 7/57.2957 -- Угол в пределах которого снайпер ведет поиск потерянного врага.
 

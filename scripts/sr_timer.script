@@ -73,20 +73,17 @@ end
 function set_scheme(obj, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(obj, ini, scheme, section)
 	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, obj)
-	st.type = utils.cfg_get_string( ini, section, "type", obj, false, "", "inc")
+	st.type = ini:r_string_ex(section,"type") or "inc"
 	if st.type ~= "inc" and st.type ~= "dec" then
 		abort("ERROR: wrong sr_timer type. Section [%s], Restrictor [%s]", section, obj:name())
 	end
 
-	if st.type == "dec" then
-		st.start_value = utils.cfg_get_number(ini, section, "start_value", obj, true)
-	else
-		st.start_value = utils.cfg_get_number(ini, section, "start_value", obj, false, 0)
-	end
+	st.start_value = ini:r_float_ex(section,"start_value") or 0
+	
 	-- Вычитываем значения перехода.
-	st.on_value = parse_data(obj, utils.cfg_get_string(ini, section, "on_value", obj, false, ""))
-	st.timer_id = utils.cfg_get_string( ini, section, "timer_id", obj, false, "", "hud_timer")
-	st.string	= utils.cfg_get_string( ini, section, "string", obj, false, "")
+	st.on_value = parse_data(obj, ini:r_string_ex(section,"on_value"))
+	st.timer_id = ini:r_string_ex(section,"timer_id") or "hud_timer"
+	st.string	= ini:r_string_ex(section,"string")
 
 	local hud = get_hud()
 	hud:AddCustomStatic(st.timer_id, true)

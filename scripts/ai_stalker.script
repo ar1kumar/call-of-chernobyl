@@ -78,7 +78,7 @@ function update_best_weapon(npc,cur_wpn)
 		--if (wpn:get_ammo_in_magazine() > 0) then
 			for i=1,#prior do 
 				if (prior[i](nil,cls)) then
-					best_weapons[wpn] = ini:r_float(wpn:section(),"cost")
+					best_weapons[wpn] = ini:r_float_ex(wpn:section(),"cost")
 					break
 				end
 			end

@@ -63,12 +63,12 @@ end
 
 function set_actor_dialogs(npc, ini, name, dialog_section)
 	if dialog_section == nil then return end
-	local actor_dialogs_string = utils.cfg_get_string(ini, dialog_section, "id", npc, false, "")
+	local actor_dialogs_string = ini:r_string_ex(dialog_section,"id") or ""
 	if actor_dialogs_string ~= nil then
 		db.storage[npc:id()].actor_dialogs = parse_names(actor_dialogs_string)
 	end
 
-	local actor_disable = utils.cfg_get_string(ini, dialog_section, "disable", npc, false, "")
+	local actor_disable = ini:r_string_ex(dialog_section,"disable") or ""
 	if actor_disable ~= nil then
 		db.storage[npc:id()].actor_disable = parse_names(actor_disable)
 	end

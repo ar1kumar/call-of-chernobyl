@@ -24,7 +24,7 @@ end
 
 ---------------------------------------------------------------------------------------------------------------------
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
-	local combat_section = utils.cfg_get_string(ini, section, "on_combat", npc, false, "")
+	local combat_section = ini:r_string_ex(section,"on_combat")
 	if (combat_section) then
 		local st = xr_logic.assign_storage_and_bind(npc,ini,"mob_combat",combat_section,temp)
 		st.logic = xr_logic.cfg_get_switch_conditions(ini,combat_section,npc)

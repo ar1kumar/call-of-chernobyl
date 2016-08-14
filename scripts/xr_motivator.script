@@ -43,9 +43,8 @@ function motivator_binder:reinit()
 	--printf("motivator_binder:reinit() %s",self.object:name())
 	object_binder.reinit(self)
 
-	local id = self.object:id()
-	db.storage[id] = {}
-	self.st = db.storage[id]
+	self.st = {}
+	db.storage[self.object:id()] = self.st
 
 	self.st.state_mgr = state_mgr.bind_manager(self.object)
 	self.object:enable_vision(false)
@@ -63,7 +62,7 @@ function motivator_binder:net_spawn(sobject)
 	--self.name = self.object:name()
 
 	self.object:enable_vision(true)
-	local visual = utils.cfg_get_string(system_ini(), self.object:section(), "set_visual", self.object, false, "")
+	local visual = system_ini():r_string_ex(self.object:section(),"set_visual")
 	if (visual and visual ~= "") then
 		if visual == "actor_visual" then
 			self.object:set_visual_name(db.actor:get_visual_name())
@@ -76,7 +75,7 @@ function motivator_binder:net_spawn(sobject)
 
 	if self.loaded == false then
 		local spawn_ini = self.object:spawn_ini()
-		local filename = spawn_ini and utils.cfg_get_string(spawn_ini, "logic", "cfg", self.object, false, "")
+		local filename = spawn_ini and spawn_ini:r_string_ex("logic","cfg")
 		local char_ini = filename and ini_file(filename) or spawn_ini or ini_file("scripts\\dummy.ltx")
 		xr_info.loadInfo(self.object, char_ini)
 	end
@@ -125,7 +124,10 @@ function motivator_binder:net_spawn(sobject)
 
 	sound_theme.init_npc_sound(self.object)
 
-	xr_reach_task.add_reach_task_action(self.object)
+	-- only compatible with npcs with squads
+	if (sobject.group_id ~= 65535) then
+		xr_reach_task.add_reach_task_action(self.object)
+	end
 	
 	local as = sobject.get_alife_storage and sobject:get_alife_storage()
 	if (as and as.companion) then
@@ -142,25 +144,19 @@ function motivator_binder:net_spawn(sobject)
 		force_set_position = level.vertex_position(db.offline_objects[id].level_vertex_id)
 		db.offline_objects[id].level_vertex_id = nil
 	else
-		-- Force position for spawn position assigned by squad object
+		-- Try force position for spawn position assigned by squad object
 		if (db.spawned_vertex_by_id[id]) then
 			force_set_position = level.vertex_position(db.spawned_vertex_by_id[id])
 			db.spawned_vertex_by_id[id] = nil
 		end
 		
-		-- Expedite arrival and job assignment
+		-- Try force position to alife smart task position
 		if (sobject.m_smart_terrain_id ~= 65535) then
 			local smart = alife():object(sobject.m_smart_terrain_id)
-			--alun_utils.debug_write(strformat("xr_movtivator: npc=%s smart=%s",self.object:name(),smart and smart:name()))
-			
-			if (smart and not smart.disabled and not smart.need_init_npc) then
-				smart:force_assign_arrived_job(id)
-				if (smart.npc_info[id]) then
-					if (smart.npc_info[id].job) then
-						--alun_utils.debug_write(strformat("xr_movtivator: npc=%s job=%s",self.object:name(),smart.npc_info[id].job.section))
-						local smart_task = smart.npc_info[id].job.alife_task
-						force_set_position = smart_task and smart_task:position() or force_set_position or nil
-					end
+			if (smart and not smart.disabled) then
+				if (smart.npc_info[id] and smart.npc_info[id].job) then
+					local smart_task = smart.npc_info[id].job.alife_task
+					force_set_position = smart_task and smart_task:position() or force_set_position or nil
 				end
 			end
 		end
@@ -330,7 +326,7 @@ function motivator_binder:death_callback(victim, who)
 		xr_logic.pstor_store(who,"s_kill_count",count)
 	end
 
-	local known_info = utils.cfg_get_string(self.st.ini,self.st.section_logic , "known_info", victim, false, "", nil)
+	local known_info = self.st.ini and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
 	if (known_info) then
 		xr_info.loadInfo(victim, self.st.ini, known_info)
 	end

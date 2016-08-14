@@ -25,8 +25,8 @@ function generic_object_binder:reinit()
 	--alun_utils.debug_write(self.object:name().."re_init() Start")
 	object_binder.reinit(self)
 
-	db.storage[self.object:id()] = {}
-	self.st = db.storage[self.object:id()]
+	self.st = {}
+	db.storage[self.object:id()] = self.st
 
 	if (self.object:alive()) then
 		self.object:set_callback(callback.patrol_path_in_point, self.waypoint_callback, self)

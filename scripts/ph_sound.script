@@ -135,13 +135,13 @@ end
 function set_scheme(npc, ini, scheme, section, gulag_name)
 	local st    = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic    = xr_logic.cfg_get_switch_conditions(ini, section, npc)
-	st.theme    = utils.cfg_get_string(ini, section, "snd",	npc, false, "")
-	st.looped   = utils.cfg_get_bool (ini, section, "looped", npc, false, false)
-	st.random   = utils.cfg_get_bool (ini, section, "random", npc, false, true)
-	st.pause_min = utils.cfg_get_number (ini, section, "min_idle", npc, false, 0)
-	st.pause_max = utils.cfg_get_number (ini, section, "max_idle", npc, false, 0)
-	st.no_hit   = utils.cfg_get_bool (ini, section, "no_hit", npc, false, true)
-	st.volume = xr_logic.parse_condlist(npc, section, "volume",utils.cfg_get_string(ini, section, "volume", npc, false,"","1"))
+	st.theme    = ini:r_string_ex(section,"snd")
+	st.looped   = ini:r_bool_ex(section,"looped") or false
+	st.random   = ini:r_bool_ex(section,"random") or true
+	st.pause_min = ini:r_float_ex(section,"min_idle") or 0
+	st.pause_max = ini:r_float_ex(section,"max_idle") or 0
+	st.no_hit   = ini:r_bool_ex(section,"no_hit") or true
+	st.volume = xr_logic.parse_condlist(npc, section, "volume",ini:r_string_ex(section,"volume") or "1")
 	if st.pause_max < st.pause_min then
 	   abort ("PH_SOUND - invalid time range !!!")
     end

@@ -107,7 +107,7 @@ function CGeneralTask:__init(id)
 	end 
 	
 	self.current_target = self.target_functor and task_functor[self.target_functor](self.id, "target", self.target,self)
-	self.dont_send_update_news = utils.cfg_get_bool(task_ini, id, "dont_send_update_news", nil, false, false)
+	self.dont_send_update_news = task_ini:r_bool_ex(id,"dont_send_update_news") or false
 end
 
 function CGeneralTask:get_title()

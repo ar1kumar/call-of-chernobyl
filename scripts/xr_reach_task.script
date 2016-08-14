@@ -115,8 +115,12 @@ function action_reach_task_location:__init( name, storage )  super ( nil, name )
 end
 function action_reach_task_location:initialize()
 	action_base.initialize( self )
-	self.target_id = get_object_squad(self.object).assigned_target_id
-	self.squad_id = get_object_squad(self.object).id
+	local squad = get_object_squad(self.object)
+	if not (squad) then
+		return 
+	end
+	self.target_id = squad.assigned_target_id
+	self.squad_id = squad.id
 	self.l_vid = -1
 	self.dist = 0
 	self.dir = vector():set(0, 0, 1)
@@ -141,11 +145,14 @@ end
 
 
 function action_reach_task_location:execute()
-	local squad = get_object_squad(self.object)
+	local squad = alife():object(self.squad_id)
+	if not (squad) then 
+		self:single_execute()
+	end
 	if (not squad) or (squad:commander_id() == self.object:id() or not level.object_by_id(squad:commander_id()))then
-		self:commander_execute()
+		self:commander_execute(squad)
 	else
-		self:soldier_execute()
+		self:soldier_execute(squad)
 	end
 	action_base.execute (self)
 end
@@ -155,9 +162,36 @@ function action_reach_task_location:finalize()
 	action_base.finalize( self )
 end
 
-function action_reach_task_location:commander_execute()
+function action_reach_task_location:single_execute()
+	local npc = self.object 
+	local se_obj = alife():object(npc:id())
+	if not (se_obj) then 
+		abort("ERROR: action_reach_task_location:single_execute se_obj nil!")
+		return
+	end
+	
+	npc:set_movement_type(move.walk)
+	npc:set_mental_state(anim.free)
+	
+	local squad_target = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and alife():object(se_obj.m_smart_terrain_id)
+	if (squad_target) then
+		local pos, lv_id, gv_id = squad_target:get_location()
+		if npc:game_vertex_id() ~= gv_id then
+			npc:set_path_type			(game_object.game_path)
+			npc:set_dest_game_vertex_id	(gv_id)
+			npc:set_sight				(look.path_dir,nil,0)
+		else
+			npc:set_path_type(game_object.level_path)
+			utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:3")
+			npc:set_sight(look.path_dir,nil,0)
+			npc:set_desired_position(pos)
+		end
+	else 
+		npc:set_movement_type(move.stand)
+	end	
+end
+function action_reach_task_location:commander_execute(squad)
 	local npc = self.object
-	local squad = get_object_squad(self.object)
 	local squad_target = simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
 	if squad_target == nil and squad:get_script_target() ~= nil then
 	 	squad_target = alife():object(squad.assigned_target_id)
@@ -221,17 +255,9 @@ function action_reach_task_location:commander_execute()
 	end
 end
 
-function action_reach_task_location:soldier_execute()
-	local tg = time_global()
- 	if self.time_to_update - tg > 0 then
-		return
-	end
-	self.time_to_update = tg + math.random(800,1000)
-
+function action_reach_task_location:soldier_execute(squad)
 	local npc = self.object
-	local squad = get_object_squad(npc)
-
-	local commander = level.object_by_id(squad:commander_id())
+	local commander = db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object or level.object_by_id(squad:commander_id())
 	if not (commander) then 
 		return 
 	end

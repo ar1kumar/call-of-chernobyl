@@ -1252,14 +1252,17 @@ end
 -----------------------------------------------------------------------------------------------
 -- Получить сквад обьекта!!!!!
 function get_object_squad(object,caller)
-	if object == nil then return abort("You are trying to get squad_object from NIL object!!! %s",caller) end
-	local obj_id = type(object.id ) == "function" and object:id() or object.id
-	local sim = alife()
-	local se_obj = sim:object(obj_id)
-	if se_obj and se_obj.group_id ~= 65535 then
-		return sim:object(se_obj.group_id)
+	if not (object) then 
+		return 
+	end 
+	
+	if (object.group_id ~= nil and object.group_id ~= 65535) then 
+		return alife():object(object.group_id)
 	end
-	return nil
+	
+	local sim = alife()
+	local se_obj = type(object.id) == "function" and sim:object(object:id())
+	return se_obj and se_obj.group_id ~= 65535 and sim:object(se_obj.group_id) or nil
 end
 
 function get_story_squad(story_id)
@@ -1413,16 +1416,98 @@ function give_object_to_actor(obj,count)
   end
 end
 
+-- memoize ini results
+local ini_cache = {}
+function clear_ini_cache()
+	empty_table(ini_cache)
+end 
+
 -- extensions
-function ini_file:r_string_ex(s,k)
-	return self:section_exist(s) and self:line_exist(s,k) and self:r_string(s,k) or nil
+function ini_file.r_string_ex(ini,s,k)
+	if not (ini_cache[ini]) then 
+		ini_cache[ini] = {}
+	end 
+	
+	if not (s) then
+		callstack()
+	end
+	
+	local key = s .. "&" .. k
+	if (ini_cache[ini][key]) then 
+		--printf("res=%s",ini_cache[ini][key])
+		return ini_cache[ini][key]
+	else 
+		local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_string(s,k) or nil
+		if (res == nil) then 
+			return 
+		end
+		ini_cache[ini][key] = res 
+		return res
+	end
 end
-function ini_file:r_bool_ex(s,k)
-	return self:section_exist(s) and self:line_exist(s,k) and self:r_bool(s,k) or nil
+function ini_file.r_bool_ex(ini,s,k)
+	if not (ini_cache[ini]) then 
+		ini_cache[ini] = {}
+	end 
+	
+	if not (s) then
+		callstack()
+	end
+	
+	local key = s .. "&" .. k
+	if (ini_cache[ini][key]) then 
+		--printf("res=%s",ini_cache[ini][key])
+		return ini_cache[ini][key]
+	else 
+		local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_bool(s,k) or nil
+		if (res == nil) then 
+			return 
+		end
+		ini_cache[ini][key] = res 
+		return res
+	end
 end
-function ini_file:r_float_ex(s,k)
-	return self:section_exist(s) and self:line_exist(s,k) and self:r_float(s,k) or nil
+function ini_file.r_float_ex(ini,s,k)
+	if not (ini_cache[ini]) then 
+		ini_cache[ini] = {}
+	end 
+	
+	if not (s) then
+		callstack()
+	end
+	
+	local key = s .. "&" .. k
+	if (ini_cache[ini][key]) then 
+		--printf("res=%s",ini_cache[ini][key])
+		return ini_cache[ini][key]
+	else 
+		local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_float(s,k) or nil
+		if (res == nil) then 
+			return 
+		end
+		ini_cache[ini][key] = res 
+		return res
+	end
 end
+function ini_file.r_line_ex(ini,s,k)
+	if not (ini_cache[ini]) then 
+		ini_cache[ini] = {}
+	end 
+	
+	if not (s) then
+		callstack()
+	end
+	
+	local key = s .. "&" .. k
+	if (ini_cache[ini][key]) then 
+		--printf("res=%s",ini_cache[ini][key])
+		return unpack(ini_cache[ini][key])
+	else 
+		local a,b,c = ini:r_line(s,k,"","")
+		ini_cache[ini][key] = {a,b,c}
+		return a,b,c
+	end
+end 
 
 -----------------------------------------
 -- New INI wrapper to replace alun_utils.cfg_file
@@ -1444,11 +1529,11 @@ end
 
 function ini_file_ex:r_value(section,key,typ,def)
 	if (typ == 1) then
-		return self.ini:r_string_ex(section,key) == "true" or def
+		return self:r_string_ex(section,key) == "true" or def
 	elseif (typ == 2) then
-		return tonumber(self.ini:r_string_ex(section,key)) or def
+		return tonumber(self:r_string_ex(section,key)) or def
 	end
-	return self.ini:r_string_ex(section,key) or def
+	return self:r_string_ex(section,key) or def
 end
 
 function ini_file_ex:w_value(section,key,val,comment)
@@ -1495,13 +1580,13 @@ function ini_file_ex:line_exist(section,key)
 end
 
 function ini_file_ex:r_string_ex(s,k)
-	return self.ini:r_string_ex(s,k)
+	return self.ini:section_exist(s) and self.ini:line_exist(s,k) and self.ini:r_string(s,k) or nil
 end
 
 function ini_file_ex:r_bool_ex(s,k)
-	return self.ini:r_string_ex(s,k) == "true" or false
+	return self.ini:section_exist(s) and self.ini:line_exist(s,k) and self.ini:r_string(s,k) == "true" or self.ini:r_string(s,k) == "false" and false or nil
 end 
 
 function ini_file_ex:r_float_ex(s,k)
-	return tonumber(self.ini:r_string_ex(s,k))
+	return self.ini:section_exist(s) and self.ini:line_exist(s,k) and tonumber(self.ini:r_string(s,k)) or nil
 end

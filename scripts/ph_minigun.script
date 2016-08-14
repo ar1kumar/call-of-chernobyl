@@ -495,15 +495,15 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 
 	st.logic            = xr_logic.cfg_get_switch_conditions(ini, section, npc)
-	st.path_fire        = utils.cfg_get_string(ini, section, "path_fire",       npc, false, gulag_name, nil)
-	st.auto_fire        = utils.cfg_get_bool(ini,   section, "auto_fire",       npc, false, false) --' Стрелять или нет.
-	st.fire_time        = utils.cfg_get_number(ini, section, "fire_time",       npc, false, def_min_fire_time) --' Время стрельбы
-	st.fire_rep         = utils.cfg_get_number(ini, section, "fire_repeat",     npc, false, def_fire_rep) --' Время задержки
-	st.fire_range       = utils.cfg_get_number(ini, section, "fire_range",      npc, false, def_fire_range) --' Расстояние при которой стреляем
-	st.fire_target      = utils.cfg_get_string(ini, section, "target",          npc, false, gulag_name, "points") --' Цель: actor|story_ids|points
-	st.fire_track_target= utils.cfg_get_bool(ini,   section, "track_target",    npc, false, false)  --' Преследовать цель.
-	st.fire_angle		= utils.cfg_get_number(ini, section, "fire_angle",    npc, false, def_fire_angle) --' Угол обзора
-	st.shoot_only_on_visible =  utils.cfg_get_bool(ini, section, "shoot_only_on_visible", npc, false, true)
+	st.path_fire        = utils.prefix_r_string(ini,section,"path_fire",gulag_name)
+	st.auto_fire        = ini:r_bool_ex(section, "auto_fire") or false
+	st.fire_time        = ini:r_float_ex(section,"fire_time") or def_min_fire_time
+	st.fire_rep         = ini:r_float_ex(section,"fire_repeat") or def_fire_rep
+	st.fire_range       = ini:r_float_ex(section,"fire_range") or def_fire_range
+	st.fire_target      = ini:r_string_ex(section,"target") or "points"
+	st.fire_track_target= ini:r_bool_ex(section, "track_target") or false
+	st.fire_angle		= ini:r_float_ex(section,"fire_angle") or def_fire_angle
+	st.shoot_only_on_visible =  ini:r_bool_ex(section,"shoot_only_on_visible") or true
 
 	st.on_target_vis    = xr_logic.cfg_get_string_and_condlist(ini, section, "on_target_vis", npc) --' Условие перехода
 	st.on_target_nvis   = xr_logic.cfg_get_string_and_condlist(ini, section, "on_target_nvis", npc) --' Условие перехода
@@ -511,11 +511,11 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	-- Alundaio
 	-- Picks target based on best enemy of smart_terrain job holder
-	st.smart			= utils.cfg_get_string(ini, section, "smart", npc, false, "")
+	st.smart			= ini:r_string_ex(section,"smart")
 
 	if (st.smart) then
 		st.smart = SIMBOARD.smarts_by_names[st.smart]
-		st.job = st.smart and utils.cfg_get_string(ini, section, "job", npc, false, "")
+		st.job = st.smart and ini:r_string_ex(section,"job")
 
 		if not (st.job) then
 			st.smart = nil

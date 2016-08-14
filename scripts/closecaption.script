@@ -786,17 +786,10 @@ function read_cc_ini()
 	cc_npc = load_variable("cc_npc", 0)
 	if cc_npc == 0 then
 		local ini = ini_file("misc\\closecaption.ltx")
-		if ini:section_exist(cc) then
-			if ini:line_exist(cc, "cc_ingame_npc") then
-				cc_npc = ini:r_bool(cc, "cc_ingame_npc")
-			end
-			if ini:line_exist(cc, "cc_ingame_vrb") then
-				cc_vrb = ini:r_bool(cc, "cc_ingame_vrb")
-			end
-			if ini:line_exist(cc, "cc_ingame_cc") then
-				cc_icc = ini:r_bool(cc, "cc_ingame_cc")
-			end
-		end
+		cc_npc = ini:r_bool_ex(cc, "cc_ingame_npc") or false
+		cc_vrb = ini:r_bool_ex(cc, "cc_ingame_vrb") or false
+		cc_icc = ini:r_bool_ex(cc, "cc_ingame_cc") or false
+
 		db.cc_npc = cc_npc
 		db.cc_vrb = cc_vrb
 		db.cc_icc = cc_icc

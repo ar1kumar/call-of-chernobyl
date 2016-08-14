@@ -18,10 +18,10 @@ function action_process_hit:hit_callback(obj, amount, local_direction, who, bone
 		return
 	end
 	if who then
-		printf("[%s] hit by [%s]", obj:name(), who:name())
+		--printf("[%s] hit by [%s]", obj:name(), who:name())
 		db.storage[obj:id()].hit.who = who:id()
 	else
-		printf("[%s] hit by [Unknown]", victim:name())
+		--printf("[%s] hit by [Unknown]", victim:name())
 		db.storage[obj:id()].hit.who = -1
 	end
 	if db.storage[self.object:id()].active_scheme then
@@ -40,7 +40,7 @@ end
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
-	local hit_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
+	local hit_section = ini:r_string_ex(section,"on_hit")
 	if (hit_section) then
 		local st = xr_logic.assign_storage_and_bind(npc, ini, "hit", hit_section,temp)
 		st.logic = xr_logic.cfg_get_switch_conditions(ini, hit_section, npc)

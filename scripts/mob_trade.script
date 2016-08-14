@@ -146,9 +146,9 @@ end
 
 ---------------------------------------------------------------------------------------------------------------------
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
-	local trade_section = utils.cfg_get_string(ini, section, "on_trade", npc, false, "")
+	local trade_section = ini:r_string_ex(section,"on_trade")
 	if not (trade_section) then 
-		return 
+		return
 	end
 
 	local st = xr_logic.assign_storage_and_bind(npc,ini,"mob_trade",trade_section,temp)
@@ -162,28 +162,7 @@ end
 function add_to_binder(npc,ini,scheme,section,st,temp)
 	st.action = mob_trade(npc,st)
 end
---[[
-function reset_generic_scheme(npc,scheme,section,stype,st)
-	local trade_section = utils.cfg_get_string(st.ini, st.section_logic, "on_trade", npc, false, "")
-	if trade_section then
-		if not st.ini:section_exist(trade_section) then
-			abort("There is no section [%s] for npc [%s]", trade_section, npc:name())
-		end
-		local tmp = utils.cfg_get_string(st.ini, trade_section, "on_info", npc, false, "")
-		if tmp then
-			st.mob_trade.info = xr_logic.parse_condlist(npc, trade_section, "mob_trade", tmp)
-		end
-		tmp = utils.cfg_get_string(st.ini, trade_section, "on_info2", npc, false, "")
-		if tmp then
-			st.mob_trade.info2 = xr_logic.parse_condlist(npc, trade_section, "mob_trade", tmp)
-		end
-		tmp = utils.cfg_get_string(st.ini, trade_section, "on_info3", npc, false, "")
-		if tmp then
-			st.mob_trade.info3 = xr_logic.parse_condlist(npc, trade_section, "mob_trade", tmp)
-		end
-	end
-end
---]]
+
 function disable_generic_scheme(npc,scheme,stype)
 --	npc:set_callback(callback.trade_start, nil)
 --	npc:set_callback(callback.trade_stop, nil)

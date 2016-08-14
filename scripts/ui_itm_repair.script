@@ -27,12 +27,12 @@ function repair_ui:__init(owner,obj,section) super()
 	self.owner = owner
 	self.section = section
 	local ini = system_ini()
-	self.use_condition = ini:r_bool_ex(section,"use_condition")
+	self.use_condition = ini:r_bool_ex(section,"use_condition") or false
 	self.min_condition = ini:r_float_ex(section,"repair_min_condition") or 0
 	self.max_condition = ini:r_float_ex(section,"repair_max_condition") or 0
 	self.add_condition = ini:r_float_ex(section,"repair_add_condition") or 0
 	self.part_bonus = ini:r_float_ex(section,"repair_part_bonus") or 0
-	self.use_parts = ini:r_bool_ex(section,"repair_use_parts")
+	self.use_parts = ini:r_bool_ex(section,"repair_use_parts") or false
 	self.repair_type = ini:r_string_ex(section,"repair_type") or "all"
 
 	self.repair_only = alun_utils.parse_list(ini,section,"repair_only",true)

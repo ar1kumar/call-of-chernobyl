@@ -14,8 +14,8 @@ end
 
 -- прочитать число из ini
 function r_num( spawn_ini, section, line, default )
-	if spawn_ini:line_exist( section, line ) then
-		return spawn_ini:r_float( section, line )
+	if spawn_ini and spawn_ini:line_exist( section, line ) then
+		return spawn_ini:r_float_ex( section, line )
 	else
 		return default
 	end
@@ -33,11 +33,11 @@ function zone_sound:__init( zone, binder, ini )
 	local sect = "sound"
 
 	if ini:line_exist( sect, "snd" ) then
-		table_include( self.sound_names, parse_names( ini:r_string( sect, "snd" ) ) )
+		table_include( self.sound_names, parse_names( ini:r_string_ex( sect, "snd" ) ) )
 	end
 
 	if ini:line_exist( sect, "type" ) then
-		local t = parse_names( ini:r_string( sect, "type" ) )
+		local t = parse_names( ini:r_string_ex( sect, "type" ) )
 
 		-- типы звуков для зон
 		local sound_types = {

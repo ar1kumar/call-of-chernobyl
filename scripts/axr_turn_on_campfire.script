@@ -302,7 +302,7 @@ end
 
 function reset_generic_scheme(npc,scheme,section,stype,st)
 	if (st.turn_on_campfire) then
-		st.turn_on_campfire.allow = xr_logic.parse_condlist(npc, section, "turn_on_campfire",utils.cfg_get_string(st.ini, section, "turn_on_campfire", npc, false,"","false"))
+		st.turn_on_campfire.allow = xr_logic.parse_condlist(npc, section, "turn_on_campfire", st.ini:r_string_ex(section,"turn_on_campfire") or "false")
 		eval_reset(st.turn_on_campfire)
 	end
 end

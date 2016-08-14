@@ -190,27 +190,27 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
-	st.path_walk = utils.cfg_get_string(ini, section, "path_walk", npc, true,  gulag_name)
+	st.path_walk = utils.prefix_r_string(ini,section,"path_walk",gulag_name)
 
 	if not level.patrol_path_exists(st.path_walk) then
 		printf("ERROR: There is no patrol path %s", st.path_walk)
 	end
 
-	st.path_look = utils.cfg_get_string(ini, section, "path_look", npc, false, gulag_name)
+	st.path_look = utils.prefix_r_string(ini,section,"path_look",gulag_name)
 
 	if st.path_walk == st.path_look then
 		printf("ERROR: You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
 	end
 
-	st.team      = utils.cfg_get_string(ini, section, "team",      npc, false, gulag_name)
-	st.sound_idle= utils.cfg_get_string(ini, section, "sound_idle",npc, false, "")
-	st.use_camp  = utils.cfg_get_bool(ini, section, "use_camp",npc, false, false)
+	st.team      = utils.prefix_r_string(ini,section,"team",gulag_name)
+	st.sound_idle= ini:r_string_ex(section,"sound_idle")
+	st.use_camp  = ini:r_bool_ex(section,"use_camp") or false
 
 	st.suggested_state = {}
-	st.suggested_state.standing = utils.cfg_get_string(ini, section, "def_state_standing", npc, false, "")
+	st.suggested_state.standing = ini:r_string_ex(section,"def_state_standing")
 
-	st.suggested_state.moving  = utils.cfg_get_string(ini, section, "def_state_moving1", npc, false, "")
-	st.suggested_state.moving  = utils.cfg_get_string(ini, section, "def_state_moving", npc, false, "", st.suggested_state.moving)
+	st.suggested_state.moving  = ini:r_string_ex(section,"def_state_moving1")
+	st.suggested_state.moving  = ini:r_string_ex(section,"def_state_moving") or st.suggested_state.moving
 
 	st.path_walk_info = nil -- Будут инициализированы в reset(), сейчас пути могут быть еще
 	st.path_look_info = nil -- не загружены.

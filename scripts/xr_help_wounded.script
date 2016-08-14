@@ -11,11 +11,11 @@ local alife, level = alife, level
 --------------------
 
 local ini = ini_file("ai_tweaks\\xr_help_wounded.ltx")
-local HelpInCombat = ini:r_bool_ex("settings","help_in_combat")
-local UseNewAnim = ini:r_bool_ex("settings","use_new_anim")
+local HelpInCombat = ini:r_bool_ex("settings","help_in_combat") or true
+local UseNewAnim = ini:r_bool_ex("settings","use_new_anim") or true
 local AnimCombat = ini:r_float_ex("settings","anim_combat_type") or 2
 local AnimFree = ini:r_float_ex("settings","anim_free_type") or 1
-local AlwaysHelpDistance = ini:r_float_ex("settings","help_in_combat") or 3
+local AlwaysHelpDistance = ini:r_float_ex("settings","always_help_distance") or 900
 local HelpInCombatVisuals = alun_utils.collect_sections(ini,{"help_in_combat_visuals"})
 ini = nil
 
@@ -423,7 +423,7 @@ function reset_generic_scheme(npc,scheme,section,stype,t)
 
 	t.help_wounded.vertex_id = nil
 	t.help_wounded.vertex_position = nil
-	t.help_wounded.help_wounded_enabled = utils.cfg_get_bool(t.ini, section, "help_wounded_enabled", npc, false, true)
+	t.help_wounded.help_wounded_enabled = t.ini:r_string_ex(section,"help_wounded_enabled") or true
 end
 
 

@@ -213,7 +213,7 @@ function animpoint:position_riched()
 		local v1 = -math.deg(math.atan2(dir.x, dir.z))
 		local v2 = -math.deg(math.atan2(npc:direction().x, npc:direction().z))
 		local rot_y = math.min( math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2) )
-		if (rot_y <= 70 and dist <= self.st.reach_distance) then
+		if (rot_y <= 90 and dist <= self.st.reach_distance) then
 			return true 
 		end 
 	end 
@@ -469,17 +469,16 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	--printf("DEBUG: %s set_scheme: scheme='%s', section='%s'", npc:name(), scheme, section)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 	st.logic	  		= xr_logic.cfg_get_switch_conditions(ini, section, npc)
-	st.cover_name		= utils.cfg_get_string(ini, section, "cover_name", npc, false, "", "$script_id$_cover")
-	st.use_camp 		= utils.cfg_get_bool(ini, section, "use_camp", npc, false, true)
-	st.reach_distance	= utils.cfg_get_number(ini, section, "reach_distance", npc, false, 0.8)
-	--st.reach_movement	= utils.cfg_get_string(ini, section, "reach_movement", npc, false, "", "walk")
-	st.reach_movement = xr_logic.parse_condlist(db.actor, "animpoint", "reach_movement", utils.cfg_get_string(ini, section, "reach_movement", npc, false, "", "walk"))
+	st.cover_name		= ini:r_string_ex(section,"cover_name") or "$script_id$_cover"
+	st.use_camp 		= ini:r_bool_ex(section,"use_camp") or true
+	st.reach_distance	= ini:r_float_ex(section,"reach_distance") or 0.8
+	st.reach_movement = xr_logic.parse_condlist(db.actor, "animpoint", "reach_movement", ini:r_string_ex(section,"reach_movement") or "walk")
 	st.reach_distance = st.reach_distance*st.reach_distance
 
-	st.direction = utils.cfg_get_string(ini, section, "direction", npc, false, "", nil)
+	st.direction = ini:r_string_ex(section,"direction")
 	st.direction = st.direction and alun_utils.string_to_vector(st.direction)
 
-	local tmp = utils.cfg_get_string(ini, section, "avail_animations", npc, false, "", nil)
+	local tmp = ini:r_string_ex(section,"avail_animations")
 
 
 	if(tmp~=nil) then

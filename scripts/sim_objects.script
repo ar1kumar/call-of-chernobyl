@@ -27,17 +27,13 @@ function register_object(obj)
 	show_object_spot(obj)
 
 	--' ВРЕМЕННО. Здесь будем выбирать смарттеррейн.
-	local obj_ini = obj:spawn_ini()
-	local smart = utils.cfg_get_string(obj_ini, "logic", "smart_terrain", obj, false, "", "")
-	printf("SMART = %s", smart)
-	local smart_obj = sim_board.get_sim_board():get_smart_by_name(smart)
-
-	if smart_obj == nil then
-		return
+	local spawn_ini = self:spawn_ini()
+	local smartn = spawn_ini and spawn_ini:r_string_ex("logic","smart_terrain")
+	local smart = smartn and SIMBOARD:get_smart_by_name(smartn)
+	
+	if (smart) then 
+		smart:register_npc(self) 
 	end
-
-	printf("SMART_ID = %s ", smart_obj.id)
-	alife():object(smart_obj.id):register_npc(obj)
 	--obj.m_smart_terrain_id = tonumber(smart_id)
 end
 

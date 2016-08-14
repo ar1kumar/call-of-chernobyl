@@ -280,11 +280,11 @@ end
 function set_scheme(npc, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
 
-	st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
-	st.state           = mob_state_mgr.get_state(ini, section, npc)
-	st.no_reset        = utils.cfg_get_bool(ini, section, "no_reset", npc, false)
-	st.path_walk       = utils.cfg_get_string(ini, section, "path_walk", npc, true,  gulag_name)
-	st.path_look       = utils.cfg_get_string(ini, section, "path_look", npc, false, gulag_name)
+	st.logic     		= xr_logic.cfg_get_switch_conditions(ini, section, npc)
+	st.state           	= mob_state_mgr.get_state(ini, section, npc)
+	st.no_reset        	= ini:r_bool_ex(section,"no_reset") or false
+	st.path_walk       	= utils.prefix_r_string(ini,section,"path_walk",gulag_name)
+	st.path_look       	= utils.prefix_r_string(ini,section,"path_look",gulag_name)
 
 	if st.path_walk == st.path_look then
 		abort("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())

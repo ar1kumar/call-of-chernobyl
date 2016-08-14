@@ -162,17 +162,17 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.logic    = xr_logic.cfg_get_switch_conditions(ini, section, npc)
 
-	st.smart	= utils.cfg_get_string(ini, section, "smart", npc, false, "")
-	st.path_center	= utils.cfg_get_string(ini, section, "path_center", npc, false, "")
-	st.anim		= xr_logic.parse_condlist(npc, "anim", "anim", utils.cfg_get_string(ini, section, "anim", npc, false, "", "hide"))
-	st.sound_idle= utils.cfg_get_string(ini, section, "sound_idle",npc, false, "")
+	st.smart	= ini:r_string_ex(section,"smart")
+	st.path_center	= ini:r_string_ex(section,"path_center")
+	st.anim		= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "hide")
+	st.sound_idle= ini:r_string_ex(section,"sound_idle")
 
 	if (st.smart== nil and st.path_center == nil) then
 		printf("There is no path_center or smart in xr_cover.")
 	end
 
-	st.use_attack_direction = utils.cfg_get_bool(ini, section, "use_attack_direction", npc, false, true)
+	st.use_attack_direction = ini:r_bool_ex(section,"use_attack_direction") or true
 
-	st.radius_min = utils.cfg_get_number(ini, section, "radius_min", npc, false, 3)
-	st.radius_max = utils.cfg_get_number(ini, section, "radius_max", npc, false, 7)
+	st.radius_min = ini:r_float_ex(section,"radius_min") or 3
+	st.radius_max = ini:r_float_ex(section,"radius_max") or 7
 end

@@ -16,17 +16,13 @@ actid_facer = 18815
 actid_steal_up_facer = 18816
 --------------------
 
-local function read_from_ini(ini,sec,val,typ,def)
-	return alun_utils.read_from_ini(ini,sec,val,typ,def)
-end
-
 local hit_sound = [[material\dead-body\collide\hithard06hl]]
 
 local facer_sets = {}
 local Enabled
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\xrs_facer.ltx")
-	Enabled = read_from_ini(ini,"plugin","enable","bool",false)
+	Enabled = ini:r_bool_ex("plugin","enable") or false
 	if not (Enabled) then return end
 
 	if (state_mgr.combat_action_ids) then
@@ -39,22 +35,22 @@ function on_game_start()
 	facer_sets =	{
 						forbiddens = { factions = {} },
 						ranks = {},
-						check_prd = read_from_ini(ini,"plugin","check_period","float",1500)
+						check_prd = ini:r_float_ex("plugin","check_period") or 1500
 					}
 
 	local ranks = alun_utils.get_rank_list()
 	for k,v in ipairs(ranks) do
 		if ini:section_exist(v) then
 			facer_sets.ranks[v] = 	{
-										power = read_from_ini(ini,v,"power","float",50),
-										k_mutant = read_from_ini(ini,v,"k_mutant","float",1),
-										k_stalker = read_from_ini(ini,v,"k_stalker","float",1),
-										k_actor = read_from_ini(ini,v,"k_actor","float",1),
-										k_friend = read_from_ini(ini,v,"k_friend","float",0.3),
-										min_delay = read_from_ini(ini,v,"min_delay","float",1400),
-										enable_vs_actor = read_from_ini(ini,v,"enable_vs_actor","bool",true),
-										enable_vs_stalker = read_from_ini(ini,v,"enable_vs_stalker","bool",true),
-										enable_vs_monster = read_from_ini(ini,v,"enable_vs_monster","bool",true)
+										power = (ini:r_float_ex(v,"power","float") or 50),
+										k_mutant = (ini:r_float_ex(v,"k_mutant","float") or 1),
+										k_stalker = (ini:r_float_ex(v,"k_stalker","float") or 1),
+										k_actor = (ini:r_float_ex(v,"k_actor","float") or 1),
+										k_friend = (ini:r_float_ex(v,"k_friend","float") or 0.3),
+										min_delay = (ini:r_float_ex(v,"min_delay","float") or 1400),
+										enable_vs_actor = (ini:r_bool_ex(v,"enable_vs_actor") or true),
+										enable_vs_stalker = (ini:r_bool_ex(v,"enable_vs_stalker") or true),
+										enable_vs_monster = (ini:r_bool_ex(v,"enable_vs_monster") or true)
 									}
 		end
 	end

@@ -125,6 +125,7 @@ end
 -- mandatory - поле обязательно должно быть задано
 --
 -- Возвращает true или false
+-- depreciated
 function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
 	if mandatory == nil then
 		printf("section '%s': wrong arguments order in call to cfg_get_bool", section)
@@ -137,7 +138,7 @@ function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
 	
 	--printf("DEBUG: conf_get_bool: section='%s', field='%s'", section, field)
 	if section and char_ini:section_exist(section) and char_ini:line_exist(section, field) then
-		local ret = char_ini:r_bool(section, field)
+		local ret = char_ini:r_bool_ex(section, field) 
 		return ret
 	end
 	if not mandatory then
@@ -154,6 +155,7 @@ function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
 		"section '%s'", object:name(), field, section)
 end
 
+-- depreciated
 function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name, default_val)
 	if mandatory == nil then
 		printf("section '%s': wrong arguments order in call to cfg_get_string", section)
@@ -167,9 +169,9 @@ function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name,
 	--printf("DEBUG: conf_get_string: section='%s', field='%s'", section, field)
 	if section and char_ini:section_exist(section) and char_ini:line_exist(section, field) then
 		if gulag_name and gulag_name ~= "" and gulag_name ~= "nil" then
-			return gulag_name .. "_" .. char_ini:r_string(section, field)
+			return gulag_name .. "_" .. char_ini:r_string_ex(section, field)
 		else
-			return char_ini:r_string(section, field)
+			return char_ini:r_string_ex(section, field)
 		end
 	end
 	--if not mandatory then
@@ -180,6 +182,7 @@ function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name,
 	return default_val
 end
 
+-- depreciated
 function cfg_get_number(char_ini, section, field, object, mandatory, default_val)
 	if mandatory == nil then
 		printf("section '%s': wrong arguments order in call to cfg_get_number", section)
@@ -192,7 +195,7 @@ function cfg_get_number(char_ini, section, field, object, mandatory, default_val
 
 	--printf("DEBUG: conf_get_number: section='%s', field='%s'", section, field)
 	if section and char_ini:section_exist(section) and char_ini:line_exist(section, field) then
-		return char_ini:r_float(section, field)
+		return char_ini:r_float_ex(section, field)
 	end
 	if not mandatory then
 		return default_val
@@ -391,11 +394,17 @@ function parse_waypoint_data(pathname, wpflags, wpname)
 end
 
 function path_parse_waypoints(pathname)
-	if not pathname then
+	if (pathname == nil or pathname == "") then
 		return nil
 	end
 
 	--printf("_bp: path_parse_waypoints: pathname='%s'", pathname)
+	
+	if not (level.patrol_path_exists(pathname)) then 
+		printf("ERROR: utils.path_parse_waypoints: patrol path %s don't exist!",pathname)
+		return
+	end 
+	
 	local ptr = patrol(pathname)
 	local cnt = ptr:count()
 	local rslt = {}
@@ -481,15 +490,7 @@ function wpn_info_equal(wpn_info1, wpn_info2)
 end
 
 function get_scheme_by_section(section)
-	if not (section) then
-		return
-	end
-	local scheme = string.gsub(section, "%d", "")
-	local at, to = string.find(scheme, "@", 1, true)
-	if at and to then
-		scheme = string.sub(scheme, 1, at - 1)
-	end
-	return scheme
+	return section and string.gsub(section,"@(.*)","")
 end
 
 -- a | b | c  ==>  { 1 = "a", 2 = "b", 3 = "c" }
@@ -761,9 +762,9 @@ function parse_spawns(str)
 end
 
 function r_2nums( spawn_ini, section, line, def1, def2 )
-	if spawn_ini:line_exist( section, line ) then
+	if (spawn_ini and spawn_ini:line_exist( section, line )) then
 		-- если default-ов больше, чем значений в ini, то забить недостающие последним значением из ini
-		local t = utils.parse_names( spawn_ini:r_string( section, line ) )
+		local t = utils.parse_names( spawn_ini:r_string_ex( section, line ) )
 		local n = #t
 
 		if n == 0 then
@@ -865,3 +866,15 @@ end
 function valid_pathname(str)
 	return str:find('^[%//%\\%.%-%w_]+$') ~= nil
 end
+
+function prefix_r_string(ini,sec,key,prefix)
+	local rslt = ini:r_string_ex(sec,key)
+	if not (rslt) then 
+		--callstack()
+		return 
+	end
+	if (prefix and prefix ~= "" and prefix ~= "nil") then 
+		return prefix .. "_" .. rslt
+	end
+	return rslt
+end	

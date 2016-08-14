@@ -81,7 +81,9 @@ local function load_state(data)
 end
 
 local function physic_object_on_use_callback(box,who)
-	try_spawn_treasure(box)
+	if (box:clsid() == clsid.inventory_box_s) then
+		try_spawn_treasure(box)
+	end
 end
 ------------------------------------------------------------------------------------------------------------------
 --							ON GAME START
@@ -245,16 +247,18 @@ function try_spawn_treasure(box)
 	end 
 	
 	local spawned_item = alun_utils.str_explode(caches[id],",")
-	local sec,data,ammos,ct,ammo_type,ammo_section
+	local sec,ammos,ct,ammo_type,ammo_section
 	local ini = system_ini()
 	local sim = alife()
 	for i=1,#spawned_item do
 		sec = spawned_item[i]
 		if (sec ~= "" and ini:section_exist(sec)) then
-			local se_obj = sim:create(sec,box:position(),0,0,id)
-			if (IsWeapon(nil,se_obj:clsid())) then
+		
+			-- since we spawning on parent, we don't want to register object or packetdata will be inaccurate
+			local se_obj = sim:create(sec,box:position(),0,0,id,false)
+			if (se_obj and IsWeapon(nil,se_obj:clsid())) then
 				--printf("coc_treasure_manager: item is fa")
-				data = stpk_utils.get_weapon_data(se_obj)
+				local data = stpk_utils.get_weapon_data(se_obj)
 				if (data) then
 					-- Create random addon flag for weapon
 					flag = 0
@@ -283,6 +287,9 @@ function try_spawn_treasure(box)
 					data.ammo_type = ammo_type
 					data.condition = (math.random(70)+30)/100
 					stpk_utils.set_weapon_data(data,se_obj)
+					
+					-- because we didn't register, we do it now, manually
+					alife():register(se_obj)
 				end
 				--printf("coc_treasure_manager: item is fa- end")
 			end

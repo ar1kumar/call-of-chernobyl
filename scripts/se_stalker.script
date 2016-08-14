@@ -90,8 +90,6 @@ function se_stalker:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 
-	local obj_ini = self:spawn_ini()
-
 	if db.offline_objects[self.id] == nil then
 		db.offline_objects[self.id] = {}
 	end
@@ -102,12 +100,13 @@ function se_stalker:on_register()
 	self:brain():can_choose_alife_tasks(false)
 
 	--' Выбор смарта
-	local smart = utils.cfg_get_string(obj_ini, "logic", "smart_terrain", self, false, "", "")
-	local smart_obj = SIMBOARD.smarts_by_names[smart]
-	if smart_obj == nil then
-		return
+	local spawn_ini = self:spawn_ini()
+	local smartn = spawn_ini and spawn_ini:r_string_ex("logic","smart_terrain")
+	local smart = smartn and SIMBOARD:get_smart_by_name(smartn)
+	
+	if (smart) then 
+		smart:register_npc(self) 
 	end
-	smart_obj:register_npc(self)
 	--alun_utils.debug_write("se_stalker:on_register "..self:name().." END")
 end
 --------------------

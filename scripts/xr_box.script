@@ -62,7 +62,10 @@ end
 function ph_item_box:spawn_items()
 	local spawn_items = {}
 	local ini = self.obj:spawn_ini()
-	local community	= utils.cfg_get_string(ini, "drop_box", "community", self.obj, false, "", "def_box")
+	if not (ini) then 
+		return 
+	end
+	local community	= ini:r_string_ex("drop_box","community") or "def_box"
 	local items = r_items(ini, "drop_box", "items", self.obj)
 	if items then
 		for k,v in pairs(items) do
@@ -135,8 +138,8 @@ function parse_names( s )
 end
 
 function r_items( spawn_ini, section, line, obj)
-	if spawn_ini:line_exist( section, line ) then
-		local t = parse_names( spawn_ini:r_string( section, line ) )
+	if (spawn_ini and spawn_ini:line_exist( section, line )) then
+		local t = parse_names( spawn_ini:r_string_ex( section, line ) )
 		local n = #t
 		local ret_table = {}
 		local k = 1

@@ -51,7 +51,7 @@ local function npc_on_item_take(npc,item)
 	-- CHANGE VISUAL FOR OUTFIT
 --[[
 	if (item.is_outfit and item:is_outfit()) then 
-		local vis = alun_utils.read_from_ini(nil,item:section(),"npc_visual","string")
+		local vis = system_ini():r_string_ex(item:section(),"npc_visual")
 		if (vis) then 
 			npc:set_visual_name(vis:sub(0,-5))
 		end
@@ -86,7 +86,7 @@ end
 ---------------------------------------
 function on_game_start()
 	local ini = ini_file("ai_tweaks\\xr_gather_items.ltx")
-	Enable = ini:r_bool("settings","enable")
+	Enable = ini:r_bool_ex("settings","enable") or false
 
 	if not (Enable) then return end
 	Items = {}
@@ -94,10 +94,10 @@ function on_game_start()
 	StateRun = ini:r_string_ex("settings","state_run") or "rush"
 	RunDist = ini:r_float_ex("settings","run_dist") or 3
 	MaxDetectDistance = ini:r_float_ex("settings","max_detect_dist") or 900
-	ArtifactDectection = ini:r_bool("settings","allow_artifact_detection")
+	ArtifactDectection = ini:r_bool_ex("settings","allow_artifact_detection") or false
 	ArtifactSearchTimer = ini:r_float_ex("settings","artifact_search_time") or 60000
 	ArtifactCommunities = alun_utils.collect_section(ini,"artifact_communities",true)
-	UseCorpseLootTable = ini:r_bool("settings","use_xr_corpse_detection_loot_table")
+	UseCorpseLootTable = ini:r_bool_ex("settings","use_xr_corpse_detection_loot_table") or false
 	if not (UseCorpseLootTable) then
 		LootTable = alun_utils.collect_section(ini,"lootable",true)
 	end
@@ -604,8 +604,8 @@ function reset_generic_scheme(npc,scheme,section,stype,st)
 	st.gather_items.vid = nil
 	st.gather_items.vid_pos = nil
 
-	st.gather_items.gather_items_enabled = xr_logic.parse_condlist(npc, section, "gather_items_enabled",utils.cfg_get_string(st.ini, section, "gather_items_enabled", npc, false,"","true"))
-	st.gather_items.gather_artefact_items_enabled = xr_logic.parse_condlist(npc, section, "gather_artefact_items_enabled",utils.cfg_get_string(st.ini, section, "gather_artefact_items_enabled", npc, false,"","true"))
+	st.gather_items.gather_items_enabled = xr_logic.parse_condlist(npc, section, "gather_items_enabled", st.ini:r_string_ex(section,"gather_items_enabled") or "true")
+	st.gather_items.gather_artefact_items_enabled = xr_logic.parse_condlist(npc, section, "gather_artefact_items_enabled",st.ini:r_string_ex(section,"gather_artefact_items_enabled") or "true")
 end
 
 function npc_add_precondition(action)

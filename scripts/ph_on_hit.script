@@ -38,7 +38,7 @@ end
 
 ---------------------------------------------------------------------------------------------------------------------
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
-	local hit_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
+	local hit_section = ini:r_string_ex(section,"on_hit")
 	if not (hit_section) then 
 		return 
 	end 

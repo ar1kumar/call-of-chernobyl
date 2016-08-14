@@ -249,15 +249,15 @@ function set_scheme(obj, ini, scheme, section, gulag_name)
 	local st = xr_logic.assign_storage_and_bind(obj, ini, scheme, section)
 	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, obj)
 
-	st.point = utils.cfg_get_string(ini, section, "point", obj, true, "", "none")
-	st.look = utils.cfg_get_string(ini, section, "look", obj, true, "", "none")
-	st.global_cameffect = utils.cfg_get_bool(ini, section, "global_cameffect", obj, false, false)
-	st.pp_effector = utils.cfg_get_string(ini, section, "pp_effector", obj, false, "", "nil")..".ppe"
-	st.cam_effector = parse_names(utils.cfg_get_string(ini, section, "cam_effector", obj, true, ""))
-	st.fov = utils.cfg_get_number(ini, section, "fov", obj, true)
+	st.point = ini:r_string_ex(section,"point") or "none"
+	st.look = ini:r_string_ex(section,"look") or "none"
+	st.global_cameffect = ini:r_bool_ex(section,"global_cameffect") or false
+	st.pp_effector = tostring(ini:r_string_ex(section,"pp_effector"))..".ppe"
+	st.cam_effector = parse_names(ini:r_string_ex(section,"cam_effector") or "")
+	st.fov = ini:r_float_ex(section,"fov")
 
-	st.enable_ui_on_end = utils.cfg_get_bool(ini, section, "enable_ui_on_end", obj, false, true)
-	st.outdoor = utils.cfg_get_bool(ini, section, "outdoor", obj, false, false)
+	st.enable_ui_on_end = ini:r_bool_ex(section,"enable_ui_on_end") or true
+	st.outdoor = ini:r_bool_ex(section,"outdoor") or false
 end
 function effector_callback(obj)
 	xr_logic.issue_event(object_scene, storage_scene, "cutscene_callback")

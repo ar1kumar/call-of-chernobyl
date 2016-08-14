@@ -85,7 +85,7 @@ function CTreasureManager:register_item(se_obj)
 	end
 
 	local spawn_ini = se_obj:spawn_ini()
-	if(spawn_ini:section_exist("secret")) then
+	if(spawn_ini and spawn_ini:section_exist("secret")) then
 		local result, id, value
 		result, id, value	= spawn_ini:r_line("secret",0,"","")
 		if id ~= "name" then
@@ -104,7 +104,7 @@ function CTreasureManager:register_restrictor(se_obj)
 	end
 
 	local spawn_ini = se_obj:spawn_ini()
-	if(spawn_ini:section_exist("secret")) then
+	if(spawn_ini and spawn_ini:section_exist("secret")) then
 		self.secret_restrs[se_obj:name()] = se_obj.id
 	end
 end

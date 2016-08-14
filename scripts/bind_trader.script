@@ -12,6 +12,9 @@ class "trader_object_binder" (object_binder)
 
 function trader_object_binder:__init(obj) super(obj)
 	self.loaded = false
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 end
 
 
@@ -97,20 +100,85 @@ end
 function trader_object_binder:save(packet)
 	set_save_marker(packet, "save", false, "trader_object_binder")
 	object_binder.save(self, packet)
-	xr_logic.save_obj(self.object, packet)
-	if self.object:clsid() == clsid.script_trader then
-		trade_manager.save(self.object, packet)
-	end
 	set_save_marker(packet, "save", true, "trader_object_binder")
+	
+	if (USE_MARSHAL) then 
+		return 
+	end 
+	
+	xr_logic.save_obj(self.object, packet)
 end
 
 function trader_object_binder:load(reader)
 	self.loaded = true
 	set_save_marker(reader, "load", false, "trader_object_binder")
 	object_binder.load(self, reader)
-	xr_logic.load_obj(self.object, reader)
-	if self.object:clsid() == clsid.script_trader then
-		trade_manager.load(self.object, reader)
-	end
+
 	set_save_marker(reader, "load", true, "trader_object_binder")
+	
+	if (USE_MARSHAL) then
+		if (self.object) then
+			load_state(self.object:id(),alife_storage_manager.get_state()) -- fake because binder not ready when real load_state made
+		end
+		return 
+	end
+	
+	xr_logic.load_obj(self.object, reader)
 end
+
+----------------------------------------------------------------------------------
+function trader_object_binder:save_state(m_data)
+	--alun_utils.debug_write(strformat("trader_object_binder:save_state %s BEFORE",id))
+	local id = self.object and self.object:id()
+	local st = id and db.storage[id]
+	if not (st) then 
+		return
+	end
+	if not (m_data.xr_logic) then 
+		m_data.xr_logic = {}
+	end
+	m_data.xr_logic[id] = {}
+	--m_data.xr_logic[id].job_ini = st.job_ini
+	m_data.xr_logic[id].ini_filename = st.ini_filename
+	m_data.xr_logic[id].section_logic = st.section_logic
+	m_data.xr_logic[id].active_section = st.active_section
+	m_data.xr_logic[id].gulag_name = st.gulag_name
+	m_data.xr_logic[id].activation_time = (st.activation_time or 0) - time_global()
+	m_data.xr_logic[id].activation_game_time = st.activation_game_time
+
+	--xr_sound.npc_save_state(id,m_data)
+	trade_manager.save_state(id,m_data)
+	
+	db.storage[id].pstor = db.storage[id].pstor or {}
+	--alun_utils.debug_write(strformat("trader_object_binder:save_state %s AFTER",id))
+end 
+
+function load_state(id,m_data)
+	if not (id and m_data.xr_logic and m_data.xr_logic[id]) then 
+		return 
+	end
+	db.storage[id] = db.storage[id] or {}
+	local st = db.storage[id]
+	--alun_utils.debug_write(strformat("trader_object_binder:load_state %s BEFORE",id))
+	--st.job_ini = m_data.xr_logic[id].job_ini
+	st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
+	st.loaded_section_logic = m_data.xr_logic[id].section_logic
+	st.loaded_active_section = m_data.xr_logic[id].active_section or "nil"
+	st.loaded_gulag_name = m_data.xr_logic[id].gulag_name or ""
+	st.activation_time = m_data.xr_logic[id].activation_time and m_data.xr_logic[id].activation_time + time_global() or time_global()
+	st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
+	
+	--xr_sound.npc_load_state(id,m_data)
+	trade_manager.load_state(id,m_data)
+	
+	if (m_data.pstor_all and m_data.pstor_all[id]) then 
+		db.storage[id].pstor = m_data.pstor_all[id]
+		m_data.pstor_all[id] = nil
+	end 
+
+	if (m_data.pstor_ctime and m_data.pstor_ctime[id]) then
+		db.storage[id].pstor_ctime = m_data.pstor_ctime[id]
+		m_data.pstor_ctime[id] = nil
+	end
+	--alun_utils.debug_write(strformat("trader_object_binder:load_state %s AFTER",id))
+end 

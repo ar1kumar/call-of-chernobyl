@@ -9,18 +9,18 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 --]]
 local ini = ini_file("plugins\\itms_manager.ltx")
 	--Backpack stash mod
-	local BackPackStashEnable = ini:r_bool_ex("backpack_stash","enable")
-	local BackPackStashAllowInBase = BackPackStashEnable and ini:r_bool_ex("backpack_stash","allow_in_base")
-	local BackPackStashSpot = BackPackStashEnable and ini:r_string_ex("backpack_stash","map_spot") or "treasure"
-	local BackPackStashEnableTip = BackPackStashEnable and ini:r_bool_ex("backpack_stash","enable_news_tip")
-	local BackPackStashEnableUi = BackPackStashEnable and ini:r_bool_ex("backpack_stash","enable_ui")
+	local BackPackStashEnable = ini:r_bool_ex("backpack_stash","enable") or false
+	local BackPackStashAllowInBase = BackPackStashEnable and ini:r_bool_ex("backpack_stash","allow_in_base") or false
+	local BackPackStashSpot = BackPackStashEnable and ini:r_string_ex("backpack_stash","map_spot") or "treasure" 
+	local BackPackStashEnableTip = BackPackStashEnable and ini:r_bool_ex("backpack_stash","enable_news_tip") or false
+	local BackPackStashEnableUi = BackPackStashEnable and ini:r_bool_ex("backpack_stash","enable_ui") or false
 
 	-- Sleep bag mod
 	local SleepBagEnable = ini:r_bool_ex("sleeping_bag","enable")
-	local SleepBagEnableDangerous = SleepBagEnable and ini:r_bool_ex("sleeping_bag","dangerous_sleep")
+	local SleepBagEnableDangerous = SleepBagEnable and ini:r_bool_ex("sleeping_bag","dangerous_sleep") or false
 	local SleepBagRadius = SleepBagEnable and ini:r_float_ex("sleeping_bag","unsafe_radius") or 5000
-	local SleepBagPlaceable = SleepBagEnable and ini:r_bool_ex("sleeping_bag","use_placeable")
-	local SleepBagGameStart = SleepBagEnable and ini:r_bool_ex("sleeping_bag","have_at_start")
+	local SleepBagPlaceable = SleepBagEnable and ini:r_bool_ex("sleeping_bag","use_placeable") or false
+	local SleepBagGameStart = SleepBagEnable and ini:r_bool_ex("sleeping_bag","have_at_start") or false
 	local SleepBagSections = SleepBagEnable and alun_utils.collect_section(ini,"sleeping_bag_sections",true)
 	local SleepBagPlaceableSections = SleepBagEnable and alun_utils.collect_section(ini,"sleeping_bag_ph_sections",true)
 
@@ -433,28 +433,13 @@ function squad_assign_new_target(squad)
 end
 
 function is_ammo_for_wpn(sec)
-	local ammos, wpn, data
 	local sim = alife()
 	for i=2,3 do
-		wpn = db.actor:item_in_slot(i)
+		local wpn = db.actor:item_in_slot(i)
 		if (wpn) then
-
-			ammos = alun_utils.parse_list(system_ini(),wpn:section(),"ammo_class")
-
-			se_wpn = sim:object(wpn:id())
-			data = stpk_utils.get_weapon_data(se_wpn)
-			if (data) then
-				if (sec == ammos[data.ammo_type+1]) then
-					return true
-				end
-				--Adjusted Yasti
-				if (sec == ammos[data.ammo_type+2]) then
-					return true
-				end
-				if (sec == ammos[data.ammo_type+3]) then
-					return true
-				end
-				--End Yasti
+			local ammos = alun_utils.parse_list(system_ini(),wpn:section(),"ammo_class",true)
+			if (ammos[sec]) then 
+				return true 
 			end
 		end
 	end

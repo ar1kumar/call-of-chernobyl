@@ -48,33 +48,33 @@ function heli_combat:__init( object, heliObject )
 	local ltx                  = system_ini()
 	local section 			   = object:section()
 										   
-	self.flyby_attack_dist     = utils.cfg_get_number( ltx, section, "flyby_attack_dist",    self.object, true )
-	self.search_attack_dist    = utils.cfg_get_number( ltx, section, "search_attack_dist",   self.object, true )
-	self.default_safe_altitude = utils.cfg_get_number( ltx, section, "safe_altitude",        self.object, true ) + self.level_max_y
-	self.m_max_mgun_dist       = utils.cfg_get_number( ltx, section, "max_mgun_attack_dist", self.object, true )
+	self.flyby_attack_dist     = ltx:r_float_ex(section,"flyby_attack_dist") or 0
+	self.search_attack_dist    = ltx:r_float_ex(section,"search_attack_dist") or 0
+	self.default_safe_altitude = (ltx:r_float_ex(section,"safe_altitude") or 0) + self.level_max_y
+	self.m_max_mgun_dist       = ltx:r_float_ex(section,"max_mgun_attack_dist") or 0
 
-	self.default_velocity      = utils.cfg_get_number( ltx, section, "velocity",             self.object, true )
-	self.search_velocity       = utils.cfg_get_number( ltx, section, "search_velocity",      self.object, true )
-	self.round_velocity        = utils.cfg_get_number( ltx, section, "round_velocity",       self.object, true )
+	self.default_velocity      = ltx:r_float_ex(section,"velocity") or 30
+	self.search_velocity       = ltx:r_float_ex(section,"search_velocity") or 40
+	self.round_velocity        = ltx:r_float_ex(section,"round_velocity") or 60
 
-	self.vis_time_quant        = utils.cfg_get_number( ltx, section, "vis_time_quant",       self.object, true )
-	self.vis_threshold         = utils.cfg_get_number( ltx, section, "vis_threshold",        self.object, true )
-	self.vis_inc               = utils.cfg_get_number( ltx, section, "vis_inc",              self.object, true ) * self.vis_time_quant * 0.001
-	self.vis_dec               = utils.cfg_get_number( ltx, section, "vis_dec",              self.object, true ) * self.vis_time_quant * 0.001
+	self.vis_time_quant        = ltx:r_float_ex(section,"vis_time_quant") or 0
+	self.vis_threshold         = ltx:r_float_ex(section,"vis_threshold") or 0
+	self.vis_inc               = (ltx:r_float_ex(section,"vis_inc") or 0) * self.vis_time_quant * 0.001
+	self.vis_dec               = (ltx:r_float_ex(section,"vis_dec") or 0) * self.vis_time_quant * 0.001
 	self.vis                   = 0
 	self.vis_next_time         = 0
 
-	self.forget_timeout        = utils.cfg_get_number( ltx, section, "forget_timeout",       self.object, true ) * 1000
+	self.forget_timeout        = (ltx:r_float_ex(section,"forget_timeout") or 0) * 1000
 
-	self.flame_start_health    = utils.cfg_get_number( ltx, section, "flame_start_health",   self.object, true )
+	self.flame_start_health    = ltx:r_float_ex(section,"flame_start_health") or 0.1
 
 	self.attack_before_retreat = false
 
 	self.section_changed       = false
 	
-	self.combat_use_rocket = utils.cfg_get_bool(ltx, section, "combat_use_rocket", self.object, false, false )
-	self.combat_use_mgun   = utils.cfg_get_bool(ltx, section, "combat_use_mgun",   self.object, false, true )
-	self.actor_always_enemy= utils.cfg_get_bool(ltx, section, "actor_always_enemy", self.object, false, false)
+	self.combat_use_rocket = ltx:r_bool_ex(section,"combat_use_rocket") or false
+	self.combat_use_mgun   = ltx:r_bool_ex(section,"combat_use_mgun") or true
+	self.actor_always_enemy= ltx:r_bool_ex(section,"actor_always_enemy") or false
 	
 	self.max_velocity      = self.default_velocity
 	self.safe_altitude     = self.default_safe_altitude + self.level_max_y
@@ -197,9 +197,9 @@ function heli_combat:find_valid_target()
 			if (self.st.ini and self.st.active_section) then
 				local smart = xr_gulag.get_npc_smart(self.object)
 				if (smart) then
-					local defend_smart = utils.cfg_get_string(self.st.ini,self.st.active_section, "defend_job", self.object, false, false)
+					local defend_smart = self.st.ini:r_bool_ex(self.st.active_section, "defend_job")
 					if (defend_smart) then 
-						local radius = utils.cfg_get_number(self.st.ini,self.st.active_section,"defend_job_radius",self.object,false,50)
+						local radius = self.st.ini:r_float_ex(self.st.active_section,"defend_job_radius") or 50
 						if (radius) then 
 							local dist = heli_alife.distance_2d_sqr(target_pos,smart.position)
 							if (dist < radius) then
@@ -245,14 +245,14 @@ function heli_combat:read_custom_data( ini, section )
 	
 	--	self.combat_ignore     = utils.cfg_get_bool  ( ini, section, "combat_ignore",     self.object, false, false )
 
-	local combat_ignore    = utils.cfg_get_string( ini, section, "combat_ignore",     self.object, false, "", nil )
+	local combat_ignore    = ini:r_string_ex(section,"combat_ignore")
 	if combat_ignore then
 		self.combat_ignore = xr_logic.parse_condlist( self.object, section, "combat_ignore", combat_ignore )
 	else
 		self.combat_ignore = nil
 	end
 
-	local combat_enemy     = utils.cfg_get_string( ini, section, "combat_enemy",      self.object, false, "", nil )
+	local combat_enemy     = ini:r_string_ex(section,"combat_enemy")
 	self:set_enemy_from_custom_data( combat_enemy )
 
 	self.max_velocity      = utils.cfg_get_number( ini, section, "combat_velocity",      self.object, false, self.default_velocity )

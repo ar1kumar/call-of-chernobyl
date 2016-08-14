@@ -24,6 +24,9 @@ function destroy_dynamic_news()
 end
 
 function on_game_start()
+	
+	destroy_dynamic_news()
+	
 	if (axr_main.config:r_value("mm_options","enable_dynamic_news",1,true) == false) then
 		return 
 	end

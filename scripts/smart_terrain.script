@@ -154,88 +154,48 @@ end
 
 function se_smart_terrain:read_params()
 	--alun_utils.debug_write(strformat("%s:%s:se_smart_terrain:read_params BEFORE",self:name(),self.id))
-	local ini = self:spawn_ini()
-
-	if not ini:section_exist( "smart_terrain" ) then
-		printf( "[smart_terrain %s] no configuration!", self:name() )
+	local spawn_ini = self:spawn_ini()
+	local filename = spawn_ini:r_string_ex("smart_terrain","cfg")
+	if not (filename) then
+		printf("ERROR!: smart_terrain: no configuration file defined in spawn ini for %s",self:name())
 		self.disabled = true
 		return
 	end
 
-	local filename = utils.cfg_get_string(ini, "smart_terrain", "cfg", 	self, false, "")
-	if not (filename) then
-		printf("no configuration file defined in spawn ini for %s",self:name())
-		--filename = "scripts\\"..tostring(self.level_name).."\\smart\\"..self:name()..".ltx"
-	end
-
-	local fs = getFS()
 	if filename then
+		local fs = getFS()
 		if fs:exist("$game_config$",filename) then
-			ini = ini_file(filename)
+			self.ini = ini_file(filename)
 		else
-			printf("There is no configuration file [%s] in smart_terrain [%s]", filename, 	self:name())
+			printf("ERROR: There is no configuration file [%s] in smart_terrain [%s]", filename, 	self:name())
+			self.disabled = true
+			return
 		end
 	end
 	
-	self.ini = ini
-
-	-- use self.props instead
-	--self.sim_type		= utils.cfg_get_string(ini, "smart_terrain", "sim_type", 		self, false, "", "default")
-
-	--if valid_territory[self.sim_type] == nil then
-		--printf("Wrong sim_type value [%s] in smart [%s]", self.sim_type, self:name())
-	--end
-
-	self.squad_id		= utils.cfg_get_number(ini, "smart_terrain", "squad_id", 		self, false, 0)
-	self.respawn_sector = utils.cfg_get_string(ini, "smart_terrain", "respawn_sector", 	self, false, "")
-	self.respawn_radius  = utils.cfg_get_number(ini, "smart_terrain", "respawn_radius", 	self, false, 200)^2
-	if self.respawn_sector ~= nil then
-		if self.respawn_sector == "default" then
-			self.respawn_sector = "all"
-		end
-		self.respawn_sector = xr_logic.parse_condlist(nil, "smart_terrain", "respawn_sector", self.respawn_sector)
-	end
-
-	self.forbidden_point	= utils.cfg_get_string(ini, "smart_terrain", "forbidden_point", self, false, "")
-
-	self.def_restr		= utils.cfg_get_string(ini, "smart_terrain", "def_restr", 	self, false, "", nil)
-	self.att_restr		= utils.cfg_get_string(ini, "smart_terrain", "att_restr", 	self, false, "", nil)
-	self.safe_restr		= utils.cfg_get_string(ini, "smart_terrain", "safe_restr", 	self, false, "", nil)
-
-	self.spawn_point	= utils.cfg_get_string(ini, "smart_terrain", "spawn_point", 	self, false, "")
-
-	self.arrive_dist	= utils.cfg_get_number(ini, "smart_terrain", "arrive_dist", 	self, false, 50)
-
-	local max_population = utils.cfg_get_string(ini, "smart_terrain", "max_population", self, false, "", 0)
-	local parsed_condlist = xr_logic.parse_condlist(nil, "smart_terrain", "max_population", max_population)
-	self.max_population = tonumber(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, parsed_condlist))
-
-	self.death_idle_time = utils.cfg_get_number(ini, "smart_terrain", "death_idle_time", 	self, false, 600)
-
-	if level.patrol_path_exists(self:name() .. "_traveller_actor") then
-		--printf("Smart_terrain [%s] has no traveller_actor path!!!!!", self:name())
-		self.traveler_actor_path = self:name() .. "_traveller_actor"
-	end
-
-	if level.patrol_path_exists(self:name() .. "_traveller_squad") then
-		--printf("Smart_terrain [%s] has no traveller_squad path!!!!!", self:name())
-		self.traveler_squad_path = self:name() .. "_traveller_squad"
-	end
-
 	if not locations_ini:section_exist(self:name()) then
 		printf("! SMART_TERRAIN [%s] has no terrain_mask section in smart_terrain_masks.ltx!!!",self:name())
 	end
 	
-	self.faction_controlled = utils.cfg_get_string(ini, "smart_terrain", "faction_controlled", self, false, "", nil)
-	self.default_faction = utils.cfg_get_string(self.ini, "smart_terrain", "default_faction",self, false,"")
-				
-	self.respawn_only_smart = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_smart", self, false, false)
-	self.respawn_idle = utils.cfg_get_number(ini, "smart_terrain", "respawn_idle", 	self, false, 43200)
-	self.respawn_only_level = utils.cfg_get_bool(ini, "smart_terrain", "respawn_only_level", self, false, false)
-	self.respawn_point = false
+	local ini = self.ini
+	
+	self.arrive_dist			= ini:r_float_ex("smart_terrain","arrive_dist") or 50
+	self.death_idle_time 		= ini:r_float_ex("smart_terrain","death_idle_time") or 600
+	self.def_restr				= ini:r_string_ex("smart_terrain","def_restr")	-- default out_restrictor for npc on jobs here
+	self.default_faction 		= ini:r_string_ex("smart_terrain","default_faction")
+	self.faction_controlled 	= ini:r_string_ex("smart_terrain","faction_controlled")
+	self.max_population 		= tonumber(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, xr_logic.parse_condlist(nil, "smart_terrain", "max_population", ini:r_string_ex("smart_terrain","max_population") or ""))) or 0
+	self.respawn_idle 			= ini:r_float_ex("smart_terrain","respawn_idle") or 43200
+	self.respawn_only_level 	= ini:r_bool_ex("smart_terrain","respawn_only_level") or false
+	self.respawn_only_smart 	= ini:r_bool_ex("smart_terrain","respawn_only_smart") or false
+	self.respawn_point 			= false
+	self.respawn_radius  		= ini:r_float_ex("smart_terrain","respawn_radius") or 40000
+	self.safe_restr				= ini:r_string_ex("smart_terrain","safe_restr")	-- npc with jobs inside are invulnerable
+	self.spawn_point			= ini:r_string_ex("smart_terrain","spawn_point")
+	self.squad_id				= ini:r_float_ex("smart_terrain","squad_id") or 0	
 	
 	if (self.faction_controlled) then
-		local spawn_num = utils.cfg_get_string(ini, "smart_terrain", "faction_respawn_num",	self, false, "", nil)
+		local spawn_num = ini:r_string_ex("smart_terrain","faction_respawn_num")
 		if (spawn_num) then 
 			spawn_num = xr_logic.parse_condlist(nil, "smart_terrain", "faction_respawn_num", spawn_num)
 			self.respawn_params 	= {}
@@ -245,15 +205,15 @@ function se_smart_terrain:read_params()
 			local p = utils.parse_names(self.faction_controlled)
 			if (p) then
 				local squads_by_faction = {
-					["stalker"] = "stalker_sim_squad_novice, stalker_sim_squad_advanced, stalker_sim_squad_veteran",
-					["bandit"] = "bandit_sim_squad_novice, bandit_sim_squad_advanced, bandit_sim_squad_veteran",
-					["ecolog"] = "ecolog_sim_squad_novice, ecolog_sim_squad_advanced, ecolog_sim_squad_veteran",
 					["army"] = "army_sim_squad_novice, army_sim_squad_advanced, army_sim_squad_veteran",
+					["bandit"] = "bandit_sim_squad_novice, bandit_sim_squad_advanced, bandit_sim_squad_veteran",
 					["csky"] = "csky_sim_squad_novice, csky_sim_squad_advanced, csky_sim_squad_veteran",
+					["dolg"] = "duty_sim_squad_novice, duty_sim_squad_advanced, duty_sim_squad_veteran",
+					["ecolog"] = "ecolog_sim_squad_novice, ecolog_sim_squad_advanced, ecolog_sim_squad_veteran",
+					["freedom"] = "freedom_sim_squad_novice, freedom_sim_squad_advanced, freedom_sim_squad_veteran",
 					["killer"] = "merc_sim_squad_novice, merc_sim_squad_advanced, merc_sim_squad_veteran",
 					["monolith"] = "monolith_sim_squad_novice, monolith_sim_squad_advanced, monolith_sim_squad_veteran",
-					["dolg"] = "duty_sim_squad_novice, duty_sim_squad_advanced, duty_sim_squad_veteran",
-					["freedom"] = "freedom_sim_squad_novice, freedom_sim_squad_advanced, freedom_sim_squad_veteran"
+					["stalker"] = "stalker_sim_squad_novice, stalker_sim_squad_advanced, stalker_sim_squad_veteran"				
 				}
 				
 				for i,faction in pairs(p) do
@@ -298,7 +258,7 @@ function se_smart_terrain:read_params()
 		if not ini:section_exist(prop_name) then
 			printf("ERROR: %s Wrong smatr_terrain respawn_params section [%s] prop [%s](there is no section)",self:name(), respawn_params, prop_name)
 		else
-			local spawn_num = utils.cfg_get_string(ini, prop_name, "spawn_num", 	self, false, "", nil)
+			local spawn_num = ini:r_string_ex(prop_name,"spawn_num")
 			if not (spawn_num) then 
 				printf("ERROR: %s Wrong smart_terrain respawn_params section [%s] prop [%s] line [spawn_num](there is no line)",self:name(),respawn_params, prop_name)
 			else
@@ -308,8 +268,8 @@ function se_smart_terrain:read_params()
 				self.respawn_params[prop_name].num		= spawn_num
 				self.already_spawned[prop_name].num	= 0
 				
-				local spawn_squads = utils.cfg_get_string(ini, prop_name, "spawn_squads", 	self, false, "", nil)
-				local spawn_helicopter = utils.cfg_get_string(ini, prop_name, "spawn_helicopter", 	self, false, "", nil)
+				local spawn_squads = ini:r_string_ex(prop_name,"spawn_squads")
+				local spawn_helicopter = ini:r_string_ex(prop_name,"spawn_helicopter")
 				if (spawn_helicopter) then 
 					spawn_helicopter = utils.parse_names(spawn_helicopter)
 					self.respawn_params[prop_name].helicopter = spawn_helicopter
@@ -523,6 +483,9 @@ function se_smart_terrain:load_jobs()
 					end 
 					
 					active_section = ltx:r_string_ex(section, "active")
+					if not (active_section) then 
+						abort("%s has no active = in logic %s",self:name(),self.ltx_name)
+					end
 
 					job_type = gulag_general.get_job_type(job)
 					job.alife_task = self.smart_alife_task
@@ -591,21 +554,15 @@ function se_smart_terrain:clear_job(id,rem)
 	--alun_utils.debug_write(strformat("%s:clear_job %s",self:name(),id))
 	if (self.npc_info[id]) then 
 		if (self.npc_info[id].job) then 
-			self.npc_by_job_section[self.npc_info[id].job.section] = nil
+			for sec,npcid in pairs(self.npc_by_job_section) do 
+				if (id == npcid) then 
+					self.npc_by_job_section[sec] = nil
+				end
+			end
 		end
 		if (rem) then
 			self.npc_info[id] = nil
 		end
-	end
-end 
-
-function se_smart_terrain:force_assign_arrived_job(id)
-	local se_obj = self.arriving_npc[id]
-	if (se_obj) then 
-		if (arrived_to_smart(se_obj,self)) then 
-			self.npc_info[id] = self:fill_npc_info(se_obj)
-			self.arriving_npc[id] = nil
-		end 	
 	end
 end 
 
@@ -635,11 +592,11 @@ function se_smart_terrain:update_jobs()
 	self.level_id = self.level_id or gg:vertex(self.m_game_vertex_id):level_id()
 	
 	-- Update Jobs for existing NPCs
-	for id,npc_info in pairs(self.npc_info) do
-		local se_obj = npc_info.se_obj
+	for id,info in pairs(self.npc_info) do
+		local se_obj = info.se_obj
 		if (se_obj) then
 			if (self.level_id == gg:vertex(se_obj.m_game_vertex_id):level_id()) then
-				self:select_npc_job(npc_info)
+				self:select_npc_job(info)
 			else 
 				self.arriving_npc[id] = se_obj
 				self:clear_job(id,true)
@@ -654,7 +611,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 	if (self.disabled) then
 		return
 	end
-
+	
 	--alun_utils.debug_write(strformat("%s:select_npc_job %s",self:name()))
 	
 	if not (npc_info and npc_info.se_obj and npc_info.stype) then 
@@ -700,7 +657,8 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 					npc_id = self.npc_by_job_section[itr_job.section]
 					
 					-- Check empty job
-					if (npc_id == nil or npc_id == npc_info.se_obj.id) then
+					--if (npc_id == nil or npc_id == npc_info.se_obj.id) then
+					if (npc_id == nil) then
 						-- Find only higher priority jobs if already linked to a job
 						if (gulag_general.get_job_prior(itr_job) > gulag_general.get_job_prior(npc_info.job)) then
 							if (job_avail_to_npc(npc_info, itr_job, self)) then
@@ -710,6 +668,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 									npc_info.current_index = 1
 								end
 							end
+						--[[
 						else
 							-- Found a job with npc_id but npc isn't on the job, remove it
 							if (npc_id == npc_info.se_obj.id and npc_info.job ~= itr_job) then
@@ -717,18 +676,28 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 							end
 							-- Rest of jobs in table will be lower priority, so reset index
 							npc_info.current_index = 1
+						--]]
 						end
 					end
 				end
 			else
 				-- Job is no longer available, unlink job info
-				self.npc_by_job_section[npc_info.job.section] = nil
+				for sec,npcid in pairs(self.npc_by_job_section) do 
+					if (npcid == npc_info.se_obj.id) then 
+						self.npc_by_job_section[sec] = nil
+					end
+				end
 				npc_info.job = nil
 				npc_info.current_index = 1
 			end
 		else
 			-- Job is not linked properly, npc_id doesn't match owner se_obj
-			self.npc_by_job_section[npc_info.job.section] = nil
+			for sec,npcid in pairs(self.npc_by_job_section) do 
+				if (npcid == npc_info.se_obj.id) then 
+					self.npc_by_job_section[sec] = nil
+				end
+			end
+		
 			npc_info.job = nil
 			npc_info.current_index = 1
 		end
@@ -773,42 +742,46 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 		end
 	end
 
+	local id = npc_info.se_obj.id
 	-- newly selected job
 	if (new_job and new_job ~= npc_info.job) then
-
+		
 		-- Unassign npc_id from old job and unreference job section
-		if (npc_info.job) then
-			self.npc_by_job_section[npc_info.job.section] = nil
+		for sec,npcid in pairs(self.npc_by_job_section) do 
+			if (npcid == id) then 
+				self.npc_by_job_section[sec] = nil
+			end
 		end
-
+			
 		-- setup table that references NPCs by their job section
-		self.npc_by_job_section[new_job.section] = npc_info.se_obj.id
+		self.npc_by_job_section[new_job.section] = id
 
 		-- link up NPC info and references
 		npc_info.job = new_job
 		npc_info.begin_job = false
 
 		-- grab storage and ensure object is online.
-		local st = self.online and db.storage[npc_info.se_obj.id]
+		local st = self.online and db.storage[id]
 		
 		-- If NPC has storage, it is online, so switch logic
 		if (st and st.object) then
 			--xr_logic.switch_to_section(st.object, self.ltx, "nil")
 			npc_info.begin_job = true
-			empty_table(db.offline_objects[npc_info.se_obj.id])
+			empty_table(db.offline_objects[id])
 			self:setup_logic(st.object)
-			return
+			return true
 		end
 	end
 
 	if (npc_info.begin_job ~= true and npc_info.job) then
 		-- grab storage and ensure object is online.
-		local st = self.online and db.storage[npc_info.se_obj.id]
+		local st = self.online and db.storage[id]
 		-- If NPC has storage it is online, so switch logic
 		if (st and st.object) then
 			npc_info.begin_job = true
-			empty_table(db.offline_objects[npc_info.se_obj.id])
+			empty_table(db.offline_objects[id])
 			self:setup_logic(st.object)
+			return true
 		end
 	end
 end
@@ -1122,6 +1095,20 @@ function se_smart_terrain:STATE_Read(packet, size)
 			local id = packet:r_stringZ()
 			local num = packet:r_u8()
 			if (id and id ~= "nil" and id ~= "") then
+				-- technically it's an error but it's makes save compatible if change respawn
+				if not (self.already_spawned[id]) then 
+					self.already_spawned[id] = {}
+				end
+				--[[
+				if (self.already_spawned[id] == nil) then 
+					printf("ERROR! %s:STATE_Read already_spawned %s is nil!",self:name(),id)
+					local str = ""
+					for k,v in pairs(self.already_spawned) do 
+						str = str .. k .. ", "
+					end
+					printf("ERROR! %s.already_spawned[%s]",self:name(),str)
+				end
+				--]]
 				self.already_spawned[id].num = num
 			end
 		end
@@ -1157,13 +1144,13 @@ function se_smart_terrain:init_npc_after_load()
 
 			if (new_info.job) then
 				self.npc_by_job_section[new_info.job.section] = id
-				new_info.begin_job = info.begin_job
+				new_info.begin_job = false --info.begin_job
 				new_info.need_job = info.need_job
 			end
 
 			self.npc_info[id] = new_info
 		else
-			self.npc_info.job = self:find_job_by_section(info.job_section)
+			--self.npc_info.job = self:find_job_by_section(info.job_section)
 			self:clear_job(id,true)
 		end
 	end
@@ -1417,11 +1404,22 @@ end
 function setup_gulag_and_logic_on_spawn(obj, st, se_obj, stype, loaded)
 	--alun_utils.debug_write(strformat("smart_terrain.setup_gulag_and_logic_on_spawn %s",obj and obj:name()))
 	local sim = alife()
+	
+	-- Expedite arrival and job assignment
 	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and sim:object(se_obj.m_smart_terrain_id)
-	local npc_info = smart and smart.npc_info and smart.npc_info[se_obj.id]
-	if (npc_info) then
-		npc_info.begin_job = false
+	if (smart) then
+		if (smart.arriving_npc[se_obj.id] and arrived_to_smart(se_obj,smart)) then 
+			smart.npc_info[se_obj.id] = smart:fill_npc_info(se_obj)
+			smart.arriving_npc[se_obj.id] = nil
+			smart:select_npc_job(smart.npc_info[se_obj.id],true)
+		end 
+		local npc_info = smart.npc_info[se_obj.id]
+		if (npc_info) then
+			npc_info.begin_job = false
+			return
+		end
 	end
+
 	xr_logic.initialize_obj(obj, st, loaded, db.actor, stype)
 end
 
@@ -1665,7 +1663,7 @@ function se_smart_terrain:try_respawn()
 					
 					local se_heli = alife():create(heli,pos,lvid,gvid)
 					
-					local visual = utils.cfg_get_string(system_ini(),heli,"visual",se_heli,false)
+					local visual = system_ini():r_string_ex(heli,"visual")
 					-- required to spawn by script
 					local data = stpk_utils.get_heli_data(se_heli)
 					if (data) then

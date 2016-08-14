@@ -16,8 +16,8 @@ function se_heli:on_register()
 	story_objects.check_spawn_ini_for_story_id(self)
 	se_helicopters[self.id] = self
 	local ltx = system_ini()
-	self.player_id = utils.cfg_get_string(ltx,self:section_name(), "player_id", self, false, "") or "heli"
-	self.community = utils.cfg_get_string(ltx,self:section_name(), "faction", self, false, "") or "heli"
+	self.player_id = ltx:r_string_ex(self:section_name(),"player_id") or "heli"
+	self.community = ltx:r_string_ex(self:section_name(),"faction") or "heli"
 end
 
 function se_heli:on_unregister()

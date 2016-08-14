@@ -171,14 +171,14 @@ function enable_generic_schemes(npc,ini,section,stype)
 
 	if (stype == stype_stalker) then 
 		stalker_generic.reset_invulnerability(npc,ini,section)
-		local info_section = utils.cfg_get_string(ini,section,"info",npc,false,"")
+		local info_section = ini:r_string_ex(section,"info")
 		if (info_section) then
 			stalker_generic.set_npc_info(npc,ini,"info",info_section)
 		end
 	elseif (stype == stype_mobile) then 
 		stalker_generic.reset_invulnerability(npc,ini,section)
 	elseif (stype == stype_item) then
-		local hit_section = utils.cfg_get_string(ini, section, "on_hit", npc, false, "")
+		local hit_section = ini:r_string_ex(section,"on_hit")
 		if hit_section then
 			ph_on_hit.set_scheme(npc, ini, "ph_on_hit", hit_section)
 		end

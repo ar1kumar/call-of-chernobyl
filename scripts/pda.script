@@ -472,15 +472,10 @@ function fill_sleep_zones()
 end
 
 function add_quick_slot_items_on_game_start()
-	local _ini = system_ini()
-	local str = utils.cfg_get_string(_ini, "actor", "quick_item_1", db.actor, false, "", "")
-	get_console():execute("slot_0 "..str)
-	local str = utils.cfg_get_string(_ini, "actor", "quick_item_2", db.actor, false, "", "")
-	get_console():execute("slot_1 "..str)
-	local str = utils.cfg_get_string(_ini, "actor", "quick_item_3", db.actor, false, "", "")
-	get_console():execute("slot_2 "..str)
-	local str = utils.cfg_get_string(_ini, "actor", "quick_item_4", db.actor, false, "", "")
-	get_console():execute("slot_3 "..str)
+	local ini = system_ini()
+	for i=0,3 do 
+		get_console():execute( strformat("slot_%s %s",i, ini:r_string_ex("actor","quick_item_"..tostring(i+1)) or "") )
+	end
 end
 
 function change_anomalies_names()

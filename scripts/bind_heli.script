@@ -51,14 +51,12 @@ function heli_binder:reinit()
 
 	self.last_hit_snd_timeout = 0
 
-	local ltx = system_ini()
+	self.flame_start_health   = system_ini():r_float_ex("helicopter","flame_start_health") or 0.1
 
-	self.flame_start_health   = utils.cfg_get_number( ltx, "helicopter", "flame_start_health", self.object, true ) or 0.1
-
-	local object_ini = self.object:spawn_ini()
-	self.snd_hit	= utils.cfg_get_string( object_ini, "helicopter", "snd_hit", self.object, false, "", "heli_hit")
-	self.snd_damage = utils.cfg_get_string( object_ini, "helicopter", "snd_damage", self.object, false, "", "heli_damaged")
-	self.snd_down	= utils.cfg_get_string( object_ini, "helicopter", "snd_down", self.object, false, "", "heli_down")
+	local spawn_ini = self.object:spawn_ini()
+	self.snd_hit	= spawn_ini and spawn_ini:r_string_ex("helicopter","snd_hit") or "heli_hit"
+	self.snd_damage = spawn_ini and spawn_ini:r_string_ex("helicopter","snd_damage") or "heli_damaged"
+	self.snd_down	= spawn_ini and spawn_ini:r_string_ex("helicopter","snd_down") or "heli_down"
 
 	-- на случай загрузки
 	self.st.last_alt       = self.st.heliObject:GetRealAltitude()

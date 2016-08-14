@@ -344,7 +344,7 @@ end
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
-	local wounded_section = utils.cfg_get_string (ini, section, "wounded", npc, false, "")
+	local wounded_section = ini:r_string_ex(section,"wounded")
 	local st = xr_logic.assign_storage_and_bind(npc,ini,"wounded",wounded_section,temp)
 	st.wound_manager = Cwound_manager(npc, st)
 end
@@ -391,9 +391,9 @@ function reset_generic_scheme(npc,scheme,section,stype,st)
 	if (st.wounded) then
 		local wounded_section
 		if scheme == nil or scheme == "nil" then
-			wounded_section = utils.cfg_get_string(st.ini, st.section_logic, "wounded", npc, false, "")
+			wounded_section = st.ini:r_string_ex(st.section_logic,"wounded")
 		else
-			wounded_section = utils.cfg_get_string(st.ini, section, "wounded", npc, false, "")
+			wounded_section = st.ini:r_string_ex(section,"wounded")
 		end
 		init_wounded(npc, st.ini, wounded_section, st.wounded, scheme)
 		st.wounded.wound_manager:hit_callback()
@@ -480,19 +480,19 @@ function init_wounded(npc, ini, section, st, scheme)
 		st.enable_talk	= true
 		st.not_for_help	= def.not_for_help
 	else
-		st.hp_state		= utils.parse_data(npc, utils.cfg_get_string(ini, section, "hp_state", npc, false, "", def.hp_state))
-		st.hp_state_see	= utils.parse_data(npc, utils.cfg_get_string(ini, section, "hp_state_see", npc, false, "", def.hp_state_see))
-		st.psy_state	= utils.parse_data(npc, utils.cfg_get_string(ini, section, "psy_state", npc, false, "", def.psy_state))
-		st.hp_victim	= utils.parse_data(npc, utils.cfg_get_string(ini, section, "hp_victim", npc, false, "", def.hp_victim))
-		st.hp_cover		= utils.parse_data(npc, utils.cfg_get_string(ini, section, "hp_cover", npc, false, "", def.hp_cover))
-		st.hp_fight		= utils.parse_data(npc, utils.cfg_get_string(ini, section, "hp_fight", npc, false, "", def.hp_fight))
-		st.syndata		= utils.parse_syn_data(npc, utils.cfg_get_string(ini, section, "syndata", npc, false, "", def.syndata))
-		st.help_dialog	= utils.cfg_get_string(ini, section, "help_dialog", npc, false, "", def.help_dialog)
-		st.help_start_dialog = utils.cfg_get_string(ini, section, "help_start_dialog", npc, false, "", nil)
-		st.use_medkit   = utils.cfg_get_bool(ini, section, "use_medkit", npc, false, def.use_medkit)
-		st.autoheal		= utils.cfg_get_bool(ini, section, "autoheal", npc, false, true)
-		st.enable_talk	= utils.cfg_get_bool(ini, section, "enable_talk", npc, false, true)
-		st.not_for_help	= utils.cfg_get_bool(ini, section, "not_for_help", npc, false, def.not_for_help)
+		st.hp_state		= utils.parse_data(npc, ini:r_string_ex(section,"hp_state") or def.hp_state)
+		st.hp_state_see	= utils.parse_data(npc, ini:r_string_ex(section,"hp_state_see") or def.hp_state_see)
+		st.psy_state	= utils.parse_data(npc, ini:r_string_ex(section,"psy_state") or def.psy_state)
+		st.hp_victim	= utils.parse_data(npc, ini:r_string_ex(section,"hp_victim") or def.hp_victim)
+		st.hp_cover		= utils.parse_data(npc, ini:r_string_ex(section,"hp_cover") or def.hp_cover)
+		st.hp_fight		= utils.parse_data(npc, ini:r_string_ex(section,"hp_fight") or def.hp_fight)
+		st.syndata		= utils.parse_syn_data(npc, ini:r_string_ex(section,"syndata") or def.syndata)
+		st.help_dialog	= ini:r_string_ex(section,"help_dialog") or def.help_dialog
+		st.help_start_dialog = ini:r_string_ex(section,"help_start_dialog")
+		st.use_medkit   = ini:r_bool_ex(section,"use_medkit") or def.use_medkit
+		st.autoheal		= ini:r_bool_ex(section,"autoheal") or true
+		st.enable_talk	= ini:r_bool_ex(section,"enable_talk") or true
+		st.not_for_help	= ini:r_bool_ex(section,"not_for_help") or def.not_for_help
 	end
 
 	-- флажок, что функция хотя бы раз вызывалась
