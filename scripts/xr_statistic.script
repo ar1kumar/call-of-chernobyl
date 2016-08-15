@@ -564,7 +564,7 @@ function inc_actor_rank(rank)
 		db.actor:set_character_rank(db.actor:character_rank() + rank)
 	end
 	check_actor_rank_change()
---	news_manager.send_tip(db.actor, "Rank: ".. db.actor:character_rank(), nil, "rank_change", nil, nil)
+--	news_manager.send_tip(db.actor, "Rank: ".. db.actor:character_rank(), nil, "rank_rep_change", nil, nil)
 end
 
 -- Check for actor rank change.
@@ -580,9 +580,9 @@ function check_actor_rank_change()
 		old = old + 1
 	end
 	if old > new then
-		news_manager.send_tip(db.actor, "st_rank_decreased", nil, "rank_change", nil, nil)
+		news_manager.send_tip(db.actor, "st_rank_decreased", nil, "rank_rep_change", nil, nil)
 	elseif new > old then
-		news_manager.send_tip(db.actor, "st_rank_increased", nil, "rank_change", nil, nil)
+		news_manager.send_tip(db.actor, "st_rank_increased", nil, "rank_rep_change", nil, nil)
 	end
 	actor_statistic.actual_rank = current_rank
 end
@@ -592,7 +592,7 @@ function inc_actor_reputation(reputation)
 	if reputation and ((db.actor:character_reputation()+reputation) <= 2500 and (db.actor:character_reputation()+reputation) >= -2500) then
 		db.actor:change_character_reputation(reputation)
 	end
---	news_manager.send_tip(db.actor, "Reputation: ".. db.actor:character_reputation(), nil, "reputation_change", nil, nil)
+--	news_manager.send_tip(db.actor, "Reputation: ".. db.actor:character_reputation(), nil, "rank_rep_change", nil, nil)
 	check_actor_reputation_change()
 end
 
@@ -609,9 +609,9 @@ function check_actor_reputation_change()
 		old = old + 1
 	end
 	if old > new then
-		news_manager.send_tip(db.actor, "st_reputation_decreased", nil, "reputation_change", nil, nil)
+		news_manager.send_tip(db.actor, "st_reputation_decreased", nil, "rank_rep_change", nil, nil)
 	elseif new > old then
-		news_manager.send_tip(db.actor, "st_reputation_increased", nil, "reputation_change", nil, nil)
+		news_manager.send_tip(db.actor, "st_reputation_increased", nil, "rank_rep_change", nil, nil)
 	end
 	actor_statistic.actual_reputation = current_reputation
  end
