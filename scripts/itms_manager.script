@@ -34,6 +34,7 @@ local ini = ini_file("plugins\\itms_manager.ltx")
 	-- Repair mod
 	local RepairModEnable = ini:r_bool_ex("repair_mod","enable",true)
 	local RepairTools = RepairModEnable and alun_utils.collect_section(ini,"repair_mod_tools",true)
+	local RepairUI = RepairModEnable and ini:r_bool_ex("repair_mod","use_ui",false)
 
 	-- Loot Mutant mod
 	local MutantLootEnable = ini:r_bool_ex("mutant_loot_mod","enable",true)
@@ -59,7 +60,7 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_item_take_from_box",actor_on_item_take_from_box)
 	RegisterScriptCallback("physic_object_on_use_callback",physic_object_on_use_callback)
 	RegisterScriptCallback("squad_assign_new_target",squad_assign_new_target)
-	--RegisterScriptCallback("npc_on_item_take_from_box",npc_on_item_take_from_box)
+	RegisterScriptCallback("CUIActorMenu_OnItemDropped",on_item_drag_dropped)
 end
 
 function on_game_load()
@@ -85,6 +86,101 @@ function on_game_load()
 	end
 	--]]
 end
+
+function on_item_drag_dropped(itm1,itm2,from_slot,to_slot)
+	--printf("itm1=%s itm2=%s from_slot=%s to_slot=%s",itm1 and itm1:name(),itm2 and itm2:name(),from_slot,to_slot)
+	if (from_slot ~= EDDListType.iActorBag) then 
+		return 
+	end 
+	
+	if not (to_slot == EDDListType.iActorSlot or to_slot == EDDListType.iActorBag) then 
+		return 
+	end
+	
+	local section = itm1:section()
+	if not (RepairTools[section]) then 
+		return 
+	end
+
+	local ini = system_ini()
+	local repair_type = ini:r_string_ex(section,"repair_type")
+	if not (repair_type) then 
+		return 
+	end
+
+	if (repair_type == "weapon") then 
+		if not (IsWeapon(itm2)) then 
+			return 
+		end
+	elseif (repair_type == "outfit") then 
+		if not (IsOutfit(itm2) or IsHeadgear(itm2)) then 
+			return 
+		end
+	elseif (repair_type == "all") then 
+		if not (IsWeapon(itm2) or IsOutfit(itm2) or IsHeadgear(itm2)) then
+			return
+		end
+	end
+	
+	local cur_condition = itm2:condition()
+	local c_min = ini:r_float_ex(section,"repair_min_condition") or 0
+	local c_max = ini:r_float_ex(section,"repair_max_condition") or 0.75
+	
+	if (cur_condition < c_min) then 
+		ui_dyn_msg_box.msg_box_ui("message_box_ok",true,game.translate_string("st_repair_mod_message_box_condition_to_low"))
+		return
+	elseif (cur_condition > c_max) then 
+		ui_dyn_msg_box.msg_box_ui("message_box_ok",true,game.translate_string("st_repair_mod_message_box_condition_to_high"))
+		return	
+	end
+	
+	local c_add = ini:r_float_ex(section,"repair_add_condition") or 0.15
+	if (has_alife_info("achieved_mechanized_warfare")) then 
+		c_add = c_add + 0.10
+	end
+	
+	local function on_yes(owner,p)
+		
+		
+		local new_condition = cur_condition + c_add
+		if (new_condition > c_max) then 
+			new_condition = c_max
+		end
+		
+		itm2:set_condition(new_condition)
+		
+		local use_condition = ini:r_bool_ex(section,"use_condition",false)
+		if (use_condition) then 
+			local r = itm1:get_remaining_uses()
+			if (r-1 >= 0) then
+				r = r - 1
+				itm1:set_remaining_uses(r)
+			end
+			if (r <= 0) then 
+				local se_obj = alife():object(itm1:id())
+				if (se_obj) then 
+					alife():release(se_obj,true)
+				end
+			end
+		else 
+			local se_obj = alife():object(itm1:id())
+			if (se_obj) then 
+				alife():release(se_obj,true)
+			end
+		end
+		
+		ActorMenu.get_actor_menu():refresh_current_cell_item()
+	end
+	
+	local function on_no(owner,p)
+	
+	end
+	
+	local inv_name = game.translate_string(ini:r_string_ex(itm2:section(),"inv_name") or "st_none")
+	local msg = strformat(game.translate_string("st_repair_mod_message_box_ask"),inv_name,c_add*100)
+
+	ui_dyn_msg_box.msg_box_ui("message_box_yes_no",true,msg,on_yes,on_no)
+end 
 
 local torch_delay
 -- bind_stalker update
@@ -272,13 +368,20 @@ function actor_on_item_use(obj)
 
 	-- Repair mod
 	if (RepairModEnable and RepairTools[obj:section()]) then
-		local hud = get_hud()
-		if (hud) then
-			--hud:HideActorMenu()
-			local ui = ui_itm_repair and ui_itm_repair.repair_ui(hud,obj,obj:section())
-			if (ui) then
-				ui:ShowDialog(true)
-				ui:FillList()
+		if (RepairUI) then
+			local hud = get_hud()
+			if (hud) then
+				--hud:HideActorMenu()
+				local ui = ui_itm_repair and ui_itm_repair.repair_ui(hud,obj,obj:section())
+				if (ui) then
+					ui:ShowDialog(true)
+					ui:FillList()
+				end
+			end
+		else 
+			local r = obj:get_remaining_uses()
+			if (r+1 <= obj:get_max_uses()) then
+				obj:set_remaining_uses(r+1)
 			end
 		end
 	end

@@ -5,7 +5,6 @@ Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
 class "msg_box_ui" (CUIScriptWnd)
-
 function msg_box_ui:__init(typ,show,txt,func_ok,func_cancel,...) super()
 	self:SetWndRect					(Frect():set(0,0,1024,768))
 	self.message_box = CUIMessageBoxEx()
@@ -38,16 +37,15 @@ function msg_box_ui:OnMsgOk()
 end
 
 function msg_box_ui:OnKeyboard(dik, keyboard_action)
-	local res = CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
-	if res==false then
-		local bind = dik_to_bind(dik)
-		if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
-			if dik == DIK_keys.DIK_ESCAPE then
-				self:OnMsgCancel()
-			end
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if (keyboard_action == ui_events.WINDOW_KEY_PRESSED) then
+		if (dik == DIK_keys.DIK_RETURN) then
+
+		elseif (dik == DIK_keys.DIK_ESCAPE) then
+			self:OnMsgCancel()
 		end
 	end
-	return res
+	return true
 end
 
 function msg_box_ui:OnMsgCancel()
