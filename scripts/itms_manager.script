@@ -129,7 +129,7 @@ function on_item_drag_dropped(itm1,itm2,from_slot,to_slot)
 	if (cur_condition < c_min) then 
 		ui_dyn_msg_box.msg_box_ui("message_box_ok",true,game.translate_string("st_repair_mod_message_box_condition_to_low"))
 		return
-	elseif (cur_condition > c_max) then 
+	elseif (cur_condition >= c_max) then 
 		ui_dyn_msg_box.msg_box_ui("message_box_ok",true,game.translate_string("st_repair_mod_message_box_condition_to_high"))
 		return	
 	end
@@ -147,6 +147,7 @@ function on_item_drag_dropped(itm1,itm2,from_slot,to_slot)
 			new_condition = c_max
 		end
 		
+		--printf("%s:set_condition(%s)",itm2:name(),new_condition)
 		itm2:set_condition(new_condition)
 		
 		local use_condition = ini:r_bool_ex(section,"use_condition",false)

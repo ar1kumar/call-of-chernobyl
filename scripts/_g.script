@@ -8,6 +8,8 @@ if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
 end
 
+USE_INI_MEMOIZE = true 
+
 -- Improves performance if true, by disabling update methods for squads and smart terrains on levels not linked in configs\ai_tweaks\simulation_objects.ltx
 -- But this means simulation will only be active on actor level and linked levels everything else will remain in an idle state
 DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = true
@@ -1416,104 +1418,112 @@ function give_object_to_actor(obj,count)
   end
 end
 
--- memoize ini results
-local ini_cache = {}
-function clear_ini_cache()
-	empty_table(ini_cache)
-end 
 
--- extensions
-function ini_file.r_string_ex(ini,s,k)
-	if not (ini_cache[ini]) then 
-		ini_cache[ini] = {}
-	end 
-	
-	if not (s) then
-		callstack()
-	end
-	
-	local key = s .. "&" .. k
-	if (ini_cache[ini][key]) then 
-		--printf("res=%s",ini_cache[ini][key])
-		return ini_cache[ini][key]
-	else 
-		local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_string(s,k) or nil
-		if (res == nil) then 
-			return 
+if (USE_INI_MEMOIZE) then
+	-- memoize ini results
+	local ini_cache = {}
+
+	-- extensions
+	function ini_file.r_string_ex(ini,s,k)
+		if not (ini_cache[ini]) then 
+			ini_cache[ini] = {}
+		end 
+		
+		if not (s) then
+			callstack()
 		end
-		ini_cache[ini][key] = res 
-		return res
+		
+		local key = s .. "&" .. k
+		if (ini_cache[ini][key]) then 
+			--printf("res=%s",ini_cache[ini][key])
+			return ini_cache[ini][key]
+		else 
+			local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_string(s,k) or nil
+			if (res == nil) then 
+				return 
+			end
+			ini_cache[ini][key] = res 
+			return res
+		end
 	end
-end
 
--- only one that can return a default value because def needs returned only on nil, not on false
-function ini_file.r_bool_ex(ini,s,k,def)
-	if not (ini_cache[ini]) then 
-		ini_cache[ini] = {}
+	-- only one that can return a default value because def needs returned only on nil, not on false
+	function ini_file.r_bool_ex(ini,s,k,def)
+		if not (ini_cache[ini]) then 
+			ini_cache[ini] = {}
+		end 
+		
+		local key = s .. "&" .. k
+		if (ini_cache[ini][key]) then 
+			--printf("res=%s",ini_cache[ini][key])
+			return ini_cache[ini][key]
+		else
+			if not (ini:section_exist(s) and ini:line_exist(s,k)) then 
+				return def
+			end
+			local v = ini:r_string(s,k)
+			if (v == nil) then
+				return def 
+			end
+			local res = v == "true"
+			ini_cache[ini][key] = res 
+			return res
+		end
+	end
+	function ini_file.r_float_ex(ini,s,k)
+		if not (ini_cache[ini]) then 
+			ini_cache[ini] = {}
+		end 
+		
+		local key = s .. "&" .. k
+		if (ini_cache[ini][key]) then 
+			--printf("res=%s",ini_cache[ini][key])
+			return ini_cache[ini][key]
+		else 
+			local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_float(s,k) or nil
+			if (res == nil) then 
+				return 
+			end
+			ini_cache[ini][key] = res 
+			return res
+		end
+	end
+	function ini_file.r_line_ex(ini,s,k)
+		if not (ini_cache[ini]) then 
+			ini_cache[ini] = {}
+		end 
+		
+		local key = s .. "&" .. k
+		if (ini_cache[ini][key]) then 
+			--printf("res=%s",ini_cache[ini][key])
+			return unpack(ini_cache[ini][key])
+		else 
+			local a,b,c = ini:r_line(s,k,"","")
+			ini_cache[ini][key] = {a,b,c}
+			return a,b,c
+		end
+	end 
+else 
+	function ini_file.r_string_ex(s,k)
+		return ini:section_exist(s) and ini:line_exist(s,k) and ini:r_string_ex(s,k)
 	end 
 	
-	if not (s) then
-		callstack()
-	end
+	function ini_file.r_float_ex(s,k)
+		return ini:section_exist(s) and ini:line_exist(s,k) and ini:r_float_ex(s,k)
+	end 
 	
-	local key = s .. "&" .. k
-	if (ini_cache[ini][key]) then 
-		--printf("res=%s",ini_cache[ini][key])
-		return ini_cache[ini][key]
-	else
+	function ini_file.r_bool_ex(s,k,def)
 		if not (ini:section_exist(s) and ini:line_exist(s,k)) then 
-			return def
-		end
-		local v = ini:r_string(s,k)
-		if (v == nil) then
 			return def 
 		end
-		local res = v == "true"
-		ini_cache[ini][key] = res 
-		return res
-	end
-end
-function ini_file.r_float_ex(ini,s,k)
-	if not (ini_cache[ini]) then 
-		ini_cache[ini] = {}
+		local v = ini:r_bool_ex(s,k)
+		return v == nil and def or v 
 	end 
 	
-	if not (s) then
-		callstack()
-	end
-	
-	local key = s .. "&" .. k
-	if (ini_cache[ini][key]) then 
-		--printf("res=%s",ini_cache[ini][key])
-		return ini_cache[ini][key]
-	else 
-		local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_float(s,k) or nil
-		if (res == nil) then 
-			return 
-		end
-		ini_cache[ini][key] = res 
-		return res
+	function ini_file.r_line_ex(ini,s,k)
+		return ini:r_line(s,k,"","")
 	end
 end
-function ini_file.r_line_ex(ini,s,k)
-	if not (ini_cache[ini]) then 
-		ini_cache[ini] = {}
-	end 
-	
-	if not (s) then
-		callstack()
-	end
-	
-	local key = s .. "&" .. k
-	if (ini_cache[ini][key]) then 
-		--printf("res=%s",ini_cache[ini][key])
-		return unpack(ini_cache[ini][key])
-	else 
-		local a,b,c = ini:r_line(s,k,"","")
-		ini_cache[ini][key] = {a,b,c}
-		return a,b,c
-	end
-end 
 
 -----------------------------------------
 -- New INI wrapper to replace alun_utils.cfg_file
