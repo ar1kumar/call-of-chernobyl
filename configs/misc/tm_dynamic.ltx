@@ -256,7 +256,7 @@ stage_complete = 1
 status_functor = hostage_task
 status_functor_params = hostage_companion_task_1
 target_functor = simulation_task_target
-on_init = %=find_smart_under_faction_control_ex(simulation_task_10_id:bandit) =setup_companion_task(hostage_companion_task_1_stalker:nil:simulation_task_10_id:true) +hostage_companion_task_1_started%
+on_init = %=find_smart_under_faction_control_ex(simulation_task_10_id:bandit) =setup_companion_task(hostage_companion_task_1_ecolog:nil:simulation_task_10_id:true) +hostage_companion_task_1_started%
 precondition = {=random_chance =is_faction_enemy_to_actor(bandit) -hostage_companion_task_1_started -hostage_companion_task_1_hostage_rescued =all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:bandit) !squad_exist(hostage_companion_task_1)} true, false
 repeat_timeout = 259200
 on_complete = %=complete_task_inc_goodwill(50:ecolog) =reward_stash(true) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_10_id) =pstor_reset(simulation_task_10_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_10) =unlock_smart(simulation_task_10_id)%
