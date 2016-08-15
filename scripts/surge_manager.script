@@ -371,7 +371,7 @@ function CSurgeManager:init_surge_covers()
 	local ini = self.ini
 	for i = 0, ini:line_count("list")-1 do
 		temp1, id, temp2 = ini:r_line("list", i, "", "")
-		self.covers[id] = ini:line_exist(id, "condlist") and xr_logic.parse_condlist(db.actor, id, "condlist", ini:r_string_ex(id, "condlist") or "true") or "true"
+		self.covers[id] = ini:line_exist(id, "condlist") and xr_logic.parse_condlist(db.actor, id, "condlist", ini:r_string_ex(id, "condlist") or "true") or true
 	end
 end
 
