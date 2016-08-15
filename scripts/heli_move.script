@@ -28,14 +28,14 @@ end
 
 
 function heli_move:reset_scheme( loading )
-	--printf("heli_move: reset_scheme: %s", self.object:name())
+	--printf("heli_move: START reset_scheme: loading[%s] %s",loading,self.object:name())
     self.a.signals = {}
-    self.heliObject:TurnEngineSound(self.a.engine_sound and axr_main.config:r_value("mm_options","enable_heli_engine_sound",1,false) or false)
+    self.heliObject:TurnEngineSound(self.a.engine_sound and axr_main.config:r_value("mm_options","enable_heli_engine_sound",1,false))
 ----------------------------------Вейпоинты - Начало------------------------------------------------
 
 	if (self.a.path_move) then 
 		if not level.patrol_path_exists(self.a.path_move) then
-			printf("Patrol path %s doesnt exist", self.a.path_move)
+			printf("heli_move: reset_scheme: Patrol path %s doesnt exist", self.a.path_move)
 			return
 		end
 		
@@ -65,13 +65,12 @@ function heli_move:reset_scheme( loading )
 
 	self.max_velocity = self.a.max_velocity
 	if loading then
+		self.state            	= xr_logic.pstor_retrieve(self.object, "st")
 
-		self.state            	= xr_logic.pstor_retrieve( self.object, "st"  )
+		self.last_index       	= xr_logic.pstor_retrieve(self.object, "li") or nil
+		self.next_index       	= xr_logic.pstor_retrieve(self.object, "ni") or nil
 
-		self.last_index       	= xr_logic.pstor_retrieve( self.object, "li"  ) or nil
-		self.next_index       	= xr_logic.pstor_retrieve( self.object, "ni"  ) or nil
-
-		self.was_callback     	= xr_logic.pstor_retrieve( self.object, "wc"  )
+		self.was_callback     	= xr_logic.pstor_retrieve(self.object, "wc")
 		self.a.path_index 		= xr_logic.pstor_retrieve(self.object,"path_index") or 1
 		self.a.path_increment	= xr_logic.pstor_retrieve(self.object,"path_increment") or 1
 	else
@@ -95,7 +94,10 @@ function heli_move:reset_scheme( loading )
         self.heli_fire.enemy                = nil
         self.heli_fire.flag_by_enemy        = true
         if self.a.fire_point then
-            self.heli_fire.fire_point       = patrol(self.a.fire_point):point( 0 )
+			local pat = patrol(self.a.fire_point)
+			if (pat) then
+				self.heli_fire.fire_point = pat:point(0)
+			end
         end
         if self.a.max_mgun_dist then
             self.heliObject.m_max_mgun_dist = self.a.max_mgun_dist
@@ -125,21 +127,11 @@ function heli_move:reset_scheme( loading )
 			self.heli_fire:update_enemy_state()
 		end
 		self:update_movement_state()
-		--[[
-        if self.a.show_health then
-            self.heli_fire:cs_remove()
-            self.heli_fire.show_health = true
-            self.heli_fire:cs_heli()
-        else
-            self.heli_fire.show_health = false
-            self.heli_fire:cs_remove()
-        end
-		--]]
-		-- new universal way to show enemy health
 		db.storage[self.object:id()].show_health = self.a.show_health
-
         self.heliObject:UseFireTrail(self.a.fire_trail)
+		printf("8")
 	end
+	--printf("heli_move: END reset_scheme: %s", self.object:name())
 end
 
 
@@ -156,7 +148,6 @@ function heli_move:save()
 end
 
 function heli_move:update( delta )
-
     if xr_logic.try_switch_to_another_section(self.object, self.a, db.actor) then
         return
     end
@@ -404,16 +395,24 @@ function set_scheme( npc, ini, scheme, section, gulag_name)
 	
 	if not (retreat_mode) then
 		a.path_move  = utils.prefix_r_string(ini,section,"path_move",gulag_name)
-		if (a.path_move and not level.patrol_path_exists(a.path_move)) then
-			printf("Patrol path %s doesnt exist", a.path_move)
-			a.path_move = nil
+		if not (a.path_move and level.patrol_path_exists(a.path_move)) then 
+			a.path_move = ini:r_string_ex(section,"path_move")
+			if not (a.path_move and level.patrol_path_exists(a.path_move)) then 
+				printf("Patrol path %s doesnt exist", a.path_move)
+				a.path_move = nil
+			else 
+				a.path_look = ini:r_string_ex(section,"path_look")
+			end
+		else 
+			a.path_look = utils.prefix_r_string(ini,section,"path_look",gulag_name)
 		end
-		a.path_look = utils.prefix_r_string(ini,section,"path_look",gulag_name)
 	end
 	
+	--printf("heli_move %s",a.path_move)
+	
 	a.max_velocity      = ini:r_float_ex(section,"max_velocity") or st.combat and st.combat.max_velocity or 45
-	a.enemy_            = ini:r_string_ex(section, "enemy") or ""
-	a.fire_point        = ini:r_string_ex(section, "fire_point") or ""
+	a.enemy_            = ini:r_string_ex(section, "enemy")
+	a.fire_point        = ini:r_string_ex(section, "fire_point")
 	a.max_mgun_dist     = ini:r_float_ex(section,"max_mgun_attack_dist") or 0
     a.max_rocket_dist   = ini:r_float_ex(section,"max_rocket_attack_dist") or 0
     a.min_mgun_dist     = ini:r_float_ex(section,"min_mgun_attack_dist") or 0

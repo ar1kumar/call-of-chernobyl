@@ -202,7 +202,9 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 		printf("ERROR: You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
 	end
 
-	st.team      = utils.prefix_r_string(ini,section,"team",gulag_name)
+	-- not sure if used anymore
+	--st.team      = utils.prefix_r_string(ini,section,"team",gulag_name)
+	
 	st.sound_idle= ini:r_string_ex(section,"sound_idle")
 	st.use_camp  = ini:r_bool_ex(section,"use_camp",false)
 
