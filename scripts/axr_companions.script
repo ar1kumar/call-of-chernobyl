@@ -202,33 +202,22 @@ function setup_companion_logic(npc,st,loaded,as)
 		return
 	end
 	
-	if not (loaded) then
-		local id = npc:id()
-		local sim = alife()
-		local se_npc = sim:object(id)
-		local unreg_id = se_npc.m_smart_terrain_id
-		if (unreg_id ~= 65535) then
-			local unreg = sim:object(unreg_id)
-			if (unreg) then
-				unreg:unregister_npc(se_npc)
-			end
+	local id = npc:id()
+	local sim = alife()
+	local se_npc = sim:object(id)
+	local unreg_id = se_npc.m_smart_terrain_id
+	if (unreg_id and unreg_id ~= 65535) then
+		local unreg = sim:object(unreg_id)
+		if (unreg) then
+			unreg:unregister_npc(se_npc)
 		end
-		--axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
-
-		xr_logic.configure_schemes(npc, ltx, ltx_name, modules.stype_stalker, "logic", "")
-
-		local sect = xr_logic.determine_section_to_activate(npc, ltx, "logic", db.actor)
-		if utils.get_scheme_by_section("logic") == "nil" then
-			printf("section=%s, don't use section 'nil'!", sect)
-		end
-
-		--printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
-		xr_logic.activate_by_section(npc, ltx, sect, "", false)
-		return
 	end
 	
-	xr_logic.configure_schemes(npc, ltx, ltx_filename, modules.stype_stalker, st.loaded_section_logic, st.loaded_gulag_name)
-	xr_logic.activate_by_section(npc, ltx, st.loaded_active_section, st.loaded_gulag_name, true)
+	xr_logic.configure_schemes(npc, ltx, ltx_name, modules.stype_stalker, loaded and st.loaded_section_logic or "logic", "")
+	
+	local section = loaded and st.loaded_active_section or xr_logic.determine_section_to_activate(npc, ltx, "logic", db.actor)
+	xr_logic.activate_by_section(npc, ltx, section, "", loaded)
+	--printf("setup complete")
 end 
 
 function add_special_task_npc_to_actor_squad(npc)
@@ -236,7 +225,7 @@ function add_special_task_npc_to_actor_squad(npc)
 	local sim = alife()
 	local se_npc = sim:object(id)
 	local unreg_id = se_npc.m_smart_terrain_id
-	if (unreg_id ~= 65535) then
+	if (unreg_id and unreg_id ~= 65535) then
 		local unreg = sim:object(unreg_id)
 		if (unreg) then
 			unreg:unregister_npc(se_npc)
