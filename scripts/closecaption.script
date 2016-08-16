@@ -18,7 +18,7 @@ local function opt_menu_on_accept(menu,opt,con)
 	local rcap = tabs[menu.tab_captioning:GetActiveId()]
 	ini:w_value("closecaption","cc_npc",(rcap > 0))
 	ini:w_value("closecaption","cc_vrb",(rcap > 1))
-	ini:w_value("closecaption","cc_icc",menu.check_closedcaptions:GetCheck())
+	ini:w_value("closecaption","cc_icc",menu.check_closedcaptions:GetCheck() and true)
 	ini:save()
 end
 

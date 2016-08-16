@@ -9,13 +9,18 @@
 local STAY_POINT_IDLE_MIN = 2*60*60
 local STAY_POINT_IDLE_MAX = 8*60*60
 
-local squad_behaviour_ini 	= ini_file("misc\\squad_behaviours.ltx")
-local locations_ini			= ini_file("misc\\smart_terrain_masks.ltx")
-
---------------------
-local level,alife,game_graph,math,pairs,tostring,tonumber = level,alife,game_graph,math,pairs,tostring,tonumber
---------------------
-
+-- setup location types
+local location_types = {}
+do -- to localize below
+	local locations_ini	= ini_file("misc\\smart_terrain_masks.ltx")
+	
+	local function itr(section)
+		local a,key,val = locations_ini:r_line_ex(section,0,"","")
+		location_types[key] = key
+	end 
+	
+	locations_ini:section_for_each(itr)
+end
 
 --***********************************************************************************************
 --*										INITIALIZATION								  *
@@ -28,7 +33,6 @@ function sim_squad_scripted:__init(section) super (section)
 	self.current_target_id	= nil
 	self.assigned_target_id	= nil
 	self:init_squad()
-	self:set_squad_behaviour()
 	--if (USE_MARSHAL) then
 	--	RegisterScriptCallback("save_state",self.save_state,self)
 	--end
@@ -76,21 +80,6 @@ function sim_squad_scripted:init_squad_on_load()
 	self.current_action = 0
 	self.need_to_reset_location_masks = true
 	--alun_utils.debug_write(self:name().."init_squad_on_load end")
-end
-
-function sim_squad_scripted:set_squad_behaviour()
-	--alun_utils.debug_write("sim_squad_scripted:set_squad_behaviour")
-	self.behaviour		= {}
-	local behaviour_section = system_ini():r_string_ex(self:section_name(),"behaviour") or self.player_id
-	if not squad_behaviour_ini:section_exist(behaviour_section) then
-		printf("There is no section ["..behaviour_section.."] in 'misc\\squad_behaviours.ltx'")
-	end
-	local n = squad_behaviour_ini:line_count(behaviour_section)
-	local result, prop_name, prop_condlist
-	for j=0,n-1 do
-		result, prop_name, prop_condlist = squad_behaviour_ini:r_line_ex(behaviour_section,j,"","")
-		self.behaviour[prop_name] = tonumber(prop_condlist)
-	end
 end
 
 function sim_squad_scripted:find_open_smart()
@@ -560,11 +549,12 @@ function sim_squad_scripted:check_invulnerability()
 end
 
 function sim_squad_scripted:set_location_types_section (section)
-	if locations_ini:section_exist(section) then
-		local result, id, value	= locations_ini:r_line_ex(section,0,"","")
-		self:add_location_type(id)
+	local location = location_types[section]
+	if (location) then
+		self:add_location_type(location)
 	end
 end
+
 function sim_squad_scripted:set_location_types(new_smart_name)
 	local default_location = "stalker_terrain"
 	self:clear_location_types()
@@ -974,27 +964,15 @@ function sim_squad_scripted:on_unregister()
 end
 
 function sim_squad_scripted:can_switch_offline()
-	if (axr_main) then
-		if (axr_main.squad_can_switch_offline(self) == false) then
-			return false
-		end
-	end
-	
+	--[[
 	if (self.current_action == 1) then 
 		local current_target = self.current_target_id and alife():object(self.current_target_id)
 		if (current_target.online and current_target.faction_controlled and current_target.faction_war_in_progress == true) then
 			--printf("forced online %s",current_target:name())
 			return false
 		end
-	--[[
-	else 
-		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
-		if (se_target and se_target.online and se_target.dist_to_actor and se_target.dist_to_actor <= 150) then
-			--printf("force online %s",self:name())
-			return false
-		end
-	--]]
 	end
+	--]]
 
 	return cse_alife_online_offline_group.can_switch_offline(self)
 end
@@ -1053,8 +1031,11 @@ function sim_squad_scripted:can_switch_online()
 		
 		if (db.actor and db.spawned_vertex_by_id[self:commander_id()] == nil) then
 			local dist = axr_main.config:r_value("mm_options","excl_dist",2) or 0
-			if (dist > 0 and self.position:distance_to(db.actor:position()) <= dist) then
-				return false
+			if (dist > 0) then 
+				local actor = alife():actor()
+				if (self.position:distance_to(actor.position) <= dist) then
+					return false
+				end
 			end
 		end
     end

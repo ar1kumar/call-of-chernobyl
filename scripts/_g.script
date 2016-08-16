@@ -8,7 +8,7 @@ if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
 end
 
-USE_INI_MEMOIZE = false 
+USE_INI_MEMOIZE = true 
 
 -- Improves performance if true, by disabling update methods for squads and smart terrains on levels not linked in configs\ai_tweaks\simulation_objects.ltx
 -- But this means simulation will only be active on actor level and linked levels everything else will remain in an idle state
@@ -1410,90 +1410,81 @@ function give_object_to_actor(obj,count)
   end
 end
 
-
+-- INI Extensions
 if (USE_INI_MEMOIZE) then
 	-- memoize ini results
-	local ini_cache = {}
-
-	-- extensions
-	function ini_file.r_string_ex(ini,s,k)
-		if not (ini_cache[ini]) then 
-			ini_cache[ini] = {}
-		end 
-		
-		if not (s) then
+	local ini_cache = { [system_ini()] = {} }
+	
+	local function r_memoize(ini,s,k,def,typ)
+		if not (s) then 
 			callstack()
 		end
 		
-		local key = s .. "&" .. k
-		if (ini_cache[ini][key]) then 
-			--printf("res=%s",ini_cache[ini][key])
-			return ini_cache[ini][key]
-		else 
-			local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_string(s,k) or nil
-			if (res == nil) then 
-				return 
+		if (ini_cache[ini]) then 
+			local key = s.."&"..k
+			if (ini_cache[ini][key]) then 
+				return ini_cache[ini][key]
 			end
-			ini_cache[ini][key] = res 
-			return res
 		end
+		
+		if not (ini:section_exist(s) and ini:line_exist(s,k)) then 
+			return def
+		end
+		
+		local result = ini:r_string(s,k)
+		if (result) then
+			if (typ == 0) then 
+				result = result == "true" or result == "1" or false
+			elseif (typ == 1) then 
+				result = tonumber(result)
+			end
+			
+			if (ini_cache[ini]) then 
+				local key = s.."&"..k
+				if (ini_cache[ini][key]) then 
+					ini_cache[ini][key] = result
+				end
+			end
+		end
+		
+		return result == nil and def or result
 	end
 
-	-- only one that can return a default value because def needs returned only on nil, not on false
+	function ini_file.r_string_ex(ini,s,k,def)
+		return r_memoize(ini,s,k,def)
+	end
+
+	-- It is wise to use the def with r_bool_ex, because false and nil are consider 'not'. def is only returned on nil
 	function ini_file.r_bool_ex(ini,s,k,def)
-		if not (ini_cache[ini]) then 
-			ini_cache[ini] = {}
-		end 
-		
-		local key = s .. "&" .. k
-		if (ini_cache[ini][key]) then 
-			--printf("res=%s",ini_cache[ini][key])
-			return ini_cache[ini][key]
-		else
-			if not (ini:section_exist(s) and ini:line_exist(s,k)) then 
-				return def
-			end
-			local v = ini:r_string(s,k)
-			if (v == nil) then
-				return def 
-			end
-			local res = v == "true" or v == "1" or false
-			ini_cache[ini][key] = res 
-			return res
-		end
+		return r_memoize(ini,s,k,def,0)
 	end
+	
 	function ini_file.r_float_ex(ini,s,k)
-		if not (ini_cache[ini]) then 
-			ini_cache[ini] = {}
-		end 
-		
-		local key = s .. "&" .. k
-		if (ini_cache[ini][key]) then 
-			--printf("res=%s",ini_cache[ini][key])
-			return ini_cache[ini][key]
-		else 
-			local res = ini:section_exist(s) and ini:line_exist(s,k) and ini:r_float(s,k) or nil
-			if (res == nil) then 
-				return 
-			end
-			ini_cache[ini][key] = res 
-			return res
-		end
+		return r_memoize(ini,s,k,def,1)
 	end
+	
 	function ini_file.r_line_ex(ini,s,k)
 		if not (ini_cache[ini]) then 
 			ini_cache[ini] = {}
 		end 
 		
-		local key = s .. "&" .. k
-		if (ini_cache[ini][key]) then 
-			--printf("res=%s",ini_cache[ini][key])
-			return unpack(ini_cache[ini][key])
-		else 
-			local a,b,c = ini:r_line(s,k,"","")
-			ini_cache[ini][key] = {a,b,c}
-			return a,b,c
+		if (ini_cache[ini]) then 
+			local key = s .. "&" .. k
+			if (ini_cache[ini][key]) then 
+				return unpack(ini_cache[ini][key])
+			end
 		end
+		
+		local a,b,c = ini:r_line(s,k,"","")
+		
+		if (ini_cache[ini]) then 
+			local key = s.."&"..k
+			if (ini_cache[ini][key]) then 
+				ini_cache[ini][key] = {a,b,c}
+			end
+		end
+		
+		return a,b,c
 	end 
 else 
 	function ini_file.r_string_ex(ini,s,k)
@@ -1530,8 +1521,9 @@ class "ini_file_ex"
 function ini_file_ex:__init(fname,advanced_mode)
 	self.fname = getFS():update_path('$game_config$', '')..fname
 	self.ini = ini_file(fname)
+	self.cache = {}
 	
-	if (advanced_mode) then 
+	if (advanced_mode) then
 		self.ini:set_override_names(true)
 		self.ini:set_readonly(false)
 		--self.ini:save_at_end(true)
@@ -1542,21 +1534,32 @@ function ini_file_ex:save()
 	self.ini:save_as(self.fname)
 end
 
+-- r_value and w_value cache results
 function ini_file_ex:r_value(s,k,typ,def)
+	if (self.cache[s.."&"..k]) then 
+		--printf("v=%s type=%s[%s]",self.cache[s.."&"..k],type(self.cache[s.."&"..k]),typ)
+		return self.cache[s.."&"..k]
+	end
+	
 	if not (self.ini:section_exist(s) and self.ini:line_exist(s,k)) then 
 		return def 
 	end
+	
+	local v = self.ini:r_string(s,k)
 	if (typ == 1) then
-		local v = self.ini:r_string(s,k)
-		return v == nil and def or v == "true"
+		v = v == nil and def or v == "true" or false
 	elseif (typ == 2) then
-		return tonumber(self.ini:r_string(s,k)) or nil
+		v = tonumber(v) or nil
 	end
-	return self.ini:r_string(s,k) or def
+	
+	self.cache[s.."&"..k] = v
+	
+	return v == nil and def or v
 end
 
-function ini_file_ex:w_value(section,key,val,comment)
-	self.ini:w_string(section,key,val ~= nil and tostring(val) or "",comment ~= nil and tostring(comment) or "")
+function ini_file_ex:w_value(s,k,val,comment)
+	self.cache[s.."&"..k] = val
+	self.ini:w_string(s,k,val ~= nil and tostring(val) or "",comment ~= nil and tostring(comment) or "")
 end
 
 function ini_file_ex:collect_section(section)

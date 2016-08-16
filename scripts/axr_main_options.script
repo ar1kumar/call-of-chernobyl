@@ -111,7 +111,13 @@ function opt_menu_on_accept(menu,optMgr,console)
 			if (v.typ=="check") then
 				axr_main.config:w_value("mm_options","enable_"..name,v.ctrl:GetCheck())
 			elseif (v.typ=="list") then 
-				axr_main.config:w_value("mm_options",name,v.ctrl:GetText())
+				if (type(v.default) == "boolean") then
+					axr_main.config:w_value("mm_options",name,v.ctrl:GetText()=="true" or false)
+				elseif (type(v.default) == "number") then 
+					axr_main.config:w_value("mm_options",name,tonumber(v.ctrl:GetText()) or v.default)
+				else 
+					axr_main.config:w_value("mm_options",name,v.ctrl:GetText())
+				end
 			end
 			
 			if (v.on_accept) then 
