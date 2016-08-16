@@ -560,7 +560,7 @@ end
 
 -- Increment the actor rank.
 function inc_actor_rank(rank)
-	if rank and ((db.actor:character_rank()+rank) <= 8000 and (db.actor:character_rank()+rank) >= 0 and rank >= 0) then
+	if rank and ((db.actor:character_rank()+rank) <= 14500 and (db.actor:character_rank()+rank) >= 0 and rank >= 0) then
 		db.actor:set_character_rank(db.actor:character_rank() + rank)
 	end
 	check_actor_rank_change()

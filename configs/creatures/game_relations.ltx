@@ -1,12 +1,13 @@
 [game_relations]
 ; Requirements for each rank increase by an additional multiple of 500 points with each rank.
-; Rookie -> Experienced: 500 (+500), Experienced -> Professional: 1500 (+1000), Professional -> Veteran: 3000 (+1500) etc.
+; Rookie -> Trainee: 500 (+500), Trainee -> Experienced: 1500 (+1000), Experienced -> Professional: 3000 (+1500) etc.
+; Rank values are set 1 point lower than their target as engine uses upper_bound to determine which text to display in inventory.
 
-rating			= novice, 499, experienced, 1499, professional, 2999, veteran, 4999, master, 7499, legend
+rating			= novice, 499, trainee, 1499, experienced, 2999, professional, 4999, veteran, 7499, expert, 10499, master, 13999, legend
 monster_rating	= weak, 40, normal, 80, strong
 reputation		= terrible, -1999, really_bad, -1499, very_bad, -999, bad, -499, neutral, 499, good, 999, very_good, 1499, really_good, 1999, excellent
 
-rating_names		= st_rank_novice, 499, st_rank_experienced, 1499, st_rank_professional, 2999, st_rank_veteran, 4999, st_rank_master, 7499, st_rank_legend
+rating_names		= st_rank_novice, 499, st_rank_trainee, 1499, st_rank_experienced, 2999, st_rank_professional, 4999, st_rank_veteran, 7499, st_rank_expert, 10499, st_rank_master, 13999, st_rank_legend
 reputation_names	= st_reputation_terrible, -1999, st_reputation_really_bad, -1499, st_reputation_very_bad, -999, st_reputation_bad, -499, st_reputation_neutral, 499, st_reputation_good, 999, st_reputation_very_good, 1499, st_reputation_really_good, 1999, st_reputation_excellent
 goodwill_names      = st_goodwill_enemy, 0, st_goodwill_indifferent, 1000, st_goodwill_friendly
 
@@ -60,14 +61,16 @@ actor_zombied = -5000, -5000,-5000, -5000,  -5000, -5000,   -5000,    1000,  -50
 arena_enemy   = -5000,     0,    0,     0,      0,     0,       0,       0,      0,      0,       0,     0,   0,		-5000,		-5000,			-5000,			-5000,		-5000,		-5000,			-5000,			-5000,			-5000,			-5000,				0
 
 [rank_relations]
-;			  	novice, experienced, professional, veteran, master, legend
-;=========================================================================
-novice			=	 0,			 0,		        0,		0,		0,		 0
-experienced		=    0,			 0,     	    0,		0,		0,		 0
-professional	=    0,			 0,        		0,		0,		0,		 0
-veteran			=    0,      	 0,        		0,      0,		0,		 0
-master			=    0,      	 0,        		0,      0,		0,		 0
-legend			=    0,      	 0,        		0,      0,		0,		 0
+;			  	novice, trainee, experienced, professional, veteran, expert, master, legend
+;==========================================================================================
+novice			=	 0,			 0,		        0,		0,		0,		 0,		0,		0
+trainee			=    0,			 0,     	    0,		0,		0,		 0,		0,		0
+experienced		=    0,			 0,        		0,		0,		0,		 0,		0,		0
+professional	=    0,      	 0,        		0,      0,		0,		 0,		0,		0
+veteran			=    0,      	 0,        		0,      0,		0,		 0,		0,		0
+expert			=    0,      	 0,        		0,      0,		0,		 0,		0,		0
+master			=    0,      	 0,        		0,      0,		0,		 0,		0,		0
+legend			=    0,      	 0,        		0,      0,		0,		 0,		0,		0
 
 
 
@@ -92,12 +95,14 @@ excellent		=	0,			  0,	 	0,	 0,		  0,	 0,		   0,			0,		   0
 ;i?ee ?aeoeiaa, iieo?aaiua ca oaeenoai ia?niia?a
 ;n ii?aaaeaiiui noaoonii
 [rank_kill_points]
-novice			=        5
-experienced		=		 6
-professional	=		 7
-veteran			=        8
-master			=        9
-legend			=        10
+novice			=	5
+trainee			=	6
+experienced		=	7
+professional	=	8
+veteran			=	9
+expert			=	10
+master			=	15
+legend			=	20
 
 ;eiyooeoeaiou "ni?oanoaey" a?oiie?iaie
 ;iinea aicaaenoaey ia iaiiai ec ?eaiia a?oiie?iaee
@@ -206,38 +211,18 @@ fight_remember_time = 0.2		;(cae) a?aiy eioi?ia i?i a?aeo aoaao iiiieou ?aano?
 
 ;naienoaa, eioi?ua eciaiy?ony o noaeea?ia a
 ;caaeneiinoe io eo ?aiaa
-;eiyooeoeaiou eeiaeii eioa?iiee?o?ony aey ?aiaia io 0 (novice) ai 100 (experienced)
+;eiyooeoeaiou eeiaeii eioa?iiee?o?ony aey ?aiaia io 0 (novice) ai 100 (trainee)
 
-
-
-
-
-
-
-
-
-
+; Section is not used by the game.
+; However it is directly referenced in-engine.
+; Removing this or its contents will crash the game.
 [ranks_properties]
 immunities_novice_k			= 1.0
 immunities_experienced_k	= 1.0
-immunities_professional_k	= 1.0
-immunities_veteren_k		= 1.0
-immunities_master_k			= 1.0
-immunities_legend_k			= 1.0
-
 visibility_novice_k			= 1.0
 visibility_experienced_k	= 1.0
-visibility_professional_k	= 1.0
-visibility_veteren_k		= 1.0
-visibility_master_k			= 1.0
-visibility_legend_k			= 1.0
-
 dispersion_novice_k			= 1.0
 dispersion_experienced_k	= 0.8
-dispersion_professional_k	= 0.6
-dispersion_veteren_k		= 0.4
-dispersion_master_k			= 0.2
-dispersion_legend_k			= 0.1
 
 
 ; aeaiacii eciaiaiey ?aiaia i?e ?aaeno?aoee a iiaii nia?o oa??aeia
