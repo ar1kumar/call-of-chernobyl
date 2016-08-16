@@ -37,19 +37,20 @@ end
 
 function read_float(wpn_section, upgr_sections, param)
 	local ltx = system_ini()
-		local res = ltx:r_float_ex(wpn_section, param)
+	local res = ltx:r_float_ex(wpn_section, param) or 0
 	
 	if upgr_sections == nil or upgr_sections == "" then
         return res
     end
 	
 	for k, sect in pairs(parse_names(upgr_sections)) do 
+		local r = ltx:r_float_ex(sect,param) or 0
 		if param == "hit_power" then
-			if res < read_if_exist(sect, param, 0) then
-				res = read_if_exist(sect, param, 0)
+			if res < r then
+				res = r
 			end	
 		else	
-			res = res + read_if_exist(sect, param, 0)
+			res = res + r
 		end		
     end 
 	
@@ -79,8 +80,7 @@ end
 
 function GetHandling(wpn_section, upgr_sections) --' удобность
 	local ltx = system_ini()
-	-- local val	
-		local PDM_disp_base = 1
+	local PDM_disp_base = 1
 	if ltx:line_exist(wpn_section,"PDM_disp_base") then
 		PDM_disp_base = read_float(wpn_section, upgr_sections, "PDM_disp_base")
 	end	
