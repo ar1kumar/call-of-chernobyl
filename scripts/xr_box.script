@@ -56,6 +56,7 @@ function ph_item_box:__init()
 end
 
 function ph_item_box:spawn_items(obj,who,spawn_ini)
+	xr_statistic.inc_boxes_smashed_counter()
 	local community
 	if (spawn_ini) then
 		local items = r_items(spawn_ini, "drop_box", "items", obj)
