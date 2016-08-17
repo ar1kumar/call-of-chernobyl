@@ -88,12 +88,6 @@ function ph_item_box:spawn_items(obj,who,spawn_ini)
 			end
 		end
 	end
-	
-	-- actor found stash
-	if (found and who and who:id() == 0) then
-		xr_statistic.inc_founded_secrets_counter()
-		news_manager.send_treasure(1)
-	end
 end
 
 function create_items(obj, section, number, rnd, found)
