@@ -18,6 +18,9 @@ if not (config:section_exist("temp")) then
 	get_console():execute("cfg_load " .. getFS():update_path('$game_config$', '').."rspec_default.ltx")
 	config:w_value("temp","rspec_default",true)
 	config:save()
+else
+	get_console():execute("r2_tonemap_lowlum 0.4")
+	get_console():execute("vid_restart")
 end
 -------------------------------------------------------------------------------------------------
 
