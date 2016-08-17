@@ -357,7 +357,7 @@ end
 -- Requires rank of 'Legend' be reached.
 function patriarch_requirements()
 	return (
-				(db.actor:character_rank() >= 7500)
+				(db.actor:character_rank() >= 14000)
 		)
 end
 
@@ -429,8 +429,10 @@ function clear_skies_rewards()
 end
 
 -- Completionist.
+-- Spawns the 'Heart of the Oasis' artefact in a stash.
 -- Reputation and rank point increase.
 function completionist_rewards()
+	coc_treasure_manager.create_random_stash(nil, "Completionist's stash", {"af_oasis_heart"}, 15)
 	db.actor:give_info_portion("achieved_completionist")
 	news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.completionist.rnk)
@@ -555,10 +557,10 @@ function well_dressed_rewards()
 end
 
 -- Wishful Thinking.
--- Spawns the 'Heart of the Oasis' artefact in a stash.
 -- Reputation and rank point increase.
 function wishful_thinking_rewards()
-	coc_treasure_manager.create_random_stash(nil, "Curious stash", {"af_oasis_heart"}, 15)
+	xr_statistic.inc_actor_rank(1000)
+	xr_statistic.inc_actor_reputation(500)
 	db.actor:give_info_portion("achieved_wishful_thinking")
 	news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.wishful_thinking.rnk)
