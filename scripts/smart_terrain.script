@@ -17,9 +17,11 @@ local locations_ini	= ini_file("misc\\smart_terrain_masks.ltx")
 nearest_to_actor_smart = {id = nil , dist = math.huge}
 
 local function job_avail_to_npc(npc_info, job, smart)
+	--[[
 	if (smart.dead_time[job.section]) then
 		return false
 	end
+	--]]
 
 	local precond = gulag_general.get_job_precondition(job)
 	if (precond) then
@@ -29,51 +31,35 @@ local function job_avail_to_npc(npc_info, job, smart)
 	return true
 end
 
-local function arrived_to_smart(obj, smart)
-	--alun_utils.debug_nearest(obj,"check arrived_to_smart %s",smart:name())
-
-	if not (obj and smart) then 
-		return false 
+local function arrived_to_smart(se_obj, smart)
+	--alun_utils.debug_nearest(se_obj,"check arrived_to_smart %s",smart:name())
+	local squad = se_obj.group_id and SIMBOARD.squads[se_obj.group_id]
+	if (squad) then 
+		if (squad.current_action == 1 and squad.assigned_target_id == smart.id) then 
+			return true
+		end
+		return smart:am_i_reached(squad)
 	end 
 	
-	local cls = obj and obj.clsid and obj:clsid()
+	local cls = se_obj.clsid and se_obj:clsid()
 	if not (cls) then 
-		return false 
-	end
-	
-	local gg = game_graph()
-	local obj_gv, obj_pos = gg:vertex(obj.m_game_vertex_id), obj.position
-	local smart_gv = gg:vertex(smart.m_game_vertex_id)
-	
-	if (obj_gv:level_id() ~= smart_gv:level_id() or alife():level_name(obj_gv:level_id()) ~= level.name())then
-		return false 
+		return false
 	end
 	
 	if (IsHelicopter(nil,cls)) then 
-		return true 
-	end 
-
-	local squad = obj.group_id and SIMBOARD.squads[obj.group_id]
+		return true
+	end
 	
-	local script_target = squad and squad:get_script_target() and alife():object(squad:get_script_target())
-	--alun_utils.debug_nearest(obj,"squad=%s script_id=%s smart_id=%s",squad and squad:name(),script_target and script_target:name(),smart:name())
-	if (squad) then
-		if (squad.m_game_vertex_id == smart.m_game_vertex_id) then 
-			return true 
-		end 
-		
-		if (squad.current_action == 1 and squad.assigned_target_id == smart.id) then 
-			return true 
-		end
-		
-		if (is_squad_monster[squad.player_id] and squad:get_script_target() == nil) then 
-			return squad.position:distance_to_sqr(smart.position) <= 625
-		end
-
-		return squad.always_arrived or squad.position:distance_to_sqr(smart.position) <= smart.arrive_dist^2
+	if (se_obj.m_game_vertex_id == smart.m_game_vertex_id) then 
+		return true
 	end 
-
-	return obj_pos:distance_to_sqr(smart.position) <= 900
+	
+	local gg = game_graph()
+	if (gg:vertex(se_obj.m_game_vertex_id):level_id() ~= gg:vertex(smart.m_game_vertex_id):level_id()) then
+		return false
+	end
+	
+	return se_obj.position:distance_to_sqr(smart.position) <= 10000
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -83,7 +69,7 @@ class "se_smart_terrain" (cse_alife_smart_zone)
 function se_smart_terrain:__init(section) super(section)
 	self.job_count = 0
 	self.npc_by_job_section = {}
-	self.dead_time = {}
+	--self.dead_time = {}
 	self.npc_info  = {}
 	self.arriving_npc  = {}
 	self.__campfire_check_time = game.get_game_time()
@@ -189,7 +175,7 @@ function se_smart_terrain:read_params()
 	self.respawn_only_level 	= ini:r_bool_ex("smart_terrain","respawn_only_level",false)
 	self.respawn_only_smart 	= ini:r_bool_ex("smart_terrain","respawn_only_smart",false)
 	self.respawn_point 			= false
-	self.respawn_radius  		= ini:r_float_ex("smart_terrain","respawn_radius") or 40000
+	self.respawn_radius  		= ini:r_float_ex("smart_terrain","respawn_radius") or 150
 	self.safe_restr				= ini:r_string_ex("smart_terrain","safe_restr")	-- npc with jobs inside are invulnerable
 	self.spawn_point			= ini:r_string_ex("smart_terrain","spawn_point")
 	self.squad_id				= ini:r_float_ex("smart_terrain","squad_id") or 0	
@@ -355,7 +341,7 @@ function se_smart_terrain:register_npc(obj)
 
 	if (arrived_to_smart(obj, self)) then
 		self.npc_info[obj.id] = self:fill_npc_info(obj)
-		self.dead_time = empty_table(self.dead_time)
+		--self.dead_time = empty_table(self.dead_time)
 		self:select_npc_job(self.npc_info[obj.id],true)
 	else
 		self.arriving_npc[obj.id]  = obj
@@ -777,66 +763,6 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 	end
 end
 
-function se_smart_terrain:setup_logic(npc)
-	--alun_utils.debug_write(self:name().." setup_logic "..tostring(npc and npc:name()))
-	if not (npc) then
-		printf("%s.setup_logic: NPC is nil",self:name())
-		return
-	end
-
-	local npc_info = self.npc_info[npc:id()]
-	if not (npc_info) then
-		printf("%s.setup_logic: npc_info is nil! for id=%s",self:name(),npc:id())
-		return
-	end
-	
-	if not (npc_info.se_obj) then
-		printf("%s.setup_logic: npc_info.se_obj is nil! for id=%s",self:name(),npc:id())
-		return 
-	end
-
-	local job = npc_info.job
-	if not (job) then
-		printf("%s.setup_logic: npc_info has no job! for id=%s",self:name(),npc:id())
-		self:unregister_npc(npc_info.se_obj)
-		self:register_npc(npc_info.se_obj)
-		return
-	end
-
-	--[[ fixed elsewhere now
-	-- sanity; Not sure why this happens. It happens in all 3 Stalker games, NPCs try to switch logic for a job on another level, causes waypoint/path crashes. Re-register NPC
-	if not (self.online) then
-		printf("%s.setup_logic: npc is trying to setup logic for a job on another level! npc=%s job=%s",self:name(),npc:name(),job.section)
-		self:unregister_npc(npc_info.se_obj)
-		--self:register_npc(npc_info.se_obj)
-		return
-	end
-
-	-- sanity; Not sure why this happens. It happens in all 3 Stalker games, NPCs try to switch logic for a job on another level, causes waypoint/path crashes. Re-register NPC
-	local gg = game_graph()
-	local level = gg:vertex(npc:game_vertex_id()):level_id()
-	if (level ~= gg:vertex(self.m_game_vertex_id):level_id() or level ~= gg:vertex(alife():actor().m_game_vertex_id):level_id()) then
-		printf("%s.setup_logic: npc is trying to setup logic for a job on another level! npc=%s job=%s npc_level_id=%s",self:name(),npc:name(),job.section,level)
-		self:unregister_npc(npc_info.se_obj)
-		--self:register_npc(npc_info.se_obj)
-		return
-	end
-	--]]
-
-	local ltx = job.ltx or self.ltx
-	local ltx_name = job.ini_path or self.ltx_name
-
-	xr_logic.configure_schemes(npc, ltx, ltx_name, npc_info.stype, job.section, job.prefix_name or self:name())
-
-	local sect = xr_logic.determine_section_to_activate(npc, ltx, job.section, db.actor)
-	if utils.get_scheme_by_section(job.section) == "nil" then
-		printf("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
-	end
-
-	--printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
-	xr_logic.activate_by_section(npc, ltx, sect, job.prefix_name or self:name(), false)
-end
-
 function se_smart_terrain:getJob(obj_id)
 	return self.npc_info[obj_id] and self.npc_info[obj_id].job or nil
 end
@@ -947,7 +873,7 @@ function se_smart_terrain:load_state(m_data)
 	end
 	
 	self.load_info = m_data.smart_terrains[self:name()].npc_info or {}
-	self.dead_time = m_data.smart_terrains[self:name()].dead_time or self.dead_time
+	--self.dead_time = m_data.smart_terrains[self:name()].dead_time or self.dead_time
 	self.already_spawned = m_data.smart_terrains[self:name()].already_spawned or self.already_spawned
 	self.last_respawn_update = m_data.smart_terrains[self:name()].last_respawn_update
 	
@@ -992,6 +918,7 @@ function se_smart_terrain:STATE_Write(packet)
 		alun_utils.w_stpk(packet,"stringZ",tostring(info.need_job),"npc_info.need_job")
 	end
 
+	--[[
 	n = 0
 	for k,v in pairs(self.dead_time) do
 		n = n + 1
@@ -1002,6 +929,7 @@ function se_smart_terrain:STATE_Write(packet)
 		alun_utils.w_stpk(packet,"stringZ",k,"dead_time job_section")
 		alun_utils.w_stpk(packet,"CTime",v,"dead_time CTime")
 	end
+	--]]
 
 	if self.respawn_point then
 		alun_utils.w_stpk(packet,"bool",true,"respawn_point")
@@ -1066,6 +994,7 @@ function se_smart_terrain:STATE_Read(packet, size)
 		self.load_info[65535] = nil
 	end
 
+	--[[
 	n = packet:r_u8()
 
 	empty_table(self.dead_time)
@@ -1077,6 +1006,7 @@ function se_smart_terrain:STATE_Read(packet, size)
 			self.dead_time[sec] = gt
 		end
 	end
+	--]]
 
 	local respawn_point = packet:r_bool()
 	--printf("LOAD RESPAWN %s", self:name())
@@ -1119,12 +1049,6 @@ function se_smart_terrain:init_npc_after_load()
 
 	local sim = alife()
 
-	-- Here we setup arriving npcs from loaded savegame
-	-- throw out invalid object ids
-	for id,v in pairs(self.arriving_npc) do
-		self.arriving_npc[id] = sim:object(id) or nil
-	end
-	
 	-- validate and fill saved npc_info; find job by saved uid
 	for id, info in pairs(self.load_info) do
 		local sobj = sim:object(id)
@@ -1143,6 +1067,16 @@ function se_smart_terrain:init_npc_after_load()
 		else
 			--self.npc_info.job = self:find_job_by_section(info.job_section)
 			self:clear_job(id,true)
+		end
+	end
+	
+	-- Here we setup arriving npcs from loaded savegame
+	for id,v in pairs(self.arriving_npc) do
+		local se_obj = sim:object(id)
+		if (se_obj and arrived_to_smart(se_obj,self)) then
+			self.npc_info[se_obj.id] = self:fill_npc_info(se_obj)
+			self:select_npc_job(self.npc_info[se_obj.id],true)
+			self.arriving_npc[se_obj.id] = nil
 		end
 	end
 	
@@ -1281,69 +1215,55 @@ end
 function se_smart_terrain:update()
 	cse_alife_smart_zone.update( self )
 
-	--if (DEV_DEBUG and axr_main.config:r_value("mm_options","enable_debug_hud",1,false) == true) then
-		self:show()
-	--end
-	
 	if (self.disabled) then
-		return
+		return self:show()
+	end
+	
+	local tg = time_global()
+	if (self.__check_time and tg < self.__check_time) then 
+		return 
 	end
 	
 	--alun_utils.debug_write(strformat("%s:update ",self:name()))
 	
+	simulation_objects.get_sim_obj_registry():update_avaliability(self)
+	self:update_jobs()
+	
 	if self.respawn_params ~= nil then
 		self:try_respawn()
-	end
-
-	-- delta
-	local tg = time_global()
-	if (self.check_time and tg < self.check_time) then
-		return
 	end
 	
 	local sim = alife()
 	local se_actor = sim:actor()
-	local dist_to_actor = self.position:distance_to(se_actor.position)
+	self.dist_to_actor = self.position:distance_to(se_actor.position)
 	
-	simulation_objects.get_sim_obj_registry():update_avaliability(self)
+	self.__check_time = tg + 500 + math.max(500, 0.025 * self.dist_to_actor)
 	
 	if (self.online) then
-		self.dist_to_actor = dist_to_actor
 		local old_dist_to_actor = (nearest_to_actor_smart.id == nil and nearest_to_actor_smart.dist) or sim:object(nearest_to_actor_smart.id).position:distance_to(se_actor.position)
-		if dist_to_actor < old_dist_to_actor then
+		if self.dist_to_actor < old_dist_to_actor then
 			nearest_to_actor_smart.id = self.id
-			nearest_to_actor_smart.dist = dist_to_actor
-		end
-		
-		-- check time
-		if (nearest_to_actor_smart and nearest_to_actor_smart.id == self.id) then 
-			nearest_to_actor_smart.dist = dist_to_actor
-			self.check_time = tg+500
-		else 
-			self.check_time = tg+3000 + math.max(500, 0.025*dist_to_actor)
+			nearest_to_actor_smart.dist = self.dist_to_actor
 		end
 		
 		if (self.__campfire_check_time == nil or game.get_game_time():diffSec(self.__campfire_check_time) > 12000) then
-			--if (is_only_monsters_on_jobs(self.npc_info)) then
-				bind_campfire.turn_off_campfires_by_smart_name(self:name())
-				self.__campfire_check_time = game.get_game_time()
-			--end
+			bind_campfire.turn_off_campfires_by_smart_name(self:name())
+			self.__campfire_check_time = game.get_game_time()
 		end
-
+		
 		self:check_smart_faction()
-	else
-		-- check time
-		self.check_time = tg + 15000 + math.random(1000,5000)
 	end
-
+	
+	self:show()
+	
+	--[[ Disabled, I think left over from Clear Sky
 	local gt = game.get_game_time()
 	for k,v in pairs(self.dead_time) do
 		if (gt:diffSec(v) >= self.death_idle_time) then
 			self.dead_time[k] = nil
 		end
 	end
-
-	self:update_jobs()
+	--]]
 end
 
 function se_smart_terrain:set_alarm()
@@ -1389,6 +1309,46 @@ function se_smart_terrain:find_job_by_section(section)
 			end
 		end
 	end
+end
+
+function se_smart_terrain:setup_logic(npc)
+	--alun_utils.debug_write(self:name().." setup_logic "..tostring(npc and npc:name()))
+	if not (npc) then
+		printf("%s.setup_logic: NPC is nil",self:name())
+		return
+	end
+
+	local npc_info = self.npc_info[npc:id()]
+	if not (npc_info) then
+		printf("%s.setup_logic: npc_info is nil! for id=%s",self:name(),npc:id())
+		return
+	end
+	
+	if not (npc_info.se_obj) then
+		printf("%s.setup_logic: npc_info.se_obj is nil! for id=%s",self:name(),npc:id())
+		return 
+	end
+
+	local job = npc_info.job
+	if not (job) then
+		printf("%s.setup_logic: npc_info has no job! for id=%s",self:name(),npc:id())
+		self:unregister_npc(npc_info.se_obj)
+		self:register_npc(npc_info.se_obj)
+		return
+	end
+
+	local ltx = job.ltx or self.ltx
+	local ltx_name = job.ini_path or self.ltx_name
+
+	xr_logic.configure_schemes(npc, ltx, ltx_name, npc_info.stype, job.section, job.prefix_name or self:name())
+
+	local sect = xr_logic.determine_section_to_activate(npc, ltx, job.section, db.actor)
+	if utils.get_scheme_by_section(job.section) == "nil" then
+		printf("[smart_terrain %s] section=%s, don't use section 'nil'!", self:name(), sect)
+	end
+
+	--printf("npc=%s ltx=%s sect=%s prefix=%s",npc:name(),ltx_name,sect,job.prefix_name or self:name())
+	xr_logic.activate_by_section(npc, ltx, sect, job.prefix_name or self:name(), false)
 end
 
 -- called in xr_motivator and bind_monster net_spawn()
@@ -1588,8 +1548,10 @@ function se_smart_terrain:try_respawn()
 	
 	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
 	
-	if (self.dist_to_actor and self.dist_to_actor^2 < self.respawn_radius) then
-		return
+	if (self.online and self.dist_to_actor ~= nil) then 
+		if (self.dist_to_actor < self.respawn_radius) then
+			return
+		end
 	end
 
 	if self.sim_avail ~= nil and xr_logic.pick_section_from_condlist(db.actor, self, self.sim_avail) ~= "true" then return end

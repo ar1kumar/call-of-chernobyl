@@ -8,12 +8,20 @@ function init(obj)
 		return
 	end
 		
+	-- bind script to object only if it has logic or if visual used for xr_box
 	local ini = obj:spawn_ini()
-	if not (ini and ini:section_exist("logic")) then
-		return
+	if (ini and ini:section_exist("logic")) then
+		obj:bind_object(generic_physics_binder(obj))
+	else
+		local visual = obj:get_visual_name()
+		if (visual == [[dynamics\box\box_metall_01]]) then 
+			obj:bind_object(generic_physics_binder(obj))
+		elseif (visual == [[dynamics\box\box_wood_01]]) then 
+			obj:bind_object(generic_physics_binder(obj))
+		elseif (visual == [[dynamics\box\box_wood_02]]) then 
+			obj:bind_object(generic_physics_binder(obj))
+		end
 	end
-
-	obj:bind_object(generic_physics_binder(obj))
 end
 
 ---------------------------------------------------------------------------------------------
@@ -42,9 +50,11 @@ function generic_physics_binder:update(delta)
 		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_item)
 	end
 
+	--[[
 	if self.st.active_section ~= nil or (self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true) then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
 	end
+	--]]
 	
 	self.object:set_callback(callback.hit, generic_physics_binder.hit_callback, self)
 	self.object:set_callback(callback.death, generic_physics_binder.death_callback, self)
@@ -57,35 +67,32 @@ function generic_physics_binder:net_spawn(data)
 	if not object_binder.net_spawn(self, data) then
 		return false
 	end
-	if(self.object:spawn_ini()) then
-		--  CoC uses axr_treasure_manager.script instead to generate loot
-		if(self.object:spawn_ini():section_exist("drop_box")) then
-			--if (coc_treasure_manager.caches[self.object:id()] ~= nil) then
-				self.box_items = xr_box.ph_item_box(self.object)
-			--end
-		end
-
-		if(self.object:spawn_ini():section_exist("level_spot")) then
-			if(self.object:spawn_ini():line_exist("level_spot", "actor_box")) then
-    	        --level.map_add_object_spot(self.object:id(), "ui_pda2_actor_box_location", "st_ui_pda_actor_box")
-			end
-		end
-	end
 	
+	--[[
+	local ini = self.object:spawn_ini()
+	if(ini and ini:section_exist("level_spot") and ini:line_exist("level_spot","actor_box")) then
+		level.map_add_object_spot(self.object:id(), "ui_pda2_actor_box_location", "st_ui_pda_actor_box")
+	end
+	--]]
+
 	db.add_obj(self.object)
 	
 	return true
 end
 
 function generic_physics_binder:net_destroy()
+	--[[
     if level.map_has_object_spot(self.object:id(), "ui_pda2_actor_box_location") ~= 0 then
         level.map_remove_object_spot(self.object:id(), "ui_pda2_actor_box_location")
     end
+	--]]
+	
 	xr_sound.stop_sounds_by_id(self.object:id())
 	local st = db.storage[self.object:id()]
 	if st.active_scheme then
 		xr_logic.issue_event(self.object, st[st.active_scheme], "net_destroy")
 	end
+	
 	local on_offline_condlist = db.storage[self.object:id()] and db.storage[self.object:id()].overrides and db.storage[self.object:id()].overrides.on_offline_condlist
 	if on_offline_condlist ~= nil then
 		xr_logic.pick_section_from_condlist(db.actor, self.object, on_offline_condlist)
@@ -157,12 +164,18 @@ function generic_physics_binder:death_callback(victim, who)
 	if self.particle ~= nil then
 		self.particle:stop()
 	end
-
-	if (self.object:spawn_ini() ~= nil and self.object:spawn_ini():section_exist("drop_box") == true and self.box_items) then
-		--if (coc_treasure_manager.caches[self.object:id()] == true) then
-		--	coc_treasure_manager.caches[self.object:id()] = nil
-			self.box_items:spawn_items()
-		--	level.map_remove_object_spot(self.object:id(), "treasure")
-		--end
+	
+	local ini = self.object:spawn_ini()
+	if (ini and ini:section_exist("drop_box")) then
+		xr_box.get_box_manager():spawn_items(self.object,who,ini)
+	elseif (math.random() < 0.3) then
+		local visual = self.object:get_visual_name()
+		if (visual == [[dynamics\box\box_metall_01]]) then 
+			xr_box.get_box_manager():spawn_items(self.object,who)
+		elseif (visual == [[dynamics\box\box_wood_01]]) then 
+			xr_box.get_box_manager():spawn_items(self.object,who)
+		elseif (visual == [[dynamics\box\box_wood_02]]) then 
+			xr_box.get_box_manager():spawn_items(self.object,who)
+		end
 	end
 end

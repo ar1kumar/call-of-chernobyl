@@ -64,13 +64,12 @@ function opt_menu_on_init(menu)
 			end
 		}
 		
-		--[[ It works, just doesn't have character_icon set for all outfits yet
 		menu.gameplay_options["outfit_portrait"]	= {default=false, 	debug_only=false, 	typ="check", 
 			on_accept=function(handler,optMgr,ctrl)
 				if (ctrl:GetCheck()) then
 					local outfit = db.actor:item_in_slot(7)
 					if (outfit) then 
-						local icon = system_ini():r_string_ex(outfit:section(),"character_icon")
+						local icon = system_ini():r_string_ex(outfit:section(),"character_portrait")
 						if (icon) then 
 							db.actor:set_character_icon(icon)
 						end
@@ -80,7 +79,6 @@ function opt_menu_on_init(menu)
 				end
 			end
 		}
-		--]]
 	end 
 	
     -- axr option default config

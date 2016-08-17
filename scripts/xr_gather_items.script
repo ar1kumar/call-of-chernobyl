@@ -49,14 +49,24 @@ local function npc_on_item_take(npc,item)
 	end
 	
 	-- CHANGE VISUAL FOR OUTFIT
---[[
-	if (item.is_outfit and item:is_outfit()) then 
-		local vis = system_ini():r_string_ex(item:section(),"npc_visual")
-		if (vis) then 
-			npc:set_visual_name(vis:sub(0,-5))
-		end
+	-- TODO: FIX IN ENGINE
+	--[[
+	if not (IsOutfit(item)) then 
+		return
+	end 
+	
+	local story_name = story_objects.get_story_objects_registry():get_story_id(npc:id())
+	if (story_name ~= nil) then
+		return
 	end
---]]
+	
+	local npc_visual = system_ini():r_string_ex(item:section(),"npc_visual")
+	if not (npc_visual) then
+		return
+	end
+	
+	npc:set_visual_name(npc_visual)
+	--]]
 end
 
 local function actor_on_item_take(item)

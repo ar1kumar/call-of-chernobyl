@@ -18,7 +18,7 @@ function find_smart_under_faction_control(actor,npc,p)
 			local smrt = SIMBOARD.smarts[smart.id]
 			if (smrt) then 
 				for k,squad in pairs(smrt.squads) do
-					if (squad and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
+					if (squad and squad.stay_time and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
 						for i=2,#p do
 							if (p[i] == "monster" and is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
 								alun_utils.save_var(db.actor,p[1],smart.id)

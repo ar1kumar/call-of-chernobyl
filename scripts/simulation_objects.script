@@ -43,7 +43,7 @@ function simulation_objects_registry:update_avaliability(obj)
 		return
 	end 
 	
-	if (obj:sim_available() and xr_logic.pick_section_from_condlist(db.actor or alife():actor(), obj, obj.sim_avail) == "true") then
+	if (obj:sim_available() and xr_logic.pick_section_from_condlist(alife():actor(), obj, obj.sim_avail) == "true") then
 		self.objects[obj.id] = obj
 	else
 		self.objects[obj.id] = nil
@@ -183,25 +183,9 @@ function evaluate_prior(target, squad)
 
 		-- Level travel
 		if not (is_on_the_same_level(target, squad)) then
-		
-			-- monster squads can't change level to prevent weird running in place at graph points
-			--if (is_squad_monster[squad.player_id]) then 
-			--	return 0
-			--end
-			
 			if not (ALLOW_NPC_LEVEL_TRANSITION) then
 				return 0
 			end
-
-			--[[
-			local gg = game_graph()
-			local level_name = sim:level_name(gg:vertex(squad.m_game_vertex_id):level_id())
-			local target_level_name = sim:level_name(gg:vertex(target.m_game_vertex_id):level_id())
-
-			if not (config:section_exist(level_name) and string.find(config:r_value(level_name,"target_maps",0,""),target_level_name)) then
-				return 0
-			end
-			--]]
 		end
 	end
 
@@ -225,9 +209,3 @@ function evaluate_prior(target, squad)
 	
 	return prior*evaluate_prior_by_dist(target, squad)
 end
-
-
---***********************************************************************************************
---*										DEBUG_FUNCTIONS
---***********************************************************************************************
-

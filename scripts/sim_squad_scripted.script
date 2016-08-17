@@ -81,16 +81,6 @@ function sim_squad_scripted:init_squad_on_load()
 	self.need_to_reset_location_masks = true
 	--alun_utils.debug_write(self:name().."init_squad_on_load end")
 end
-
-function sim_squad_scripted:find_open_smart()
-	--alun_utils.debug_write("sim_squad_scripted:find_open_smart")
-	local actor = db.actor or alife():actor()
-	for name,smart in pairs(SIMBOARD.smarts_by_names) do
-		if (smart and not smart.disabled and smart.props and smart.props.territory > 0) and (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor , smart, smart.sim_avail,"find open smart") == "true" and smart:sim_available()) then
-			return smart
-		end
-	end
-end
 --***********************************************************************************************
 --*										SCRIPT_TARGET_SELECTION									*
 --***********************************************************************************************
@@ -189,9 +179,8 @@ function sim_squad_scripted:update()
 		self.need_to_reset_location_masks = false
 	end
 	
-	-- Delta
 	local tg = time_global()
-	if (self.dtimer and tg < self.dtimer) then
+	if (self.__check_time and tg < self.__check_time) then
 		--alun_utils.debug_write("sim_squad_scripted:update END 1")
 		return
 	end
@@ -202,12 +191,11 @@ function sim_squad_scripted:update()
 	local se_actor = sim:actor()
 	self.dist_to_actor = self.position:distance_to(se_actor.position)
 
-	self.dtimer = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
-	--
+	self.__check_time = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
+
 	
-	--self.sound_manager:update()
 	self:check_invulnerability()
-	simulation_objects.get_sim_obj_registry():update_avaliability(self)
+	--simulation_objects.get_sim_obj_registry():update_avaliability(self)
 
 	local script_target_id = self:get_script_target()
 	if (script_target_id) then
@@ -404,7 +392,7 @@ function sim_squad_scripted:generic_update()
 	self.current_action = nil
 
 	-- Find a new target
-	local target = SIMBOARD:get_squad_target(self) or self:find_open_smart()
+	local target = SIMBOARD:get_squad_target(self)
 	if not (target) then
 		--printf("no target %s",self:name())
 		self:on_reach_target(self)

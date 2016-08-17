@@ -1,15 +1,19 @@
 local item_by_community = {}
 local mul_by_level = {}
 local count_by_level = {}
-local ammo_sections = {}
 
-local death_ini = ini_file("misc\\ph_box_generic.ltx")
+ph_item_box_manager = nil
+function get_box_manager()
+	if not (ph_item_box_manager) then 
+		ph_item_box_manager = ph_item_box()
+	end 
+	return ph_item_box_manager
+end 
 
 class "ph_item_box"
-function ph_item_box:__init(obj)
-	self.obj = obj
+function ph_item_box:__init()
+	local death_ini = ini_file("misc\\ph_box_generic.ltx")
 	local community_list = { "def_box", "small_box_generic", "small_box_ussr", "small_box_nato", "small_box_army", "small_box_science", "big_box_generic", "big_box_dungeons", "big_box_arsenal"}
-
 	for k,v in pairs(community_list) do
 		item_by_community[v] = {}
 		if death_ini:section_exist(v) then
@@ -49,50 +53,43 @@ function ph_item_box:__init(obj)
 
 		count_by_level[id] = {min = min, max = max}
 	end
-
-	ammo_sections = {}
-	local n = death_ini:line_count("ammo_sections")
-	local id, value = "", ""
-	for i=0,n-1 do
-		result, id, value	= death_ini:r_line("ammo_sections",i,"","")
-		ammo_sections[id] = true
-	end
 end
 
-function ph_item_box:spawn_items()
-	local spawn_items = {}
-	local ini = self.obj:spawn_ini()
-	if not (ini) then 
+function ph_item_box:spawn_items(obj,who,spawn_ini)
+	local community
+	if (spawn_ini) then
+		local items = r_items(spawn_ini, "drop_box", "items", obj)
+		if items then
+			for k,v in pairs(items) do
+				if (v.count > 0) then
+					create_obligatory_items(obj, v.section, v.count)
+				end
+			end
+			return
+		end
+		community = spawn_ini:r_string_ex("drop_box","community")
+	else 
+		local community_list = {"small_box_generic", "small_box_ussr", "small_box_nato", "small_box_army", "small_box_science"}
+		community = community_list[math.random(#community_list)]
+	end
+
+	local spawn_list = community and item_by_community[community]
+	if not (spawn_list) then 
 		return 
-	end
-	local community	= ini:r_string_ex("drop_box","community") or "def_box"
-	local items = r_items(ini, "drop_box", "items", self.obj)
-	if items then
-		for k,v in pairs(items) do
-			if (v.count > 0) then
-				create_obligatory_items(self.obj, v.section, v.count)
-			end
-		end
-		return
-	end
-
-	local spawn_items = item_by_community[community]
-	if spawn_items == nil then
-		printf("xr_box: wrong community [%s] for box [%s]", community, self.obj:name())
-		spawn_items = {}
-		spawn_items = item_by_community["def_box"]
-	end
-
+	end 
+	
 	local found = false
-	for k,v in pairs(spawn_items) do
+	for k,v in pairs(spawn_list) do
 		if (v > 0) then
-			local number = math.ceil(math.random(count_by_level[k].min, count_by_level[k].max))
+			local number = math.random(count_by_level[k].min, count_by_level[k].max)
 			if (number > 0) then
-				create_items(self.obj, k, number, v, found)
+				create_items(obj, k, number, v, found)
 			end
 		end
 	end
-	if (found) then
+	
+	-- actor found stash
+	if (found and who and who:id() == 0) then
 		xr_statistic.inc_founded_secrets_counter()
 		news_manager.send_treasure(1)
 	end
@@ -102,14 +99,11 @@ function create_items(obj, section, number, rnd, found)
 	if not (system_ini():section_exist(section)) then 
 		return 
 	end
-	if ammo_sections[section] == true then
+	if _G.ammo_section[section] == true then
 		if math.random(100) <= rnd	then
 			if number > 0 then
-				local position = vector():set(0,0,0)
-				position.x = obj:position().x --+ math.random(-30,30)/100
-				position.z = obj:position().z --+ math.random(-30,30)/100
-				position.y = obj:position().y + 0.5 --+ math.random(30,50)/100
-				
+				local position = vector():set(obj:position())
+				position.y = obj:position().y + 0.3 --+ math.random(30,50)/100
 				create_ammo(section,position,obj:level_vertex_id(),obj:game_vertex_id(),65535,number)
 			end
 			found = true
@@ -117,11 +111,8 @@ function create_items(obj, section, number, rnd, found)
 	else
 		for i=1,number do
 			if math.random(100) <=  rnd then
-				local position = vector():set(0,0,0)
-				position.x = obj:position().x --+ math.random(-30,30)/100
-				position.z = obj:position().z --+ math.random(-30,30)/100
-				position.y = obj:position().y + 0.2 --+ math.random(30,50)/100
-
+				local position = vector():set(obj:position())
+				position.y = obj:position().y + 0.3 --+ math.random(30,50)/100
 				alife():create(section,position,obj:level_vertex_id(),obj:game_vertex_id())
 				found = true
 			end

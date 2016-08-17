@@ -102,15 +102,14 @@ end
 function se_monster:on_death(killer)
 	cse_alife_monster_base.on_death(self, killer)
 	smart_terrain.on_death(self)
-	if self.group_id ~= 65535 then
-		local squad = alife():object(self.group_id)
-		if squad == nil then
-			--printf("sim_board squads")
-			--print_table(SIMBOARD.squads)
-			printf("There is no squad with ID [%s]", self.group_id)
-			return
-		end
+
+	local squad = self.group_id and self.group_id < 65535 and alife():object(self.group_id)
+	if (squad) then
 		squad:on_npc_death(self,killer)
+	end
+	
+	if (level.map_has_object_spot(self.id,"red_location") == 1) then
+		level.map_remove_object_spot(self.id, "red_location")
 	end
 end
 --------------------

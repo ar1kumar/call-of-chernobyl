@@ -20,8 +20,21 @@ local function under_faction_control_target_id(task_id)
 	local target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
 	local se_target = target_id and sim:object(target_id)
 
-	if (se_target and smart.position:distance_to_sqr(se_target.position) > 4225) then
-		return target_id
+	-- If enemies are more then 50m from target location, then show red (?) near their location
+	if (se_target) then
+		if (smart.position:distance_to_sqr(se_target.position) > 2500) then
+			if (se_target:clsid() == clsid.online_offline_group_s) then
+				if (se_target.id and level.map_has_object_spot(se_target.id,"red_location") == 0) then
+					level.map_add_object_spot(se_target.id, "red_location", "st_ui_pda_task_unknown_enemy")
+				end
+			end
+		else
+			if (se_target:clsid() == clsid.online_offline_group_s) then
+				if (se_target.id and level.map_has_object_spot(se_target.id,"red_location") == 1) then
+					level.map_remove_object_spot(se_target.id, "red_location")
+				end
+			end
+		end
 	end
 
 	return smart_id
@@ -191,7 +204,7 @@ function esc_m_trader_task_target(task_id,field,p,task)
 			local target_id = alun_utils.load_var(db.actor,"esc_m_trader_task_1_target_id")
 			local se_target = target_id and alife():object(target_id)
 
-			if (se_target and smart.position:distance_to_sqr(se_target.position) > 4225) then
+			if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
 				return target_id
 			end
 
