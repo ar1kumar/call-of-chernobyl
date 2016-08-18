@@ -28,7 +28,7 @@ status_functor_params = monster
 stage_complete = 1
 on_init = %=find_smart_under_faction_control(zat_a2_stalker_barmen_task_1_id:monster)%
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
-repeat_timeout = 259200
+repeat_timeout = 86400
 on_complete = %=inc_task_stage(zat_a2_stalker_barmen_task_1) =reward_random_money(2000:4500) =reward_stash(true) =pstor_reset(zat_a2_stalker_barmen_task_1_id) =pstor_reset(zat_a2_stalker_barmen_task_1_target_id)%
 on_fail = %=pstor_reset(zat_a2_stalker_barmen_task_1_id) =pstor_reset(zat_a2_stalker_barmen_task_1_target_id)%
 reward_item = vodka
@@ -53,7 +53,7 @@ status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = zat_a2_stalker_barmen_task_2_fetch_finish
 ; precondition = true
-repeat_timeout = 259200
+repeat_timeout = 86400
 on_complete = %=reward_random_money(4500:12000) =reward_stash(true) =remove_fetch_item(zat_a2_stalker_barmen_task_2_fetch) =inc_task_stage(zat_a2_stalker_barmen_task_2)%
 reward_item = vodka
 
@@ -69,7 +69,7 @@ title = zat_a2_stalker_barmen_task_3_name
 descr = zat_a2_stalker_barmen_task_3_text
 job_descr = zat_a2_stalker_barmen_task_3_about
 task_complete_descr = zat_a2_stalker_barmen_task_3_finish
-repeat_timeout = 259200
+repeat_timeout = 86400
 status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1

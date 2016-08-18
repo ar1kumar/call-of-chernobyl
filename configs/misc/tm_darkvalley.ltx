@@ -27,7 +27,7 @@ status_functor = check_smart_under_faction_control_staged
 status_functor_params = monster
 on_init = %=find_smart_under_faction_control(val_smart_terrain_7_4_bandit_trader_stalker_task_1_id:monster)%
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
-repeat_timeout = 259200
+repeat_timeout = 86400
 stage_complete = 1
 on_complete = %==reward_random_money(1000:3000) =reward_stash(true) =inc_task_stage(val_smart_terrain_7_4_bandit_trader_stalker_task_1) =complete_task_inc_goodwill(50:bandit) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_id) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_target_id)%
 on_fail = %=pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_id) =fail_task_dec_goodwill(25:bandit) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_target_id)%
@@ -44,7 +44,7 @@ title = val_smart_terrain_7_4_bandit_trader_stalker_task_2_name
 descr = val_smart_terrain_7_4_bandit_trader_stalker_task_2_text
 job_descr = val_smart_terrain_7_4_bandit_trader_stalker_task_2_about
 task_complete_descr = val_smart_terrain_7_4_bandit_trader_stalker_task_2_finish
-repeat_timeout = 259200
+repeat_timeout = 86400
 target_functor = general_under_faction_control
 status_functor = check_smart_under_faction_control_staged
 status_functor_params = stalker,army,dolg,killer,csky,monolith
@@ -69,7 +69,7 @@ task_complete_descr = val_smart_terrain_7_4_bandit_trader_stalker_task_3_finish
 target_functor = val_smart_terrain_7_4_bandit_trader_stalker_task_target
 on_init = %=setup_companion_task(bandit_companion_task_1:val_smart_terrain_7_4) -bandit_companion_task_1_started -bandit_companion_task_1_force_started%
 precondition = {!squad_exist(bandit_companion_task_1)} true, false
-repeat_timeout = 259200
+repeat_timeout = 86400
 on_complete = %=reward_random_money(1500:3500) =complete_task_inc_goodwill(50:bandit) =reward_stash(true) =remove_special_task_squad(bandit_companion_task_1)%
 on_fail = %=fail_task_dec_goodwill(25:bandit) =remove_special_task_squad(bandit_companion_task_1)%
 condlist_0 = {!squad_exist(bandit_companion_task_1)} fail
@@ -86,7 +86,7 @@ title = val_smart_terrain_7_4_bandit_trader_stalker_task_4_name
 descr = val_smart_terrain_7_4_bandit_trader_stalker_task_4_text
 job_descr = val_smart_terrain_7_4_bandit_trader_stalker_task_4_about
 task_complete_descr = val_smart_terrain_7_4_bandit_trader_stalker_task_4_finish
-repeat_timeout = 259200
+repeat_timeout = 86400
 status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1

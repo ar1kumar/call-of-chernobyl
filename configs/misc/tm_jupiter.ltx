@@ -36,7 +36,7 @@ target_functor = jup_b6_scientist_tech_task_target
 task_complete_descr = jup_b6_scientist_tech_task_finish
 on_init = %=setup_companion_task(ecolog_companion_task_2:jup_b41) =setup_task_target_anomaly -ecolog_companion_task_2_started -ecolog_companion_task_2_force_started%
 precondition = {!squad_exist(ecolog_companion_task_1) !squad_exist(ecolog_companion_task_2)} true, false
-repeat_timeout = 259200
+repeat_timeout = 86400
 on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reward_stash(true) =reset_task_target_anomaly%
 on_fail = %=fail_task_dec_goodwill(25:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reset_task_target_anomaly%
 reward_item = af_cristall
@@ -85,7 +85,7 @@ status_functor_params = monster
 stage_complete = 1
 on_init = %=find_smart_under_faction_control(jup_b220_trapper_task_1_id:monster)%
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
-repeat_timeout = 259200
+repeat_timeout = 86400
 on_complete = %=inc_task_stage(jup_b220_trapper_task_1) =complete_task_inc_goodwill(50:stalker) =reward_random_money(1000:3500) =reward_stash(true) =pstor_reset(jup_b220_trapper_task_1_id) =pstor_reset(jup_b220_trapper_task_1_target_id)%
 on_fail = %=pstor_reset(jup_b220_trapper_task_1_id) =pstor_reset(jup_b220_trapper_task_1_target_id)%
 
@@ -102,7 +102,7 @@ descr = jup_b220_trapper_task_2_text
 job_descr = jup_b220_trapper_task_2_about
 task_complete_descr = jup_b220_trapper_task_2_finish
 precondition = true
-repeat_timeout = 259200
+repeat_timeout = 86400
 status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1
@@ -129,7 +129,7 @@ status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = jup_b220_trapper_task_3_fetch_finish
 ; precondition = {=random_chance(60)} true, false
-repeat_timeout = 259200
+repeat_timeout = 86400
 on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_stash(true) =reward_item_cost_mult_and_remove(jup_b220_trapper_task_3_fetch:1.7) =inc_task_stage(jup_b220_trapper_task_3)%
 on_fail = %=fail_task_dec_goodwill(25:stalker)%
 
@@ -150,7 +150,7 @@ fetch_descr = jup_b220_trapper_task_4_fetch_about
 fetch_func = %=setup_rare_mutant_fetch_task(jup_b220_trapper_task_4_fetch)%
 stage_complete = 1
 ; precondition = true
-repeat_timeout = 259200
+repeat_timeout = 86400
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = jup_b220_trapper_task_4_fetch_finish
