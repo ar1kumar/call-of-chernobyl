@@ -328,7 +328,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.hit_on_bone 			= utils.parse_data_1v(npc, ini:r_string_ex(section,"hit_on_bone") or "")
 	st.locked    			= ini:r_bool_ex(section,"locked",false)
 	st.no_force  			= ini:r_bool_ex(section,"no_force",false)
-	st.not_for_npc  		= ini:r_bool_ex(section,"not_for_npc") or not_for_npcs[npc:get_visual_name()] or false
+	st.not_for_npc  		= ini:r_bool_ex(section,"not_for_npc",not_for_npcs[npc:get_visual_name()] or false)
 	st.on_use    			= xr_logic.cfg_get_condlist(ini, section, "on_use", npc)
 	st.show_tips 			= ini:r_bool_ex(section,"show_tips",true)
 	st.slider 				= ini:r_bool_ex(section,"slider",false)
