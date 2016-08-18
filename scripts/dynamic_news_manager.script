@@ -702,6 +702,29 @@ function DynamicNewsManager:KillWounded(sender,victim,is_hostage)
 	end
 end 
 
+function DynamicNewsManager:GossipTaskRepeatTimeout(task_id)
+	local story_id = task_id:sub(1,-8)
+	local se_obj = get_story_object(story_id)
+	if not (se_obj) then 
+		return false 
+	end
+	
+	local sender = self:FindSpeakerNoVictim(nil,nil,true)
+	if not (sender) then 
+		return false 
+	end
+	
+	Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+	local Tbl = {
+		"Looks like ol' %s is looking for stalkers to do some work.",
+		"Heads up, %s is has some new work available.",
+		"Any need some work? I just heard %s is looking for stalkers for a job.",
+		"%s has new work, if anyone is interested..."
+	}
+	local msg = strformat(Tbl[math.random(#Tbl)],se_obj:character_name())
+	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})	
+end
+
 ----------------------------------- helpers
 function DynamicNewsManager:BuildSentenceStalkerEnemy(victim,who,mn,mx)
 	local comm_victim = victim:character_community()

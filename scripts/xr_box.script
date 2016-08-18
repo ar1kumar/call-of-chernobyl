@@ -56,6 +56,10 @@ function ph_item_box:__init()
 end
 
 function ph_item_box:spawn_items(obj,who,spawn_ini)
+	if (who and who:id() == 0) then 
+		xr_statistic.inc_boxes_smashed_counter()
+	end
+
 	local community
 	if (spawn_ini) then
 		local items = r_items(spawn_ini, "drop_box", "items", obj)
@@ -74,28 +78,21 @@ function ph_item_box:spawn_items(obj,who,spawn_ini)
 	end
 
 	local spawn_list = community and item_by_community[community]
-	if not (spawn_list) then 
+	if not (spawn_list) then
 		return 
-	end 
+	end
 	
-	local found = false
 	for k,v in pairs(spawn_list) do
 		if (v > 0) then
 			local number = math.random(count_by_level[k].min, count_by_level[k].max)
 			if (number > 0) then
-				create_items(obj, k, number, v, found)
+				create_items(obj, k, number, v)
 			end
 		end
 	end
-	
-	-- actor found stash
-	if (found and who and who:id() == 0) then
-		xr_statistic.inc_founded_secrets_counter()
-		news_manager.send_treasure(1)
-	end
 end
 
-function create_items(obj, section, number, rnd, found)
+function create_items(obj, section, number, rnd)
 	if not (system_ini():section_exist(section)) then 
 		return 
 	end
@@ -106,7 +103,6 @@ function create_items(obj, section, number, rnd, found)
 				position.y = obj:position().y + 0.3 --+ math.random(30,50)/100
 				create_ammo(section,position,obj:level_vertex_id(),obj:game_vertex_id(),65535,number)
 			end
-			found = true
 		end
 	else
 		for i=1,number do
@@ -114,7 +110,6 @@ function create_items(obj, section, number, rnd, found)
 				local position = vector():set(obj:position())
 				position.y = obj:position().y + 0.3 --+ math.random(30,50)/100
 				alife():create(section,position,obj:level_vertex_id(),obj:game_vertex_id())
-				found = true
 			end
 		end
 	end

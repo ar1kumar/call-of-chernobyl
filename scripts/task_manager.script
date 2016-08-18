@@ -103,6 +103,7 @@ function CRandomTask:update()
 		local tsk = self.task_info[k]
 		tsk:check_task(self)
 		if (tsk.timeout and game.get_game_time():diffSec(tsk.timeout) > tsk.repeat_timeout) then
+			dynamic_news_manager.get_dynamic_news():GossipTaskRepeatTimeout(k)
 			if not (db.actor:get_task(k,true)) then -- don't remove if engine task object still exist
 				self.task_info[k] = nil
 			end

@@ -61,6 +61,7 @@ function on_game_start()
 	RegisterScriptCallback("physic_object_on_use_callback",physic_object_on_use_callback)
 	RegisterScriptCallback("squad_assign_new_target",squad_assign_new_target)
 	RegisterScriptCallback("CUIActorMenu_OnItemDropped",on_item_drag_dropped)
+	RegisterScriptCallback("CUIActorMenu_OnItemFocusReceive",on_item_focus)
 end
 
 function on_game_load()
@@ -86,6 +87,33 @@ function on_game_load()
 	end
 	--]]
 end
+
+function on_item_focus(itm)
+	local section = itm:section()
+	if (RepairTools[section]) then 
+		local ini = system_ini()
+		local repair_type = ini:r_string_ex(section,"repair_type")
+		if not (repair_type) then 
+			return
+		end
+		
+		local function itr(obj)
+			if (repair_type == "weapon" and IsWeapon(obj)) then 
+				return true 
+			elseif (repair_type == "outfit") and (IsOutfit(obj) or IsHeadgear(obj)) then 
+				return true
+			elseif (repair_type == "all") then 
+				local cls = obj:clsid()
+				if (IsWeapon(nil,cls) or IsOutfit(nil,cls) or IsHeadgear(nil,cls)) then 
+					return true 
+				end
+			end
+			return false
+		end 
+		
+		ActorMenu.get_actor_menu():highlight_for_each_in_slot(itr)
+	end 
+end 
 
 function on_item_drag_dropped(itm1,itm2,from_slot,to_slot)
 	--printf("itm1=%s itm2=%s from_slot=%s to_slot=%s",itm1 and itm1:name(),itm2 and itm2:name(),from_slot,to_slot)
