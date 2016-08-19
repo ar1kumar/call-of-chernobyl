@@ -1237,16 +1237,12 @@ function load_obj(obj, reader)
 end
 
 function get_customdata_or_ini_file(npc, filename)
-	--printf( "get_customdata_or_ini_file: filename=%s", filename )
 	local st = db.storage[npc:id()]
 	if filename == "<customdata>" then
-		--printf("custom_data_or_ini:1!!!")
 		local ini = npc:spawn_ini()
 		if ini then
-			--printf("custom_data_or_ini:2!!!")
 			return ini
 		else
-			--printf("custom_data_or_ini:3!!!")
 			return ini_file([[scripts\dummy.ltx]])
 		end
 	elseif string.find( filename, "*" ) == 1 then
@@ -1257,7 +1253,6 @@ function get_customdata_or_ini_file(npc, filename)
 			return ini_file(st.job_ini)
 		end
 		--]]
-		--printf("custom_data_or_ini:4!!!")
 		
 		local gname = string.sub(filename, 2)
 		
@@ -1268,10 +1263,8 @@ function get_customdata_or_ini_file(npc, filename)
 			return db.dynamic_ltx[filename]
 		end
 
-		--printf("custom_data_or_ini:5!!!")
 		return ini_file(filename)
 	end
-	--printf("custom_data_or_ini:6!!!")
 end
 
 function initialize_obj(obj, st, loaded, actor, stype)

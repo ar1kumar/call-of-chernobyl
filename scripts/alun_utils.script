@@ -10,8 +10,8 @@ function get_inv_name(section)
 end 
 
 -- Prints a formated lua table to print_table.txt for debugging purposes
-function print_table(tbl,header)
-	local txt = "-- " .. tostring(header) .. "\n{\n\n"
+function print_table(tbl,header,format_only)
+	local txt = header and ("-- " .. tostring(header) .. "\n{\n\n") or "{\n\n"
 	local depth = 1
 
 	local function tab(amt)
@@ -72,6 +72,10 @@ function print_table(tbl,header)
 
 	txt = txt .. "\n}"
 
+	if (format_only) then
+		return txt 
+	end
+	
 	local file = io.open("print_table.txt","a+")
 	file:write(txt.."\n\n")
 	file:close()

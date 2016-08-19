@@ -1,26 +1,23 @@
 saved_game_extension	= ".scop"
 
 class "load_item" (CUIListBoxItem)
-
 function load_item:__init(height) super(height)
---	printf("%f",height)
 	self.file_name		= "filename"
 
-		self:SetTextColor(GetARGB(255, 170, 170, 170))
+	self:SetTextColor(GetARGB(255, 170, 170, 170))
 
-		self.fn = self:GetTextItem()
-		self.fn:SetFont(GetFontLetterica18Russian())
-		self.fn:SetEllipsis(true)
+	self.fn = self:GetTextItem()
+	self.fn:SetFont(GetFontLetterica18Russian())
+	self.fn:SetEllipsis(true)
 end
 
 function load_item:__finalize()
 end
 
 class "load_dialog" (CUIScriptWnd)
-
 function load_dialog:__init() super()
-	 self:InitControls()
-	 self:InitCallBacks()
+	self:InitControls()
+	self:InitCallBacks()
 end
 
 function load_dialog:__finalize()
@@ -103,8 +100,6 @@ function load_dialog:InitCallBacks()
 
 	self:AddCallback("list_window", ui_events.LIST_ITEM_CLICKED, 			  self.OnListItemClicked,		self)
 	self:AddCallback("list_window", ui_events.WINDOW_LBUTTON_DB_CLICK,		  self.OnListItemDbClicked,		self)
-
-
 end
 
 function file_exist(fname)
@@ -216,6 +211,32 @@ function load_dialog:OnListItemClicked()
 		self.picture:InitTexture("ui\\ui_noise")
 	end
 	self.picture:SetTextureRect(Frect():set(r.x1,r.y1,r.x2,r.y2))
+	
+	if (__show_scoc_debug) then
+		__show_scoc_debug = nil
+		local fname = item_text .. ".scoc"
+		if not file_exist(fname) then
+			return
+		end 
+
+		local path = getFS():update_path('$game_saves$', '')
+		local f = io.open(path..fname,"rb")
+		if not (f) then 
+			return
+		end
+		local data = f:read("*all")
+		f:close()
+		if (data) then 
+			local m_data = marshal.decode(data)
+			local output = io.open(path..item_text..".lua","wb")
+			if (output) then 
+				output:write(alun_utils.print_table(m_data,nil,true) or "")
+				output:close()
+				local msg = strformat("%s.scoc has be converted to *.lua",item_text)
+				ui_dyn_msg_box.msg_box_ui("message_box_ok",true,msg)
+			end 
+		end
+	end
 end
 
 function load_dialog:OnListItemDbClicked()
@@ -325,6 +346,13 @@ end
 
 function load_dialog:OnKeyboard(dik, keyboard_action)  --virtual function
 	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if (DEV_DEBUG) then
+		if (keyboard_action == ui_events.WINDOW_KEY_PRESSED and dik == DIK_keys.DIK_LCONTROL) then
+			__show_scoc_debug = true
+		elseif (keyboard_action == ui_events.WINDOW_KEY_RELEASED and dik == DIK_keys.DIK_LCONTROL) then
+			__show_scoc_debug = nil
+		end
+	end
 	local bind = dik_to_bind(dik)
 	if bind == key_bindings.kQUIT then
 		self:OnButton_back_clicked()
@@ -357,6 +385,3 @@ function load_dialog:AddItemToList(file_name, date_time)
 
 	self.list_box:AddExistingItem(_itm)
 end
-
-
-

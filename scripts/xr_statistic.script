@@ -557,8 +557,9 @@ function init_ranks_reps()
 		for name in string.gfind( s, "([%w_%-.\\]+)[%,%s]*" ) do table.insert( t, name ) end
 		return t
 	end
-	local tbl = parse_str(ini_file("creatures\\game_relations.ltx"):r_string_ex("game_relations","rating"))
-	local tbl2 = parse_str(ini_file("creatures\\game_relations.ltx"):r_string_ex("game_relations","reputation"))
+	local ini = ini_file("creatures\\game_relations.ltx")
+	local tbl = parse_str(ini:r_string_ex("game_relations","rating"))
+	local tbl2 = parse_str(ini:r_string_ex("game_relations","reputation"))
 	for i=2, #tbl, 2 do
 		table.insert(ranks, tonumber(tbl[i]))
 	end
