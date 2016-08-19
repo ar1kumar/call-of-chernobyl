@@ -1,13 +1,11 @@
 --[[
 	scheme_type: generic
-	author: Chugai
-	modified_by: Alundaio
+	Author: Alundaio
+	Original concept: Chugai
 --]]
 
 ----------------------------------------------------------------------------------------------------------------------
 --	—хема патруль дл€ reach_task_location.
-----------------------------------------------------------------------------------------------------------------------
-local alife = alife
 ----------------------------------------------------------------------------------------------------------------------
 local formations = {
 										 { dir = vector ():set (0.7, 0, -.5), dist = 1.2 },
@@ -25,20 +23,13 @@ local formations = {
 										 { dir = vector ():set (0.7, 0, -1), dist = 8.4 },
 										 { dir = vector ():set (-0.7, 0, -1), dist = 8.4}
 										 }
-local accel_by_curtype = {
-						walk	= "run",
-						patrol	= "rush",
-						raid	= "assault",
-						sneak	= "sneak_run",
-						sneak_run = "assault"
-						}
-
 local function get_npc_command(npc)
 	local squad = get_object_squad(npc)
 	if not (squad) then 
 		return npc:level_vertex_id(), npc:direction()
 	end 
-	local commander = db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object
+	local c_id = squad:commander_id()
+	local commander = db.storage[c_id] and db.storage[c_id].object
 	if not (commander) then 
 		return npc:level_vertex_id(), npc:direction()
 	end
@@ -58,7 +49,7 @@ local function get_npc_command(npc)
 	for k in squad:squad_members() do
 		if (k.id == id) then 
 			break
-		elseif (k.id ~= squad:commander_id()) then
+		elseif (k.id ~= c_id) then
 			_index = _index + 1
 		end
 	end
@@ -80,110 +71,96 @@ local function get_npc_command(npc)
 	return vertex, dir
 end 
 
-local function squad_current_action (object)
-	local squad = get_object_squad(object)
-	return squad and squad.current_action
-end
-
 class "evaluator_reached_task_location" ( property_evaluator )
 function evaluator_reached_task_location:__init( name, storage ) super ( nil, name )
 	self.st = storage
 end
 
 function evaluator_reached_task_location:evaluate()
-	if not (self.object:alive()) then 
+	if not (self.object:alive()) then
 		return false 
 	end 
-	local squad = get_object_squad(self.object)
-	if squad and squad.current_action and squad.current_action == 0 then
-		local squad_target = squad.assigned_target_id and alife():object(squad.assigned_target_id)
-		if squad_target == nil then
-			return false
-		end
-		return not squad_target:am_i_reached(squad)
+
+	local sim = alife()
+	local se_obj = sim:object(self.object:id())
+	if not (se_obj) then 
+		return false 
+	end 
+	
+	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and sim:object(se_obj.group_id)
+	if (squad) then 
+		local target = squad.assigned_target_id and sim:object(squad.assigned_target_id)
+		if not (target) then 
+			return false 
+		end  
+		return not target:am_i_reached(squad)
 	end
-	return false
+	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and sim:object(se_obj.m_smart_terrain_id)
+	if not (smart) then 
+		return false 
+	end
+
+	return not smart_terrain.arrived_to_smart(se_obj, smart)
 end
 
 --------------------------------------------------------------------------------------------------------------
--- действие "довести сталкера к месту работы"
-
-class "action_reach_task_location" ( action_base )
-
-function action_reach_task_location:__init( name, storage )  super ( nil, name )
+class "action_reach_task_location" (action_base)
+function action_reach_task_location:__init(name,storage) super (nil,name)
 	self.st = storage
 end
 function action_reach_task_location:initialize()
 	action_base.initialize( self )
-	local squad = get_object_squad(self.object)
-	if not (squad) then
-		return 
-	end
-	self.target_id = squad.assigned_target_id
-	self.squad_id = squad.id
-	self.l_vid = -1
-	self.dist = 0
-	self.dir = vector():set(0, 0, 1)
-	self.on_point = false
-	self.was_reset = false
-	self.time_to_update = time_global () + 1500
 
-	self.object:set_desired_direction   	()
-	self.object:set_movement_selection_type	(game_object.alifeMovementTypeMask)
-	local best_weapon = self.object:best_weapon()
-	self.object:set_item					(object.idle, best_weapon)
-	self.object:set_body_state				(move.standing)
-	self.object:set_detail_path_type    	( move.line )
-	self.object:set_mental_state			(anim.free)
-	self.object:set_movement_type			(move.walk)
-	local squad_target 						= alife():object(self.target_id)
-	self.object:set_dest_game_vertex_id		(squad_target.m_game_vertex_id)
-	self.object:set_path_type           	( game_object.game_path )
-	self.object:inactualize_patrol_path		()
-	self.object:set_sight					(look.path_dir,nil,0)
+	self.object:set_desired_direction()
+	self.object:inactualize_patrol_path()
+	self.object:set_body_state(move.standing)
+	self.object:set_detail_path_type(move.line)
+	self.object:set_mental_state(anim.free)
+	self.object:set_movement_selection_type(game_object.alifeMovementTypeMask)
+	self.object:set_movement_type(move.walk)
+	self.object:set_path_type(game_object.game_path)
+	self.object:set_sight(look.path_dir,nil,0)
 end
 
-
 function action_reach_task_location:execute()
-	local squad = alife():object(self.squad_id)
-	if not (squad) then 
-		self:single_execute()
+	action_base.execute(self)
+	
+	local sim = alife()
+	local se_obj = sim:object(self.object:id())
+	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and sim:object(se_obj.group_id)
+
+	if (squad) then
+		if (squad:commander_id() == self.object:id() or not level.object_by_id(squad:commander_id()))then
+			self:commander_execute(squad)
+		else
+			self:soldier_execute(squad)
+		end
+	else 
+		self:single_execute(se_obj)
 	end
-	if (not squad) or (squad:commander_id() == self.object:id() or not level.object_by_id(squad:commander_id()))then
-		self:commander_execute(squad)
-	else
-		self:soldier_execute(squad)
-	end
-	action_base.execute (self)
 end
 
 function action_reach_task_location:finalize()
 	self.object:set_movement_selection_type(game_object.alifeMovementTypeRandom)
-	action_base.finalize( self )
+	action_base.finalize(self)
 end
 
-function action_reach_task_location:single_execute()
+function action_reach_task_location:single_execute(se_obj)
 	local npc = self.object 
-	local se_obj = alife():object(npc:id())
-	if not (se_obj) then 
-		abort("ERROR: action_reach_task_location:single_execute se_obj nil!")
-		return
-	end
 	
-	npc:set_movement_type(move.walk)
 	npc:set_mental_state(anim.free)
+	npc:set_movement_type(move.walk)
 	
-	local squad_target = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and alife():object(se_obj.m_smart_terrain_id)
-	if (squad_target) then
-		local pos, lv_id, gv_id = squad_target:get_location()
-		if npc:game_vertex_id() ~= gv_id then
-			npc:set_path_type			(game_object.game_path)
-			npc:set_dest_game_vertex_id	(gv_id)
-			npc:set_sight				(look.path_dir,nil,0)
+	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and alife():object(se_obj.m_smart_terrain_id)
+	if (smart and not npc:is_talking()) then
+		npc:set_sight(look.path_dir,nil,0)
+		local pos, lv_id, gv_id = smart:get_location()
+		if (npc:game_vertex_id() ~= gv_id) then
+			npc:set_path_type(game_object.game_path)
+			npc:set_dest_game_vertex_id(gv_id)
 		else
 			npc:set_path_type(game_object.level_path)
 			utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:3")
-			npc:set_sight(look.path_dir,nil,0)
 			npc:set_desired_position(pos)
 		end
 	else 
@@ -238,16 +215,16 @@ function action_reach_task_location:commander_execute(squad)
 			npc:set_movement_type(move.walk)
 			npc:set_mental_state(anim.free)
 		end
-
+		
+		npc:set_sight(look.path_dir,nil,0)
+		
 		local pos, lv_id, gv_id = squad_target:get_location()
 		if npc:game_vertex_id() ~= gv_id then
-			npc:set_path_type			(game_object.game_path)
-			npc:set_dest_game_vertex_id	(gv_id)
-			npc:set_sight				(look.path_dir,nil,0)
+			npc:set_path_type(game_object.game_path)
+			npc:set_dest_game_vertex_id(gv_id)
 		else
 			npc:set_path_type(game_object.level_path)
 			utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:2")
-			npc:set_sight(look.path_dir,nil,0)
 			npc:set_desired_position(pos)
 		end
 	else
@@ -267,9 +244,8 @@ function action_reach_task_location:soldier_execute(squad)
 		squad_target = alife():object(squad.assigned_target_id)
 	end
 
-	self.l_vid, self.dir = get_npc_command(npc)
+	local lvid,desired_direction = get_npc_command(npc)
 
-	local desired_direction = self.dir
 	--printf("desired_direction = %s", vec_to_str(desired_direction))
 	if desired_direction and not utils.vector_cmp(desired_direction, vector():set(0,0,0)) then
 		desired_direction:normalize()
@@ -277,7 +253,7 @@ function action_reach_task_location:soldier_execute(squad)
 	end
 	npc:set_path_type(game_object.level_path)
 
-	self.l_vid = utils.send_to_nearest_accessible_vertex(npc, self.l_vid,"xr_reach_task")
+	lvid = utils.send_to_nearest_accessible_vertex(npc, lvid,"xr_reach_task")
 
 	if (squad_target == nil or xr_conditions.surge_started() or squad_target:clsid() == clsid.online_offline_group_s) then
 		npc:set_movement_type(commander:movement_type())
@@ -302,7 +278,7 @@ function action_reach_task_location:soldier_execute(squad)
 		return
 	end
 
-	if level.vertex_position(self.l_vid):distance_to(npc:position()) > 5 then
+	if (lvid ~= nil and level.vertex_position(lvid):distance_to(npc:position()) > 5) then
 		npc:set_movement_type(move.run)
 	else
 		npc:set_movement_type(move.walk)
@@ -315,12 +291,7 @@ end
 function action_reach_task_location:net_destroy(npc)
 
 end
-
-
-
-
 --------------------------------------------------------------------------------------------------------------
-
 function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
 	local st = xr_logic.assign_storage_and_bind(npc,ini,"reach_task",section,temp)
 end
@@ -349,13 +320,11 @@ function add_reach_task_action(npc)
 
 	local new_action = action_reach_task_location("reach_task_location", st)
 
-	local world_property = world_property
+	new_action:add_precondition(world_property(stalker_ids.property_alife,true))
 
-	new_action:add_precondition	(world_property(stalker_ids.property_alife, 			 true))
+ 	new_action:add_precondition(world_property(stalker_ids.property_smart_terrain_task,true))
 
- 	new_action:add_precondition	(world_property(stalker_ids.property_smart_terrain_task, true))
-
-	new_action:add_effect		(world_property(stalker_ids.property_smart_terrain_task, false))
+	new_action:add_effect(world_property(stalker_ids.property_smart_terrain_task,false))
 
 	alife_action_planner:add_action(stalker_ids.action_smart_terrain_task, new_action)
 end
