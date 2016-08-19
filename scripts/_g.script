@@ -312,7 +312,9 @@ function strformat(text,...)
 		end
 		return tostring(p[i])
 	end
-	return string.gsub(text,"%%s",sr)
+	-- so that it doesn't return gsub's multiple returns
+	local s = string.gsub(text,"%%s",sr) 
+	return s
 end
 
 -- Used by modules.script for generic module management
@@ -584,9 +586,13 @@ end
 
 -- очистка таблицы.
 function iempty_table (t)
+	if not (t) then 
+		return {}
+	end
 	while #t > 0 do
 		t[#t] = nil
 	end
+	return t
 end
 
 function empty_table(t)
