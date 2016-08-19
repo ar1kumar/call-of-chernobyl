@@ -460,42 +460,33 @@ function switch_to_section(npc, ini, section)
 		return false
 	end
 
-	if (axr_beh) then alun_utils.save_var(npc,"path_index",1) end
-
-	--printf("section = [%s]", tostring(section))
 	local npc_id = npc:id()
 	local active_section = db.storage[npc_id].active_section
 
-	db.storage[npc_id].overrides = cfg_get_overrides(ini, section, npc)
-	
 	if active_section == section then
-		--printf("section = [%s]3", tostring(section))
 		return false
 	end
 	
-	--printf("[%s] switch to section [%s] %s", npc:name(), tostring(section), device():time_global())
-
+	db.storage[npc_id].overrides = cfg_get_overrides(ini, section, npc)
+	
+	if (axr_beh) then alun_utils.save_var(npc,"path_index",1) end
+	
 	if active_section then
 		local st = db.storage[npc_id][db.storage[npc_id].active_scheme]
 		issue_event(npc, st, "deactivate", npc, st)
 	end
+	
 	db.storage[npc_id].exit_from_smartcover_initialized = nil
 	db.storage[npc_id].active_section = nil
 	db.storage[npc_id].active_scheme = nil
-	if section == nil then
-		return true
-	end
+	
 	activate_by_section(npc, ini, section, db.storage[npc_id].gulag_name, false)
-	--printf("section = [%s]5", tostring(section))
+	
 	return true
 end
 
 function see_actor(npc)
 	return npc:alive() and npc:see(db.actor)
-end
-
-function cond_name(cond, etalon)
-	return string.find( cond, "^"..etalon.."%d*$" ) ~= nil
 end
 
 function try_switch_to_another_section(npc, st, actor)
@@ -514,57 +505,57 @@ function try_switch_to_another_section(npc, st, actor)
 
 	local switched = false
 	for n, c in pairs(l) do
-		if cond_name(c.name, "on_actor_dist_le") then
+		if (c.name == "on_actor_dist_le") then
 			if see_actor(npc) and distance_between(actor, npc) <= c.v1 then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_actor_dist_le_nvis") then
+		elseif (c.name == "on_actor_dist_le_nvis") then
 			if distance_between(actor, npc) <= c.v1 then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_actor_dist_ge") then
+		elseif (c.name == "on_actor_dist_ge") then
 			if see_actor(npc) and distance_between(actor, npc) > c.v1 then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_actor_dist_ge_nvis") then
+		elseif (c.name == "on_actor_dist_ge_nvis") then
 			if distance_between(actor, npc) > c.v1 then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_signal") then
+		elseif (c.name == "on_signal") then
 			if st.signals and st.signals[c.v1] then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_info") then
+		elseif (c.name == "on_info") then
 			switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
-		elseif cond_name(c.name, "on_timer") then
+		elseif (c.name == "on_timer") then
 			if time_global() >= db.storage[npc_id].activation_time + c.v1 then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_game_timer") then
+		elseif (c.name == "on_game_timer") then
 			if  game.get_game_time():diffSec(db.storage[npc_id].activation_game_time) >= c.v1 then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_actor_in_zone") then
+		elseif (c.name == "on_actor_in_zone") then
 			if utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_actor_not_in_zone") then
+		elseif (c.name == "on_actor_not_in_zone") then
 			if not utils.npc_in_zone(actor, db.zone_by_name[c.v1]) then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_npc_in_zone") then
+		elseif (c.name == "on_npc_in_zone") then
 			if utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_npc_not_in_zone") then
+		elseif (c.name == "on_npc_not_in_zone") then
 			if not utils.npc_in_zone(level.object_by_id(c.npc_id), db.zone_by_name[c.v2]) then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_actor_inside") then
+		elseif (c.name == "on_actor_inside") then
 			if utils.npc_in_zone(actor, npc) then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
-		elseif cond_name(c.name, "on_actor_outside") then
+		elseif (c.name == "on_actor_outside") then
 			if not utils.npc_in_zone(actor, npc) then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
@@ -753,7 +744,7 @@ function parse_condlist(npc, section, field, src)
 	return lst
 end
 
-function cfg_get_number_and_condlist(ini, section, field, npc)
+function cfg_get_number_and_condlist(ini, section, field, npc,cond_name)
 	local str = ini:r_string_ex(section,field)
 	if not str then
 		return nil
@@ -766,14 +757,14 @@ function cfg_get_number_and_condlist(ini, section, field, npc)
 
 	local t = {}
 
-	t.name = field
+	t.name = cond_name or field
 	t.v1 = tonumber(par[1])
 	t.condlist = parse_condlist(npc, section, field, par[2])
 
 	return t
 end
 
-function cfg_get_string_and_condlist(ini, section, field, npc)
+function cfg_get_string_and_condlist(ini, section, field, npc,cond_name)
 	local str = ini:r_string_ex(section,field)
 	if not str then
 		return nil
@@ -786,14 +777,14 @@ function cfg_get_string_and_condlist(ini, section, field, npc)
 
 	local t = {}
 
-	t.name = field
+	t.name = cond_name or field
 	t.v1 = par[1]
 	t.condlist = parse_condlist(npc, section, field, par[2])
 
 	return t
 end
 
-function cfg_get_two_strings_and_condlist(ini, section, field, npc)
+function cfg_get_two_strings_and_condlist(ini, section, field, npc,cond_name)
 	local str = ini:r_string_ex(section,field)
 	if not str then
 		return nil
@@ -806,7 +797,7 @@ function cfg_get_two_strings_and_condlist(ini, section, field, npc)
 
 	local t = {}
 
-	t.name = field
+	t.name = cond_name or field
 	t.v1 = par[1]
 	t.v2 = par[2]
 	t.condlist = parse_condlist(npc, section, field, par[3])
@@ -814,7 +805,7 @@ function cfg_get_two_strings_and_condlist(ini, section, field, npc)
 	return t
 end
 
-function cfg_get_condlist(ini, section, field, npc)
+function cfg_get_condlist(ini, section, field, npc,cond_name)
 	
 	local str = ini:r_string_ex(section,field)
 	if not str then
@@ -829,43 +820,74 @@ function cfg_get_condlist(ini, section, field, npc)
 
 	local t = {}
 
-	t.name = field
+	t.name = cond_name or field
 	t.condlist = parse_condlist(npc, section, field, par[1])
 
 	return t
 end
 
-function cfg_get_switch_conditions(ini, section, npc)
-	if not ini:section_exist(tostring(section)) then
-		--printf("DEBUG: cfg get switch cond: [%s] section %s does not exist! ini=%s",npc and npc:name(),section,db.storage[npc:id()].job_ini or db.storage[npc:id()].ini_filename)
-		return
+function cfg_get_npc_and_zone(ini, section, field, npc,cond_name)
+	local t = cfg_get_two_strings_and_condlist(ini, section, field, npc,cond_name)
+
+	if t then
+		local id = get_story_object_id(t.v1)
+		if not (id) then 
+			printf("object '%s': section '%s': field '%s': there is no object with story_id '%s'",npc:name(), section, field, t.v1)
+			t.npc_id = 65535
+		end 
+		
+		local sim = alife()
+		local se_obj = sim:object(id)
+		t.npc_id = se_obj ~= nil and se_obj.id or 65535
 	end
+
+	return t
+end
+
+function cfg_get_switch_conditions(ini, section, npc)
+	if not (section and ini:section_exist(section)) then
+		--callstack()
+		--printf("DEBUG: cfg get switch cond: [%s] section %s does not exist! ini=%s",npc and npc:name(),section,db.storage[npc:id()].ini_filename)
+		return {}
+	end
+	
 	local lst = {}
 	local line_count = ini:line_count(section)
 
-	local function add_conditions(func, cond)
-		for line_number = 0, line_count - 1 do
-			local result, id, value  = ini:r_line_ex(section,line_number,"","")
-			if string.find( id, "^"..cond.."%d*$" ) ~= nil then
-				lst[#lst+1] = func(ini, section, id, npc)
-			end
+	for line_number = 0, line_count - 1 do
+		local result, id, value  = ini:r_line_ex(section,line_number,"","")
+		local cond_name = id:gsub("%d*$","")
+		if (cond_name == "on_actor_dist_le") then
+			lst[#lst+1] = cfg_get_number_and_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_actor_dist_le_nvis") then
+			lst[#lst+1] = cfg_get_number_and_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_actor_dist_ge") then
+			lst[#lst+1] = cfg_get_number_and_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_actor_dist_ge_nvis") then
+			lst[#lst+1] = cfg_get_number_and_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_signal") then
+			lst[#lst+1] = cfg_get_string_and_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_info") then
+			lst[#lst+1] = cfg_get_condlist(ini,section,id,npc,cond_name)	
+		elseif (cond_name == "on_timer") then
+			lst[#lst+1] = cfg_get_number_and_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_game_timer") then
+			lst[#lst+1] = cfg_get_number_and_condlist(ini,section,id,npc,cond_name)	
+		elseif (cond_name == "on_actor_in_zone") then
+			lst[#lst+1] = cfg_get_string_and_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_actor_not_in_zone") then
+			lst[#lst+1] = cfg_get_string_and_condlist(ini,section,id,npc,cond_name)	
+		elseif (cond_name == "on_actor_inside") then
+			lst[#lst+1] = cfg_get_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_actor_outside") then
+			lst[#lst+1] = cfg_get_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_npc_in_zone") then
+			lst[#lst+1] = cfg_get_npc_and_zone(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_npc_not_in_zone") then
+			lst[#lst+1] = cfg_get_npc_and_zone(ini,section,id,npc,cond_name)
 		end
 	end
 
-	add_conditions( cfg_get_number_and_condlist, "on_actor_dist_le"      )
-	add_conditions( cfg_get_number_and_condlist, "on_actor_dist_le_nvis" )
-	add_conditions( cfg_get_number_and_condlist, "on_actor_dist_ge"      )
-	add_conditions( cfg_get_number_and_condlist, "on_actor_dist_ge_nvis" )
-	add_conditions( cfg_get_string_and_condlist, "on_signal"             )
-	add_conditions( cfg_get_condlist           , "on_info"               )
-	add_conditions( cfg_get_number_and_condlist, "on_timer"              )
-	add_conditions( cfg_get_number_and_condlist, "on_game_timer"         )
-	add_conditions( cfg_get_string_and_condlist, "on_actor_in_zone"      )
-	add_conditions( cfg_get_string_and_condlist, "on_actor_not_in_zone"  )
-	add_conditions( cfg_get_condlist           , "on_actor_inside"       )
-	add_conditions( cfg_get_condlist           , "on_actor_outside"      )
-	add_conditions( cfg_get_npc_and_zone       , "on_npc_in_zone"        )
-	add_conditions( cfg_get_npc_and_zone       , "on_npc_not_in_zone"    )
 	return lst
 end
 
@@ -889,6 +911,7 @@ function cfg_get_overrides(ini, section, npc)
 	else
 		l.on_offline_condlist =  xr_logic.parse_condlist(npc, st.section_logic, "on_offline", ini:r_string_ex(st.section_logic,"on_offline") or "nil")
 	end
+	
 	if string.find(section, "kamp") ~= nil then
 		l.soundgroup		= ini:r_string_ex(section,"center_point")
 	else
@@ -898,23 +921,7 @@ function cfg_get_overrides(ini, section, npc)
 	return l
 end
 
-function cfg_get_npc_and_zone(ini, section, field, npc)
-	local t = cfg_get_two_strings_and_condlist(ini, section, field, npc)
 
-	if t then
-		local id = get_story_object_id(t.v1)
-		if not (id) then 
-			printf("object '%s': section '%s': field '%s': there is no object with story_id '%s'",npc:name(), section, field, t.v1)
-			t.npc_id = 65535
-		end 
-		
-		local sim = alife()
-		local se_obj = sim:object(id)
-		t.npc_id = se_obj ~= nil and se_obj.id or 65535
-	end
-
-	return t
-end
 
 -- Возвращает ссылку на оверрайды, зарегистрированные в активной на данный момент секции,
 -- либо nil, если ни одна из секций не активна, или оверрайдов нет.

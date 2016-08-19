@@ -61,7 +61,7 @@ function action_door:reset_scheme(loading)
 end
 
 function action_door:update(delta)
-	--printf("_bp: action_door:update()", delta)
+	--printf("_bp: %s action_door:update()",self.object:name(),delta)
 	if not self.initialized then
 		printf("object '%s': door failed to initialize", self.object:name())
 	end
@@ -236,7 +236,7 @@ function action_door:close_door(disable_snd)
 end
 
 function action_door:try_switch()
-	--printf("_bp: action_door: object '%s': try_switch", self.object:name())
+	--printf("_bp: action_door: object '%s': try_switch  on_use=%s", self.object:name(),self.st.on_use)
 	if self.st.on_use then		
 		if xr_logic.switch_to_section(self.object, self.st.ini,xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.on_use.condlist)) then
 			return true
@@ -252,24 +252,8 @@ function action_door:use_callback(door, actor)
             xr_sound.set_sound_play(self.object:id(), self.st.snd_open_start)
 		end
 	end
-	
-	if self:try_switch() then
-		return
-	end
 
-	--[[
-	if (actor and actor:id() ~= 0) then
-		local angle = self.joint:get_axis_angle(90)
-
-		if angle - self.low_limits > self.hi_limits - angle then
-			self:open_door(false)
-			printf("open")
-		else
-			self:close_door(false)
-			printf("close")
-		end
-	end
-	--]]
+	self:try_switch()
 end
 function action_door:hit_callback(obj, amount, local_direction, who, bone_index)
 	--printf("DOOR: hit_callback: obj='%s', amount=%d, who='%s', bone='%s'", obj and obj:name(), amount, who and who:name(), bone_index)

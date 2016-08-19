@@ -98,7 +98,7 @@ local function actor_on_update()
 		for i,v in ipairs (ignored_zone) do
 			local zone = db.zone_by_name[v]
 			if (zone and utils.npc_in_zone(db.actor, zone)) then
-				alun_utils.save_var(db.actor,"heli_enemy_flag",false)
+				alun_utils.save_var(db.actor,"heli_enemy_flag",nil)
 			end
 		end
 	end

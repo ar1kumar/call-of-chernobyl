@@ -145,7 +145,7 @@ function sleep_dialog:OnButtonSleep()
 	if self:IsShown() then
 		self:HideDialog()
 	end
-	alun_utils.save_var(db.actor,"heli_enemy_flag",false)
+	alun_utils.save_var(db.actor,"heli_enemy_flag",nil)
 	xr_effects.disable_ui(db.actor, nil)
 	level.add_cam_effector("camera_effects\\sleep.anm", 10, false, "ui_sleep_dialog.dream_callback")
 	level.add_pp_effector("sleep_fade.ppe", 11, false)
