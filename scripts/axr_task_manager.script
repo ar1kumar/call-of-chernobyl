@@ -188,7 +188,7 @@ function generate_ongoing_tasks(npc,is_sim)
    
     local count = 1
     while (task_manager.task_ini:section_exist(task_id)) do
-		local task_can_be_cancelled = task_manager.task_ini:r_bool_ex(task_id,"can_cancel",false)
+		local task_can_be_cancelled = task_manager.task_ini:r_bool_ex(task_id,"can_cancel",true)
 		if (task_can_be_cancelled == nil or task_can_be_cancelled == true) then
 			if (db.actor:get_task(task_id,true) and task_info[task_id] and task_info[task_id].stage and task_info[task_id].stage < (task_manager.task_ini:r_float_ex(task_id,"stage_complete") or 255)) then
 				if (task_info[task_id].status ~= "fail" and task_info[task_id].status ~= "completed") then
