@@ -228,7 +228,7 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 		xr_statistic.inc_heli_kills()
 	end
 	
-	-- Clear Skies achievement
+	-- Down to Earth achievement
 	if (db.actor and enemy:id() == 0) then
 		local itm = db.actor:active_item()
 		if (itm and itm:section() == "wpn_rpg7") then

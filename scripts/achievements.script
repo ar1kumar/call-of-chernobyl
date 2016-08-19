@@ -19,24 +19,6 @@ end
 ----- Functors -----
 --------------------
 
--- Clear Skies.
--- Currently not unlockable.
-function clear_skies_functor()
-	-- Check if it can be unlocked.
-	if (not can_unlock()) then
-		return false
-	end
-	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_clear_skies")) then
-		return true
-	end
-	-- Unlock the achievement.
-	if (clear_skies_requirements()) then
-		clear_skies_rewards()
-		return true
-	end
-end
-
 -- Completionist.
 function completionist_functor()
 	-- Check if it can be unlocked.
@@ -50,6 +32,23 @@ function completionist_functor()
 	-- Unlock the achievement.
 	if (completionist_requirements()) then
 		completionist_rewards()
+		return true
+	end
+end
+
+-- Down to Earth.
+function down_to_earth_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_alife_info("achieved_down_to_earth")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (down_to_earth_requirements()) then
+		down_to_earth_rewards()
 		return true
 	end
 end
@@ -268,16 +267,6 @@ end
 ----- Requirements -----
 ------------------------
 
--- Clear Skies.
--- Currently not unlockable.
--- Requires 3 helicopters killed, or just one with an RPG-7.
-function clear_skies_requirements()
-	return (
-				(xr_statistic.actor_statistic.heli_kills >= 3)
-			 or (xr_statistic.actor_statistic.heli_rocket_kills >= 1)
-		)
-end
-
 -- Completionist.
 -- Requires all other achievements to be unlocked.
 -- Exception to 'Duga Free' if story mode is disabled.
@@ -286,6 +275,7 @@ end
 function completionist_requirements()
 	return (
 				(has_alife_info("achieved_duga_free") or has_alife_info("story_mode_disabled"))
+			and (has_alife_info("achieved_down_to_earth"))
 			and (has_alife_info("achieved_geologist"))
 			and (has_alife_info("achieved_heavy_pockets"))
 			and (has_alife_info("achieved_infopreneur"))
@@ -299,6 +289,15 @@ function completionist_requirements()
 			and (has_alife_info("achieved_tourist"))
 			and (has_alife_info("achieved_well_dressed"))
 			and (has_alife_info("achieved_wishful_thinking") or has_alife_info("story_mode_disabled"))
+		)
+end
+
+-- Down to Earth.
+-- Requires 3 helicopters killed, or just one with an RPG-7.
+function down_to_earth_requirements()
+	return (
+				(xr_statistic.actor_statistic.heli_kills >= 3)
+			 or (xr_statistic.actor_statistic.heli_rocket_kills >= 1)
 		)
 end
 
@@ -418,16 +417,6 @@ end
 ----- Rewards -----
 -------------------
 
--- Clear Skies.
--- Currently not unlockable.
--- Reputation and rank point increase.
-function clear_skies_rewards()
-	db.actor:give_info_portion("achieved_clear_skies")
-	news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "clear_skies", nil, nil)
-	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.clear_skies.rnk)
-	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.clear_skies.rpt)
-end
-
 -- Completionist.
 -- Spawns the 'Heart of the Oasis' artefact in a stash.
 -- Reputation and rank point increase.
@@ -437,6 +426,16 @@ function completionist_rewards()
 	news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.completionist.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.completionist.rpt)
+end
+
+-- Down to Earth.
+-- Weaker helicopters are respawned.
+-- Reputation and rank point increase.
+function down_to_earth_rewards()
+	db.actor:give_info_portion("achieved_down_to_earth")
+	news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "down_to_earth", nil, nil)
+	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.down_to_earth.rnk)
+	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.down_to_earth.rpt)
 end
 
 -- Duga Free.
