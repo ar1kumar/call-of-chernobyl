@@ -18,18 +18,21 @@
 --]]
 local m_data = {}
 m_data.se_stalker = {}
+m_data.game_object = {}
 
 local function on_pstor_load_all(obj,packet)
-	local id = obj:id()
-	if (m_data.pstor_all and m_data.pstor_all[id]) then 
-		db.storage[id].pstor = m_data.pstor_all[id]
-		m_data.pstor_all[id] = nil
-	end 
+	local state = get_game_object_state(obj,false)
+	if (state) then
+		if (state.pstor_all) then
+			db.storage[id].pstor = state.pstor_all
+			state.pstor_all = nil
+		end 
 
-	if (m_data.pstor_ctime and m_data.pstor_ctime[id]) then
-		db.storage[id].pstor_ctime = m_data.pstor_ctime[id]
-		m_data.pstor_ctime[id] = nil
-	end 
+		if (state.pstor_ctime) then
+			db.storage[id].pstor_ctime = state.pstor_ctime
+			state.pstor_ctime = nil
+		end
+	end
 end
 
 function on_game_start()
@@ -59,29 +62,30 @@ function CALifeStorageManager_before_save(fname)
 	SendScriptCallback("save_state",m_data)
 	
 	-- save pstor
-	m_data.pstor_all = {}
-	m_data.pstor_ctime = {}
 	for id,t in pairs(db.storage) do
-		if (t and type(t) == "table") then
-			if (t.pstor) then
-				if not (is_empty(t.pstor)) then
-					m_data.pstor_all[id] = t.pstor
-				end
+		if (m_data.game_object[id]) then
+			if (t.pstor and not is_empty(t.pstor)) then
+				m_data.game_object[id].pstor_all = t.pstor
 			end
-	
+			
 			-- serialization with game.CTime.__persist
-			if (t.pstor_ctime) then
-				if not (is_empty(t.pstor_ctime)) then
-					m_data.pstor_ctime[id] = t.pstor_ctime
-				end
+			if (t.pstor_ctime and not is_empty(t.pstor_ctime)) then 
+				m_data.game_object[id].pstor_ctime = t.pstor_ctime
 			end
 		end
 	end
 	
 	--ProcessEventQueueState(m_data,true)
 	
-	-- clean out se_stalker table of empty tables
+	-- clean out se_stalker table of empty sub tables
 	for k,v in pairs(m_data.se_stalker) do 
+		if (is_empty(v)) then 
+			v = nil 
+		end
+	end
+	
+	-- clean out game_object table of empty sub tables
+	for k,v in pairs(m_data.game_object) do 
 		if (is_empty(v)) then 
 			v = nil 
 		end
@@ -155,3 +159,17 @@ end
 function decode(t)
 	return marshal.decode(t)
 end
+
+-- storage based on ID but verified by object name
+function get_game_object_state(obj,create_if_dont_exist)
+	local id = obj:id()
+	local name = obj:name()
+	if not (m_data.game_object[id] and m_data.game_object[id].name == name) then
+		if not (create_if_dont_exist) then
+			return 
+		end
+		m_data.game_object[id] = {}
+		m_data.game_object[id].name = name
+	end
+	return m_data.game_object[id]
+end	

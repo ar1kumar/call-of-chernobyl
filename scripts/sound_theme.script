@@ -325,11 +325,11 @@ function npc_sound:save_state(m_data)
 		return 
 	end
 	
-	if (self.played_id or (self.group_snd and self.can_play_group_sound == true)) then
-		m_data[self.section] = {}
-		m_data[self.section].played_id = self.played_id
+	if (self.played_id or (self.group_snd and self.can_play_group_sound == false)) then
+		m_data[self.section] = empty_table(m_data[self.section])
+		m_data[self.section].played_id = self.played_id or nil
 		if (self.group_snd) then
-			m_data[self.section].can_play_group_sound = self.can_play_group_sound == true
+			m_data[self.section].can_play_group_sound = self.can_play_group_sound == true and nil
 		end
 	end
 end 
@@ -340,7 +340,7 @@ function npc_sound:load_state(m_data)
 	end 
 	self.played_id = m_data[self.section].played_id
 	if (self.group_snd) then
-		self.can_play_group_sound = m_data[self.section].can_play_group_sound
+		self.can_play_group_sound = m_data[self.section].can_play_group_sound == nil and true or false
 	end
 end
 function npc_sound:save(thread)
@@ -609,7 +609,7 @@ end
 
 function actor_sound:save_state(m_data)
 	if (self.played_id) then
-		m_data[self.section] = {}
+		m_data[self.section] = empty_table(m_data[self.section])
 		m_data[self.section].played_id = self.played_id
 	end
 end 
@@ -814,7 +814,7 @@ function object_sound:load_npc(thread)
 end
 function object_sound:save_state(m_data)
 	if (self.played_id) then
-		m_data[self.section] = {}
+		m_data[self.section] = empty_table(m_data[self.section])
 		m_data[self.section].played_id = self.played_id
 	end
 end 

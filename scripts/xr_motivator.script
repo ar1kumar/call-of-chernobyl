@@ -8,9 +8,7 @@ function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
 	self.opened_doors = {}
 	self.first_update = false
-	if (USE_MARSHAL) then
-		RegisterScriptCallback("save_state",self.save_state,self)
-	end
+	self.object = obj
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
@@ -44,6 +42,9 @@ function motivator_binder:reinit()
 	self.st.state_mgr = state_mgr.bind_manager(self.object)
 	self.object:enable_vision(false)
 		
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end
 	--alun_utils.debug_write(self.object:name()..":motivator_reinit() end")
 end
 ----------------------------------------------------------------------------------------------------------------------
@@ -504,7 +505,7 @@ function motivator_binder:load(reader)
 	
 	if (USE_MARSHAL) then
 		if (self.object) then
-			load_state(self.object:id(),alife_storage_manager.get_state()) -- fake because binder not ready when real load_state made
+			self:load_state() -- fake because binder not ready when real load_state made
 		end
 		return 
 	end
@@ -538,17 +539,15 @@ function motivator_binder:save_state(m_data)
 	if not (st) then 
 		return
 	end
-	if not (m_data.xr_logic) then 
-		m_data.xr_logic = {}
-	end
-	m_data.xr_logic[id] = {}
-	--m_data.xr_logic[id].job_ini = st.job_ini
-	m_data.xr_logic[id].ini_filename = st.ini_filename
-	m_data.xr_logic[id].section_logic = st.section_logic
-	m_data.xr_logic[id].active_section = st.active_section
-	m_data.xr_logic[id].gulag_name = st.gulag_name
-	m_data.xr_logic[id].activation_time = (st.activation_time or 0) - time_global()
-	m_data.xr_logic[id].activation_game_time = st.activation_game_time
+	local state = alife_storage_manager.get_game_object_state(self.object,true)
+	state.xr_logic = empty_table(state.xr_logic)
+	--state.xr_logic.job_ini = st.job_ini
+	state.xr_logic.ini_filename = st.ini_filename
+	state.xr_logic.section_logic = st.section_logic
+	state.xr_logic.active_section = st.active_section
+	state.xr_logic.gulag_name = st.gulag_name
+	state.xr_logic.activation_time = (st.activation_time or 0) - time_global()
+	state.xr_logic.activation_game_time = st.activation_game_time
 
 	xr_sound.npc_save_state(id,m_data)
 	trade_manager.save_state(id,m_data)
@@ -557,32 +556,36 @@ function motivator_binder:save_state(m_data)
 	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",id))
 end 
 
-function load_state(id,m_data)
-	if not (id and m_data.xr_logic and m_data.xr_logic[id]) then 
+function motivator_binder:load_state()
+	
+	local state = alife_storage_manager.get_game_object_state(self.object)
+	if not (state and state.xr_logic) then 
 		return 
 	end
+	
+	local id = self.object:id()
 	db.storage[id] = db.storage[id] or {}
 	local st = db.storage[id]
 	--alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",id))
-	--st.job_ini = m_data.xr_logic[id].job_ini
-	st.loaded_ini_filename = m_data.xr_logic[id].ini_filename
-	st.loaded_section_logic = m_data.xr_logic[id].section_logic
-	st.loaded_active_section = m_data.xr_logic[id].active_section or "nil"
-	st.loaded_gulag_name = m_data.xr_logic[id].gulag_name or ""
-	st.activation_time = m_data.xr_logic[id].activation_time and m_data.xr_logic[id].activation_time + time_global() or time_global()
-	st.activation_game_time = m_data.xr_logic[id].activation_game_time or game.get_game_time()
+	--st.job_ini = state.xr_logic.job_ini
+	st.loaded_ini_filename = state.xr_logic.ini_filename
+	st.loaded_section_logic = state.xr_logic.section_logic
+	st.loaded_active_section = state.xr_logic.active_section or "nil"
+	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
+	st.activation_time = state.xr_logic.activation_time and state.xr_logic.activation_time + time_global() or time_global()
+	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
 	
-	xr_sound.npc_load_state(id,m_data)
-	trade_manager.load_state(id,m_data)
+	xr_sound.npc_load_state(id,state)
+	trade_manager.load_state(id,state)
 	
-	if (m_data.pstor_all and m_data.pstor_all[id]) then 
-		db.storage[id].pstor = m_data.pstor_all[id]
-		m_data.pstor_all[id] = nil
+	if (state.pstor_all) then 
+		db.storage[id].pstor = state.pstor_all
+		state.pstor_all = nil
 	end 
 
-	if (m_data.pstor_ctime and m_data.pstor_ctime[id]) then
-		db.storage[id].pstor_ctime = m_data.pstor_ctime[id]
-		m_data.pstor_ctime[id] = nil
+	if (state.pstor_ctime) then
+		db.storage[id].pstor_ctime = state.pstor_ctime
+		state.pstor_ctime = nil
 	end
 	--alun_utils.debug_write(strformat("motivator_binder:load_state %s AFTER",id))
 end 

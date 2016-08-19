@@ -20,10 +20,6 @@ function actor_binder:__init (obj) super(obj)
 	self.last_mutant_hunter_achievement_spawn_time	= nil
 
 	bind_stalker_ext.actor_on_init(self)
-	
-	if (USE_MARSHAL) then 
-		RegisterScriptCallback("save_state",self.save_state,self)
-	end 
 	--alun_utils.debug_write("actor init end")
 end
 
@@ -182,6 +178,10 @@ function actor_binder:reinit()
 			self.object:set_callback(callback[cb],func,self)
 		end
 	end
+	
+	if (USE_MARSHAL) then 
+		RegisterScriptCallback("save_state",self.save_state,self)
+	end 
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -280,7 +280,7 @@ function actor_binder:save(packet)
 	
 	if (USE_MARSHAL) then
 		if (utils.level_changing()) then
-			alun_utils.save_var(db.actor,"heli_enemy_flag",false)
+			alun_utils.save_var(db.actor,"heli_enemy_flag",nil)
 			SendScriptCallback("on_level_changing")
 		end
 		return
@@ -289,7 +289,7 @@ function actor_binder:save(packet)
 	set_save_marker(packet, "save", false, "actor_binder")
 
 	if (utils.level_changing()) then
-		alun_utils.save_var(db.actor,"heli_enemy_flag",false)
+		alun_utils.save_var(db.actor,"heli_enemy_flag",nil)
 	end
 	
 	--alundaio
@@ -379,15 +379,21 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save_state(m_data)
 	--alun_utils.debug_write(strformat("actor_binder:save_state BEFORE"))
-	m_data.actor_binder = {}
-	m_data.actor_binder.game_difficulty = level.get_game_difficulty()
-	m_data.actor_binder.disable_input_time = self.st.disable_input_time
-	m_data.actor_binder.simulation_started = SIMBOARD.simulation_started
-	--m_data.actor_binder.last_level_name = self.last_level_name
-	m_data.actor_binder.active_slot = self.object:active_slot()
-	m_data.actor_binder.last_detective_achievement_spawn_time = self.last_detective_achievement_spawn_time
-	m_data.actor_binder.last_mutant_hunter_achievement_spawn_time = self.last_mutant_hunter_achievement_spawn_time
-	m_data.actor_binder.character_icon = self.character_icon
+	
+	local state = alife_storage_manager.get_game_object_state(self.object,true)
+	
+	if not (state.actor_binder) then 
+		state.actor_binder = {} 
+	end 
+	
+	state.actor_binder.game_difficulty = level.get_game_difficulty()
+	state.actor_binder.disable_input_time = self.st.disable_input_time
+	state.actor_binder.simulation_started = SIMBOARD.simulation_started
+	--state.actor_binder.last_level_name = self.last_level_name
+	state.actor_binder.active_slot = self.object:active_slot()
+	state.actor_binder.last_detective_achievement_spawn_time = self.last_detective_achievement_spawn_time
+	state.actor_binder.last_mutant_hunter_achievement_spawn_time = self.last_mutant_hunter_achievement_spawn_time
+	state.actor_binder.character_icon = self.character_icon
 	
 	if (sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state ~= 0 and not utils.level_changing()) then 
 		sr_psy_antenna.psy_antenna:save_state(m_data)
@@ -395,7 +401,7 @@ function actor_binder:save_state(m_data)
 	
 	xr_statistic.save_state(m_data)
 	inventory_upgrades.save_state(m_data)
-	xr_sound.actor_save_state(m_data)
+	xr_sound.actor_save_state(state)
 	task_manager.save_state(m_data)
 	level_weathers.get_weather_manager():save_state(m_data)
 	surge_manager.save_state(m_data)
@@ -406,7 +412,8 @@ function actor_binder:save_state(m_data)
 end
 
 function actor_binder:load_state(m_data)
-	if not (m_data.actor_binder) then 
+	local state = alife_storage_manager.get_game_object_state(self.object)
+	if not (state and state.actor_binder) then 
 		return 
 	end
 	--alun_utils.debug_write(strformat("actor_binder:load_state %s BEFORE",self.object:name()))
@@ -417,14 +424,14 @@ function actor_binder:load_state(m_data)
 				[2] = "gd_veteran",
 				[3] = "gd_master"
 				}
-	get_console():execute("g_game_difficulty "..game_difficulty_by_num[m_data.actor_binder.game_difficulty or 3])
-	self.st.disable_input_time = m_data.actor_binder.disable_input_time
-	SIMBOARD.simulation_started = m_data.actor_binder.simulation_started
-	--self.last_level_name = m_data.actor_binder.last_level_name
-	self.loaded_active_slot = m_data.actor_binder.active_slot or 0
-	self.last_detective_achievement_spawn_time = m_data.actor_binder.last_detective_achievement_spawn_time
-	self.last_mutant_hunter_achievement_spawn_time = m_data.actor_binder.last_mutant_hunter_achievement_spawn_time
-	self.character_icon = m_data.actor_binder.character_icon
+	get_console():execute("g_game_difficulty "..game_difficulty_by_num[state.actor_binder.game_difficulty or 3])
+	self.st.disable_input_time = state.actor_binder.disable_input_time
+	SIMBOARD.simulation_started = state.actor_binder.simulation_started
+	--self.last_level_name = state.actor_binder.last_level_name
+	self.loaded_active_slot = state.actor_binder.active_slot or 0
+	self.last_detective_achievement_spawn_time = state.actor_binder.last_detective_achievement_spawn_time
+	self.last_mutant_hunter_achievement_spawn_time = state.actor_binder.last_mutant_hunter_achievement_spawn_time
+	self.character_icon = state.actor_binder.character_icon
 	
 	if (sr_psy_antenna.psy_antenna) then 
 		sr_psy_antenna.psy_antenna:load_state(m_data)
@@ -432,23 +439,23 @@ function actor_binder:load_state(m_data)
 	
 	xr_statistic.load_state(m_data)
 	inventory_upgrades.load_state(m_data)
-	xr_sound.actor_load_state(m_data)
+	xr_sound.actor_load_state(state)
 	task_manager.load_state(m_data)
 	level_weathers.get_weather_manager():load_state(m_data)
 	surge_manager.load_state(m_data)
 	psi_storm_manager.load_state(m_data)
 	
-	if (m_data.pstor_all and m_data.pstor_all[0]) then 
-		db.storage[0].pstor = m_data.pstor_all[0]
-		m_data.pstor_all[0] = nil
+	if (state.pstor_all) then 
+		db.storage[0].pstor = state.pstor_all
+		state.pstor_all = nil
 	end 
 
-	if (m_data.pstor_ctime and m_data.pstor_ctime[0]) then
-		db.storage[0].pstor_ctime = m_data.pstor_ctime[0]
-		m_data.pstor_ctime[0] = nil
+	if (m_data.pstor_ctime) then
+		db.storage[0].pstor_ctime = state.pstor_ctime
+		state.pstor_ctime = nil
 	end
 	
-	m_data.actor_binder = nil
+	state.actor_binder = nil
 	--alun_utils.debug_write(strformat("actor_binder:load_state %s AFTER",self.object:name()))
 end 
 

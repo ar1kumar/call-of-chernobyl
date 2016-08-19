@@ -115,47 +115,45 @@ end
 
 function actor_save_state(m_data)
 	--alun_utils.debug_write("actor_save_state")
-	if not (m_data.xr_sound) then 
-		m_data.xr_sound = {}
-	end	
-	m_data.xr_sound[0] = {}
+
+	m_data.xr_sound = empty_table(m_data.xr_sound)
 	for k,v in pairs(sound_theme.theme) do
-		v:save_state(m_data.xr_sound[0])
+		v:save_state(m_data.xr_sound)
 	end	
-	m_data.xr_sound[0].sound_table = {}
+	m_data.xr_sound.sound_table = {}
 	for k,v in pairs(sound_table) do
-		m_data.xr_sound[0].sound_table[k] = v.section
+		m_data.xr_sound.sound_table[k] = v.section
 	end
-	m_data.xr_sound[0].looped_sound = {}
+	m_data.xr_sound.looped_sound = {}
 	for k,v in pairs(looped_sound) do
-		m_data.xr_sound[0].looped_sound[k] = {}
+		m_data.xr_sound.looped_sound[k] = {}
 		for kk,vv in pairs(looped_sound[k]) do
-			m_data.xr_sound[0].looped_sound[k][kk] = true
+			m_data.xr_sound.looped_sound[k][kk] = true
 		end
 	end
 end 
 
 function actor_load_state(m_data)
-	if not (m_data.xr_sound and m_data.xr_sound[0]) then 
-		return 
+	if not (m_data.xr_sound) then 
+		return
 	end 
 	for k,v in pairs(sound_theme.theme) do
-		v:load_state(m_data.xr_sound[0])
+		v:load_state(m_data.xr_sound)
 	end
-	for k,v in pairs(m_data.xr_sound[0].sound_table) do
+	for k,v in pairs(m_data.xr_sound.sound_table) do
 		if (sound_theme.theme[v]) then
 			sound_table[k] = sound_theme.theme[v]
 		end
 	end
-	for k,v in pairs(m_data.xr_sound[0].looped_sound) do 
+	for k,v in pairs(m_data.xr_sound.looped_sound) do 
 		looped_sound[k] = {}
-		for kk,vv in pairs(m_data.xr_sound[0].looped_sound[k]) do
+		for kk,vv in pairs(m_data.xr_sound.looped_sound[k]) do
 			if (sound_theme.theme[kk]) then
 				looped_sound[k][kk] = sound_theme.theme[kk]
 			end
 		end
 	end
-	m_data.xr_sound[0] = nil 
+	m_data.xr_sound = nil 
 end
 
 function actor_save(stpk)
@@ -219,23 +217,20 @@ function actor_load(stpk)
 end
 function npc_save_state(id,m_data)
 	--alun_utils.debug_write("npc_save_state")
-	if not (m_data.xr_sound) then 
-		m_data.xr_sound = {}
-	end
-	m_data.xr_sound[id] = {}
+	m_data.xr_sound = empty_table(m_data.xr_sound)
 	for k,v in pairs(sound_theme.theme) do
-		v:save_state(m_data.xr_sound[id])
+		v:save_state(m_data.xr_sound)
 	end
 end 
 
 function npc_load_state(id,m_data)
-	if not (m_data.xr_sound and m_data.xr_sound[id]) then 
+	if not (m_data.xr_sound) then 
 		return 
 	end 
 	for k,v in pairs(sound_theme.theme) do
-		v:load_state(m_data.xr_sound[id])
+		v:load_state(m_data.xr_sound)
 	end
-	m_data.xr_sound[id] = nil
+	m_data.xr_sound = nil
 end 
 
 function save_npc(stpk, npc_id)
