@@ -31,7 +31,7 @@ local function job_avail_to_npc(npc_info, job, smart)
 	return true
 end
 
-local function arrived_to_smart(se_obj, smart)
+function arrived_to_smart(se_obj, smart)
 	--alun_utils.debug_nearest(se_obj,"check arrived_to_smart %s",smart:name())
 	local squad = se_obj.group_id and SIMBOARD.squads[se_obj.group_id]
 	if (squad) then 
@@ -59,7 +59,7 @@ local function arrived_to_smart(se_obj, smart)
 		return false
 	end
 	
-	return se_obj.position:distance_to_sqr(smart.position) <= 10000
+	return se_obj.position:distance_to_sqr(smart.position) <= smart.arrive_dist^2
 end
 
 ----------------------------------------------------------------------------------------------------------------------

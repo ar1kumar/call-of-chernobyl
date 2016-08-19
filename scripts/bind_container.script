@@ -68,7 +68,7 @@ function access_inventory(obj)
 	end
 	if (se_inv_box) then
 		-- shouldn't be possible but very safe incase some sort of save corruption
-		if (se_inv_box:clsid() ~= clsid.inventory_box_s) then
+		if not (IsInvbox(nil,se_inv_box:clsid())) then
 			containers[id].id = nil
 			return 
 		end

@@ -50,10 +50,6 @@ function start_game_callback()
 	sim_objects.clear()
 	sr_light.clean_up ()
 	pda.add_quick_slot_items_on_game_start()
-	
-	printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
-	collectgarbage("collect")
-	printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 end
 
 -------------------------------------------------------------------------------------------------------
@@ -699,21 +695,21 @@ function IsOutfit(o,c)
 	if not c then
 		c = o and o:clsid()
 	end
-	return c and c == clsid.equ_stalker_s
+	return c and (c == clsid.equ_stalker_s or c == clsid.equ_stalker)
 end
 
 function IsHeadgear(o,c)
 	if not c then
 		c = o and o:clsid()
 	end
-	return c and c == clsid.equ_helmet_s
+	return c and (c == clsid.equ_helmet_s or c == clsid.helmet)
 end
 
 function IsExplosive(o,c)
 	if not c then
 		c = o and o:clsid()
 	end
-	return c and c == clsid.obj_explosive_s
+	return c and (c == clsid.obj_explosive_s or  c == clsid.obj_explosive)
 end
 
 function IsPistol(o,c)
@@ -725,7 +721,12 @@ function IsPistol(o,c)
 					[clsid.wpn_walther_s] = true,
 					[clsid.wpn_usp45_s] = true,
 					[clsid.wpn_hpsa_s] = true,
-					[clsid.wpn_lr300_s] = true
+					[clsid.wpn_lr300_s] = true,
+					[clsid.wpn_pm] = true,
+					[clsid.wpn_walther] = true,
+					[clsid.wpn_usp45] = true,
+					[clsid.wpn_hpsa] = true,
+					[clsid.wpn_lr300] = true
 	}
 	return c and pistol[c] or false
 end
@@ -737,7 +738,10 @@ function IsSniper(o,c)
 	local sniper = {
 				[clsid.wpn_svu_s] = true,
 				[clsid.wpn_svd_s] = true,
-				[clsid.wpn_vintorez_s] = true
+				[clsid.wpn_vintorez_s] = true,
+				[clsid.wpn_svu] = true,
+				[clsid.wpn_svd] = true,
+				[clsid.wpn_vintorez] = true
 	}
 	return c and sniper[c] or false
 end
@@ -748,7 +752,9 @@ function IsLauncher(o,c)
 	end
 	local launcher = {
 					[clsid.wpn_rg6_s] = true,
-					[clsid.wpn_rpg7_s] = true
+					[clsid.wpn_rpg7_s] = true,
+					[clsid.wpn_rg6] = true,
+					[clsid.wpn_rpg7] = true
 	}
 	return c and launcher[c] or false
 end
@@ -760,7 +766,10 @@ function IsShotgun(o,c)
 	local shotgun = {
 				[clsid.wpn_bm16_s] = true,
 				[clsid.wpn_shotgun_s] = true,
-				[clsid.wpn_auto_shotgun_s] = true
+				[clsid.wpn_auto_shotgun_s] = true,
+				[clsid.wpn_bm16] = true,
+				[clsid.wpn_shotgun] = true,
+				[clsid.wpn_auto_shotgun] = true
 	}
 	return c and shotgun[c] or false
 end
@@ -772,7 +781,10 @@ function IsRifle(o,c)
 	local rifle = {
 				[clsid.wpn_ak74_s] = true,
 				[clsid.wpn_groza_s] = true,
-				[clsid.wpn_val_s] = true
+				[clsid.wpn_val_s] = true,
+				[clsid.wpn_ak74] = true,
+				[clsid.wpn_groza] = true,
+				[clsid.wpn_val] = true
 	}
 	return c and rifle[c] or false
 end
@@ -827,10 +839,6 @@ function IsWeapon(o,c)
 	end
 	if not (weapon_classes) then 
 		weapon_classes = {
-				--[clsid.wpn_grenade_f1_s] 		= true,
-				--[clsid.wpn_grenade_rgd5_s] 		= true,
-				--[clsid.wpn_grenade_launcher] 	= true,
-				--[clsid.wpn_grenade_fake] 		= true,
 				[clsid.wpn_vintorez_s] 			= true,
 				[clsid.wpn_ak74_s] 				= true,
 				[clsid.wpn_lr300_s] 			= true,
@@ -847,10 +855,53 @@ function IsWeapon(o,c)
 				[clsid.wpn_walther_s] 			= true,
 				[clsid.wpn_usp45_s] 			= true,
 				[clsid.wpn_groza_s] 			= true,
-				[clsid.wpn_knife_s] 			= true
+				[clsid.wpn_knife_s] 			= true,
+				[clsid.wpn_vintorez] 			= true,
+				[clsid.wpn_ak74] 				= true,
+				[clsid.wpn_lr300] 				= true,
+				[clsid.wpn_hpsa] 				= true,
+				[clsid.wpn_pm] 					= true,
+				[clsid.wpn_shotgun] 			= true,
+				--[clsid.wpn_auto_shotgun]		= true,
+				[clsid.wpn_bm16] 				= true,
+				[clsid.wpn_svd] 				= true,
+				[clsid.wpn_svu] 				= true,
+				[clsid.wpn_rg6] 				= true,
+				[clsid.wpn_rpg7] 				= true,
+				[clsid.wpn_val] 				= true,
+				[clsid.wpn_walther] 			= true,
+				[clsid.wpn_usp45] 				= true,
+				[clsid.wpn_groza] 				= true,
+				[clsid.wpn_knife] 				= true
 		}
 	end
 	return c and weapon_classes[c] or false
+end
+
+function IsAmmo(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end 
+	return c and (c == clsid.ammo or c == clsid.ammo_s)
+end 
+
+function IsGrenade(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	if not (grenade_classes) then 
+		grenade_classes = {
+				[clsid.wpn_grenade_f1_s] 		= true,
+				[clsid.wpn_grenade_rgd5_s] 		= true,
+				[clsid.wpn_grenade_launcher_s] 	= true,
+				[clsid.wpn_grenade_fake] 		= true,
+				[clsid.wpn_grenade_f1]			= true,
+				[clsid.wpn_grenade_launcher] 	= true,
+				[clsid.wpn_grenade_rgd5] 		= true,
+				[clsid.wpn_grenade_rpg7]		= true
+		}
+	end
+	return c and grenade_classes[c] or false
 end
 
 function IsArtefact(o,c)
@@ -879,6 +930,12 @@ function IsArtefact(o,c)
 	return c and artefact_classes[c] or false
 end
 
+function IsInvbox(o,c)
+	if not (c) then 
+		c = o and o:clsid()
+	end
+	return c and (c == clsid.inventory_box_s or c == clsid.inventory_box)
+end
 -------------------------------------------------------------
 -- 					SQUAD BEHAVIOR TESTING
 -------------------------------------------------------------

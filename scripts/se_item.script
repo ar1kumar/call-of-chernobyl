@@ -1,16 +1,4 @@
 -- Alundaio
-function register_item(se_obj)
-	--[[
-	if not (xrs_debug_tools) then
-		return
-	end
-	if not (registered_items) then
-		registered_items = {}
-	end
-	registered_items[se_obj:section_name()] = registered_items[se_obj:section_name()] and registered_items[se_obj:section_name()] + 1 or 1
-	--]]
-end
-
 local function sstpk_write(sstpk,self)
 	if (axr_dynamic_spawn) then
 		sstpk:w_stringZ(self.dynamic_name)
@@ -53,9 +41,9 @@ function se_outfit:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_outfit:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -69,13 +57,13 @@ function se_outfit:can_switch_online()
 	return cse_alife_item_custom_outfit.can_switch_online(self)
 end
 function se_outfit:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_custom_outfit.STATE_Write(self, stpk)
 end
 
 function se_outfit:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_custom_outfit.STATE_Read(self, stpk,size)
 end
 
@@ -89,9 +77,9 @@ function se_helmet:on_register()
 	story_objects.check_spawn_ini_for_story_id(self)
 
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_helmet:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -106,13 +94,13 @@ function se_helmet:can_switch_online()
 end
 
 function se_helmet:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_helmet.STATE_Write(self, stpk)
 end
 
 function se_helmet:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_helmet.STATE_Read(self, stpk, size)
 end
 -- Weapons ---------------------------------------------------------------------
@@ -127,9 +115,9 @@ function se_weapon:on_register()
 
 
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_weapon:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -144,13 +132,13 @@ function se_weapon:can_switch_online()
 end
 
 function se_weapon:STATE_Read(packet, size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_weapon.STATE_Read(self,packet,size)
 end
 
 function se_weapon:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_weapon.STATE_Write(self, stpk)
 end
 
@@ -163,9 +151,9 @@ function se_weapon_shotgun:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_weapon_shotgun:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -179,13 +167,13 @@ function se_weapon_shotgun:can_switch_online()
 	return cse_alife_item_weapon_shotgun.can_switch_online(self)
 end
 function se_weapon_shotgun:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_weapon_shotgun.STATE_Write(self, stpk)
 end
 
 function se_weapon_shotgun:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_weapon_shotgun.STATE_Read(self, stpk, size)
 end
 
@@ -198,9 +186,9 @@ function se_weapon_automatic_shotgun:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_weapon_automatic_shotgun:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -214,13 +202,13 @@ function se_weapon_automatic_shotgun:can_switch_online()
 	return cse_alife_item_weapon_auto_shotgun.can_switch_online(self)
 end
 function se_weapon_automatic_shotgun:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_weapon_auto_shotgun.STATE_Write(self, stpk)
 end
 
 function se_weapon_automatic_shotgun:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_weapon_auto_shotgun.STATE_Read(self, stpk, size)
 end
 
@@ -233,9 +221,9 @@ function se_weapon_magazined:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_weapon_magazined:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -249,13 +237,13 @@ function se_weapon_magazined:can_switch_online()
 	return cse_alife_item_weapon_magazined.can_switch_online(self)
 end
 function se_weapon_magazined:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_weapon_magazined.STATE_Write(self, stpk)
 end
 
 function se_weapon_magazined:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_weapon_magazined.STATE_Read(self, stpk, size)
 end
 
@@ -268,9 +256,9 @@ function se_weapon_magazined_w_gl:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_weapon_magazined_w_gl:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -284,13 +272,13 @@ function se_weapon_magazined_w_gl:can_switch_online()
 	return cse_alife_item_weapon_magazined_w_gl.can_switch_online(self)
 end
 function se_weapon_magazined_w_gl:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_weapon_magazined_w_gl.STATE_Write(self, stpk)
 end
 
 function se_weapon_magazined_w_gl:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_weapon_magazined_w_gl.STATE_Read(self, stpk, size)
 end
 
@@ -304,9 +292,9 @@ function se_item:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_item:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -320,13 +308,13 @@ function se_item:can_switch_online()
 	return cse_alife_item.can_switch_online(self)
 end
 function se_item:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item.STATE_Write(self, stpk)
 end
 
 function se_item:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item.STATE_Read(self, stpk, size)
 end
 
@@ -343,9 +331,9 @@ function se_item_torch:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_item_torch:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -359,13 +347,13 @@ function se_item_torch:can_switch_online()
 	return cse_alife_item_torch.can_switch_online(self)
 end
 function se_item_torch:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_torch.STATE_Write(self, stpk)
 end
 
 function se_item_torch:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_torch.STATE_Read(self, stpk, size)
 end
 
@@ -379,7 +367,7 @@ function se_physic:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
 end
 function se_physic:on_unregister()
 	unregister_story_object_by_id(self.id)
@@ -396,13 +384,13 @@ function se_physic:can_switch_online()
 end
 
 function se_physic:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_object_physic.STATE_Write(self,stpk)
 end
 
 function se_physic:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_object_physic.STATE_Read(self,stpk,size)
 end
 
@@ -415,7 +403,7 @@ function se_lamp:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
 end
 function se_lamp:on_unregister()
 	unregister_story_object_by_id(self.id)
@@ -432,13 +420,13 @@ function se_lamp:can_switch_online()
 end
 
 function se_lamp:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_object_hanging_lamp.STATE_Write(self,stpk)
 end
 
 function se_lamp:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_object_hanging_lamp.STATE_Read(self,stpk,size)
 end
 
@@ -453,8 +441,8 @@ function se_ammo:on_register()
 	cse_alife_item_ammo.on_register( self )
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-	register_item(self)
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 
 function se_ammo:on_unregister()
@@ -468,13 +456,13 @@ function se_ammo:can_switch_online()
 	return cse_alife_item_ammo.can_switch_online(self)
 end
 function se_ammo:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_item_ammo.STATE_Write(self, stpk)
 end
 
 function se_ammo:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_ammo.STATE_Read(self,stpk,size)
 end
 
@@ -488,8 +476,8 @@ function se_grenade:on_register()
 	cse_alife_item_grenade.on_register( self )
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-	register_item(self)
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 
 function se_grenade:on_unregister()
@@ -512,8 +500,8 @@ function se_eatable:on_register()
 	cse_alife_item.on_register( self )
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-	register_item(self)
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 
 function se_eatable:on_unregister()
@@ -537,8 +525,8 @@ function se_invbox:on_register()
 	cse_alife_inventory_box.on_register( self )
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-	register_item(self)
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 
 function se_invbox:on_unregister()
@@ -553,13 +541,13 @@ function se_invbox:can_switch_online()
 end
 
 function se_invbox:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
-	--repack(self,stpk)
+
+
 	cse_alife_inventory_box.STATE_Write(self,stpk)
 end
 
 function se_invbox:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_inventory_box.STATE_Read(self,stpk,size)
 end
 
@@ -573,8 +561,8 @@ function se_explosive:on_register()
 	cse_alife_item_explosive.on_register( self )
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-	register_item(self)
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 
 function se_explosive:on_unregister()
@@ -589,12 +577,12 @@ function se_explosive:can_switch_online()
 end
 
 function se_explosive:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
+
 	cse_alife_item_explosive.STATE_Write(self,stpk)
 end
 
 function se_explosive:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_explosive.STATE_Read(self,stpk,size)
 end
 
@@ -608,8 +596,8 @@ function se_pda:on_register()
 	cse_alife_item_pda.on_register( self )
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-	register_item(self)
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 
 function se_pda:on_unregister()
@@ -624,12 +612,12 @@ function se_pda:can_switch_online()
 end
 
 function se_pda:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
+
 	cse_alife_item_pda.STATE_Write(self,stpk)
 end
 
 function se_pda:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_pda.STATE_Read(self,stpk,size)
 end
 
@@ -642,9 +630,9 @@ function se_detector:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 	-- Собираем статистику по предметам.
-	register_item(self)
 
-	--self.secret_item = treasure_manager.get_treasure_manager():register_item(self)
+
+
 end
 function se_detector:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -659,11 +647,11 @@ function se_detector:can_switch_online()
 end
 
 function se_detector:STATE_Write(stpk)
-	--sstpk_STATE_Write(sstpk_write,self.id,self)
+
 	cse_alife_item_detector.STATE_Write(self,stpk)
 end
 
 function se_detector:STATE_Read(stpk,size)
-	--sstpk_STATE_Read(sstpk_read,self.id,self)
+
 	cse_alife_item_detector.STATE_Read(self,stpk,size)
 end

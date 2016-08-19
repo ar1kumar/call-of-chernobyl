@@ -17,7 +17,7 @@ local function on_game_load()
 	for i=1, 65535 do
 		local se_obj = sim:object(i)
 		if (se_obj) then
-			if (se_obj:clsid() == clsid.inventory_box_s) then
+			if (IsInvbox(nil,se_obj:clsid())) then
 				caches[se_obj.id] = false
 				caches_count = caches_count + 1
 			--elseif (se_obj:spawn_ini() and se_obj:spawn_ini():section_exist("drop_box")) then 
@@ -81,7 +81,7 @@ local function load_state(data)
 end
 
 local function physic_object_on_use_callback(box,who)
-	if (box:clsid() == clsid.inventory_box_s) then
+	if (IsInvbox(box)) then
 		try_spawn_treasure(box)
 	end
 end
@@ -118,7 +118,7 @@ function create_random_stash(no_spot,hint,bonus_items,bonus_lottery)
 			if (bonus_items) then 
 				-- this feature only works with inventory boxes
 				local se_box = id and sim:object(id)
-				if (se_box and se_box:clsid() == clsid.inventory_box_s) then 
+				if (se_box and IsInvbox(nil,se_box:clsid())) then 
 					table.insert(t,id)
 				end			
 			else
@@ -140,7 +140,7 @@ function create_random_stash(no_spot,hint,bonus_items,bonus_lottery)
 		return
 	end 
 	
-	if (se_box:clsid() ~= clsid.inventory_box_s) then 
+	if (IsInvbox(nil,se_box:clsid())) then 
 		if (se_box:spawn_ini() and se_box:spawn_ini():section_exist("drop_box")) then 
 			-- create map spot
 			if (no_spot ~= true and level.map_has_object_spot(id,"treasure") == 0) then

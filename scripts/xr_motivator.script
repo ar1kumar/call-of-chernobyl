@@ -1,10 +1,5 @@
 function AddToMotivator(npc)
-	if (db.storage[npc:id()]) then 
-		printf("ERROR AddToMotivator storage already exists for object!!! how?")
-	end
-	if alife() then
-		npc:bind_object(this.motivator_binder(npc))
-	end
+	npc:bind_object(this.motivator_binder(npc))
 end
 
 -- CScriptGameObject Binder for CAIStalker
@@ -124,10 +119,7 @@ function motivator_binder:net_spawn(sobject)
 
 	sound_theme.init_npc_sound(self.object)
 
-	-- only compatible with npcs with squads
-	if (sobject.group_id ~= 65535) then
-		xr_reach_task.add_reach_task_action(self.object)
-	end
+	xr_reach_task.add_reach_task_action(self.object)
 	
 	local as = sobject.get_alife_storage and sobject:get_alife_storage()
 	if (as and as.companion) then

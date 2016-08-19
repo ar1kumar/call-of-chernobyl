@@ -211,6 +211,10 @@ function actor_binder:update(delta)
 		if (self.character_icon) then 
 			db.actor:set_character_icon(self.character_icon)
 		end
+		
+		printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
+		collectgarbage("collect")
+		printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
 	end
 	
 	self.task_manager:update()

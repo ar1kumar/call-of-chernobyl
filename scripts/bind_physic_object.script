@@ -3,7 +3,7 @@
 ----------------------------------------------------------------------------------------------------
 
 function init(obj)
-	if obj:clsid() == clsid.inventory_box_s then
+	if (IsInvbox(obj)) then
 		obj:bind_object(generic_physics_binder(obj))
 		return
 	end

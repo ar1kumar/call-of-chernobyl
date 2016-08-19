@@ -8,7 +8,6 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 local stpk = net_packet()
 local uppk = net_packet()
 
-
 -- only use if you don't know the object class, otherwise call get_* directly to avoid needless overhead
 function get_object_data(sobj)
 	if not (sobj) then
@@ -66,17 +65,22 @@ function get_object_data(sobj)
 		["II_DOC"]   = this.get_item_document_data,
 
 		["SO_HLAMP"] = this.get_lamp_data,
+		["O_HLAMP"] = this.get_lamp_data,
 		--["O_SEARCH"] = "cse_alife_object_projector",
 		["TORCH_S"]  = this.get_item_data,
 
 		--["O_BRKBL"]  = "cse_alife_object_breakable",
 		["O_CLMBL"]  = this.get_climable_data,
 
+		["O_PHYSIC"] = this.get_physic_data,
+		["O_DSTRBL"] = this.get_physic_data,
+		
 		["O_PHYS_S"] = this.get_physic_data,
 		["O_DSTR_S"] = this.get_physic_data,
 		--["P_SKELET"] = "cse_alife_ph_skeleton_object",
 
 		["S_INVBOX"] = this.get_inv_box_data,
+		["O_INVBOX"] = this.get_inv_box_data,
 
 		["DET_SIMP"] = this.get_item_data,
 		["DET_ADVA"] = this.get_item_data,
@@ -116,6 +120,7 @@ function get_object_data(sobj)
 		["W_STMGUN"] = this.get_weapon_data,
 
 		["S_EXPLO"]  = this.get_item_data,
+		["II_EXPLO"]  = this.get_item_data,
 
 		["AMMO_S"]   = this.get_ammo_data,
 		["S_OG7B"]   = this.get_ammo_data,
