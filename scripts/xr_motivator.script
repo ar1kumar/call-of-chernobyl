@@ -311,7 +311,7 @@ function motivator_binder:death_callback(victim, who)
 
 	stalker_generic.remove_level_spot(victim, self.st)
 
-	if (IsStalker(who) and who:alive()) then
+	if (who and IsStalker(who) and who:alive()) then
 		local count = xr_logic.pstor_retrieve(who,"s_kill_count") or 0
 		if (count >= 255) then 
 			count = 254

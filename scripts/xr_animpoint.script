@@ -344,7 +344,7 @@ function animpoint:update()
 	if(is_director) then
 		--printf(" [%s] is director", self.npc_id)
 		tbl = assoc_tbl[camp_action].director
-		self.__dtimer = 0
+		self.__dtimer = time_global()
 	else
 		self.__dtimer = not self.__dtimer and time_global() + math.random(10000,15000) or self.__dtimer
 		if (self.current_action and time_global() < self.__dtimer) then

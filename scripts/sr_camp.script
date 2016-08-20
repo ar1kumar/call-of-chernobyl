@@ -89,7 +89,7 @@ function CCampManager:__init(object, ini)
 								min_time = 30000,
 								max_time = 120000,
 								timeout = 0,
-								transitions = {harmonica = 30, guitar = 30, story = 40},
+								transitions = {harmonica = 50, guitar = 50, story = 50},
 								precondition = sr_camp_idle_precondition
 							 },
 					harmonica = {
@@ -98,7 +98,7 @@ function CCampManager:__init(object, ini)
 								min_time = 30000,
 								max_time = 120000,
 								timeout = 0,
-								transitions = {idle = 100, harmonica = 0, guitar = 0, story = 0},
+								transitions = {idle = 50, harmonica = 50, guitar = 5, story = 10},
 								precondition = sr_camp_harmonica_precondition
 								},
 					guitar = {
@@ -107,7 +107,7 @@ function CCampManager:__init(object, ini)
 								min_time = 30000,
 								max_time = 120000,
 								timeout = 0,
-								transitions = {idle = 100, harmonica = 0, guitar = 0, story = 0},
+								transitions = {idle = 50, harmonica = 5, guitar = 50, story = 5},
 								precondition = sr_camp_guitar_precondition
 							 },
 					story = {
@@ -116,7 +116,7 @@ function CCampManager:__init(object, ini)
 								min_time = 30000,
 								max_time = 120000,
 								timeout = 0,
-								transitions = {idle = 100, harmonica = 0, guitar = 0, story = 0},
+								transitions = {idle = 50, harmonica = 5, guitar = 5, story = 5},
 								precondition = sr_camp_story_precondition
 							},
 					}
@@ -205,8 +205,8 @@ function CCampManager:set_next_state()
 				self.active_state = k
 				break
 			end
-		else
-			rnd = rnd - v
+		--else
+		--	rnd = rnd - v
 		end
 	end
 	for k,v in pairs(self.npc) do
