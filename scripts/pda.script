@@ -522,6 +522,15 @@ function change_anomalies_names()
 	--]]
 end
 
+local function npc_on_net_spawn(npc,se_obj)
+	local m_data = se_obj:get_alife_storage(true)
+	m_data.last_seen_level = level.name()
+	m_data.last_seen_time = game.get_game_time()
+end 
+
+function on_game_start()
+	RegisterScriptCallback("npc_on_net_spawn",npc_on_net_spawn)
+end
 ---------------------------------------------
 -- Character Ranking 
 ---------------------------------------------
@@ -589,8 +598,36 @@ end
 -- called from engine! must return string!
 function coc_rankings_set_hint(index)
 	local se_obj = coc_ranking_list[index] ~= nil and alife():object(coc_ranking_list[index])
-	if (se_obj) then
-		return se_obj:character_name() .. ". This is a hint! Maybe bio? May something else here, like npc personal stats?"
+	if (se_obj) then 
+		if (se_obj.id == 0) then
+			--TODO: Maybe some stats for player, like rank points per minute; if such a thing is possible.
+			return ""
+		else
+			-- stalker stats
+			local m_data = se_obj:get_alife_storage()
+			if (m_data) then
+				local last_seen_level = m_data.last_seen_level
+				local last_seen_time = m_data.last_seen_time and m_data.last_seen_time:dateToString(game.CTime.DateToDay)
+				
+				if not (last_seen_level and last_seen_time) then 
+					return ""
+				end
+				
+				local return_str = game.translate_string("st_last_seen") .. ": " .. game.translate_string(last_seen_level) .. " on " .. last_seen_time
+					
+				if (m_data.stalkers_killed) then 
+					return_str = return_str .. " \n" .. game.translate_string("st_stalkers_killed") .. ": " .. tostring(m_data.stalkers_killed)
+				end
+				if (m_data.artefacts_found) then
+					return_str = return_str .. " \n" .. game.translate_string("st_artefacts_found") .. ": " .. tostring(m_data.artefacts_found)
+				end 
+				if (m_data.items_sold) then 
+					return_str = return_str .. " \n" .. game.translate_string("st_items_sold") .. ": " .. tostring(m_data.items_sold)
+				end
+				
+				return return_str
+			end
+		end
 	end
 	return ""
 end

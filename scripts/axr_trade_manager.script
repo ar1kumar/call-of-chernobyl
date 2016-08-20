@@ -99,6 +99,8 @@ function npc_trade_buy_sell(npc)
 
 	-- increase NPC rank because he is a good boy
 	npc:set_character_rank(npc:character_rank()+math.random(20,30))
+	local se_obj = alife():object(id)
+
 	
 	-- SELL ITEMS
 	local itm,itm_base_cost,buy_sell, slot, bw,can_sell
@@ -130,6 +132,13 @@ function npc_trade_buy_sell(npc)
 					sim:release(sim:object(itm:id()),true)
 
 					--printf("trading %s",sec)
+					-- npc_statistic
+					if (se_obj and se_obj.get_alife_storage) then 
+						local m_data = se_obj:get_alife_storage()
+						if (m_data) then
+							m_data.items_sold = m_data.items_sold and m_data.items_sold + 1 or 1
+						end
+					end
 
 					itm_base_cost = system_ini():r_float_ex(sec,"cost") or 30
 					npc:money(itm_base_cost * (tonumber(buy_sell[4]) or 1))

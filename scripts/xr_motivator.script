@@ -317,6 +317,15 @@ function motivator_binder:death_callback(victim, who)
 			count = 254
 		end
 		xr_logic.pstor_store(who,"s_kill_count",count)
+		
+		-- npc_statistic
+		local se_obj = alife():object(who:id())
+		if (se_obj and se_obj.get_alife_storage) then 
+			local m_data = se_obj:get_alife_storage()
+			if (m_data) then 
+				m_data.stalkers_killed = m_data.stalkers_killed and m_data.stalkers_killed + 1 or 1
+			end
+		end
 	end
 
 	local known_info = self.st.ini and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
