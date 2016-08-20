@@ -61,6 +61,7 @@ precondition = {!squad_exist(ecolog_companion_task_1)} true, false
 repeat_timeout = 86400
 on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_1) =reward_stash(true) =reset_task_target_anomaly%
 on_fail = %=fail_task_dec_goodwill(25:csky) =remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
+on_cancel = %=remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
 reward_item = af_blood
 condlist_0 = {!squad_exist(ecolog_companion_task_1)} fail
 
@@ -85,6 +86,7 @@ repeat_timeout = 86400
 stage_complete = 1
 on_complete = %=reward_random_money(1000:2000) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_1) =complete_task_inc_goodwill(50:csky) =pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
 on_fail = %=pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id) =fail_task_dec_goodwill(25:csky)%
+on_cancel = %=pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
 
 
 ;--------------------------------------------------------------------------------------------------
@@ -107,7 +109,7 @@ precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:ba
 stage_complete = 1
 on_complete = %=reward_random_money(1500:4000) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_2) =complete_task_inc_goodwill(50:csky) =pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
 on_fail = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id) =fail_task_dec_goodwill(25:csky)%
-
+on_cancel = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
 
 ;--------------------------------------------------------------------------------------------------
 ; FIND MUTANT MEAT FOR CLEAR SKY TASK-

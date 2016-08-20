@@ -30,6 +30,7 @@ on_init = %=pstor_set(yan_ecolog_semenov_task_1_tissue_need:5) =add_task_compani
 repeat_timeout = 86400
 on_complete = %=complete_task_inc_goodwill(50:ecolog) =reward_random_money(4000:4500) =reward_stash(true) =inc_task_stage(yan_ecolog_semenov_task_1) =pstor_reset(yan_ecolog_semenov_task_1_tissue_need) =pstor_reset(yan_ecolog_semenov_task_1_tissue_count) -yan_ecolog_semenov_task_1_started -yan_ecolog_semenov_task_1_completed%
 on_fail = %=remove_task_companion(yan_ecolog_semenov_squad) =fail_task_dec_goodwill(25:ecolog)%
+on_cancel = %=remove_task_companion(yan_ecolog_semenov_squad)%
 condlist_0 = {!squad_exist(yan_ecolog_semenov_squad)} fail
 condlist_1 = {=check_task_stage(yan_ecolog_semenov_task_1:1)} %+yan_ecolog_semenov_task_1_completed =inc_task_stage(yan_ecolog_semenov_task_1) =remove_task_companion(yan_ecolog_semenov_squad)%
 

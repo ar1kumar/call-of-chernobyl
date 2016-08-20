@@ -31,6 +31,7 @@ precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:mo
 repeat_timeout = 86400
 on_complete = %=inc_task_stage(zat_a2_stalker_barmen_task_1) =reward_random_money(2000:4500) =reward_stash(true) =pstor_reset(zat_a2_stalker_barmen_task_1_id) =pstor_reset(zat_a2_stalker_barmen_task_1_target_id)%
 on_fail = %=pstor_reset(zat_a2_stalker_barmen_task_1_id) =pstor_reset(zat_a2_stalker_barmen_task_1_target_id)%
+on_cancel = %=pstor_reset(zat_a2_stalker_barmen_task_1_id) =pstor_reset(zat_a2_stalker_barmen_task_1_target_id)%
 reward_item = vodka
 
 

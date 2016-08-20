@@ -51,6 +51,7 @@ on_init = %=find_smart_under_faction_control_ex(cit_killers_merc_trader_stalker_
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:stalker:bandit:dolg:army)} true, false
 on_complete = %=complete_task_inc_goodwill(50:killer) =reward_random_money(7500:9000) =reward_stash(true) =inc_task_stage(cit_killers_merc_trader_stalker_task_2_name) =pstor_reset(cit_killers_merc_trader_stalker_task_2_name_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_name_target_id)%
 on_fail = %=pstor_reset(cit_killers_merc_trader_stalker_task_2_name_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_name_target_id)%
+on_cancel = %=pstor_reset(cit_killers_merc_trader_stalker_task_2_name_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_name_target_id)%
 
 
 ;--------------------------------------------------------------------------------------------------

@@ -31,7 +31,7 @@ on_init = %=find_smart_under_faction_control_ex(bar_dolg_general_petrenko_stalke
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:killer:bandit)} true, false
 on_complete = %=complete_task_inc_goodwill(50:dolg) =reward_random_money(7500:9000) =reward_stash(true) =inc_task_stage(bar_dolg_general_petrenko_stalker_task_1) =pstor_reset(bar_dolg_general_petrenko_stalker_task_1_id) =pstor_reset(bar_dolg_general_petrenko_stalker_task_1_target_id)%
 on_fail = %=pstor_reset(bar_dolg_general_petrenko_stalker_task_1_id) =pstor_reset(bar_dolg_general_petrenko_stalker_task_1_target_id)%
-
+on_cancel = %=pstor_reset(bar_dolg_general_petrenko_stalker_task_1_id) =pstor_reset(bar_dolg_general_petrenko_stalker_task_1_target_id)%
 
 ;--------------------------------------------------------------------------------------------------
 ; CAPTURE TERRITORY FOR DUTY TASK-
@@ -53,7 +53,7 @@ on_init = %=find_smart_under_faction_control(bar_dolg_general_petrenko_stalker_t
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:freedom)} true, false
 on_complete = %=complete_task_inc_goodwill(50:dolg) =reward_random_money(7500:9000) =reward_stash(true) =inc_task_stage(bar_dolg_general_petrenko_stalker_task_2) =pstor_reset(bar_dolg_general_petrenko_stalker_task_2_id) =pstor_reset(bar_dolg_general_petrenko_stalker_task_2_target_id)%
 on_fail = %=pstor_reset(bar_dolg_general_petrenko_stalker_task_2_id) =pstor_reset(bar_dolg_general_petrenko_stalker_task_2_target_id)%
-
+on_cancel = %=pstor_reset(bar_dolg_general_petrenko_stalker_task_2_id) =pstor_reset(bar_dolg_general_petrenko_stalker_task_2_target_id)%
 
 ;--------------------------------------------------------------------------------------------------
 ; ASSASSINATION FOR DUTY TASK-
