@@ -629,7 +629,7 @@ end
 function coc_rankings_set_icon(index)
 	local se_obj = coc_ranking_list[index] ~= nil and alife():object(coc_ranking_list[index])
 	if (se_obj) then
-		printf("character_icon=%s",se_obj:character_icon())
+		--printf("character_icon=%s",se_obj:character_icon())
 		local icon_name = se_obj:character_icon()
 		return icon_name and icon_name ~= "" and icon_name or "ui\\ui_noise"
 	end
