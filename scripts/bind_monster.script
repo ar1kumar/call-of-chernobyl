@@ -182,7 +182,7 @@ function generic_object_binder:death_callback(victim, who)
 			xr_statistic.inc_killed_monsters_counter()
 			xr_statistic.set_best_monster(victim)
 		elseif (IsStalker(who) and who:alive()) then
-			local  = alife():object(who:id())
+			local se_who = alife():object(who:id())
 			-- npc_statistic
 			if (se_who and se_who.get_alife_storage) then
 				local m_data = se_who:get_alife_storage()
