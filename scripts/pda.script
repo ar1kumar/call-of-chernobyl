@@ -616,16 +616,16 @@ function coc_rankings_set_hint(index)
 				local return_str = game.translate_string("st_last_seen") .. ": " .. game.translate_string(last_seen_level) .. " on " .. last_seen_time
 					
 				if (m_data.stalkers_killed) then 
-					return_str = return_str .. " \n" .. game.translate_string("st_stalkers_killed") .. ": " .. tostring(m_data.stalkers_killed)
+					return_str = return_str .. [[ \n]] .. game.translate_string("st_stalkers_killed") .. ": " .. tostring(m_data.stalkers_killed)
 				end
 				if (m_data.mutants_killed) then 
-					return_str = return_str .. " \n" .. game.translate_string("st_mutants_killed") .. ": " .. tostring(m_data.mutants_killed)
+					return_str = return_str .. [[ \n]] .. game.translate_string("st_mutants_killed") .. ": " .. tostring(m_data.mutants_killed)
 				end
 				if (m_data.artefacts_found) then
-					return_str = return_str .. " \n" .. game.translate_string("st_artefacts_found") .. ": " .. tostring(m_data.artefacts_found)
+					return_str = return_str .. [[ \n]] .. game.translate_string("st_artefacts_found") .. ": " .. tostring(m_data.artefacts_found)
 				end 
 				if (m_data.items_sold) then 
-					return_str = return_str .. " \n" .. game.translate_string("st_items_sold") .. ": " .. tostring(m_data.items_sold)
+					return_str = return_str .. [[ \n]] .. game.translate_string("st_items_sold") .. ": " .. tostring(m_data.items_sold)
 				end
 				
 				return return_str
