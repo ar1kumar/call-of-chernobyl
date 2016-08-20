@@ -31,8 +31,7 @@ function generic_object_binder:reinit()
 		self.object:set_callback(callback.sound, 				self.hear_callback, 	self)
 		self.object:set_tip_text("")
 	end
-	
-	if (USE_MARSHAL) then 
+		if (USE_MARSHAL) then
 		RegisterScriptCallback("save_state",self.save_state,self)
 	end
 	--alun_utils.debug_write(self.object:name().."re_init() End")
@@ -48,31 +47,27 @@ function generic_object_binder:use_kick(obj, who)
 	h.impulse = 6000
 	h.type = hit.wound
 	obj:hit(h)
-end 
+end
 
 function generic_object_binder:update(delta)
 	--alun_utils.debug_write(strformat("%s:update  loaded=%s",self.object and self.object:name(),self.loaded))
 	object_binder.update(self, delta)
-	
-	local object_alive = self.object:alive()
-	
-	-- update squad
+		local object_alive = self.object:alive()
+		-- update squad
 	if (object_alive) then
 		self.squad = self.squad or get_object_squad(self.object)
 		if (self.squad) then
-			if (self.squad:commander_id() == self.object:id()) then 
+			if (self.squad:commander_id() == self.object:id()) then
 				self.squad:update()
 			end
 		end
 	end
-	
-	local tg = time_global()
+		local tg = time_global()
 	if (self.last_update and tg < self.last_update) then
 		return
 	end
 	self.last_update = tg + 500
-	
-	local id = self.object:id()
+		local id = self.object:id()
 
 	-- Start [Alundaio]
 	SendScriptCallback("monster_on_update",self.object,self.st)
@@ -89,9 +84,8 @@ function generic_object_binder:update(delta)
 		end
 		return
 	end
-	
-	local cls = self.object:clsid()
-	if (cls == clsid.tushkano_s or cls == clsid.rat_s) then 
+		local cls = self.object:clsid()
+	if (cls == clsid.tushkano_s or cls == clsid.rat_s) then
 		self.object:set_callback(callback.use_object, self.use_kick, self)
 		self.object:set_tip_text("Kick")
 	end
@@ -103,18 +97,17 @@ function generic_object_binder:update(delta)
 	if self.object:get_enemy() then
 		xr_logic.mob_release(self.object)
 		return
-	else 
+	else
 		xr_combat_ignore.fighting_with_actor_npcs[id] = nil
 	end
 
 	if self.st.active_section ~= nil then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
 	end
-	
-	if self.squad and self.squad.current_action and self.squad.current_action == 0 then
+		if self.squad and self.squad.current_action and self.squad.current_action == 0 then
 		local squad_target = self.squad.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.squad.assigned_target_id]
 		if not (squad_target) then
-			return 
+			return
 		end
 
 		local target_pos, target_lv_id, target_gv_id = squad_target:get_location()
@@ -179,29 +172,27 @@ function generic_object_binder:death_callback(victim, who)
 	if not (se_obj) then
 		return
 	end
-	
-	db.delete_enemy(victim)
+		db.delete_enemy(victim)
 
 	-- This is necessary because hit callback is not triggered if it takes a single blow to kill npc
 	self:hit_callback(victim, 1, vector():set(0,0,0), who, "from_death_callback")
 
-	if (who) then 
+	if (who) then
 		if (who:id() == db.actor:id()) then
 			xr_statistic.inc_killed_monsters_counter()
 			xr_statistic.set_best_monster(victim)
-		elseif (IsStalker(who) and who:alive()) then 
+		elseif (IsStalker(who) and who:alive()) then
 			local  = alife():object(who:id())
 			-- npc_statistic
-			if (se_who and se_who.get_alife_storage) then 
+			if (se_who and se_who.get_alife_storage) then
 				local m_data = se_who:get_alife_storage()
-				if (m_data) then 
+				if (m_data) then
 					m_data.mutants_killed = m_data.mutants_killed and m_data.mutants_killed + 1 or 1
 				end
 			end
 		end
 	end
-	
-	if self.st.mob_death then
+		if self.st.mob_death then
 		xr_logic.issue_event(victim, self.st.mob_death, "death_callback", victim, who)
 	end
 
@@ -256,8 +247,8 @@ function generic_object_binder:hear_callback(npc, who_id, sound_type, sound_posi
 end
 
 function generic_object_binder:use_callback(obj, who)
-	if not (self.object) then 
-		return 
+	if not (self.object) then
+		return
 	end
 	-- Alundaio
 	SendScriptCallback("monster_on_actor_use_callback",obj,who)
@@ -279,8 +270,7 @@ function generic_object_binder:net_spawn(sobject)
 	-- Alundaio
 	SendScriptCallback("monster_on_net_spawn",self.object,sobject)
 	-- Alundaio
-	
-	if not self.object:alive() then
+		if not self.object:alive() then
 		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body...")
 		release_body_manager.get_release_body_manager():moving_dead_body(self.object,true)
 		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body done")
@@ -294,11 +284,9 @@ function generic_object_binder:net_spawn(sobject)
 		end
 		
 		self.already_dead = true
-	
-		return true
+			return true
 	end
-	
-	db.add_obj(self.object)
+		db.add_obj(self.object)
 	db.add_enemy(self.object)
 
 	local sim = alife()
@@ -321,14 +309,12 @@ function generic_object_binder:net_spawn(sobject)
 		db.spawned_vertex_by_id[se_obj.id] = nil
 	end
 
-	if (force_set_position) then 
+	if (force_set_position) then
 		self.object:set_npc_position(force_set_position)
 		db.offline_objects[se_obj.id].level_vertex_id = nil
 	end
-	
-	smart_terrain.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded)
-	
-	--alun_utils.debug_write(sobject:name()..":net_spawn()  END")
+		smart_terrain.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded)
+		--alun_utils.debug_write(sobject:name()..":net_spawn()  END")
 	return true
 end
 
@@ -357,14 +343,11 @@ function generic_object_binder:net_destroy()
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
 	db.storage[self.object:id()] = nil
-	
-	object_binder.net_destroy(self)
-	
-	if (USE_MARSHAL) then 
+		object_binder.net_destroy(self)
+		if (USE_MARSHAL) then
 		UnregisterScriptCallback("save_state",self.save_state)
 	end
-	
-	--alun_utils.debug_write("generic_object_binder:net_destroy END")
+		--alun_utils.debug_write("generic_object_binder:net_destroy END")
 end
 
 function generic_object_binder:reload(section)
@@ -385,7 +368,7 @@ function generic_object_binder:save(packet)
 	object_binder.save(self, packet)
 	set_save_marker(packet, "save", true, "generic_object_binder")
 	if (USE_MARSHAL) then
-		return 
+		return
 	end
 	--alun_utils.debug_write("\n-------bind_monster save start------ "..self.object:name(),true)
 	xr_logic.save_obj(self.object, packet)
@@ -401,7 +384,7 @@ function generic_object_binder:load(reader)
 		if (self.object) then -- ??
 			self:load_state()
 		end
-		return 
+		return
 	end
 	--alun_utils.debug_write("\n-------bind_monster load start------ "..self.object:name(),true)
 	xr_logic.load_obj(self.object, reader)
@@ -415,10 +398,8 @@ function generic_object_binder:save_state(m_data)
 	if not (st) then
 		return
 	end
-	
-	local state = alife_storage_manager.get_game_object_state(self.object,true)
-	
-	state.xr_logic = empty_table(state.xr_logic)
+		local state = alife_storage_manager.get_game_object_state(self.object,true)
+		state.xr_logic = empty_table(state.xr_logic)
 
 	--state.xr_logic.job_ini = st.job_ini
 	state.xr_logic.ini_filename = st.ini_filename
@@ -429,19 +410,16 @@ function generic_object_binder:save_state(m_data)
 	state.xr_logic.activation_game_time = st.activation_game_time
 
 	db.storage[id].pstor = db.storage[id].pstor or {}
-	
-	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
-end 
+		--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
+end
 
 function generic_object_binder:load_state()
 
 	local state = alife_storage_manager.get_game_object_state(self.object)
-	
-	if not (state and state.xr_logic) then 
-		return 
+		if not (state and state.xr_logic) then
+		return
 	end
-	
-	local id = self.object:id()
+		local id = self.object:id()
 	db.storage[id] = db.storage[id] or {}
 	local st = db.storage[id]	
 	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
@@ -452,16 +430,14 @@ function generic_object_binder:load_state()
 	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
 	st.activation_time = state.xr_logic.activation_time and state.xr_logic.activation_time + time_global() or time_global()
 	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
-	
-	if (state.pstor_all) then
+		if (state.pstor_all) then
 		db.storage[id].pstor = state.pstor_all
 		state.pstor_all = nil
-	end 
+	end
 
 	if (state.pstor_ctime) then
 		db.storage[id].pstor_ctime = state.pstor_ctime
 		state.pstor_ctime = nil
 	end
-	
-	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
+		--alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
 end

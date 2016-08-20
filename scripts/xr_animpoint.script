@@ -34,8 +34,8 @@ function evaluator_reach_animpoint:__init(storage, name) super(nil, name)
 end
 function evaluator_reach_animpoint:evaluate()
 	--alun_utils.debug_write("eva_reach_animpoint")
-	if (xr_danger.has_danger(self.object)) then 
-		return false 
+	if (xr_danger.has_danger(self.object)) then
+		return false
 	end
 	return self.st.animpoint:position_riched() == true
 end
@@ -50,8 +50,7 @@ function action_reach_animpoint:initialize()
 end
 function action_reach_animpoint:execute()
 	action_base.execute(self)
-	
-	--alun_utils.debug_write("action_reach_animpoint:execute")
+		--alun_utils.debug_write("action_reach_animpoint:execute")
 
 	if not (self.st.animpoint.position_vertex) then
 		return
@@ -87,8 +86,7 @@ function action_animpoint:initialize()
 end
 function action_animpoint:execute()
 	action_base.execute(self)
-	
-	--alun_utils.debug_write("action_animpoint:execute")
+		--alun_utils.debug_write("action_animpoint:execute")
 
 	if not(self.st.animpoint.started) then
 		self.st.animpoint:start() -- zatychka
@@ -143,7 +141,6 @@ function animpoint:activate_scheme(loading, npc, switching_scheme)
 			local target_action = self.st.approved_actions[math.random(#self.st.approved_actions)].name
 			--printf("check animpoint stop %s == %s", tostring(target_action), tostring(self.current_action))
 
-
 			local current_st_animstate = state_lib.states[target_action].animstate
 			local target_st_animstate = state_lib.states[self.current_action].animstate
 			--printf("check animpoint stop %s == %s", tostring(current_st_animstate), tostring(target_st_animstate))
@@ -197,28 +194,24 @@ function animpoint:position_riched()
 	if not (npc) then
 		return false
 	end
-	
-	if not (self.position) then
+		if not (self.position) then
 		return false
 	end
-	
-	local dist = npc:position():distance_to_sqr(self.position)
-	if (self.current_action and dist <= self.st.reach_distance) then 
+		local dist = npc:position():distance_to_sqr(self.position)
+	if (self.current_action and dist <= self.st.reach_distance) then
 		return true
-	end 
-	
-	if (dist <= self.st.reach_distance+2) then
+	end
+		if (dist <= self.st.reach_distance+2) then
 		local dir = vector():set(self.smart_direction:normalize())
 		npc:set_desired_direction(dir)
 		local v1 = -math.deg(math.atan2(dir.x, dir.z))
 		local v2 = -math.deg(math.atan2(npc:direction().x, npc:direction().z))
 		local rot_y = math.min( math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2) )
 		if (rot_y <= 90 and dist <= self.st.reach_distance) then
-			return true 
-		end 
-	end 
-	
-	return false
+			return true
+		end
+	end
+		return false
 end
 function animpoint:fill_approved_actions()
 	local is_in_camp = self.camp ~= nil
@@ -244,20 +237,18 @@ end
 -- Чувак дошел до точки и может начинать работать
 function animpoint:start()
 	local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
-	if not (npc) then 
+	if not (npc) then
 		printf("xr_animpoint: ERROR: NPC don't exist!")
-		return 
-	end 
-	
-	local state = state_mgr.get_state(npc)
+		return
+	end
+		local state = state_mgr.get_state(npc)
 	local camp = sr_camp.get_current_camp(self.vertex_position)
-	
-	if (camp) then 
+		if (camp) then
 		if (self.st.use_camp == true and not string.find(state,"sleep")) then
 			self.camp = camp
 			self.camp:register_npc(self.npc_id)
 			self.in_camp = true			
-		elseif (self.st.use_camp == false or string.find(state,"sleep")) then 
+		elseif (self.st.use_camp == false or string.find(state,"sleep")) then
 			if self.in_camp == true then
 				self.camp:unregister_npc(self.npc_id)
 				self.in_camp = nil
@@ -279,13 +270,12 @@ function animpoint:start()
 		if (self.st.approved_actions and #self.st.approved_actions > 0) then
 			self.current_action = self.st.approved_actions[math.random(#self.st.approved_actions)].name
 		else
-			if not (self.st.avail_animations) then 
-				return 
+			if not (self.st.avail_animations) then
+				return
 			end
 			self.current_action = self.st.avail_animations[1]
 		end
 	end
-
 
 	self.started = true
 	self.cover_name = self.st.cover_name
@@ -307,13 +297,11 @@ function animpoint:update()
 	if not (self.vertex_position) then
 		return
 	end
-	
-	if (self.npc_id==nil) then
+		if (self.npc_id==nil) then
 		printf("Trying to use destroyed object!")
 		return
 	end
-	
-	local tmp_actions = {}
+		local tmp_actions = {}
 	local descr = self.st.description
 
 	if (self.camp == nil or self.st.use_camp ~= true) then
@@ -336,12 +324,9 @@ function animpoint:update()
 		return
 	end
 
-
-
 	local camp_action, is_director = self.camp:get_camp_action(self.npc_id)
 	local tbl = {}
-	
-	if(is_director) then
+		if(is_director) then
 		--printf(" [%s] is director", self.npc_id)
 		tbl = assoc_tbl[camp_action].director
 		self.__dtimer = time_global()
@@ -353,10 +338,9 @@ function animpoint:update()
 		--printf(" [%s] is not director", self.npc_id)
 		tbl = assoc_tbl[camp_action].listener
 	end
-	
-	if not (self.st.approved_actions) then
+		if not (self.st.approved_actions) then
 		printf("animpoint in camp and approved_actions is nil. Name [%s]", self.st.cover_name)
-		return 
+		return
 	end
 
 	local found = false
@@ -377,7 +361,6 @@ function animpoint:update()
 	local rnd = math.random(#tmp_actions)
 	local action = tmp_actions[rnd]
 
-
 	--action - выбранный экшн из доступных
 	if(self.st.base_action) then
 		if(self.st.base_action==descr.."_weapon") then
@@ -395,10 +378,8 @@ function animpoint:update()
 			self.st.base_action = descr
 		end
 	end
-	
-	self.current_action = action
-	
-	local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
+		self.current_action = action
+		local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
 	if (npc) then
 		state_mgr.set_state(npc, action, nil, nil, {fast_set = true, look_position = self.look_position},{animation_position = self.position, animation_direction = self.smart_direction} )		
 	end
@@ -433,7 +414,6 @@ function add_to_binder(npc, ini, scheme, section, storage)
 	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
 	xr_logic.subscribe_action_for_events(npc, storage, storage.animpoint)
 
-
 	local new_action = this.action_reach_animpoint(npc, "action_reach_animpoint", storage)
 	new_action:add_precondition(world_property(stalker_ids.property_alive, true))
 	new_action:add_precondition(world_property(stalker_ids.property_anomaly,false))
@@ -464,7 +444,6 @@ function add_to_binder(npc, ini, scheme, section, storage)
 	new_action:add_precondition(world_property(properties["need_animpoint"], false))
 end
 
-
 function set_scheme(npc, ini, scheme, section, gulag_name)
 	--printf("DEBUG: %s set_scheme: scheme='%s', section='%s'", npc:name(), scheme, section)
 	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
@@ -479,7 +458,6 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.direction = st.direction and alun_utils.string_to_vector(st.direction)
 
 	local tmp = ini:r_string_ex(section,"avail_animations")
-
 
 	if(tmp~=nil) then
 		st.avail_animations = parse_names(tmp)
