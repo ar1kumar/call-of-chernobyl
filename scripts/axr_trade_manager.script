@@ -97,6 +97,9 @@ function npc_trade_buy_sell(npc)
 
 	local sim = alife()
 
+	-- increase NPC rank because he is a good boy
+	npc:set_character_rank(npc:character_rank()+math.random(20,30))
+	
 	-- SELL ITEMS
 	local itm,itm_base_cost,buy_sell, slot, bw,can_sell
 	for sec,count in pairs(st.trade_items) do

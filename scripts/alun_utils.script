@@ -379,6 +379,20 @@ function get_rank_list()
 	return ranks
 end
 
+local reputations
+function get_reputation_name(value)
+	reputations = reputations or parse_list(system_ini(),"game_relations","reputation_names")
+	local prev = nil
+	for i,rn in ipairs(reputations) do
+		local repu = tonumber(rn)
+		if (repu and value <= repu) then 
+			return prev
+		else
+			prev = rn
+		end
+	end
+	return prev
+end
 
 local communities
 function get_communities_list()

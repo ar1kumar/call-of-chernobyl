@@ -297,6 +297,9 @@ local function help_wounded_execute(npc,st)
 			else
 				state_mgr.set_state(npc, "help_victim_"..AnimFree,nil,nil,nil,{fast_set = true})
 			end
+			
+			-- increase stalker rank for helping an ally
+			npc:set_character_rank(npc:character_rank()+math.random(10,20))
 		else
 			state_mgr.set_state(npc, "help_wounded",nil,nil,nil,{fast_set = true})
 		end
