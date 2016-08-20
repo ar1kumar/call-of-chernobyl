@@ -120,7 +120,11 @@ function se_stalker:on_unregister()
 		end
 	end
 	db.offline_objects[self.id] = nil
+	
+	-- If object unregisters before saving, it means it was removed from game
 	alife_storage_manager.get_state().se_stalker[self.id] = nil
+	alife_storage_manager.get_state().game_object[self.id] = nil
+	
 	unregister_story_object_by_id(self.id)
 	cse_alife_human_stalker.on_unregister(self)
 end
