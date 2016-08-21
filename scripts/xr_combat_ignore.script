@@ -234,7 +234,7 @@ function is_enemy(obj,enemy,no_memory)
 			return false
 		end
 		if (dist > 4900) then
-			if (is_monster or xr_conditions.surge_started() or xr_conditions.is_heavy_rain() or get_object_story_id(id) or get_object_story_id(ene_id) or string.find(level.get_weather(),"veryfoggy")) then 
+			if (is_monster or xr_conditions.surge_started() or xr_conditions.is_heavy_rain() or get_object_story_id(id) or get_object_story_id(ene_id)) then 
 				return false
 			end 
 			
