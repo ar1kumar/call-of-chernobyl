@@ -229,10 +229,11 @@ function motivator_binder:net_destroy()
 
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
-		object_binder.net_destroy(self)
-		if (USE_MARSHAL) then
+	object_binder.net_destroy(self)
+	if (USE_MARSHAL) then
 		UnregisterScriptCallback("save_state",self.save_state)
 	end
+	alife_storage_manager.get_state().game_object[self.object:id()] = nil
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)

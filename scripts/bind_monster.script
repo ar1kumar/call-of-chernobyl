@@ -343,11 +343,12 @@ function generic_object_binder:net_destroy()
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
 	db.storage[self.object:id()] = nil
-		object_binder.net_destroy(self)
-		if (USE_MARSHAL) then
+	object_binder.net_destroy(self)
+	if (USE_MARSHAL) then
 		UnregisterScriptCallback("save_state",self.save_state)
 	end
-		--alun_utils.debug_write("generic_object_binder:net_destroy END")
+	alife_storage_manager.get_state().game_object[self.object:id()] = nil
+	--alun_utils.debug_write("generic_object_binder:net_destroy END")
 end
 
 function generic_object_binder:reload(section)

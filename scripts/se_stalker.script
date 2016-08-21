@@ -70,15 +70,15 @@ end
 function se_stalker:get_alife_storage(create_if_dont_exist)
 	--alun_utils.debug_write("se_stalker:get_alife_storage")
 	local m_data = alife_storage_manager.get_state()
-	if (create_if_dont_exist) then
-		if not (m_data.se_stalker[self.id]) then
-			m_data.se_stalker[self.id] = {}
+	if not (m_data.se_stalker[self.id] and m_data.se_stalker[self.id].name == self:name()) then 
+		if not (create_if_dont_exist) then 
+			return 
 		end
-		return m_data.se_stalker[self.id]
-	else 
-		return m_data.se_stalker[self.id]
+		m_data.se_stalker[self.id] = {}
+		m_data.se_stalker[self.id].name = self:name()
 	end
-end 
+	return m_data.se_stalker[self.id]
+end
 
 --------------------
 function se_stalker:on_before_register()
@@ -103,9 +103,8 @@ function se_stalker:on_register()
 	local spawn_ini = self:spawn_ini()
 	local smartn = spawn_ini and spawn_ini:r_string_ex("logic","smart_terrain")
 	local smart = smartn and SIMBOARD:get_smart_by_name(smartn)
-	
-	if (smart) then 
-		smart:register_npc(self) 
+		if (smart) then
+		smart:register_npc(self)
 	end
 	--alun_utils.debug_write("se_stalker:on_register "..self:name().." END")
 end
@@ -120,11 +119,8 @@ function se_stalker:on_unregister()
 		end
 	end
 	db.offline_objects[self.id] = nil
-	
 	-- If object unregisters before saving, it means it was removed from game
 	alife_storage_manager.get_state().se_stalker[self.id] = nil
-	alife_storage_manager.get_state().game_object[self.id] = nil
-	
 	unregister_story_object_by_id(self.id)
 	cse_alife_human_stalker.on_unregister(self)
 end
@@ -146,7 +142,6 @@ function se_stalker:on_death(killer)
 	if (squad) then
 		squad:on_npc_death(self,killer)
 	end
-	
 	if (level.map_has_object_spot(self.id,"red_location") == 1) then
 		level.map_remove_object_spot(self.id, "red_location")
 	end
@@ -162,15 +157,15 @@ function se_trader:__init (section) super (section)
 
 end
 
-function se_trader:on_register() 
+function se_trader:on_register()
 	story_objects.check_spawn_ini_for_story_id(self)
 	cse_alife_trader.on_register(self)
-end 
+end
 
-function se_trader:on_unregister() 
+function se_trader:on_unregister()
 	unregister_story_object_by_id(self.id)
 	cse_alife_trader.on_unregister(self)
-end 
+end
 
 function se_trader:keep_saved_data_anyway()
 	return true
