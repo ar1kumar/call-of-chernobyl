@@ -284,9 +284,10 @@ function generic_object_binder:net_spawn(sobject)
 		end
 		
 		self.already_dead = true
-			return true
+		return true
 	end
-		db.add_obj(self.object)
+	
+	db.add_obj(self.object)
 	db.add_enemy(self.object)
 
 	local sim = alife()
@@ -313,8 +314,9 @@ function generic_object_binder:net_spawn(sobject)
 		self.object:set_npc_position(force_set_position)
 		db.offline_objects[se_obj.id].level_vertex_id = nil
 	end
-		smart_terrain.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded)
-		--alun_utils.debug_write(sobject:name()..":net_spawn()  END")
+	
+	smart_terrain.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded)
+	--alun_utils.debug_write(sobject:name()..":net_spawn()  END")
 	return true
 end
 
@@ -411,7 +413,7 @@ function generic_object_binder:save_state(m_data)
 	state.xr_logic.activation_game_time = st.activation_game_time
 
 	db.storage[id].pstor = db.storage[id].pstor or {}
-		--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
 end
 
 function generic_object_binder:load_state()
@@ -440,5 +442,5 @@ function generic_object_binder:load_state()
 		db.storage[id].pstor_ctime = state.pstor_ctime
 		state.pstor_ctime = nil
 	end
-		--alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s AFTER",self.object:name()))
 end

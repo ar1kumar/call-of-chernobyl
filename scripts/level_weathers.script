@@ -166,23 +166,24 @@ function WeatherManager:reset()
 		self.weather_list = xr_logic.parse_condlist(db.actor, level.name(), "weather", "[default]")
 	else
 		self.weather_list = xr_logic.parse_condlist(db.actor, level.name(), "weather", weather)
-	end
-	-- CC read DOF kernels and far_plane distances
-	self.dof_kernels = alun_utils.parse_ini_section_to_array(self.graphs_ini,"dof_kernels")
-	for cycle,dof in pairs(self.dof_kernels) do
-		self.far_distances[cycle]={}
-		local phase
-		if cycle=="clear" or cycle=="partly" then
-			phase="_0"
-		else
-			phase = ""
+		-- CC read DOF kernels and far_plane distances
+		self.dof_kernels = alun_utils.parse_ini_section_to_array(self.graphs_ini,"dof_kernels")
+		for cycle,dof in pairs(self.dof_kernels) do
+			self.far_distances[cycle]={}
+			local phase
+			if cycle=="clear" or cycle=="partly" then
+				phase="_0"
+			else
+				phase = ""
+			end
+			local cycle_ltx=ini_file(("environment\\weathers\\af3_dark_"..cycle..phase..".ltx"))
+			for h = 0, 23 do
+				local hour=self:get_hour_as_string(h)
+				self.far_distances[cycle][hour] = cycle_ltx:r_float_ex(hour, "fog_distance")
+			end
 		end
-		local cycle_ltx=ini_file(("environment\\weathers\\af3_dark_"..cycle..phase..".ltx"))
-		for h = 0, 23 do
-			local hour=self:get_hour_as_string(h)
-			self.far_distances[cycle][hour] = cycle_ltx:r_float_ex(hour, "fog_distance")
-		end
 	end
+
 	self.next_period_change_hour=self:get_next_period_change_hour(self.period)
 	self.inited_time = game.get_game_time()
 	self.last_hour=level.get_time_hours()

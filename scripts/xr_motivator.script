@@ -91,9 +91,10 @@ function motivator_binder:net_spawn(sobject)
 			local v_id = self.object:accessible_nearest(level.vertex_position(sobject.m_level_vertex_id), vector())
 			self.object:set_npc_position(level.vertex_position(v_id))
 		end
-			return true
+		return true
 	end
-		self.st.move_mgr = move_mgr.move_mgr(self.object)
+	
+	self.st.move_mgr = move_mgr.move_mgr(self.object)
 	self.st.move_mgr:initialize()
 
 	self.object:set_patrol_extrapolate_callback(motivator_binder.extrapolate_callback, self)
@@ -117,7 +118,8 @@ function motivator_binder:net_spawn(sobject)
 	sound_theme.init_npc_sound(self.object)
 
 	xr_reach_task.add_reach_task_action(self.object)
-		local as = sobject.get_alife_storage and sobject:get_alife_storage()
+	
+	local as = sobject.get_alife_storage and sobject:get_alife_storage()
 	if (as and as.companion) then
 		axr_companions.setup_companion_logic(self.object,self.st,self.loaded,as)
 	else
@@ -125,8 +127,10 @@ function motivator_binder:net_spawn(sobject)
 		self.object:disable_info_portion("npcx_beh_cannot_dismiss")
 		smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_stalker, self.loaded)
 	end
-		local id = sobject.id
+	
+	local id = sobject.id
 	local force_set_position
+	
 	if (db.offline_objects[id] and db.offline_objects[id].level_vertex_id) then
 		force_set_position = level.vertex_position(db.offline_objects[id].level_vertex_id)
 		db.offline_objects[id].level_vertex_id = nil
