@@ -297,7 +297,6 @@ function af_options_dialog:InitControls()
 	self.dialog					= xml:InitStatic("main_dialog:dialog", self)
 
 	-- main dialog
-	xml:InitStatic				("main_dialog:cap_af_options", self.dialog)
 	local btn
 	btn = xml:Init3tButton		("main_dialog:btn_accept", self.dialog)
 	self:Register				(btn, "btn_accept")
@@ -932,8 +931,6 @@ function af_opt_weather:InitControls(x, y, xml, handler)
 		_st = xml:InitStatic("weather_dialog:templ_item", nil)
 		_el=xml:InitStatic("weather_dialog:div_1", _st)
 		_el:SetWndPos(vector2():set(0,0))
-		_el=xml:InitStatic("weather_dialog:cap_af_zaton", _st)
-		_el:SetWndPos(vector2():set(0,21))
 		_el:TextControl():SetTextST(level_name)
 
 		handler:RegisterPeriodCombo(xml, "weather_dialog", level_name.."_period_good", "periods", _st)
