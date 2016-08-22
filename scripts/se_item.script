@@ -525,8 +525,6 @@ function se_invbox:on_register()
 	cse_alife_inventory_box.on_register( self )
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-
-
 end
 
 function se_invbox:on_unregister()
@@ -534,15 +532,10 @@ function se_invbox:on_unregister()
 	cse_alife_inventory_box.on_unregister(self)
 end
 function se_invbox:can_switch_online()
-	-- if(self.secret_item) then
-		-- return false
-	-- end
 	return cse_alife_inventory_box.can_switch_online(self)
 end
 
 function se_invbox:STATE_Write(stpk)
-
-
 	cse_alife_inventory_box.STATE_Write(self,stpk)
 end
 
