@@ -1,4 +1,3 @@
--- run_string log("----->"..tostring(xr_statistic.actor_statistic.best_monster).." "..tostring(xr_statistic.actor_statistic.best_monster_rank))
 -- Modified by Alundaio
 
 actor_statistic = {
@@ -8,7 +7,6 @@ actor_statistic = {
 					artefacts_detected = 0,
 					artefacts_founded = 0,
 					best_monster = nil,
-					best_monster_rank = 0,
 					boxes_smashed = 0,
 					enemies_surrendered = 0,
 					favorite_weapon_sect = nil,
@@ -371,35 +369,6 @@ function npc_on_death_callback(victim,who)
 	
 end
 
-function set_best_monster(obj)
-	if not IsMonster(obj) then
-		return 
-	end
-	
-	local s_obj = alife():object(obj:id())
-	if not (s_obj) then 
-		return 
-	end 
-	
-	local rank = s_obj:rank() or 1
-	
-	if (rank <= actor_statistic.best_monster_rank) then 
-		return 
-	end
-	
-	local community = monster_classes[get_clsid(obj)]
-	if not(community) then
-		printf("Statistic ERROR: cannot find monster class for [%s] clsid [%s]", obj:name(), tostring(get_clsid(obj)))
-		return
-	end
-	
-	local spec_rank = system_ini():r_string_ex(obj:section(),"spec_rank") or "normal"
-	community = community .. "_" .. spec_rank
-
-	actor_statistic.best_monster_rank = rank
-	actor_statistic.best_monster = community
-end
-
 function set_best_weapon(hit_amount)
 	-- Weapon currently equipped.
 	local active_item = db.actor:active_item()
@@ -445,7 +414,6 @@ function save(package)
 	package:w_u32(actor_statistic.killed_stalkers)
 	package:w_u16(actor_statistic.founded_secrets)
 	package:w_u16(actor_statistic.artefacts_founded)
-	package:w_u32(actor_statistic.best_monster_rank)
 	package:w_u16(actor_statistic.pdas_delivered)
 	package:w_u16(actor_statistic.heli_kills)
 	package:w_u16(actor_statistic.heli_rocket_kills)
@@ -514,7 +482,6 @@ function load(package)
 	actor_statistic.killed_stalkers  	= package:r_u32()
 	actor_statistic.founded_secrets  	= package:r_u16()
 	actor_statistic.artefacts_founded	= package:r_u16()
-	actor_statistic.best_monster_rank 	= package:r_u32()
 	actor_statistic.pdas_delivered 		= package:r_u16()
 	actor_statistic.heli_kills			= package:r_u16()
 	actor_statistic.heli_rocket_kills	= package:r_u16()
