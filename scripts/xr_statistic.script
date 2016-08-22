@@ -17,6 +17,7 @@ actor_statistic = {
 					help_wounded = 0,
 					killed_monsters = 0,
 					killed_stalkers = 0,
+					level_changes = -1, -- Increases on start relocation.
 					pdas_delivered = 0,
 					storms = 0,
 					surges = 0,
@@ -158,7 +159,12 @@ function on_game_start()
 	RegisterScriptCallback("on_game_load",on_game_load)
 	RegisterScriptCallback("actor_on_item_take",actor_on_item_take)
 	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
+	RegisterScriptCallback("on_level_changing",on_level_changing)
 	init_ranks_reps()
+end
+
+function on_level_changing()
+	inc_level_changes_counter()
 end
 
 function on_game_load()
@@ -265,6 +271,11 @@ function inc_founded_artefacts_counter(art_id)
 end
 function inc_boxes_smashed_counter()
 	actor_statistic.boxes_smashed = actor_statistic.boxes_smashed + 1
+	inc_actor_rank(rank_rep.boxes.rnk)
+	inc_actor_reputation(rank_rep.boxes.rpt)
+end
+function inc_level_changes_counter()
+	actor_statistic.level_changes = actor_statistic.level_changes + 1
 	inc_actor_rank(rank_rep.boxes.rnk)
 	inc_actor_reputation(rank_rep.boxes.rpt)
 end
@@ -431,6 +442,7 @@ function save(package)
 	package:w_u16(actor_statistic.actual_rank)
 	package:w_u16(actor_statistic.actual_reputation)
 	package:w_u16(actor_statistic.boxes_smashed)
+	package:w_u16(actor_statistic.level_changes)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
 
@@ -497,6 +509,7 @@ function load(package)
 	actor_statistic.actual_rank 		= package:r_u16()
 	actor_statistic.actual_reputation	= package:r_u16()
 	actor_statistic.boxes_smashed		= package:r_u16()
+	actor_statistic.level_changes		= package:r_u16()
 
 	local str = package:r_stringZ()
 	if(str~="nil") then
