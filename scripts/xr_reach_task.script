@@ -120,6 +120,11 @@ function action_reach_task_location:initialize()
 	self.object:set_movement_type(move.walk)
 	self.object:set_path_type(game_object.game_path)
 	self.object:set_sight(look.path_dir,nil,0)
+	
+	local best_weapon = self.object:best_weapon()
+	if (best_weapon) then
+		self.object:set_item(object.idle, best_weapon)
+	end
 end
 
 function action_reach_task_location:execute()
@@ -130,7 +135,7 @@ function action_reach_task_location:execute()
 	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and sim:object(se_obj.group_id)
 
 	if (squad) then
-		if (squad:commander_id() == self.object:id() or not level.object_by_id(squad:commander_id()))then
+		if (squad:commander_id() == self.object:id() or not (db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object))then
 			self:commander_execute(squad)
 		else
 			self:soldier_execute(squad)
@@ -152,20 +157,21 @@ function action_reach_task_location:single_execute(se_obj)
 	npc:set_movement_type(move.walk)
 	
 	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and alife():object(se_obj.m_smart_terrain_id)
-	if (smart and not npc:is_talking()) then
-		npc:set_sight(look.path_dir,nil,0)
-		local pos, lv_id, gv_id = smart:get_location()
-		if (npc:game_vertex_id() ~= gv_id) then
-			npc:set_path_type(game_object.game_path)
-			npc:set_dest_game_vertex_id(gv_id)
-		else
-			npc:set_path_type(game_object.level_path)
-			utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:3")
-			npc:set_desired_position(pos)
-		end
-	else 
+	if (smart == nil or npc:is_talking()) then
 		npc:set_movement_type(move.stand)
-	end	
+		return 
+	end 
+	
+	npc:set_sight(look.path_dir,nil,0)
+	local pos, lv_id, gv_id = smart:get_location()
+	if (npc:game_vertex_id() ~= gv_id) then
+		npc:set_path_type(game_object.game_path)
+		npc:set_dest_game_vertex_id(gv_id)
+	else
+		npc:set_path_type(game_object.level_path)
+		utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:3")
+		npc:set_desired_position(pos)
+	end
 end
 function action_reach_task_location:commander_execute(squad)
 	local npc = self.object
@@ -173,9 +179,14 @@ function action_reach_task_location:commander_execute(squad)
 	if squad_target == nil and squad:get_script_target() ~= nil then
 	 	squad_target = alife():object(squad.assigned_target_id)
 	end
-
-	if squad_target and not npc:is_talking() then
-		if (xr_conditions.surge_started() and character_community(npc) ~= "zombied") then
+	
+	if (squad_target == nil or npc:is_talking()) then 
+		npc:set_movement_type(move.stand)
+		return
+	end
+	
+	if (character_community(npc) ~= "zombied") then
+		if (xr_conditions.surge_started()) then
 			if not(db.storage[npc:id()].surge_timer) then
 				db.storage[npc:id()].surge_timer = time_global() + math.random(7000,15000)
 			end
@@ -199,36 +210,34 @@ function action_reach_task_location:commander_execute(squad)
 				rush_to_target = true
 			end
 		end
+	end
 
-		if squad.rush_to_target ~= nil then
-			rush_to_target = squad.rush_to_target
-		end
+	if squad.rush_to_target ~= nil then
+		rush_to_target = squad.rush_to_target
+	end
 
-		if (rush_to_target) then
-			npc:set_movement_type(move.run)
-			if (squad_target.position:distance_to_sqr(npc:position()) <= 10000) then
-				npc:set_mental_state(anim.danger)
-			else
-				npc:set_mental_state(anim.free)
-			end
+	if (rush_to_target) then
+		npc:set_movement_type(move.run)
+		if (squad_target.position:distance_to_sqr(npc:position()) <= 10000) then
+			npc:set_mental_state(anim.danger)
 		else
-			npc:set_movement_type(move.walk)
 			npc:set_mental_state(anim.free)
 		end
-		
-		npc:set_sight(look.path_dir,nil,0)
-		
-		local pos, lv_id, gv_id = squad_target:get_location()
-		if npc:game_vertex_id() ~= gv_id then
-			npc:set_path_type(game_object.game_path)
-			npc:set_dest_game_vertex_id(gv_id)
-		else
-			npc:set_path_type(game_object.level_path)
-			utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:2")
-			npc:set_desired_position(pos)
-		end
 	else
-		npc:set_movement_type(move.stand)
+		npc:set_movement_type(move.walk)
+		npc:set_mental_state(anim.free)
+	end
+	
+	npc:set_sight(look.path_dir,nil,0)
+	
+	local pos, lv_id, gv_id = squad_target:get_location()
+	if npc:game_vertex_id() ~= gv_id then
+		npc:set_path_type(game_object.game_path)
+		npc:set_dest_game_vertex_id(gv_id)
+	else
+		npc:set_path_type(game_object.level_path)
+		utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:2")
+		npc:set_desired_position(pos)
 	end
 end
 

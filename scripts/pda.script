@@ -561,33 +561,37 @@ function coc_rankings_set_hint(index)
 			--TODO: Maybe some stats for player, like rank points per minute; if such a thing is possible.
 			return ""
 		else
+			local return_str = ""
+			
+			-- DEBUG REMOVE ME LATER
+			if(DEV_DEBUG and axr_main.config:r_value("mm_options","enable_debug_hud",1,false) == true) then
+				return_str = se_obj:profile_name() .. [[ \n]] .. se_obj:character_icon() .. [[ \n]]
+			end 
+			
 			-- stalker stats
 			local m_data = se_obj:get_alife_storage()
 			if (m_data) then
 				local last_seen_level = m_data.last_seen_level
 				local last_seen_time = m_data.last_seen_time and m_data.last_seen_time:dateToString(game.CTime.DateToDay)
 				
-				if not (last_seen_level and last_seen_time) then
-					return ""
-				end
-				
-				local return_str = game.translate_string("st_last_seen") .. ": " .. game.translate_string(last_seen_level) .. " on " .. last_seen_time
-					
-				if (m_data.stalkers_killed) then
-					return_str = return_str .. [[ \n]] .. game.translate_string("st_stalkers_killed") .. ": " .. tostring(m_data.stalkers_killed)
-				end
-				if (m_data.mutants_killed) then
-					return_str = return_str .. [[ \n]] .. game.translate_string("st_mutants_killed") .. ": " .. tostring(m_data.mutants_killed)
-				end
-				if (m_data.artefacts_found) then
-					return_str = return_str .. [[ \n]] .. game.translate_string("st_artefacts_found") .. ": " .. tostring(m_data.artefacts_found)
-				end
-				if (m_data.items_sold) then
-					return_str = return_str .. [[ \n]] .. game.translate_string("st_items_sold") .. ": " .. tostring(m_data.items_sold)
-				end
-				
-				return return_str
+				if (last_seen_level and last_seen_time) then
+					return_str = return_str .. game.translate_string("st_last_seen") .. ": " .. game.translate_string(last_seen_level) .. " on " .. last_seen_time
+						
+					if (m_data.stalkers_killed) then
+						return_str = return_str .. [[ \n]] .. game.translate_string("st_stalkers_killed") .. ": " .. tostring(m_data.stalkers_killed)
+					end
+					if (m_data.mutants_killed) then
+						return_str = return_str .. [[ \n]] .. game.translate_string("st_mutants_killed") .. ": " .. tostring(m_data.mutants_killed)
+					end
+					if (m_data.artefacts_found) then
+						return_str = return_str .. [[ \n]] .. game.translate_string("st_artefacts_found") .. ": " .. tostring(m_data.artefacts_found)
+					end
+					if (m_data.items_sold) then
+						return_str = return_str .. [[ \n]] .. game.translate_string("st_items_sold") .. ": " .. tostring(m_data.items_sold)
+					end
+				end 
 			end
+			return return_str
 		end
 	end
 	return ""
@@ -626,9 +630,32 @@ end
 function coc_rankings_set_icon(index)
 	local se_obj = coc_ranking_list[index] ~= nil and alife():object(coc_ranking_list[index])
 	if (se_obj) then
-		--printf("character_icon=%s",se_obj:character_icon())
-		local icon_name = se_obj:character_icon()
+		local icon_name
+		if (se_obj.id == 0) then 
+			if (axr_main.config:r_value("mm_options","enable_outfit_portrait",1,false) == true) then
+				local outfit = db.actor:item_in_slot(7)
+				if (outfit) then 
+					local icon = system_ini():r_string_ex(outfit:section(),"character_portrait")
+					if (icon and icon ~= "") then
+						return icon
+					end
+				end 
+			end
+			icon_name = db.actor:character_icon()
+		else
+			local npc = db.storage[se_obj.id] and db.storage[se_obj.id].object
+			if (npc) then
+				icon_name = npc:character_icon() 
+			else 
+				icon_name = se_obj:character_icon()
+			end
+		end
 		return icon_name and icon_name ~= "" and icon_name or "ui\\ui_noise"
 	end
 	return ""
+end
+
+function coc_rankings_use_background(index)
+	local se_obj = coc_ranking_list[index] ~= nil and alife():object(coc_ranking_list[index])
+	return se_obj and se_obj.id == 0 or false
 end

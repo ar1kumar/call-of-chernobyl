@@ -145,6 +145,7 @@ function action.debug_test(p)
 	end 
 	if (p==1) then 
 	
+		--[[ clones active weapon
 		if (db.actor) then 
 			local wpn = db.actor:active_item()
 			if (wpn and IsWeapon(wpn)) then 
@@ -152,8 +153,15 @@ function action.debug_test(p)
 				if (se_wpn) then 
 					alife():clone_weapon(se_wpn,se_wpn:section_name(),se_wpn.position,se_wpn.m_level_vertex_id,se_wpn.m_game_vertex_id,0)
 				end
+				
+				local function itr(section)
+					printf("%s",section)
+				end
+				
+				wpn:iterate_installed_upgrades(itr)
 			end
 		end
+		--]]
 		
 		--xr_effects.disable_generator_zones()
 		-- RELEASES TASK GIVER FOR ALL TASKS WITH task_giver_id; useful for testing how a task works when giver is dead
@@ -187,10 +195,6 @@ function action.debug_test(p)
 			end
 		end
 		--]]
-	
-
-		--]]
-		
 	end
 end
 

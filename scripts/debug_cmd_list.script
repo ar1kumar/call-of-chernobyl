@@ -1689,9 +1689,9 @@ function cmd.dev_debug(me,txt,owner,p)
 	local wrd = check_and_set_help(me,txt,owner,"[on | off]")
 	if not (wrd) then return end
 	if (wrd == "on") then
-		_G.dev_debug = true
+		_G.DEV_DEBUG = true
 	elseif (wrd == "off") then
-		_G.dev_debug = false
+		_G.DEV_DEBUG = false
 	end
 	return "dev_debug:= type dev_debug help for list of sub commands."
 end
