@@ -299,6 +299,9 @@ function monster_on_actor_use_callback(obj,who)
 				local t = {}
 				loot_mutant(nil,obj:clsid(),t)
 				for sec,v in pairs(t) do
+					for i=1,v.count do
+						xr_statistic.inc_field_dressings_counter()
+					end
 					news_manager.relocate_item(db.actor, "in", sec, v.count)
 				end
 			end

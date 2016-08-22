@@ -8,7 +8,9 @@ actor_statistic = {
 					artefacts_founded = 0,
 					best_monster = nil,
 					boxes_smashed = 0,
+					enemies_surrendered = 0,
 					favorite_weapon_sect = nil,
+					field_dressings = 0,
 					founded_secrets = 0,
 					heli_kills = 0,
 					heli_rocket_kills = 0,
@@ -272,6 +274,16 @@ function inc_boxes_smashed_counter()
 	inc_actor_rank(rank_rep.boxes.rnk)
 	inc_actor_reputation(rank_rep.boxes.rpt)
 end
+function inc_field_dressings_counter()
+	actor_statistic.field_dressings = actor_statistic.field_dressings + 1
+	inc_actor_rank(rank_rep.boxes.rnk)
+	inc_actor_reputation(rank_rep.boxes.rpt)
+end
+function inc_enemies_surrendered_counter()
+	actor_statistic.enemies_surrendered = actor_statistic.enemies_surrendered + 1
+	inc_actor_rank(rank_rep.boxes.rnk)
+	inc_actor_reputation(rank_rep.boxes.rpt)
+end
 function inc_level_changes_counter()
 	actor_statistic.level_changes = actor_statistic.level_changes + 1
 	inc_actor_rank(rank_rep.boxes.rnk)
@@ -411,6 +423,8 @@ function save(package)
 	package:w_u16(actor_statistic.actual_reputation)
 	package:w_u16(actor_statistic.boxes_smashed)
 	package:w_u16(actor_statistic.level_changes)
+	package:w_u16(actor_statistic.enemies_surrendered)
+	package:w_u16(actor_statistic.field_dressings)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
 
@@ -477,6 +491,8 @@ function load(package)
 	actor_statistic.actual_reputation	= package:r_u16()
 	actor_statistic.boxes_smashed		= package:r_u16()
 	actor_statistic.level_changes		= package:r_u16()
+	actor_statistic.enemies_surrendered	= package:r_u16()
+	actor_statistic.field_dressings		= package:r_u16()
 
 	local str = package:r_stringZ()
 	if(str~="nil") then
