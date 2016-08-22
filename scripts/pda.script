@@ -1,54 +1,9 @@
 local coc_ranking_array_size = 100
 local coc_ranking_list = {}
 
--- вызывается  1 раз в 3 секунды
-function fill_faction_state(state)
-	state.member_count = 0
-	state.resource = 0
-	state.power = 0
 
- 	state.actor_goodwill = 3000
-	state.name = "ui_inGame2_hint_wnd_bar"
-	state.icon = "ui_inGame2_hint_wnd_bar"
-	state.icon_big = "logos_big_empty"
-	state.target = game.translate_string("ui_st_no_faction")
-	state.target_desc = "aaa"
-	state.location = "a"
 
-	state.war_state1 = "a"
-	state.war_state_hint1 = "1"
-	state.war_state2 = "3"
-	state.war_state_hint2 = "2"
-	state.war_state3 = "33"
-	state.war_state_hint3 = ""
-	state.war_state4 = "23"
-	state.war_state_hint4 = ""
-	state.war_state5 = "5"
-	state.war_state_hint5 = "5"
-
-	state.bonus = 0
-end
-
---int		get_max_member_count	();   ------ 1 раз в 3 секунды
---float	get_max_resource();
---float	get_max_power();
-
-function get_max_member_count()
-	return 10
-end
-
-function get_max_resource()
-	return 10
-end
-
-function get_max_power()
-	return 10
-end
-
--- потом это нужно стереть
-
--- int mode:
--- 0 = 	Undefined = закрыто
+-- 0 = 	Undefined
 -- 1 = 	Inventory
 -- 2 = 	Trade
 -- 3 = 	Upgrade
@@ -175,48 +130,10 @@ function get_stat(index) -- index= int        return string
 		return tostring(xr_statistic.actor_statistic.artefacts_detected)
 	elseif(index==11) then
 		return tostring(xr_statistic.actor_statistic.help_wounded)
+	elseif(index==12) then 
+		return tostring(db.actor:money()) .. " RU"
 	end
-end
-
-killed_monsters_tbl =
-{	bloodsucker_weak  	= {back = "ui_inGame2_Krovosos", 		icon = ""},
-	bloodsucker_normal	= {back = "ui_inGame2_Krovosos_1", 		icon = ""},
-	bloodsucker_strong	= {back = "ui_inGame2_Krovosos_2", 		icon = ""},
-	boar_weak  			= {back = "ui_inGame2_Kaban_1", 		icon = ""},
-	boar_strong			= {back = "ui_inGame2_Kaban", 			icon = ""},
-	burer 				= {back = "ui_inGame2_Burer", 			icon = ""},
-	chimera 			= {back = "ui_inGame2_Himera", 			icon = ""},
-	controller 			= {back = "ui_inGame2_Controller", 		icon = ""},
-	dog 				= {back = "ui_inGame2_Blind_Dog", 		icon = ""},
-	flesh_weak 			= {back = "ui_inGame2_Flesh", 			icon = ""},
-	flesh_strong		= {back = "ui_inGame2_Flesh_1", 		icon = ""},
-	gigant 				= {back = "ui_inGame2_Pseudo_Gigant", 	icon = ""},
-	poltergeist_tele 	= {back = "ui_inGame2_Poltergeyst", 	icon = ""},
-	poltergeist_flame	= {back = "ui_inGame2_Poltergeist_1", 	icon = ""},
-	psy_dog_weak  		= {back = "ui_inGame2_PseudoDog_1", 	icon = ""},
-	psy_dog_strong		= {back = "ui_inGame2_PseudoDog", 		icon = ""},
-	pseudodog_weak 		= {back = "ui_inGame2_PseudoDog_1", 	icon = ""},
-	pseudodog_strong	= {back = "ui_inGame2_PseudoDog",  		icon = ""},
-	snork 				= {back = "ui_inGame2_Snork", 			icon = ""},
-	tushkano 			= {back = "ui_inGame2_Tushkan", 		icon = ""},
-	none 				= {back = "", icon = ""}
-}function get_monster_back()
-	if not(xr_statistic.actor_statistic.best_monster) or not(killed_monsters_tbl[xr_statistic.actor_statistic.best_monster]) then
-		return tostring(killed_monsters_tbl.none.back)
-	end
-		return tostring(killed_monsters_tbl[xr_statistic.actor_statistic.best_monster].back)
-end
-function get_monster_icon()
-	if not(xr_statistic.actor_statistic.best_monster) or not(killed_monsters_tbl[xr_statistic.actor_statistic.best_monster]) then
-		return tostring(killed_monsters_tbl.none.icon)
-	end
-		return tostring(killed_monsters_tbl[xr_statistic.actor_statistic.best_monster].icon)
-end
-function get_favorite_weapon()
-	if not(xr_statistic.actor_statistic.favorite_weapon_sect) then
-		return "wpn_knife"
-	end
-		return xr_statistic.actor_statistic.favorite_weapon_sect
+	return ""
 end
 
 local primary_objects_tbl =
@@ -440,43 +357,7 @@ function add_quick_slot_items_on_game_start()
 end
 
 function change_anomalies_names()
-	-- not used in CoC
-	--[[
-	if has_alife_info("jup_b32_scanner_reward") then
-		for k,v in pairs(change_objects_tbl) do
-			if has_alife_info(v.group) and not v.enabled then
-				v.enabled = true
-			end
-		end
-	end
 
-	if level.name() ~= "jupiter" then
-		return
-	end
-	for k,v in pairs(change_objects_tbl) do
-		if v.enabled then
-			local obj_id = get_story_object_id(v.target)
-			if (obj_id) and (level.map_has_object_spot(obj_id, "primary_object") ~= 0) then
-				level.map_remove_object_spot(obj_id, "primary_object")
-			end
-			local hint = game.translate_string(v.hint).."\\n".." \\n"
-			local has_af = false
-			local af_table = {}
-			has_af, af_table = xr_conditions.anomaly_has_artefact(db.actor, nil, {v.zone})
-			if has_af then
-				hint = hint..game.translate_string("st_jup_b32_has_af")
-				for k,v in pairs(af_table) do
-					hint = hint.."\\n"..game.translate_string("st_"..v.."_name")
-				end
-			else
-				hint = hint..game.translate_string("st_jup_b32_no_af")
-			end
-			if (obj_id) and level.map_has_object_spot(obj_id, "primary_object") == 0 then
-				level.map_add_object_spot(obj_id, "primary_object", hint)
-			end
-		end
-	end
-	--]]
 end
 
 local function npc_on_net_spawn(npc,se_obj)
@@ -514,22 +395,23 @@ function calculate_rankings()
 			end
 		end
 	end
-		coc_ranking_list = iempty_table(coc_ranking_list)
-		-- sort by highest rank first
+	
+	coc_ranking_list = iempty_table(coc_ranking_list)
+	-- sort by highest rank first
 	for id,rank in spairs(t, function(t,a,b) return t[a] > t[b] end) do
 		table.insert(coc_ranking_list,id)
 		if (id == 0) then
 			actor_rank_place = #coc_ranking_list
 		end
 	end
-		-- force actor into last visible slot + 1 on ranking list
-	coc_ranking_list[coc_ranking_array_size+1] = actor_rank_place > coc_ranking_array_size and 0 or nil
+	
+	-- force actor into last visible slot + 1 on ranking list
+	coc_ranking_list[coc_ranking_array_size+1] = 0
 end
 
 -- called from engine! It's how many character rankings to display! u8 (max 255)
 function get_rankings_array_size()
-	-- +1 because we want to show actor at size+1 if he is off the list
-	return coc_ranking_array_size+1
+	return coc_ranking_array_size
 end	
 
 -- called from engine! must return bool!
@@ -655,7 +537,7 @@ function coc_rankings_set_icon(index)
 	return ""
 end
 
-function coc_rankings_use_background(index)
+function coc_rankings_show_border(index)
 	local se_obj = coc_ranking_list[index] ~= nil and alife():object(coc_ranking_list[index])
 	return se_obj and se_obj.id == 0 or false
 end
