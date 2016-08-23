@@ -560,6 +560,16 @@ function actor_visited_all_levels()
 	return true
 end
 
+function get_levels_visited_count()
+	local count = -1 -- fake_start increases this by 1.
+	for level,v in pairs(actor_statistic.visited) do 
+		if (v == true) then
+			count = count + 1
+		end
+	end
+	return count
+end
+
 -- Notes --
 -- These methods are disabled in-engine:
 -- db.actor:change_character_rank(num)
