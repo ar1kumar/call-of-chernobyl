@@ -87,7 +87,10 @@ rank_rep = {
 			arena_boro			=	{rnk=75,	rpt=150},
 			arena_trad			=	{rnk=100,	rpt=200},
 			surges				=	{rnk=5,		rpt=0},
+			dressing			=	{rnk=1,		rpt=0},
 			boxes				=	{rnk=5,		rpt=0},
+			forfeits			=	{rnk=5,		rpt=0},
+			levels				=	{rnk=0,		rpt=0},
 			storms				=	{rnk=5,		rpt=0},
 			tasks				=	{rnk=50,	rpt=100},
 			tasks_fail			=	{rnk=0,		rpt=-100},
@@ -276,18 +279,18 @@ function inc_boxes_smashed_counter()
 end
 function inc_field_dressings_counter()
 	actor_statistic.field_dressings = actor_statistic.field_dressings + 1
-	inc_actor_rank(rank_rep.boxes.rnk)
-	inc_actor_reputation(rank_rep.boxes.rpt)
+	inc_actor_rank(rank_rep.dressing.rnk)
+	inc_actor_reputation(rank_rep.dressing.rpt)
 end
 function inc_enemies_surrendered_counter()
 	actor_statistic.enemies_surrendered = actor_statistic.enemies_surrendered + 1
-	inc_actor_rank(rank_rep.boxes.rnk)
-	inc_actor_reputation(rank_rep.boxes.rpt)
+	inc_actor_rank(rank_rep.forfeits.rnk)
+	inc_actor_reputation(rank_rep.forfeits.rpt)
 end
 function inc_level_changes_counter()
 	actor_statistic.level_changes = actor_statistic.level_changes + 1
-	inc_actor_rank(rank_rep.boxes.rnk)
-	inc_actor_reputation(rank_rep.boxes.rpt)
+	inc_actor_rank(rank_rep.levels.rnk)
+	inc_actor_reputation(rank_rep.levels.rpt)
 end
 function inc_founded_secrets_counter()
 	actor_statistic.founded_secrets = actor_statistic.founded_secrets + 1
