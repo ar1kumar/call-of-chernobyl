@@ -312,10 +312,10 @@ function duga_free_requirements()
 end
 
 -- Geologist.
--- Requires 25 artefacts be detected by the player.
+-- Requires 50 artefacts be detected by the player.
 function geologist_requirements()
 	return (
-				(xr_statistic.actor_statistic.artefacts_detected >= 25)
+				(xr_statistic.actor_statistic.artefacts_detected >= 50)
 		)
 end
 
@@ -328,10 +328,10 @@ function heavy_pockets_requirements()
 end
 
 -- Infopreneur.
--- Requires player to deliver 25 PDAs.
+-- Requires player to deliver 50 PDAs.
 function infopreneur_requirements()
 	return (
-				(xr_statistic.actor_statistic.pdas_delivered >= 25)
+				(xr_statistic.actor_statistic.pdas_delivered >= 50)
 		)
 end
 
@@ -373,18 +373,19 @@ function radiotherapy_requirements()
 end
 
 -- Rag and Bone.
--- Requires 75 stashes be found and looted.
+-- Requires 100 stashes be found and looted.
 function rag_and_bone_requirements()
 	return (
-				(xr_statistic.actor_statistic.founded_secrets >= 75)
+				(xr_statistic.actor_statistic.founded_secrets >= 100)
 		)
 end
 
 -- Silver or Lead.
--- Requires player to kill 500 stalkers.
+-- Requires player to kill 500 stalkers or have 50 surrender to you.
 function silver_or_lead_requirements()
 	return (
 				(xr_statistic.actor_statistic.killed_stalkers >= 500)
+			 or (xr_statistic.actor_statistic.enemies_surrendered >= 50)
 		)
 end
 
@@ -397,10 +398,11 @@ function tourist_requirements()
 end
 
 -- Well Dressed.
--- Requires player to kill 500 mutants.
+-- Requires player to kill 500 mutants or field dress 250 mutant parts.
 function well_dressed_requirements()
 	return (
 				(xr_statistic.actor_statistic.killed_monsters >= 500)
+			 or (xr_statistic.actor_statistic.field_dressings >= 250)
 		)
 end
 
