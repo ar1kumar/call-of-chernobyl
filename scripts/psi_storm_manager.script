@@ -21,7 +21,6 @@ local prev_sec 				= -1
 local prev_game_sec 		= -1
 local diff_sec 				= -1
 local diff_game_sec			= -1
-local artifact_chance 		= 0.05
 
 local function actor_on_update(binder,delta)
 	if (PsiStormManager) then
@@ -35,12 +34,7 @@ end
 
 class "CPsiStormManager"
 function CPsiStormManager:__init()
-	self.artifacts = { 	af_electra_flash 		= 0.25,
-						af_dummy_dummy 			= 0.10,
-						af_ice 					= 0.05,
-						af_electra_moonlight	= 0.45,
-						af_cristall_flower 		= 0.15
-						}
+
 end
 
 function CPsiStormManager:initialize()
@@ -276,7 +270,6 @@ function CPsiStormManager:update()
 				local life_time=diff_sec-vortex.start_time
 				if life_time>=20 and vortex.hit==false then
 					self:kill_crows_at_pos(vortex.sound_pos)
-					self:spawn_artefact(vortex.sound_pos)
 					if (atmosfear_options.config:r_value("atmosfear_current_parameters","opt_psi_storm_fate",0,"unhurt")~="unhurt") then
 						self:kill_obj_at_pos(vortex.sound_pos)
 					end
@@ -317,28 +310,6 @@ function CPsiStormManager:vortex()
 	if self.vortexes[self.vortex_index].sound ~= nil then
 		self.vortexes[self.vortex_index].sound:play_at_pos(db.actor, self.vortexes[self.vortex_index].sound_pos)
 		self.vortexes[self.vortex_index].sound.volume = 1
-	end
-end
-
-function CPsiStormManager:spawn_artefact(pos)
-	local sum=0
-	for artefact,prob in pairs(self.artifacts) do
-		sum=sum+prob
-	end
-	local rnd=math.random()*sum
-	local artefact_to_spawn
-	for artefact,prob in pairs(self.artifacts) do
-		artefact_to_spawn=artefact
-		rnd=rnd-prob
-		if (rnd<=0) then
-			break
-		end
-	end
-	local chance = math.random(1,100)/100
-	--af_electra_flash 4000ru, af_dummy_dummy 12000, af_ice 18000, af_electra_moonlight 6000,af_cristall_flower 3000
-	if chance <= artifact_chance then
-		alife():create(artefact_to_spawn, pos, 0, 0, -1)
-	else
 	end
 end
 
@@ -401,7 +372,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 			local squad_npcs = surge_manager.get_squad_members(squad.id)
 			local fate = atmosfear_options.config:r_value("atmosfear_current_parameters","opt_psi_storm_fate",0,"kill")
 			for kk,vv in pairs(squad_npcs) do
-				local obj = alife():object(kk)
+				local obj = sim:object(kk)
 				if(obj and not(get_object_story_id(obj.id))) then
 					if (surge_manager.check_squad_smart_props(squad.id)) then
 						local cl_obj = level.object_by_id(obj.id)

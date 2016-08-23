@@ -189,10 +189,8 @@ function dream_callback()
 	printf("dream_callback hours=%s",hours)
 	level.change_game_time(0,hours,0)
 	
-	surge_manager.SurgeManager.time_forwarded = true
-	if (psi_storm_manager) then
-		psi_storm_manager.PsiStormManager.time_forwarded = true
-	end
+	surge_manager.get_surge_manager().time_forwarded = true
+	psi_storm_manager.get_psi_storm_manager().time_forwarded = true
 		
 	if(surge_manager.is_started() and level_weathers.get_weather_manager().weather_fx) then
 		level.stop_weather_fx()
