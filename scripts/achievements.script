@@ -15,6 +15,21 @@ function can_unlock()
 	end
 end
 
+-- Returns how many achievements are available.
+function get_achievements_available()
+	local available = 14
+	-- 'Duga Free' and 'Wishful Thinking'.
+	if (has_alife_info("story_mode_disabled")) then
+		available = available - 2
+	end
+	-- 'Radiotherapy'.
+	if (character_community(db.actor) == "actor_monolith"
+	or character_community(db.actor) == "actor_zombied") then
+		available = available - 1
+	end
+	return available
+end
+
 --------------------
 ----- Functors -----
 --------------------
@@ -312,10 +327,10 @@ function duga_free_requirements()
 end
 
 -- Geologist.
--- Requires 25 artefacts be detected by the player.
+-- Requires 50 artefacts be detected by the player.
 function geologist_requirements()
 	return (
-				(xr_statistic.actor_statistic.artefacts_detected >= 25)
+				(xr_statistic.actor_statistic.artefacts_detected >= 50)
 		)
 end
 
@@ -328,10 +343,10 @@ function heavy_pockets_requirements()
 end
 
 -- Infopreneur.
--- Requires player to deliver 25 PDAs.
+-- Requires player to deliver 50 PDAs.
 function infopreneur_requirements()
 	return (
-				(xr_statistic.actor_statistic.pdas_delivered >= 25)
+				(xr_statistic.actor_statistic.pdas_delivered >= 50)
 		)
 end
 
@@ -373,18 +388,19 @@ function radiotherapy_requirements()
 end
 
 -- Rag and Bone.
--- Requires 75 stashes be found and looted.
+-- Requires 100 stashes be found and looted.
 function rag_and_bone_requirements()
 	return (
-				(xr_statistic.actor_statistic.founded_secrets >= 75)
+				(xr_statistic.actor_statistic.founded_secrets >= 100)
 		)
 end
 
 -- Silver or Lead.
--- Requires player to kill 500 stalkers.
+-- Requires player to kill 500 stalkers or have 50 surrender to you.
 function silver_or_lead_requirements()
 	return (
 				(xr_statistic.actor_statistic.killed_stalkers >= 500)
+			 or (xr_statistic.actor_statistic.enemies_surrendered >= 50)
 		)
 end
 
@@ -397,10 +413,11 @@ function tourist_requirements()
 end
 
 -- Well Dressed.
--- Requires player to kill 500 mutants.
+-- Requires player to kill 500 mutants or field dress 250 mutant parts.
 function well_dressed_requirements()
 	return (
 				(xr_statistic.actor_statistic.killed_monsters >= 500)
+			 or (xr_statistic.actor_statistic.field_dressings >= 250)
 		)
 end
 
@@ -424,6 +441,7 @@ function completionist_rewards()
 	coc_treasure_manager.create_random_stash(nil, "Completionist's stash", {"af_oasis_heart"}, 15)
 	db.actor:give_info_portion("achieved_completionist")
 	news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.completionist.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.completionist.rpt)
 end
@@ -434,6 +452,7 @@ end
 function down_to_earth_rewards()
 	db.actor:give_info_portion("achieved_down_to_earth")
 	news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "down_to_earth", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.down_to_earth.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.down_to_earth.rpt)
 end
@@ -444,6 +463,7 @@ end
 function duga_free_rewards()
 	db.actor:give_info_portion("achieved_duga_free")
 	news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.duga_free.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.duga_free.rpt)
 end
@@ -454,6 +474,7 @@ end
 function geologist_rewards()
 	db.actor:give_info_portion("achieved_geologist")
 	news_manager.send_tip(db.actor, "st_achievement_13_unlock", nil, "geologist", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.geologist.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.geologist.rpt)
 end
@@ -464,6 +485,7 @@ end
 function heavy_pockets_rewards()
 	db.actor:give_info_portion("achieved_heavy_pockets")
 	news_manager.send_tip(db.actor, "st_achievement_1_unlock", nil, "heavy_pockets", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.heavy_pockets.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.heavy_pockets.rpt)
 end
@@ -474,6 +496,7 @@ end
 function infopreneur_rewards()
 	db.actor:give_info_portion("achieved_infopreneur")
 	news_manager.send_tip(db.actor, "st_achievement_3_unlock", nil, "infopreneur", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.infopreneur.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.infopreneur.rpt)
 end
@@ -484,6 +507,7 @@ end
 function mechanized_warfare_rewards()
 	db.actor:give_info_portion("achieved_mechanized_warfare")
 	news_manager.send_tip(db.actor, "st_achievement_7_unlock", nil, "mechanized_warfare", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.mechanized_warfare.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.mechanized_warfare.rpt)
 end
@@ -494,6 +518,7 @@ end
 function patriarch_rewards()
 	db.actor:give_info_portion("achieved_patriarch")
 	news_manager.send_tip(db.actor, "st_achievement_14_unlock", nil, "patriarch", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.patriarch.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.patriarch.rpt)
 	
@@ -508,6 +533,7 @@ end
 function radiotherapy_rewards()
 	db.actor:give_info_portion("achieved_radiotherapy")
 	news_manager.send_tip(db.actor, "st_achievement_2_unlock", nil, "radiotherapy", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.radiotherapy.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.radiotherapy.rpt)
 end
@@ -518,6 +544,7 @@ end
 function rag_and_bone_rewards()
 	db.actor:give_info_portion("achieved_rag_and_bone")
 	news_manager.send_tip(db.actor, "st_achievement_9_unlock", nil, "rag_and_bone", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.rag_and_bone.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.rag_and_bone.rpt)
 end
@@ -528,6 +555,7 @@ end
 function silver_or_lead_rewards()
 	db.actor:give_info_portion("achieved_silver_or_lead")
 	news_manager.send_tip(db.actor, "st_achievement_6_unlock", nil, "silver_or_lead", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.silver_or_lead.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.silver_or_lead.rpt)
 end
@@ -541,6 +569,7 @@ function tourist_rewards()
 	end
 	db.actor:give_info_portion("achieved_tourist")
 	news_manager.send_tip(db.actor, "st_achievement_8_unlock", nil, "tourist", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.tourist.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.tourist.rpt)
 end
@@ -551,6 +580,7 @@ end
 function well_dressed_rewards()
 	db.actor:give_info_portion("achieved_well_dressed")
 	news_manager.send_tip(db.actor, "st_achievement_5_unlock", nil, "well_dressed", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.well_dressed.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.well_dressed.rpt)
 end
@@ -562,6 +592,7 @@ function wishful_thinking_rewards()
 	xr_statistic.inc_actor_reputation(500)
 	db.actor:give_info_portion("achieved_wishful_thinking")
 	news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
+	xr_statistic.inc_achievements_counter()
 	xr_statistic.inc_actor_rank(xr_statistic.rank_rep.wishful_thinking.rnk)
 	xr_statistic.inc_actor_reputation(xr_statistic.rank_rep.wishful_thinking.rpt)
 end

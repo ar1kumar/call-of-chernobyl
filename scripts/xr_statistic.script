@@ -1,6 +1,7 @@
 -- Modified by Alundaio
 
 actor_statistic = {
+					achievements = 0,
 					actual_rank = 0,
 					actual_reputation = 0,
 					arena_battles = 0,
@@ -83,11 +84,15 @@ monster_classes = {
 
 rank_rep = {
 			-- Gameplay mechanics.
+			achievements		=	{rnk=0,		rpt=0},
 			arena_chal			=	{rnk=50,	rpt=100},
 			arena_boro			=	{rnk=75,	rpt=150},
 			arena_trad			=	{rnk=100,	rpt=200},
 			surges				=	{rnk=5,		rpt=0},
+			dressing			=	{rnk=1,		rpt=0},
 			boxes				=	{rnk=5,		rpt=0},
+			forfeits			=	{rnk=5,		rpt=0},
+			levels				=	{rnk=0,		rpt=0},
 			storms				=	{rnk=5,		rpt=0},
 			tasks				=	{rnk=50,	rpt=100},
 			tasks_fail			=	{rnk=0,		rpt=-100},
@@ -108,7 +113,8 @@ rank_rep = {
 			killed_friend		=	{rnk=0,		rpt=-150},
 			killed_neutral		=	{rnk=0,		rpt=-100},
 			
-			-- Achievements
+			-- Achievements. (Individual)
+			-- Global value can be defined above.
 			completionist 		=	{rnk=50,	rpt=0},
 			down_to_earth		=	{rnk=25,	rpt=0},
 			duga_free			=	{rnk=25,	rpt=0},
@@ -219,6 +225,11 @@ function load_state(data)
 	data.xr_statistic = nil
 end
 
+function inc_achievements_counter()
+	actor_statistic.achievements = actor_statistic.achievements + 1
+	inc_actor_rank(rank_rep.achievements.rnk)
+	inc_actor_reputation(rank_rep.achievements.rpt)
+end
 function inc_surges_counter()
 	actor_statistic.surges = actor_statistic.surges + 1
 	inc_actor_rank(rank_rep.surges.rnk)
@@ -276,18 +287,18 @@ function inc_boxes_smashed_counter()
 end
 function inc_field_dressings_counter()
 	actor_statistic.field_dressings = actor_statistic.field_dressings + 1
-	inc_actor_rank(rank_rep.boxes.rnk)
-	inc_actor_reputation(rank_rep.boxes.rpt)
+	inc_actor_rank(rank_rep.dressing.rnk)
+	inc_actor_reputation(rank_rep.dressing.rpt)
 end
 function inc_enemies_surrendered_counter()
 	actor_statistic.enemies_surrendered = actor_statistic.enemies_surrendered + 1
-	inc_actor_rank(rank_rep.boxes.rnk)
-	inc_actor_reputation(rank_rep.boxes.rpt)
+	inc_actor_rank(rank_rep.forfeits.rnk)
+	inc_actor_reputation(rank_rep.forfeits.rpt)
 end
 function inc_level_changes_counter()
 	actor_statistic.level_changes = actor_statistic.level_changes + 1
-	inc_actor_rank(rank_rep.boxes.rnk)
-	inc_actor_reputation(rank_rep.boxes.rpt)
+	inc_actor_rank(rank_rep.levels.rnk)
+	inc_actor_reputation(rank_rep.levels.rpt)
 end
 function inc_founded_secrets_counter()
 	actor_statistic.founded_secrets = actor_statistic.founded_secrets + 1
@@ -400,6 +411,12 @@ function set_best_weapon(hit_amount)
 	end	
 end
 
+function get_best_weapon()
+	local weapon_name = actor_statistic.favorite_weapon_sect
+	if (weapon_name == nil) then weapon_name = "wpn_knife" end
+	return game.translate_string(system_ini():r_string_ex(weapon_name, "inv_name"))
+end
+
 function save(package)
 	if (USE_MARSHAL) then
 		return
@@ -425,6 +442,7 @@ function save(package)
 	package:w_u16(actor_statistic.level_changes)
 	package:w_u16(actor_statistic.enemies_surrendered)
 	package:w_u16(actor_statistic.field_dressings)
+	package:w_u16(actor_statistic.achievements)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
 
@@ -493,6 +511,7 @@ function load(package)
 	actor_statistic.level_changes		= package:r_u16()
 	actor_statistic.enemies_surrendered	= package:r_u16()
 	actor_statistic.field_dressings		= package:r_u16()
+	actor_statistic.achievements		= package:r_u16()
 
 	local str = package:r_stringZ()
 	if(str~="nil") then
@@ -539,6 +558,16 @@ function actor_visited_all_levels()
 		end
 	end
 	return true
+end
+
+function get_levels_visited_count()
+	local count = -1 -- fake_start increases this by 1.
+	for level,v in pairs(actor_statistic.visited) do 
+		if (v == true) then
+			count = count + 1
+		end
+	end
+	return count
 end
 
 -- Notes --
