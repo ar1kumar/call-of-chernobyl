@@ -1,6 +1,7 @@
 -- Modified by Alundaio
 
 actor_statistic = {
+					achievements = 0,
 					actual_rank = 0,
 					actual_reputation = 0,
 					arena_battles = 0,
@@ -83,6 +84,7 @@ monster_classes = {
 
 rank_rep = {
 			-- Gameplay mechanics.
+			achievements		=	{rnk=0,		rpt=0},
 			arena_chal			=	{rnk=50,	rpt=100},
 			arena_boro			=	{rnk=75,	rpt=150},
 			arena_trad			=	{rnk=100,	rpt=200},
@@ -111,7 +113,8 @@ rank_rep = {
 			killed_friend		=	{rnk=0,		rpt=-150},
 			killed_neutral		=	{rnk=0,		rpt=-100},
 			
-			-- Achievements
+			-- Achievements. (Individual)
+			-- Global value can be defined above.
 			completionist 		=	{rnk=50,	rpt=0},
 			down_to_earth		=	{rnk=25,	rpt=0},
 			duga_free			=	{rnk=25,	rpt=0},
@@ -222,6 +225,11 @@ function load_state(data)
 	data.xr_statistic = nil
 end
 
+function inc_achievements_counter()
+	actor_statistic.achievements = actor_statistic.achievements + 1
+	inc_actor_rank(rank_rep.achievements.rnk)
+	inc_actor_reputation(rank_rep.achievements.rpt)
+end
 function inc_surges_counter()
 	actor_statistic.surges = actor_statistic.surges + 1
 	inc_actor_rank(rank_rep.surges.rnk)
@@ -434,6 +442,7 @@ function save(package)
 	package:w_u16(actor_statistic.level_changes)
 	package:w_u16(actor_statistic.enemies_surrendered)
 	package:w_u16(actor_statistic.field_dressings)
+	package:w_u16(actor_statistic.achievements)
 	package:w_stringZ(tostring(actor_statistic.best_monster))
 	package:w_stringZ(tostring(actor_statistic.favorite_weapon_sect))
 
@@ -502,6 +511,7 @@ function load(package)
 	actor_statistic.level_changes		= package:r_u16()
 	actor_statistic.enemies_surrendered	= package:r_u16()
 	actor_statistic.field_dressings		= package:r_u16()
+	actor_statistic.achievements		= package:r_u16()
 
 	local str = package:r_stringZ()
 	if(str~="nil") then

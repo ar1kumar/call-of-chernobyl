@@ -139,6 +139,8 @@ function get_stat(index) -- index= int        return string
 	elseif(index==15) then 
 		return xr_statistic.get_best_weapon()
 	elseif(index==16) then 
+		return tostring(xr_statistic.actor_statistic.achievements .. "/" .. achievements.get_achievements_available())
+	elseif(index==17) then 
 		return tostring(db.actor:money()) .. " RU"
 	end
 	return ""
