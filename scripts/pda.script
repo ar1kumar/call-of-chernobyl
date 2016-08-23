@@ -137,6 +137,8 @@ function get_stat(index) -- index= int        return string
 	elseif(index==14) then 
 		return tostring(xr_statistic.actor_statistic.field_dressings)
 	elseif(index==15) then 
+		return xr_statistic.get_best_weapon()
+	elseif(index==16) then 
 		return tostring(db.actor:money()) .. " RU"
 	end
 	return ""

@@ -403,6 +403,12 @@ function set_best_weapon(hit_amount)
 	end	
 end
 
+function get_best_weapon()
+	local weapon_name = actor_statistic.favorite_weapon_sect
+	if (weapon_name == nil) then weapon_name = "wpn_knife" end
+	return game.translate_string(system_ini():r_string_ex(weapon_name, "inv_name"))
+end
+
 function save(package)
 	if (USE_MARSHAL) then
 		return
