@@ -399,7 +399,7 @@ function calculate_rankings()
 	
 	for i=1,65534 do
 		local se_obj = sim:object(i)
-		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:community() ~= "zombied" and se_obj:community() ~= "trader") then
+		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and se_obj:community() ~= "zombied" and se_obj:community() ~= "trader") then
 			-- Check if object has a story id, if it does they are probably unique
 			local sid = sor:get_story_id(se_obj.id)
 			if not (sid) then
