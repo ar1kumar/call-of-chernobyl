@@ -1892,7 +1892,7 @@ function debug_ui_spawner:InitControls(x, y, xml, owner)
 	local board = SIMBOARD
 	local smrts = {}
 	for id,t in pairs(board.smarts) do
-		if (t.smrt and actor_level == t.smrt.smart_level) then
+		if (t.smrt and self.is_on_actor_level) then
 			smrts[#smrts+1] = t.smrt:name()
 		end
 	end
