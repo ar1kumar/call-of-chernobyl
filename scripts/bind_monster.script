@@ -384,7 +384,7 @@ function generic_object_binder:load(reader)
 end
 -----------------------------------------------------------------------------------------------------------------
 function generic_object_binder:save_state(m_data)
-	alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
+	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
 	local id = self.object and self.object:id()
 	local st = id and db.storage[id]
 	if not (st) then
@@ -402,7 +402,7 @@ function generic_object_binder:save_state(m_data)
 	state.xr_logic.activation_game_time = st.activation_game_time
 
 	db.storage[id].pstor = db.storage[id].pstor or {}
-	alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
 end
 
 function generic_object_binder:load_state()

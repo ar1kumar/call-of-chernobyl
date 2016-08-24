@@ -92,13 +92,14 @@ function se_smart_terrain:on_register()
 	local sim = alife()
 	local gg = game_graph()
 	local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
+	local smart_level = alife():level_name(game_graph():vertex(self.m_game_vertex_id):level_id())
 	
-	self.smart_level = alife():level_name(game_graph():vertex(self.m_game_vertex_id):level_id())
+	self.is_on_actor_level = actor_level == actor_level or nil
 
 	-- Disable any smart terrain that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
-	if not (actor_level == self.smart_level) then
+	if not (self.is_on_actor_level) then
 		if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
-			if not (string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),self.smart_level)) then
+			if not (string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),smart_level)) then
 				SIMBOARD.smarts[self.id] = nil
 				self.disabled = true
 				--alun_utils.debug_write(strformat("%s:%s:ON_REGISTER END (DISABLED)",self:name(),self.id))
@@ -436,6 +437,10 @@ function se_smart_terrain:load_jobs()
 		return
 	end
 	
+	if not (self.is_on_actor_level) then 
+		return
+	end
+	
 	--alun_utils.debug_write(strformat("%s:%s:load_jobs %s  Before",self:name(),self.id,obj and obj:name()))
 
 	-- load job data from dynamic ltx from gulag_general.script
@@ -555,6 +560,9 @@ end
 function se_smart_terrain:update_jobs()
 	if (self.disabled) then
 		return
+	end
+	if not (self.is_on_actor_level) then 
+		return 
 	end
 	
 	-- Fill NPC Job Info and Give them a job
