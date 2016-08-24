@@ -82,18 +82,18 @@ function DynamicNewsManager:__init()
 	CreateTimeEvent("DynamicNewsManager","NewsTick",10*level.get_time_factor(),self.NewsTick,self)
 	CreateTimeEvent("DynamicNewsManager","TickSpecialEvent",10*level.get_time_factor(),self.TickSpecialEvent,self)
 
-	RegisterScriptCallback("monster_on_death_callback", self.monster_on_death_callback, self)
-	--RegisterScriptCallback("monster_on_net_spawn", self.monster_on_net_spawn, self)	
-	RegisterScriptCallback("npc_on_death_callback", self.npc_on_death_callback, self)
-	--RegisterScriptCallback("npc_on_hear_callback", self.npc_on_hear_callback, self)
+	RegisterScriptCallback("monster_on_death_callback",self)
+	--RegisterScriptCallback("monster_on_net_spawn",self)	
+	RegisterScriptCallback("npc_on_death_callback",self)
+	--RegisterScriptCallback("npc_on_hear_callback",self)
 end
 
 function DynamicNewsManager:destroy()
 	RemoveTimeEvent("DynamicNewsManager","NewsTick")
 	RemoveTimeEvent("DynamicNewsManager","TickSpecialEvent")
-	UnregisterScriptCallback("monster_on_death_callback", self.monster_on_death_callback)
-	--UnregisterScriptCallback("monster_on_net_spawn", self.monster_on_net_spawn)	
-	UnregisterScriptCallback("npc_on_death_callback", self.npc_on_death_callback)
+	UnregisterScriptCallback("monster_on_death_callback",self)
+	--UnregisterScriptCallback("monster_on_net_spawn",self)	
+	UnregisterScriptCallback("npc_on_death_callback",self)
 end
 
 function DynamicNewsManager:NewsTick()

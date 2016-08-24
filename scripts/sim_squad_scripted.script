@@ -225,14 +225,6 @@ function sim_squad_scripted:assigned_target_avaliable()
 end
 
 local function can_help_actor(squad)
-	-- Alundaio
-	if (axr_main) then
-		if (axr_main.squad_can_help_actor(squad)) then
-			return true
-		end
-	end
-	-- Alundaio
-	
 	if is_empty(xr_combat_ignore.fighting_with_actor_npcs) then
 		return false
 	end
@@ -242,52 +234,15 @@ local function can_help_actor(squad)
 		return false
 	end
 
-	--[[
-	if has_alife_info("sim_duty_help_harder") and squad:get_squad_community() == "duty" then
-		return true
-	elseif has_alife_info("sim_freedom_help_harder") and squad:get_squad_community() == "freedom" then
-		return true
-	elseif has_alife_info("sim_stalker_help_harder") and squad:get_squad_community() == "stalker" then
-		return true
-	end
-	--]]
 	return false
 end
 
 local function get_help_target_id(squad)
-
 	if (IsSurvivalMode()) then
 		if (squad.player_id == "zombied" or _g.is_squad_monster[squad.player_id]) then
 			return 0
 		end
 	end 
-	
-	-- Alundaio
-	local target_id = axr_main and axr_main.squad_assign_new_target(squad)
-	if (target_id and alife():object(target_id)) then
-		return target_id
-	end
-	-- End Alundaio
-
-	--[[
-	if not can_help_actor(squad) then
-		return
-	end
-
-	local enemy_squad_id
-	local target_squad
-	for k,v in pairs (xr_combat_ignore.fighting_with_actor_npcs) do
-		enemy_squad_id = alife():object(k).group_id
-		if enemy_squad_id ~= nil then
-			target_squad = alife():object(enemy_squad_id)
-			if target_squad and squad.position:distance_to_sqr(target_squad.position) < 150^2 and
-				game_relations.is_factions_enemies(squad:get_squad_community(), target_squad:get_squad_community()) then
-				return enemy_squad_id
-			end
-		end
-	end
-
-	--]]
 
 	return
 end
@@ -931,7 +886,6 @@ function sim_squad_scripted:on_register()
 end
 function sim_squad_scripted:on_unregister()
 	--alun_utils.debug_write("sim_squad_scripted:on_unregister")
-	cse_alife_online_offline_group.on_unregister( self )
 	unregister_story_object_by_id(self.id)
 	SendScriptCallback("squad_on_unregister",self)
 	SIMBOARD.squads[self.id] = nil
@@ -949,6 +903,7 @@ function sim_squad_scripted:on_unregister()
 	--if (USE_MARSHAL) then 
 	--	UnregisterScriptCallback("save_state",self)
 	--end
+	cse_alife_online_offline_group.on_unregister(self)
 end
 
 function sim_squad_scripted:can_switch_offline()

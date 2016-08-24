@@ -121,8 +121,8 @@ function container_binder:net_spawn(sobject)
 end
 -- Net destroy
 function container_binder:net_destroy()
-    object_binder.net_destroy(self)
 	containers[self.object:id()] = nil
+	object_binder.net_destroy(self)
 end
 -- Standart function for save
 function container_binder:net_save_relevant()

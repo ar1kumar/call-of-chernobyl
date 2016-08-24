@@ -17,7 +17,6 @@ local ini = ini_file("plugins\\itms_manager.ltx")
 
 	-- Sleep bag mod
 	local SleepBagEnable = ini:r_bool_ex("sleeping_bag","enable",true)
-	local SleepBagEnableDangerous = SleepBagEnable and ini:r_bool_ex("sleeping_bag","dangerous_sleep",false)
 	local SleepBagRadius = SleepBagEnable and ini:r_float_ex("sleeping_bag","unsafe_radius") or 5000
 	local SleepBagPlaceable = SleepBagEnable and ini:r_bool_ex("sleeping_bag","use_placeable",false)
 	local SleepBagGameStart = SleepBagEnable and ini:r_bool_ex("sleeping_bag","have_at_start",false)
@@ -59,7 +58,7 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_item_use",actor_on_item_use)
 	RegisterScriptCallback("actor_on_item_take_from_box",actor_on_item_take_from_box)
 	RegisterScriptCallback("physic_object_on_use_callback",physic_object_on_use_callback)
-	RegisterScriptCallback("squad_assign_new_target",squad_assign_new_target)
+
 	RegisterScriptCallback("CUIActorMenu_OnItemDropped",on_item_drag_dropped)
 	RegisterScriptCallback("CUIActorMenu_OnItemFocusReceive",on_item_focus)
 end
@@ -539,31 +538,6 @@ function physic_object_on_use_callback(obj,who)
 		end
 		local se_obj = alife():object(obj:id())
 		local ui = ui_sleep_dialog.sleep_bag(obj:id(),se_obj.sleepbag_section)
-	end
-end
-
-sleep_actor_safe = nil
-function squad_assign_new_target(squad)
-	if not (SleepBagEnableDangerous) then
-		return
-	end
-
-	if not (sleep_actor_safe) then
-		return
-	end
-
-	if not (has_alife_info("actor_is_sleeping")) then
-		return
-	end
-
-	if not (game_relations.get_squad_goodwill_to_actor_by_id(squad.id) == "enemy") then
-		return
-	end
-
-	local dist = db.actor:position():distance_to_sqr(squad.position)
-	if (dist < SleepBagRadius) then
-		--printf("actor is target")
-		return 0
 	end
 end
 

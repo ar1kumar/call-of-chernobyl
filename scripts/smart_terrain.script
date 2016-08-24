@@ -74,7 +74,7 @@ function se_smart_terrain:__init(section) super(section)
 	self.arriving_npc  = {}
 	self.__campfire_check_time = game.get_game_time()
 	--if (USE_MARSHAL) then 
-	--	RegisterScriptCallback("save_state",self.save_state,self)
+	--	RegisterScriptCallback("save_state",self)
 	--end
 	--alun_utils.debug_write(strformat("%s:%s Init",self:name(),self.id))
 end
@@ -129,13 +129,13 @@ function se_smart_terrain:on_register()
 end
 
 function se_smart_terrain:on_unregister()
-	cse_alife_smart_zone.on_unregister(self)
 	SIMBOARD:unregister_smart(self)
 	unregister_story_object_by_id(self.id)
 	simulation_objects.get_sim_obj_registry():unregister(self)
 	--if (USE_MARSHAL) then 
 	--	UnregisterScriptCallback("save_state",self)
 	--end
+	cse_alife_smart_zone.on_unregister(self)
 end
 
 function se_smart_terrain:read_params()
@@ -1059,7 +1059,7 @@ function se_smart_terrain:init_npc_after_load()
 
 			if (new_info.job) then
 				self.npc_by_job_section[new_info.job.section] = id
-				new_info.begin_job = false --info.begin_job
+				new_info.begin_job = info.begin_job
 				new_info.need_job = info.need_job
 			end
 
@@ -1359,26 +1359,25 @@ function setup_gulag_and_logic_on_spawn(obj, st, se_obj, stype, loaded)
 	-- Expedite arrival and job assignment
 	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and sim:object(se_obj.m_smart_terrain_id)
 	if (smart) then
-		--[[
-		if (smart.arriving_npc[se_obj.id] and arrived_to_smart(se_obj,smart)) then 
-			smart.npc_info[se_obj.id] = smart:fill_npc_info(se_obj)
-			smart.arriving_npc[se_obj.id] = nil
-			npc_info.begin_job = true
-			empty_table(db.offline_objects[se_obj.id])
-			smart:select_npc_job(smart.npc_info[se_obj.id],true)
-		end 
-		--]]
 		local npc_info = smart.npc_info[se_obj.id]
 		if (npc_info) then 
 			if not (npc_info.job) then
 				smart:select_npc_job(smart.npc_info[se_obj.id],true)
-				return
+				local smart_task = smart.npc_info[se_obj.id].job and smart.npc_info[se_obj.id].job.alife_task
+				if (smart_task) then 
+					db.spawned_vertex_by_id[se_obj.id] = smart_task:level_vertex_id()
+				end
 			elseif (npc_info.job) then
+				-- if already job begin then don't spawn at job
+				local smart_task = npc_info.begin_job ~= true and npc_info.job and npc_info.job.alife_task or nil
+				if (smart_task) then 
+					db.spawned_vertex_by_id[se_obj.id] = smart_task:level_vertex_id()
+				end
 				npc_info.begin_job = true
 				empty_table(db.offline_objects[se_obj.id])
 				smart:setup_logic(obj)
-				return
 			end
+			return
 		end
 	end
 

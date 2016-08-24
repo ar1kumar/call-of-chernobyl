@@ -42,7 +42,7 @@ function motivator_binder:reinit()
 	self.object:enable_vision(false)
 		
 	if (USE_MARSHAL) then
-		RegisterScriptCallback("save_state",self.save_state,self)
+		RegisterScriptCallback("save_state",self)
 	end
 	--alun_utils.debug_write(self.object:name()..":motivator_reinit() end")
 end
@@ -134,23 +134,9 @@ function motivator_binder:net_spawn(sobject)
 	if (db.offline_objects[id] and db.offline_objects[id].level_vertex_id) then
 		force_set_position = level.vertex_position(db.offline_objects[id].level_vertex_id)
 		db.offline_objects[id].level_vertex_id = nil
-	else
-		-- Try force position for spawn position assigned by squad object
-		if (db.spawned_vertex_by_id[id]) then
-			force_set_position = level.vertex_position(db.spawned_vertex_by_id[id])
-			db.spawned_vertex_by_id[id] = nil
-		end
-		
-		-- Try force position to alife smart task position
-		if (sobject.m_smart_terrain_id ~= 65535) then
-			local smart = alife():object(sobject.m_smart_terrain_id)
-			if (smart and not smart.disabled) then
-				if (smart.npc_info[id] and smart.npc_info[id].job) then
-					local smart_task = smart.npc_info[id].job.alife_task
-					force_set_position = smart_task and smart_task:position() or force_set_position or nil
-				end
-			end
-		end
+	elseif (db.spawned_vertex_by_id[id]) then
+		force_set_position = level.vertex_position(db.spawned_vertex_by_id[id])
+		db.spawned_vertex_by_id[id] = nil
 	end
 
 	if (force_set_position) then
@@ -205,7 +191,7 @@ function motivator_binder:net_destroy()
 	self.object:set_callback(callback.death,nil)
 	self.object:set_callback(callback.sound,nil)
 	self.object:set_callback(callback.take_item_from_box,nil)
-		-- start [Alundaio]
+	-- start [Alundaio]
 	SendScriptCallback("npc_on_net_destroy",self.object)
 	-- end [Alundaio]
 	xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] = nil
@@ -229,15 +215,15 @@ function motivator_binder:net_destroy()
 		db.offline_objects[self.object:id()].active_section = db.storage[self.object:id()].active_section
 	end
 
-	--db.storage[self.object:id()] = nil
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self)
+	end
 
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
-	object_binder.net_destroy(self)
-	if (USE_MARSHAL) then
-		UnregisterScriptCallback("save_state",self.save_state)
-	end
 	alife_storage_manager.get_state().game_object[self.object:id()] = nil
+	
+	object_binder.net_destroy(self)
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
@@ -378,12 +364,14 @@ end
 
 function motivator_binder:update(delta)
 	object_binder.update(self, delta)
-		--alun_utils.debug_write(strformat("motivator_bind:update %s START",self.object and self.object:name()))
+	--alun_utils.debug_write(strformat("motivator_bind:update %s START",self.object and self.object:name()))
 
 	local object = self.object
 	local id = object:id()
 	local st = db.storage[id]
 
+	--alun_utils.debug_nearest(object,"motivator_binder:update(%s)",delta)
+	
 	-- check dead
 	local object_alive = object:alive()
 	if not (object_alive) then
@@ -395,33 +383,39 @@ function motivator_binder:update(delta)
 		--alun_utils.debug_write("motivator_bind:update %s END 1",self.object and self.object:name())
 		return
 	end
-		xr_meet.process_npc_usability(object)
+	
+	xr_meet.process_npc_usability(object)
 	sr_light.check_light(object)
-		if not (object:best_enemy()) then
+	
+	if not (object:best_enemy()) then
 		xr_combat_ignore.fighting_with_actor_npcs[id] = nil
 	end
-		self.squad = self.squad or get_object_squad(object)
+	
+	self.squad = self.squad or get_object_squad(object)
 	if (self.squad and self.squad:commander_id() == id) then
 		self.squad:update()
 	end
-		if (self.st.state_mgr) then
+	if (self.st.state_mgr) then
 		self.st.state_mgr:update()
 		if (self.st.state_mgr.combat ~= true and self.st.state_mgr.alife ~= true) then
 			trade_manager.update(object)
 		end
 	end
-		local tg = time_global()
+	
+	local tg = time_global()
 	if (self.__tmr and tg < self.__tmr) then
 		--alun_utils.debug_write("motivator_bind:update %s END 2",self.object and self.object:name())
 		return
 	end
 	self.__tmr = tg+500
-		-- DOOR
+	
+	-- DOOR
 	ph_door.try_to_open_door(self.object, self.opened_doors)
 	ph_door.try_to_close_door(self.object, self.opened_doors)
-		stalker_generic.update_invulnerability(object)
+	
+	stalker_generic.update_invulnerability(object)
 	xr_sound.update(id)
-		local st_combat = st.combat
+	local st_combat = st.combat
 	if (st.active_scheme) then
 		local switched
 		if (st_combat) then
@@ -451,12 +445,12 @@ function motivator_binder:update(delta)
 	elseif (st_combat) then
 		xr_combat.set_combat_type(object, db.actor, st_combat)
 	end
-		--alun_utils.debug_write("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name())
+	--alun_utils.debug_write("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name())
 
 	-- Start [Alundaio]
 	SendScriptCallback("npc_on_update",object,db.storage[id])
 	-- End [Alundaio]
-		--alun_utils.debug_write("motivator_bind:update %s END 3 AFTER AXR_MAIN",self.object and self.object:name())
+	--alun_utils.debug_write("motivator_bind:update %s END 3 AFTER AXR_MAIN",self.object and self.object:name())
 end
 
 function motivator_binder:reload(section)
@@ -474,8 +468,8 @@ function motivator_binder:save(packet)
 		if (USE_MARSHAL) then
 		return
 	end
-		--alun_utils.debug_write("\n-------motivator save start------ "..self.object:name(),true)
-		xr_logic.save_obj(self.object, packet)
+	--alun_utils.debug_write("\n-------motivator save start------ "..self.object:name(),true)
+	xr_logic.save_obj(self.object, packet)
 	trade_manager.save(self.object, packet)
 	xr_sound.save_npc(packet, self.object:id())
 
@@ -493,11 +487,11 @@ function motivator_binder:load(reader)
 		end
 		return
 	end
-		--alun_utils.debug_write("\nmotivator load start "..self.object:name(),true)	
-		xr_logic.load_obj(self.object, reader)
+	--alun_utils.debug_write("\nmotivator load start "..self.object:name(),true)	
+	xr_logic.load_obj(self.object, reader)
 	trade_manager.load(self.object, reader)
 	xr_sound.load_npc(reader, self.object:id())
-		--alun_utils.debug_write("\nmotivator load END "..self.object:name())
+	--alun_utils.debug_write("\nmotivator load END "..self.object:name())
 end
 
 function motivator_binder:hear_callback(npc, who_id, sound_type, sound_position, sound_power)
@@ -514,7 +508,7 @@ end
 
 ----------------------------------------------------------------------------------
 function motivator_binder:save_state(m_data)
-	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",id))
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",self.object:name()))
 	local id = self.object and self.object:id()
 	local st = id and db.storage[id]
 	if not (st) then
@@ -532,29 +526,30 @@ function motivator_binder:save_state(m_data)
 
 	xr_sound.npc_save_state(id,m_data)
 	trade_manager.save_state(id,m_data)
-		db.storage[id].pstor = db.storage[id].pstor or {}
-	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",id))
+	db.storage[id].pstor = db.storage[id].pstor or {}
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",self.object:name()))
 end
 
 function motivator_binder:load_state()
-		local state = alife_storage_manager.get_game_object_state(self.object)
+	local state = alife_storage_manager.get_game_object_state(self.object)
 	if not (state and state.xr_logic) then
 		return
 	end
-		local id = self.object:id()
+	
+	local id = self.object:id()
 	db.storage[id] = db.storage[id] or {}
 	local st = db.storage[id]
 	--alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",id))
 	--st.job_ini = state.xr_logic.job_ini
 	st.loaded_ini_filename = state.xr_logic.ini_filename
 	st.loaded_section_logic = state.xr_logic.section_logic
-	st.loaded_active_section = state.xr_logic.active_section or "nil"
+	st.loaded_active_section = state.xr_logic.active_section
 	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
 	st.activation_time = state.xr_logic.activation_time and state.xr_logic.activation_time + time_global() or time_global()
 	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
-		xr_sound.npc_load_state(id,state)
+	xr_sound.npc_load_state(id,state)
 	trade_manager.load_state(id,state)
-		if (state.pstor_all) then
+	if (state.pstor_all) then
 		db.storage[id].pstor = state.pstor_all
 		state.pstor_all = nil
 	end

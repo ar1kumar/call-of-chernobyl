@@ -31,8 +31,8 @@ function generic_object_binder:reinit()
 		self.object:set_callback(callback.sound, 				self.hear_callback, 	self)
 		self.object:set_tip_text("")
 	end
-		if (USE_MARSHAL) then
-		RegisterScriptCallback("save_state",self.save_state,self)
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",self)
 	end
 	--alun_utils.debug_write(self.object:name().."re_init() End")
 end
@@ -262,15 +262,10 @@ function generic_object_binder:net_spawn(sobject)
 		return false
 	end
 
-	local on_offline_condlist = db.storage[self.object:id()] and db.storage[self.object:id()].overrides and db.storage[self.object:id()].overrides.on_offline_condlist
-	if on_offline_condlist ~= nil then
-		xr_logic.pick_section_from_condlist(db.actor, self.object, on_offline_condlist)
-	end
-
 	-- Alundaio
 	SendScriptCallback("monster_on_net_spawn",self.object,sobject)
 	-- Alundaio
-		if not self.object:alive() then
+	if not self.object:alive() then
 		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body...")
 		release_body_manager.get_release_body_manager():moving_dead_body(self.object,true)
 		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body done")
@@ -290,32 +285,21 @@ function generic_object_binder:net_spawn(sobject)
 	db.add_obj(self.object)
 	db.add_enemy(self.object)
 
-	local sim = alife()
-	local se_obj = sim:object(self.object:id())
+	smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_mobile, self.loaded)
+	
 	local force_set_position
-	if (db.offline_objects[se_obj.id] and db.offline_objects[se_obj.id].level_vertex_id) then
-		force_set_position = level.vertex_position(db.offline_objects[se_obj.id].level_vertex_id)
-	elseif se_obj.m_smart_terrain_id ~= 65535 then
-		local smart = sim:object(se_obj.m_smart_terrain_id)
-		if (smart and not smart.disabled) then
-			if not (smart.arriving_npc[se_obj.id]) then
-				if (smart.npc_info[se_obj.id] and smart.npc_info[se_obj.id].job) then
-					local smart_task = smart.npc_info[se_obj.id].job.alife_task
-					force_set_position = smart_task and smart_task:position() or nil
-				end
-			end
-		end
-	elseif db.spawned_vertex_by_id[se_obj.id] ~= nil then
-		force_set_position = level.vertex_position(db.spawned_vertex_by_id[se_obj.id])
-		db.spawned_vertex_by_id[se_obj.id] = nil
+	if (db.offline_objects[sobject.id] and db.offline_objects[sobject.id].level_vertex_id) then
+		force_set_position = level.vertex_position(db.offline_objects[sobject.id].level_vertex_id)
+	elseif db.spawned_vertex_by_id[sobject.id] ~= nil then
+		force_set_position = level.vertex_position(db.spawned_vertex_by_id[sobject.id])
+		db.spawned_vertex_by_id[sobject.id] = nil
 	end
 
 	if (force_set_position) then
 		self.object:set_npc_position(force_set_position)
-		db.offline_objects[se_obj.id].level_vertex_id = nil
+		db.offline_objects[sobject.id].level_vertex_id = nil
 	end
 	
-	smart_terrain.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_mobile, self.loaded)
 	--alun_utils.debug_write(sobject:name()..":net_spawn()  END")
 	return true
 end
@@ -331,9 +315,13 @@ function generic_object_binder:net_destroy()
 
 	xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] = nil
 
-	local st = db.storage[self.object:id()]
-	if st and st.active_scheme then
-		xr_logic.issue_event(self.object, st[st.active_scheme], "net_destroy")
+	if (self.st) then
+		if (self.st.active_scheme) then
+			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "net_destroy", self.object)
+		end
+		if (self.st.overrides and self.st.overrides.on_offline_condlist) then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.overrides.on_offline_condlist)
+		end
 	end
 
 	-- Запоминаем позицию и активную секцию --------
@@ -341,15 +329,16 @@ function generic_object_binder:net_destroy()
 		db.offline_objects[self.object:id()].level_vertex_id = self.object:level_vertex_id()
 		db.offline_objects[self.object:id()].active_section = db.storage[self.object:id()].active_section
 	end
+	
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self)
+	end
 
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
-	db.storage[self.object:id()] = nil
-	object_binder.net_destroy(self)
-	if (USE_MARSHAL) then
-		UnregisterScriptCallback("save_state",self.save_state)
-	end
 	alife_storage_manager.get_state().game_object[self.object:id()] = nil
+	
+	object_binder.net_destroy(self)
 	--alun_utils.debug_write("generic_object_binder:net_destroy END")
 end
 
@@ -395,14 +384,14 @@ function generic_object_binder:load(reader)
 end
 -----------------------------------------------------------------------------------------------------------------
 function generic_object_binder:save_state(m_data)
-	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
+	alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
 	local id = self.object and self.object:id()
 	local st = id and db.storage[id]
 	if not (st) then
 		return
 	end
-		local state = alife_storage_manager.get_game_object_state(self.object,true)
-		state.xr_logic = empty_table(state.xr_logic)
+	local state = alife_storage_manager.get_game_object_state(self.object,true)
+	state.xr_logic = empty_table(state.xr_logic)
 
 	--state.xr_logic.job_ini = st.job_ini
 	state.xr_logic.ini_filename = st.ini_filename
@@ -413,7 +402,7 @@ function generic_object_binder:save_state(m_data)
 	state.xr_logic.activation_game_time = st.activation_game_time
 
 	db.storage[id].pstor = db.storage[id].pstor or {}
-	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
+	alun_utils.debug_write(strformat("generic_object_binder:save_state %s AFTER",self.object:name()))
 end
 
 function generic_object_binder:load_state()
@@ -422,18 +411,19 @@ function generic_object_binder:load_state()
 		if not (state and state.xr_logic) then
 		return
 	end
-		local id = self.object:id()
+	
+	local id = self.object:id()
 	db.storage[id] = db.storage[id] or {}
 	local st = db.storage[id]	
 	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
 	--st.job_ini = state.xr_logic.job_ini
 	st.loaded_ini_filename = state.xr_logic.ini_filename
 	st.loaded_section_logic = state.xr_logic.section_logic
-	st.loaded_active_section = state.xr_logic.active_section or "nil"
+	st.loaded_active_section = state.xr_logic.active_section
 	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
 	st.activation_time = state.xr_logic.activation_time and state.xr_logic.activation_time + time_global() or time_global()
 	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
-		if (state.pstor_all) then
+	if (state.pstor_all) then
 		db.storage[id].pstor = state.pstor_all
 		state.pstor_all = nil
 	end

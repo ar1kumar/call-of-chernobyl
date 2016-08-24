@@ -70,13 +70,6 @@ local function squad_on_unregister(squad)
 	companion_squads[squad.id] = nil
 end
 
-local function squad_can_switch_offline(squad)
-	local id = squad:commander_id()
-	if (id and alife():has_info(id,"npcx_is_companion")) then
-		return false
-	end
-end
-
 local function squad_on_update(squad)
 	--alun_utils.debug_write(strformat("axr_companions.squad_on_update - heli_enemy_flag"))
 	local id = squad:commander_id()
@@ -133,7 +126,6 @@ function on_game_start()
 	RegisterScriptCallback("squad_on_update",squad_on_update)
 	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 	RegisterScriptCallback("squad_on_unregister",squad_on_unregister)
-	RegisterScriptCallback("squad_can_switch_offline",squad_can_switch_offline)
 	RegisterScriptCallback("on_level_changing",on_level_changing)
 	RegisterScriptCallback("on_game_load",on_game_load)
 

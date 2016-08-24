@@ -7,7 +7,7 @@
 class "se_monster" (cse_alife_monster_base)
 --------------------
 function se_monster:__init (section) super (section)
-	db.offline_objects[self.id] = db.offline_objects[self.id] and empty_table(db.offline_objects[self.id]) or {}
+	db.offline_objects[self.id] = empty_table(db.offline_objects[self.id])
 end
 --------------------
 function se_monster:can_switch_offline()

@@ -17,7 +17,11 @@
 	by: Alundaio
 --]]
 local m_data = {}
+
+-- store stuff that you want to persist even offline
 m_data.se_stalker = {}
+
+-- store stuff only for online objects. When object goes offline this table is purged.
 m_data.game_object = {}
 
 local function on_pstor_load_all(obj,packet)

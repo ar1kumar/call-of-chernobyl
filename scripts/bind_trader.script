@@ -26,7 +26,7 @@ function trader_object_binder:reinit()
 	self.st = db.storage[self.object:id()]
 	
 	if (USE_MARSHAL) then
-		RegisterScriptCallback("save_state",self.save_state,self)
+		RegisterScriptCallback("save_state",self)
 	end
 end
 
@@ -87,13 +87,15 @@ function trader_object_binder:net_destroy()
 		db.offline_objects[self.object:id()].level_vertex_id = self.object:level_vertex_id()
 		db.offline_objects[self.object:id()].active_section = db.storage[self.object:id()].active_section
 	end
-	
-	if (USE_MARSHAL) then
-		UnregisterScriptCallback("save_state",self.save_state)
-	end
 
+		if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self)
+	end
+	
 	db.del_obj(self.object)
 	db.storage[self.object:id()] = nil
+	alife_storage_manager.get_state().game_object[self.object:id()] = nil
+	
 	object_binder.net_destroy(self)
 end
 
@@ -171,7 +173,7 @@ function trader_object_binder:load_state()
 	--st.job_ini = state.xr_logic.job_ini
 	st.loaded_ini_filename = state.xr_logic.ini_filename
 	st.loaded_section_logic = state.xr_logic.section_logic
-	st.loaded_active_section = state.xr_logic.active_section or "nil"
+	st.loaded_active_section = state.xr_logic.active_section
 	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
 	st.activation_time = state.xr_logic.activation_time and state.xr_logic.activation_time + time_global() or time_global()
 	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()

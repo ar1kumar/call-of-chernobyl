@@ -83,12 +83,9 @@ local intercepts = {
 	squad_on_npc_creation		= {},
 	
 	-- sim_squad_scripted.script
-	squad_assign_new_target		= {},
-	squad_can_help_actor		= {},
 	squad_on_npc_death			= {},
 	squad_on_update				= {},
 	squad_on_add_npc			= {},
-	squad_can_switch_offline	= {},
 	squad_on_unregister			= {},
 
 	-- xr_logic.script
@@ -154,41 +151,33 @@ local intercepts = {
 -----------------------------------------------------------
 -- Global Callback Register
 -- param 1 - name as type<string> (ie. intercepts[name])
--- param 2 - function to execute as type<function> or type<table>
+-- param 2 - function to execute as type<function> or userdata with name as function
 -----------------------------------------------------------
-function callback_set(name,func,userdata)
-	--printf("callback_set %s",name)
-	if not (func) then
-		return
+function callback_set(name,func_or_userdata)
+	if (func_or_userdata == nil) then 
+		callstack()
 	end
 	if (intercepts[name]) then
-		if (userdata) then 
-			local function wrapper(...)
-				func(userdata,...)
-			end
-			intercepts[name][func] = wrapper
-		else
-			intercepts[name][func] = func
-		end
+		intercepts[name][func_or_userdata] = true
 	end
 end
 
 function callback_unset(name,func_or_userdata)
-	if not (intercepts[name]) then
-		return
+	if (intercepts[name]) then
+		intercepts[name][func_or_userdata] = nil
 	end
-	intercepts[name][func_or_userdata] = nil
 end
 
 function make_callback(name,...)
-	if not (intercepts[name]) then
-		return 
+	if (intercepts[name]) then
+		for func_or_userdata,v in pairs(intercepts[name]) do 
+			if (type(func_or_userdata) == "function") then 
+				func_or_userdata(...)
+			elseif (func_or_userdata[name]) then
+				func_or_userdata[name](func_or_userdata,...)
+			end
+		end
 	end
-	
-	for k,callb in pairs(intercepts[name]) do
-		--printf("make_callback %s",name)
-		callb(...)
-	end 
 end
 
 --------------------------------------------------------------------------------------------------------------------
@@ -260,51 +249,6 @@ function on_game_start()
 	xrs_facer.on_game_start()
 	xrs_kill_wounded.on_game_start()
 	--]]
-end
-
--------------------
--- squad_can_switch_offline(self)
--------------------
-function squad_can_switch_offline(squad,npc)
-	if (intercepts.squad_can_switch_offline) then 
-		for k, func in pairs(intercepts.squad_can_switch_offline) do
-			if (func(squad) == false) then
-				return false
-			end
-		end
-	end
-end
-
--------------------
--- squad_assign_new_target(squad)
--------------------
-function squad_assign_new_target(squad)
-	if (intercepts.squad_assign_new_target) then
-		local id
-		for k, func in pairs(intercepts.squad_assign_new_target) do
-			id = func(squad)
-			if (id) then
-				break
-			end
-		end
-		return id
-	end
-end
-
--------------------
--- squad_can_help_actor(squad)
--------------------
-function squad_can_help_actor(squad)
-	if (intercepts.squad_can_help_actor) then 
-		local flag
-		for k, func in pairs(intercepts.squad_can_help_actor) do
-			flag = func(squad)
-			if (flag) then
-				break
-			end
-		end
-		return flag
-	end
 end
 
 ------------------

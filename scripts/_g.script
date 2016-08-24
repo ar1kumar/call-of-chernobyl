@@ -55,12 +55,12 @@ end
 -------------------------------------------------------------------------------------------------------
 -- 											SCRIPTED CALLBACKS
 -------------------------------------------------------------------------------------------------------
-function RegisterScriptCallback(name,func,userdata)
-	axr_main.callback_set(name,func,userdata)
+function RegisterScriptCallback(name,func_or_userdata)
+	axr_main.callback_set(name,func_or_userdata)
 end
 
-function UnregisterScriptCallback(name,func)
-	axr_main.callback_unset(name,func)
+function UnregisterScriptCallback(name,func_or_userdata)
+	axr_main.callback_unset(name,func_or_userdata)
 end
 
 -- Call this from a script to create a new callback to functions that register for it with RegisterScriptCallback
@@ -675,7 +675,7 @@ end
 ----------------------------------------
 function IsWounded(o)
 	local st = o and db.storage[o:id()]
-	return st and st.wounded and tostring(st.wounded.wound_manager.state) ~= "nil"
+	return st and st.wounded and tostring(st.wounded.wound_manager.state) ~= "nil" or false
 	--[[
 	local c = o:clsid()
 	return c and c == clsid.script_stalker and o:alive() and o:wounded() or false
@@ -879,7 +879,7 @@ function IsAmmo(o,c)
 	if not (c) then
 		c = o and o:clsid()
 	end
-	return c and (c == clsid.ammo or c == clsid.ammo_s)
+	return c and (c == clsid.wpn_ammo or c == clsid.wpn_ammo_s)
 end
 
 function IsGrenade(o,c)
@@ -1353,10 +1353,10 @@ end
 -- Called before actor hit callback
 -- returning false will ignore the hit completely
 function CActor__BeforeHitCallback(actor,hit,bone_id)
-		--printf("power=%s impuse=%s type=%s dir=%s who=%s",hit.power,hit.impulse,hit.type,hit.direction and vec_to_str(hit.direction),hit.draftsman and hit.draftsman:name())
-		local return_flag = true
+	--printf("power=%s impuse=%s type=%s dir=%s who=%s",hit.power,hit.impulse,hit.type,hit.direction and vec_to_str(hit.direction),hit.draftsman and hit.draftsman:name())
+	local return_flag = true
 	SendScriptCallback("actor_on_before_hit",hit,bone_id,return_flag)
-		return return_flag
+	return return_flag
 end
 
 get_console():execute("r__clear_models_on_unload 0")
