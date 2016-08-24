@@ -19,6 +19,12 @@ function evaluator_combat_zombied:evaluate()
 	if not (self.object:alive()) then 
 		return false 
 	end 
+	
+	local be = self.object:best_enemy()
+	if not (be and be:alive()) then 
+		return false 
+	end 
+	
 	return character_community(self.object) == "zombied"
 end
 

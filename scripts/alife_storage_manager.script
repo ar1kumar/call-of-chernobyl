@@ -177,3 +177,16 @@ function get_game_object_state(obj,create_if_dont_exist)
 	end
 	return m_data.game_object[id]
 end	
+
+function get_se_obj_state(se_obj,create_if_dont_exist)
+	local id = se_obj.id
+	local name = se_obj:name()
+	if not (m_data.se_stalker[id] and m_data.se_stalker[id].name == name) then
+		if not (create_if_dont_exist) then
+			return 
+		end
+		m_data.se_stalker[id] = {}
+		m_data.se_stalker[id].name = name
+	end
+	return m_data.se_stalker[id]
+end
