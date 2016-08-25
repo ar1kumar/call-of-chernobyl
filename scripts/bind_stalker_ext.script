@@ -187,11 +187,11 @@ end
 -- actor_on_trade(item)
 -------------------
 function actor_on_trade(binder,item,sell_bye,money)
-	if sell_bye == true then
-		 game_stats.money_trade_update (money)
-	else
-		 game_stats.money_trade_update (-money)
-	end
+	-- if sell_bye == true then
+		 -- game_stats.money_trade_update (money)
+	-- else
+		 -- game_stats.money_trade_update (-money)
+	-- end
 	SendScriptCallback("actor_on_trade",item,sell_bye,money)
 end
 
