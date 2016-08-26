@@ -25,7 +25,7 @@ precondition = {-yar_ashot_cancelled} true, false
 on_cancel = %+yar_ashot_cancelled%
 
 ;--------------------------------------------------------------------------------------------------
-; ESCORT ECOGS TASK-
+; ESCORT ECOLOGS TASK-
 
 [jup_b6_scientist_tech_task_1]
 icon = ui_inGame2_PD_Opitniy_stalker
@@ -39,15 +39,14 @@ task_complete_descr = jup_b6_scientist_tech_task_finish
 on_init = %=setup_companion_task(ecolog_companion_task_2:jup_b41) =setup_task_target_anomaly -ecolog_companion_task_2_started -ecolog_companion_task_2_force_started%
 precondition = {!squad_exist(ecolog_companion_task_1) !squad_exist(ecolog_companion_task_2)} true, false
 repeat_timeout = 86400
-on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reward_stash(true) =reset_task_target_anomaly%
+on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reward_stash(true) =reset_task_target_anomaly =reward_random_item(af_fire:af_eye:af_fireball:af_blood:af_cristall:detector_elite)%
 on_fail = %=fail_task_dec_goodwill(25:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reset_task_target_anomaly%
 on_cancel = %=remove_special_task_squad(ecolog_companion_task_2) =reset_task_target_anomaly%
-reward_item = af_cristall
 condlist_0 = {!squad_exist(ecolog_companion_task_2)} fail
 
 
 ;--------------------------------------------------------------------------------------------------
-; FIND ARTEFACT FOR ECOGS TASK-
+; FIND ARTEFACT FOR ECOLOGS TASK-
 
 [jup_b6_scientist_tech_task_2]
 icon = ui_inGame2_Kontrakt_s_uchenimi
@@ -66,10 +65,8 @@ target_functor = general_fetch_task
 task_complete_descr = jup_b6_scientist_tech_task_2_fetch_finish
 ; precondition = true
 repeat_timeout = 604800
-on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =reward_stash(true) =remove_fetch_item(jup_b6_scientist_tech_task_2_fetch) =inc_task_stage(jup_b6_scientist_tech_task_2)%
+on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =reward_stash(true) =remove_fetch_item(jup_b6_scientist_tech_task_2_fetch) =inc_task_stage(jup_b6_scientist_tech_task_2) =reward_random_item(scientific_outfit:ecolog_outfit_orange:ecolog_outfit_green:detector_elite)%
 on_fail = %=fail_task_dec_goodwill(25:ecolog:csky)%
-reward_item = scientific_outfit
-
 
 ;--------------------------------------------------------------------------------------------------
 ; ELIMINATE MUTANTS FOR TRAPPER TASK-

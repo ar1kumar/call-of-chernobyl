@@ -99,27 +99,27 @@ function sim_squad_scripted:get_script_target()
 	else
 		new_target = xr_logic.pick_section_from_condlist(db.actor, self, self.action_condlist)
 	end 
+	
 	if (new_target == "actor") then
 		return 0 
 	end
+	
 	local smart = new_target and SIMBOARD.smarts_by_names[new_target]
-	if not (smart) then
-		local id = self:commander_id()
-		local se_obj = id and alife():object(id)
-		if (se_obj and se_obj.get_alife_storage) then 
-			local as = se_obj:get_alife_storage()
-			if (as) then 
-				if (as.companion) then 
-					if (as.companion_cannot_teleport) then 
-						return self.id 
-					end 
-					return 0
-				end			
-			end	
-		end 
-		return
+	if (smart) then
+		return smart.id
 	end
-	return smart.id
+	
+	-- prevent companions from moving to actor if they cannot teleport and actor is not on same level
+	if (axr_companions.companion_squads[self.id]) then
+		local gg = game_graph()
+		if (gg:vertex(self.m_game_vertex_id):level_id() ~= gg:vertex(alife().actor().m_game_vertex_id):level_id()) then
+			local se_obj = alife():object(self:commander_id())
+			if (se_obj and utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_teleport")) then
+				return self.id 
+			end
+		end
+		return 0
+	end
 end
 
 function sim_squad_scripted:update()
@@ -131,11 +131,11 @@ function sim_squad_scripted:update()
 		local se_actor = sim:actor()
 		local se_obj = self:commander_id() and alife():object(self:commander_id())
 		local skip = false
-		if (se_obj and se_obj.get_alife_storage) then 
-			local as = se_obj:get_alife_storage()
-			if (as) and (as.companion or as.do_not_deactivate) then 
-				skip = true 
-			end
+		
+		if (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion")) then
+			skip = true
+		elseif (utils.se_obj_load_var(se_obj.id,se_obj:name(),"do_not_deactivate")) then 
+			skip = true 
 		end
 		
 		if (skip ~= true) then
@@ -375,35 +375,82 @@ end
 
 --' Удаление персонажей отряда
 function sim_squad_scripted:remove_squad()
-	--alun_utils.debug_write(strformat("%s:remove_squad %s",self:name()))
+	--alun_utils.debug_write(strformat("START sim_squad_scripted:remove_squad %s",self:name()))
+	
+	SIMBOARD:assign_squad_to_smart(self, nil)
+	SIMBOARD.squads[self.id] = nil
+	
 	local squad_npcs = {}
 	for k in self:squad_members() do
-		squad_npcs[k.id] = true
+		squad_npcs[k.id] = k.object
+	end
+	
+	if (self.online and self:can_switch_offline()) then 
+		self:switch_offline()
 	end
 
 	local sim = alife()
-	for id,v in pairs(squad_npcs) do
-		local obj = db.storage[id] and db.storage[id].object
-		if (obj and obj:is_talking()) then
-			obj:stop_talk()
+	for id,se_obj in pairs(squad_npcs) do
+		local smart_id = se_obj:smart_terrain_id()
+		if smart_id ~= 65535 then
+			local smart = alife():object(smart_id)
+			if smart ~= nil then
+				smart:unregister_npc(self)
+			end
 		end
-		local se_obj = sim:object(id)
-		if se_obj then
-			self:unregister_member(id)
-			sim:release(se_obj,true)
+		self:unregister_member(id)
+		
+		utils.se_obj_save_var(se_obj.id,se_obj:name(),"marked_for_delete")
+		
+		if (se_obj.online and se_obj:can_switch_offline()) then 
+			se_obj:switch_offline()
 		end
+		
+		sim:release(se_obj,true)
 	end
 	self:hide()
-	sim:release(self,true) -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine instead?
+	sim:release(self,true)
+	--alun_utils.debug_write(strformat("END sim_squad_scripted:remove_squad %s",self:name()))
 end
 
 function sim_squad_scripted:remove_npc(npc_id)
 	--alun_utils.debug_write(strformat("%s:remove_npc %s",self:name(),npc_id))
 	local sim = alife()
-	local npc = sim:object(npc_id)
-	if (npc) then
-		self:on_npc_death(npc)
-		sim:release(npc, true)
+	local se_obj = sim:object(npc_id)
+	if (se_obj) then
+		local smart_id = se_obj:smart_terrain_id()
+		if smart_id ~= 65535 then
+			local smart = alife():object(smart_id)
+			if smart ~= nil then
+				smart:unregister_npc(self)
+			end
+		end
+	
+		self:unregister_member(se_obj.id)
+		
+		utils.se_obj_save_var(se_obj.id,se_obj:name(),"marked_for_delete")
+		
+		if (se_obj.online and se_obj:can_switch_offline()) then 
+			se_obj:switch_offline()
+		end
+		
+		sim:release(se_obj, true)
+	end
+	if self:npc_count() == 0 then
+		self.current_action = nil
+		if self.death_condlist ~= nil then
+			xr_logic.pick_section_from_condlist(db.actor, self, self.death_condlist)
+		end
+		
+		SIMBOARD:assign_squad_to_smart(self, nil)
+		SIMBOARD.squads[self.id] = nil
+		
+		if (self.online and self:can_switch_offline()) then 
+			self:switch_offline()
+		end
+		
+		self:hide()
+		alife():release(self,true)
 	end
 end
 
@@ -411,21 +458,31 @@ function sim_squad_scripted:on_npc_death(npc,killer)
 	--alun_utils.debug_write(strformat("%s:on_npc_death %s",self:name(),npc and npc:name()))
 	--printf("Squad %s. Killed member %s", tostring(self.id), npc.id)
 	--self.sound_manager:unregister_npc(npc.id)
+		
 	self:unregister_member(npc.id)
-	-- Alundaio
+
 	SendScriptCallback("squad_on_npc_death",self,npc,killer)
-	-- End Alundaio
-	if self:npc_count() == 0 then
-		self.current_action = nil
-		if self.death_condlist ~= nil then
-			xr_logic.pick_section_from_condlist(db.actor, self, self.death_condlist)
-		end
-		SIMBOARD:assign_squad_to_smart(self, nil)
-		self:hide()
-		--alife():release(self,true)  -- TODO: Determine if this is needed or not. GSC had it commented but are squads removed from game by engine or perhaps reused instead?
-		return
+
+	if self:npc_count() > 0 then
+		self:refresh()
+		return 
+	end 
+	
+	self.current_action = nil
+	if self.death_condlist ~= nil then
+		xr_logic.pick_section_from_condlist(db.actor, self, self.death_condlist)
 	end
-	self:refresh()
+	
+	SIMBOARD:assign_squad_to_smart(self, nil)
+	SIMBOARD.squads[self.id] = nil
+	
+	if (self.online and self:can_switch_offline()) then 
+		self:switch_offline()
+	end
+
+	self:hide()
+	alife():release(self,true)
+	return
 end
 function sim_squad_scripted:assign_squad_member_to_smart(member_id, smart, old_smart_id)
 	local sim = alife()
@@ -988,7 +1045,7 @@ function sim_squad_scripted:switch_offline()
 	cse_alife_online_offline_group.switch_offline(self)
 end
 function sim_squad_scripted:switch_online()
-	if (dev_debug) then
+	if (DEV_DEBUG) then
 		printf("sim_squad_scripted:switch_online() [%s]",self:name())
 		--get_console():execute("flush")
 	end

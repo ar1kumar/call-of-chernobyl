@@ -65,14 +65,14 @@ function heli_move:reset_scheme( loading )
 
 	self.max_velocity = self.a.max_velocity
 	if loading then
-		self.state            	= xr_logic.pstor_retrieve(self.object, "st")
+		self.state            	= utils.load_var(self.object, "st")
 
-		self.last_index       	= xr_logic.pstor_retrieve(self.object, "li") or nil
-		self.next_index       	= xr_logic.pstor_retrieve(self.object, "ni") or nil
+		self.last_index       	= utils.load_var(self.object, "li") or nil
+		self.next_index       	= utils.load_var(self.object, "ni") or nil
 
-		self.was_callback     	= xr_logic.pstor_retrieve(self.object, "wc")
-		self.a.path_index 		= xr_logic.pstor_retrieve(self.object,"path_index") or 1
-		self.a.path_increment	= xr_logic.pstor_retrieve(self.object,"path_increment") or 1
+		self.was_callback     	= utils.load_var(self.object, "wc")
+		self.a.path_index 		= utils.load_var(self.object,"path_index") or 1
+		self.a.path_increment	= utils.load_var(self.object,"path_increment") or 1
 	else
 		self.last_index       = nil
 		self.next_index       = nil
@@ -136,14 +136,14 @@ end
 
 
 function heli_move:save()
-	xr_logic.pstor_store( self.object, "st",  self.state )
+	utils.save_var( self.object, "st",  self.state )
 ----------------------------------Вейпоинты - Начало------------------------------------------------
-	xr_logic.pstor_store( self.object, "li",  self.last_index       or false )
-	xr_logic.pstor_store( self.object, "ni",  self.next_index       or false )
+	utils.save_var( self.object, "li",  self.last_index       or false )
+	utils.save_var( self.object, "ni",  self.next_index       or false )
 ----------------------------------Вейпоинты - Конец-------------------------------------------------
-	xr_logic.pstor_store( self.object, "wc",  self.was_callback )
-	xr_logic.pstor_store( self.object, "path_index", self.a.path_index )
-	xr_logic.pstor_store( self.object, "path_increment", self.a.path_increment )
+	utils.save_var( self.object, "wc",  self.was_callback )
+	utils.save_var( self.object, "path_index", self.a.path_index )
+	utils.save_var( self.object, "path_increment", self.a.path_increment )
 end
 
 function heli_move:update( delta )

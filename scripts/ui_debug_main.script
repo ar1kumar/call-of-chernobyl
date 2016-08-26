@@ -2253,7 +2253,7 @@ function debug_ui_attach:OnStateListSelect()
 		return 
 	end
 	
-	local npc = xrs_debug_tools.get_debug_npc() or xrs_debug_tools.NEAREST_STALKER
+	local npc = xrs_debug_tools.get_debug_npc()
 	if not (npc and npc:id() ~= 0) then
 		return 
 	end
@@ -2432,7 +2432,7 @@ local function delayed_attach(id)
 	return false
 end
 function debug_ui_attach:OnAttach()
-	local npc = xrs_debug_tools.get_debug_npc() or xrs_debug_tools.NEAREST_STALKER
+	local npc = xrs_debug_tools.get_debug_npc()
 	if not (npc and npc:id() ~= 0) then
 		return 
 	end

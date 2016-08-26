@@ -27,7 +27,7 @@ local function on_fighting_actor(npc)
 	--alun_utils.debug_write(strformat("axr_companions.on_fighting_actor"))
 	if (db.actor:has_info("axr_has_companion")) then
 		for i=1,max_actor_squad_size do
-			local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
+			local c = utils.load_var(db.actor,"companion_"..i,nil)
 			local obj = c and level.object_by_id(c)
 			if (obj) then
 				alun_utils.set_squad_relation_to_squad(obj,npc,game_object.enemy)
@@ -52,9 +52,9 @@ local function squad_on_npc_death(squad,se_npc)
 	--alun_utils.debug_write(strformat("axr_companions.squad_on_npc_death"))
 	if (se_npc and alife():has_info(se_npc.id,"npcx_is_companion") ) then
 		for i=1,max_actor_squad_size do
-			local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
+			local c = utils.load_var(db.actor,"companion_"..i,nil)
 			if (c == se_npc.id) then
-				alun_utils.save_var(db.actor,"companion_"..i,nil)
+				utils.save_var(db.actor,"companion_"..i,nil)
 			end
 		end
 		if (get_companion_count() < 1) then
@@ -77,7 +77,7 @@ local function squad_on_update(squad)
 	if (id and sim:has_info(id,"npcx_is_companion")) then
 		squad.scripted_target = "actor"
 		companion_squads[squad.id] = squad
-		if (alun_utils.load_var(db.actor,"heli_enemy_flag") == true) then
+		if (utils.load_var(db.actor,"heli_enemy_flag") == true) then
 			for k in squad:squad_members() do
 				if (db.storage[k.id]) then
 					db.storage[k.id].heli_enemy_flag = true
@@ -101,7 +101,7 @@ local function on_level_changing()
 	
 	for id,v in pairs(companion_squads) do 
 		squad = sim:object(id)
-		if (squad and companion_squad_can_teleport(squad)) then 
+		if (squad and companion_squad_can_teleport(squad)) then
 			TeleportSquad(squad,pos,lvid,gvid)
 		end
 	end
@@ -138,9 +138,8 @@ function companion_squad_can_teleport(squad)
 	local id = squad:commander_id()
 	local sim = alife()
 	local se_obj = sim:object(id)
-	if (se_obj and IsStalker(nil,se_obj:clsid())) then
-		local as = se_obj.get_alife_storage and se_obj:get_alife_storage()
-		if (as and as.companion_cannot_teleport) then 
+	if (se_obj) then
+		if (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_teleport")) then 
 			return false 
 		end
 	end 
@@ -154,12 +153,12 @@ end
 function get_companion_count()
 	local count = 0
 	for i=1,max_actor_squad_size do
-		local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
+		local c = utils.load_var(db.actor,"companion_"..i,nil)
 		local se_obj = c and alife():object(c)
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
 			count = count + 1
 		else 
-			alun_utils.save_var(db.actor,"companion_"..i,nil)
+			utils.save_var(db.actor,"companion_"..i,nil)
 		end
 	end
 	return count
@@ -168,22 +167,23 @@ end
 function list_actor_squad_by_id()
 	local t = {}
 	for i=1,max_actor_squad_size do
-		local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
+		local c = utils.load_var(db.actor,"companion_"..i,nil)
 		if (c) then
 			local se_obj = alife():object(c)
 			if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
 				table.insert(t,c)
 			else 
-				alun_utils.save_var(db.actor,"companion_"..i,nil)
+				utils.save_var(db.actor,"companion_"..i,nil)
 			end
 		end
 	end
 	return t
 end 
 
-function setup_companion_logic(npc,st,loaded,as)
+function setup_companion_logic(npc,st,loaded,cannot_dismiss)
 	npc:give_info_portion("npcx_is_companion")
-	if (as.companion_cannot_dismiss) then 
+	
+	if (cannot_dismiss or utils.se_obj_load_var(npc:id(),npc:name(),"companion_cannot_dismiss")) then
 		npc:give_info_portion("npcx_beh_cannot_dismiss")
 	end
 		
@@ -233,9 +233,9 @@ function add_to_actor_squad(npc)
 	local inserted
 	local id = npc:id()
 	for i=1,max_actor_squad_size do
-		local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
+		local c = utils.load_var(db.actor,"companion_"..i,nil)
 		if not (c) then
-			alun_utils.save_var(db.actor,"companion_"..i,id)
+			utils.save_var(db.actor,"companion_"..i,id)
 			--alun_utils.debug_write("add to actor squad %s in slot %s",npc:name(),i)
 			inserted = true
 			break
@@ -253,12 +253,9 @@ function add_to_actor_squad(npc)
 	local sim = alife()
 	local se_npc = sim:object(id)
 
-	as = se_npc and IsStalker(nil,se_npc:clsid()) and se_npc.get_alife_storage and se_npc:get_alife_storage(true)
-	if (as) then
-		as.companion = true
-		setup_companion_logic(npc,db.storage[id],false,as)
-	end
-
+	utils.se_obj_save_var(se_npc.id,se_npc:name(),"companion",true)
+	setup_companion_logic(npc,db.storage[id],false)
+	
 	--axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
 	--alun_utils.debug_write("Inserted %s into actor squad",npc:name())
 end
@@ -270,12 +267,10 @@ function remove_from_actor_squad(npc)
 	end 
 	
 	local se_obj = alife():object(npc:id())
-	as = se_obj and IsStalker(nil,se_obj:clsid()) and se_obj.get_alife_storage and se_obj:get_alife_storage()
-	if (as) then
-		as.companion = nil
-		as.companion_cannot_dismiss = nil
-		as.companion_cannot_teleport = nil
-	end
+	
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion",nil)
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss",nil)
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",nil)
 			
 	npc:disable_info_portion("npcx_is_companion")
 	npc:disable_info_portion("npcx_beh_cannot_dismiss")
@@ -284,9 +279,9 @@ function remove_from_actor_squad(npc)
 
 	local count = 0
 	for i=1,max_actor_squad_size do
-		local c = alun_utils.load_var(db.actor,"companion_"..i,nil)
+		local c = utils.load_var(db.actor,"companion_"..i,nil)
 		if (c == npc:id()) then
-			alun_utils.save_var(db.actor,"companion_"..i,nil)
+			utils.save_var(db.actor,"companion_"..i,nil)
 		end
 		count = count + 1
 	end
@@ -310,22 +305,12 @@ end
 
 function set_companion_allow_teleport(npc)
 	local se_obj = alife():object(npc:id())
-	if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj.get_alife_storage) then 
-		local as = se_obj:get_alife_storage()
-		if (as) then
-			as.companion_cannot_teleport = nil
-		end
-	end
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",nil)
 end 
 
 function set_companion_disable_teleport(npc)
 	local se_obj = alife():object(npc:id())
-	if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj.get_alife_storage) then 
-		local as = se_obj:get_alife_storage(true)
-		if (as) then
-			as.companion_cannot_teleport = true
-		end
-	end
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",true)
 end 
 
 function set_companion_combat_type_camper(npc)
@@ -345,13 +330,13 @@ end
 
 function set_companion_to_wait_state(npc)
 	npc:give_info_portion("npcx_beh_wait")
-	alun_utils.save_var(npc,"fight_from_point",npc:level_vertex_id())
+	utils.save_var(npc,"fight_from_point",npc:level_vertex_id())
 end
 
 function set_companion_to_follow_state(npc)
 	npc:disable_info_portion("npcx_beh_wait")
 	npc:disable_info_portion("npcx_beh_hide_in_cover")
-	alun_utils.save_var(npc,"fight_from_point",nil)
+	utils.save_var(npc,"fight_from_point",nil)
 end
 
 function set_companion_to_attack_state(npc)
@@ -424,24 +409,24 @@ end
 function companion_remove_waypoints(npc)
 	npc:disable_info_portion("npcx_beh_patrol_mode")
 	local i = 1
-	local p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
+	local p = utils.se_obj_load_var(npc:id(),npc:name(),"pathpoint"..i)--utils.load_var(npc,"pathpoint"..tostring(i))
 	while p do 
-		alun_utils.save_var(npc,"pathpoint"..tostring(i),nil)
+		utils.se_obj_save_var(npc:id(),npc:name(),"pathpoint"..i,nil)--utils.save_var(npc,"pathpoint"..tostring(i),nil)
 		i = i + 1
-		p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
+		p = utils.se_obj_load_var(npc:id(),npc:name(),"pathpoint"..i)--utils.load_var(npc,"pathpoint"..tostring(i))
 	end
 end
 
 function companion_add_waypoints(npc,pos)
 	local i = 1
-	local p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
+	local p = utils.se_obj_load_var(npc:id(),npc:name(),"pathpoint"..i)--utils.load_var(npc,"pathpoint"..tostring(i))
 	while p do 
 		i = i + 1
-		p = alun_utils.load_var(npc,"pathpoint"..tostring(i))
+		p = utils.se_obj_load_var(npc:id(),npc:name(),"pathpoint"..i)--utils.load_var(npc,"pathpoint"..tostring(i))
 	end
 	local pos = db.actor:position()
 	local s = "5000,patrol | pos:"..pos.x..","..pos.y..","..pos.z
-	alun_utils.save_var(npc,"pathpoint"..tostring(i),s)
+	utils.se_obj_load_var(npc:id(),npc:name(),"pathpoint"..i,s)--utils.save_var(npc,"pathpoint"..tostring(i),s)
 end
 
 function cycle_companions_combat_mode()
@@ -543,7 +528,7 @@ function move_to_point(p)
 							local member = st and st.object
 							if (member and member:alive()) then
 								set_companion_to_follow_state(member)
-								alun_utils.save_var(member,"fight_from_point",lvid)
+								utils.save_var(member,"fight_from_point",lvid)
 							end
 							if (k.id == squad:commander_id() and not xrs_kill_wounded.hostage_list[k.id]) then 
 								if (st and st.beh) then 

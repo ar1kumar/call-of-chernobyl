@@ -388,9 +388,8 @@ function change_anomalies_names()
 end
 
 local function npc_on_net_spawn(npc,se_obj)
-	local m_data = se_obj:get_alife_storage(true)
-	m_data.last_seen_level = level.name()
-	m_data.last_seen_time = game.get_game_time()
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"last_seen_level",level.name())
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"last_seen_level",game.get_game_time())
 end
 
 function on_game_start()

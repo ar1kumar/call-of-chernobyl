@@ -135,7 +135,7 @@ function text_npc_has_cancel_task(a,b)
 	
 	local fetch = task_id and task_manager.task_ini:r_string_ex(task_id,"fetch_descr")
 	if (fetch) then
-        local sec = alun_utils.load_var(db.actor,task_id.."_fetch")
+        local sec = utils.load_var(db.actor,task_id.."_fetch")
         if not (sec) then
             return text or game.translate_string("st_task_none_active")
         end
@@ -379,17 +379,17 @@ end
 
 function victim_surrender(a,b)
 	local npc = dialogs.who_is_npc(a,b)
-	return alun_utils.load_var(npc,"victim_surrender",false) == true
+	return utils.load_var(npc,"victim_surrender",false) == true
 end
 
 function victim_no_surrender(a,b)
 	local npc = dialogs.who_is_npc(a,b)
-	return alun_utils.load_var(npc,"victim_surrender",false) == false
+	return utils.load_var(npc,"victim_surrender",false) == false
 end
 
 function set_victim_surrendered(a,b)
 	local npc = dialogs.who_is_npc(a,b)
-	alun_utils.save_var(npc,"victim_surrender",true)
+	utils.save_var(npc,"victim_surrender",true)
 end
 
 function surrender_victim_answers_bounty(a,b)
@@ -661,14 +661,14 @@ function relocate_money(victim, num, type)
 	if db.actor then
 		if type == "in" then
 			db.actor:give_money(num)
-			game_stats.money_quest_update (num)
+			-- game_stats.money_quest_update (num)
 
 		elseif type == "out" then
 			if victim == nil then
 				printf("Couldn't relocate money to NULL")
 			end
 			db.actor:transfer_money(num, victim)
-			game_stats.money_quest_update(-num)
+			-- game_stats.money_quest_update(-num)
 		end
 		news_manager.relocate_money(db.actor, type, num)
 	end
@@ -910,7 +910,7 @@ end
 
 function relocate_money_to_actor(first_speaker, second_speaker, num)
 	db.actor:give_money(num)
-	game_stats.money_quest_update (num)
+	-- game_stats.money_quest_update (num)
 	news_manager.relocate_money(db.actor, "in", num)
 end
 
@@ -920,7 +920,7 @@ function relocate_money_from_actor(first_speaker, second_speaker, num)
 		printf("Couldn't relocate money to NULL")
 	end
 	db.actor:transfer_money(num, victim)
-	game_stats.money_quest_update(-num)
+	-- game_stats.money_quest_update(-num)
 	news_manager.relocate_money(db.actor, "out", num)
 end
 

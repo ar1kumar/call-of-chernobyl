@@ -25,12 +25,11 @@ end
 
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:net_spawn(data)
-	--printf("actor net spawn")
 	--alun_utils.debug_write("actor net spawn start")
 	
 	level.show_indicators()
 	self.bCheckStart = true
-	self.weapon_hide = false -- спрятано или нет оружие при разговоре.
+	self.weapon_hide = false
 	self.weapon_hide_in_dialog = false
 
 	if object_binder.net_spawn(self,data) == false then
@@ -135,7 +134,7 @@ end
 function actor_binder:reinit()
 	object_binder.reinit(self)
 	
-	--alun_utils.debug_write("actor reinit")
+	--alun_utils.debug_write("actor reinit start")
 	
 	local npc_id = self.object:id()
 	db.storage[npc_id] = empty_table(db.storage[npc_id])
@@ -181,12 +180,13 @@ function actor_binder:reinit()
 	if (USE_MARSHAL) then 
 		RegisterScriptCallback("save_state",self)
 	end 
+	
+	--alun_utils.debug_write("actor reinit end")
 end
 
 ----------------------------------------------------------------------------------------------------------------------
 
 function actor_binder:update(delta)
---get_console():execute("flush")
 	object_binder.update(self, delta)
 	--alun_utils.debug_write("actor update START")
 	if not (db.actor:alive()) then
@@ -194,14 +194,16 @@ function actor_binder:update(delta)
 	end
 	
 	if self.bCheckStart then -- first update after netspawn
+		--alun_utils.debug_write("actor first_update START")
 		bind_stalker_ext.actor_on_first_update(self,delta)
-		--printf("SET DEFAULT INFOS")
+
 		if not has_alife_info("global_dialogs") then
 			self.object:give_info_portion("global_dialogs")
 		end
 		if not has_alife_info("level_changer_icons") then
 			self.object:give_info_portion("level_changer_icons")
 		end
+		
 		pda.fill_primary_objects()
 		self.object:activate_slot(self.loaded_active_slot or 0)
 		self.bCheckStart = nil
@@ -214,16 +216,13 @@ function actor_binder:update(delta)
 		printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
 		collectgarbage("collect")
 		printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
+		--alun_utils.debug_write("actor first_update END")
 	end
 	
 	self.task_manager:update()
 
-	-- DEBUG slowdown
-	--slowdown.update()
-	
-	game_stats.update (delta, self.object)
+	--game_stats.update(delta, self.object) --  ??
 
-	--' Апдейт саундменеджера
 	xr_sound.update(self.object:id())
 
 	-- Обновление отключения ввода с клавиатуры.
@@ -259,7 +258,7 @@ function actor_binder:update(delta)
 	
 	local tg = time_global()
 	if (self.last_update and tg < self.last_update) then
-		--alun_utils.debug_write("actor update END")
+		--alun_utils.debug_write("actor update END 1")
 		return
 	end
 	self.last_update = tg + 3000
@@ -269,7 +268,7 @@ function actor_binder:update(delta)
 	pda.fill_sleep_zones()
 	treasure_manager.get_treasure_manager():update()
 	
-	--alun_utils.debug_write("actor update END")
+	--alun_utils.debug_write("actor update END 2")
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:save(packet)
@@ -279,7 +278,7 @@ function actor_binder:save(packet)
 	
 	if (USE_MARSHAL) then
 		if (utils.level_changing()) then
-			alun_utils.save_var(db.actor,"heli_enemy_flag",nil)
+			utils.save_var(db.actor,"heli_enemy_flag",nil)
 			SendScriptCallback("on_level_changing")
 		end
 		return
@@ -288,7 +287,7 @@ function actor_binder:save(packet)
 	set_save_marker(packet, "save", false, "actor_binder")
 
 	if (utils.level_changing()) then
-		alun_utils.save_var(db.actor,"heli_enemy_flag",nil)
+		utils.save_var(db.actor,"heli_enemy_flag",nil)
 	end
 	
 	--alundaio
@@ -415,8 +414,7 @@ function actor_binder:load_state(m_data)
 	if not (state and state.actor_binder) then 
 		return 
 	end
-	--alun_utils.debug_write(strformat("actor_binder:load_state %s BEFORE",self.object:name()))
-	--alun_utils.debug_write("actor_binder:load_state")
+	--alun_utils.debug_write("actor_binder:load_state before")
 	local game_difficulty_by_num = {
 				[0] = "gd_novice",
 				[1] = "gd_stalker",
@@ -455,6 +453,6 @@ function actor_binder:load_state(m_data)
 	end
 	
 	state.actor_binder = nil
-	--alun_utils.debug_write(strformat("actor_binder:load_state %s AFTER",self.object:name()))
+	--alun_utils.debug_write("actor_binder:load_state after")
 end 
 

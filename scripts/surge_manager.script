@@ -171,7 +171,7 @@ function CSurgeManager:start(manual)
 	else
 	
 		-- heli_combat flag
-		alun_utils.save_var(db.actor,"heli_enemy_flag",nil)
+		utils.save_var(db.actor,"heli_enemy_flag",nil)
 		
 		self.started = true
 		self.finished = false
@@ -844,7 +844,7 @@ function CSurgeManager:hit_power(power,hit_type)
 
 	local ini,g_time
 	-- DRUG PROTECTIONS CHECK
-	local expiration = xr_logic.pstor_retrieve(db.actor,"drug_psy_blockade_expiration")
+	local expiration = utils.load_var(db.actor,"drug_psy_blockade_expiration")
 	if (expiration) then
 		g_time = utils.CTimeToSec(game.get_game_time())
 		if g_time<expiration then
@@ -855,7 +855,7 @@ function CSurgeManager:hit_power(power,hit_type)
 		end
 	end
 	
-	expiration = xr_logic.pstor_retrieve(db.actor,"drug_radioprotector_expiration")
+	expiration = utils.load_var(db.actor,"drug_radioprotector_expiration")
 	if (expiration) then
 		g_time = g_time or utils.CTimeToSec(game.get_game_time())
 		if g_time<expiration then
@@ -866,7 +866,7 @@ function CSurgeManager:hit_power(power,hit_type)
 		end
 	end
 	
-	expiration = xr_logic.pstor_retrieve(db.actor,"drug_antidot_expiration")
+	expiration = utils.load_var(db.actor,"drug_antidot_expiration")
 	if (expiration) then
 		g_time = g_time or utils.CTimeToSec(game.get_game_time())
 		if g_time<expiration then
@@ -1419,8 +1419,8 @@ function CSurgeManager:kill_all_unhided()
 	if(db.actor and db.actor:alive() and not self.actor_in_cover) then
 		if has_alife_info("anabiotic_in_process") then
 			local counter_name = "actor_marked_by_zone_cnt"
-			local cnt_value = xr_logic.pstor_retrieve(db.actor, counter_name, 0)
-			xr_logic.pstor_store(db.actor, counter_name, cnt_value + 1)
+			local cnt_value = utils.load_var(db.actor, counter_name, 0)
+			utils.save_var(db.actor, counter_name, cnt_value + 1)
 		end
 		if not(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_god_mode",1,false)) then
 			xr_effects.disable_ui_only(db.actor, nil)

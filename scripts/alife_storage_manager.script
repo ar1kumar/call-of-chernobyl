@@ -19,7 +19,7 @@
 local m_data = {}
 
 -- store stuff that you want to persist even offline
-m_data.se_stalker = {}
+m_data.se_object = {}
 
 -- store stuff only for online objects. When object goes offline this table is purged.
 m_data.game_object = {}
@@ -81,8 +81,8 @@ function CALifeStorageManager_before_save(fname)
 	
 	--ProcessEventQueueState(m_data,true)
 	
-	-- clean out se_stalker table of empty sub tables
-	for k,v in pairs(m_data.se_stalker) do 
+	-- clean out se_object table of empty sub tables
+	for k,v in pairs(m_data.se_object) do 
 		if (is_empty(v)) then 
 			v = nil 
 		end
@@ -181,12 +181,12 @@ end
 function get_se_obj_state(se_obj,create_if_dont_exist)
 	local id = se_obj.id
 	local name = se_obj:name()
-	if not (m_data.se_stalker[id] and m_data.se_stalker[id].name == name) then
+	if not (m_data.se_object[id] and m_data.se_object[id].name == name) then
 		if not (create_if_dont_exist) then
 			return 
 		end
-		m_data.se_stalker[id] = {}
-		m_data.se_stalker[id].name = name
+		m_data.se_object[id] = {}
+		m_data.se_object[id].name = name
 	end
-	return m_data.se_stalker[id]
+	return m_data.se_object[id]
 end

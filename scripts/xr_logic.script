@@ -469,7 +469,7 @@ function switch_to_section(npc, ini, section)
 	
 	db.storage[npc_id].overrides = cfg_get_overrides(ini, section, npc)
 	
-	if (axr_beh) then alun_utils.save_var(npc,"path_index",1) end
+	if (axr_beh) then utils.save_var(npc,"path_index",1) end
 	
 	if active_section then
 		local st = db.storage[npc_id][db.storage[npc_id].active_scheme]
@@ -953,104 +953,6 @@ end
 local pstor_number = 0
 local pstor_string = 1
 local pstor_boolean = 2
-
-function pstor_is_registered_type(tv)
-	if tv ~= "boolean" and tv ~= "string" and tv ~= "number" then
-		return false
-	end
-	return true
-end
-
-function pstor_store(obj, varname, val)
-	if not (obj) then
-		printf("xr_logic: error: pstor_store: obj is nil for varname = %s, val = %s",varname,val)
-		return
-	end
-
-	local npc_id = type(obj) == "number" and obj or type(obj.id) == "function" and obj:id() or obj.id
-
-	if not (db.storage[npc_id]) then
-		return
-	end
-	
-	if not (db.storage[npc_id].pstor) then
-		db.storage[npc_id].pstor = {}
-	end
-
-	if not (USE_MARSHAL) then
-		local tv = type(val)
-		if val ~= nil and not pstor_is_registered_type(tv) then
-			printf("xr_logic: pstor_store: not registered type '%s' encountered [name=%s varname=%s ]", tv,obj:name(),varname)
-			return
-		end
-	end
-	
-	--printf("xr_logic: pstor_store: %s storing a value %s = %s",obj:name(),varname,val)
-	db.storage[npc_id].pstor[varname] = val
-end
-
-function pstor_retrieve(obj, varname, defval)
-	local npc_id = obj and (type(obj) == "number" and obj or type(obj.id) == "function" and obj:id() or obj.id)
-
-	if not (npc_id) then
-		printf("xr_logic: error: pstor_retrieve: npc_id is nil for varname = %s, val = %s",varname,defval)
-		return defval
-	end
-
-	if not (db.storage[npc_id]) then
-		printf("xr_logic.pstor_retrieve: Warning: no db.storage for %s, db.storage is for online objects only",npc_id)
-		return defval
-	end
-
-	if (db.storage[npc_id].pstor) then
-		local ret_val = db.storage[npc_id].pstor[varname]
-		--printf("xr_logic: pstor_retrieve: %s retrieving a value %s = %s",obj:name(),varname,ret_val)
-		return ret_val or defval
-	end
-	
-	--printf("xr_logic: pstor_retrieve: %s does not have a db.storage.pstor table - trying to retrieve %s",obj:name(),varname)
-
-	return defval
-end
-
-function save_ctime(obj,varname,val)
-	if not (obj) then
-		return
-	end
-
-	local npc_id = type(obj) == "number" and obj or type(obj.id) == "function" and obj:id() or obj.id
-
-	if not (db.storage[npc_id]) then
-		return
-	end
-	
-	if not (db.storage[npc_id].pstor_ctime) then
-		db.storage[npc_id].pstor_ctime = {}
-	end
-	
-	db.storage[npc_id].pstor_ctime[varname] = val
-end
-
-function load_ctime(obj, varname)
-	local npc_id = obj and (type(obj) == "number" and obj or type(obj.id) == "function" and obj:id() or obj.id)
-
-	if not (npc_id) then
-		printf("xr_logic: error: pstor_retrieve: npc_id is nil for varname = %s, val = %s",varname,defval)
-		return
-	end
-
-	if not (db.storage[npc_id]) then
-		printf("xr_logic.pstor_retrieve: Warning: no db.storage for %s, db.storage is for online objects only",npc_id)
-		return
-	end
-
-	if (db.storage[npc_id].pstor_ctime) then
-		return db.storage[npc_id].pstor_ctime[varname]
-	end
-
-	return
-end
-
 function pstor_save_all(obj, packet)
 	local npc_id = obj:id()
 	if (USE_MARSHAL) then
@@ -1275,6 +1177,12 @@ function get_customdata_or_ini_file(npc, filename)
 end
 
 function initialize_obj(obj, st, loaded, actor, stype)
+	if (IsStalker(obj)) then
+		if (obj:has_info("npcx_is_companion")) then 
+			axr_companions.setup_companion_logic(obj,st,loaded)
+			return
+		end
+	end
 	local ini_filename = st.loaded_ini_filename or "<customdata>"
 	local ini = get_customdata_or_ini_file(obj, ini_filename)
 	ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, st.loaded_section_logic or "logic", st.loaded_gulag_name or "")

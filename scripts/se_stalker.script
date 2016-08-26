@@ -67,19 +67,6 @@ function se_stalker:STATE_Read(packet, size)
 	--alun_utils.debug_write("se_stalker:STATE_Read "..self:name().." END\n")
 end
 
-function se_stalker:get_alife_storage(create_if_dont_exist)
-	--alun_utils.debug_write("se_stalker:get_alife_storage")
-	local m_data = alife_storage_manager.get_state()
-	if not (m_data.se_stalker[self.id] and m_data.se_stalker[self.id].name == self:name()) then 
-		if not (create_if_dont_exist) then 
-			return 
-		end
-		m_data.se_stalker[self.id] = {}
-		m_data.se_stalker[self.id].name = self:name()
-	end
-	return m_data.se_stalker[self.id]
-end
-
 --------------------
 function se_stalker:on_before_register()
 end
@@ -87,6 +74,10 @@ end
 function se_stalker:on_register()
 	--alun_utils.debug_write("\nse_stalker:on_register "..self:name().." START")
 	cse_alife_human_stalker.on_register( self )
+	
+	-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
+	
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 
@@ -103,7 +94,7 @@ function se_stalker:on_register()
 	local spawn_ini = self:spawn_ini()
 	local smartn = spawn_ini and spawn_ini:r_string_ex("logic","smart_terrain")
 	local smart = smartn and SIMBOARD:get_smart_by_name(smartn)
-		if (smart) then
+	if (smart) then
 		smart:register_npc(self)
 	end
 	--alun_utils.debug_write("se_stalker:on_register "..self:name().." END")
@@ -120,7 +111,7 @@ function se_stalker:on_unregister()
 	end
 	db.offline_objects[self.id] = nil
 	-- If object unregisters before saving, it means it was removed from game
-	alife_storage_manager.get_state().se_stalker[self.id] = nil
+	alife_storage_manager.get_state().se_object[self.id] = nil
 	unregister_story_object_by_id(self.id)
 	cse_alife_human_stalker.on_unregister(self)
 end

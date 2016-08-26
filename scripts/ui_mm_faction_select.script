@@ -215,11 +215,9 @@ local function actor_on_first_update(binder,delta)
 					if (se_obj) then
 						game_relations.change_factions_community_num("zombied",k.id,-5000)
 						SIMBOARD:setup_squad_and_group(se_obj)
-						as = se_obj:get_alife_storage(true)
-						if (as) then
-							as.companion = true
-							as.companion_cannot_dismiss = true
-						end
+						
+						utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion",true)
+						utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss",true)
 					end
 				end
 			end

@@ -116,7 +116,7 @@ end
 
 local function npc_on_death_callback(npc,who)
 	if (IsStalker(npc) and character_community(npc) ~= "zombied") then
-		--alun_utils.save_var(npc,"death_by_id",who:id())
+		--utils.save_var(npc,"death_by_id",who:id())
 		local st = db.storage[npc:id()]
 		if (st) then
 			st.killer_last_known_position = vector():set(who:position())
