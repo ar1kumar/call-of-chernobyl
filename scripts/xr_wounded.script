@@ -28,11 +28,11 @@ function evaluator_wound:evaluate ()
 		return false
 	end
 
-	if self.object:best_enemy() and xr_logic.pstor_retrieve(self.object, "wounded_fight") == "true" then
+	if self.object:best_enemy() and utils.load_var(self.object, "wounded_fight") == "true" then
 		return false
 	end
 
-	local state = xr_logic.pstor_retrieve(self.object, "wounded_state")
+	local state = utils.load_var(self.object, "wounded_state")
 	if (state == nil or state == "nil") then 
 		return false
 	end 
@@ -49,7 +49,7 @@ function evaluator_can_fight:evaluate ()
 		return true
 	end
 
-	return xr_logic.pstor_retrieve(self.object, "wounded_fight") ~= "false"
+	return utils.load_var(self.object, "wounded_fight") ~= "false"
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -97,10 +97,10 @@ function action_wounded:execute()
 	-- Проверяем возможность скушать аптечку.
 	if self.a.autoheal == true then
 		if wound_manager.can_use_medkit ~= true then
-			local begin_wounded = xr_logic.pstor_retrieve(self.object, "begin_wounded")
+			local begin_wounded = utils.load_var(self.object, "begin_wounded")
 			local current_time = time_global()
 			if begin_wounded == nil then
-				xr_logic.pstor_store(self.object, "begin_wounded", current_time)
+				utils.save_var(self.object, "begin_wounded", current_time)
 			elseif current_time - begin_wounded > 60000 then
 				local sim = alife()
 				sim:create("medkit_script",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
@@ -109,7 +109,7 @@ function action_wounded:execute()
 		end
 	end
 
-	local wound_manager_state = xr_logic.pstor_retrieve(npc, "wounded_state")
+	local wound_manager_state = utils.load_var(npc, "wounded_state")
 	
 	if wound_manager_state == "true" then
 		local h = hit()
@@ -131,12 +131,12 @@ function action_wounded:execute()
 	
 	local id = npc:id()
 	local po = db.storage[id].victim_surrender and level.object_by_id(db.storage[id].victim_surrender)
-	if (po and po:alive() and not alun_utils.load_var(npc,"victim_surrender",nil)) then
+	if (po and po:alive() and not utils.load_var(npc,"victim_surrender",nil)) then
 		state_mgr.set_state(npc,"prisoner",nil,nil,nil,{fast_set = true})
 		return
 	end
 
-	local wound_manager_sound = xr_logic.pstor_retrieve(npc, "wounded_sound")
+	local wound_manager_sound = utils.load_var(npc, "wounded_sound")
 
 	if (not wound_manager_sound or wound_manager_sound == "nil") then
 		xr_sound.set_sound_play(npc:id(), nil)
@@ -215,10 +215,10 @@ function Cwound_manager:update()
 	--printf("f[%s]c[%s]v[%s]", utils.to_str(self.fight), utils.to_str(self.cover), utils.to_str(self.victim))
 	--printf("st[%s]so[%s]", utils.to_str(self.state), utils.to_str(self.sound))
 
-	xr_logic.pstor_store(self.npc, "wounded_state", self.state)
-	xr_logic.pstor_store(self.npc, "wounded_sound", self.sound)
-	xr_logic.pstor_store(self.npc, "wounded_fight", self.fight)
-	xr_logic.pstor_store(self.npc, "wounded_victim", self.victim)
+	utils.save_var(self.npc, "wounded_state", self.state)
+	utils.save_var(self.npc, "wounded_sound", self.sound)
+	utils.save_var(self.npc, "wounded_fight", self.fight)
+	utils.save_var(self.npc, "wounded_victim", self.victim)
 end
 function Cwound_manager:unlock_medkit()
 	self.can_use_medkit = true
@@ -241,13 +241,13 @@ function Cwound_manager:eat_medkit()
 		end
 
 
-		local begin_wounded = xr_logic.pstor_retrieve(self.npc, "begin_wounded")
+		local begin_wounded = utils.load_var(self.npc, "begin_wounded")
 		local current_time = time_global()
 		if begin_wounded ~= nil and current_time - begin_wounded <= 60000 then
 			xr_sound.set_sound_play(self.npc:id(), "help_thanks")
 		end
 
-		xr_logic.pstor_store(self.npc, "begin_wounded", nil)
+		utils.save_var(self.npc, "begin_wounded", nil)
 
 		self.can_use_medkit = false
 		db.storage[self.npc:id()].wounded_already_selected = nil

@@ -17,7 +17,7 @@ function bandit_companion_task_1_complete(a,b)
 	for k in squad:squad_members() do
 		local npc = db.storage[k.id] and db.storage[k.id].object
 		if (npc) then 
-			total_loot_count = total_loot_count + (alun_utils.load_var(npc,"s_loot_count") or 0)
+			total_loot_count = total_loot_count + (utils.load_var(npc,"s_loot_count") or 0)
 		end
 	end
 	

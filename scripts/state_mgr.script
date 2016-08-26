@@ -7,7 +7,9 @@
 --function printf()
 --end
 
-combat_action_ids = {	[stalker_ids.action_combat_planner] = true,
+combat_action_ids = {
+						-- basically if your scheme sets body/movement states manually and doesn't use set_state, then you need it here
+						[stalker_ids.action_combat_planner] = true,
 						[stalker_ids.action_danger_planner] = true,
 						[stalker_ids.action_anomaly_planner] = true,
 						[xrs_facer.actid_facer] = true,
@@ -310,8 +312,8 @@ function act_state_mgr_end:execute()
 	end
 	
 	if (t == "sniper_fire" or t == "fire") then
-		local o = self.st.look_object and db.storage[self.st.look_object] and db.storage[self.st.look_object].object
-		if (o == nil or o:alive()) then
+		-- local o = self.st.look_object and db.storage[self.st.look_object] and db.storage[self.st.look_object].object
+		-- if (o == nil or o:alive()) then
 			if (self.st.planner:evaluator(state_mgr_goap.properties["direction"]):evaluate()) then
 				if (t == "sniper_fire") then
 					local aim = math.random(500,1500)
@@ -320,9 +322,9 @@ function act_state_mgr_end:execute()
 					self.st.npc:set_item(object.fire1, wpn, state_mgr_weapon.get_queue_params(self.st.npc, state_lib.states[self.st.target_state], {5,300,0} ))
 				end
 			end
-		else -- object is dead 
-			self.st.npc:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
-		end
+		-- else -- object is dead 
+			-- self.st.npc:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
+		-- end
 	elseif (t == "unstrapped") then 
 		self.st.npc:set_item(state_mgr_weapon.get_idle_state(self.st.target_state), wpn)
 	end

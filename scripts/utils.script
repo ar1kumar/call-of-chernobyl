@@ -1,40 +1,3 @@
-
---[[
-ОПИСАНИЕ ФУНКЦИЙ
-
--- Выводит отладочное сообщение в лог, если скрипт активен (активный скрипт выбирается с помощью
--- переменной debug_info.trace_script).
-function trace(script_name, fmt, ...)
-
--- Переводит переменную любого типа (включая nil) в строку. Используется для отладочного вывода информации.
-function to_str(what)
-
--- Создает и возвращает копию вектора
-function vector_copy_by_val(vec)
-
--- Настройка параметров игровых объектов:
-function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
-function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name, default_val)
-function cfg_get_number(char_ini, section, field, object, mandatory, default_val)
-
--- Проверяет, находится ли stalker рядом с точкой path_point пути patrol_path
-function stalker_at_waypoint(stalker, patrol_path, path_point)
-
--- Послать stalker в заданную точку patrol_path(path_point)
-function stalker_go_to_waypoint(stalker, patrol_path, path_point)
-
---]]
-
-----------------------------------------------------------------------------------------------------
-
--- Выводит отладочное сообщение в лог, если скрипт активен (активный скрипт выбирается с помощью
--- переменной debug_info.trace_script).
---function trace(script_name, fmt, ...)
---	if debug_info.trace_script == script_name then
---		log(string.format("[TRACE] " .. script_name .. ".script: " .. fmt, unpack(arg)))
---	end
---end
-
 -- Переводит переменную любого типа (включая nil) в строку. Используется для отладочного вывода информации.
 function to_str(what)
 	if what == nil then
@@ -105,27 +68,15 @@ end
 
 --' Сравнивает два вектора с заданной погрешностью
 function vector_cmp_prec(a, b, d)
-		return math.abs(a.x - b.x) <= d and
-					 math.abs(a.y - b.y) <= d and
-					 math.abs(a.z - b.z) <= d
+	return math.abs(a.x - b.x) <= d and math.abs(a.y - b.y) <= d and math.abs(a.z - b.z) <= d
 end
-
 
 -- Создает и возвращает копию вектора
 function vector_copy_by_val(vec)
 	return vector():set(vec)
 end
 
--- Настройка параметра типа bool у игрового объекта.
---
--- char_ini - указатель на customdata (обычно object:spawn_ini())
--- section - имя секции в customdata
--- field - имя поля в customdata
--- object - игровой объект, от которого будет взято имя для сообщения об ошибке
--- mandatory - поле обязательно должно быть задано
---
--- Возвращает true или false
--- depreciated
+-- deprecated
 function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
 	if mandatory == nil then
 		printf("section '%s': wrong arguments order in call to cfg_get_bool", section)
@@ -155,7 +106,7 @@ function cfg_get_bool(char_ini, section, field, object, mandatory, default_val)
 		"section '%s'", object:name(), field, section)
 end
 
--- depreciated
+-- deprecated
 function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name, default_val)
 	if mandatory == nil then
 		printf("section '%s': wrong arguments order in call to cfg_get_string", section)
@@ -182,7 +133,7 @@ function cfg_get_string(char_ini, section, field, object, mandatory, gulag_name,
 	return default_val
 end
 
--- depreciated
+-- deprecated
 function cfg_get_number(char_ini, section, field, object, mandatory, default_val)
 	if mandatory == nil then
 		printf("section '%s': wrong arguments order in call to cfg_get_number", section)
@@ -242,60 +193,9 @@ function stalker_at_waypoint(stalker, patrol_path, path_point)
 
 end
 
--- Послать stalker в заданную точку patrol_path(path_point)
---[[
-function stalker_go_to_waypoint(stalker, patrol_path, path_point)
-	if stalker:animation_count() > 0 then
-		stalker:clear_animations()
-	end
-	if stalker:level_vertex_id() == patrol_path:level_vertex_id(path_point) then
-		return
-	end
-	stalker:set_dest_level_vertex_id(patrol_path:level_vertex_id(path_point))
-	stalker:set_movement_type(move.run)
-	stalker:set_body_state(move.standing)
-	stalker:set_sight(look.path_dir, nil, 0)
-	stalker:set_path_type(game_object.level_path)
-	stalker:set_mental_state(anim.danger)
-	stalker:set_detail_path_type(move.line)
-end
---]]
-
 function stalker_stop(stalker)
 	stalker:set_movement_type(move.stand)
 end
-
---[[
-function stalker_look_at_waypoint(stalker, patrol_path, path_point)
-	local look_pt = this.vector_copy_by_val(patrol_path:point(path_point)):sub(stalker:position())
-	stalker:set_sight(look.direction, look_pt, 0)
-end
---]]
-
---[[
-function stalker_look_at_stalker(stalker, whom)
-	local look_pt = this.vector_copy_by_val(whom:position()):sub(stalker:position())
-	stalker:set_sight(look.direction, look_pt, 0)
-end
---]]
-
---[[
-function stalker_look_at_stalker_angle(stalker, whom, angle)
-		--stalker - killer
-		--whom - killed :)
-	local look_pt = this.vector_copy_by_val(whom:position()):sub(stalker:position())
-	stalker:set_sight (look.direction, vector_rotate_y (look_pt, angle), 0)
-end
---]]
-
---[[
-function stalker_look_firepoint_angle(stalker, whom, angle)
-		--stalker - killer
-		--whom - killed :)
-	local look_pt = this.vector_copy_by_val(whom:position()):sub(stalker:position())
-	stalker:set_sight (look.fire_point, vector_rotate_y (look_pt, angle), 0)
-end
---]]
 
 local function door_default_callback(door, actor)
 	local ph_shell = door:get_physics_shell()
@@ -333,11 +233,6 @@ function door_close_then_lock(door, callback_fn)
 		joint:set_max_force_and_velocity(1000000, 0, 0)
 	end
 end
-
---unlock_then_open(door) -- дверь разлочится и импульсом откроется
---locked(door) -- true, если дверь закрыта и залочена
-
---При попытке поюзать незапертую дверь она просто силой открывается до максимально допустимого состояния.
 
 function parse_waypoint_data(pathname, wpflags, wpname)
 	local rslt = {}
@@ -511,13 +406,11 @@ function is_day()
 end
 
 function electro_art_enabled ()
-		return level.get_time_hours() >= 0 and level.get_time_hours() < 5
+	return level.get_time_hours() >= 0 and level.get_time_hours() < 5
 end
 
 function no_need_to_rotate(npc, target_pos)
-	local y = yaw(npc:direction(),vector():set(target_pos):sub(npc:position()))
-
-	return y < 0.3
+	return yaw(npc:direction(),vector():set(target_pos):sub(npc:position())) < 0.3
 end
 
 function no_need_to_rotate_xz(npc, target_pos)
@@ -591,7 +484,6 @@ end
 
 ------------------------- запись/загрузка CTime ---------------------------
 local CTime_0
-
 if not editor() then
 	CTime_0 = game.CTime()
 end
@@ -694,19 +586,12 @@ end
 
 function parse_data_1v(npc,s)
 	local t = {}
-
-		if s then
+	if s then
 		for name in string.gfind( s, "(%|*%d+%|[^%|]+)%p*" ) do
---			printf("[%s]", utils.to_str(name))
-			local dat = {	dist = nil,
-							state = nil}
-
+			local dat = {dist = nil, state = nil}
 			local t_pos = string.find( name, "|", 1, true )
-
 			local dist = string.sub( name, 1, t_pos - 1 )
 			local state	= string.sub( name, t_pos + 1)
-
---			printf("	[%s]=[%s][%s]", utils.to_str(dist), utils.to_str(state), utils.to_str(sound))
 			dat.dist = tonumber(dist)
 			if state then
 				dat.state = xr_logic.parse_condlist(npc, dist, state, state)
@@ -714,18 +599,16 @@ function parse_data_1v(npc,s)
 			t[tonumber(dist)] = dat
 		end
 	end
-		return t
+	return t
 end
-
-
 
 --' Вычитка свойств для спауна объектов.
 function parse_names(s)
-		local t = {}
-		for name in string.gfind( s, "([%w_%-.\\]+)%p*" ) do
-				table.insert( t, name )
-		end
-		return t
+	local t = {}
+	for name in string.gfind( s, "([%w_%-.\\]+)%p*" ) do
+		table.insert( t, name )
+	end
+	return t
 end
 
 function parse_spawns(str)
@@ -781,31 +664,25 @@ end
 
 
 function parse_target(target)
-		local pos = string.find(target, ",")
-		if pos then
-				return string.sub(target, 1, pos - 1), string.sub(target, pos + 1)
-		else
-				return target, nil
-		end
+	local pos = string.find(target, ",")
+	if pos then
+		return string.sub(target, 1, pos - 1), string.sub(target, pos + 1)
+	else
+		return target, nil
+	end
 end
 
 function parse_data(npc,s)
 	local t = {}
 
-		if s then
+	if s then
 		for name in string.gfind( s, "(%|*%d+%|[^%|]+)%p*" ) do
---			printf("[%s]", utils.to_str(name))
-			local dat = {	dist = nil,
-							state = nil,
-							sound = nil}
-
+			local dat = {dist = nil,state = nil,sound = nil}
 			local t_pos = string.find( name, "|", 1, true )
 			local s_pos = string.find( name, "@", 1, true )
-
 			local dist = string.sub( name, 1, t_pos - 1 )
 			local state
 			local sound
-
 			if s_pos then
 				state	= string.sub( name, t_pos + 1,
 											s_pos - 1 )
@@ -813,8 +690,6 @@ function parse_data(npc,s)
 			else
 				state	= string.sub( name, t_pos + 1)
 			end
-
---			printf("	[%s]=[%s][%s]", utils.to_str(dist), utils.to_str(state), utils.to_str(sound))
 
 			dat.dist = tonumber(dist)
 			if state then
@@ -826,22 +701,16 @@ function parse_data(npc,s)
 			table.insert(t, dat)
 		end
 	end
-		return t
+	return t
 end
 
 function parse_syn_data(npc,s)
---	printf("parse_syn_data [%s]", utils.to_str(s))
 	local t = {}
-		if s then
+	if s then
 		for name in string.gfind( s, "(%|*[^%|]+%|*)%p*" ) do
-			local dat = {	zone = nil,
-							state = nil,
-							sound = nil}
---			printf("[%s]", utils.to_str(name))
-
+			local dat = {zone = nil,state = nil,sound = nil}
 			local t_pos = string.find( name, "@", 1, true )
 			local s_pos = string.find( name, "|", 1, true )
-
 			local state = string.sub( name, 1, t_pos - 1 )
 			local sound
 			if s_pos then
@@ -855,8 +724,7 @@ function parse_syn_data(npc,s)
 			table.insert(t, dat)
 		end
 	end
-
-		return t
+	return t
 end
 
 function is_widescreen()
@@ -869,13 +737,100 @@ end
 
 function prefix_r_string(ini,sec,key,prefix)
 	local rslt = ini:r_string_ex(sec,key)
-	--printf("prefix_r_string(%s,%s) = %s",sec,key,rslt)
 	if not (rslt) then 
-		--callstack()
 		return 
 	end
 	if (prefix and prefix ~= "" and prefix ~= "nil") then 
 		return prefix .. "_" .. rslt
 	end
 	return rslt
-end	
+end
+
+function pstor_is_registered_type(tv)
+	if tv ~= "boolean" and tv ~= "string" and tv ~= "number" then
+		return false
+	end
+	return true
+end
+
+function save_var(obj,varname,val)
+	if (obj == nil) then 
+		callstack()
+	end
+	local id = obj:id()
+	if not (db.storage[id]) then
+		printf("utils.save_var: Warning: no db.storage for %s, db.storage is for online objects only",id)
+		return
+	end
+	
+	if not (db.storage[id].pstor) then
+		db.storage[id].pstor = {}
+	end
+
+	if not (USE_MARSHAL) then
+		local tv = type(val)
+		if val ~= nil and not pstor_is_registered_type(tv) then
+			printf("utils.save_var: not registered type '%s' encountered [name=%s varname=%s ]", tv,obj:name(),varname)
+			return
+		end
+	end
+	
+	db.storage[id].pstor[varname] = val
+end
+
+function load_var(obj,varname,defval)
+	if (obj == nil) then 
+		callstack()
+	end
+	local id = obj:id()
+	if not (db.storage[id]) then
+		printf("utils.load_var: Warning: no db.storage for %s, db.storage is for online objects only",id)
+		return defval
+	end
+	
+	return db.storage[id].pstor and db.storage[id].pstor[varname] or defval
+end
+
+function save_ctime(obj,varname,val)
+	if (obj == nil) then 
+		callstack()
+	end
+	local id = obj:id()
+	if not (db.storage[id]) then
+		printf("utils.save_ctime: Warning: no db.storage for %s, db.storage is for online objects only",id)
+		return
+	end
+	
+	if not (db.storage[id].pstor_ctime) then
+		db.storage[id].pstor_ctime = {}
+	end
+	
+	db.storage[id].pstor_ctime[varname] = val
+end
+
+function load_ctime(obj, varname)
+	if (obj == nil) then 
+		callstack()
+	end
+	local id = obj:id()
+	if not (db.storage[id]) then
+		printf("utils.load_var: Warning: no db.storage for %s, db.storage is for online objects only",id)
+		return
+	end
+
+	return db.storage[id].pstor_ctime and db.storage[id].pstor_ctime[varname] or nil
+end
+
+function se_obj_save_var(id,name,varname,val)
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_stalker[id] and m_data.se_stalker[id].name == name) then
+		m_data.se_stalker[id][varname] = val 
+	end
+end
+
+function se_obj_load_var(id,name,varname)
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_stalker[id] and m_data.se_stalker[id].name == name) then
+		return m_data.se_stalker[id][varname]
+	end
+end

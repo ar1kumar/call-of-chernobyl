@@ -99,7 +99,7 @@ function heli_combat:is_enemy(obj)
 			return false 
 		end
 	
-		if (alun_utils.load_var(db.actor,"heli_enemy_flag",false) == true) then
+		if (utils.load_var(db.actor,"heli_enemy_flag",false) == true) then
 			return true
 		end
 		return self.actor_always_enemy or false
@@ -193,7 +193,7 @@ function heli_combat:find_valid_target()
 	
 	if (self.heliObject:isVisible(target)) then
 		local target_pos = target:position()
-		if (id == 0 and alun_utils.load_var(db.actor,"heli_enemy_flag",false) and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 14400) or (id ~= 0 and db.storage[id].heli_enemy_flag and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 62500) then
+		if (id == 0 and utils.load_var(db.actor,"heli_enemy_flag",false) and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 14400) or (id ~= 0 and db.storage[id].heli_enemy_flag and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 62500) then
 			if (self.st.ini and self.st.active_section) then
 				local smart = xr_gulag.get_npc_smart(self.object)
 				if (smart) then
@@ -204,7 +204,7 @@ function heli_combat:find_valid_target()
 							local dist = heli_alife.distance_2d_sqr(target_pos,smart.position)
 							if (dist < radius) then
 								if (id == 0) then 
-									alun_utils.save_var(db.actor,"heli_enemy_flag",true)
+									utils.save_var(db.actor,"heli_enemy_flag",true)
 								else
 									db.storage[target:id()].heli_enemy_flag = true
 								end

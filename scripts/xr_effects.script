@@ -21,7 +21,7 @@ function find_smart_under_faction_control(actor,npc,p)
 					if (squad and squad.stay_time and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
 						for i=2,#p do
 							if (p[i] == "monster" and is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
-								alun_utils.save_var(db.actor,p[1],smart.id)
+								utils.save_var(db.actor,p[1],smart.id)
 								return
 							end
 						end
@@ -47,7 +47,7 @@ function find_smart_under_faction_control_ex(actor,npc,p)
 					if (squad and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
 						for i=2,#p do
 							if (p[i] == "monster" and is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
-								alun_utils.save_var(db.actor,p[1],smart.id)
+								utils.save_var(db.actor,p[1],smart.id)
 								return
 							end
 						end
@@ -168,7 +168,7 @@ function on_init_bounty_hunt(actor,npc,p)
 	
 	printf("on_init_bounty_hunt %s",target_id)
 	
-	--alun_utils.save_var(db.actor,p[1],target_id)
+	--utils.save_var(db.actor,p[1],target_id)
 end 
 
 function fail_task_dec_goodwill(actor,npc,p)
@@ -203,7 +203,7 @@ function reward_stash(actor,npc,p)
 end
 
 function reward_item_cost_mult_and_remove(actor,npc,p)
-	local sec = alun_utils.load_var(db.actor,p[1])
+	local sec = utils.load_var(db.actor,p[1])
 	if not (sec) then 
 		return 
 	end 
@@ -225,7 +225,7 @@ function remove_special_task_squad(actor,npc,p)
 end 
 
 function reset_task_target_anomaly(actor,npc,p)
-	alun_utils.save_var(db.actor,"task_target_anomaly",nil)
+	utils.save_var(db.actor,"task_target_anomaly",nil)
 end 
 
 -- Spawn a squad that will become actor companion for special tasks
@@ -234,7 +234,7 @@ end
 -- param 3 - variable name. Will use smart_id in a pstor variable instead
 -- param 4 - disable level transition for the squad
 function setup_companion_task(actor,npc,p)
-	local id = p[3] and p[3] ~= "nil" and alun_utils.load_var(db.actor,p[3])
+	local id = p[3] and p[3] ~= "nil" and utils.load_var(db.actor,p[3])
 	local smart = id and alife():object(id) or p[2] and p[2] ~= "nil" and SIMBOARD.smarts_by_names[p[2]]
 	if not (smart) then 
 		return 
@@ -264,7 +264,7 @@ function setup_companion_task(actor,npc,p)
 		end
 	end
 
-	--alun_utils.save_var(db.actor,p[3] or "task_companion_slot_1",squad.id)
+	--utils.save_var(db.actor,p[3] or "task_companion_slot_1",squad.id)
 	--CreateTimeEvent(0,"add_special_task_squad",5,add_special_task_squad,squad.id,p[4] == "true")
 end
 
@@ -280,7 +280,7 @@ function setup_task_target_anomaly(actor,npc,p)
 	end 
 	
 	local target_name = targets[math.random(#targets)]
-	alun_utils.save_var(db.actor,"task_target_anomaly",target_name)
+	utils.save_var(db.actor,"task_target_anomaly",target_name)
 end
 
 -- param1 - variable name
@@ -290,10 +290,10 @@ function setup_generic_fetch_task(actor,npc,p)
 	if (p[1] and p[2] and p[3]) then 
 		local sec = #p > 3 and p[math.random(3,#p)] or p[3]
 		if (sec and system_ini():section_exist(sec)) then
-			alun_utils.save_var(db.actor,p[1],sec)
+			utils.save_var(db.actor,p[1],sec)
 			local count = tonumber(p[2]) or 1
 			if (count > 1) then 
-				alun_utils.save_var(db.actor,p[1].."_count",count)
+				utils.save_var(db.actor,p[1].."_count",count)
 			end
 			dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
 		else
@@ -315,7 +315,7 @@ function setup_rare_mutant_fetch_task(actor,npc,p)
 	}
 	local part = parts[math.random(#parts)]
 	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(part,"inv_name") or "")
-	alun_utils.save_var(db.actor,p[1],part)
+	utils.save_var(db.actor,p[1],part)
 end 
 
 -- param1 - variable name
@@ -348,7 +348,7 @@ function setup_artefact_fetch_task(actor,npc,p)
 	
 	local artefact = arts[math.random(#arts)]
 	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(artefact,"inv_name") or "")
-	alun_utils.save_var(db.actor,p[1],artefact)
+	utils.save_var(db.actor,p[1],artefact)
 end 
 
 function setup_weapon_fetch_task(actor,npc,p)
@@ -378,7 +378,7 @@ function setup_weapon_fetch_task(actor,npc,p)
 	}
 	local wpn = itm[math.random(#itm)]
 	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(wpn,"inv_name") or "")
-	alun_utils.save_var(db.actor,p[1],wpn)
+	utils.save_var(db.actor,p[1],wpn)
 end 
 
 -- param 1 - var name 
@@ -407,14 +407,14 @@ function setup_supplies_fetch_task(actor,npc,p)
 				}
 	local itm = itm[math.random(#itm)]
 	dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(itm,"inv_name") or "")
-	alun_utils.save_var(db.actor,p[1],itm)
-	alun_utils.save_var(db.actor,p[1].."_count",math.random(p[2] and tonumber(p[2]) or 1,p[3] and tonumber(p[3]) or 1))
+	utils.save_var(db.actor,p[1],itm)
+	utils.save_var(db.actor,p[1].."_count",math.random(p[2] and tonumber(p[2]) or 1,p[3] and tonumber(p[3]) or 1))
 end 
 
 function remove_fetch_item(actor,npc,p)
-	local section = alun_utils.load_var(db.actor,p[1])
+	local section = utils.load_var(db.actor,p[1])
 	if (section and db.actor:object(section)) then
-		local amt = p[2] or alun_utils.load_var(db.actor,p[1].."_count") or 1
+		local amt = p[2] or utils.load_var(db.actor,p[1].."_count") or 1
 		remove_item(actor, npc, {section,amt})
 	end
 end
@@ -425,7 +425,7 @@ function force_talk(actor,npc,p)
 end 
 
 function unlock_smart(actor,npc,p)
-	local id = p[1] and p[1] ~= "nil" and alun_utils.load_var(db.actor,p[1])
+	local id = p[1] and p[1] ~= "nil" and utils.load_var(db.actor,p[1])
 	local smart = id and alife():object(id)
 	if (smart) then 
 		smart.locked = nil
@@ -1437,24 +1437,24 @@ end
 function inc_counter(actor, npc, p)
 	if p and p[1] then
 		local inc_value = p[2] or 1
-		local new_value = xr_logic.pstor_retrieve(actor, p[1], 0) + inc_value
+		local new_value = utils.load_var(actor, p[1], 0) + inc_value
 		if npc and npc:name() then
 			printf("inc_counter '%s'  to value [%s], by [%s]", p[1], tostring(new_value), tostring(npc:name()))
 		end
-		xr_logic.pstor_store(actor, p[1], new_value)
+		utils.save_var(actor, p[1], new_value)
 	end
 end
 
 function dec_counter(actor, npc, p)
 	if p and p[1] then
 		local dec_value = p[2] or 1
-		local new_value = xr_logic.pstor_retrieve(actor, p[1], 0) - dec_value
+		local new_value = utils.load_var(actor, p[1], 0) - dec_value
 		if new_value < 0 then
 			new_value = 0
 		end
-		xr_logic.pstor_store(actor, p[1], new_value)
+		utils.save_var(actor, p[1], new_value)
 		if npc and npc:name() then
-			printf( "dec_counter [%s] value [%s] by [%s]", p[1], xr_logic.pstor_retrieve(actor, p[1], 0), tostring(npc:name()))
+			printf( "dec_counter [%s] value [%s] by [%s]", p[1], utils.load_var(actor, p[1], 0), tostring(npc:name()))
 		end
 	end
 end
@@ -1463,8 +1463,8 @@ function set_counter(actor, npc, p)
 	if p and p[1] then
 		local count = p[2] or 0
 --		printf( "set_counter '%s' %s", p[1], count)
-		xr_logic.pstor_store(actor, p[1], count)
---		printf("counter [%s] value [%s]", p[1], xr_logic.pstor_retrieve(actor, p[1], 0))
+		utils.save_var(actor, p[1], count)
+--		printf("counter [%s] value [%s]", p[1], utils.load_var(actor, p[1], 0))
 	end
 end
 
@@ -2618,13 +2618,13 @@ end
 function pstor_set(actor,npc,p)
 	p[2] = tonumber(p[2])
 	if (p[1] and p[2]) then 
-		alun_utils.save_var(db.actor,p[1],p[2])
+		utils.save_var(db.actor,p[1],p[2])
 	end
 end
 
 function pstor_reset(actor,npc,p)
 	if (p[1]) then
-		alun_utils.save_var(db.actor,p[1],nil)
+		utils.save_var(db.actor,p[1],nil)
 	end
 end 
 
@@ -3170,7 +3170,7 @@ function jup_b10_spawn_drunk_dead_items(actor, npc, p)
 					}
 
 	if p and p[1] ~= nil then
-		local cnt = xr_logic.pstor_retrieve(actor, "jup_b10_ufo_counter", 0)
+		local cnt = utils.load_var(actor, "jup_b10_ufo_counter", 0)
 		if cnt > 2 then return end
 		for k,v in pairs(items[cnt]) do
 			local target_obj_id = get_story_object_id(p[1])
@@ -3423,7 +3423,7 @@ function jup_b221_play_main(actor, npc, p)
 		disable_info(info_need_reply)
 		theme_to_play = reachable_theme[math.random(1, #reachable_theme)]
 --		printf("jup_b221_play_main: variable theme_to_play ------------------------------> [%s]", tostring(theme_to_play))
-		xr_logic.pstor_store(actor,"jup_b221_played_main_theme",tostring(theme_to_play))
+		utils.save_var(actor,"jup_b221_played_main_theme",tostring(theme_to_play))
 		db.actor:give_info_portion(main_theme .. tostring(theme_to_play) .."_played")
 		if theme_to_play ~= 0 then
 			play_sound(actor, npc, {main_theme .. tostring(theme_to_play)})
@@ -3432,13 +3432,13 @@ function jup_b221_play_main(actor, npc, p)
 		end
 	else
 		db.actor:give_info_portion(info_need_reply)
-		theme_to_play = tonumber(xr_logic.pstor_retrieve(actor,"jup_b221_played_main_theme",0))
+		theme_to_play = tonumber(utils.load_var(actor,"jup_b221_played_main_theme",0))
 		if theme_to_play ~= 0 then
 			play_sound(actor, npc, {reply_theme..tostring(theme_to_play)})
 		else
 			printf("No such theme_to_play in function 'jup_b221_play_main'")
 		end
-		xr_logic.pstor_store(actor,"jup_b221_played_main_theme","0")
+		utils.save_var(actor,"jup_b221_played_main_theme","0")
 	end
 end
 
@@ -4075,8 +4075,8 @@ function jup_b200_count_found(actor)
 		end
 	end
 
-	cnt = cnt + xr_logic.pstor_retrieve(actor, "jup_b200_tech_materials_brought_counter", 0)
-	xr_logic.pstor_store(actor, "jup_b200_tech_materials_found_counter", cnt)
+	cnt = cnt + utils.load_var(actor, "jup_b200_tech_materials_brought_counter", 0)
+	utils.save_var(actor, "jup_b200_tech_materials_found_counter", cnt)
 end
 
 function sr_teleport(actor,npc,p)
@@ -4463,7 +4463,7 @@ function erase_pstor_ctime(actor,npc,p)
 		return 
 	end 
 	
-	xr_logic.save_ctime(db.actor,p[1],nil)
+	utils.save_ctime(db.actor,p[1],nil)
 end
 
 -- Shows progress bar health for last hit enemy with db.storage[id].show_health = true

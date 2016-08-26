@@ -314,7 +314,7 @@ function action_psy_antenna:__init( obj, storage )
 end
 function action_psy_antenna:reset_scheme( loading )
 		if loading then
-			self.state = xr_logic.pstor_retrieve( self.object, "inside"  )
+			self.state = utils.load_var( self.object, "inside"  )
 		end
 		if self.state == state_inside then
 			self:zone_leave()
@@ -415,7 +415,7 @@ function action_psy_antenna:zone_leave()
 	end
 end
 function action_psy_antenna:save()
-	xr_logic.pstor_store( self.object, "inside", self.state )
+	utils.save_var( self.object, "inside", self.state )
 end
 
 ---------------------------------------------------------------------------------------------------------------------

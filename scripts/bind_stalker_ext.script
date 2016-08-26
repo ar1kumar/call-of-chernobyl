@@ -176,7 +176,7 @@ function actor_on_item_use(binder,item)
 		con:execute("snd_volume_eff 0")
 	elseif (sec == "drug_psy_blockade" or sec == "drug_radioprotector" or sec == "drug_antidot") then
 		local boost_time = system_ini():r_float_ex(sec,"boost_time")
-		xr_logic.pstor_store(db.actor,sec.."_expiration",utils.CTimeAddSec(game.get_game_time(),boost_time*level.get_time_factor()))
+		utils.save_var(db.actor,sec.."_expiration",utils.CTimeAddSec(game.get_game_time(),boost_time*level.get_time_factor()))
 	elseif (sec == "radio_connections_pda") then 
 		run_dynamic_element(pda_dialog.pda_dialog_box(),true)
 	end 

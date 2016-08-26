@@ -56,12 +56,12 @@ end
 function drop_manager:create_release_item()
 	--' Спрашиваем у серверного объекта генерились ли предметы
 	-- Alundaio
-	local death_dropped = xr_logic.pstor_retrieve(self.npc,"death_dropped",false)
-	if (death_dropped) then
+	local death_dropped = utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped")
+	if (death_dropped == true) then
 		return
 	end
-	xr_logic.pstor_store(self.npc,"death_dropped",true)
-	-- Alundaio
+	
+	utils.se_obj_save_var(self.npc:id(),self.npc:name(),"death_dropped",true)
 
 	self.npc:iterate_inventory(keep_item, self.npc)
 	

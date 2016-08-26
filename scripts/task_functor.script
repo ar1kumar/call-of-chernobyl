@@ -5,7 +5,7 @@
 -- HELPERS
 -----------------------------------------------------------
 local function under_faction_control_target_id(task_id)
-	local smart_id = db.actor and alun_utils.load_var(db.actor,task_id.."_id")
+	local smart_id = db.actor and utils.load_var(db.actor,task_id.."_id")
 	if not (smart_id) then
 		printf("task_functor.under_faction_control_target_id is nil")
 		return
@@ -17,7 +17,7 @@ local function under_faction_control_target_id(task_id)
 		return
 	end
 
-	local target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
+	local target_id = utils.load_var(db.actor,task_id.."_target_id")
 	local se_target = target_id and sim:object(target_id)
 
 	-- If enemies are more then 50m from target location, then show red (?) near their location
@@ -41,7 +41,7 @@ local function under_faction_control_target_id(task_id)
 end
 
 function get_squad_id_by_task_var(var_name,no_check_online)
-	local npc_id = db.actor and alun_utils.load_var(db.actor,var_name)
+	local npc_id = db.actor and utils.load_var(db.actor,var_name)
 	if not (npc_id) then
 		return
 	end
@@ -90,8 +90,8 @@ function general_fetch_task(task_id,field,p,task)
 		return
 	end
 	if (field == "title") then
-		local fetch = alun_utils.get_inv_name(alun_utils.load_var(db.actor,task_id.."_fetch",""))
-		local count = fetch and alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
+		local fetch = alun_utils.get_inv_name(utils.load_var(db.actor,task_id.."_fetch",""))
+		local count = fetch and utils.load_var(db.actor,task_id.."_fetch_count") or 1
 		if (count > 1) then
 			return strformat((game.translate_string(p) or ""),fetch .. " x" .. tostring(count))
 		end
@@ -100,15 +100,15 @@ function general_fetch_task(task_id,field,p,task)
 		if (task.stage == 1) then
 			return game.translate_string("st_return_for_reward")
 		end
-		local fetch = alun_utils.get_inv_name(alun_utils.load_var(db.actor,task_id.."_fetch",""))
-		local count = fetch and alun_utils.load_var(db.actor,task_id.."_fetch_count") or 1
+		local fetch = alun_utils.get_inv_name(utils.load_var(db.actor,task_id.."_fetch",""))
+		local count = fetch and utils.load_var(db.actor,task_id.."_fetch_count") or 1
 		if (count > 1) then
 			return strformat((game.translate_string(p) or ""),fetch .. " x" .. tostring(count))
 		end
 		return strformat(game.translate_string(p) or "",fetch)
 	elseif (field == "target") then
 		if (task.stage == 1) then
-			local id = alun_utils.load_var(db.actor,task_id.."_target_id") or task.task_giver_id
+			local id = utils.load_var(db.actor,task_id.."_target_id") or task.task_giver_id
 			if (id) then
 				return id
 			end
@@ -177,7 +177,7 @@ function mar_base_owl_stalker_trader_task_target(task_id,field,p)
 		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
 			return squad.id
 		end
-		local n = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
+		local n = db.actor and utils.load_var(db.actor,"task_target_anomaly")
 		if (n) then
 			local anomaly = db.anomaly_by_name[n]
 			if (anomaly and anomaly.object) then
@@ -201,7 +201,7 @@ function esc_m_trader_task_target(task_id,field,p,task)
 			end
 
 			local smart = SIMBOARD.smarts_by_names["esc_smart_terrain_7_11"]
-			local target_id = alun_utils.load_var(db.actor,"esc_m_trader_task_1_target_id")
+			local target_id = utils.load_var(db.actor,"esc_m_trader_task_1_target_id")
 			local se_target = target_id and alife():object(target_id)
 
 			if (se_target and smart.position:distance_to_sqr(se_target.position) > 2500) then
@@ -237,7 +237,7 @@ function jup_b6_scientist_tech_task_target(task_id,field,p,task)
 		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
 			return squad.id
 		end
-		local n = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
+		local n = db.actor and utils.load_var(db.actor,"task_target_anomaly")
 		if (n) then
 			local anomaly = db.anomaly_by_name[n]
 			if (anomaly and anomaly.object) then

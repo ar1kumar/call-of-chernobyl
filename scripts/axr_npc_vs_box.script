@@ -65,17 +65,14 @@ function action_npc_vs_box:initialize()
 	local npc = self.object
 	npc:set_desired_position()
 	npc:set_desired_direction()
-	if (npc:active_item()) then
-		npc:set_item(object.aim1,npc:active_item())
+	local bw = self.object:best_weapon()
+	if (bw) then
+		self.object:set_item(object.aim1,bw)
 	end
 end
 
 function action_npc_vs_box:execute()
 	action_base.execute(self)
-	if not (self.object:active_item()) then
-		return 
-	end
-	
 	local obj
 	local itr = function(id)
 		if not (obj) then
@@ -100,18 +97,36 @@ function action_npc_vs_box:execute()
 		self.st.__tmr = nil
 	end
 	
+	local pos = vector():set(obj:position())
+	pos.y = pos.y + 0.4
+	
+	local st = db.storage[self.object:id()].state_mgr
+	self.object:clear_animations()
+	st:set_state("idle", nil, nil, nil, {fast_set = true})
+	st.animation:set_state(nil, true)
+	st.animation:set_control()
+	
 	self.object:set_mental_state(anim.danger)
-	--self.object:set_body_state(move.crouch)
+	self.object:set_body_state(move.crouch)
 	self.object:set_movement_type(move.stand)
-	self.object:set_sight(look.fire_point,obj:position())
-	self.object:set_item(object.fire1,self.object:active_item(),1,30)
+	self.object:set_sight(look.fire_point,pos)
+	local bw = self.object:best_weapon()
+	if (bw) then
+		if (self.object:is_body_turning()) then
+			self.object:set_item(object.aim1,bw)
+		else 
+			self.object:set_item(object.fire1,bw,1,30)
+		end
+	end
 end
 
 function action_npc_vs_box:finalize()
     action_base.finalize(self)
-	if (self.object:active_item()) then
-		self.object:set_item(object.idle,self.object:active_item())
+	local bw = self.object:best_weapon()
+	if (bw) then
+		self.object:set_item(object.idle,bw)
 	end
+	self.st.__tmr = nil
 	self.object:set_sight(look.direction, self.object:direction() , 0)
 	self.object:set_desired_position()
 	self.object:set_desired_direction()

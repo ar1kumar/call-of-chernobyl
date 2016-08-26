@@ -209,7 +209,7 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	-- is simulation heli
 	if (self.sobject and self.sobject.player_id) then
 		if (enemy_id == 0) then 
-			alun_utils.save_var(db.actor,"heli_enemy_flag",true)
+			utils.save_var(db.actor,"heli_enemy_flag",true)
 		else 
 			db.storage[enemy_id].heli_enemy_flag = true
 		end
