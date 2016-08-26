@@ -93,15 +93,15 @@ function evaluator_facer:evaluate()
 		return false
 	end
 	
-	local target_id = alun_utils.load_var(npc,"facer_target",nil)
+	local target_id = utils.load_var(npc,"facer_target",nil)
 	local target = target_id and db.storage[target_id] and db.storage[target_id].object
 	
 	local be = npc:best_enemy()
 	if not target then
-		alun_utils.save_var(npc,"facer_target",nil)
+		utils.save_var(npc,"facer_target",nil)
 	end
 	if target and (not target:alive() and npc:animation_count() == 0) then
-		alun_utils.save_var(npc,"facer_target",nil)
+		utils.save_var(npc,"facer_target",nil)
 		target = nil
 	end
 	local spos = npc:position()
@@ -119,13 +119,13 @@ function evaluator_facer:evaluate()
 		end
 
 		if not (xr_combat_ignore.is_enemy(npc,be)) then
-			alun_utils.save_var(npc,"facer_target",nil)
+			utils.save_var(npc,"facer_target",nil)
 			return false
 		end
 
 		local epos = be:alive() and be:position()
 		if epos:distance_to_sqr(spos) < 3.8 and spos.y - epos.y < 0.8 then
-			alun_utils.save_var(npc,"facer_target",be:id())
+			utils.save_var(npc,"facer_target",be:id())
 			self.st.check_time = tg+facer_sets.check_prd
 			return true
 		end
@@ -140,10 +140,10 @@ function hit_callback(obj,amount,dir,who,bone_index)
 
 	if not(db.storage[obj:id()].facer) then return end
 	if (who and IsStalker(who) and IsMonster(who) and who:alive() and check_enemy(who,obj)) then
-		local target_id = alun_utils.load_var(obj,"facer_target",nil)
+		local target_id = utils.load_var(obj,"facer_target",nil)
 		local target = target_id and db.storage[target_id] and db.storage[target_id].object
 		if (not target or obj:relation(target) ~= game_object.enemy or target:position():distance_to_sqr(obj:position()) > 4) then
-			alun_utils.save_var(obj,"facer_target",who:id())
+			utils.save_var(obj,"facer_target",who:id())
 			db.storage[obj:id()].facer.check_time = time_global()+facer_sets.check_prd
 		end
 	end
@@ -175,7 +175,7 @@ function action_facer:execute()
 	--alun_utils.debug_write("action_facer")
 	local npc,wpn,tg = self.object,self.object:active_item(),time_global()
 	
-	local target_id = alun_utils.load_var(npc,"facer_target",nil)
+	local target_id = utils.load_var(npc,"facer_target",nil)
 	local target = target_id and db.storage[target_id] and db.storage[target_id].object
 
 	if not (target) then
@@ -301,7 +301,7 @@ function action_facer:cancel()
 	self.st.abtime = tg+vals.min_delay
 	self.end_time = nil
 	self.hit_time = nil
-	alun_utils.save_var(npc,"facer_target",nil)
+	utils.save_var(npc,"facer_target",nil)
 	if not IsWounded(npc) then -- or state_mgr.get_state(npc) == "idle"
 		npc:clear_animations()
 	end
@@ -310,7 +310,7 @@ function action_facer:cancel()
 end
 function action_facer:finalize()
     action_base.finalize(self)
-	alun_utils.save_var(self.object,"facer_target",nil)
+	utils.save_var(self.object,"facer_target",nil)
 	--self:cancel()
 end
 
@@ -336,7 +336,7 @@ function evaluator_steal_up:evaluate()
 		return false 
 	end
 	
-	local target_id = alun_utils.load_var(npc,"facer_target",nil)
+	local target_id = utils.load_var(npc,"facer_target",nil)
 	local target = target_id and db.storage[target_id] and db.storage[target_id].object
 
 	if not (target) then
@@ -355,13 +355,13 @@ function evaluator_steal_up:evaluate()
 	elseif dist < 3.3 then
 		return false
 	elseif dist > 40 then
-		alun_utils.save_var(npc,"facer_target",nil)
+		utils.save_var(npc,"facer_target",nil)
 		return false
 	end
 	
 	if not target then
 		if npc:see(be) and not be:see(npc) then
-			alun_utils.save_var(npc,"facer_target",be:id())
+			utils.save_var(npc,"facer_target",be:id())
 			target = be
 		end
 		return false
@@ -393,7 +393,7 @@ end
 function action_steal_up:execute()
 	action_base.execute(self)
 	local npc,tg = self.object,time_global()
-	local target_id = alun_utils.load_var(npc,"facer_target",nil)
+	local target_id = utils.load_var(npc,"facer_target",nil)
 	local target = target_id and db.storage[target_id] and db.storage[target_id].object
 	if not target then
 		--printf("to_close[%s]:not target",npc:character_name())

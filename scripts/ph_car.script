@@ -96,11 +96,11 @@ function action_car:reset_scheme(loading)
 	    end
 
 	    if loading then
-		    self.speed = xr_logic.pstor_retrieve(self.object, "speed") or def_moving_speed
-		    self.loop = xr_logic.pstor_retrieve(self.object, "loop") or false
-		    self.min_delta_per_sec = xr_logic.pstor_retrieve(self.object, "min_delta_per_sec") or def_min_delta_per_sec
-		    self.min_car_explode_time = xr_logic.pstor_retrieve(self.object, "min_car_explode_time") or def_min_car_explode_time
-		    self.state_moving = xr_logic.pstor_retrieve(self.object, "state_moving") or state_none
+		    self.speed = utils.load_var(self.object, "speed") or def_moving_speed
+		    self.loop = utils.load_var(self.object, "loop") or false
+		    self.min_delta_per_sec = utils.load_var(self.object, "min_delta_per_sec") or def_min_delta_per_sec
+		    self.min_car_explode_time = utils.load_var(self.object, "min_car_explode_time") or def_min_car_explode_time
+		    self.state_moving = utils.load_var(self.object, "state_moving") or state_none
 	    else
 		    self.speed = def_moving_speed
 		    self.loop = false
@@ -146,7 +146,7 @@ function action_car:reset_scheme(loading)
 	        self.target_dist = -1
 
 	        if loading then
-		        self.target_walk_pt = xr_logic.pstor_retrieve(self.object, "target_walk_pt") or self:get_nearest_walkpoint()
+		        self.target_walk_pt = utils.load_var(self.object, "target_walk_pt") or self:get_nearest_walkpoint()
 		        if self.target_walk_pt == -1 then
 		            self.target_walk_pt = self:get_nearest_walkpoint()
 		        end
@@ -180,8 +180,8 @@ function action_car:reset_scheme(loading)
 
 	    if self.hasWeapon then
 	        --if loading then
-		    --    self.state_cannon = xr_logic.pstor_retrieve(self.object, "state_cannon")
-		    --    self.state_shooting = xr_logic.pstor_retrieve(self.object, "state_shooting")
+		    --    self.state_cannon = utils.load_var(self.object, "state_cannon")
+		    --    self.state_shooting = utils.load_var(self.object, "state_shooting")
 	        --end
 	        
 	        self:set_shooting(self.state_shooting)
@@ -329,12 +329,12 @@ end
 function action_car:save()
     printf("car <state>: saving")
     if self.usable == nil then
-	    xr_logic.pstor_store(self.object, "speed", self.speed)
-	    xr_logic.pstor_store(self.object, "loop", self.loop)
-	    xr_logic.pstor_store(self.object, "min_delta_per_sec", self.min_delta_per_sec)
-	    xr_logic.pstor_store(self.object, "min_car_explode_time", self.min_car_explode_time)
-	    xr_logic.pstor_store(self.object, "state_moving", self.state_moving)
-	    xr_logic.pstor_store(self.object, "target_walk_pt", self.target_walk_pt) -- or -2)
+	    utils.save_var(self.object, "speed", self.speed)
+	    utils.save_var(self.object, "loop", self.loop)
+	    utils.save_var(self.object, "min_delta_per_sec", self.min_delta_per_sec)
+	    utils.save_var(self.object, "min_car_explode_time", self.min_car_explode_time)
+	    utils.save_var(self.object, "state_moving", self.state_moving)
+	    utils.save_var(self.object, "target_walk_pt", self.target_walk_pt) -- or -2)
 	    printf("car <save>: target_walk_pt(%d)", self.target_walk_pt)
 	end
 end

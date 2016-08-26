@@ -167,7 +167,7 @@ end
 
 function action_npc_vs_heli:try_go_cover(npc,ene_pos,r)
 	--alun_utils.debug_write(strformat("action_npc_vs_heli:try_go_cover"))
-	local lvid = alun_utils.load_var(npc,"fight_from_point")
+	local lvid = utils.load_var(npc,"fight_from_point")
 	local pos  = lvid and level.vertex_position(lvid) or npc:position()
 	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,r or 3,1,50)
 	if (validate(npc,vid)) then

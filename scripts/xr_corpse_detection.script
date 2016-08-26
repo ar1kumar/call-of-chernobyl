@@ -36,6 +36,7 @@ end
 ------------------------------------------
 
 local function on_item_take(npc,item)
+	-- remark npc as having valuables if actor places items on a corpse
 	if (not npc or npc:alive()) then
 		return
 	end
@@ -49,6 +50,7 @@ local function on_item_drop(npc,item)
 	if (not npc or npc:alive()) then
 		return
 	end
+	-- unmark npc as having valuables if they were all removed by actor
 	local se_item = alife():object(item:id())
 	if (se_item and se_item.parent_id == db.actor:id()) then
 		local corpse_contain_any_valuable
@@ -68,6 +70,7 @@ local function on_item_drop(npc,item)
 end
 
 local function on_death_callback(npc,who)
+	--[[
 	local corpse_contain_any_valuable
 	HasValuableLoot[npc:id()] = nil
 	local function check_item(npc,item)
@@ -81,8 +84,12 @@ local function on_death_callback(npc,who)
 	if (corpse_contain_any_valuable) then
 		HasValuableLoot[npc:id()] = true
 	end
-
-	--alun_utils.save_var(npc,"death_by_id",who:id())
+	--]]
+	
+	-- block above commented since it's almost always certain stalker will have loot on death. TODO: Consider only non-storied npcs to be lootable
+	HasValuableLoot[npc:id()] = true
+	
+	--utils.save_var(npc,"death_by_id",who:id())
 end
 
 local function monster_on_death_callback(obj,who)
@@ -95,7 +102,7 @@ local function monster_on_death_callback(obj,who)
 	
 	HasValuableLoot[obj:id()] = nil
 	
-	if not (alun_utils.load_var(obj,"looted")) then
+	if not (utils.load_var(obj,"looted")) then
 		HasValuableLoot[obj:id()] = true
 	end
 end
@@ -115,7 +122,7 @@ local function on_pstor_load_all(obj)
 		return 
 	end
 
-	if not (alun_utils.load_var(obj,"looted")) then
+	if not (utils.load_var(obj,"looted")) then
 		HasValuableLoot[obj:id()] = true
 	end
 end
@@ -171,14 +178,14 @@ function get_all_from_corpse(npc)
 	if not(IsStalker(corpse_npc)) then
 	
 		if (get_story_object("yan_ecolog_semenov")) then
-			local need = alun_utils.load_var(db.actor,"yan_ecolog_semenov_task_1_tissue_need") or 0
+			local need = utils.load_var(db.actor,"yan_ecolog_semenov_task_1_tissue_need") or 0
 			if (need > 0) then
-				local count = alun_utils.load_var(db.actor,"yan_ecolog_semenov_task_1_tissue_count") or 0
-				alun_utils.save_var(db.actor,"yan_ecolog_semenov_task_1_tissue_count",count + 1)
+				local count = utils.load_var(db.actor,"yan_ecolog_semenov_task_1_tissue_count") or 0
+				utils.save_var(db.actor,"yan_ecolog_semenov_task_1_tissue_count",count + 1)
 			end
 		end
 	
-		local looted = alun_utils.load_var(corpse_npc,"looted",nil)
+		local looted = utils.load_var(corpse_npc,"looted",nil)
 		if (not looted and itms_manager) then
 			local loot = {}
 			itms_manager.loot_mutant(nil,corpse_npc:clsid(),loot,npc)
@@ -194,7 +201,7 @@ function get_all_from_corpse(npc)
 			else
 				xr_sound.set_sound_play(id,"corpse_loot_bad")
 			end
-			alun_utils.save_var(corpse_npc,"looted",true)
+			utils.save_var(corpse_npc,"looted",true)
 		end
 		return
 	end
@@ -219,11 +226,11 @@ function get_all_from_corpse(npc)
 		xr_sound.set_sound_play(id,"corpse_loot_bad")
 	end
 
-	local count = alun_utils.load_var(npc,"s_loot_count") or 0
+	local count = utils.load_var(npc,"s_loot_count") or 0
 	if (count >= 255) then 
 		count = 254
 	end
-	alun_utils.save_var(npc,"s_loot_count",count+1)
+	utils.save_var(npc,"s_loot_count",count+1)
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -400,7 +407,9 @@ function action_search_corpse:initialize()
 	self.a.vertex_id = utils.send_to_nearest_accessible_vertex(npc,self.a.vertex_id,"corpse_detection")
 end
 
-local function execute_search_corpse(npc,self)
+function action_search_corpse:execute()
+	action_base.execute(self)
+	local npc = self.object
 	local current_state = state_mgr.get_state(npc)
 	if (current_state == "search_corpse" or current_state == "field_dress") then
 		local tg = time_global()
@@ -436,9 +445,13 @@ local function execute_search_corpse(npc,self)
 		local corpse = db.storage[self.a.selected_corpse_id] and db.storage[self.a.selected_corpse_id].object or level.object_by_id(self.a.selected_corpse_id)
 		look_pos = corpse and alun_utils.safe_bone_pos(corpse,"bip01_spine") or self.a.vertex_position
 
-		if (corpse and IsMonster(corpse)) then 
-			state_mgr.set_state(npc,"field_dress",nil,nil,{look_position = look_pos})
-			return
+		if (corpse) then 
+			if (IsMonster(corpse)) then 
+				state_mgr.set_state(npc,"field_dress",nil,nil,{look_position = look_pos})
+				return
+			end
+			-- moved from xr_motivator to here and xr_motivator use_callback
+			death_manager.drop_manager(corpse):create_release_item()
 		end
 		state_mgr.set_state(npc,"search_corpse",nil,nil,{look_position = look_pos})
 	else
@@ -457,11 +470,6 @@ local function execute_search_corpse(npc,self)
 		state_mgr.set_state(npc,self.a.state or "patrol")
 		self.a.vertex_id = utils.send_to_nearest_accessible_vertex(npc, self.a.vertex_id,"corpse_detection")
 	end
-end
-
-function action_search_corpse:execute()
-	action_base.execute(self)
-	execute_search_corpse(self.object,self)
 end
 
 function action_search_corpse:finalize()

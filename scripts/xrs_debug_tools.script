@@ -207,7 +207,7 @@ local function actor_on_update()
 
 	NEAREST_STALKER = alun_utils.get_nearest_stalker("cam",500)
 
-	--local disable_draw = alun_utils.load_var(db.actor,"disable_debug_draw",nil)
+	--local disable_draw = utils.load_var(db.actor,"disable_debug_draw",nil)
 	local disable_draw = axr_main and axr_main.config and axr_main.config:r_value("mm_options","enable_debug_hud",1,false) == false
 	if (disable_draw) then
 		hud_display_top:clear()
@@ -232,16 +232,16 @@ local function on_game_load()
 	toggle_top_key = axr_main.config:r_value("xrs_debug_tools","toggle_top_key",2,1)
 	toggle_right_key = axr_main.config:r_value("xrs_debug_tools","toggle_right_key",2,1)
 	
-	local i = alun_utils.load_var(db.actor,"debug_warpall")
+	local i = utils.load_var(db.actor,"debug_warpall")
 	if (i) then 
 		i = i + 1
 		local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 		if (levels[i]) then 
-			alun_utils.save_var(db.actor,"debug_warpall",i)
+			utils.save_var(db.actor,"debug_warpall",i)
 			--get_console():execute("flush")
 			JumpToLevel(levels[i])
 		else
-			alun_utils.save_var(db.actor,"debug_warpall",nil)
+			utils.save_var(db.actor,"debug_warpall",nil)
 		end
 	end
 	
@@ -345,18 +345,18 @@ local function on_game_load()
 end 
 
 local function on_level_changing()
-	local i = alun_utils.load_var(db.actor,"debug_warpall")
+	local i = utils.load_var(db.actor,"debug_warpall")
 	if not (i) then 
 		return
 	end
 	i = i + 1
 	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 	if (levels[i]) then 
-		alun_utils.save_var(db.actor,"debug_warpall",i)
+		utils.save_var(db.actor,"debug_warpall",i)
 		--get_console():execute("flush")
 		JumpToLevel(i)
 	else
-		alun_utils.save_var(db.actor,"debug_warpall",nil)
+		utils.save_var(db.actor,"debug_warpall",nil)
 	end
 end
 
@@ -594,7 +594,7 @@ function heli_hud_show(hud)
 				hud:add_msg("Enemy",enemy and enemy:name())
 			end
 			
-			local heli_enemy_flag = alun_utils.load_var(db.actor,"heli_enemy_flag",false)
+			local heli_enemy_flag = utils.load_var(db.actor,"heli_enemy_flag",false)
 			if (heli_enemy_flag) then 
 				hud:add_msg("ActorFlaggedEnemy",heli_enemy_flag)
 			end
@@ -1259,7 +1259,7 @@ function stalker_info_hud_show(hud)
 
 		local pt_index = near.get_current_point_index and near:get_current_point_index()
 		if (not pt_index or pt_index == 4294967296 ) then
-			pt_index = st.active_scheme and (st.active_scheme == "camper" or st.active_scheme == "beh") and alun_utils.load_var(near,"path_index",nil)
+			pt_index = st.active_scheme and (st.active_scheme == "camper" or st.active_scheme == "beh") and utils.load_var(near,"path_index",nil)
 		end
 
 		if (pt_index) then
@@ -1628,9 +1628,9 @@ function task_hud_show(hud)
 			hud:add_msg("Cooldown", v.repeat_timeout - game.get_game_time():diffSec(v.timeout))
 		end
 		
-		local id = alun_utils.load_var(db.actor,k.."_target_id")
+		local id = utils.load_var(db.actor,k.."_target_id")
 		local o = id and alife():object(id)
-		local smart_id = alun_utils.load_var(db.actor,k.."_id")
+		local smart_id = utils.load_var(db.actor,k.."_id")
 		local smart = smart_id and alife():object(smart_id)
 		
 		hud:add_msg("Has CTaskObject",v.t ~= nil)

@@ -1273,12 +1273,12 @@ function cmd.hud(me,txt,owner,p)
 	if not (wrd) then return end
 
 	if (wrd == "on") then
-		alun_utils.save_var(db.actor,"disable_debug_draw",false)
+		utils.save_var(db.actor,"disable_debug_draw",false)
 		return "hud:= debug hud enabled"
 	end
 
 	if (wrd == "off") then
-		alun_utils.save_var(db.actor,"disable_debug_draw",true)
+		utils.save_var(db.actor,"disable_debug_draw",true)
 		return "hud:= debug hud disabled"
 	end
 
@@ -1678,7 +1678,7 @@ end
 function cmd.warpall(me,txt,owner,p)
 	local levels = alun_utils.collect_section(game_ini(),"level_maps_single")
 	if (levels[1]) then
-		alun_utils.save_var(db.actor,"debug_warpall",1)
+		utils.save_var(db.actor,"debug_warpall",1)
 		_G.JumpToLevel(levels[1])
 	end
 	return "warpall := warping to every single level then flushing log"
@@ -2069,7 +2069,7 @@ function cmd.pstor_test(me,txt,owner,p)
 		local var = tostring( math.random() ):sub( 1, 10 )
 		local val = tostring( math.random() ):sub( 1, 10 )
 		printf("%s | %s",var,val)
-		xr_logic.pstor_store( db.actor, var, val )
+		utils.save_var( db.actor, var, val )
 	end
 
 	return "pstor_test:= successfully saved 2000 values to db.actor pstor"

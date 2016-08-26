@@ -162,7 +162,7 @@ local function init_custom_data(npc, ini, section, st, scheme)
 
 	st.signals 			= {}
 
-	st.path_index 		= alun_utils.load_var(npc,"path_index",1)
+	st.path_index 		= utils.load_var(npc,"path_index",1)
 	st.wait_delay		= nil
 	st.am_i_reached 	= nil
 	st.rally_lvid		= nil
@@ -309,7 +309,7 @@ function action_beh:set_desired_target()
 			self.st.behavior = "beh_cover"
 		end
 	elseif (target == "task_target_anomaly") then
-		local name = db.actor and alun_utils.load_var(db.actor,"task_target_anomaly")
+		local name = db.actor and utils.load_var(db.actor,"task_target_anomaly")
 		if (name) then 
 			local anomaly = db.anomaly_by_name[name]
 			if (anomaly and anomaly.object) then
@@ -632,7 +632,7 @@ function action_beh:get_current_waypoint(use_var)
 	local st = db.storage[self.object:id()]
 	local str
 	if (self.object:has_info("npcx_beh_patrol_mode")) then
-		str = alun_utils.load_var(self.object,"pathpoint"..self.st.path_index)
+		str = utils.se_obj_load_var(self.object:id(),self.object:name(),"pathpoint"..self.st.path_index) --utils.load_var(self.object,"pathpoint"..self.st.path_index)
 	else
 		str = st.active_section and st.ini:r_string_ex(st.active_section,"pt"..tostring(self.st.path_index))
 	end
@@ -724,7 +724,7 @@ function action_beh:next_waypoint_index()
 	local st = db.storage[self.object:id()]
 	local inc = self.st.path_reverse and -1 or 1
 	if (self.object:has_info("npcx_beh_patrol_mode")) then 
-		return alun_utils.load_var(self.object,"pathpoint"..tostring(self.st.path_index+inc))
+		return utils.se_obj_load_var(self.object:id(),self.object:name(),"pathpoint"..(self.st.path_index+inc))--utils.load_var(self.object,"pathpoint"..tostring(self.st.path_index+inc))
 	end 
 	return st.active_section and st.ini:r_string_ex(st.active_section,"pt"..tostring(self.st.path_index+inc))
 end
@@ -736,7 +736,7 @@ function action_beh:increment_waypoint_index()
 	
 	local next_index
 	if (self.object:has_info("npcx_beh_patrol_mode")) then
-		next_index = alun_utils.load_var(self.object,"pathpoint"..self.st.path_index+inc)
+		next_index = utils.se_obj_load_var(self.object:id(),self.object:name(),"pathpoint"..(self.st.path_index+inc))--utils.load_var(self.object,"pathpoint"..self.st.path_index+inc)
 	else
 		next_index = st.active_section and st.ini:r_string_ex(st.active_section,"pt"..self.st.path_index+inc)
 	end
@@ -767,7 +767,7 @@ function action_beh:increment_waypoint_index()
 	end
 
 	self.st.wait_delay = nil
-	alun_utils.save_var(self.object,"path_index",self.st.path_index)
+	utils.save_var(self.object,"path_index",self.st.path_index)
 end
 
 function action_beh:fill_approved_actions(state)
@@ -798,7 +798,7 @@ function action_beh:finalize()
 	if (self.st.desired_target and self.st.desired_target.level_vertex_id) then 
 		db.used_level_vertex_ids[self.st.desired_target.level_vertex_id] = nil
 	end
-	alun_utils.save_var(self.object,"path_index",1)
+	utils.save_var(self.object,"path_index",1)
 end
 
 --

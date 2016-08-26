@@ -415,7 +415,7 @@ end
 
 function companion_has_waypoint(actor,npc)
 	local npc = dialogs.who_is_npc(actor,npc)
-	return alun_utils.load_var(npc,"pathpoint2") ~= nil
+	return utils.se_obj_load_var(npc:id(),npc:name(),"pathpoint2") ~= nil--utils.load_var(npc,"pathpoint2") ~= nil
 end
 
 function companion_gather_items_enabled(actor,npc)

@@ -104,7 +104,7 @@ function evaluator_fight_from_cover:evaluate()
 		return false
 	end 
 	
-	if not (alun_utils.load_var(npc,"fight_from_point")) then -- or IsSniper(npc:best_weapon())) then
+	if not (utils.load_var(npc,"fight_from_point")) then -- or IsSniper(npc:best_weapon())) then
 		return false 
 	end
 	
@@ -133,7 +133,7 @@ end
 
 function action_fight_from_cover:try_go_cover(npc,ene_pos)
 	--alun_utils.debug_write(strformat("action_fight_from_cover:try_go_cover"))
-	local lvid = alun_utils.load_var(npc,"fight_from_point")
+	local lvid = utils.load_var(npc,"fight_from_point")
 	local pos  = lvid and level.vertex_position(lvid) or npc:position()
 	local vid = alun_utils.find_close_cover(npc,pos,ene_pos,lvid and 1 or 5,1,lvid and 10 or 20)
 	if (validate(npc,vid)) then

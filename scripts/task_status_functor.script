@@ -7,7 +7,7 @@
 ----------------------------------------------------------------------------------------------
 -- checks smart from pstor variable
 function check_smart_under_faction_control(task,task_id)
-	local smart_id = alun_utils.load_var(db.actor,task_id.."_id")
+	local smart_id = utils.load_var(db.actor,task_id.."_id")
 	if not (smart_id) then 
 		return "fail"
 	end 
@@ -35,7 +35,7 @@ function check_smart_under_faction_control(task,task_id)
 	end
 	task.__check_smart_time = tg+3000
 	
-	alun_utils.save_var(db.actor,task_id.."_target_id",nil)
+	utils.save_var(db.actor,task_id.."_target_id",nil)
 	
 	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
 		for id,squad in pairs(SIMBOARD.squads) do
@@ -46,7 +46,7 @@ function check_smart_under_faction_control(task,task_id)
 				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
 					for i=1,#faction_list do
 						if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
-							alun_utils.save_var(db.actor,task_id.."_target_id",squad.id)
+							utils.save_var(db.actor,task_id.."_target_id",squad.id)
 							squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
 							--printf("task_id = %s squad_id = %s",task_id,squad.id)
 							return
@@ -62,7 +62,7 @@ function check_smart_under_faction_control(task,task_id)
 	--end
 
 	--[[
-	local last_target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
+	local last_target_id = utils.load_var(db.actor,task_id.."_target_id")
 	if (last_target_id and axr_task_manager.actor_tagged_squad_by_id[last_target_id] ~= true) then
 		return "fail"
 	end
@@ -110,7 +110,7 @@ function specific_check_smart_under_faction_control(task,task_id)
 	end
 	task.__check_smart_time = tg+1500
 	
-	alun_utils.save_var(db.actor,task_id.."_target_id",nil)
+	utils.save_var(db.actor,task_id.."_target_id",nil)
 	
 	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
 		for id,squad in pairs(SIMBOARD.squads) do
@@ -121,7 +121,7 @@ function specific_check_smart_under_faction_control(task,task_id)
 				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
 					for i=2,#p do
 						if (p[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == p[i]) then
-							alun_utils.save_var(db.actor,task_id.."_target_id",squad.id)
+							utils.save_var(db.actor,task_id.."_target_id",squad.id)
 							squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
 							--printf("task_id = %s squad_id = %s",task_id,squad.id)
 							return
@@ -137,7 +137,7 @@ function specific_check_smart_under_faction_control(task,task_id)
 	--end
 
 	--[[
-	local last_target_id = alun_utils.load_var(db.actor,task_id.."_target_id")
+	local last_target_id = utils.load_var(db.actor,task_id.."_target_id")
 	if (last_target_id and axr_task_manager.actor_tagged_squad_by_id[last_target_id] ~= true) then
 		return "fail"
 	end
@@ -204,7 +204,7 @@ function hostage_task(task,task_id)
 		return
 	end
 	
-	local id = alun_utils.load_var(db.actor,task_id .. "_id")
+	local id = utils.load_var(db.actor,task_id .. "_id")
 	local smart = id and alife():object(id)
 	if (smart) then 
 		smart.locked = true
@@ -262,7 +262,7 @@ function actor_has_fetch_item(task,task_id)
 	--if not (axr_task_manager.is_task_giver_valid(task)) then 
 	--	return "fail"
 	--end
-	local section = db.actor and alun_utils.load_var(db.actor,task_id.."_fetch")
+	local section = db.actor and utils.load_var(db.actor,task_id.."_fetch")
 	local item = section and db.actor:object(section)
 	if (item ~= nil) then 
 		if (task_id == "esc_2_12_stalker_nimble_task_1" or task_id == "jup_b220_trapper_task_3") then 
@@ -272,7 +272,7 @@ function actor_has_fetch_item(task,task_id)
 				task.stage = 0
 			end
 		else 
-			local count = alun_utils.load_var(db.actor,task_id.."_fetch_count")
+			local count = utils.load_var(db.actor,task_id.."_fetch_count")
 			if (count and count > 1) then
 			 	local cnt = 0
 				local function section_count(npc, item)
@@ -300,7 +300,7 @@ function check_if_enough_time_passed(task,task_id)
 		return 
 	end 
 	
-	local gt = xr_logic.load_ctime(db.actor,task_id)
+	local gt = utils.load_ctime(db.actor,task_id)
 	if (gt and game.get_game_time():diffSec(gt) > tonumber(p[1])) then 
 		task.stage = 2
 		return
@@ -331,7 +331,7 @@ function check_if_killed_enough(task,task_id)
 	for k in self:squad_members() do
 		local npc = db.storage[k.id] and db.storage[k.id].object
 		if (npc) then 
-			total_kill_count = total_kill_count + (alun_utils.load_var(npc,"s_kill_count") or 0)
+			total_kill_count = total_kill_count + (utils.load_var(npc,"s_kill_count") or 0)
 		end
 	end
 	
@@ -362,7 +362,7 @@ function check_if_looted_enough(task,task_id)
 	for k in squad:squad_members() do
 		local npc = db.storage[k.id] and db.storage[k.id].object
 		if (npc) then 
-			total_loot_count = total_loot_count + (alun_utils.load_var(npc,"s_loot_count") or 0)
+			total_loot_count = total_loot_count + (utils.load_var(npc,"s_loot_count") or 0)
 		end
 	end
 	
@@ -373,8 +373,8 @@ end
 
 function task_type_ecolog_gathered_tissue_samples(task,task_id)
 	if (db.actor and task.stage == 0) then 
-		local count = alun_utils.load_var(db.actor,task_id.."_tissue_count",0)
-		local need = alun_utils.load_var(db.actor,task_id.."_tissue_need",0)
+		local count = utils.load_var(db.actor,task_id.."_tissue_count",0)
+		local need = utils.load_var(db.actor,task_id.."_tissue_need",0)
 		
 		if (count >= need) then 
 			task.stage = 1
