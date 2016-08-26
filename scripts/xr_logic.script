@@ -1177,6 +1177,12 @@ function get_customdata_or_ini_file(npc, filename)
 end
 
 function initialize_obj(obj, st, loaded, actor, stype)
+	if (IsStalker(obj)) then
+		if (obj:has_info("npcx_is_companion")) then 
+			axr_companions.setup_companion_logic(obj,st,loaded)
+			return
+		end
+	end
 	local ini_filename = st.loaded_ini_filename or "<customdata>"
 	local ini = get_customdata_or_ini_file(obj, ini_filename)
 	ini = xr_logic.configure_schemes(obj, ini, ini_filename, stype, st.loaded_section_logic or "logic", st.loaded_gulag_name or "")

@@ -63,6 +63,9 @@ end
 function se_monster:on_register()
 	--alun_utils.debug_write("\nse_monster:on_register "..self:name().." START")
 	cse_alife_monster_base.on_register( self )
+	
+	-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
 
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
@@ -91,9 +94,10 @@ function se_monster:on_unregister()
 	if strn_id ~= 65535 then
 		local smart = alife():object(strn_id)
 		if smart ~= nil then
-				smart:unregister_npc(self)
+			smart:unregister_npc(self)
 		end
 	end
+	alife_storage_manager.get_state().se_object[self.id] = nil
 	db.offline_objects[self.id] = nil
 	unregister_story_object_by_id(self.id)
 	cse_alife_monster_base.on_unregister(self)

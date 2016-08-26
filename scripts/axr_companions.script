@@ -101,7 +101,7 @@ local function on_level_changing()
 	
 	for id,v in pairs(companion_squads) do 
 		squad = sim:object(id)
-		if (squad and companion_squad_can_teleport(squad)) then 
+		if (squad and companion_squad_can_teleport(squad)) then
 			TeleportSquad(squad,pos,lvid,gvid)
 		end
 	end
@@ -138,9 +138,8 @@ function companion_squad_can_teleport(squad)
 	local id = squad:commander_id()
 	local sim = alife()
 	local se_obj = sim:object(id)
-	if (se_obj and IsStalker(nil,se_obj:clsid())) then
-		local as = se_obj.get_alife_storage and se_obj:get_alife_storage()
-		if (as and as.companion_cannot_teleport) then 
+	if (se_obj) then
+		if (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_teleport")) then 
 			return false 
 		end
 	end 
@@ -181,9 +180,10 @@ function list_actor_squad_by_id()
 	return t
 end 
 
-function setup_companion_logic(npc,st,loaded,as)
+function setup_companion_logic(npc,st,loaded,cannot_dismiss)
 	npc:give_info_portion("npcx_is_companion")
-	if (as.companion_cannot_dismiss) then 
+	
+	if (cannot_dismiss or utils.se_obj_load_var(npc:id(),npc:name(),"companion_cannot_dismiss")) then
 		npc:give_info_portion("npcx_beh_cannot_dismiss")
 	end
 		
@@ -253,12 +253,9 @@ function add_to_actor_squad(npc)
 	local sim = alife()
 	local se_npc = sim:object(id)
 
-	as = se_npc and IsStalker(nil,se_npc:clsid()) and se_npc.get_alife_storage and se_npc:get_alife_storage(true)
-	if (as) then
-		as.companion = true
-		setup_companion_logic(npc,db.storage[id],false,as)
-	end
-
+	utils.se_obj_save_var(se_npc.id,se_npc:name(),"companion",true)
+	setup_companion_logic(npc,db.storage[id],false)
+	
 	--axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
 	--alun_utils.debug_write("Inserted %s into actor squad",npc:name())
 end
@@ -270,12 +267,10 @@ function remove_from_actor_squad(npc)
 	end 
 	
 	local se_obj = alife():object(npc:id())
-	as = se_obj and IsStalker(nil,se_obj:clsid()) and se_obj.get_alife_storage and se_obj:get_alife_storage()
-	if (as) then
-		as.companion = nil
-		as.companion_cannot_dismiss = nil
-		as.companion_cannot_teleport = nil
-	end
+	
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion",nil)
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss",nil)
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",nil)
 			
 	npc:disable_info_portion("npcx_is_companion")
 	npc:disable_info_portion("npcx_beh_cannot_dismiss")
@@ -310,22 +305,12 @@ end
 
 function set_companion_allow_teleport(npc)
 	local se_obj = alife():object(npc:id())
-	if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj.get_alife_storage) then 
-		local as = se_obj:get_alife_storage()
-		if (as) then
-			as.companion_cannot_teleport = nil
-		end
-	end
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",nil)
 end 
 
 function set_companion_disable_teleport(npc)
 	local se_obj = alife():object(npc:id())
-	if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj.get_alife_storage) then 
-		local as = se_obj:get_alife_storage(true)
-		if (as) then
-			as.companion_cannot_teleport = true
-		end
-	end
+	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",true)
 end 
 
 function set_companion_combat_type_camper(npc)

@@ -679,8 +679,9 @@ end
 
 -------------------------------------------------------- DEBUG FUNCTION -------------------------------------------------
 function debug_nearest(npc,msg,...)
+	local dbg = xrs_debug_tools.get_debug_npc()
 	local id = npc and npc.id and (type(npc.id) == "function" and npc:id() or npc.id)
-	if (id and xrs_debug_tools.NEAREST_STALKER and id == xrs_debug_tools.NEAREST_STALKER:id()) then
+	if (id and dbg and id == dbg:id()) then
 		printf("nearest=%s |"..msg,npc:name(),...)
 	end
 end 

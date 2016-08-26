@@ -59,12 +59,10 @@ task_complete_descr = mar_base_owl_stalker_trader_task_3_finish
 on_init = %=setup_companion_task(ecolog_companion_task_1:mar_smart_terrain_base) =setup_task_target_anomaly -ecolog_companion_task_1_started -ecolog_companion_task_1_force_started%
 precondition = {!squad_exist(ecolog_companion_task_1)} true, false
 repeat_timeout = 86400
-on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_1) =reward_stash(true) =reset_task_target_anomaly%
+on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_1) =reward_stash(true) =reset_task_target_anomaly =reward_random_item(af_fire:af_eye:af_fireball:af_blood:af_cristall)%
 on_fail = %=fail_task_dec_goodwill(25:csky) =remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
 on_cancel = %=remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
-reward_item = af_blood
 condlist_0 = {!squad_exist(ecolog_companion_task_1)} fail
-
 
 ;--------------------------------------------------------------------------------------------------
 ; HUNT MUTANTS FOR CLEAR SKY TASK-

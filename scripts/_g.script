@@ -1,3 +1,15 @@
+--[[ 	General Scripting TIPS
+
+	1. 	NEVER keep userdata (ie. engine classes) in global scope, instead keep track of game object id, and grab object in the scope you need it in by using level.object_by_id or db.storage table. 
+		Otherwise object can't deconstruct and you will end up with instances were script binder exists but object doesn't or level object exists but server object doesn't. This is because variables in lua are all references.
+			Ex. _G.npc = level.object_by_id(2342) 
+				alife():release(alife():object(2342))
+		Above, 'npc' will not be nil but se_obj will be! scripts will blow up. Pure Virtual Function calls may occur! Or quite possibly silent errors like for example when player goes to talk to npc game crashes because self.object is nil
+		Such thing is 'okay' in db.storage, but that is because on net_destroy db.storage[id] is set nil. So if you are keeping track of objects directly in a table, instead of ID 
+		then you absolutely must rid of every single reference to the userdata so that it can be destroy and garbage collected. Otherwise you end up with undetectable issues.
+--]]
+
+
 if (jit == nil) then
 	profiler.setup_hook	()
 end
@@ -1562,21 +1574,21 @@ function ini_file_ex:r_value(s,k,typ,def)
 		--printf("v=%s type=%s[%s]",self.cache[s.."&"..k],type(self.cache[s.."&"..k]),typ)
 		return self.cache[s.."&"..k]
 	end
-		if not (self.ini:section_exist(s) and self.ini:line_exist(s,k)) then
+	if not (self.ini:section_exist(s) and self.ini:line_exist(s,k)) then
 		return def
 	end
-		local v = self.ini:r_string(s,k)
+	local v = self.ini:r_string(s,k)
 	if (typ == 1) then
 		v = v == nil and def or v == "true" or false
 	elseif (typ == 2) then
-		v = tonumber(v) or nil
+		v = tonumber(v) or def
 	end
-		self.cache[s.."&"..k] = v
-		return v == nil and def or v
+	self.cache[s.."&"..k] = v
+	return v == nil and def or v
 end
 
 function ini_file_ex:w_value(s,k,val,comment)
-	self.cache[s.."&"..k] = val
+	self.cache[s.."&"..k] = nil
 	self.ini:w_string(s,k,val ~= nil and tostring(val) or "",comment ~= nil and tostring(comment) or "")
 end
 

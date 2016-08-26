@@ -559,11 +559,6 @@ function send_to_nearest_accessible_vertex( npc, v_id, caller)
 		v_id, vtemp = npc:accessible_nearest(v_id and level.vertex_position(v_id) or npc:position(), vtemp )
 	end
 
-	-- For debugging strange movement behavior
-	--if (xrs_debug_tools.NEAREST_STALKER and npc:id() == xrs_debug_tools.NEAREST_STALKER:id()) then
-		--printf("send nearest npc=%s  caller=%s  vid=%s",npc:name(),caller,v_id)
-	--end
-
 	npc:set_dest_level_vertex_id( v_id )
 
 	return v_id
@@ -823,14 +818,14 @@ end
 
 function se_obj_save_var(id,name,varname,val)
 	local m_data = alife_storage_manager.get_state()
-	if (m_data.se_stalker[id] and m_data.se_stalker[id].name == name) then
-		m_data.se_stalker[id][varname] = val 
+	if (m_data.se_object[id] and m_data.se_object[id].name == name) then
+		m_data.se_object[id][varname] = val 
 	end
 end
 
 function se_obj_load_var(id,name,varname)
 	local m_data = alife_storage_manager.get_state()
-	if (m_data.se_stalker[id] and m_data.se_stalker[id].name == name) then
-		return m_data.se_stalker[id][varname]
+	if (m_data.se_object[id] and m_data.se_object[id].name == name) then
+		return m_data.se_object[id][varname]
 	end
 end

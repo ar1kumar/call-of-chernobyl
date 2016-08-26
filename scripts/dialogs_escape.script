@@ -42,12 +42,10 @@ function set_esc_2_12_stalker_fanat_as_companion(a,b)
 	for k in squad:squad_members() do
 		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id))
 		if (npc) then
-			as = k.object and k.object.get_alife_storage and k.object:get_alife_storage(true)
-			if (as) then
-				as.companion = true
-				as.companion_cannot_dismiss = true
-				axr_companions.setup_companion_logic(npc,db.storage[k.id],false,as)
-			end
+			utils.se_obj_save_var(k.id,k.object:name(),"companion",true)
+			utils.se_obj_save_var(k.id,k.object:name(),"companion_cannot_dismiss",true)
+			utils.se_obj_save_var(k.id,k.object:name(),"companion_cannot_teleport",true)
+			axr_companions.setup_companion_logic(npc,db.storage[k.id],false,true)
 		end
 	end
 end

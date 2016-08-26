@@ -176,8 +176,8 @@ function gather_item(npc)
 		npc:set_character_rank(npc:character_rank()+math.random(15,25))
 		local se_obj = alife():object(id)
 		-- npc_statistic
-		if (se_obj and se_obj.get_alife_storage) then 
-			local m_data = se_obj:get_alife_storage()
+		if (se_obj) then 
+			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
 			if (m_data) then
 				m_data.artefacts_found = m_data.artefacts_found and m_data.artefacts_found + 1 or 1
 			end

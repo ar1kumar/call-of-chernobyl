@@ -588,7 +588,7 @@ function cmd.waypoint(me,txt,owner,p)
 		return "waypoint:= invalid argument. Type waypoint help for a list of subcommands"
 	end
 
-	local npc = xrs_debug_tools.get_debug_npc() or xrs_debug_tools.NEAREST_STALKER
+	local npc = xrs_debug_tools.get_debug_npc()
 	if (npc == nil and wrd == "checklevel" and npc:id() ~= 0) then
 		return "waypoint:= need NPC to validate waypoints, no nearest stalker found."
 	end

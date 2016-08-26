@@ -52,8 +52,6 @@ function motivator_binder:net_spawn(sobject)
 	if not object_binder.net_spawn(self, sobject) then
 		return false
 	end
-		-- debug
-	--self.name = self.object:name()
 
 	self.object:enable_vision(true)
 	local visual = system_ini():r_string_ex(self.object:section(),"set_visual")
@@ -119,9 +117,8 @@ function motivator_binder:net_spawn(sobject)
 
 	xr_reach_task.add_reach_task_action(self.object)
 	
-	local as = sobject.get_alife_storage and sobject:get_alife_storage()
-	if (as and as.companion) then
-		axr_companions.setup_companion_logic(self.object,self.st,self.loaded,as)
+	if (utils.se_obj_load_var(sobject.id,sobject:name(),"companion")) then
+		axr_companions.setup_companion_logic(self.object,self.st,self.loaded)
 	else
 		self.object:disable_info_portion("npcx_is_companion")
 		self.object:disable_info_portion("npcx_beh_cannot_dismiss")
@@ -183,6 +180,7 @@ function motivator_binder:on_item_drop(item)
 	-- End Alundaio
 end
 function motivator_binder:net_destroy()
+	--printf("%s:net_destroy()",self.object:name())
 	self.object:set_callback(callback.use_object,nil)
 	self.object:set_callback(callback.on_item_take,nil)
 	self.object:set_callback(callback.on_item_drop,nil)
@@ -197,6 +195,10 @@ function motivator_binder:net_destroy()
 	xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] = nil
 
 	xr_sound.stop_sounds_by_id(self.object:id())
+	
+	if (self.object:is_talking()) then
+		self.object:stop_talk()
+	end
 
 	if (self.st) then
 		if (self.st.active_scheme) then
@@ -299,8 +301,8 @@ function motivator_binder:death_callback(victim, who)
 		
 		-- npc_statistic
 		local se_obj = alife():object(who:id())
-		if (se_obj and se_obj.get_alife_storage) then
-			local m_data = se_obj:get_alife_storage()
+		if (se_obj) then
+			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
 			if (m_data) then
 				m_data.stalkers_killed = m_data.stalkers_killed and m_data.stalkers_killed + 1 or 1
 			end
