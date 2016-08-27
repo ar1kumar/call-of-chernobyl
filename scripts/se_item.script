@@ -366,8 +366,6 @@ function se_physic:on_register()
 	cse_alife_object_physic.on_register(self)
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
-
-
 end
 function se_physic:on_unregister()
 	unregister_story_object_by_id(self.id)
@@ -377,20 +375,14 @@ function se_physic:keep_saved_data_anyway()
 	return true
 end
 function se_physic:can_switch_online()
-	-- if(self.secret_item) then
-		-- return false
-	-- end
 	return cse_alife_object_physic.can_switch_online(self)
 end
 
 function se_physic:STATE_Write(stpk)
-
-
 	cse_alife_object_physic.STATE_Write(self,stpk)
 end
 
 function se_physic:STATE_Read(stpk,size)
-
 	cse_alife_object_physic.STATE_Read(self,stpk,size)
 end
 
