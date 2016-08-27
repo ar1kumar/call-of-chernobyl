@@ -666,6 +666,9 @@ function monster_hud_show(hud)
 	if (near and near:alive()) then
 		st = db.storage[near:id()]
 		local sobj = alife():object(near:id())
+		if not (sobj) then 
+			return 
+		end
 
 		hud:add_msg("Section Name",sobj:section_name())
 		hud:add_msg("ID",near:id())
@@ -823,6 +826,9 @@ function stalker_data_hud_show(hud)
 		if (stalker_id ~= obj:id()) then
 			stalker_id = obj:id()
 			local se_obj = alife():object(stalker_id)
+			if not (se_obj) then 
+				return 
+			end
 			--alun_utils.switch_offline(se_obj.id)
 			stalker_data = stpk_utils.get_stalker_data(se_obj)
 			--alun_utils.switch_online(se_obj.id)
@@ -1170,6 +1176,9 @@ function stalker_info_hud_show(hud)
 	local st = near and near:alive() and db.storage[near:id()]
 	if (st) then
 		local sobj = alife():object(near:id())
+		if not (sobj) then 
+			return 
+		end
 
 		hud:add_msg("Name",near:name())
 		hud:add_msg("Section",sobj:section_name())
@@ -1316,6 +1325,9 @@ function enemy_hud_show(hud)
 	if (near and near:alive()) then
 		local id = near:id()
 		local se_obj = alife():object(id)
+		if not (se_obj) then 
+			return 
+		end
 		local st = db.storage[id]
 		if (st) then
 			local be = near:best_enemy()
@@ -1435,6 +1447,9 @@ function anim_hud_show(hud)
 		local st = db.storage[near:id()]
 		if (st) then
 			local sobj = alife():object(near:id())
+			if not (sobj) then 
+				return 
+			end
 
 			if (st.active_scheme == "animpoint") then
 				local avail_animations = ""
@@ -1538,6 +1553,9 @@ function weapon_hud_show(hud)
 
 	if (wpn) then
 		local sobj = alife():object(wpn:id())
+		if not (sobj) then 
+			return 
+		end
 		local id = wpn:id()
 		local data = sobj and IsWeapon(wpn) and stpk_utils.get_weapon_data(sobj)
 		local sec = wpn:section()

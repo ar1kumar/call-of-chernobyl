@@ -2,7 +2,6 @@
 -- smart_terrain and gulag job system
 --
 -- Revamped by Alundaio
--- TODO: Get rid of utils.cfg_* in favor of ini:r_*_ex for less overhead
 ------------------------------
 
 -- How many jobs are checked per update per npc, for a job
@@ -1427,9 +1426,8 @@ end
 
 function se_smart_terrain:on_after_reach(squad)
 	local sim = alife()
-	local se_obj
 	for k in squad:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 		end

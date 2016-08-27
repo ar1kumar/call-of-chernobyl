@@ -348,64 +348,65 @@ function interpret_spawn_data(sections)
 
 				if (section and pos and lvid and gvid) then
 					local se_obj = alife():create(section,pos,lvid,gvid)
+					if (se_obj) then
+						-- set dynamic name
+						se_obj.dynamic_name = sec
 
-					-- set dynamic name
-					se_obj.dynamic_name = sec
+						-- dynamic section name as story_id
+						dynamic_story_id[sec] = se_obj.id
 
-					-- dynamic section name as story_id
-					dynamic_story_id[sec] = se_obj.id
-
-					-- Keep track of objects marked secret
-					if (t.secret == "true" and secret_stashes[sec] ~= false) then
-						secret_stashes[sec] = true
-					end
-
-					-- Repack abstract properties
-					--se_obj.repack = {}
-					--se_obj.repack.direction = t.direction and alun_utils.string_to_vector(t.direction) or vector():set(0,0,0)
-
-					-- Alter packet properties
-					local class = system_ini():r_string_ex(section,"class")
-					if (class and m_classes[class] and dynamic[m_classes[class]]) then
-						dynamic[m_classes[class]](se_obj,t,sec)
-
-						local pid
-						if (m_classes[class] == "cse_alife_inventory_box" or m_classes[class] == "cse_alife_stalker") then
-							pid = se_obj.id
+						-- Keep track of objects marked secret
+						if (t.secret == "true" and secret_stashes[sec] ~= false) then
+							secret_stashes[sec] = true
 						end
 
-						-- Spawn supplemental items
-						local i = 1
-						local itm
-						local sysini = system_ini()
-						local sim = alife()
-						while t["item"..i] do
-							itm = alun_utils.str_explode(t["item"..i],",")
-							if (itm[1] and sysini:section_exist(itm[1])) then
-								for n=1,itm[2] and tonumber(itm[2]) or 1 do
-									if (pid) then
-										sim:create(itm[1],se_obj.position,0,0,pid)
-									else
-										sim:create(itm[1],se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id)
+						-- Repack abstract properties
+						--se_obj.repack = {}
+						--se_obj.repack.direction = t.direction and alun_utils.string_to_vector(t.direction) or vector():set(0,0,0)
+
+						-- Alter packet properties
+						local class = system_ini():r_string_ex(section,"class")
+						if (class and m_classes[class] and dynamic[m_classes[class]]) then
+							dynamic[m_classes[class]](se_obj,t,sec)
+
+							local pid
+							if (m_classes[class] == "cse_alife_inventory_box" or m_classes[class] == "cse_alife_stalker") then
+								pid = se_obj.id
+							end
+
+							-- Spawn supplemental items
+							local i = 1
+							local itm
+							local sysini = system_ini()
+							local sim = alife()
+							while t["item"..i] do
+								itm = alun_utils.str_explode(t["item"..i],",")
+								if (itm[1] and sysini:section_exist(itm[1])) then
+									for n=1,itm[2] and tonumber(itm[2]) or 1 do
+										if (pid) then
+											sim:create(itm[1],se_obj.position,0,0,pid)
+										else
+											sim:create(itm[1],se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id)
+										end
 									end
 								end
+								i = i + 1
 							end
-							i = i + 1
 						end
-					end
 
-					-- Set Map Spot
-					if (t.map_spot) then
-						level.map_add_object_spot(se_obj.id,t.map_spot,t.hint)
-					end
+						-- Set Map Spot
+						if (t.map_spot) then
+							level.map_add_object_spot(se_obj.id,t.map_spot,t.hint)
+						end
 
-					if (t.angle) then
-						se_obj.angle = alun_utils.string_to_vector(t.angle)
-					end
+						if (t.angle) then
+							se_obj.angle = alun_utils.string_to_vector(t.angle)
+						end
 
-					printf("after create %s [%s]",se_obj:name(),sec)
-				else
-					printf("dynamic_spawn.ltx: ERROR improper values for section %s [ section=%s | pos=%s | lvid=%s | gvid=%s ]",sec,section,t.position,lvid,gvid)
+						printf("after create %s [%s]",se_obj:name(),sec)
+					else
+						printf("dynamic_spawn.ltx: ERROR improper values for section %s [ section=%s | pos=%s | lvid=%s | gvid=%s ]",sec,section,t.position,lvid,gvid)
+					end
 				end
 			end
 		end

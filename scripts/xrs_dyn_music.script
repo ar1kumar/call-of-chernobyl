@@ -252,19 +252,6 @@ function start_theme()
 	--alun_utils.debug_write("xrs_dyn_music:start_theme end")
 end
 
-function clamp(val, min, max)
-	local res = val
-	if(res<min) then
-		res = min
-		return res
-	end
-	if(res>max) then
-		res = max
-		return res
-	end
-	return res
-end
-
 function fade_theme()
 	local g_time = time_global()
 	if(g_time-prev_fade_time<=THEME_FADE_UPDATE_DELTA) then
@@ -272,7 +259,7 @@ function fade_theme()
 	end
 	prev_fade_time = g_time
 
-	FadeTo_theme = clamp(FadeTo_theme, 0, ambient_vol)
+	FadeTo_theme = utils.clamp(FadeTo_theme, 0, ambient_vol)
 
 	if(m_theme_volume>FadeTo_theme) then
 		if(force_fade) then
@@ -280,14 +267,14 @@ function fade_theme()
 		else
 			m_theme_volume = m_theme_volume - VOLUME_DELTA
 		end
-		m_theme_volume = clamp(m_theme_volume, FadeTo_theme, m_theme_volume)
+		m_theme_volume = utils.clamp(m_theme_volume, FadeTo_theme, m_theme_volume)
 	elseif(m_theme_volume<FadeTo_theme) then
 		if(force_fade) then
 			m_theme_volume = FadeTo_theme
 		else
 			m_theme_volume = m_theme_volume + VOLUME_DELTA
 		end
-		m_theme_volume = clamp(m_theme_volume, m_theme_volume, FadeTo_theme)
+		m_theme_volume = utils.clamp(m_theme_volume, m_theme_volume, FadeTo_theme)
 	end
 end
 
@@ -298,7 +285,7 @@ function fade_ambient()
 	end
 	prev_fade_time = g_time
 
-	FadeTo_ambient = clamp(FadeTo_ambient, 0, ambient_vol)
+	FadeTo_ambient = utils.clamp(FadeTo_ambient, 0, ambient_vol)
 
 	if(m_ambient_vol>FadeTo_ambient) then
 		if(force_fade) then
@@ -306,14 +293,14 @@ function fade_ambient()
 		else
 			m_ambient_vol = m_ambient_vol - VOLUME_DELTA
 		end
-		m_ambient_vol = clamp(m_ambient_vol, FadeTo_ambient, m_ambient_vol)
+		m_ambient_vol = utils.clamp(m_ambient_vol, FadeTo_ambient, m_ambient_vol)
 	elseif(m_ambient_vol<FadeTo_ambient) then
 		if(force_fade) then
 			m_ambient_vol = FadeTo_ambient
 		else
 			m_ambient_vol = m_ambient_vol + VOLUME_DELTA
 		end
-		m_ambient_vol = clamp(m_ambient_vol, m_ambient_vol, FadeTo_ambient)
+		m_ambient_vol = utils.clamp(m_ambient_vol, m_ambient_vol, FadeTo_ambient)
 	end
 	get_console():execute("snd_volume_music "..m_ambient_vol)
 end

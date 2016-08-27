@@ -254,7 +254,7 @@ function setup_companion_task(actor,npc,p)
 	
 	squad:create_npc(smart)
 	squad:set_squad_relation()
-	local as
+
 	for k in squad:squad_members() do
 		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
@@ -778,7 +778,7 @@ function jup_b32_place_scanner(actor, npc)
 end
 
 function jup_b32_pda_check(actor, npc)
-	pda.change_anomalies_names()
+
 end
 
 function pri_b306_generator_start(actor, npc)
@@ -1081,6 +1081,9 @@ function give_item(actor, npc, p)
 		npc_id = npc:id()
 	end
 	local se_npc = alife():object(npc_id)
+	if not (se_npc) then 
+		return 
+	end
 	local pos, lv_id, gv_id, npc_id = se_npc.position, se_npc.m_level_vertex_id, se_npc.m_game_vertex_id, se_npc.id
 	alife():create(p[1], pos, lv_id, gv_id, npc_id)
 end
@@ -1429,7 +1432,8 @@ function remove_npc(actor, npc, p)
 	if npc_id ~= nil then
 		local se_obj = alife():object(npc_id)
 		if (se_obj) then
-			alife():release(se_obj, true)
+			safe_release_manager.release(se_obj)
+			--alife():release(se_obj, true)
 		end
 	end
 end
@@ -1802,14 +1806,13 @@ function spawn_object(actor, obj, p)
 	local yaw = p[4] or 0
 
 	--' printf("Spawning %s at %s, %s", tostring(p[1]), tostring(p[2]), tostring(p[3]))
-	local se_obj = alife():create(spawn_sect,
-								ptr:point(index),
-								ptr:level_vertex_id(0),
-								ptr:game_vertex_id(0))
-	if IsStalker( nil, se_obj:clsid()) then
-		se_obj:o_torso().yaw = yaw * math.pi / 180
-	elseif se_obj:clsid() == clsid.script_phys then
-		se_obj:set_yaw(yaw * math.pi / 180)
+	local se_obj = alife():create(spawn_sect,ptr:point(index),ptr:level_vertex_id(0),ptr:game_vertex_id(0))
+	if (se_obj) then
+		if IsStalker( nil, se_obj:clsid()) then
+			se_obj:o_torso().yaw = yaw * math.pi / 180
+		elseif se_obj:clsid() == clsid.script_phys then
+			se_obj:set_yaw(yaw * math.pi / 180)
+		end
 	end
 end
 
@@ -1836,11 +1839,10 @@ function jup_b219_restore_gate()
 	local yaw = 0
 	local spawn_sect = "jup_b219_gate"
 	if jup_b219_position then
-		local se_obj = alife():create(spawn_sect,
-									vector():set(jup_b219_position),
-									jup_b219_lvid,
-									jup_b219_gvid)
-		se_obj:set_yaw(yaw * math.pi / 180)
+		local se_obj = alife():create(spawn_sect,vector():set(jup_b219_position),jup_b219_lvid,jup_b219_gvid)
+		if (se_obj) then
+			se_obj:set_yaw(yaw * math.pi / 180)
+		end
 	end
 end
 
@@ -1863,11 +1865,10 @@ function spawn_corpse(actor, obj, p)
 	local ptr = patrol(path_name)
 	local index = p[3] or 0
 
-	local se_obj = alife():create(spawn_sect,
-									ptr:point(index),
-									ptr:level_vertex_id(0),
-									ptr:game_vertex_id(0))
-	se_obj:kill()
+	local se_obj = alife():create(spawn_sect,ptr:point(index),ptr:level_vertex_id(0),ptr:game_vertex_id(0))
+	if (se_obj) then
+		se_obj:kill()
+	end
 end
 
 
@@ -1954,7 +1955,8 @@ function destroy_object(actor, obj, p)
 		return
 	end
 
-	alife():release(sobj, true)
+	safe_release_manager.release(sobj)
+	--alife():release(sobj, true)
 end
 
 function give_actor(actor, npc, p)
@@ -2121,10 +2123,9 @@ function create_squad(actor, obj, p)
 
 	--board:enter_smart(squad, smart.id)
 
-	local se_obj
 	local sim = alife()
 	for k in squad:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then
 			board:setup_squad_and_group(se_obj)
 		end
@@ -2486,12 +2487,7 @@ end
 --  Treasures support
 -----------------------------------------------------------------------
 function give_treasure (actor, npc, p)
-	if p == nil then
-		printf("Required parameter is [NIL]")
-	end
-	for k,v in pairs(p) do
-		treasure_manager.get_treasure_manager():give_treasure(v)
-	end
+
 end
 
 --[[

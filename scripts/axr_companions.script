@@ -88,10 +88,8 @@ local function squad_on_update(squad)
 end
 
 local function on_level_changing()
-	local squad
 	local sim = alife()
 	local se_actor = sim:actor()
-	local se_obj
 	
 	local gg = game_graph()
 	local gvid = se_actor.m_game_vertex_id
@@ -100,7 +98,7 @@ local function on_level_changing()
 	local pos = vert:level_point()
 	
 	for id,v in pairs(companion_squads) do 
-		squad = sim:object(id)
+		local squad = sim:object(id)
 		if (squad and companion_squad_can_teleport(squad)) then
 			TeleportSquad(squad,pos,lvid,gvid)
 		end
@@ -197,7 +195,7 @@ function setup_companion_logic(npc,st,loaded,cannot_dismiss)
 	local id = npc:id()
 	local sim = alife()
 	local se_npc = sim:object(id)
-	local unreg_id = se_npc.m_smart_terrain_id
+	local unreg_id = se_npc and se_npc.m_smart_terrain_id
 	if (unreg_id and unreg_id ~= 65535) then
 		local unreg = sim:object(unreg_id)
 		if (unreg) then
@@ -216,7 +214,7 @@ function add_special_task_npc_to_actor_squad(npc)
 	local id = npc:id()
 	local sim = alife()
 	local se_npc = sim:object(id)
-	local unreg_id = se_npc.m_smart_terrain_id
+	local unreg_id = se_npc and se_npc.m_smart_terrain_id
 	if (unreg_id and unreg_id ~= 65535) then
 		local unreg = sim:object(unreg_id)
 		if (unreg) then
@@ -252,8 +250,9 @@ function add_to_actor_squad(npc)
 
 	local sim = alife()
 	local se_npc = sim:object(id)
-
-	utils.se_obj_save_var(se_npc.id,se_npc:name(),"companion",true)
+	if (se_npc) then
+		utils.se_obj_save_var(se_npc.id,se_npc:name(),"companion",true)
+	end
 	setup_companion_logic(npc,db.storage[id],false)
 	
 	--axr_logic.set_new_scheme_and_logic(npc,"beh","beh@base","logic",nil,"scripts\\beh_companion.ltx")
@@ -267,6 +266,9 @@ function remove_from_actor_squad(npc)
 	end 
 	
 	local se_obj = alife():object(npc:id())
+	if not (se_obj) then 
+		return 
+	end
 	
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion",nil)
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss",nil)
@@ -305,11 +307,17 @@ end
 
 function set_companion_allow_teleport(npc)
 	local se_obj = alife():object(npc:id())
+	if not (se_obj) then 
+		return 
+	end
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",nil)
 end 
 
 function set_companion_disable_teleport(npc)
 	local se_obj = alife():object(npc:id())
+	if not (se_obj) then 
+		return 
+	end
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",true)
 end 
 

@@ -306,6 +306,9 @@ function is_hostage_task_giver(a,b)
 	local t = {"simulation_task_7", "simulation_task_8", "simulation_task_9", "simulation_task_10"}
 	local id = npc:id()
 	local se_obj = alife():object(id)
+	if not (se_obj) then 
+		return false 
+	end
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
 	local task

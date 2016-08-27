@@ -16,6 +16,9 @@ function actor_on_init(binder)
 	SendScriptCallback("actor_on_init",binder)
 end 
 
+function actor_on_reinit(binder)
+	SendScriptCallback("actor_on_reinit",binder)
+end
 -------------------
 -- actor_on_net_spawn
 -------------------
@@ -141,7 +144,6 @@ function actor_on_item_take(binder,item)
 	if not (db.actor) then 
 		return -- don't remove, for some reason this callback is triggered before actor is fully loaded
 	end
-	--treasure_manager.get_treasure_manager():on_item_take(item:id()) -- disabled for coc
 	SendScriptCallback("actor_on_item_take",item)
 end
 

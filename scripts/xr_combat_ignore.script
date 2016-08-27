@@ -135,6 +135,10 @@ function is_enemy(obj,enemy,no_memory)
 		if (obj_is_stalker and community ~= "zombied" and not is_monster) then
 
 			local se_obj = sim:object(id)
+			if not (se_obj) then 
+				return false
+			end
+			
 			local cid = se_obj.group_id and se_obj.group_id ~= 65535 and se_obj.group_id or id
 			local tg = time_global()
 			

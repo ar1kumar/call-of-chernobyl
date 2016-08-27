@@ -1313,10 +1313,9 @@ function squad_in_zone_all(actor, npc, p)
 		--printf("There is no squad with id[%s]", tostring(zone_name))
 		return false
 	end
-	local se_obj
 	local sim = alife()
 	for k in squad:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj and zone:inside(se_obj.position)) then
 			return true
 		end
@@ -1852,10 +1851,9 @@ function pas_b400_actor_far_forward(actor, npc)
 
 	local squad = alife():object(alife():object(npc:id()).group_id)
 
-	local se_obj
 	local sim = alife()
 	for k in squad:squad_members() do
-		se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj and se_obj.position:distance_to_sqr(actor:position()) < distance) then
 			return true
 		end

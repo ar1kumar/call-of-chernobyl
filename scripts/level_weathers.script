@@ -5,8 +5,6 @@
 local weather_manager = nil
 local prev_sec = 0
 local diff_sec = 0
-local prev_sec_5 = 0
-local diff_game_2sec = 0
 valid_levels = {}
 
 function atmosfear_init()
@@ -362,36 +360,31 @@ end
 -- Обновляем погоду раз в час.
 function WeatherManager:update()
 	--alun_utils.debug_write("WeatherManager:update")
-	if(level.is_wfx_playing()) then
-		self.weather_fx = level.get_weather()
-	else
-		self.weather_fx = nil
+	if (self.___timer and time_global() < self.___timer) then 
+		return 
 	end
-	--if not benchmark.weather then
-		if self.last_hour~=level.get_time_hours() then
-				self.last_hour=level.get_time_hours()
-				self.next_hour=self.last_hour+1
-				if self.next_hour>23 then
-					self.next_hour=self.next_hour-24
-				end
-				for lvl,st in pairs(self.state) do
-				st.current_state=st.next_state
-				st.next_state=get_next_state(st.graph,st.current_state)
-				end
-				self:change_period()
-			-- Устанавливаем погоду на текущем уровне
-			self:select_weather(false)
+	self.___timer = time_global() + 3000
+	
+	self.weather_fx = level.is_wfx_playing() and level.get_weather() or nil
+
+	if self.last_hour~=level.get_time_hours() then
+		self.last_hour=level.get_time_hours()
+		self.next_hour=self.last_hour+1
+		if self.next_hour>23 then
+			self.next_hour=self.next_hour-24
 		end
-	--end
-	-- CC applying DOF every sec
-	diff_game_2sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor()*5)
-	if (prev_game_2sec~=diff_game_2sec) then
-		prev_game_2sec = diff_game_2sec
-		--self.debugMessages[1]:SetText("diff_sec="..tostring(diff_sec))
-		if not (axr_main.weapon_is_zoomed) then
-			self:apply_dof()
+		for lvl,st in pairs(self.state) do
+			st.current_state=st.next_state
+			st.next_state=get_next_state(st.graph,st.current_state)
 		end
+		self:change_period()
+		self:select_weather(false)
 	end
+
+	if not (axr_main.weapon_is_zoomed) then
+		self:apply_dof()
+	end
+	
 	diff_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor())
 	if (prev_sec~=diff_sec) then
 		prev_sec = diff_sec
@@ -400,7 +393,6 @@ function WeatherManager:update()
 			self:distant_storm()
 		end
 	end
-	-- end CC
 end
 
 function WeatherManager:get_moon_phase()
@@ -725,6 +717,28 @@ function WeatherManager:distant_storm()
 		end
 	end
 
+	for key,thunder in pairs(self.thunders) do
+		local life_time=diff_sec-thunder.start_time
+		if life_time>=30 then
+			if thunder.sound ~= nil and thunder.sound:playing() then
+				thunder.sound:stop()
+			end
+			--atmosfear.debugMessages[4]:SetText("removing "..tostring(key))
+			self.thunders[key]=nil
+		end
+		if life_time>=4 and life_time<30 and thunder.hit==false then
+			if thunder.sound ~= nil and thunder.sound:playing() then
+				thunder.sound:stop()
+			end
+			if thunder.sound ~= nil then
+				--atmosfear.debugMessages[3]:SetText("play sound for "..tostring(key))
+				thunder.sound:play_at_pos(db.actor, thunder.sound_pos)
+				thunder.sound.volume = 0.33
+			end
+			thunder.hit=true
+		end
+	end
+	
 	if self.distant_storm_on==true and ((self.curr_weather=="cloudy" and level.get_time_minutes()<=30) or (self.next_weather=="cloudy"  and level.get_time_minutes()>=30)) and not level.is_wfx_playing() then
 		--atmosfear.debugMessages[2]:SetText("storm on")
 		if self.next_thunder_at == nil then
@@ -742,29 +756,6 @@ function WeatherManager:distant_storm()
 		self.next_thunder_at=nil
 		--atmosfear.debugMessages[2]:SetText("storm ended")
 	end
-
-	for key,thunder in pairs(self.thunders) do
-		local life_time=diff_sec-thunder.start_time
-		if life_time>=30 then
-			if thunder.sound ~= nil and thunder.sound:playing() then
-				thunder.sound:stop()
-			end
-			--atmosfear.debugMessages[4]:SetText("removing "..tostring(key))
-			thunder=nil
-		end
-		if life_time>=4 and life_time<30 and thunder.hit==false then
-			if thunder.sound ~= nil and thunder.sound:playing() then
-				thunder.sound:stop()
-			end
-			if thunder.sound ~= nil then
-				--atmosfear.debugMessages[3]:SetText("play sound for "..tostring(key))
-				thunder.sound:play_at_pos(db.actor, thunder.sound_pos)
-				thunder.sound.volume = 0.33
-			end
-			thunder.hit=true
-		end
-	end
-
 end
 
 function WeatherManager:inside_boundaries(x, y)

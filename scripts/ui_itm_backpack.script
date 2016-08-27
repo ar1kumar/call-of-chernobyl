@@ -58,8 +58,9 @@ function backpack_ui:OnInput()
 	end
 
 	local se_obj = alife():object(self.box_id)
-
-	level.map_add_object_spot_ser(se_obj.id, self.box_spot, txt)
+	if (se_obj) then
+		level.map_add_object_spot_ser(se_obj.id, self.box_spot, txt)
+	end
 
 	self:HideDialog()
 end

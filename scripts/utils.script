@@ -1,3 +1,7 @@
+function clamp(val, min, max)
+	return val < min and min or val > max and max or val
+end
+
 -- Переводит переменную любого типа (включая nil) в строку. Используется для отладочного вывода информации.
 function to_str(what)
 	if what == nil then

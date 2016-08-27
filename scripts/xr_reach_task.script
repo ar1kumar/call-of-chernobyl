@@ -132,6 +132,10 @@ function action_reach_task_location:execute()
 	
 	local sim = alife()
 	local se_obj = sim:object(self.object:id())
+	if not (se_obj) then 
+		return 
+	end 
+	
 	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and sim:object(se_obj.group_id)
 
 	if (squad) then
@@ -175,20 +179,38 @@ function action_reach_task_location:single_execute(se_obj)
 end
 function action_reach_task_location:commander_execute(squad)
 	local npc = self.object
+	
+	if (npc:is_talking()) then 
+		npc:set_movement_type(move.stand)
+		return
+	end 
+	
 	local squad_target = simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
 	if squad_target == nil and squad:get_script_target() ~= nil then
 	 	squad_target = alife():object(squad.assigned_target_id)
 	end
 	
-	if (squad_target == nil or npc:is_talking()) then 
+	if (squad_target == nil) then 
 		npc:set_movement_type(move.stand)
 		return
+	end
+	
+	npc:set_sight(look.path_dir,nil,0)
+	
+	local pos, lv_id, gv_id = squad_target:get_location()
+	if npc:game_vertex_id() ~= gv_id then
+		npc:set_path_type(game_object.game_path)
+		npc:set_dest_game_vertex_id(gv_id)
+	else
+		npc:set_path_type(game_object.level_path)
+		utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:2")
+		npc:set_desired_position(pos)
 	end
 	
 	if (character_community(npc) ~= "zombied") then
 		if (xr_conditions.surge_started()) then
 			if not(db.storage[npc:id()].surge_timer) then
-				db.storage[npc:id()].surge_timer = time_global() + math.random(7000,15000)
+				db.storage[npc:id()].surge_timer = time_global() + math.random(3000,10000)
 			end
 			if (db.storage[npc:id()].surge_timer and time_global() > db.storage[npc:id()].surge_timer) then
 				npc:set_mental_state(anim.panic)
@@ -227,25 +249,20 @@ function action_reach_task_location:commander_execute(squad)
 		npc:set_movement_type(move.walk)
 		npc:set_mental_state(anim.free)
 	end
-	
-	npc:set_sight(look.path_dir,nil,0)
-	
-	local pos, lv_id, gv_id = squad_target:get_location()
-	if npc:game_vertex_id() ~= gv_id then
-		npc:set_path_type(game_object.game_path)
-		npc:set_dest_game_vertex_id(gv_id)
-	else
-		npc:set_path_type(game_object.level_path)
-		utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:2")
-		npc:set_desired_position(pos)
-	end
 end
 
 function action_reach_task_location:soldier_execute(squad)
 	local npc = self.object
+	
 	local commander = db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object or level.object_by_id(squad:commander_id())
-	if not (commander) then 
+	if not (commander) then
+		npc:set_movement_type(move.stand)
 		return 
+	end
+	
+	if (commander:movement_type() == move.stand) then
+		npc:set_movement_type(move.stand)
+		return
 	end
 	
 	local squad_target = simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
@@ -255,42 +272,20 @@ function action_reach_task_location:soldier_execute(squad)
 
 	local lvid,desired_direction = get_npc_command(npc)
 
-	--printf("desired_direction = %s", vec_to_str(desired_direction))
 	if desired_direction and not utils.vector_cmp(desired_direction, vector():set(0,0,0)) then
 		desired_direction:normalize()
 		npc:set_desired_direction(desired_direction)
 	end
+	
 	npc:set_path_type(game_object.level_path)
 
 	lvid = utils.send_to_nearest_accessible_vertex(npc, lvid,"xr_reach_task")
-
-	if (squad_target == nil or xr_conditions.surge_started() or squad_target:clsid() == clsid.online_offline_group_s) then
-		npc:set_movement_type(commander:movement_type())
-		npc:set_mental_state(commander:mental_state())
-		return
-	elseif (squad_target:clsid() == clsid.smart_terrain) then
-		if (SIMBOARD.smarts[squad_target.id] and SIMBOARD.smarts[squad_target.id].population > 0) then
-			if (squad.player_id == "dolg" and squad_target.props and squad_target.props.freedom > 0)
-			or (squad.player_id == "freedom" and squad_target.props and squad_target.props.dolg > 0) then
-				npc:set_movement_type(commander:movement_type())
-				npc:set_mental_state(commander:mental_state())
-			end
-		end
-	end
 	
-	if squad.rush_to_target ~= nil and squad.rush_to_target == true then
-		npc:set_mental_state(commander:mental_state())
-	end
-
-	if commander:movement_type() == move.stand then
-		npc:set_movement_type(move.stand)
-		return
-	end
-
-	if (lvid ~= nil and level.vertex_position(lvid):distance_to(npc:position()) > 5) then
+	if (lvid and level.vertex_position(lvid):distance_to(npc:position()) > 5) then 
 		npc:set_movement_type(move.run)
 	else
-		npc:set_movement_type(move.walk)
+		npc:set_movement_type(commander:movement_type())
+		npc:set_mental_state(commander:mental_state())
 	end
 end
 

@@ -163,215 +163,198 @@ function get_stat(index) -- index= int        return string
 	return ""
 end
 
-local primary_objects_tbl =
-{	{target="mar_2c_01_anomaly_spot",					hint="st_mar_2c_01_anomaly_spot_name"},
-	{target="mar_2c_02_anomaly_spot",					hint="st_mar_2c_02_anomaly_spot_name"},
-		{target="ds_2c_01_anomaly_spot",					hint="st_ds_2c_01_anomaly_spot_name"},
-	{target="ds_2c_02_anomaly_spot",					hint="st_ds_2c_02_anomaly_spot_name"},
-	{target="ds_2c_03_anomaly_spot",					hint="st_ds_2c_03_anomaly_spot_name"},
-	{target="ds_2c_04_anomaly_spot",					hint="st_ds_2c_04_anomaly_spot_name"},
-		{target="trc_2c_01_rift_anom_spot",					hint="st_trc_2c_01_rift_anom_spot_name"},
-	{target="trc_2c_02_chem_anom_spot",					hint="st_trc_2c_02_chem_anom_spot_name"},
-	{target="trc_2c_03_desolation_anom_spot",			hint="st_trc_2c_03_desolation_anom_spot_name"},
-		{target="esc_2c_01_high_hopes_anomaly_spot",		hint="st_esc_2c_01_high_hopes_anomaly_spot_name"},
-		{target="gar_2c_01_nwi_anomaly_spot",				hint="st_gar_2c_01_nwi_anomaly_spot_name"},
-	{target="gar_2c_02_toaster_anomaly_spot",			hint="st_gar_2c_02_toaster_anomaly_spot_name"},
-		{target="agr_2c_01_hg_anomaly_spot",				hint="st_agr_2c_01_hg_anomaly_spot_name"},
-		-- Undergound anomalies are commented out until we can have underground minimaps.
-		--{target="labx18_2c_01_deep_burn_anomaly_spot",	hint="st_labx18_2c_01_deep_burn_anomaly_spot_name"},
-	--{target="labx18_2c_02_ff_anomaly_spot",			hint="st_labx18_2c_02_ff_anomaly_spot_name"},
-	--{target="labx18_2c_03_elders_anomaly_spot",		hint="st_labx18_2c_03_elders_anomaly_spot_name"},
-	--{target="labx18_2c_04_bioh_anomaly_spot",			hint="st_labx18_2c_04_bioh_anomaly_spot_name"},
-		{target="bar_2c_01_grant_anomaly_spot",				hint="st_bar_2c_01_grant_anomaly_spot_name"},
-		{target="ros_2c_01_tunnel_anomaly_spot",			hint="st_ros_2c_01_tunnel_anomaly_spot_name"},
-	{target="ros_2c_02_crispy_train_anomaly_spot",		hint="st_ros_2c_02_crispy_train_anomaly_spot_name"},
-	{target="ros_2c_03_yc_anomaly_spot",				hint="st_ros_2c_03_yc_anomaly_spot_name"},
-		{target="mil_2c_01_hw_anomaly_spot",				hint="st_mil_2c_01_hw_anomaly_spot_name"},
-		{target="yan_2c_01_cd_anomaly_spot",				hint="st_yan_2c_01_cd_anomaly_spot_name"},
-		--{target="x16_lab_2c_01_fb_anomy_spot",			hint="st_x16_lab_2c_01_fb_anomy_spot_name"},
-		{target="cit_2c_01_ch_anomaly_spot",				hint="st_cit_2c_01_ch_anomaly_spot_name"},
-	{target="cit_2c_02_pg_anomaly_spot",				hint="st_cit_2c_02_pg_anomaly_spot_name"},
-		{target="lim_2c_01_ls_anomaly_spot",				hint="st_lim_2c_01_ls_anomaly_spot_name"},
-	{target="lim_2c_02_ib_anomaly_spot",				hint="st_lim_2c_02_ib_anomaly_spot_name"},
-		{target="rad_2c_01_bl_anomaly_spot",				hint="st_rad_2c_01_bl_anomaly_spot_name"},
-	{target="rad_2c_02_pp_anomaly_spot",				hint="st_rad_2c_02_pp_anomaly_spot_name"},
-		--{target="bun_2c_01_f_anomaly_spot",				hint="st_bun_2c_01_f_anomaly_spot_name"},
-	--{target="bun_2c_02_gp_anomaly_spot",				hint="st_bun_2c_02_gp_anomaly_spot_name"},
-		{target="pri_2c_01_pp_anomaly_spot",				hint="st_pri_2c_01_pp_anomaly_spot_name"},
-	{target="pri_2c_02_gt_anomaly_spot",				hint="st_pri_2c_02_gt_anomaly_spot_name"},
-	{target="pri_2c_03_wr_anomaly_spot",				hint="st_pri_2c_03_wr_anomaly_spot_name"},
-	{target="pri_2c_04_o_anomaly_spot",					hint="st_pri_2c_04_o_anomaly_spot_name"},
-		{target="aes_2c_01_ce_anomaly_spot",				hint="st_aes_2c_01_ce_anomaly_spot_name"},
-	{target="aes_2c_02_p_anomaly_spot",					hint="st_aes_2c_02_p_anomaly_spot_name"},
-		{target="aes2_2c_01_bo_anomaly_spot",				hint="st_aes2_2c_01_bo_anomaly_spot_name"},
-	{target="aes2_2c_02_at_anomaly_spot",				hint="st_aes2_2c_02_at_anomaly_spot_name"},
-		--{target="sar_2c_01_r_anomaly_spot",				hint="st_sar_2c_01_r_anomaly_spot_name"},
-		{target="gen_2c_01_ss_anomaly_spot",				hint="st_gen_2c_01_ss_anomaly_spot_name"},
-		{target="mar_smart_terrain_11_3_anomaly_spot",		hint="st_mar_smart_terrain_11_3_anomaly_spot_name"},
-	{target="mar_smart_terrain_10_10_anomaly_spot",		hint="st_mar_smart_terrain_10_10_anomaly_spot_name"},
-	{target="mar_smart_terrain_base_anomaly_spot",		hint="st_mar_smart_terrain_base_anomaly_spot_name"},
-	{target="mar_smart_terrain_8_8_anomaly_spot",		hint="st_mar_smart_terrain_8_8_anomaly_spot_name"},
-	{target="mar_smart_terrain_12_2_anomaly_spot",		hint="st_mar_smart_terrain_12_2_anomaly_spot_name"},
-	{target="mar_smart_terrain_3_7_anomaly_spot",		hint="st_mar_smart_terrain_3_7_anomaly_spot_name"},
-	{target="mar_smart_terrain_3_3_anomaly_spot",		hint="st_mar_smart_terrain_3_3_anomaly_spot_name"},
-		{target="esc_smart_terrain_1_11_anomaly_spot",		hint="st_esc_smart_terrain_1_11_anomaly_spot_name"},
-	{target="esc_smart_terrain_8_9_anomaly_spot",		hint="st_esc_smart_terrain_8_9_anomaly_spot_name"},
-	{target="esc_smart_terrain_5_4_anomaly_spot",		hint="st_esc_smart_terrain_5_4_anomaly_spot_name"},
-		{target="gar_smart_terrain_3_7_anomaly_spot",		hint="st_gar_smart_terrain_3_7_anomaly_spot_name"},
-	{target="gar_smart_terrain_3_7_anomaly_spot_2",		hint="st_gar_smart_terrain_3_7_anomaly_spot_2_name"},
-	{target="gar_smart_terrain_2_4_anomaly_spot",		hint="st_gar_smart_terrain_2_4_anomaly_spot_name"},
-	{target="gar_smart_terrain_6_7_anomaly_spot",		hint="st_gar_smart_terrain_6_7_anomaly_spot_name"},
-	{target="gar_smart_terrain_5_6_anomaly_spot",		hint="st_gar_smart_terrain_5_6_anomaly_spot_name"},
-	{target="gar_smart_terrain_1_7_anomaly_spot",		hint="st_gar_smart_terrain_1_7_anomaly_spot_name"},
-		{target="agr_smart_terrain_1_3_anomaly_spot",		hint="st_agr_smart_terrain_1_3_anomaly_spot_name"},
-	{target="agr_smart_terrain_4_4_near_3_anomaly_spot", hint="st_agr_smart_terrain_4_4_near_3_anomaly_spot_name"},
-	{target="agr_smart_terrain_5_7_anomaly_spot", 		hint="st_agr_smart_terrain_5_7_anomaly_spot_name"},
-	{target="agr_smart_terrain_5_2_anomaly_spot", 		hint="st_agr_smart_terrain_5_2_anomaly_spot_name"},
-	{target="agr_smart_terrain_1_2_anomaly_spot", 		hint="st_agr_smart_terrain_1_2_anomaly_spot_name"},
-		{target="val_smart_terrain_9_10_anomaly_spot",		hint="st_val_smart_terrain_9_10_anomaly_spot_name"},
-	{target="val_smart_terrain_6_4_anomaly_spot",		hint="st_val_smart_terrain_6_4_anomaly_spot_name"},
-	{target="val_smart_terrain_8_6_anomaly_spot",		hint="st_val_smart_terrain_8_6_anomaly_spot_name"},
-	{target="val_smart_terrain_9_4_anomaly_spot",		hint="st_val_smart_terrain_9_4_anomaly_spot_name"},
-	{target="val_smart_terrain_8_9_anomaly_spot",		hint="st_val_smart_terrain_8_9_anomaly_spot_name"},
-		{target="mil_smart_terrain_4_7_anomaly_spot",		hint="st_mil_smart_terrain_4_7_anomaly_spot_name"},
-	{target="mil_smart_terrain_2_1_anomaly_spot",		hint="st_mil_smart_terrain_2_1_anomaly_spot_name"},
-	{target="mil_smart_terrain_2_6_anomaly_spot",		hint="st_mil_smart_terrain_2_6_anomaly_spot_name"},
-	{target="mil_smart_terrain_7_4_anomaly_spot",		hint="st_mil_smart_terrain_7_4_anomaly_spot_name"},
-	{target="mil_smart_terrain_8_3_anomaly_spot",		hint="st_mil_smart_terrain_8_3_anomaly_spot_name"},
-		{target="yan_smart_terrain_2_5_anomaly_spot",		hint="st_yan_smart_terrain_2_5_anomaly_spot_name"},
-	{target="yan_smart_terrain_zombi_spawn_anomaly_spot",		hint="st_yan_smart_terrain_zombi_spawn_anomaly_spot_name"},
-	{target="yan_smart_terrain_5_3_anomaly_spot",		hint="st_yan_smart_terrain_5_3_anomaly_spot_name"},
-	{target="yan_smart_terrain_4_2_anomaly_spot",		hint="st_yan_smart_terrain_4_2_anomaly_spot_name"},
-		{target="red_smart_terrain_6_3_anomaly_spot",		hint="st_red_smart_terrain_6_3_anomaly_spot_name"},
-	{target="red_smart_terrain_4_5_anomaly_spot",		hint="st_red_smart_terrain_4_5_anomaly_spot_name"},
-	{target="red_smart_terrain_monsters_anomaly_spot",	hint="st_red_smart_terrain_monsters_anomaly_spot_name"},
-	{target="red_smart_terrain_3_2_anomaly_spot",		hint="st_red_smart_terrain_3_2_anomaly_spot_name"},
-	{target="red_smart_terrain_6_6_anomaly_spot",		hint="st_red_smart_terrain_6_6_anomaly_spot_name"},
-	{target="red_smart_terrain_3_1_anomaly_spot",		hint="st_red_smart_terrain_3_1_anomaly_spot_name"},
-		{target="gen_smart_terrain_urod_anomaly_spot",		hint="st_gen_smart_terrain_urod_anomaly_spot_name"},
-		{target="trc_sim_13_anomal_zone_spot",				hint="st_trc_sim_13_anomal_zone_spot_name"},
+function fill_primary_objects()
+	local primary_objects_tbl =
+	{	{target="mar_2c_01_anomaly_spot",					hint="st_mar_2c_01_anomaly_spot_name"},
+		{target="mar_2c_02_anomaly_spot",					hint="st_mar_2c_02_anomaly_spot_name"},
+			{target="ds_2c_01_anomaly_spot",					hint="st_ds_2c_01_anomaly_spot_name"},
+		{target="ds_2c_02_anomaly_spot",					hint="st_ds_2c_02_anomaly_spot_name"},
+		{target="ds_2c_03_anomaly_spot",					hint="st_ds_2c_03_anomaly_spot_name"},
+		{target="ds_2c_04_anomaly_spot",					hint="st_ds_2c_04_anomaly_spot_name"},
+			{target="trc_2c_01_rift_anom_spot",					hint="st_trc_2c_01_rift_anom_spot_name"},
+		{target="trc_2c_02_chem_anom_spot",					hint="st_trc_2c_02_chem_anom_spot_name"},
+		{target="trc_2c_03_desolation_anom_spot",			hint="st_trc_2c_03_desolation_anom_spot_name"},
+			{target="esc_2c_01_high_hopes_anomaly_spot",		hint="st_esc_2c_01_high_hopes_anomaly_spot_name"},
+			{target="gar_2c_01_nwi_anomaly_spot",				hint="st_gar_2c_01_nwi_anomaly_spot_name"},
+		{target="gar_2c_02_toaster_anomaly_spot",			hint="st_gar_2c_02_toaster_anomaly_spot_name"},
+			{target="agr_2c_01_hg_anomaly_spot",				hint="st_agr_2c_01_hg_anomaly_spot_name"},
+			-- Undergound anomalies are commented out until we can have underground minimaps.
+			--{target="labx18_2c_01_deep_burn_anomaly_spot",	hint="st_labx18_2c_01_deep_burn_anomaly_spot_name"},
+		--{target="labx18_2c_02_ff_anomaly_spot",			hint="st_labx18_2c_02_ff_anomaly_spot_name"},
+		--{target="labx18_2c_03_elders_anomaly_spot",		hint="st_labx18_2c_03_elders_anomaly_spot_name"},
+		--{target="labx18_2c_04_bioh_anomaly_spot",			hint="st_labx18_2c_04_bioh_anomaly_spot_name"},
+			{target="bar_2c_01_grant_anomaly_spot",				hint="st_bar_2c_01_grant_anomaly_spot_name"},
+			{target="ros_2c_01_tunnel_anomaly_spot",			hint="st_ros_2c_01_tunnel_anomaly_spot_name"},
+		{target="ros_2c_02_crispy_train_anomaly_spot",		hint="st_ros_2c_02_crispy_train_anomaly_spot_name"},
+		{target="ros_2c_03_yc_anomaly_spot",				hint="st_ros_2c_03_yc_anomaly_spot_name"},
+			{target="mil_2c_01_hw_anomaly_spot",				hint="st_mil_2c_01_hw_anomaly_spot_name"},
+			{target="yan_2c_01_cd_anomaly_spot",				hint="st_yan_2c_01_cd_anomaly_spot_name"},
+			--{target="x16_lab_2c_01_fb_anomy_spot",			hint="st_x16_lab_2c_01_fb_anomy_spot_name"},
+			{target="cit_2c_01_ch_anomaly_spot",				hint="st_cit_2c_01_ch_anomaly_spot_name"},
+		{target="cit_2c_02_pg_anomaly_spot",				hint="st_cit_2c_02_pg_anomaly_spot_name"},
+			{target="lim_2c_01_ls_anomaly_spot",				hint="st_lim_2c_01_ls_anomaly_spot_name"},
+		{target="lim_2c_02_ib_anomaly_spot",				hint="st_lim_2c_02_ib_anomaly_spot_name"},
+			{target="rad_2c_01_bl_anomaly_spot",				hint="st_rad_2c_01_bl_anomaly_spot_name"},
+		{target="rad_2c_02_pp_anomaly_spot",				hint="st_rad_2c_02_pp_anomaly_spot_name"},
+			--{target="bun_2c_01_f_anomaly_spot",				hint="st_bun_2c_01_f_anomaly_spot_name"},
+		--{target="bun_2c_02_gp_anomaly_spot",				hint="st_bun_2c_02_gp_anomaly_spot_name"},
+			{target="pri_2c_01_pp_anomaly_spot",				hint="st_pri_2c_01_pp_anomaly_spot_name"},
+		{target="pri_2c_02_gt_anomaly_spot",				hint="st_pri_2c_02_gt_anomaly_spot_name"},
+		{target="pri_2c_03_wr_anomaly_spot",				hint="st_pri_2c_03_wr_anomaly_spot_name"},
+		{target="pri_2c_04_o_anomaly_spot",					hint="st_pri_2c_04_o_anomaly_spot_name"},
+			{target="aes_2c_01_ce_anomaly_spot",				hint="st_aes_2c_01_ce_anomaly_spot_name"},
+		{target="aes_2c_02_p_anomaly_spot",					hint="st_aes_2c_02_p_anomaly_spot_name"},
+			{target="aes2_2c_01_bo_anomaly_spot",				hint="st_aes2_2c_01_bo_anomaly_spot_name"},
+		{target="aes2_2c_02_at_anomaly_spot",				hint="st_aes2_2c_02_at_anomaly_spot_name"},
+			--{target="sar_2c_01_r_anomaly_spot",				hint="st_sar_2c_01_r_anomaly_spot_name"},
+			{target="gen_2c_01_ss_anomaly_spot",				hint="st_gen_2c_01_ss_anomaly_spot_name"},
+			{target="mar_smart_terrain_11_3_anomaly_spot",		hint="st_mar_smart_terrain_11_3_anomaly_spot_name"},
+		{target="mar_smart_terrain_10_10_anomaly_spot",		hint="st_mar_smart_terrain_10_10_anomaly_spot_name"},
+		{target="mar_smart_terrain_base_anomaly_spot",		hint="st_mar_smart_terrain_base_anomaly_spot_name"},
+		{target="mar_smart_terrain_8_8_anomaly_spot",		hint="st_mar_smart_terrain_8_8_anomaly_spot_name"},
+		{target="mar_smart_terrain_12_2_anomaly_spot",		hint="st_mar_smart_terrain_12_2_anomaly_spot_name"},
+		{target="mar_smart_terrain_3_7_anomaly_spot",		hint="st_mar_smart_terrain_3_7_anomaly_spot_name"},
+		{target="mar_smart_terrain_3_3_anomaly_spot",		hint="st_mar_smart_terrain_3_3_anomaly_spot_name"},
+			{target="esc_smart_terrain_1_11_anomaly_spot",		hint="st_esc_smart_terrain_1_11_anomaly_spot_name"},
+		{target="esc_smart_terrain_8_9_anomaly_spot",		hint="st_esc_smart_terrain_8_9_anomaly_spot_name"},
+		{target="esc_smart_terrain_5_4_anomaly_spot",		hint="st_esc_smart_terrain_5_4_anomaly_spot_name"},
+			{target="gar_smart_terrain_3_7_anomaly_spot",		hint="st_gar_smart_terrain_3_7_anomaly_spot_name"},
+		{target="gar_smart_terrain_3_7_anomaly_spot_2",		hint="st_gar_smart_terrain_3_7_anomaly_spot_2_name"},
+		{target="gar_smart_terrain_2_4_anomaly_spot",		hint="st_gar_smart_terrain_2_4_anomaly_spot_name"},
+		{target="gar_smart_terrain_6_7_anomaly_spot",		hint="st_gar_smart_terrain_6_7_anomaly_spot_name"},
+		{target="gar_smart_terrain_5_6_anomaly_spot",		hint="st_gar_smart_terrain_5_6_anomaly_spot_name"},
+		{target="gar_smart_terrain_1_7_anomaly_spot",		hint="st_gar_smart_terrain_1_7_anomaly_spot_name"},
+			{target="agr_smart_terrain_1_3_anomaly_spot",		hint="st_agr_smart_terrain_1_3_anomaly_spot_name"},
+		{target="agr_smart_terrain_4_4_near_3_anomaly_spot", hint="st_agr_smart_terrain_4_4_near_3_anomaly_spot_name"},
+		{target="agr_smart_terrain_5_7_anomaly_spot", 		hint="st_agr_smart_terrain_5_7_anomaly_spot_name"},
+		{target="agr_smart_terrain_5_2_anomaly_spot", 		hint="st_agr_smart_terrain_5_2_anomaly_spot_name"},
+		{target="agr_smart_terrain_1_2_anomaly_spot", 		hint="st_agr_smart_terrain_1_2_anomaly_spot_name"},
+			{target="val_smart_terrain_9_10_anomaly_spot",		hint="st_val_smart_terrain_9_10_anomaly_spot_name"},
+		{target="val_smart_terrain_6_4_anomaly_spot",		hint="st_val_smart_terrain_6_4_anomaly_spot_name"},
+		{target="val_smart_terrain_8_6_anomaly_spot",		hint="st_val_smart_terrain_8_6_anomaly_spot_name"},
+		{target="val_smart_terrain_9_4_anomaly_spot",		hint="st_val_smart_terrain_9_4_anomaly_spot_name"},
+		{target="val_smart_terrain_8_9_anomaly_spot",		hint="st_val_smart_terrain_8_9_anomaly_spot_name"},
+			{target="mil_smart_terrain_4_7_anomaly_spot",		hint="st_mil_smart_terrain_4_7_anomaly_spot_name"},
+		{target="mil_smart_terrain_2_1_anomaly_spot",		hint="st_mil_smart_terrain_2_1_anomaly_spot_name"},
+		{target="mil_smart_terrain_2_6_anomaly_spot",		hint="st_mil_smart_terrain_2_6_anomaly_spot_name"},
+		{target="mil_smart_terrain_7_4_anomaly_spot",		hint="st_mil_smart_terrain_7_4_anomaly_spot_name"},
+		{target="mil_smart_terrain_8_3_anomaly_spot",		hint="st_mil_smart_terrain_8_3_anomaly_spot_name"},
+			{target="yan_smart_terrain_2_5_anomaly_spot",		hint="st_yan_smart_terrain_2_5_anomaly_spot_name"},
+		{target="yan_smart_terrain_zombi_spawn_anomaly_spot",		hint="st_yan_smart_terrain_zombi_spawn_anomaly_spot_name"},
+		{target="yan_smart_terrain_5_3_anomaly_spot",		hint="st_yan_smart_terrain_5_3_anomaly_spot_name"},
+		{target="yan_smart_terrain_4_2_anomaly_spot",		hint="st_yan_smart_terrain_4_2_anomaly_spot_name"},
+			{target="red_smart_terrain_6_3_anomaly_spot",		hint="st_red_smart_terrain_6_3_anomaly_spot_name"},
+		{target="red_smart_terrain_4_5_anomaly_spot",		hint="st_red_smart_terrain_4_5_anomaly_spot_name"},
+		{target="red_smart_terrain_monsters_anomaly_spot",	hint="st_red_smart_terrain_monsters_anomaly_spot_name"},
+		{target="red_smart_terrain_3_2_anomaly_spot",		hint="st_red_smart_terrain_3_2_anomaly_spot_name"},
+		{target="red_smart_terrain_6_6_anomaly_spot",		hint="st_red_smart_terrain_6_6_anomaly_spot_name"},
+		{target="red_smart_terrain_3_1_anomaly_spot",		hint="st_red_smart_terrain_3_1_anomaly_spot_name"},
+			{target="gen_smart_terrain_urod_anomaly_spot",		hint="st_gen_smart_terrain_urod_anomaly_spot_name"},
+			{target="trc_sim_13_anomal_zone_spot",				hint="st_trc_sim_13_anomal_zone_spot_name"},
 
-	-- Non-anomalies are commented out because as you can see above; ShoC, CS and beta maps only 'spot' major anomalies.
-	-- Some anomalous areas from CoP (Dredge station, Burnt Farmstead, Swamp etc.) are renamed to fit their naming scheme.
-	{target="zat_b55_spot",		hint="st_zat_b55_name"},	-- Claw anomaly
-	{target="zat_b100_spot",	hint="st_zat_b100_name"},	-- Iron Forest anomaly
-	--{target="zat_b104_spot",	hint="st_zat_b104_name"},	-- Sawmill
-	--{target="zat_b38_spot",	hint="st_zat_b38_name"},	-- Krug antenna complex
-	--{target="zat_b40_spot",	hint="st_zat_b40_name"},	-- Waste processing station
-	{target="zat_b56_spot",		hint="st_zat_b56_name"},	-- Circus anomaly
-	--{target="zat_b5_spot",	hint="st_zat_b5_name"},		-- Ranger station
-	--{target="zat_a2_spot",	hint="st_zat_a2_name"},		-- Skadovsk
-	--{target="zat_b20_spot",	hint="st_zat_b20_name"},	-- Burnt farmstead
-	{target="zat_b20_spot",		hint="st_zat_fire_name"},	-- Barge's Inferno anomaly
-	{target="zat_b53_spot",		hint="st_zat_b53_name"},	-- Boiler anomaly
-	--{target="zat_b101_spot",	hint="st_zat_b101_name"},	-- Swamp
-	{target="zat_b101_spot",	hint="st_zat_waste_name"},	-- Sullage anomaly
-	--{target="zat_b106_spot",	hint="st_zat_b106_name"},	-- Izumrudnoye
-	--{target="zat_b7_spot",	hint="st_zat_b7_name"},		-- Shevchenko
-	--{target="zat_b14_spot",	hint="st_zat_b14_name"},	-- Dredge station
-	{target="zat_b14_spot",		hint="st_zat_tide_name"},	-- Riptide anomaly
-	--{target="zat_b52_spot",	hint="st_zat_b52_name"},	-- Dock cranes
-	{target="zat_b39_spot",		hint="st_zat_b39_name"},	-- Oakpine anomaly
-	--{target="zat_b33_spot",	hint="st_zat_b33_name"},	-- Fuelling station
-	--{target="zat_b18_spot",	hint="st_zat_b18_name"},	-- Old barge
-	{target="zat_b54_spot",		hint="st_zat_b54_name"},	-- Scar anomaly
-	--{target="zat_b12_spot",	hint="st_zat_b12_name"},	-- Preobrazhensky bridge
-	--{target="zat_b28_spot",	hint="st_zat_b28_name"},	-- Southern plateau
-	--{target="zat_b103_spot",	hint="st_zat_b103_name"},	-- Substation workshops
-		{target="jup_b1_spot",		hint="st_jup_b1_name"},		-- Ash Heap anomaly
-	--{target="jup_b46_spot",	hint="st_jup_b46_name"},	-- Cooling tower
-	--{target="jup_b202_spot",	hint="st_jup_b202_name"},	-- Substation
-	{target="jup_b211_spot",	hint="st_jup_b211_name"},	-- Plavni anomaly
-	--{target="jup_b200_spot",	hint="st_jup_b200_name"},	-- Cement factory
-	--{target="jup_b19_spot",	hint="st_jup_b19_name"},	-- Kopachy
-	--{target="jup_a6_spot",	hint="st_jup_a6_name"},		-- Yanov
-	--{target="jup_b25_spot",	hint="st_jup_b25_name"},	-- Quarry
-	{target="jup_b25_spot",		hint="st_jup_earth_name"},	-- Cracked Earth anomaly
-	--{target="jup_b6_spot",	hint="st_jup_b6_name"},		-- Scientists’ bunker
-	--{target="jup_b205_spot",	hint="st_jup_b205_name"},	-- Volkhov AA complex
-	--{target="jup_b206_spot",	hint="st_jup_b206_name"},	-- Anomalous grove
-	{target="jup_b206_spot",	hint="st_jup_grove_name"},	-- Rotten Grove anomaly
-	--{target="jup_b32_spot",	hint="st_jup_b32_name"},	-- Parking lot
-	--{target="jup_a10_spot",	hint="st_jup_a10_name"},	-- Checkpoint
-	{target="jup_b209_spot",	hint="st_jup_b209_name"},	-- Bitumen anomaly
-	--{target="jup_b208_spot",	hint="st_jup_b208_name"},	-- Eastern tunnel
-	--{target="jup_a12_spot",	hint="st_jup_a12_name"},	-- Container warehouse
-	--{target="jup_b212_spot",	hint="st_jup_b212_name"},	-- Ventilation complex
-	--{target="jup_b9_spot",	hint="st_jup_b9_name"},		-- Helipads
-	{target="jup_b201_spot",	hint="st_jup_b201_name"},	-- Concrete Bath anomaly
-	--{target="jup_a9_spot",	hint="st_jup_a9_name"},		-- Jupiter plant
+		-- Non-anomalies are commented out because as you can see above; ShoC, CS and beta maps only 'spot' major anomalies.
+		-- Some anomalous areas from CoP (Dredge station, Burnt Farmstead, Swamp etc.) are renamed to fit their naming scheme.
+		{target="zat_b55_spot",		hint="st_zat_b55_name"},	-- Claw anomaly
+		{target="zat_b100_spot",	hint="st_zat_b100_name"},	-- Iron Forest anomaly
+		--{target="zat_b104_spot",	hint="st_zat_b104_name"},	-- Sawmill
+		--{target="zat_b38_spot",	hint="st_zat_b38_name"},	-- Krug antenna complex
+		--{target="zat_b40_spot",	hint="st_zat_b40_name"},	-- Waste processing station
+		{target="zat_b56_spot",		hint="st_zat_b56_name"},	-- Circus anomaly
+		--{target="zat_b5_spot",	hint="st_zat_b5_name"},		-- Ranger station
+		--{target="zat_a2_spot",	hint="st_zat_a2_name"},		-- Skadovsk
+		--{target="zat_b20_spot",	hint="st_zat_b20_name"},	-- Burnt farmstead
+		{target="zat_b20_spot",		hint="st_zat_fire_name"},	-- Barge's Inferno anomaly
+		{target="zat_b53_spot",		hint="st_zat_b53_name"},	-- Boiler anomaly
+		--{target="zat_b101_spot",	hint="st_zat_b101_name"},	-- Swamp
+		{target="zat_b101_spot",	hint="st_zat_waste_name"},	-- Sullage anomaly
+		--{target="zat_b106_spot",	hint="st_zat_b106_name"},	-- Izumrudnoye
+		--{target="zat_b7_spot",	hint="st_zat_b7_name"},		-- Shevchenko
+		--{target="zat_b14_spot",	hint="st_zat_b14_name"},	-- Dredge station
+		{target="zat_b14_spot",		hint="st_zat_tide_name"},	-- Riptide anomaly
+		--{target="zat_b52_spot",	hint="st_zat_b52_name"},	-- Dock cranes
+		{target="zat_b39_spot",		hint="st_zat_b39_name"},	-- Oakpine anomaly
+		--{target="zat_b33_spot",	hint="st_zat_b33_name"},	-- Fuelling station
+		--{target="zat_b18_spot",	hint="st_zat_b18_name"},	-- Old barge
+		{target="zat_b54_spot",		hint="st_zat_b54_name"},	-- Scar anomaly
+		--{target="zat_b12_spot",	hint="st_zat_b12_name"},	-- Preobrazhensky bridge
+		--{target="zat_b28_spot",	hint="st_zat_b28_name"},	-- Southern plateau
+		--{target="zat_b103_spot",	hint="st_zat_b103_name"},	-- Substation workshops
+			{target="jup_b1_spot",		hint="st_jup_b1_name"},		-- Ash Heap anomaly
+		--{target="jup_b46_spot",	hint="st_jup_b46_name"},	-- Cooling tower
+		--{target="jup_b202_spot",	hint="st_jup_b202_name"},	-- Substation
+		{target="jup_b211_spot",	hint="st_jup_b211_name"},	-- Plavni anomaly
+		--{target="jup_b200_spot",	hint="st_jup_b200_name"},	-- Cement factory
+		--{target="jup_b19_spot",	hint="st_jup_b19_name"},	-- Kopachy
+		--{target="jup_a6_spot",	hint="st_jup_a6_name"},		-- Yanov
+		--{target="jup_b25_spot",	hint="st_jup_b25_name"},	-- Quarry
+		{target="jup_b25_spot",		hint="st_jup_earth_name"},	-- Cracked Earth anomaly
+		--{target="jup_b6_spot",	hint="st_jup_b6_name"},		-- Scientists’ bunker
+		--{target="jup_b205_spot",	hint="st_jup_b205_name"},	-- Volkhov AA complex
+		--{target="jup_b206_spot",	hint="st_jup_b206_name"},	-- Anomalous grove
+		{target="jup_b206_spot",	hint="st_jup_grove_name"},	-- Rotten Grove anomaly
+		--{target="jup_b32_spot",	hint="st_jup_b32_name"},	-- Parking lot
+		--{target="jup_a10_spot",	hint="st_jup_a10_name"},	-- Checkpoint
+		{target="jup_b209_spot",	hint="st_jup_b209_name"},	-- Bitumen anomaly
+		--{target="jup_b208_spot",	hint="st_jup_b208_name"},	-- Eastern tunnel
+		--{target="jup_a12_spot",	hint="st_jup_a12_name"},	-- Container warehouse
+		--{target="jup_b212_spot",	hint="st_jup_b212_name"},	-- Ventilation complex
+		--{target="jup_b9_spot",	hint="st_jup_b9_name"},		-- Helipads
+		{target="jup_b201_spot",	hint="st_jup_b201_name"},	-- Concrete Bath anomaly
+		--{target="jup_a9_spot",	hint="st_jup_a9_name"},		-- Jupiter plant
 
-	--{target="pri_a28_spot",			hint="st_pri_a28_name"},	-- Prometheus movie theater
-	--{target="pri_b36_spot",			hint="st_pri_b36_name"},	-- River port
-	--{target="pri_b303_spot",			hint="st_pri_b303_name"},	-- Old service center
-	--{target="pri_b301_spot",			hint="st_pri_b301_name"},	-- School
-	--{target="pri_a17_spot",			hint="st_pri_a17_name"},	-- Hospital
-	--{target="pri_b306_spot",			hint="st_pri_b306_name"},	-- Yubileiny service center
-	{target="pri_b306_spot",			hint="st_pri_plug_name"},	-- Spark Plug anomaly
-	--{target="pri_a16_spot",			hint="st_pri_a16_name"},	-- Laundromat
-	--{target="pri_a25_spot",			hint="st_pri_a25_name"},	-- Kindergarten
-	--{target="pri_b35_spot",			hint="st_pri_b35_name"},	-- Apartment complex
-	--{target="pri_a21_spot",			hint="st_pri_a21_name"},	-- Grocery store
-	--{target="pri_b304_spot",			hint="st_pri_b304_name"},	-- Department store
-	{target="pri_b304_spot",			hint="st_pri_bath_name"},	-- Acid Bath anomaly
-	--{target="pri_a18_spot",			hint="st_pri_a18_name"},	-- Book store
-	{target="pri_anomal_vulkan_spot",	hint="st_pri_b307_name"},	-- Volcano anomaly
-	{target="pri_anomal_loza_spot",		hint="st_pri_b302_name"}	-- Vine anomaly
+		--{target="pri_a28_spot",			hint="st_pri_a28_name"},	-- Prometheus movie theater
+		--{target="pri_b36_spot",			hint="st_pri_b36_name"},	-- River port
+		--{target="pri_b303_spot",			hint="st_pri_b303_name"},	-- Old service center
+		--{target="pri_b301_spot",			hint="st_pri_b301_name"},	-- School
+		--{target="pri_a17_spot",			hint="st_pri_a17_name"},	-- Hospital
+		--{target="pri_b306_spot",			hint="st_pri_b306_name"},	-- Yubileiny service center
+		{target="pri_b306_spot",			hint="st_pri_plug_name"},	-- Spark Plug anomaly
+		--{target="pri_a16_spot",			hint="st_pri_a16_name"},	-- Laundromat
+		--{target="pri_a25_spot",			hint="st_pri_a25_name"},	-- Kindergarten
+		--{target="pri_b35_spot",			hint="st_pri_b35_name"},	-- Apartment complex
+		--{target="pri_a21_spot",			hint="st_pri_a21_name"},	-- Grocery store
+		--{target="pri_b304_spot",			hint="st_pri_b304_name"},	-- Department store
+		{target="pri_b304_spot",			hint="st_pri_bath_name"},	-- Acid Bath anomaly
+		--{target="pri_a18_spot",			hint="st_pri_a18_name"},	-- Book store
+		{target="pri_anomal_vulkan_spot",	hint="st_pri_b307_name"},	-- Volcano anomaly
+		{target="pri_anomal_loza_spot",		hint="st_pri_b302_name"}	-- Vine anomaly
 	}
-
-local change_objects_tbl =
-{	{target = "jup_b32_spot",		hint = "st_jup_b32_name",	zone = "jup_b32_anomal_zone",	group = "jup_b32_scanner_1_placed",	enabled = false},
-	{target = "jup_b201_spot",		hint = "st_jup_b201_name",	zone = "jup_b201_anomal_zone",	group = "jup_b32_scanner_2_placed",	enabled = false},
-	{target = "jup_b209_spot",		hint = "st_jup_b209_name",	zone = "jup_b209_anomal_zone",	group = "jup_b32_scanner_3_placed",	enabled = false},
-	{target = "jup_b211_spot",		hint = "st_jup_b211_name",	zone = "jup_b211_anomal_zone",	group = "jup_b32_scanner_4_placed",	enabled = false},
-	{target = "jup_b1_spot",		hint = "st_jup_b1_name",	zone = "jup_b10_anomal_zone",	group = "jup_b32_scanner_5_placed",	enabled = false},
-
-}
-
-local sleep_zones_tbl =
-{	{target = "mar_a3_sr_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "agr_sr_sleep_wagon_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "agr_sr_sleep_tunnel_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "agr_army_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "esc_basement_sleep_area_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "esc_secret_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "ds_farmhouse_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "val_abandoned_house_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "val_vagon_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "gar_dolg_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "gar_angar_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "bar_actor_sleep_zone_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "yan_bunker_sleep_restrictor_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "ros_vagon_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "mil_freedom_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "mil_smart_terran_2_4_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "rad_sleep_room_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "cit_merc_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "pri_monolith_sleep_id",	hint = "st_ui_pda_sleep_place"},
-	{target = "pri_room27_sleep_id",	hint = "st_ui_pda_sleep_place"},	
-	{target = "zat_a2_sr_sleep_id",		hint = "st_ui_pda_sleep_place"},
-	{target = "jup_a6_sr_sleep_id",		hint = "st_ui_pda_sleep_place"},
-	{target = "pri_a16_sr_sleep_id",	hint = "st_ui_pda_sleep_place"}
-}function fill_primary_objects()
 	for k,v in pairs(primary_objects_tbl) do
 		local obj_id = get_story_object_id(v.target)
 		if(obj_id) then
 			level.map_add_object_spot_ser(obj_id, "primary_object", v.hint)
 		end
 	end
-	change_anomalies_names()
-	fill_sleep_zones()
-end
-
-function fill_sleep_zones()
-	for k,v in pairs(sleep_zones_tbl) do
-		local obj_id = get_story_object_id(v.target)
-		if(obj_id and db.storage[obj_id] and db.storage[obj_id].object) then
-			if(db.storage[obj_id].object:position():distance_to(db.actor:position())<=150 and level.map_has_object_spot(obj_id, "ui_pda2_actor_sleep_location")==0) then
-				level.map_add_object_spot_ser(obj_id, "ui_pda2_actor_sleep_location", v.hint)
-			elseif(db.storage[obj_id].object:position():distance_to(db.actor:position())>150 and level.map_has_object_spot(obj_id, "ui_pda2_actor_sleep_location")~=0) then
-				level.map_remove_object_spot(obj_id, "ui_pda2_actor_sleep_location")
-			end
+	
+	local sleep_zones_tbl =
+	{	"mar_a3_sr_sleep_id",
+		"agr_sr_sleep_wagon_id",
+		"agr_sr_sleep_tunnel_id",
+		"agr_army_sleep_id",
+		"esc_basement_sleep_area_id",
+		"esc_secret_sleep_id",
+		"ds_farmhouse_sleep_id",
+		"val_abandoned_house_sleep_id",
+		"val_vagon_sleep_id",
+		"gar_dolg_sleep_id",
+		"gar_angar_sleep_id",
+		"bar_actor_sleep_zone_id",
+		"yan_bunker_sleep_restrictor_id",
+		"ros_vagon_sleep_id",
+		"mil_freedom_sleep_id",
+		"mil_smart_terran_2_4_sleep_id",
+		"rad_sleep_room_id",
+		"cit_merc_sleep_id",
+		"pri_monolith_sleep_id",
+		"pri_room27_sleep_id",
+		"zat_a2_sr_sleep_id",
+		"jup_a6_sr_sleep_id",
+		"pri_a16_sr_sleep_id"
+	}
+	for i=1,#sleep_zones_tbl do
+		local obj_id = get_story_object_id(sleep_zones_tbl[i])
+		if (level.map_has_object_spot(obj_id, "ui_pda2_actor_sleep_location")==0) then
+			level.map_add_object_spot_ser(obj_id, "ui_pda2_actor_sleep_location", "st_ui_pda_sleep_place")
 		end
 	end
 end
@@ -381,10 +364,6 @@ function add_quick_slot_items_on_game_start()
 	for i=0,3 do
 		get_console():execute( strformat("slot_%s %s",i, ini:r_string_ex("actor","quick_item_"..tostring(i+1)) or "") )
 	end
-end
-
-function change_anomalies_names()
-
 end
 
 local function npc_on_net_spawn(npc,se_obj)
@@ -404,13 +383,12 @@ local actor_rank_place
 function calculate_rankings()
 	local t = {}
 	local sim = alife()
-		-- add actor to list
+	-- add actor to list
 	t[0] = alife():actor():rank()
-		-- check all stalker server objects
-		
-
+	
 	local sor = story_objects.get_story_objects_registry()
 	
+	-- check all stalker server objects
 	for i=1,65534 do
 		local se_obj = sim:object(i)
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and se_obj:community() ~= "zombied" and se_obj:community() ~= "trader") then
@@ -445,11 +423,11 @@ function coc_rankings_can_show(index)
 	if (has_alife_info("ui_pda_hide")) then
 		return false
 	end
-		local se_obj = coc_ranking_list[index] ~= nil and alife():object(coc_ranking_list[index])
+	local se_obj = coc_ranking_list[index] ~= nil and alife():object(coc_ranking_list[index])
 	if (se_obj) then
 		return true
 	end
-		return false
+	return false
 end
 
 -- called from engine! must return string!

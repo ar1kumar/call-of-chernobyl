@@ -179,7 +179,11 @@ function actor_binder:reinit()
 	
 	if (USE_MARSHAL) then 
 		RegisterScriptCallback("save_state",self)
-	end 
+	end
+	
+	bind_stalker_ext.actor_on_reinit(self)
+	
+	alife():set_objects_per_update(65534) -- To force all of alife to spawn and update at least once
 	
 	--alun_utils.debug_write("actor reinit end")
 end
@@ -213,6 +217,12 @@ function actor_binder:update(delta)
 			db.actor:set_character_icon(self.character_icon)
 		end
 		
+		local function set_obj_per_upd()
+			alife():set_objects_per_update(25)
+			return true
+		end
+		CreateTimeEvent(0,"obj_per_upd",30,set_obj_per_upd)
+		
 		printf("collectgarbage before=%sKb",collectgarbage("count")*1024)
 		collectgarbage("collect")
 		printf("collectgarbage after=%sKb",collectgarbage("count")*1024)
@@ -220,9 +230,7 @@ function actor_binder:update(delta)
 	end
 	
 	self.task_manager:update()
-
-	--game_stats.update(delta, self.object) --  ??
-
+	level_weathers.get_weather_manager():update()
 	xr_sound.update(self.object:id())
 
 	-- Обновление отключения ввода с клавиатуры.
@@ -255,18 +263,6 @@ function actor_binder:update(delta)
 	simulation_objects.get_sim_obj_registry():update_avaliability(alife():actor())
 
 	bind_stalker_ext.actor_on_update(self,delta)
-	
-	local tg = time_global()
-	if (self.last_update and tg < self.last_update) then
-		--alun_utils.debug_write("actor update END 1")
-		return
-	end
-	self.last_update = tg + 3000
-	
-	level_weathers.get_weather_manager():update()
-
-	pda.fill_sleep_zones()
-	treasure_manager.get_treasure_manager():update()
 	
 	--alun_utils.debug_write("actor update END 2")
 end
@@ -304,7 +300,6 @@ function actor_binder:save(packet)
 	xr_sound.actor_save(packet)
 	--alun_utils.w_stpk(packet,"stringZ",self.last_level_name,"last level name")
 	xr_statistic.save(packet)
-	treasure_manager.get_treasure_manager():save(packet)
 	task_manager.get_task_manager():save(packet)
 	packet:w_u8(self.object:active_slot())
 
@@ -357,7 +352,6 @@ function actor_binder:load(reader)
 	end
 	--]]
 	xr_statistic.load(reader)
-	treasure_manager.get_treasure_manager():load(reader)
 	task_manager.get_task_manager():load(reader)
 
 	self.loaded_active_slot = reader:r_u8()

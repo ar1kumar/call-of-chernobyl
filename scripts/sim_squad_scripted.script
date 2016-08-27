@@ -127,15 +127,16 @@ function sim_squad_scripted:update()
 	cse_alife_online_offline_group.update(self)
 	if not (self.first_update) then
 		self.first_update = true
+		local skip = false
 		local sim = alife()
 		local se_actor = sim:actor()
 		local se_obj = self:commander_id() and alife():object(self:commander_id())
-		local skip = false
-		
-		if (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion")) then
-			skip = true
-		elseif (utils.se_obj_load_var(se_obj.id,se_obj:name(),"do_not_deactivate")) then 
-			skip = true 
+		if (se_obj) then
+			if (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion")) then
+				skip = true
+			elseif (utils.se_obj_load_var(se_obj.id,se_obj:name(),"do_not_deactivate")) then 
+				skip = true 
+			end
 		end
 		
 		if (skip ~= true) then
@@ -303,18 +304,6 @@ function sim_squad_scripted:generic_update()
 	self.assigned_target_id = get_help_target_id(self) or self.assigned_target_id or self.current_target_id
 
 	if (self.current_action) then
-		-- Forces a reset on current action when a surge starts so squads go to highest prior target
-		--[[ commented as it conflicts with tasks that depend on squad alife
-		if (xr_conditions.surge_started()) then
-			if not (self.surge_reset_action) then
-				self.surge_reset_action = true
-				self.assigned_target_id = nil
-			end
-		else
-			self.surge_reset_action = nil
-		end
-		--]]
-		
 		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
 
 		-- Evaluate current assigned target; make sure it is still valid
@@ -385,10 +374,6 @@ function sim_squad_scripted:remove_squad()
 		squad_npcs[k.id] = k.object
 	end
 	
-	if (self.online and self:can_switch_offline()) then 
-		self:switch_offline()
-	end
-
 	local sim = alife()
 	for id,se_obj in pairs(squad_npcs) do
 		local smart_id = se_obj:smart_terrain_id()
@@ -399,17 +384,12 @@ function sim_squad_scripted:remove_squad()
 			end
 		end
 		self:unregister_member(id)
-		
-		utils.se_obj_save_var(se_obj.id,se_obj:name(),"marked_for_delete")
-		
-		if (se_obj.online and se_obj:can_switch_offline()) then 
-			se_obj:switch_offline()
-		end
-		
-		sim:release(se_obj,true)
+		safe_release_manager.release(se_obj)
+		--sim:release(se_obj,true)
 	end
 	self:hide()
-	sim:release(self,true)
+	--sim:release(self,true)
+	safe_release_manager.release(self)
 	--alun_utils.debug_write(strformat("END sim_squad_scripted:remove_squad %s",self:name()))
 end
 
@@ -427,14 +407,8 @@ function sim_squad_scripted:remove_npc(npc_id)
 		end
 	
 		self:unregister_member(se_obj.id)
-		
-		utils.se_obj_save_var(se_obj.id,se_obj:name(),"marked_for_delete")
-		
-		if (se_obj.online and se_obj:can_switch_offline()) then 
-			se_obj:switch_offline()
-		end
-		
-		sim:release(se_obj, true)
+		safe_release_manager.release(se_obj)
+		--sim:release(se_obj, true)
 	end
 	if self:npc_count() == 0 then
 		self.current_action = nil
@@ -445,12 +419,9 @@ function sim_squad_scripted:remove_npc(npc_id)
 		SIMBOARD:assign_squad_to_smart(self, nil)
 		SIMBOARD.squads[self.id] = nil
 		
-		if (self.online and self:can_switch_offline()) then 
-			self:switch_offline()
-		end
-		
 		self:hide()
-		alife():release(self,true)
+		safe_release_manager.release(self)
+		--alife():release(self,true)
 	end
 end
 
@@ -475,13 +446,11 @@ function sim_squad_scripted:on_npc_death(npc,killer)
 	
 	SIMBOARD:assign_squad_to_smart(self, nil)
 	SIMBOARD.squads[self.id] = nil
-	
-	if (self.online and self:can_switch_offline()) then 
-		self:switch_offline()
-	end
 
 	self:hide()
-	alife():release(self,true)
+	safe_release_manager.release(self)
+	--alife():release(self,true)
+	
 	return
 end
 function sim_squad_scripted:assign_squad_member_to_smart(member_id, smart, old_smart_id)
@@ -586,6 +555,18 @@ function sim_squad_scripted:set_location_types(new_smart_name)
 		end
 	end
 end
+
+function sim_squad_scripted:add_new_member_forced(section,pos,lvid,gvid)
+	local se_obj = alife():create(section,pos,lvid,gvid)
+	if (se_obj) then
+		self:register_member(se_obj.id)
+		local smart = self.smart_id and db.smart_terrain_by_id[self.smart_id]
+		if (smart) then 
+			smart:register_npc(se_obj)
+			SIMBOARD:setup_squad_and_group(se_obj)
+		end
+	end
+end 
 
 function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_id, gv_id)
 	--alun_utils.debug_write("sim_squad_scripted:add_squad_member")
