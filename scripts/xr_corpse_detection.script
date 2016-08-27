@@ -36,10 +36,10 @@ end
 ------------------------------------------
 
 local function on_item_take(npc,item)
-	-- remark npc as having valuables if actor places items on a corpse
-	if (not npc or npc:alive()) then
+	if (npc:alive()) then
 		return
 	end
+	-- remark npc as having valuables if actor places items on a corpse
 	if (item and lootable_table[item:section()] ~= nil) then
 		HasValuableLoot[npc:id()] = true
 		return
@@ -47,7 +47,7 @@ local function on_item_take(npc,item)
 end
 
 local function on_item_drop(npc,item)
-	if (not npc or npc:alive()) then
+	if (npc:alive()) then
 		return
 	end
 	-- unmark npc as having valuables if they were all removed by actor

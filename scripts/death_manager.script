@@ -53,19 +53,23 @@ class "drop_manager"
 function drop_manager:__init(npc)
 	self.npc = npc
 end
+
+function drop_manager:decide_items_to_keep()
+	local death_dropped = tonumber(utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped") or 0)
+	if (death_dropped == 0) then
+		utils.se_obj_save_var(self.npc:id(),self.npc:name(),"death_dropped",1)
+		self.npc:iterate_inventory(keep_item, self.npc)
+	end
+end 
+
 function drop_manager:create_release_item()
-	--' Спрашиваем у серверного объекта генерились ли предметы
-	-- Alundaio
-	local death_dropped = utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped")
-	if (death_dropped == true) then
+	local death_dropped = tonumber(utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped") or 0)
+	if (death_dropped > 1) then
 		return
 	end
+	utils.se_obj_save_var(self.npc:id(),self.npc:name(),"death_dropped",2)
 	
-	utils.se_obj_save_var(self.npc:id(),self.npc:name(),"death_dropped",true)
-
-	self.npc:iterate_inventory(keep_item, self.npc)
-	
-	-- spawn items by story id 
+	-- spawn items by story id
 	local sid = item_by_story_id and get_object_story_id(self.npc:id())
 	if (sid and item_by_story_id[sid]) then
 		local p = xr_logic.pick_section_from_condlist(db.actor,self.npc,alun_utils.parse_condlist(item_by_story_id[sid]))
@@ -80,9 +84,9 @@ function drop_manager:create_release_item()
 	if ini and ini:section_exist("dont_spawn_loot") then
 		return
 	end
-	local st		= db.storage[self.npc:id()]
-	local st_ini 	= st and st.ini
-	if st_ini and st_ini:line_exist(st.section_logic , "dont_spawn_loot") then
+	
+	local st = db.storage[self.npc:id()]
+	if (st and st.ini and st.section_logic and st.ini:line_exist(st.section_logic,"dont_spawn_loot")) then 
 		return
 	end
 
@@ -117,7 +121,7 @@ function try_spawn_ammo(npc,spawn_items)
 				sec = ammo_class[math.random(1,#ammo_class)]
 				if (sec and item_count[sec]) then 
 					number = math.random(item_count[sec][1], item_count[sec][2])
-					if (number > 0 and system_ini():section_exist(sec)) then 
+					if (number > 0 and system_ini():section_exist(sec)) then
 						create_ammo(sec,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id(),number)
 					end
 				end
@@ -159,15 +163,15 @@ function keep_item(npc, item)
 		end
 		return
 	end
+	
 	local st = db.storage[npc:id()]
-	local st_ini = st and st.ini
-	if st_ini and st_ini:line_exist(st.section_logic , "dont_keep_items") then
+	if (st and st.ini and st.section_logic and st.ini:line_exist(st.section_logic,"dont_keep_items")) then
 		local se_item = alife():object(item:id())
 		if (se_item) then
 			alife():release(se_item, true)
 		end
 		return
-	end
+	end 
 	
 	-- release all animation objects
 	if (section == "bolt" or section == "medkit_script" or section == "guitar_a" or section == "harmonica_a" or section == "wpn_binoc" or section == "anim_binoc" or section == "anim_knife" 
@@ -182,13 +186,13 @@ function keep_item(npc, item)
 	local m = item:get_max_uses()
 	if (m > 0) then 
 		local r = math.random(0,m)
+		item:set_remaining_uses(r)
 		if (r == 0) then 
 			local se_item = alife():object(item:id())
 			if (se_item) then
 				alife():release(se_item, true)
 			end
 		end
-		item:set_remaining_uses(r)
 		return
 	end
 	

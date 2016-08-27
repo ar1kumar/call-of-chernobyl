@@ -27,7 +27,7 @@ local LootTable
 -- Localized Functions
 ------------------------------------------
 local function npc_on_item_take(npc,item)
-	if (npc:alive() ~= true or item == nil) then
+	if not (npc:alive()) then
 		return
 	end
 	

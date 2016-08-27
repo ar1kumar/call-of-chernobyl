@@ -65,17 +65,10 @@ function motivator_binder:net_spawn(sobject)
 
 	self.object:apply_loophole_direction_distance(1.0)
 
-	if self.loaded == false then
-		local spawn_ini = self.object:spawn_ini()
-		local filename = spawn_ini and spawn_ini:r_string_ex("logic","cfg")
-		local char_ini = filename and ini_file(filename) or spawn_ini or ini_file("scripts\\dummy.ltx")
-		xr_info.loadInfo(self.object, char_ini)
-	end
-
 	self.object:set_callback(callback.use_object, motivator_binder.use_callback, self)
 	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
 	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)
-		
+	
 	db.add_obj(self.object)
 	if not self.object:alive() then
 		self.object:death_sound_enabled(false)
@@ -89,12 +82,14 @@ function motivator_binder:net_spawn(sobject)
 			local v_id = self.object:accessible_nearest(level.vertex_position(sobject.m_level_vertex_id), vector())
 			self.object:set_npc_position(level.vertex_position(v_id))
 		end
+		
+		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_stalker)
 		return true
 	end
 	
 	self.st.move_mgr = move_mgr.move_mgr(self.object)
 	self.st.move_mgr:initialize()
-
+	
 	self.object:set_patrol_extrapolate_callback(motivator_binder.extrapolate_callback, self)
 	self.object:set_callback(callback.hit, motivator_binder.hit_callback, self)
 	self.object:set_callback(callback.death, motivator_binder.death_callback, self)
@@ -282,13 +277,14 @@ function motivator_binder:death_callback(victim, who)
 		abort(strformat("CRITICAL ERROR: motivator_binder:death_callback : Game Object is nil and binder is not! %s",self.name),2)
 		return
 	end
-		trade_manager.on_npc_death(victim)
-		self:hit_callback(victim, 1, vector():set(0,0,0), who, "from_death_callback")
+	
+	trade_manager.on_npc_death(victim)
+	self:hit_callback(victim, 1, vector():set(0,0,0), who, "from_death_callback")
 
 	local id = victim:id()
 	xr_combat_ignore.fighting_with_actor_npcs[id] = nil
 
-	death_manager.drop_manager(victim):create_release_item()
+	death_manager.drop_manager(victim):decide_items_to_keep()
 
 	stalker_generic.remove_level_spot(victim, self.st)
 
@@ -307,11 +303,6 @@ function motivator_binder:death_callback(victim, who)
 				m_data.stalkers_killed = m_data.stalkers_killed and m_data.stalkers_killed + 1 or 1
 			end
 		end
-	end
-
-	local known_info = self.st.ini and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
-	if (known_info) then
-		xr_info.loadInfo(victim, self.st.ini, known_info)
 	end
 
 	if (self.st.state_mgr) then
@@ -350,6 +341,12 @@ end
 function motivator_binder:use_callback(obj, who)
 	--alun_utils.debug_write(strformat("motivator_binder:use_callback %s",obj and obj:name()))
 	if not obj:alive() then
+		local known_info = self.st.ini and self.st.section_logic and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
+		--printf("known_info %s ini=%s section_logic=%s",known_info,self.st.ini_filename,self.st.section_logic)
+		if (known_info) then
+			xr_info.give_actor_info(self.st.ini,known_info)
+		end
+		
 		death_manager.drop_manager(obj):create_release_item()
 		return
 	end
@@ -379,12 +376,16 @@ function motivator_binder:update(delta)
 	-- check dead
 	local object_alive = object:alive()
 	if not (object_alive) then
-		-- Moved to use_callback and xr_corpse_detection since it's more efficient to create items when actor opens the inventory, less lag when stuff dies.
-		-- if not (self.first_update) then
-			-- death_manager.drop_manager(object):create_release_item()
-		-- end
-		--self.first_update = true
+		if not (self.first_update) then
+			death_manager.drop_manager(object):decide_items_to_keep()
+		end
+		self.first_update = true
+		
 		object:set_tip_text_default()
+		
+		if (self.st.active_scheme) then
+			xr_logic.try_switch_to_another_section(object, self.st[self.st.active_scheme], db.actor)
+		end
 		--alun_utils.debug_write("motivator_bind:update %s END 1",self.object and self.object:name())
 		return
 	end
