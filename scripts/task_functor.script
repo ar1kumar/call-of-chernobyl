@@ -86,9 +86,6 @@ function general_bounty_task(task_id,field,p,task)
 end
 
 function general_fetch_task(task_id,field,p,task)
-	if not (db.actor) then
-		return
-	end
 	if (field == "title") then
 		local fetch = alun_utils.get_inv_name(utils.load_var(db.actor,task_id.."_fetch",""))
 		local count = fetch and utils.load_var(db.actor,task_id.."_fetch_count") or 1
@@ -135,7 +132,7 @@ end
 function yan_ecolog_semenov_task_target(task_id,field,p,task)
 	if (task_id == "yan_ecolog_semenov_task_1") then
 		local squad = get_story_squad("yan_ecolog_semenov_squad")
-		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
+		if (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
 			return squad.id
 		end
 
@@ -147,9 +144,6 @@ end
 
 -- Marsh
 function mar_base_stalker_barmen_task_target(task_id,field,p,task)
-	if not (db.actor) then
-		return
-	end
 
 	if (task and task.stage == 1 and task.task_giver_id) then
 		return task.task_giver_id
@@ -215,10 +209,6 @@ end
 
 -- Darkvalley
 function val_smart_terrain_7_4_bandit_trader_stalker_task_target(task_id,field,p,task)
-	if not (db.actor) then
-		return
-	end
-
 	if (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_3") then
 		local squad = get_story_squad("bandit_companion_task_1")
 		if (squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
@@ -234,10 +224,10 @@ end
 function jup_b6_scientist_tech_task_target(task_id,field,p,task)
 	if (task_id == "jup_b6_scientist_tech_task_1") then
 		local squad = get_story_squad("ecolog_companion_task_2")
-		if (db.actor and squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
+		if (squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
 			return squad.id
 		end
-		local n = db.actor and utils.load_var(db.actor,"task_target_anomaly")
+		local n = utils.load_var(db.actor,"task_target_anomaly")
 		if (n) then
 			local anomaly = db.anomaly_by_name[n]
 			if (anomaly and anomaly.object) then
@@ -275,10 +265,6 @@ end
 
 -- Simulation
 function simulation_task_target(task_id,field,p,task)
-	if not (db.actor) then
-		return
-	end
-
 	if (task_id == "simulation_task_7" or task_id == "simulation_task_8" or task_id == "simulation_task_9" or task_id == "simulation_task_10") then
 		local squad = get_story_squad("hostage_companion_task_1")
 		if not (squad and squad:clsid() == clsid.online_offline_group_s) then

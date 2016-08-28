@@ -81,9 +81,6 @@ function CGeneralTask:__init(id)
 	--' Статус квеста, может быть: "normal", "selected", "completed", "fail", "reversed"
 	self.status = "normal"
 
-	self.current_title = task_functor[self.title_functor](self.id, "title", self.title,self)
-	self.current_descr = task_functor[self.descr_functor](self.id, "descr", self.descr,self)
-
 	local time = 0
 	if self.wait_time ~= nil then
 		time = self.wait_time  -- Тут время задано в игровых секундах
@@ -106,7 +103,6 @@ function CGeneralTask:__init(id)
 		printf("task_id=%s | target_functor not set properly, it's either missing or misnamed, check tm_*.ltx and task_functor.script",id)
 	end 
 	
-	self.current_target = self.target_functor and task_functor[self.target_functor](self.id, "target", self.target,self)
 	self.dont_send_update_news = task_ini:r_bool_ex(id,"dont_send_update_news",false)
 end
 
