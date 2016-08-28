@@ -9,13 +9,7 @@
 sound_table = {}
 
 function set_sound_play(npc_id, sound, faction, point)
-	--printf("SET_SOUND_PLAY. theme[%s] object[%s]", tostring(sound), npc_id)
-	--alun_utils.debug_write(strformat("xr_sound:set_sound_play %s",sound))
-	if sound == nil then
-		return
-	end
-	
-	if sound_theme.theme[sound] == nil then
+	if not (sound and sound_theme.theme[sound]) then
 		printf("set_sound_play. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
 		return
 	end
@@ -25,22 +19,13 @@ function set_sound_play(npc_id, sound, faction, point)
 		printf("You trying to play sound [%s] which type is looped", sound)
 	end
 	
-	
 	if sound_table[npc_id] == nil or snd_theme.play_always == true then
 		if sound_table[npc_id] ~= nil then
-			--printf("sound table not nil")
 			if(sound_table[npc_id].reset~=nil) then
 				sound_table[npc_id]:reset(npc_id)
-			else
-				--printf("--------------"..type(sound_table[npc_id]))
-				--printf("npc_id="..npc_id)
-				--printf("sound="..sound)
 			end
 		end
-		--printf("PLAY1. theme[%s] object[%s] class_id=%s", tostring(sound), npc_id,snd_theme.class_id)
 		if snd_theme:play(npc_id, faction, point,sound) then
-			--printf("PLAY2. theme[%s] object[%s] class_id=%s", tostring(sound), npc_id,snd_theme.class_id)
-			--' fill table
 			sound_table[npc_id] = snd_theme
 		end
 	end

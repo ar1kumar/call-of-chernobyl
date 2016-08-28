@@ -752,7 +752,7 @@ path_walk = guard_%s_walk
 meet = meet@generic_lager
 path_walk = guard_%s_walk
 def_state_standing = wait_na
-on_info2 = {=dist_to_obj_on_job_le(logic@follower_%s:5)} remark@%s
+;on_info2 = {=dist_to_obj_on_job_le(logic@follower_%s:4)} remark@%s
 ]]
 			job_ltx = strformat(job_ltx,name,i,name,name,name,name)
 
@@ -777,10 +777,10 @@ on_info2 = {=dist_to_obj_on_job_le(logic@follower_%s:5)} remark@%s
 			job_ltx = [[
 [remark@%s]
 anim = wait_na
-target = logic@follower_%s
+target = job | logic@follower_%s, %s
 ]]
 
-			job_ltx = strformat(job_ltx,name,name)
+			job_ltx = strformat(job_ltx,name,name,gname)
 
 			if (smart.def_restr) then
 				job_ltx = job_ltx .."out_restr = "..smart.def_restr.."\n"
@@ -795,7 +795,7 @@ active = walker@follow_%s
 [walker@follow_%s]
 meet = meet@generic_lager
 path_walk = guard_%s_walk
-on_info = {=dist_to_obj_on_job_le(logic@%s:3)} remark@follower_%s
+on_info = {=dist_to_obj_on_job_le(logic@%s:4)} remark@follower_%s
 ]]
 
 			job_ltx = strformat(job_ltx,name,name,name,i,name,name)
@@ -819,10 +819,11 @@ on_info = {=dist_to_obj_on_job_le(logic@%s:3)} remark@follower_%s
 			job_ltx = [[
 [remark@follower_%s]
 anim = wait_na
-target = logic@%s
-on_timer = %s | %=switch_to_desired_job%
+target = job | logic@%s, %s
+;on_timer = %s | %=switch_to_desired_job%
+on_info = {!dist_to_obj_on_job_le(logic@%s:4)} walker@follow_%s
 ]]
-			job_ltx = strformat(job_ltx,name,name,guard_timeout)
+			job_ltx = strformat(job_ltx,name,name,gname,guard_timeout)
 
 			if (smart.def_restr) then
 				job_ltx = job_ltx .."out_restr = "..smart.def_restr.."\n"

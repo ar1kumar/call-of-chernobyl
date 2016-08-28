@@ -148,7 +148,7 @@ function npc_sound:callback(npc_id)
 
 --	get_hud():RemoveCustomStatic("cs_subtitles_npc")
 
-	local st   = db.storage[npc_id]
+	local st = db.storage[npc_id]
 	if st.active_scheme == nil then
 		return
 	end
@@ -711,7 +711,7 @@ function object_sound:play(obj_id, faction, point,sound)
 
 	--printf("START object_sound:play() sound=%s %s[%s] can_play=%s",sound,obj:name(),obj_id,self.can_play_sound[obj_id] ~= false and true)
 	
-	if self.can_play_sound[obj_id] == false then 
+	if not (self.can_play_sound[obj_id]) then 
 		return false 
 	end
 
@@ -739,19 +739,7 @@ function object_sound:play(obj_id, faction, point,sound)
 	end
 	self.snd_obj = sound_object(snd)
 	self.snd_obj:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
-	--local snd_st, num_copy = string.gsub(snd, "\\", "_")
---[[
-	if game.translate_string(snd_st) ~= snd_st then
-		local hud_demo = get_hud()
---		printf("uraaaa!!!")
-		self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_object")
-		if self.custom_static_demo == nil then
-			hud_demo:AddCustomStatic("cs_subtitles_object", true)
-			self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_object")
-		end
-		self.custom_static_demo:wnd():SetTextST(snd_st)
-	end
-]]
+
 	self.can_play_sound[obj_id] = false
 
 	if not closecaption.sound(snd, self.snd_obj:length(), obj, faction, point, 0) then
