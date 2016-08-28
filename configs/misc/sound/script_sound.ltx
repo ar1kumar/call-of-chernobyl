@@ -14,6 +14,10 @@
 #include "script_sound_x18.ltx"
 #include "script_sound_warlab.ltx"
 
+; A new feature has been added to help alleviate an issue with all sounds being loaded, even unused ones. Restricting sounds by level and story id is this solution.
+; 'levels' is a new optional field. It's what levels to load the sound on, otherwise sound is not loaded. The absense of a levels field means the sound is loaded on all levels.
+; 'story_ids' is a new optional field. It's a list of story_ids that can load the sound, otherwise sound is not loaded. The absense of a story_ids field means the sound can be loaded by all npc.
+
 [brain_scorcher_rumble]
 type = 3d
 path = ambient\earthquake
@@ -60,7 +64,7 @@ npc_prefix = false
 path = characters_voice\scenario\radar\rad_hat_1
 shuffle = seq
 idle = 1,1,100
-levels = l10_radar, l10u_bunker
+levels = l10_radar, l10u_bunker, l08u_brainlab
 
 [rad_hat_2]
 type = actor
@@ -69,7 +73,7 @@ npc_prefix = false
 path = characters_voice\scenario\radar\rad_hat_2
 shuffle = seq
 idle = 1,1,100
-levels = l10_radar, l10u_bunker
+levels = l10_radar, l10u_bunker, l08u_brainlab
 
 [radar_meh_on]
 type = looped

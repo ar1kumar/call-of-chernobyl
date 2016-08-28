@@ -177,58 +177,39 @@ function npc_sound:play(npc_id, faction, point, sound)
 	local npc = db.storage[npc_id] and db.storage[npc_id].object
 
 	if npc == nil then
-		--printf("coudnt find npc!!!")
+		printf("coudnt find npc!!!")
 		return false
 	end
+	
+	local npc_data = self.npc[npc_id]
+	if not (npc_data) then 
+		return false 
+	end
 
---	if not self.play_always then
-		if self.group_snd then
-			if not self.can_play_group_sound then
-				---printf("coudnt play snd1!!!")
-				return false
-			end
-		else
-			if not self.can_play_sound[npc_id] then
-				--printf("coudnt play snd1!!!")
-				return false
-			end
-		end
---	end
+	if (self.group_snd and self.can_play_group_sound == false or self.can_play_sound[npc_id] == false) then 
+		return false 
+	end 
 
 	if self.played_time ~= nil and time_global() - self.played_time < self.idle_time then
-		--printf("coudnt play snd2!!!")
 		return false
 	end
-
 	self.played_time = nil
 
-	local npc_data = self.npc[npc_id]
-	if(npc_data==nil) then
-		--printf("coudnt play nodata!!!")
-		return false
-	end
-	--' Выбор звука, который играть.
 	self.played_id = self:select_next_sound(npc_id)
 
 	if self.played_id == -1 then
-		--printf("coudnt play snd3!!!")
-		--' Пропускаем.
 		return false
 	end
-	--printf("playing sound "..self.played_id)
-	if npc ~= nil then
-		-- play_sound (u32 internal_type, u32 max_start_time, u32 min_start_time, u32 max_stop_time, u32 min_stop_time, u32 id)
-		--printf("TEST: BEFORE PLAY SOUND")
-		npc:play_sound(npc_data.id, self.delay_sound+0.06, self.delay_sound+0.05, 1, 0, self.played_id)
-		--printf("TEST: AFTER PLAY SOUND")
-	end
+
+	npc:play_sound(npc_data.id, self.delay_sound+0.06, self.delay_sound+0.05, 1, 0, self.played_id)
+
 	local table_id = self.played_id + 1
 	local snd = self.sound_path[npc_id][table_id]
 	if not (snd) then 
 		printf("sound_theme.npc_sound:play() snd is nil! %s",sound)
 		return
 	end
-	-- проверка на существование звука дублирующего основной по ПДА. Если он есть то играть его.
+
 	if snd and npc:position():distance_to_sqr(db.actor:position()) >= 100 and getFS():exist("$game_sounds$", snd.."_pda.ogg") ~= nil then
 		if self.pda_snd_obj ~= nil and self.pda_snd_obj:playing() then
 			self.pda_snd_obj:stop()
@@ -249,13 +230,11 @@ function npc_sound:play(npc_id, faction, point, sound)
 
 	if not closecaption.sound(snd, sound_object(snd):length(), npc, faction, point, self.delay_sound) then
 		if game.translate_string(snd_st) ~= snd_st then
-			if not faction then
-				faction = character_community(npc)
-			end
+			faction = faction or character_community(npc)
 			if not point then
-							point = npc:profile_name().."_name"
+				point = npc:profile_name().."_name"
 				if game.translate_string(point) == point then
-								point = nil
+					point = nil
 				end
 			end
 			news_manager.send_sound(npc, faction, point, snd, snd_st, self.delay_sound)
@@ -325,12 +304,10 @@ function npc_sound:save_state(m_data)
 		return 
 	end
 	
-	if (self.played_id or (self.group_snd and self.can_play_group_sound == false)) then
+	if (self.played_id) or (self.group_snd and self.can_play_group_sound == false) then
 		m_data[self.section] = empty_table(m_data[self.section])
 		m_data[self.section].played_id = self.played_id or nil
-		if (self.group_snd) then
-			m_data[self.section].can_play_group_sound = self.can_play_group_sound == true and nil
-		end
+		m_data[self.section].can_play_group_sound = self.can_play_group_sound == false and false or nil
 	end
 end 
 
@@ -340,7 +317,7 @@ function npc_sound:load_state(m_data)
 	end 
 	self.played_id = m_data[self.section].played_id
 	if (self.group_snd) then
-		self.can_play_group_sound = m_data[self.section].can_play_group_sound == nil and true or false
+		self.can_play_group_sound = m_data[self.section].can_play_group_sound ~= false and true or false
 	end
 end
 function npc_sound:save(thread)
@@ -486,24 +463,20 @@ function actor_sound:is_playing ()
 end
 function actor_sound:play(npc, faction, point, sound)
 	--printf("PLAY ACTOR SOUND")
-	if not self.can_play_sound then
-		printf("self.can_play_sound == false")
+	if (self.can_play_sound == false) then
 		return false
 	end
 
-	if self.played_time ~= nil and time_global() - self.played_time < self.idle_time
-	then
-	--printf("self.idle_time not reached!!")
+	if self.played_time ~= nil and time_global() - self.played_time < self.idle_time then
 		return false
 	end
-
 	self.played_time = nil
-	--' Выбор звука, который играть.
+
 	self.played_id = self:select_next_sound()
 	if self.played_id == -1 then
-		--' Пропускаем.
 		return false
 	end
+	
 	local snd = self.sound[self.played_id]
 	if not (snd) then 
 		printf("sound_theme.actor_sound:play() snd is nil! %s",sound)
@@ -513,19 +486,6 @@ function actor_sound:play(npc, faction, point, sound)
 	self.snd_obj.volume = 0.8
 	self.snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
 	self.snd_obj.volume = 0.8
---[[
-	local snd_st, num_copy = string.gsub(snd, "\\", "_")
-	if game.translate_string(snd_st) ~= snd_st then
-		local hud_demo = get_hud()
-		--printf("uraaaa!!!")
-		self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_actor")
-		if self.custom_static_demo == nil then
-			hud_demo:AddCustomStatic("cs_subtitles_actor", true)
-			self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_actor")
-		end
-		self.custom_static_demo:wnd():SetTextST(snd_st)
-	end
-]]
 	self.can_play_sound = false
 
 	local sender, sname
@@ -535,7 +495,7 @@ function actor_sound:play(npc, faction, point, sound)
 		sender = npc
 		sname = point
 	end
-
+	
 	if not closecaption.sound(snd, self.snd_obj:length(), sender, faction, sname, 0) then
 		news_manager.send_sound(nil, faction, point, snd)
 	end
@@ -711,13 +671,13 @@ function object_sound:play(obj_id, faction, point,sound)
 
 	--printf("START object_sound:play() sound=%s %s[%s] can_play=%s",sound,obj:name(),obj_id,self.can_play_sound[obj_id] ~= false and true)
 	
-	if not (self.can_play_sound[obj_id]) then 
+	if (self.can_play_sound[obj_id] == false) then 
 		return false 
 	end
 
 	if (self.cooldown) then 
 		if (self.cooldown[obj_id] and time_global() < self.cooldown[obj_id]) then 
-			--return false
+			return false
 		end 
 		self.cooldown[obj_id] = nil
 	end

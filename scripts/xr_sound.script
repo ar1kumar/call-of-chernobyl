@@ -20,10 +20,8 @@ function set_sound_play(npc_id, sound, faction, point)
 	end
 	
 	if sound_table[npc_id] == nil or snd_theme.play_always == true then
-		if sound_table[npc_id] ~= nil then
-			if(sound_table[npc_id].reset~=nil) then
-				sound_table[npc_id]:reset(npc_id)
-			end
+		if (sound_table[npc_id] and sound_table[npc_id].reset) then 
+			sound_table[npc_id]:reset(npc_id)
 		end
 		if snd_theme:play(npc_id, faction, point,sound) then
 			sound_table[npc_id] = snd_theme
