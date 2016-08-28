@@ -150,15 +150,14 @@ end
 
 function ProcessEventQueue(force)
 	if has_alife_info("sleep_active") then
-		return
+		return false
 	end
-		local gt
+	
 	for event_id,actions in pairs(ev_queue) do
-
 		for action_id,act in pairs(actions) do
 			--alun_utils.debug_write(strformat("event_queue: event_id=%s action_id=%s",event_id,action_id))
 			if (action_id ~= "__size") then
-				gt = act.game_time
+				local gt = act.game_time
 				if (gt == nil) or (force) or (game.get_game_time():diffSec(gt) >= act.timer) then
 					if (act.f(unpack(act.p)) == true) then
 						ev_queue[event_id][action_id] = nil
@@ -172,6 +171,8 @@ function ProcessEventQueue(force)
 			ev_queue[event_id] = nil
 		end
 	end
+	
+	return false
 end
 function ProcessEventQueueState(m_data,save)
 	if (save) then

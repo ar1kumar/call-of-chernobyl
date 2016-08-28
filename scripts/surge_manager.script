@@ -30,17 +30,37 @@ local sleep_fade_pp_eff		= 4
 
 local prev_sec 				= -1
 local prev_game_sec 		= -1
-local currentPPEfactor = 0.001
+local currentPPEfactor 		= 0.001
 
 
-local function actor_on_update(binder,delta)
-	if (SurgeManager) then
-		SurgeManager:update()
-	end
+local function actor_on_first_update(binder,delta)
+	local _tmr
+	level.add_call(function()
+		local tg = time_global()
+		if (_tmr and tg < _tmr) then 
+			return false 
+		end
+		_tmr = tg + 1000
+		if (SurgeManager) then 
+			SurgeManager:update()
+		end
+		if (psi_storm_manager.PsiStormManager) then 
+			psi_storm_manager.PsiStormManager:update()
+		end
+		return false
+	end, function()
+		return 
+	end)
+end
+
+local function actor_on_init()
+	get_surge_manager()
+	psi_storm_manager.get_psi_storm_manager()
 end
 
 function on_game_start()
-	RegisterScriptCallback("actor_on_update",actor_on_update)
+	RegisterScriptCallback("actor_on_init",actor_on_init)
+	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
 end
 	
 class "CSurgeManager"

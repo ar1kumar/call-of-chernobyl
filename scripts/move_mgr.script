@@ -61,11 +61,6 @@ function move_mgr:__init(npc)
 end
 
 function move_mgr:initialize(npc)
-	if npc ~= nil then
-		printf("Wrong arguments passed to move_mgr:initialize(), please update the script")
-	end
-	--printf("move_mgr:initialize()")
-
 	self.object:set_callback(callback.patrol_path_in_point, self.waypoint_callback, self)
 end
 

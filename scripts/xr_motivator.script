@@ -76,6 +76,15 @@ function motivator_binder:net_spawn(sobject)
 		release_body_manager.get_release_body_manager():moving_dead_body(self.object,true)
 		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body done")
 		
+		if not (self.loaded) then
+			local ini = self.object:spawn_ini()
+			local filename = ini and ini:r_string_ex("logic","cfg")
+			ini = filename and ini_file(filename) or ini
+			if (ini) then
+				xr_info.setup_known_info(self.object,ini,ini:r_string_ex("logic","known_info"))
+			end
+		end
+		
 		-- fix for 'Invalid vertex for object'
 		if not (sobject.m_level_vertex_id < 4294967295 and self.object:accessible(sobject.m_level_vertex_id)) then
 			printf("npc %s has invalid spawning vertex, correcting",sobject:name())
@@ -83,7 +92,7 @@ function motivator_binder:net_spawn(sobject)
 			self.object:set_npc_position(level.vertex_position(v_id))
 		end
 		
-		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_stalker)
+		--xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_stalker)
 		return true
 	end
 	
@@ -251,7 +260,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	end
 
 	xr_wounded.hit_callback(obj:id())
-		if (who and IsHelicopter(who)) then
+	if (who and IsHelicopter(who)) then
 		--printf("hit by helicopter")
 		local squad = get_object_squad(obj)
 		if (squad and not xr_combat_ignore.safe_zone_npcs[squad.id]) then
@@ -276,6 +285,11 @@ function motivator_binder:death_callback(victim, who)
 		callstack()
 		abort(strformat("CRITICAL ERROR: motivator_binder:death_callback : Game Object is nil and binder is not! %s",self.name),2)
 		return
+	end
+	
+	local known_info = self.st.ini and self.st.section_logic and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
+	if (known_info) then
+		xr_info.setup_known_info(self.object,self.st.ini,known_info)
 	end
 	
 	trade_manager.on_npc_death(victim)
@@ -341,12 +355,6 @@ end
 function motivator_binder:use_callback(obj, who)
 	--alun_utils.debug_write(strformat("motivator_binder:use_callback %s",obj and obj:name()))
 	if not obj:alive() then
-		local known_info = self.st.ini and self.st.section_logic and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
-		--printf("known_info %s ini=%s section_logic=%s",known_info,self.st.ini_filename,self.st.section_logic)
-		if (known_info) then
-			xr_info.give_actor_info(self.st.ini,known_info)
-		end
-		
 		death_manager.create_release_item(obj)
 		return
 	end

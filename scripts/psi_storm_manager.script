@@ -22,16 +22,6 @@ local prev_game_sec 		= -1
 local diff_sec 				= -1
 local diff_game_sec			= -1
 
-local function actor_on_update(binder,delta)
-	if (PsiStormManager) then
-		PsiStormManager:update()
-	end
-end
-
-function on_game_start()
-	RegisterScriptCallback("actor_on_update",actor_on_update)
-end
-
 class "CPsiStormManager"
 function CPsiStormManager:__init()
 

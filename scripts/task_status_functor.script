@@ -48,6 +48,7 @@ function check_smart_under_faction_control(task,task_id)
 						if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
 							utils.save_var(db.actor,task_id.."_target_id",squad.id)
 							squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+							squad.force_online = true
 							--printf("task_id = %s squad_id = %s",task_id,squad.id)
 							return
 						end
@@ -123,6 +124,7 @@ function specific_check_smart_under_faction_control(task,task_id)
 						if (p[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == p[i]) then
 							utils.save_var(db.actor,task_id.."_target_id",squad.id)
 							squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+							squad.force_online = true
 							--printf("task_id = %s squad_id = %s",task_id,squad.id)
 							return
 						end

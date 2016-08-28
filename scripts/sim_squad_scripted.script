@@ -981,6 +981,11 @@ function sim_squad_scripted:can_switch_online()
 		return true
 	end
 	
+	-- was forced online for task reasons 
+	if (self.force_online) then 
+		return true 
+	end
+	
     --alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
 			
     if (not get_object_story_id(self.id)) then
