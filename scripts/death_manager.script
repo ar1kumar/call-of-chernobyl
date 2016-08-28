@@ -55,7 +55,7 @@ function drop_manager:__init(npc)
 end
 
 function drop_manager:decide_items_to_keep()
-	local death_dropped = tonumber(utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped") or 0)
+	local death_dropped = tonumber(utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped") or 0) or 0
 	if (death_dropped == 0) then
 		utils.se_obj_save_var(self.npc:id(),self.npc:name(),"death_dropped",1)
 		self.npc:iterate_inventory(keep_item, self.npc)
@@ -63,7 +63,7 @@ function drop_manager:decide_items_to_keep()
 end 
 
 function drop_manager:create_release_item()
-	local death_dropped = tonumber(utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped") or 0)
+	local death_dropped = tonumber(utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped") or 0) or 0
 	if (death_dropped > 1) then
 		return
 	end
