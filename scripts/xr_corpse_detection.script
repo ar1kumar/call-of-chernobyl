@@ -451,7 +451,7 @@ function action_search_corpse:execute()
 				return
 			end
 			-- moved from xr_motivator to here and xr_motivator use_callback
-			death_manager.drop_manager(corpse):create_release_item()
+			death_manager.create_release_item(corpse)
 		end
 		state_mgr.set_state(npc,"search_corpse",nil,nil,{look_position = look_pos})
 	else

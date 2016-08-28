@@ -284,7 +284,7 @@ function motivator_binder:death_callback(victim, who)
 	local id = victim:id()
 	xr_combat_ignore.fighting_with_actor_npcs[id] = nil
 
-	death_manager.drop_manager(victim):decide_items_to_keep()
+	death_manager.decide_items_to_keep(self.object)
 
 	stalker_generic.remove_level_spot(victim, self.st)
 
@@ -347,7 +347,7 @@ function motivator_binder:use_callback(obj, who)
 			xr_info.give_actor_info(self.st.ini,known_info)
 		end
 		
-		death_manager.drop_manager(obj):create_release_item()
+		death_manager.create_release_item(obj)
 		return
 	end
 	inventory_upgrades.victim_id = obj:id()
@@ -377,7 +377,7 @@ function motivator_binder:update(delta)
 	local object_alive = object:alive()
 	if not (object_alive) then
 		if not (self.first_update) then
-			death_manager.drop_manager(object):decide_items_to_keep()
+			death_manager.decide_items_to_keep(object)
 		end
 		self.first_update = true
 		

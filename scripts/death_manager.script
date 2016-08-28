@@ -49,53 +49,48 @@ function init_drop_settings()
 	end
 end
 
-class "drop_manager"
-function drop_manager:__init(npc)
-	self.npc = npc
-end
-
-function drop_manager:decide_items_to_keep()
-	local death_dropped = tonumber(utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped") or 0) or 0
+function decide_items_to_keep(npc)
+	local death_dropped = tonumber(utils.se_obj_load_var(npc:id(),npc:name(),"death_dropped") or 0) or 0
 	if (death_dropped == 0) then
-		utils.se_obj_save_var(self.npc:id(),self.npc:name(),"death_dropped",1)
-		self.npc:iterate_inventory(keep_item, self.npc)
+		utils.se_obj_save_var(npc:id(),npc:name(),"death_dropped",1)
+		npc:iterate_inventory(keep_item, npc)
 	end
 end 
 
-function drop_manager:create_release_item()
-	local death_dropped = tonumber(utils.se_obj_load_var(self.npc:id(),self.npc:name(),"death_dropped") or 0) or 0
+function create_release_item(npc)
+	local death_dropped = tonumber(utils.se_obj_load_var(npc:id(),npc:name(),"death_dropped") or 0) or 0
 	if (death_dropped > 1) then
 		return
 	end
-	utils.se_obj_save_var(self.npc:id(),self.npc:name(),"death_dropped",2)
+	utils.se_obj_save_var(npc:id(),npc:name(),"death_dropped",2)
 	
 	-- spawn items by story id
-	local sid = item_by_story_id and get_object_story_id(self.npc:id())
+	local sid = item_by_story_id and get_object_story_id(npc:id())
 	if (sid and item_by_story_id[sid]) then
-		local p = xr_logic.pick_section_from_condlist(db.actor,self.npc,alun_utils.parse_condlist(item_by_story_id[sid]))
+		local p = xr_logic.pick_section_from_condlist(db.actor,npc,alun_utils.parse_condlist(item_by_story_id[sid]))
 		--local p = alun_utils.str_explode(item_by_story_id[sid],",")
 		--printf("sid=%s p=%s",sid,p)
 		if (p and p ~= "" and p ~= "nil") then
-			create_items(self.npc, p, 1, 100)
+			create_items(npc, p, 1, 100)
 		end
 	end
 
-	local ini = self.npc:spawn_ini()
+	local ini = npc:spawn_ini()
 	if ini and ini:section_exist("dont_spawn_loot") then
 		return
 	end
 	
-	local st = db.storage[self.npc:id()]
+	local st = db.storage[npc:id()]
 	if (st and st.ini and st.section_logic and st.ini:line_exist(st.section_logic,"dont_spawn_loot")) then 
 		return
 	end
 
-	local spawn_items = item_by_community[character_community(self.npc)]
+	local spawn_items = item_by_community[character_community(npc)]
 	if spawn_items == nil then
 		return
 	end
 	
-	try_spawn_ammo(self.npc,spawn_items)
+	try_spawn_ammo(npc,spawn_items)
 	
 	local grenade_classes = { 
 								["ammo_m209"] = true,
@@ -105,7 +100,7 @@ function drop_manager:create_release_item()
 	for sec,v in pairs(spawn_items) do
 		if (v > 0 and item_count[sec] and not _G.ammo_section[sec] and not grenade_classes[sec]) then
 			local number = math.random(item_count[sec][1], item_count[sec][2])
-			create_items(self.npc, sec, number, v)
+			create_items(npc, sec, number, v)
 		end
 	end
 end
