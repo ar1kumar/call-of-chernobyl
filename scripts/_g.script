@@ -1305,9 +1305,9 @@ end
 -- called when an inventory item is eaten/used
 -- returning false will prevent the item from being used
 function CInventory__eat(npc,item)
-		local return_flag = true
+	local return_flag = true
 	SendScriptCallback("on_before_item_use",npc,item,return_flag)
-		return return_flag
+	return return_flag
 end
 
 -- Called before actor hit callback
@@ -1341,14 +1341,14 @@ function CALifeUpdateManager__on_before_change_level(packet)
 	local lvid = packet:r_u32()
 	packet:r_vec3(pos)
 	packet:r_vec3(angle)
-		-- crazy hack to help prevent crash on Trucks Cemetery
+	-- crazy hack to help prevent crash on Trucks Cemetery
 	local gg = game_graph()
 	if (gg:valid_vertex_id(gvid) and alife():level_name(gg:vertex(gvid):level_id()) == "k02_trucks_cemetery") then
 		log("k02_trucks_cemetery hack r__clear_models_on_unload 1")
 		get_console():execute("r__clear_models_on_unload 1")
 	end
-		--printf("CALifeUpdateManager__on_before_change_level pos=%s gvid=%s lvid=%s angle=%s",pos,gvid,lvid,angle)
-		-- fix for car in 1.6 (TODO*kinda For some reason after loading a game ALL physic objects will not be teleported by TeleportObject need to investigate as to why, possibly something to do with object flags)
+	--printf("CALifeUpdateManager__on_before_change_level pos=%s gvid=%s lvid=%s angle=%s",pos,gvid,lvid,angle)
+	-- fix for car in 1.6 (TODO*kinda For some reason after loading a game ALL physic objects will not be teleported by TeleportObject need to investigate as to why, possibly something to do with object flags)
 	local car = db.actor and db.actor:get_attached_vehicle()
 	if (car) then
 		TeleportObject(car:id(),pos,lvid,gvid)
@@ -1361,7 +1361,7 @@ function CALifeUpdateManager__on_before_change_level(packet)
 	packet:w_vec3(pos)
 	packet:w_vec3(angle)
 	--]]
-		-- reset read pointer
+	-- reset read pointer
 	packet:r_seek(2)
 		
 		if (bind_container.containers) then
@@ -1400,10 +1400,13 @@ function give_object_to_actor(obj,count)
 end
 
 -- INI Extensions
+local ini_cache = { [system_ini()] = {} }
+function clear_ini_cache(ini)
+	ini_cache[ini] = empty_table(ini_cache[ini])
+end
 if (USE_INI_MEMOIZE) then
 	-- memoize ini results
-	local ini_cache = { [system_ini()] = {} }
-		local function r_memoize(ini,s,k,def,typ)
+	local function r_memoize(ini,s,k,def,typ)
 		if not (s) then
 			callstack()
 		end
@@ -1446,10 +1449,10 @@ if (USE_INI_MEMOIZE) then
 	function ini_file.r_bool_ex(ini,s,k,def)
 		return r_memoize(ini,s,k,def,0)
 	end
-		function ini_file.r_float_ex(ini,s,k)
+	function ini_file.r_float_ex(ini,s,k)
 		return r_memoize(ini,s,k,def,1)
 	end
-		function ini_file.r_line_ex(ini,s,k)
+	function ini_file.r_line_ex(ini,s,k)
 		if not (ini_cache[ini]) then
 			ini_cache[ini] = {}
 		end

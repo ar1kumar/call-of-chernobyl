@@ -746,7 +746,8 @@ function prefix_r_string(ini,sec,key,prefix)
 end
 
 function is_ammo(section)
-	return system_ini():r_string_ex(section,"class","") == "AMMO"
+	local v = system_ini():r_string_ex(section,"class","")
+	return v == "AMMO" or v == "AMMO_S"
 end
 
 function pstor_is_registered_type(tv)
