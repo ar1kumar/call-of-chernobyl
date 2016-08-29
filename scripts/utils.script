@@ -745,6 +745,10 @@ function prefix_r_string(ini,sec,key,prefix)
 	return rslt
 end
 
+function is_ammo(section)
+	return system_ini():r_string_ex(section,"class","") == "AMMO"
+end
+
 function pstor_is_registered_type(tv)
 	if tv ~= "boolean" and tv ~= "string" and tv ~= "number" then
 		return false

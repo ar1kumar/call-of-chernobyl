@@ -96,7 +96,7 @@ function create_items(obj, section, number, rnd)
 	if not (system_ini():section_exist(section)) then 
 		return 
 	end
-	if _G.ammo_section[section] == true then
+	if (utils.is_ammo(section)) then
 		if math.random(100) <= rnd	then
 			if number > 0 then
 				local position = vector():set(obj:position())

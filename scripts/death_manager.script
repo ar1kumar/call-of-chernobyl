@@ -98,7 +98,7 @@ function create_release_item(npc)
 								["ammo_og-7b"] = true
 							}
 	for sec,v in pairs(spawn_items) do
-		if (v > 0 and item_count[sec] and not _G.ammo_section[sec] and not grenade_classes[sec]) then
+		if (v > 0 and item_count[sec] and not utils.is_ammo(sec) and not grenade_classes[sec]) then
 			local number = math.random(item_count[sec][1], item_count[sec][2])
 			create_items(npc, sec, number, v)
 		end
@@ -225,7 +225,7 @@ function create_items(npc, section, number, rnd)
 	end 
 	
 	--printf("death_dropped: create %s=%s",section,number)
-	if _G.ammo_section[section] == true then
+	if (utils.is_ammo(section))then
 		if number > 0 then
 			create_ammo(section,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id(),number)
 		end

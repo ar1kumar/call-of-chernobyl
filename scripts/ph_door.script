@@ -132,7 +132,6 @@ function action_door:open_door(disable_snd)
 	--printf("_bp: [%s] action_door:open_door()", self.object:name())
 	if not disable_snd then
 		if self.st.snd_open_start then
-			printf("set_sound_play %s",self.st.snd_open_start)
             xr_sound.set_sound_play(self.object:id(), self.st.snd_open_start)
 		end
 	end

@@ -647,7 +647,7 @@ function relocate_item_section(victim, section, type, amount)
 				db.actor:transfer_item(db.actor:object(section), victim)
 			end
 		end
-		if _G.ammo_section[section] == true then
+		if (utils.is_ammo(section)) then
 			local ltx = system_ini()
 			local box_size = ltx:r_s32(section, "box_size")
 			amount = amount * box_size
@@ -900,7 +900,7 @@ function relocate_item_section_to_actor(first_speaker, second_speaker, section, 
 					db.actor:id())
 		end
 	end
-	if _G.ammo_section[section] == true then
+	if (utils.is_ammo(section)) then
 		local ltx = system_ini()
 		local box_size = ltx:r_s32(section, "box_size")
 		amount = amount * box_size
@@ -943,7 +943,6 @@ end
 --section - Имя секции для передачи; amount - количество, также принимает стринг "all"
 function relocate_item_section_from_actor(first_speaker, second_speaker, section, amount)
 	local npc = who_is_npc(first_speaker, second_speaker)
-	local actor = who_is_actor(first_speaker, second_speaker)
 	local i = 0
 	--printf("Amount [%s]", tostring(amount))
 	if not amount then
@@ -960,23 +959,23 @@ function relocate_item_section_from_actor(first_speaker, second_speaker, section
 
 	if amount == "all" then
 		i = -1
-		actor:iterate_inventory(transfer_object_item, nil)
+		db.actor:iterate_inventory(transfer_object_item, nil)
 		amount = (i+1)*(-1)
 		i = 0
 	elseif amount > 1 then
 		i = amount
-		actor:iterate_inventory(transfer_object_item, nil)
+		db.actor:iterate_inventory(transfer_object_item, nil)
 	elseif amount < 1 then
 		printf("Wrong parameters in function 'relocate_item_section_from_actor'!")
 	else
-		actor:transfer_item(actor:object(section), npc)
+		db.actor:transfer_item(db.actor:object(section), npc)
 	end
 
 	if i~=0 then
 		assert("Actor do not has enough items! Transferred [%s], needed [%s]", tostring(amount - i), tostring(amount))
 	end
 
-	if _G.ammo_section[db.actor.section] == true then
+	if (utils.is_ammo(section)) then
 		local ltx = system_ini()
 		local box_size = ltx:r_s32(section, "box_size")
 		amount = amount * box_size
