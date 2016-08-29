@@ -1,5 +1,5 @@
 -----------
--- modified by Alundaio
+-- by Alundaio
 
 phantom_registry = {}
 
@@ -41,9 +41,9 @@ local function monster_on_update(npc,st)
 	end
 	st.__phantom_check = tg + 5000
 	
-	if (has_alife_info("bar_deactivate_radar_done")) then 
-		return 
-	end 
+	-- if (has_alife_info("bar_deactivate_radar_done")) then 
+		-- return 
+	-- end 
 	
 	local phantom_section = system_ini():r_string_ex(npc:section(),"spawn_phantom")
 	if not (phantom_section) then
@@ -56,22 +56,17 @@ local function monster_on_update(npc,st)
 	end 
 	
 	if not (xr_combat_ignore.fighting_with_actor_npcs[npc:id()]) then 
-		return false 
+		return
 	end
 	
 	if (db.actor:position():distance_to_sqr(npc:position()) > 900) then 
-		return false 
+		return
 	end
 	
 	local sec = system_ini():r_string_ex(npc:section(),"spawn_phantom")
 	if (sec and sec ~= "" and phantom_manager.dynamic_phantom_count(sec) >= 4) then 
-		return false
+		return
 	end
-	
-	if (st.__phantom_check2 and tg < st.__phantom_check2) then
-		return 
-	end
-	st.__phantom_check2 = tg + 10000
 	
 	phantom_manager.spawn_dynamic_phantom(sec,npc:position(),npc:level_vertex_id(),npc:get_enemy())
 end 
@@ -86,21 +81,20 @@ end
 -- LEGACY
 class "PhantomManager"
 function PhantomManager:__init()
-	self.phantom_count		= 0;
+	self.phantom_count = 0;
 end
-g_PhantomManager			= PhantomManager();
+g_PhantomManager = PhantomManager();
+function PhantomManager:add_phantom()
+	self.phantom_count = self.phantom_count + 1;
+end
+function PhantomManager:remove_phantom()
+	self.phantom_count = self.phantom_count - 1;
+end
+function PhantomManager:spawn_phantom(pos)
+	level.spawn_phantom(pos);
+end
 
-function PhantomManager:add_phantom		()
-	self.phantom_count		= self.phantom_count + 1;
-end
-function PhantomManager:remove_phantom	()
-	self.phantom_count		= self.phantom_count - 1;
-end
-function PhantomManager:spawn_phantom	(pos)
-	level.spawn_phantom		(pos);
-end
-
-class "Phantom"		(object_binder)
+class "Phantom"	(object_binder)
 function Phantom:__init(obj) super(obj)
 	g_PhantomManager:add_phantom()
 end
@@ -109,13 +103,13 @@ function Phantom:net_destroy()
 	object_binder.net_destroy(self)
 end
 function bind(obj)
-	obj:bind_object	(Phantom(obj))
+	obj:bind_object(Phantom(obj))
 end
 
-function spawn_phantom		(pos)
+function spawn_phantom(pos)
 	g_PhantomManager:spawn_phantom(pos)
 end
-function phantom_count		()
+function phantom_count()
 	return g_PhantomManager.phantom_count
 end
 
