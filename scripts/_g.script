@@ -1430,10 +1430,12 @@ if (USE_INI_MEMOIZE) then
 				result = tonumber(result)
 			end
 			
-			if (ini_cache[ini]) then
-				local key = s.."&"..k
-				if (ini_cache[ini][key]) then
-					ini_cache[ini][key] = result
+			if (result ~= nil) then
+				if (ini_cache[ini]) then
+					local key = s.."&"..k
+					if (ini_cache[ini][key]) then
+						ini_cache[ini][key] = result
+					end
 				end
 			end
 		end
@@ -1449,7 +1451,7 @@ if (USE_INI_MEMOIZE) then
 	function ini_file.r_bool_ex(ini,s,k,def)
 		return r_memoize(ini,s,k,def,0)
 	end
-	function ini_file.r_float_ex(ini,s,k)
+	function ini_file.r_float_ex(ini,s,k,def)
 		return r_memoize(ini,s,k,def,1)
 	end
 	function ini_file.r_line_ex(ini,s,k)
