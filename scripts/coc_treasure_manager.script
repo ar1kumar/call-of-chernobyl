@@ -162,6 +162,10 @@ function create_random_stash(no_spot,hint,bonus_items)
 	local spawned_item = bonus_items or {}
 	local max_weight = math.random(100,150)
 	
+	if (has_alife_info("achieved_rag_and_bone")) then
+		max_weight = max_weight + 30
+	end
+	
 	local ini = system_ini()
 	local function is_consumable(section)
 		local v = ini:r_string_ex(section,"class","")
@@ -274,45 +278,49 @@ function try_spawn_treasure(box)
 		sec = spawned_item[i]
 		if (sec ~= "" and ini:section_exist(sec)) then
 		
-			-- since we spawning on parent, we don't want to register object or packetdata will be inaccurate
-			local se_obj = sim:create(sec,box:position(),0,0,id,false)
-			if (se_obj) then 
-				if (IsWeapon(nil,se_obj:clsid())) then
-					--printf("coc_treasure_manager: item is fa")
-					local data = stpk_utils.get_weapon_data(se_obj)
-					if (data) then
-						-- Create random addon flag for weapon
-						flag = 0
-						
-						if (ini:r_float_ex(sec,"scope_status")) then
-							flag = flag + 1
+			if (utils.is_ammo(sec)) then 
+				create_ammo(sec,box:position(),box:level_vertex_id(),box:game_vertex_id(),id,math.random(10,30))
+			else
+				-- since we spawning on parent, we don't want to register object or packetdata will be inaccurate
+				local se_obj = sim:create(sec,box:position(),0,0,id,false)
+				if (se_obj) then 
+					if (IsWeapon(nil,se_obj:clsid())) then
+						--printf("coc_treasure_manager: item is fa")
+						local data = stpk_utils.get_weapon_data(se_obj)
+						if (data) then
+							-- Create random addon flag for weapon
+							flag = 0
+							
+							if (ini:r_float_ex(sec,"scope_status")) then
+								flag = flag + 1
+							end
+
+							if (ini:r_float_ex(sec,"grenade_launcher_status")) then
+								flag = flag + 2
+							end
+
+							if (ini:r_float_ex(sec,"silencer_status")) then
+								flag = flag + 4
+							end
+
+							flag = math.random(0,flag)
+
+							-- Create random ammo type
+							ammos = alun_utils.parse_list(ini,sec,"ammo_class")
+							ct = ammos and #ammos
+							ammo_type = ammos and ct and math.random(0,ct-1) or 0
+							ammo_section = ammo_type and ammos[ammo_type+1]
+
+							data.addon_flags = flag
+							data.ammo_type = ammo_type
+							data.condition = (math.random(70)+30)/100
+							stpk_utils.set_weapon_data(data,se_obj)
 						end
-
-						if (ini:r_float_ex(sec,"grenade_launcher_status")) then
-							flag = flag + 2
-						end
-
-						if (ini:r_float_ex(sec,"silencer_status")) then
-							flag = flag + 4
-						end
-
-						flag = math.random(0,flag)
-
-						-- Create random ammo type
-						ammos = alun_utils.parse_list(ini,sec,"ammo_class")
-						ct = ammos and #ammos
-						ammo_type = ammos and ct and math.random(0,ct-1) or 0
-						ammo_section = ammo_type and ammos[ammo_type+1]
-
-						data.addon_flags = flag
-						data.ammo_type = ammo_type
-						data.condition = (math.random(70)+30)/100
-						stpk_utils.set_weapon_data(data,se_obj)
-					end
-					--printf("coc_treasure_manager: item is fa- end")
-				end 
-				-- because we didn't register, we do it now, manually
-				alife():register(se_obj)
+						--printf("coc_treasure_manager: item is fa- end")
+					end 
+					-- because we didn't register, we do it now, manually
+					alife():register(se_obj)
+				end
 			end
 		else
 			printf("coc_treasure_manager.script: invalid section %s",sec)

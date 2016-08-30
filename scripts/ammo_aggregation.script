@@ -22,7 +22,12 @@ local function actor_on_item_take(obj)
 				size = size + item:ammo_get_count()
 			end
 		end
-	)	
+	)
+	
+	-- didn't find any others
+	if (size == obj:ammo_get_count()) then 
+		return
+	end
 
 	local fill = math.floor(size/box_size)
 	local remainder = size - (box_size*fill)
@@ -36,9 +41,11 @@ local function actor_on_item_take(obj)
 			if (fill > 0) then
 				item:ammo_set_count(box_size)
 				fill = fill - 1
-			else 
+			else
+				db.actor:drop_item(item)
 				local se_obj = sim:object(ammos[i])
 				if (se_obj) then
+					printf("release %s",se_obj:name())
 					sim:release(se_obj)
 				end
 			end
