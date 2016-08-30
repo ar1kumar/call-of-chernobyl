@@ -314,11 +314,6 @@ function eva_gather_itm:find_valid_item()
 		return false
 	end
 	
-	local tm = treasure_manager.get_treasure_manager()
-	if (tm and tm.items_from_secrets and tm.items_from_secrets[itm_id]) then
-		return false
-	end
-
 	if (npc:best_enemy()) then
 		if not (IsWeapon(itm)) then 
 			return false 
