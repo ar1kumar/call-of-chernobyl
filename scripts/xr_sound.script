@@ -10,6 +10,7 @@ sound_table = {}
 
 function set_sound_play(npc_id, sound, faction, point)
 	if not (sound and sound_theme.theme[sound]) then
+		callstack()
 		printf("set_sound_play. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
 		return
 	end
