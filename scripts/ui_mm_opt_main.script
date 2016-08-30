@@ -182,7 +182,7 @@ function options_dialog:UpdateDependControls()
 	local _current_id = self.combo_renderer:CurrentID()
 
 	for i,j in pairs(self.m_preconditions) do
-		if(_current_id ~= 0 and j.func(_current_id)) then
+		if(j.func(_current_id)) then
 			self.scroll_v:AddWindow(j.control, true)
 			j.control:SetAutoDelete(false)
 		end
