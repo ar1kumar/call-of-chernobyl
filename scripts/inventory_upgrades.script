@@ -345,11 +345,11 @@ function property_functor_a(param1, name)
 				end
 			end
 		elseif (name == "prop_restore_bleeding") then
-			sum = sum + char_ini:r_float_ex(section_table[i],"bleeding_restore_speed",0)
+			sum = sum + (char_ini:r_float_ex(section_table[i],"bleeding_restore_speed",0)/0.1*100)
 		elseif (name == "prop_restore_health") then
-			sum = sum + char_ini:r_float_ex(section_table[i],"health_restore_speed",0)
+			sum = sum + (char_ini:r_float_ex(section_table[i],"health_restore_speed",0)/0.02*100)
 		elseif (name == "prop_power") then
-			sum = sum + char_ini:r_float_ex(section_table[i],"power_restore_speed",0)
+			sum = sum + (char_ini:r_float_ex(section_table[i],"power_restore_speed",0)/sysini:r_float_ex("actor_condition","max_power_restore_speed",0.01)*100)
 		elseif (name == "prop_ammo_size") then
 			sum = sum + char_ini:r_float_ex(section_table[i],"ammo_mag_size",0)
 		elseif (name == "prop_artefact") then
@@ -361,18 +361,18 @@ function property_functor_a(param1, name)
 		elseif (name == "prop_damage") then
 			val = math.abs(char_ini:r_float_ex(section_table[i],"hit_fraction_actor") or 0)*100
 			prop_damage["hit_fraction_actor"] = prop_damage["hit_fraction_actor"] and prop_damage["hit_fraction_actor"] + val or val
-			
+		elseif (name == "prop_wound") then 
 			tmp = char_ini:r_float_ex(section_table[i],"wound_protection") or 0
 			val = ((1*tmp)/max_protections["wound_protection"] * 100)
-			prop_damage["wound_protection"] = prop_damage["wound_protection"] and prop_damage["wound_protection"] + val or val
-			
+			prop_damage["wound_protection"] = prop_damage["wound_protection"] and prop_damage["wound_protection"] + val or val		
+		elseif (name == "prop_strike") then 
 			tmp = char_ini:r_float_ex(section_table[i],"strike_protection") or 0
 			val = ((1*tmp)/max_protections["strike_protection"] * 100)
-			prop_damage["strike_protection"] = prop_damage["strike_protection"] and prop_damage["strike_protection"] + val or val
-			
+			prop_damage["strike_protection"] = prop_damage["strike_protection"] and prop_damage["strike_protection"] + val or val		
+		elseif (name == "prop_explo") then 
 			tmp = char_ini:r_float_ex(section_table[i],"explosion_protection") or 0
 			val = ((1*tmp)/max_protections["explosion_protection"] * 100)
-			prop_damage["explosion_protection"] = prop_damage["explosion_protection"] and prop_damage["explosion_protection"] + val or val
+			prop_damage["explosion_protection"] = prop_damage["explosion_protection"] and prop_damage["explosion_protection"] + val or val		
 		elseif (name == "prop_chem") then
 			tmp = char_ini:r_float_ex(section_table[i],"chemical_burn_protection") or 0
 			val = ((1*tmp)/max_protections["chemical_burn_protection"] * 100)
@@ -402,16 +402,7 @@ function property_functor_a(param1, name)
 		end
 	end
 	
-	if (name == "prop_damage") then 
-		local str = ""
-		
-		local a = prop_damage["hit_fraction_actor"]
-		local b = prop_damage["wound_protection"]
-		local c = prop_damage["strike_protection"]
-		local d = prop_damage["explosion_protection"]
-		
-		return string.format("%s +%.f%s | +%.f/+%.f/+%.f",game.translate_string("ui_inv_outfit_hit_fraction_actor"),a,"%",b,c,d,e)
-	elseif (name == "prop_chem" or name == "prop_radio" or name == "prop_thermo" or name == "prop_electro" or name == "prop_psy" or name == "prop_armor") then
+	if (name == "prop_damage" or name == "prop_wound" or name == "prop_strike" or name == "prop_explo" or name == "prop_chem" or name == "prop_radio" or name == "prop_thermo" or name == "prop_electro" or name == "prop_psy" or name == "prop_armor") then
 		local str = ""
 		for k,v in pairs(prop_damage) do
 			if (v > 0) then
@@ -428,12 +419,6 @@ function property_functor_a(param1, name)
 			return game.translate_string(prop_name)
 		end
 		return game.translate_string(prop_name.."_"..sum)
-	end
-	
-	if (name == "prop_restore_bleeding" or name == "prop_power") then 
-		sum = sum * 1000
-	elseif (name == "prop_restore_health") then 
-		sum = sum * 10000
 	end
 	
 	local val_s
