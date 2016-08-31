@@ -174,7 +174,7 @@ function create_random_stash(no_spot,hint,bonus_items)
 	
 	local function is_outfit(section)
 		local v = ini:r_string_ex(section,"class","")
-		return v == "EQU_STLK" or v == "E_STLK"
+		return v == "EQU_STLK" or v == "E_STLK" or v == "EQU_HLMET" or v == "E_HLMET"
 	end
 	
 	local function try_spawn_item(sec,min,max,chance,weight)
