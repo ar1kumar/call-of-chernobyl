@@ -360,97 +360,76 @@ function property_functor_a(param1, name)
 		elseif (name == "prop_tonnage") then
 			sum = sum + char_ini:r_float_ex(section_table[i],"additional_inventory_weight",0)
 		elseif (name == "prop_damage") then
-			local t = {}
-			table.insert(t,math.abs(char_ini:r_float_ex(section_table[i],"hit_fraction_actor",0)))
-			
-			tmp = char_ini:r_float_ex(section_table[i],"wound_protection")
-			if (tmp and tmp > 0) then
-				table.insert(t,((1*tmp)/max_protections["wound_protection"] * 100))
-			end
-			
-			tmp = char_ini:r_float_ex(section_table[i],"strike_protection")
-			if (tmp and tmp > 0) then
-				table.insert(t,((1*tmp)/max_protections["strike_protection"] * 100))
-			end
-			
-			tmp = char_ini:r_float_ex(section_table[i],"explosion_protection")
-			if (tmp and tmp > 0) then
-				table.insert(t,((1*tmp)/max_protections["explosion_protection"] * 100))
-			end
-			
-			val = 0
-			for i=1, #t do
-				val = val + t[i]
-			end
-			
-			val = val/2 --Get the average of all three protections as one unit + hit_fraction_actor
-			
+			val = math.abs(char_ini:r_float_ex(section_table[i],"hit_fraction_actor") or 0)*100
 			prop_damage["hit_fraction_actor"] = prop_damage["hit_fraction_actor"] and prop_damage["hit_fraction_actor"] + val or val
+			
+			tmp = char_ini:r_float_ex(section_table[i],"wound_protection") or 0
+			val = ((1*tmp)/max_protections["wound_protection"] * 100)
+			prop_damage["wound_protection"] = prop_damage["wound_protection"] and prop_damage["wound_protection"] + val or val
+			
+			tmp = char_ini:r_float_ex(section_table[i],"strike_protection") or 0
+			val = ((1*tmp)/max_protections["strike_protection"] * 100)
+			prop_damage["strike_protection"] = prop_damage["strike_protection"] and prop_damage["strike_protection"] + val or val
+			
+			tmp = char_ini:r_float_ex(section_table[i],"explosion_protection") or 0
+			val = ((1*tmp)/max_protections["explosion_protection"] * 100)
+			prop_damage["explosion_protection"] = prop_damage["explosion_protection"] and prop_damage["explosion_protection"] + val or val
 		elseif (name == "prop_chem") then
-			tmp = char_ini:r_float_ex(section_table[i],"chemical_burn_protection")
-			if (tmp and tmp > 0) then
-				val = ((1*tmp)/max_protections["chemical_burn_protection"] * 100)
-				prop_damage["chemical_burn_protection"] = prop_damage["chemical_burn_protection"] and prop_damage["chemical_burn_protection"] + val or val	
-			end
+			tmp = char_ini:r_float_ex(section_table[i],"chemical_burn_protection") or 0
+			val = ((1*tmp)/max_protections["chemical_burn_protection"] * 100)
+			prop_damage["chemical_burn_protection"] = prop_damage["chemical_burn_protection"] and prop_damage["chemical_burn_protection"] + val or val	
 		elseif (name == "prop_radio") then
-			tmp = char_ini:r_float_ex(section_table[i],"radiation_protection")
-			if (tmp and tmp > 0) then
-				val = ((1*tmp)/max_protections["radiation_protection"] * 100)
-				prop_damage["radiation_protection"] = prop_damage["radiation_protection"] and prop_damage["radiation_protection"] + val or val	
-			end	
+			tmp = char_ini:r_float_ex(section_table[i],"radiation_protection") or 0
+			val = ((1*tmp)/max_protections["radiation_protection"] * 100)
+			prop_damage["radiation_protection"] = prop_damage["radiation_protection"] and prop_damage["radiation_protection"] + val or val	
 		elseif (name == "prop_thermo") then
-			tmp = char_ini:r_float_ex(section_table[i],"burn_protection")
-			if (tmp and tmp > 0) then
-				val = ((1*tmp)/max_protections["burn_protection"] * 100)
-				prop_damage["burn_protection"] = prop_damage["burn_protection"] and prop_damage["burn_protection"] + val or val	
-			end		
+			tmp = char_ini:r_float_ex(section_table[i],"burn_protection") or 0
+			val = ((1*tmp)/max_protections["burn_protection"] * 100)
+			prop_damage["burn_protection"] = prop_damage["burn_protection"] and prop_damage["burn_protection"] + val or val	
 		elseif (name == "prop_electro") then
-			tmp = char_ini:r_float_ex(section_table[i],"shock_protection")
-			if (tmp and tmp > 0) then
-				val = ((1*tmp)/max_protections["shock_protection"] * 100)
-				prop_damage["shock_protection"] = prop_damage["shock_protection"] and prop_damage["shock_protection"] + val or val	
-			end
+			tmp = char_ini:r_float_ex(section_table[i],"shock_protection") or 0
+			val = ((1*tmp)/max_protections["shock_protection"] * 100)
+			prop_damage["shock_protection"] = prop_damage["shock_protection"] and prop_damage["shock_protection"] + val or val	
 		elseif (name == "prop_psy") then
-			tmp = char_ini:r_float_ex(section_table[i],"telepatic_protection")
-			if (tmp and tmp > 0) then
-				val = ((1*tmp)/max_protections["telepatic_protection"] * 100)
-				prop_damage["telepatic_protection"] = prop_damage["telepatic_protection"] and prop_damage["telepatic_protection"] + val or val	
-			end	
+			tmp = char_ini:r_float_ex(section_table[i],"telepatic_protection") or 0
+			val = ((1*tmp)/max_protections["telepatic_protection"] * 100)
+			prop_damage["telepatic_protection"] = prop_damage["telepatic_protection"] and prop_damage["telepatic_protection"] + val or val	
 		elseif (name == "prop_armor") then
-			tmp = char_ini:r_float_ex(section_table[i],"fire_wound_protection")
-			if (tmp and tmp > 0) then
-				val = ((1*tmp)/max_protections["fire_wound_protection"] * 100)
-				prop_damage["fire_wound_protection"] = prop_damage["fire_wound_protection"] and prop_damage["fire_wound_protection"] + val or val	
-			end	
+			tmp = char_ini:r_float_ex(section_table[i],"fire_wound_protection") or 0
+			val = ((1*tmp)/max_protections["fire_wound_protection"] * 100)
+			prop_damage["fire_wound_protection"] = prop_damage["fire_wound_protection"] and prop_damage["fire_wound_protection"] + val or val	
 		else
-			sum = sum + char_ini:r_float_ex(section_table[i], "value",0)
+			sum = sum + char_ini:r_float_ex(section_table[i], "value") or 0
 		end
 	end
 	
-	if (name == "prop_damage" or name == "prop_chem" or name == "prop_radio" or name == "prop_thermo" or name == "prop_electro" or name == "prop_psy" or name == "prop_armor") then
+	if (name == "prop_damage") then 
+		local str = ""
+		
+		local a = prop_damage["hit_fraction_actor"]
+		local b = prop_damage["wound_protection"]
+		local c = prop_damage["strike_protection"]
+		local d = prop_damage["explosion_protection"]
+		
+		return string.format("%s +%.f%s | +%.f/+%.f/+%.f",game.translate_string("ui_inv_outfit_hit_fraction_actor"),a,"%",b,c,d,e)
+	elseif (name == "prop_chem" or name == "prop_radio" or name == "prop_thermo" or name == "prop_electro" or name == "prop_psy" or name == "prop_armor") then
 		local str = ""
 		for k,v in pairs(prop_damage) do
 			if (v > 0) then
-				if (str == "") then
-					str = str .. string.format("%s +%.f",game.translate_string("ui_inv_outfit_"..k),v) .. "%"
-				else 
-					str = str .. string.format(", %s +%.f",game.translate_string("ui_inv_outfit_"..k),v) .. "%"
-				end
+				str = str .. string.format("%s +%.f",game.translate_string("ui_inv_outfit_"..k),v) .. "%"
 			else
-				if (str == "") then
-					str = str .. string.format("%s %.f",game.translate_string("ui_inv_outfit_"..k),v) .. "%"
-				else 
-					str = str .. string.format(", %s %.f",game.translate_string("ui_inv_outfit_"..k),v) .. "%"
-				end
+				str = str .. string.format("%s %.f",game.translate_string("ui_inv_outfit_"..k),v) .. "%"
 			end
 		end
 		if (str ~= "") then
-			return str 
+			return str
 		end
 	end
 	
-	if (name == "prop_restore_bleeding" or name == "prop_restore_health" or name == "prop_power") then 
+	if (name == "prop_restore_bleeding" or name == "prop_power") then 
 		sum = sum * 1000
+	elseif (name == "prop_restore_health") then 
+		sum = sum * 10000
 	end
 	
 	local val_s
@@ -468,7 +447,7 @@ function property_functor_a(param1, name)
         return string.format("%s %5.2f %s", game.translate_string(prop_name), sum, game.translate_string("st_kg"))
 	end
 	
-	return game.translate_string(prop_name) .. " " .. sum .. "%"
+	return game.translate_string(prop_name) .. " " .. utils.round(sum) .. "%"
 end
 
 function property_functor_b( param1, name )

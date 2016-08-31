@@ -2,6 +2,11 @@ function clamp(val, min, max)
 	return val < min and min or val > max and max or val
 end
 
+function round(num, idp)
+  local mult = 10^(idp or 0)
+  return math.floor(num * mult + 0.5) / mult
+end
+
 -- Переводит переменную любого типа (включая nil) в строку. Используется для отладочного вывода информации.
 function to_str(what)
 	if what == nil then
