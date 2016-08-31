@@ -1312,10 +1312,10 @@ end
 
 -- Called before actor hit callback
 -- returning false will ignore the hit completely
-function CActor__BeforeHitCallback(actor,hit,bone_id)
+function CActor__BeforeHitCallback(actor,shit,bone_id)
 	--printf("power=%s impuse=%s type=%s dir=%s who=%s",hit.power,hit.impulse,hit.type,hit.direction and vec_to_str(hit.direction),hit.draftsman and hit.draftsman:name())
 	local return_flag = true
-	SendScriptCallback("actor_on_before_hit",hit,bone_id,return_flag)
+	SendScriptCallback("actor_on_before_hit",shit,bone_id,return_flag)
 	return return_flag
 end
 
