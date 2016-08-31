@@ -383,7 +383,7 @@ function property_functor_a(param1, name)
 				val = val + t[i]
 			end
 			
-			val = val/#t
+			val = val/2 --Get the average of all three protections as one unit + hit_fraction_actor
 			
 			prop_damage["hit_fraction_actor"] = prop_damage["hit_fraction_actor"] and prop_damage["hit_fraction_actor"] + val or val
 		elseif (name == "prop_chem") then
