@@ -339,10 +339,9 @@ function property_functor_a(param1, name)
 			if (char_ini:line_exist(section_table[i],"nightvision_sect")) then
 				val = char_ini:r_float_ex(section_table[i], "value")
 				if (val) then
-					if (val == 1) then
-						return game.translate_string(prop_name)
+					if (val > sum) then 
+						sum = val 
 					end
-					return game.translate_string(prop_name.."_"..val)
 				end
 			end
 		elseif (name == "prop_restore_bleeding") then
@@ -424,6 +423,11 @@ function property_functor_a(param1, name)
 		if (str ~= "") then
 			return str
 		end
+	elseif (name == "prop_night_vision") then
+		if (sum == 1) then
+			return game.translate_string(prop_name)
+		end
+		return game.translate_string(prop_name.."_"..sum)
 	end
 	
 	if (name == "prop_restore_bleeding" or name == "prop_power") then 
