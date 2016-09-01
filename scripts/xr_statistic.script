@@ -579,7 +579,7 @@ local ranks, reputations = {}, {}
 function init_ranks_reps()
 	local function parse_str(s)
 		local t = {}
-		for name in string.gfind( s, "([%w_%-.\\]+)[%,%s]*" ) do table.insert( t, name ) end
+		for name in string.gmatch( s, "([%w_%-.\\]+)[%,%s]*" ) do table.insert( t, name ) end
 		return t
 	end
 	local ini = ini_file("creatures\\game_relations.ltx")

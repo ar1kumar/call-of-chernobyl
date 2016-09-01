@@ -538,7 +538,7 @@ local function parse_waypoint(pathname, wpflags, wpname, owner, tRet)
 	local val
 
 	par_num = 1
-	for param in string.gfind(wpname, "([%w%+~_\\%=%{%}%s%!%-%,%*]+)|*") do
+	for param in string.gmatch(wpname, "([%w%+~_\\%=%{%}%s%!%-%,%*]+)|*") do
 		if par_num == 1 then
 			-- continue
 		else

@@ -593,7 +593,7 @@ function parse_infop1(rslt, str)
 	if str then
 		local infop_name, sign
 		local infop_n = 1
-		for s in string.gfind(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
+		for s in string.gmatch(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
 			--printf("_bp: parse_infop: s=%s", utils.to_str(s))
 			sign = string.sub(s, 1, 1)
 			infop_name = string.sub(s, 2)
@@ -618,7 +618,7 @@ end
 function parse_func_params(str)
 	local lst = {}
 	local n
-	for par in string.gfind(str, "%s*([^:]+)%s*") do
+	for par in string.gmatch(str, "%s*([^:]+)%s*") do
 		n = tonumber(par)
 		if n then table.insert(lst, n)
 		else table.insert(lst, par) end
@@ -632,7 +632,7 @@ function parse_infop(rslt, str)
 		local infop_name, sign
 		local infop_n = 1
 		local at, params
-		for s in string.gfind(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
+		for s in string.gmatch(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
 			--printf("_bp: parse_infop: s=%s", utils.to_str(s))
 			sign = string.sub(s, 1, 1)
 			infop_name = string.sub(s, 2)
@@ -690,7 +690,7 @@ function parse_condlist(npc, section, field, src)
 	local at, to, infop_check_lst, remainings, infop_set_lst, newsect
 
 	local n = 1
-	for fld in string.gfind(src, "%s*([^,]+)%s*") do
+	for fld in string.gmatch(src, "%s*([^,]+)%s*") do
 		-- Здесь fld это набор infoportions в {} и имя секции, на которую переключиться.
 		lst[n] = {}
 		--printf("_bp: iter %d: fld = %s", n, fld)

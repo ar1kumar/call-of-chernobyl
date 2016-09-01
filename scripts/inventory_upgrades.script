@@ -411,9 +411,7 @@ function property_functor_a(param1, name)
 				str = str .. string.format("%s %.f",game.translate_string("ui_inv_outfit_"..k),v) .. "%"
 			end
 		end
-		if (str ~= "") then
-			return str
-		end
+		return str
 	elseif (name == "prop_night_vision") then
 		if (sum == 1) then
 			return game.translate_string(prop_name)
@@ -423,9 +421,9 @@ function property_functor_a(param1, name)
 	
 	local val_s
 	if (sum > 0) then
-		val_s = "+" .. sum
+		val_s = "+" .. utils.round(sum)
 	else 
-		val_s = tostring(sum)
+		val_s = tostring(utils.round(sum))
 	end 
 	
 	if (name == "prop_ammo_size" or name == "prop_artefact") then
@@ -436,7 +434,7 @@ function property_functor_a(param1, name)
         return string.format("%s %5.2f %s", game.translate_string(prop_name), sum, game.translate_string("st_kg"))
 	end
 	
-	return game.translate_string(prop_name) .. " " .. utils.round(sum) .. "%"
+	return game.translate_string(prop_name) .. " " .. val_s  .. "%"
 end
 
 function property_functor_b( param1, name )
