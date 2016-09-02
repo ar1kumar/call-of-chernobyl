@@ -318,7 +318,7 @@ function CPsiStormManager:vortex_actor_hit(vortex)
 		h.impulse = 0
 		h.direction = vector():set(0,0,1)
 		h.draftsman = db.actor
-		if not(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_god_mode",1,false)) then
+		if not(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_god_mode",1,false) or utils.load_var(db.actor,"surge_immuned",false)) then
 			db.actor:hit(h)
 		end
 		level.remove_pp_effector(666)
@@ -333,7 +333,7 @@ function CPsiStormManager:vortex_actor_hit(vortex)
 		h.impulse = 0
 		h.direction = vector():set(0,0,1)
 		h.draftsman = db.actor
-		if not(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_god_mode",1,false)) then
+		if not(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_god_mode",1,false) or utils.load_var(db.actor,"surge_immuned",false)) then
 			db.actor:hit(h)
 		end
 		level.remove_pp_effector(667)
@@ -612,6 +612,11 @@ function is_actor_immune()
 	if (get_console():get_bool("g_god")) then
 		return true
 	end
+	
+	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
+		return true 
+	end 
+	
 	-- Actor is a member of the Monolith or Zombified factions.
 	if (character_community(db.actor) == "actor_monolith")
 	or (character_community(db.actor) == "actor_zombied") then

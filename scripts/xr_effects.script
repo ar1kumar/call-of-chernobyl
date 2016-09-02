@@ -4743,3 +4743,7 @@ function clear_weather(actor,npc,p)
 	--wm.next_state = "clear"
 	wm:select_weather(true)
 end
+
+function actor_surge_immuned(actor,npc,p)
+	utils.save_var(db.actor,"surge_immuned",p[1] == "true" or nil)
+end
