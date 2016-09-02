@@ -2939,3 +2939,7 @@ function heli_exist_on_level(actor,npc)
 	end
 	return true
 end
+
+function is_actor_surge_immuned(actor,npc,p)
+	return utils.load_var(db.actor,"surge_immuned",false) == true
+end
