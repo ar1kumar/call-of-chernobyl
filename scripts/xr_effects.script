@@ -4286,7 +4286,7 @@ end
 
 function switch_offline(actor,npc,p)
 	local se_obj = npc and alife():object(npc:id())
-	if (se_obj) then 
+	if (se_obj and se_obj:can_switch_offline()) then 
 		se_obj:switch_offline()
 	end
 end
@@ -4746,4 +4746,14 @@ end
 
 function actor_surge_immuned(actor,npc,p)
 	utils.save_var(db.actor,"surge_immuned",p[1] == "true" or nil)
+end
+
+function force_always_online(actor,npc,p)
+	local squad = p[1] and get_story_squad(p[1])
+	if not (squad) then 
+		return 
+	end
+	
+	alife():set_switch_offline(squad.id,false)
+	alife():set_switch_online(squad.id,true)
 end

@@ -343,6 +343,9 @@ function CPsiStormManager:vortex_actor_hit(vortex)
 end
 
 function CPsiStormManager:kill_obj_at_pos(pos)
+	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
+		return 
+	end
 	local board = SIMBOARD
 	local sim,gg = alife(),game_graph()
 	local immuned_to_surge_squads = {

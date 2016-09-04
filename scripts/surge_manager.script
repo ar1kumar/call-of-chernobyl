@@ -1127,6 +1127,9 @@ function CSurgeManager:kill_crows_at_pos(pos)
 end
 
 function CSurgeManager:kill_objects_at_pos(pos)
+	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
+		return 
+	end
 	for i,id in ipairs(self.objects_to_kill) do
         local npc = db.storage[id] and db.storage[id].object
 		if (npc) then 
@@ -1138,6 +1141,9 @@ function CSurgeManager:kill_objects_at_pos(pos)
 end
 
 function CSurgeManager:kill_obj_at_pos(pos)
+	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
+		return 
+	end
 	local board = SIMBOARD
 	local sim, gg = alife(),game_graph()
 	local immuned_to_surge_squads = {
@@ -1186,6 +1192,9 @@ function CSurgeManager:kill_obj_at_pos(pos)
 end
 
 function CSurgeManager:get_objects_to_kill()
+	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
+		return 
+	end
 	local board = SIMBOARD
 	local immuned_to_surge_squads = {
 				["monolith"] = true,
@@ -1221,6 +1230,9 @@ function CSurgeManager:get_objects_to_kill()
 end
 
 function CSurgeManager:kill_actor_at_pos(pos)
+	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
+		return 
+	end
 	if(db.actor and db.actor:alive() and db.actor:position().z>pos) then
 		if not (self.actor_in_cover) then
 			xr_effects.disable_ui_only(db.actor, nil)
@@ -1321,6 +1333,9 @@ function CSurgeManager:delay_kill_crow(id,h)
 end
 
 function CSurgeManager:kill_all_unhided()
+	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
+		return 
+	end
 	local h = hit()
 	h.type = hit.fire_wound
 	h.power = 0.9
@@ -1412,6 +1427,9 @@ function CSurgeManager:kill_all_unhided()
 end
 
 function CSurgeManager:kill_all_unhided_after_actor_death()
+	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
+		return 
+	end
 	local board = SIMBOARD
 	local immuned_to_surge_squads = {
 					["monolith"] = true,
