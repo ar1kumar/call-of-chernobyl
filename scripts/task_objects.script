@@ -150,30 +150,35 @@ function CGeneralTask:give_task()
 	self.status = "selected"
 	self.inited_time = game.get_game_time()
 
-	db.actor:give_task(t, time*10, false, time)
 	self.t = t
 	self.stage = 0
 	self.forced_status = nil
+	
+	self:check_task(true)
+	db.actor:give_task(t, time*10, false, time)
 end
 --' ѕроверка текущего выполнени€ квеста
-function CGeneralTask:check_task(tm)
+function CGeneralTask:check_task(bforce)
 	local tg = time_global()
 	
-	if (self.check_time and self.last_check_task ~= nil and tg < self.check_time) then
-		return
+	if not (bforce) then
+		if (self.check_time and self.last_check_task ~= nil and tg < self.check_time) then
+			return
+		end
 	end
-	local task_updated = false
+	
 	self.t = self.t or db.actor and db.actor:get_task(self.id,true)
 	
 	if (self.t == nil) then -- task is most likely in timeout
 		return
 	end
+	
+	local task_updated = false
 
 	self.check_time = tg + 1000 + math.random() + (self.prior*100)
 
 	local t_tile = task_functor[self.title_functor](self.id, "title", self.title, self)
 	if self.current_title ~= t_tile then
-		--printf("task [%s] updated due to title change from [%s] to [%s]", tostring(self.id), tostring(self.current_title), tostring(t_tile))
 		task_updated = true
 		self.current_title = t_tile
 		self.t:set_title(game.translate_string(t_tile))
@@ -181,7 +186,6 @@ function CGeneralTask:check_task(tm)
 
 	local t_descr = task_functor[self.descr_functor](self.id, "descr", self.descr, self)
 	if self.current_descr ~= t_descr then
-		--printf("task [%s] updated due to description change from [%s] to [%s]", tostring(self.id), tostring(self.current_descr), tostring(t_descr))
 		task_updated = true
 		self.current_descr = t_descr
 		self.t:set_description(game.translate_string(t_descr))
@@ -215,28 +219,29 @@ function CGeneralTask:check_task(tm)
 		end
 		self.current_target = t_target
 	end
-	if task_updated and not(self.dont_send_update_news) then
-		news_manager.send_task(db.actor, "updated", self.t)
+	
+	if not (bforce) then
+		if task_updated and not(self.dont_send_update_news) then
+			news_manager.send_task(db.actor, "updated", self.t)
+		end
 	end
 	
-	local valid_values = {
-		["complete"] 	= true,
-		["fail"] 		= true,
-		["reversed"] 	= true
-	}
-
+	if (bforce) then 
+		return -- because we only wanted to update title, descr and target
+	end
+	
 	for k,v in pairs(self.condlist) do
 		local t = xr_logic.pick_section_from_condlist(db.actor, db.actor, v)
-		if (t and valid_values[t]) then 
+		if (t) and (t == "complete" or t == "fail" or t == "reversed") then 
 			self.last_check_task = t
-			break
+			return
 		end
 	end
 	
 	-- status functor
 	if (self.status_functor and task_status_functor[self.status_functor]) then 
 		local t = task_status_functor[self.status_functor](self,self.id)
-		if (t and valid_values[t]) then 
+		if (t) and (t == "complete" or t == "fail" or t == "reversed") then 
 			self.last_check_task = t
 		end
 	end
