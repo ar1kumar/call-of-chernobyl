@@ -471,3 +471,14 @@ stage_complete = 1
 on_init = %=on_init_bounty_hunt(simulation_task_18:stalker:army:dolg)%
 on_complete = %=reward_random_money(2500:4500) =reward_stash(true) =inc_task_stage(simulation_task_18)%
 condlist_0 = {!task_giver_alive(simulation_task_18)} fail
+
+;--------------------------------------------------------------------------------------------------
+; FACTION BASE DEFENSE VS MUTANTS-
+[faction_base_defense]
+icon = ui_iconsTotal_defend_lager
+prior = 35
+storyline = false
+title = faction_base_defense_name
+descr = faction_base_defense_text
+target = {+faction_base_defense_flesh_squad_spawned} faction_base_defense_flesh_squad, {+faction_base_defense_boar_squad_spawned} faction_base_defense_boar_squad, {+faction_base_defense_dog_squad_spawned} faction_base_defense_dog_squad
+condlist_0 = {+faction_base_defense_enemy_killed} complete

@@ -366,3 +366,31 @@ npc_in_squad = 1
 faction = monster_zombied_day
 npc_random = m_controller_psy
 npc_in_squad = 1, 1
+
+;--------------------base defense----------------------
+[faction_base_defense_flesh_squad]:online_offline_group
+faction = monster_vegetarian
+npc_random = flesh_weak, flesh_01a_weak, flesh_02a_weak, flesh_normal, flesh_02a_normal, flesh_strong, flesh_01a_strong, flesh_02a_strong, flesh_weak, flesh_01a_weak, flesh_02a_weak, flesh_normal, flesh_02a_normal, flesh_strong, flesh_01a_strong, flesh_02a_strong, flesh_weak, flesh_01a_weak, flesh_02a_weak, flesh_normal, flesh_02a_normal, flesh_strong, flesh_01a_strong, flesh_02a_strong
+npc_in_squad = 20
+spawn_point = {=actor_on_level(k00_marsh)} mar_smart_terrain_5_12_home_attackers, mar_smart_terrain_5_12_home_attackers
+target_smart = {=actor_on_level(k00_marsh) +mar_smart_terrain_5_12_mutants_to_base} mar_smart_terrain_base, {=actor_on_level(k00_marsh) -mar_smart_terrain_5_12_mutants_to_base} mar_smart_terrain_5_12, mar_smart_terrain_5_12
+on_death = %+faction_base_defense_enemy_killed%
+story_id = faction_base_defense_flesh_squad
+
+[faction_base_defense_boar_squad]:online_offline_group
+faction = monster_vegetarian
+npc_random = boar_normal, boar_strong, boar_01a_weak, boar_02a_weak, boar_02a_strong, boar_01a_hard, boar_02a_hard, boar_normal, boar_strong, boar_01a_weak, boar_02a_weak, boar_02a_strong, boar_01a_hard, boar_02a_hard, boar_normal, boar_strong, boar_01a_weak, boar_02a_weak, boar_02a_strong, boar_01a_hard, boar_02a_hard
+npc_in_squad = 20
+spawn_point = {=actor_on_level(k00_marsh)} mar_smart_terrain_5_12_home_attackers, mar_smart_terrain_5_12_home_attackers
+target_smart = {=actor_on_level(k00_marsh) +mar_smart_terrain_5_12_mutants_to_base} mar_smart_terrain_base, {=actor_on_level(k00_marsh) -mar_smart_terrain_5_12_mutants_to_base} mar_smart_terrain_5_12, mar_smart_terrain_5_12
+on_death = %+faction_base_defense_enemy_killed%
+story_id = faction_base_defense_boar_squad
+
+[faction_base_defense_dog_squad]:online_offline_group
+faction = monster_predatory_day
+npc_random = dog_normal_red, dog_normal_white, dog_normal_brown, dog_normal_bulterier, dog_weak_red, dog_weak_white, dog_weak_brown, dog_weak_bulterier, dog_strong_red, dog_strong_white, dog_strong_brown, dog_strong_bulterier, dog_strong_black, dog_normal_red, dog_normal_white, dog_normal_brown, dog_normal_bulterier, dog_weak_red, dog_weak_white, dog_weak_brown, dog_weak_bulterier, dog_strong_red, dog_strong_white, dog_strong_brown, dog_strong_bulterier, dog_strong_black
+npc_in_squad = 20
+spawn_point = {=actor_on_level(k00_marsh)} mar_smart_terrain_5_12_home_attackers, mar_smart_terrain_5_12_home_attackers
+target_smart = {=actor_on_level(k00_marsh) +mar_smart_terrain_5_12_mutants_to_base} mar_smart_terrain_base, {=actor_on_level(k00_marsh) -mar_smart_terrain_5_12_mutants_to_base} mar_smart_terrain_5_12, mar_smart_terrain_5_12
+on_death = %+faction_base_defense_enemy_killed%
+story_id = faction_base_defense_dog_squad
