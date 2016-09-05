@@ -236,17 +236,17 @@ end
 
 function DynamicNewsManager:FindSpeakerNoVictim(who,same_as_who,not_in_combat)
 	local comm_sender
-	local comm_who = character_community(who)
-	local who_id = who:id()
+	local comm_who = who and character_community(who) or nil
+	local who_id = who and who:id() or nil
 	local t = {}
 	for i=1, #db.OnlineStalkers do
-		if (db.OnlineStalkers[i] ~= who_id) then
+		if (who_id == nil) or (db.OnlineStalkers[i] ~= who_id) then
 			local st = db.storage[db.OnlineStalkers[i]]
 			local npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
 			if (npc and IsStalker(npc,npc:clsid()) and npc:alive() and not get_object_story_id(db.OnlineStalkers[i])) then
 				if (not_in_combat == nil) or (not_in_combat == true and not npc:best_enemy()) or (not_in_combat ~= true) then
 					comm_sender = npc:character_community()
-					if (same_as_who == nil) or (same_as_who == true and comm_sender == comm_who) or (same_as_who == false and comm_sender ~= comm_who) then
+					if (same_as_who == nil) or (comm_who == nil) or (same_as_who == true and comm_sender == comm_who) or (same_as_who == false and comm_sender ~= comm_who) then
 						if (self.channel_status[comm_sender]) then
 							table.insert(t,npc)
 						end
