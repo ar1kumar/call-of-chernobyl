@@ -2116,10 +2116,12 @@ function create_squad(actor, obj, p)
 		printf("Wrong smart_name [%s] for [%s] faction in create_squad function", tostring(smart_name), tostring(player_name))
 	end
 
+	printf("Create squad %s BEFORE",squad_id)
 	local squad = board:create_squad(smart, squad_id)
 	if not (squad) then 
 		return
 	end
+	printf("Create squad %s AFTER",squad_id)
 
 	--board:enter_smart(squad, smart.id)
 
@@ -2263,6 +2265,7 @@ function update_squad(actor, obj, p)
 end
 ]]--
 
+-- this deletes squads from a smart
 function clear_smart_terrain(actor, obj, p)
 	local smart_name = p[1]
 	if smart_name == nil then
@@ -2273,16 +2276,55 @@ function clear_smart_terrain(actor, obj, p)
 	local smart = board.smarts_by_names[smart_name]
 	local smart_id = smart.id
 	for k,v in pairs(board.smarts[smart_id].squads) do
-		if p[2] and p[2] == "false" then
+		if p[2] and p[2] == "true" then
+			board:remove_squad(v)
+		else
 			if not get_object_story_id(v.id) then
-				--board:exit_smart(v, smart_id)
 				board:remove_squad(v)
 			end
-		else
-			--board:exit_smart(v, smart_id)
-			board:remove_squad(v)
 		end
 	end
+end
+
+-- This forces squads to leave a smart
+function flush_smart_terrain(actor,obj,p)
+	local smart_name = p[1]
+	if smart_name == nil then
+		printf("Wrong squad identificator [NIL] in clear_smart_terrain function")
+	end
+
+	local board = SIMBOARD
+	
+	local function unregister(squad)
+		squad.assigned_target_id = nil
+		squad.current_target_id = nil
+		squad.current_action = nil
+		board:assign_squad_to_smart(squad, nil)
+		for k in squad:squad_members() do
+			local se_obj = alife():object(k.id)
+			if (se_obj) then
+				local smart_id = se_obj:smart_terrain_id()
+				if smart_id ~= 65535 then
+					local smart = alife():object(smart_id)
+					if (smart) then
+						smart:unregister_npc(self)
+					end
+				end
+			end
+		end
+	end
+	
+	local smart = board.smarts_by_names[smart_name]
+	local smart_id = smart.id
+	for k,v in pairs(board.smarts[smart_id].squads) do
+		if p[2] and p[2] == "true" then
+			unregister(v)
+		else
+			if not get_object_story_id(v.id) then
+				unregister(v)
+			end
+		end
+	end	
 end
 
 

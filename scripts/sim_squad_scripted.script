@@ -371,21 +371,23 @@ function sim_squad_scripted:remove_squad()
 	
 	local squad_npcs = {}
 	for k in self:squad_members() do
-		squad_npcs[k.id] = k.object
+		squad_npcs[k.id] = true
 	end
 	
 	local sim = alife()
-	for id,se_obj in pairs(squad_npcs) do
-		local smart_id = se_obj:smart_terrain_id()
-		if smart_id ~= 65535 then
-			local smart = alife():object(smart_id)
-			if smart ~= nil then
-				smart:unregister_npc(self)
+	for id,v in pairs(squad_npcs) do
+		local se_obj = sim:object(id)
+		if (se_obj) then
+			local smart_id = se_obj:smart_terrain_id()
+			if smart_id ~= 65535 then
+				local smart = alife():object(smart_id)
+				if smart ~= nil then
+					smart:unregister_npc(self)
+				end
 			end
+			self:unregister_member(id)
+			safe_release_manager.release(se_obj)
 		end
-		self:unregister_member(id)
-		safe_release_manager.release(se_obj)
-		--sim:release(se_obj,true)
 	end
 	self:hide()
 	--sim:release(self,true)
