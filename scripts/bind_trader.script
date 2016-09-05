@@ -53,11 +53,6 @@ function trader_object_binder:net_spawn(sobject)
 		return false
 	end
 
-	local on_offline_condlist = db.storage[self.object:id()] and db.storage[self.object:id()].overrides and db.storage[self.object:id()].overrides.on_offline_condlist
-	if on_offline_condlist ~= nil then
-		xr_logic.pick_section_from_condlist(db.actor, self.object, on_offline_condlist)
-	end
-
 	if not self.object:alive() then
 		return true
 	end
@@ -65,7 +60,7 @@ function trader_object_binder:net_spawn(sobject)
 	if alife():object(self.object:id()) == nil then
 		return false
 	end
-
+	
 	db.add_obj(self.object)
 	if self.object:clsid() == clsid.script_trader then
 	      --self.object:set_trader_global_anim("idle_spinka")
@@ -82,6 +77,11 @@ function trader_object_binder:net_destroy()
 	if st and st.active_scheme then
 		xr_logic.issue_event(self.object, st[st.active_scheme], "net_destroy")
 	end
+	
+	local on_offline_condlist = db.storage[self.object:id()] and db.storage[self.object:id()].overrides and db.storage[self.object:id()].overrides.on_offline_condlist
+	if on_offline_condlist ~= nil then
+		xr_logic.pick_section_from_condlist(db.actor, self.object, on_offline_condlist)
+	end
 
 	if db.offline_objects[self.object:id()] then
 		db.offline_objects[self.object:id()].level_vertex_id = self.object:level_vertex_id()
@@ -95,6 +95,10 @@ function trader_object_binder:net_destroy()
 	db.del_obj(self.object)
 	db.storage[self.object:id()] = nil
 	alife_storage_manager.get_state().game_object[self.object:id()] = nil
+	
+	trade_manager.on_npc_death(self.object)
+	
+	self.object:set_callback(callback.use_object,nil)
 	
 	object_binder.net_destroy(self)
 end

@@ -229,6 +229,8 @@ function motivator_binder:net_destroy()
 	db.delete_enemy(self.object)
 	alife_storage_manager.get_state().game_object[self.object:id()] = nil
 	
+	trade_manager.on_npc_death(self.object)
+	
 	object_binder.net_destroy(self)
 end
 
@@ -292,7 +294,7 @@ function motivator_binder:death_callback(victim, who)
 		xr_info.setup_known_info(self.object,self.st.ini,known_info)
 	end
 	
-	trade_manager.on_npc_death(victim)
+	trade_manager.on_npc_death(self.object)
 	self:hit_callback(victim, 1, vector():set(0,0,0), who, "from_death_callback")
 
 	local id = victim:id()
@@ -358,6 +360,7 @@ function motivator_binder:use_callback(obj, who)
 		death_manager.create_release_item(obj)
 		return
 	end
+	trade_manager.update(obj)
 	inventory_upgrades.victim_id = obj:id()
 	xr_meet.notify_on_use(obj, who)
 	dialog_manager.disabled_phrases[obj:id()] = nil
@@ -409,11 +412,9 @@ function motivator_binder:update(delta)
 	if (self.squad and self.squad:commander_id() == id) then
 		self.squad:update()
 	end
+	
 	if (self.st.state_mgr) then
 		self.st.state_mgr:update()
-		if (self.st.state_mgr.combat ~= true and self.st.state_mgr.alife ~= true) then
-			trade_manager.update(object)
-		end
 	end
 	
 	local tg = time_global()

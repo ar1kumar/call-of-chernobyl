@@ -283,8 +283,9 @@ function try_spawn_treasure(box)
 			else
 				-- since we spawning on parent, we don't want to register object or packetdata will be inaccurate
 				local se_obj = sim:create(sec,box:position(),0,0,id,false)
-				if (se_obj) then 
-					if (IsWeapon(nil,se_obj:clsid())) then
+				if (se_obj) then
+					local cls = se_obj:clsid()
+					if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then
 						--printf("coc_treasure_manager: item is fa")
 						local data = stpk_utils.get_weapon_data(se_obj)
 						if (data) then

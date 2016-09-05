@@ -956,6 +956,10 @@ function sim_squad_scripted:can_switch_offline()
 		end
 	end
 	--]]
+	
+	if (IsSurvivalMode()) then
+		return false
+	end
 
 	return cse_alife_online_offline_group.can_switch_offline(self)
 end
@@ -970,6 +974,10 @@ function sim_squad_scripted:can_switch_online()
 	
 	-- squad already online
 	if (self.online) then 
+		return true
+	end
+	
+	if (IsSurvivalMode()) then
 		return true
 	end
 	
