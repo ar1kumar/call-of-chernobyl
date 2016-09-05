@@ -2303,8 +2303,8 @@ function flush_smart_terrain(actor,obj,p)
 		for k in squad:squad_members() do
 			local se_obj = alife():object(k.id)
 			if (se_obj) then
-				local smart_id = se_obj:smart_terrain_id()
-				if smart_id ~= 65535 then
+				local smart_id = se_obj.m_smart_terrain_id
+				if (smart_id and smart_id ~= 65535) then
 					local smart = alife():object(smart_id)
 					if (smart) then
 						smart:unregister_npc(self)

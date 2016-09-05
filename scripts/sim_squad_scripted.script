@@ -378,8 +378,8 @@ function sim_squad_scripted:remove_squad()
 	for id,v in pairs(squad_npcs) do
 		local se_obj = sim:object(id)
 		if (se_obj) then
-			local smart_id = se_obj:smart_terrain_id()
-			if smart_id ~= 65535 then
+			local smart_id = se_obj.m_smart_terrain_id --se_obj:smart_terrain_id()
+			if (smart_id and smart_id ~= 65535) then
 				local smart = alife():object(smart_id)
 				if smart ~= nil then
 					smart:unregister_npc(self)
