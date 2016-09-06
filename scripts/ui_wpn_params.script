@@ -4,16 +4,6 @@ function normalize(val, min, max)
 		return 0
 	end
 	return d
-
---[[
-	if val > 100 then
-		val = 100
-	elseif val < 1 then
-		val  = 1
-	end
-	
-	return val
-	]]
 end
 
 function normalizeMP(val)
@@ -37,20 +27,28 @@ end
 
 function read_float(wpn_section, upgr_sections, param)
 	local ltx = system_ini()
-	local res = ltx:r_float_ex(wpn_section, param) or 0
+	local res = 0
+	
+	if (param == "hit_power") then 
+		local t = parse_names(ltx:r_string_ex(wpn_section,param) or "")
+		res = tonumber(t[1]) or 0
+	else
+		res = ltx:r_float_ex(wpn_section, param) or 0
+	end 
 	
 	if upgr_sections == nil or upgr_sections == "" then
         return res
     end
 	
-	for k, sect in pairs(parse_names(upgr_sections)) do 
-		local r = ltx:r_float_ex(sect,param) or 0
+	for k, sect in pairs(parse_names(upgr_sections)) do
 		if param == "hit_power" then
+			local r = parse_names(ltx:r_string_ex(sect,param) or "")
+			r = tonumber(r[1]) or 0
 			if res < r then
 				res = r
-			end	
-		else	
-			res = res + r
+			end
+		else
+			res = res + (ltx:r_float_ex(sect,param) or 0)
 		end		
     end 
 	
@@ -59,12 +57,12 @@ end
 
 function GetRPM(wpn_section, upgr_sections) --' скорострельность
 	local rpm = read_float(wpn_section, upgr_sections, "rpm")
-	return normalize(rpm, 0, 1300)
+	return normalize(rpm, 0, 1000)
 end
 
 function GetDamage(wpn_section, upgr_sections) --' повреждение
 	local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
-	return normalize(hit_power, 0, 1.1)	
+	return normalize(hit_power, 0, 1)
 end
 
 function GetDamageMP(wpn_section, upgr_sections) -- ??? (повреждениеMP)
@@ -79,18 +77,11 @@ function GetDamageMP(wpn_section, upgr_sections) -- ??? (повреждениеMP)
 end
 
 function GetHandling(wpn_section, upgr_sections) --' удобность
-	local ltx = system_ini()
-	local PDM_disp_base = 1
-	if ltx:line_exist(wpn_section,"PDM_disp_base") then
-		PDM_disp_base = read_float(wpn_section, upgr_sections, "PDM_disp_base")
-	end	
-	
-	PDM_disp_base = 4 - PDM_disp_base
-	return normalize(PDM_disp_base, 0, 3)
+	local PDM_disp_base = read_float(wpn_section, upgr_sections, "PDM_disp_base")
+	return normalize(PDM_disp_base, 2.1, 0)
 end
 
 function GetAccuracy(wpn_section, upgr_sections) --' точность
     local fire_dispersion_base	= read_float(wpn_section, upgr_sections, "fire_dispersion_base")
-	fire_dispersion_base = 1.5 - fire_dispersion_base
-	return normalize(fire_dispersion_base, 0, 1.5)
+	return normalize(fire_dispersion_base, 1.5, 0)
 end
