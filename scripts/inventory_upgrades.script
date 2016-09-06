@@ -350,8 +350,6 @@ function property_functor_a(param1, name)
 			sum = sum + (char_ini:r_float_ex(section_table[i],"health_restore_speed",0)/0.02*100)
 		elseif (name == "prop_power") then
 			sum = sum + (char_ini:r_float_ex(section_table[i],"power_restore_speed",0)/sysini:r_float_ex("actor_condition","max_power_restore_speed",0.01)*100)
-		elseif (name == "prop_ammo_size") then
-			sum = sum + char_ini:r_float_ex(section_table[i],"ammo_mag_size",0)
 		elseif (name == "prop_artefact") then
 			sum = sum + char_ini:r_float_ex(section_table[i],"artefact_count",0)
 		elseif (name == "prop_weightoutfit" or name == "prop_weight") then
@@ -396,9 +394,42 @@ function property_functor_a(param1, name)
 		elseif (name == "prop_armor") then
 			tmp = char_ini:r_float_ex(section_table[i],"fire_wound_protection") or 0
 			val = ((1*tmp)/max_protections["fire_wound_protection"] * 100)
-			prop_damage["fire_wound_protection"] = prop_damage["fire_wound_protection"] and prop_damage["fire_wound_protection"] + val or val	
+			prop_damage["fire_wound_protection"] = prop_damage["fire_wound_protection"] and prop_damage["fire_wound_protection"] + val or val
+        elseif (name == "prop_ammo_size") then
+            sum = sum + char_ini:r_float_ex(section_table[i],"ammo_mag_size",0)
+        elseif (name == "prop_rpm") then
+            sum = sum + math.ceil(char_ini:r_float_ex(section_table[i],"rpm",0)/10)
+        elseif (name == "prop_bullet_speed") then
+            sum = sum + math.ceil(char_ini:r_float_ex(section_table[i],"bullet_speed",0)/10)
+		elseif (name == "prop_dispersion") then
+			val = char_ini:r_float_ex(section_table[i],"fire_dispersion_base") or 0
+			if (val ~= 0) then
+				sum = sum + (ui_wpn_params.normalize(val,1.5,0)-100)
+			end
+		elseif (name == "prop_recoil") then
+			local actual_section = "wpn_" .. section_table[i]:gsub("(.*)_","")
+			val = char_ini:r_float_ex(section_table[i],"zoom_cam_dispersion") or 0
+			if (val ~= 0) then
+				sum = sum + (100-ui_wpn_params.normalize(val,sysini:r_float_ex(actual_section,"zoom_cam_dispersion",3),0))
+			else
+				val = char_ini:r_float_ex(section_table[i],"cam_dispersion") or 0
+				if (val ~= 0) then				
+					sum = sum + (100-ui_wpn_params.normalize(val,sysini:r_float_ex(actual_section,"cam_dispersion",3),0))
+				end
+			end
+		elseif (name == "prop_bullet_speed") then
+			val = char_ini:r_float_ex(section_table[i],"bullet_speed") or 0
+			if (val ~= 0) then
+				local actual_section = "wpn_" .. section_table[i]:gsub("(.*)_","")
+				sum = sum + (val/sysini:r_float_ex(actual_section,"bullet_speed",1000)*100)
+			end
+		elseif (name == "prop_inertion") then 
+			val = char_ini:r_float_ex(section_table[i],"PDM_disp_base") or 0
+			if (val ~= 0) then
+				sum = sum + (ui_wpn_params.normalize(val,2.1,0)-100)
+			end
 		else
-			sum = sum + char_ini:r_float_ex(section_table[i], "value") or 0
+			sum = sum + (char_ini:r_float_ex(section_table[i], "value") or 0)
 		end
 	end
 	
