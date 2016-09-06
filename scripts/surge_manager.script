@@ -412,7 +412,9 @@ function CSurgeManager:calculate_best_surge_cover()
 
 	if (near and db.actor and near:inside(db.actor:position())) then 
 		self.actor_in_cover = true
-	else 
+		self.best_cover_id = near:id()
+	else
+		self.best_cover_id = nil
 		self.actor_in_cover = false
 	end
 end
@@ -1684,7 +1686,7 @@ function get_task_target()
 	if (mgr.actor_in_cover) then
 		return nil
 	end
-	return mgr.best_cover and mgr.best_cover:id()
+	return mgr.best_cover_id
 end
 
 function set_surge_message(mess)
