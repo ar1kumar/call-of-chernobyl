@@ -198,15 +198,12 @@ function CCampManager:update()
 end
 function CCampManager:set_next_state()
 	local transitions = self.states[self.active_state].transitions
-	local rnd = math.random(100)
 	for k,v in pairs(transitions) do
-		if(rnd<v) then
+		if(math.random(100) < v) then
 			if self.states[k].precondition(self) == true then
 				self.active_state = k
 				break
 			end
-		--else
-		--	rnd = rnd - v
 		end
 	end
 	for k,v in pairs(self.npc) do
