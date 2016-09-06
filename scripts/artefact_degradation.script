@@ -1,0 +1,227 @@
+local belted_arts = {}
+local sysini = system_ini()
+local imm_mul, mul
+verified = true	-- must be true - sets initial multiplier values
+
+local function set_artifact_multiplier(chk)
+	imm_mul = {			-- correction factors for hit events
+		["light_burn"] = 0.1,
+		["burn"] = 0.1,
+		["strike"] = 0.1,
+		["shock"] = 0.1,
+		["wound"] = 0.1,
+		["radiation"] = 0.1,
+		["telepatic"] = 0.1,
+		["chemical_burn"] = 0.1,
+		["explosion"] = 0.1,
+		["fire_wound"] = 0.1,
+	}
+
+	mul = {				-- correction factors for timed checks
+		["health"]		= 0.1,	-- updated often while slotted so don't set too high
+		["radiation"] 	= 1,
+		["satiety"] 	= 1,
+		["power"] 		= 0.3,	-- updated often while slotted so don't set too high
+		["bleeding"] 	= 0.5,
+		["psy_health"] 	= 1,
+		["weight"]		= 0.0001, -- updated often while slotted so don't set too high
+	}
+	
+	if chk == false then
+		for k,v in pairs(imm_mul) do
+			imm_mul[k] = 0
+		end
+		for k,v in pairs(mul) do
+			mul[k] = 0
+		end
+	end
+	verified = false
+end
+
+local function actor_on_first_update(binder,delta)
+	local _tmr
+	level.add_call(function()
+		
+		local tg = time_global()
+		if (_tmr and tg < _tmr) then 
+			return false 
+		end
+		_tmr = tg + 2000	-- if you change this value timed artefact multipliers will need changes 
+		
+		if (verified) then	-- reset multipliers on option switch
+			set_artifact_multiplier(axr_main.config:r_value("mm_options","enable_art_degrade",1,false))
+		end
+		if (axr_main.config:r_value("mm_options","enable_art_degrade",1,false)) then
+			for art_id,active in pairs(belted_arts) do
+				if (active) then
+					timed_artifact_cond(art_id)
+				end
+			end
+		end
+		
+		return false
+	end, function()
+		return 
+	end)
+end
+
+function on_game_start()
+	RegisterScriptCallback("actor_on_item_drop",actor_on_item_drop)
+	RegisterScriptCallback("actor_on_before_hit",actor_on_before_hit)
+	RegisterScriptCallback("actor_item_to_belt",actor_item_to_belt)
+	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
+end
+
+function actor_on_item_drop(art)
+	if not IsArtefact(art) then
+		return
+	end
+	local art_id = art:id()
+	for k,v in pairs(belted_arts) do
+		if k == art_id then
+			belted_arts[k] = nil
+			return
+		end
+	end
+end
+
+function actor_item_to_belt(item)
+	if IsArtefact(item) then
+		belted_arts[item:id()] = true
+	end
+end
+--//-----------		On hit immunities checks 
+function actor_on_before_hit(s_hit)
+	if (axr_main.config:r_value("mm_options","enable_art_degrade",1,false)) == false then return end
+printf("actor hit:hit type = %s", s_hit.type)
+	local hit_tbl = {
+		["light_burn"] = hit.light_burn,
+		["burn"] = hit.burn,
+		["shock"] = hit.shock,
+		["shock"] = hit.shock,
+		["wound"] = hit.wound,
+		["radiation"] = hit.radiation,
+		["telepatic"] = hit.telepatic,
+		["chemical_burn"] = hit.chemical_burn,
+		["explosion"] = hit.explosion,
+		["fire_wound"] = hit.fire_wound,
+	}
+	
+	local function artifact_powers(art_id, name)	-- read immunity values
+		local hit_absorbation_sect = sysini:r_string_ex(name,"hit_absorbation_sect","none")
+		local tbl = {
+			["light_burn"] = sysini:r_float_ex(hit_absorbation_sect,"light_burn_immunity",0),
+			["burn"] = sysini:r_float_ex(hit_absorbation_sect,"burn_immunity",0),
+			["strike"] = sysini:r_float_ex(hit_absorbation_sect,"strike_immunity",0),
+			["shock"] = sysini:r_float_ex(hit_absorbation_sect,"shock_immunity",0),
+			["wound"] = sysini:r_float_ex(hit_absorbation_sect,"wound_immunity",0),
+			["radiation"] = sysini:r_float_ex(hit_absorbation_sect,"radiation_immunity",0),
+			["telepatic"] = sysini:r_float_ex(hit_absorbation_sect,"telepatic_immunity",0),
+			["chemical_burn"] = sysini:r_float_ex(hit_absorbation_sect,"chemical_burn_immunity",0),
+			["explosion"] = sysini:r_float_ex(hit_absorbation_sect,"explosion_immunity",0),
+			["fire_wound"] = sysini:r_float_ex(hit_absorbation_sect,"fire_wound_immunity",0),
+		}
+	
+		local active = {}
+		for k,v in pairs(tbl) do
+			if v > 0 then
+				active[k] = v
+			end
+		end
+		return active
+	end
+
+	for art_id,active in pairs(belted_arts) do
+		local arte = level.object_by_id(art_id)
+		if not db.actor:is_on_belt(arte) then
+			belted_arts[art_id] = nil
+		else
+			local art_tbl = artifact_powers(art_id, arte:section())
+			local cond_loss = 0
+			for k,v in pairs(art_tbl) do
+				if s_hit.type == hit_tbl[k] then
+					cond_loss = (s_hit.power * imm_mul[k] * v) + cond_loss
+printf("hit type = %s hit power = %s art_id = %s condition loss %s", hit_tbl[k], s_hit.power, art_id, cond_loss)
+				end
+			end
+			arte:set_condition(arte:condition() - cond_loss)
+			if arte:condition() <= 0 then
+				alife():release(alife():object(arte:id()), true)
+				belted_arts[art_id] = nil
+			end
+		end
+	end
+end
+--//----------	Timed based condition checks
+function timed_artifact_cond(art_id)
+
+	local function artifact_powers(art_id, name)	--read restore rate values
+		local tbl = {
+			["health"] = sysini:r_float_ex(name,"health_restore_speed",0),
+			["radiation"] = sysini:r_float_ex(name,"radiation_restore_speed",0), -- pos causes health loss
+			["satiety"] = sysini:r_float_ex(name,"satiety_restore_speed",0),
+			["power"] = sysini:r_float_ex(name,"power_restore_speed",0),
+			["bleeding"] = sysini:r_float_ex(name,"bleeding_restore_speed",0),
+			["psy_health"] = sysini:r_float_ex(name,"psy_health_restore_speed",0),
+		
+			["weight"] = sysini:r_float_ex(name,"additional_inventory_weight",0),
+--			["weight2"] = sysini:r_float_ex(name,"additional_inventory_weight2",0),
+		}
+	
+		local active = {}
+		for k,v in pairs(tbl) do
+			if (k ~= "radiation" and v > 0) or (k == "radiation" and v < 0) then
+				active[k] = v
+			end
+		end
+		return active
+	end
+
+	local arte = level.object_by_id(art_id)
+	if not (arte and db.actor:is_on_belt(arte)) then
+		belted_arts[art_id] = nil
+	else
+		local art_tbl = artifact_powers(art_id, arte:section())
+		if art_tbl then
+			local trigger_cond_tbl = {		-- set condition triggers that start condition loss (0-1)
+				["health"] = (db.actor.health < 0.9),
+				["radiation"] = (db.actor.radiation > 0.1),
+				["satiety"] = (db.actor.satiety < 0.5),
+				["power"] = (db.actor.power < 0.5),
+				["bleeding"] = (db.actor.bleeding > 0.1),
+				["psy_health"] = (db.actor.psy_health < 0.9),
+--				["weight"] = (db.actor:get_total_weight()),
+			}
+			local cond_loss = 0
+			for k,v in pairs(art_tbl) do
+				if (k == "weight") then
+--					cond_loss = trigger_cond_tbl[k] * mul[k]) or cond_loss -- use this instead if effect applies to ANY weight
+					--// use this if effect applies to weights above max walk limit ------------
+					local suit = db.actor:item_in_slot(7)
+					local diff = db.actor:get_total_weight() - db.actor:get_actor_max_walk_weight() - (suit and suit:get_additional_max_weight() or 0)
+					if diff > 0 then
+						cond_loss = (diff * mul[k])/v
+					end
+					--//-------------------------------------------------------------------------
+				else
+					cond_loss = trigger_cond_tbl[k] and (mul[k] * math.abs(v)) or cond_loss
+				end
+--[[				
+if (cond_loss > 0) then
+	printf("restore type = %s id = %s condition = %s", k, art_id, arte:condition())
+	if (k == "weight") then
+		local suit = db.actor:item_in_slot(7)
+		printf("Actor Weight = %s Walk max = %s art_bonus = %s",db.actor:get_total_weight(),db.actor:get_actor_max_walk_weight()+(suit and suit:get_additional_max_weight() or 0),v)
+	end
+end
+--]]
+			end
+			arte:set_condition(arte:condition() - cond_loss)
+			if arte:condition() <= 0 then
+				alife():release(alife():object(arte:id()), true)
+				belted_arts[art_id] = nil
+			end
+		end
+	end
+	return
+end
