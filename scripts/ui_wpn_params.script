@@ -79,7 +79,7 @@ end
 function GetHandling(wpn_section, upgr_sections) --' удобность
 	local PDM_disp_base = read_float(wpn_section, upgr_sections, "PDM_disp_base")
 	local control_inertion_factor = read_float(wpn_section, upgr_sections, "control_inertion_factor")
-	return (normalize(PDM_disp_base, 2.1, 0) + normalize(control_inertion_factor, 2.2, 1))/2
+	return (normalize(PDM_disp_base, 2.1, 0) + normalize(control_inertion_factor, 3, 1))/2
 end
 
 function GetAccuracy(wpn_section, upgr_sections) --' точность
