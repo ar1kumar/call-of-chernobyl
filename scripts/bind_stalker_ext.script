@@ -30,8 +30,8 @@ function actor_on_reinit(binder)
 		end
 		return false
 	end
-	level.add_call(check_hud_msg,function() return end)
-	level.add_call(ProcessEventQueue,function() return end)
+	AddUniqueCall(check_hud_msg)
+	AddUniqueCall(ProcessEventQueue)
 end
 -------------------
 -- actor_on_net_spawn

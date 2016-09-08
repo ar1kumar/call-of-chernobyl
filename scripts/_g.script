@@ -226,7 +226,13 @@ function AddUniqueCall(functor_a)
 		if not (level_add_call_unique[functor_a]) then 
 			return true 
 		end
-		return functor_a() or false
+		
+		if (functor_a()) then
+			level_add_call_unique[functor_a] = nil
+			return true
+		end
+		
+		return false
 	end
 	
 	level_add_call_unique[functor_a] = true

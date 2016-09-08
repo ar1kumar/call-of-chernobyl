@@ -45,7 +45,7 @@ end
 ---------------------------------------------------------------
 local function actor_on_reinit(binder)
 	objects_to_release = alife_storage_manager.get_state().objects_to_release or objects_to_release
-	level.add_call(this.execute_destroy_callback,function() return end)
+	AddUniqueCall(execute_destroy_callback)
 end
 ----------------------------------------------------------------
 -- ON_GAME_START
