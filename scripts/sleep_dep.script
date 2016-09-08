@@ -5,21 +5,21 @@
 --// last edit:	4-24-2016
 --//------------------------------------------------------------------------------
 last_sleep, no_sleep, caff_chk 	= nil,nil,nil -- to change defaults, edit below in 'activate_feature' function
-local items,force,start_blur,itn_mul,pwr_rate,rng_factor,caff_max,last_warning,die_chance,last_chk,pwr_chk,feature_is_active
-
-local function dummy()
-
-end
+local items,force,start_blur,itn_mul,pwr_rate,rng_factor,caff_max,last_warning,die_chance,last_chk,pwr_chk
 
 local function main_loop()
 	local tg = time_global()
 	if (_tmr and tg < _tmr) then 
 		return false 
 	end
-	_tmr = tg + 2000	-- if you change this value timed artefact multipliers will need changes 
+	_tmr = tg + 2000
+	
+	if not (feature_is_active) then 
+		return true 
+	end 
 	
 	if not (db.actor) then
-		return 
+		return false
 	end 
 	
 	--printf("last_chk=%s last_sleep=%s",last_chk and game.get_game_time():diffSec(last_chk) or "nil",last_sleep)
@@ -40,7 +40,7 @@ local function main_loop()
 	end
 
 	if (last_chk and game.get_game_time():diffSec(last_chk) < 3600) then 
-		return 
+		return false
 	end
 	
 	last_chk = game.get_game_time()
@@ -48,8 +48,11 @@ local function main_loop()
 	last_sleep = last_sleep + 1
 	caff_chk = caff_chk > 1 and caff_chk - 1 or 0
 	test_blur()
+	
+	return false
 end
 
+feature_is_active = nil
 function activate_feature()
 	if (feature_is_active) then
 		return 
@@ -152,7 +155,7 @@ function activate_feature()
 		RegisterScriptCallback("save_state",save_state)
 		RegisterScriptCallback("load_state",load_state)
 	end
-	level.add_call(main_loop,dummy)
+	level.add_call(main_loop,function() return end)
 end 
 
 function deactivate_feature()
@@ -161,7 +164,6 @@ function deactivate_feature()
 	end
 	feature_is_active = false
 		
-	level.remove_call(main_loop,dummy)
 	UnregisterScriptCallback("actor_on_item_use",actor_on_item_use)
 	if (USE_MARSHAL) then
 		UnregisterScriptCallback("save_state",save_state)

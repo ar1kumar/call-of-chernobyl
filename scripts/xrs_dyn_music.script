@@ -28,9 +28,87 @@ local was_in_silence = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function on_game_start()
-	RegisterScriptCallback("actor_on_update",on_actor_update)
+local function main_loop()
+	local tg = time_global()
+	if (_tmr and tg < _tmr) then 
+		return false 
+	end
+	_tmr = tg + 1000
+	
+	if not (feature_is_active) then 
+		return true 
+	end
+	
+	if not (db.actor) then
+		return false
+	end
+	
+	if (init_failed) then
+		return true -- destroy add_call
+	end
+	
+	if (surge_manager.sound_started()) then
+		if (surge_manager.is_killing_all()) then
+			force_fade = true
+			FadeTo_ambient = ambient_vol
+			fade_ambient()
+			force_fade = false
+		else
+			FadeTo_ambient = 0
+			fade_ambient()
+		end
+	end
+	
+	if not (themes_inited) then
+		initialize_themes()
+	end
+
+	if (theme) then
+		theme:update(m_theme_volume)
+	end
+	
+	local state = get_theme_state()
+	if (state=="start") then
+		start_theme()
+	elseif (state=="idle") then
+		if (theme_is_fading()) then
+			fade_theme()
+		elseif (ambient_is_fading()) then
+			fade_ambient()
+		end
+		if (time_global()>next_track_start_time) then
+			select_next_track()
+		end
+	elseif (state=="finish") then
+		finish_theme()
+	end
+	
+	return false
+end
+
+feature_is_active = nil
+function activate_feature()
+	if (feature_is_active) then
+		return 
+	end
+	feature_is_active = true
+	level.add_call(main_loop,function() return end)
 	RegisterScriptCallback("on_game_end",on_actor_destroy)
+end 
+
+function deactivate_feature()
+	if not (feature_is_active) then
+		return 
+	end
+	feature_is_active = false
+	UnregisterScriptCallback("on_game_end",on_actor_destroy)
+	finish_theme()
+end
+
+function on_game_start()
+	if (IsDynamicMusic()) then
+		activate_feature()
+	end
 end
 
 function initialize_themes()
@@ -67,7 +145,7 @@ function initialize_themes()
 end
 
 function on_actor_destroy()
-	if(theme) and (theme:playing()) then
+	if (theme) and (theme:playing()) then
 		theme:stop()
 	end
 	get_console():execute("snd_volume_music "..ambient_vol)
@@ -78,59 +156,14 @@ function main_menu_on()
 end
 
 function main_menu_off()
-	local amb = get_console():get_float("snd_volume_music")
-	if(amb~=ambient_vol) then
-		ambient_vol = amb
-	end
-	if(theme) and (theme:playing()) then
-		if not(IsDynamicMusic()) then
-			themes_inited = false
-			theme:stop()
-		else
-			get_console():execute("snd_volume_music "..m_ambient_vol)
-		end
-	end
-end
-
-function on_actor_update()
-	if(init_failed) then
-		return
-	end
-	if(surge_manager.sound_started()) then
-		if(surge_manager.is_killing_all()) then
-			force_fade = true
-			FadeTo_ambient = ambient_vol
-			fade_ambient()
-			force_fade = false
-		else
-			FadeTo_ambient = 0
-			fade_ambient()
-		end
-	end
-	if(IsDynamicMusic()) then
-		if not(themes_inited) then
-			initialize_themes()
-		end
-
-		if(theme) then
-			theme:update(m_theme_volume)
-		end
-		local state = get_theme_state()
-		if(state=="start") then
-			start_theme()
-		elseif(state=="idle") then
-			if(theme_is_fading()) then
-				fade_theme()
-			elseif(ambient_is_fading()) then
-				fade_ambient()
-			end
-			if(time_global()>next_track_start_time) then
-				select_next_track()
-			end
-		elseif(state=="finish") then
-			finish_theme()
-		end
-	end
+	ambient_vol = get_console():get_float("snd_volume_music")
+	
+	if (IsDynamicMusic()) then
+		activate_feature()
+		get_console():execute("snd_volume_music "..m_ambient_vol)
+	else 
+		deactivate_feature()
+	end 
 end
 
 function get_theme_state()
@@ -209,7 +242,7 @@ end
 
 function actor_in_silence_zone()
 	local silence_zones = db.storage.silence_zone_table
-	if(silence_zones) then
+	if (silence_zones) then
 		local actor_pos = db.actor:position()
 		for k,v in pairs(silence_zones) do
 			local zone = db.zone_by_name[v]
@@ -254,22 +287,22 @@ end
 
 function fade_theme()
 	local g_time = time_global()
-	if(g_time-prev_fade_time<=THEME_FADE_UPDATE_DELTA) then
+	if (g_time-prev_fade_time<=THEME_FADE_UPDATE_DELTA) then
 		return
 	end
 	prev_fade_time = g_time
 
 	FadeTo_theme = utils.clamp(FadeTo_theme, 0, ambient_vol)
 
-	if(m_theme_volume>FadeTo_theme) then
-		if(force_fade) then
+	if (m_theme_volume>FadeTo_theme) then
+		if (force_fade) then
 			m_theme_volume = FadeTo_theme
 		else
 			m_theme_volume = m_theme_volume - VOLUME_DELTA
 		end
 		m_theme_volume = utils.clamp(m_theme_volume, FadeTo_theme, m_theme_volume)
-	elseif(m_theme_volume<FadeTo_theme) then
-		if(force_fade) then
+	elseif (m_theme_volume<FadeTo_theme) then
+		if (force_fade) then
 			m_theme_volume = FadeTo_theme
 		else
 			m_theme_volume = m_theme_volume + VOLUME_DELTA
@@ -280,22 +313,22 @@ end
 
 function fade_ambient()
 	local g_time = time_global()
-	if(g_time-prev_fade_time<=AMBIENT_FADE_UPDATE_DELTA) then
+	if (g_time-prev_fade_time<=AMBIENT_FADE_UPDATE_DELTA) then
 		return
 	end
 	prev_fade_time = g_time
 
 	FadeTo_ambient = utils.clamp(FadeTo_ambient, 0, ambient_vol)
 
-	if(m_ambient_vol>FadeTo_ambient) then
-		if(force_fade) then
+	if (m_ambient_vol>FadeTo_ambient) then
+		if (force_fade) then
 			m_ambient_vol = FadeTo_ambient
 		else
 			m_ambient_vol = m_ambient_vol - VOLUME_DELTA
 		end
 		m_ambient_vol = utils.clamp(m_ambient_vol, FadeTo_ambient, m_ambient_vol)
-	elseif(m_ambient_vol<FadeTo_ambient) then
-		if(force_fade) then
+	elseif (m_ambient_vol<FadeTo_ambient) then
+		if (force_fade) then
 			m_ambient_vol = FadeTo_ambient
 		else
 			m_ambient_vol = m_ambient_vol + VOLUME_DELTA
@@ -306,31 +339,29 @@ function fade_ambient()
 end
 
 function select_next_track()
-	if(cur_theme_number==nil or themes[cur_theme_number]==nil) then
+	if (cur_theme_number==nil or themes[cur_theme_number]==nil) then
 		print_table(themes)
 		log("-------->cur_theme_number="..tostring(cur_theme_number))
 		log("-------->cur_track_number="..tostring(cur_track_number))
 		log("-------->theme="..tostring(theme~=nil))
-		if(theme) then
+		if (theme) then
 			log("-------->theme is playing="..tostring(theme:playing()~=nil))
 		end
 		log("-------->cur_state="..tostring(get_theme_state()))
 		printf("wrong theme number")
 	end
-	if(cur_track_number<#themes[cur_theme_number]) then
+	if (cur_track_number<#themes[cur_theme_number]) then
 		cur_track_number = cur_track_number + 1
 	else
 		cur_track_number = 1
 	end
-	if(theme) then
-		next_track_start_time = theme:play_at_time(next_track_start_time + TRACK_SWITCH_DELTA,
-												   themes[cur_theme_number][cur_track_number],
-												   m_theme_volume) - TRACK_SWITCH_DELTA
+	if (theme) then
+		next_track_start_time = theme:play_at_time(next_track_start_time + TRACK_SWITCH_DELTA,themes[cur_theme_number][cur_track_number],m_theme_volume) - TRACK_SWITCH_DELTA
 	end
 end
 
 function finish_theme()
-	if(theme) then
+	if (theme) and (theme:playing()) then
 		theme:stop()
 	end
 	themes_inited = false

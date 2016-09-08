@@ -7,11 +7,7 @@
 
 local belted_arts = {}
 local sysini = system_ini()
-local imm_mul, mul, feature_is_active
-
-local function dummy()
-
-end
+local imm_mul, mul
 
 local function main_loop()
 	local tg = time_global()
@@ -19,9 +15,13 @@ local function main_loop()
 		return false 
 	end
 	_tmr = tg + 2000	-- if you change this value timed artefact multipliers will need changes 
+
+	if not (feature_is_active) then 
+		return true 
+	end 
 	
 	if not (db.actor) then
-		return 
+		return false
 	end
 	
 	for art_id,active in pairs(belted_arts) do
@@ -29,8 +29,11 @@ local function main_loop()
 			timed_artifact_cond(art_id)
 		end
 	end
+	
+	return false
 end
 
+feature_is_active = nil
 function activate_feature()
 	if (feature_is_active) then
 		return 
@@ -62,7 +65,7 @@ function activate_feature()
 	RegisterScriptCallback("actor_on_item_drop",actor_on_item_drop)
 	RegisterScriptCallback("actor_on_before_hit",actor_on_before_hit)
 	RegisterScriptCallback("actor_item_to_belt",actor_item_to_belt)
-	level.add_call(main_loop,dummy)
+	level.add_call(main_loop,function() return end)
 end 
 
 function deactivate_feature()
@@ -71,7 +74,6 @@ function deactivate_feature()
 	end
 	feature_is_active = false
 	
-	level.remove_call(main_loop,dummy)
 	UnregisterScriptCallback("actor_on_item_drop",actor_on_item_drop)
 	UnregisterScriptCallback("actor_on_before_hit",actor_on_before_hit)
 	UnregisterScriptCallback("actor_item_to_belt",actor_item_to_belt)	
