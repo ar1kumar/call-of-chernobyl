@@ -31,16 +31,20 @@ function opt_menu_on_init(menu)
 	menu.gameplay_options["sleep_deprived"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
 		if (level.present() and sleep_dep) then
 			if (ctrl:GetCheck()) then
-				sleep_dep.create()
+				sleep_dep.activate_feature()
 			else 
-				sleep_dep.destroy()
+				sleep_dep.deactivate_feature()
 			end
 		end
 	end}
 	-- art_degrade
 	menu.gameplay_options["art_degrade"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
-		if (level.present() and art_degrade) then
-			art_degrade.verified = true
+		if (level.present() and artefact_degradation) then
+			if (ctrl:GetCheck()) then
+				artefact_degradation.activate_feature()
+			else
+				artefact_degradation.deactivate_feature()
+			end
 		end
 	end}
 	-- excl_dist
@@ -137,11 +141,16 @@ function opt_menu_on_set_values(menu,optMgr)
 		if (v.default ~= nil) then
 			if (v.typ=="check") then
 				v.ctrl:SetCheck(axr_main.config:r_value("mm_options","enable_"..name,1,v.default))
-			elseif (v.typ=="list") then 
-				v.ctrl:SetText(axr_main.config:r_value("mm_options",name,0,v.default))
-				--v.ctrl:SetText(v.ctrl:GetTextOf(0))
+			elseif (v.typ=="list") then
+				-- so proper type is cached when reading
+				if (type(v.default) == "boolean") then
+					v.ctrl:SetText(axr_main.config:r_value("mm_options",name,1,v.default))
+				elseif (type(v.default) == "number") then 
+					v.ctrl:SetText(axr_main.config:r_value("mm_options",name,2,v.default))
+				else 
+					v.ctrl:SetText(axr_main.config:r_value("mm_options",name,0,v.default))
+				end
 			end
-			
 			if (v.on_set_values) then 
 				v.on_set_values(menu,optMgr,v.ctrl)
 			end

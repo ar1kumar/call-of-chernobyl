@@ -1,13 +1,61 @@
---// -----------------		sleep deprivation for Coc		---------------------
+--// -----------------		sleep deprivation for CoC		---------------------
 --// author	: 	Nuor
 --// version:	1.23 (alt)
 --// created:	4-09-2016
 --// last edit:	4-24-2016
 --//------------------------------------------------------------------------------
-last_sleep, no_sleep, caff_chk 	= nil,nil,nil -- to change defaults, edit below in 'create' function
-local items,force,start_blur,itn_mul,pwr_rate,rng_factor,caff_max,last_warning,die_chance,last_chk,pwr_chk
+last_sleep, no_sleep, caff_chk 	= nil,nil,nil -- to change defaults, edit below in 'activate_feature' function
+local items,force,start_blur,itn_mul,pwr_rate,rng_factor,caff_max,last_warning,die_chance,last_chk,pwr_chk,feature_is_active
+
+local function dummy()
+
+end
+
+local function main_loop()
+	local tg = time_global()
+	if (_tmr and tg < _tmr) then 
+		return false 
+	end
+	_tmr = tg + 2000	-- if you change this value timed artefact multipliers will need changes 
 	
-function create()
+	if not (db.actor) then
+		return 
+	end 
+	
+	--printf("last_chk=%s last_sleep=%s",last_chk and game.get_game_time():diffSec(last_chk) or "nil",last_sleep)
+	if db.actor:has_info("actor_is_sleeping") then
+		last_sleep 	= 0
+		level.remove_pp_effector(999)
+	end
+	
+	--//	drain power when exhausted
+	if last_sleep > start_blur then
+		local tg = time_global()
+		if (pwr_chk == nil or tg > pwr_chk) then 
+			if (db.actor.power > 0) then
+				db.actor.power = pwr_rate*(1+((last_sleep-start_blur)*rng_factor))
+			end
+			pwr_chk = tg+100
+		end
+	end
+
+	if (last_chk and game.get_game_time():diffSec(last_chk) < 3600) then 
+		return 
+	end
+	
+	last_chk = game.get_game_time()
+		
+	last_sleep = last_sleep + 1
+	caff_chk = caff_chk > 1 and caff_chk - 1 or 0
+	test_blur()
+end
+
+function activate_feature()
+	if (feature_is_active) then
+		return 
+	end
+	feature_is_active = true
+	
 	last_sleep 				= 0
 	no_sleep 				= 1 				--// change "no_sleep" to 0 to allow sleep spam
 	caff_chk 				= 0	
@@ -98,18 +146,22 @@ function create()
 		lucky				= 1,
 		marlboro			= 1
 	}	
-	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
-	RegisterScriptCallback("actor_on_update",actor_on_update)
+	
 	RegisterScriptCallback("actor_on_item_use",actor_on_item_use)
 	if (USE_MARSHAL) then
 		RegisterScriptCallback("save_state",save_state)
 		RegisterScriptCallback("load_state",load_state)
 	end
+	level.add_call(main_loop,dummy)
 end 
 
-function destroy()
-	UnregisterScriptCallback("actor_on_first_update",actor_on_first_update)
-	UnregisterScriptCallback("actor_on_update",actor_on_update)
+function deactivate_feature()
+	if not (feature_is_active) then
+		return 
+	end
+	feature_is_active = false
+		
+	level.remove_call(main_loop,dummy)
 	UnregisterScriptCallback("actor_on_item_use",actor_on_item_use)
 	if (USE_MARSHAL) then
 		UnregisterScriptCallback("save_state",save_state)
@@ -122,7 +174,19 @@ function on_game_start()
 	if (axr_main.config:r_value("mm_options","enable_sleep_deprived",1,false) == false) then
 		return 
 	end
-	create()
+	local function actor_on_first_update()
+		activate_feature()
+		if last_sleep > start_blur then
+			level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
+			level.set_pp_effector_factor(999, (last_sleep-start_blur) * itn_mul)
+			if last_sleep >= (force - last_warning + 1) then
+				SetHudMsg(game.translate_string("st_sleep_exhausted_final"),5)
+			else
+				SetHudMsg(game.translate_string("st_sleep_exhausted"),4)
+			end
+		end
+	end
+	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
 end
 
 ----// add to bind_stalker or bind_stalker_ext save/load if used. //--
@@ -173,47 +237,6 @@ function actor_on_item_use(item)
 			break
 		end
 	end
-end
-
-function actor_on_first_update()
-	if last_sleep > start_blur then
-		level.add_pp_effector("yantar_underground_psi.ppe", 999, true)
-		level.set_pp_effector_factor(999, (last_sleep-start_blur) * itn_mul)
-		if last_sleep >= (force - last_warning + 1) then
-			SetHudMsg(game.translate_string("st_sleep_exhausted_final"),5)
-		else
-			SetHudMsg(game.translate_string("st_sleep_exhausted"),4)
-		end
-	end
-end
-
-function actor_on_update(b,d)
-	--printf("last_chk=%s last_sleep=%s",last_chk and game.get_game_time():diffSec(last_chk) or "nil",last_sleep)
-	if db.actor:has_info("actor_is_sleeping") then
-		last_sleep 	= 0
-		level.remove_pp_effector(999)
-	end
-	
-	--//	drain power when exhausted	
-	if last_sleep > start_blur then
-		local tg = time_global()
-		if (pwr_chk == nil or tg > pwr_chk) then 
-			if (db.actor.power > 0) then
-				db.actor.power = pwr_rate*(1+((last_sleep-start_blur)*rng_factor))
-			end
-			pwr_chk = tg+100
-		end
-	end
-
-	if (last_chk and game.get_game_time():diffSec(last_chk) < 3600) then 
-		return 
-	end
-	
-	last_chk = game.get_game_time()
-		
-	last_sleep = last_sleep + 1
-	caff_chk = caff_chk > 1 and caff_chk - 1 or 0
-	test_blur()
 end
 
 function test_blur()

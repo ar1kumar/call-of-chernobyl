@@ -1510,7 +1510,7 @@ function ini_file_ex:__init(fname,advanced_mode)
 	self.fname = getFS():update_path('$game_config$', '')..fname
 	self.ini = ini_file(fname)
 	self.cache = {}
-		if (advanced_mode) then
+	if (advanced_mode) then
 		self.ini:set_override_names(true)
 		self.ini:set_readonly(false)
 		--self.ini:save_at_end(true)
@@ -1523,9 +1523,9 @@ end
 
 -- r_value and w_value cache results
 function ini_file_ex:r_value(s,k,typ,def)
-	if (self.cache[s.."&"..k]) then
-		--printf("v=%s type=%s[%s]",self.cache[s.."&"..k],type(self.cache[s.."&"..k]),typ)
-		return self.cache[s.."&"..k]
+	local cache_result = self.cache[s.."&"..k]
+	if (cache_result) then
+		return cache_result
 	end
 	if not (self.ini:section_exist(s) and self.ini:line_exist(s,k)) then
 		return def
@@ -1541,7 +1541,7 @@ function ini_file_ex:r_value(s,k,typ,def)
 end
 
 function ini_file_ex:w_value(s,k,val,comment)
-	self.cache[s.."&"..k] = nil
+	self.cache[s.."&"..k] = val
 	self.ini:w_string(s,k,val ~= nil and tostring(val) or "",comment ~= nil and tostring(comment) or "")
 end
 

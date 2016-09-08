@@ -188,14 +188,16 @@ function evaluator_wounded_exist:find_valid_target()
 	local see = dist <= 900 or npc:see(vo) or npc:memory_time(vo) <= 30000
 	if (see) and (self.a.nearest_dist == nil or dist < self.a.nearest_dist) then 
 		local vertex = level.vertex_id(vo_position)
-		if level.vertex_position(vertex):distance_to_sqr(vo_position) > 16 then
-			vertex = vo:level_vertex_id()
-		end
-		if (npc:accessible(vertex) and level.vertex_position(vertex):distance_to_sqr(vo_position) <= 15) then
-			self.a.nearest_dist = dist
-			self.a.nearest_vertex = vertex
-			self.a.nearest_position = vo_position
-			self.a.nearest_id = id
+		if (vertex and vertex < 4294967295) then
+			if level.vertex_position(vertex):distance_to_sqr(vo_position) > 16 then
+				vertex = vo:level_vertex_id()
+			end
+			if (npc:accessible(vertex) and level.vertex_position(vertex):distance_to_sqr(vo_position) <= 15) then
+				self.a.nearest_dist = dist
+				self.a.nearest_vertex = vertex
+				self.a.nearest_position = vo_position
+				self.a.nearest_id = id
+			end
 		end
 	end
 
