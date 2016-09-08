@@ -213,6 +213,31 @@ function ChangeLevel(pos,lvid,gvid,angle)
 	level.send(p,true)
 end
 
+-- Wrapper for level.add_call 
+-- For some reason in 1.6 engine level.remove_call does not work! If you know why, please contact me @alundaio
+local level_add_call_unique = {}
+function AddUniqueCall(functor_a)
+
+	if (level_add_call_unique[functor_a]) then 
+		return 
+	end 
+	
+	local function wrapper()
+		if not (level_add_call_unique[functor_a]) then 
+			return true 
+		end
+		return functor_a() or false
+	end
+	
+	level_add_call_unique[functor_a] = true
+	
+	level.add_call(wrapper,function() end)
+end 
+
+function RemoveUniqueCall(functor_a)
+	level_add_call_unique[functor_a] = nil
+end
+
 function JumpToLevel(new_level)
 	-- requires OpenXray
 	local level_name = level.name()

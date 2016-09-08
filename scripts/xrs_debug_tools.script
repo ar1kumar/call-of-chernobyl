@@ -41,18 +41,15 @@ actions_by_stalker_ids = nil
 local hud_display_top
 local hud_display_left
 local hud_display_right
+local _tmr
 
-
+feature_is_active = nil
 local function main_loop()
 	local tg = time_global()
 	if (_tmr and tg < _tmr) then 
 		return false 
 	end
 	_tmr = tg + 1000
-
-	if not (feature_is_active) then 
-		return true 
-	end 
 	
 	if not (db.actor) then
 		return false
@@ -78,7 +75,6 @@ local function main_loop()
 	return false
 end
 
-feature_is_active = nil
 function activate_feature()
 	if (feature_is_active) then
 		return 
@@ -187,7 +183,7 @@ function activate_feature()
 	hud_display_left = hud_tool("cop_debug")
 	hud_display_right = hud_tool("cop2_debug")
 	
-	level.add_call(main_loop,function() return end)
+	AddUniqueCall(main_loop)
 end 
 
 function deactivate_feature()
@@ -195,7 +191,7 @@ function deactivate_feature()
 		return 
 	end
 	feature_is_active = false
-
+	RemoveUniqueCall(main_loop)
 	hud_display_top:clear()
 	hud_display_left:clear()
 	hud_display_right:clear()

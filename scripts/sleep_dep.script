@@ -5,18 +5,15 @@
 --// last edit:	4-24-2016
 --//------------------------------------------------------------------------------
 last_sleep, no_sleep, caff_chk 	= nil,nil,nil -- to change defaults, edit below in 'activate_feature' function
-local items,force,start_blur,itn_mul,pwr_rate,rng_factor,caff_max,last_warning,die_chance,last_chk,pwr_chk
+local items,force,start_blur,itn_mul,pwr_rate,rng_factor,caff_max,last_warning,die_chance,last_chk,pwr_chk, _tmr
 
+feature_is_active = nil
 local function main_loop()
 	local tg = time_global()
 	if (_tmr and tg < _tmr) then 
 		return false 
 	end
-	_tmr = tg + 2000
-	
-	if not (feature_is_active) then 
-		return true 
-	end 
+	_tmr = tg + 2000	-- if you change this value timed artefact multipliers will need changes 
 	
 	if not (db.actor) then
 		return false
@@ -52,7 +49,6 @@ local function main_loop()
 	return false
 end
 
-feature_is_active = nil
 function activate_feature()
 	if (feature_is_active) then
 		return 
@@ -155,7 +151,7 @@ function activate_feature()
 		RegisterScriptCallback("save_state",save_state)
 		RegisterScriptCallback("load_state",load_state)
 	end
-	level.add_call(main_loop,function() return end)
+	AddUniqueCall(main_loop)
 end 
 
 function deactivate_feature()
@@ -164,6 +160,7 @@ function deactivate_feature()
 	end
 	feature_is_active = false
 		
+	RemoveUniqueCall(main_loop)
 	UnregisterScriptCallback("actor_on_item_use",actor_on_item_use)
 	if (USE_MARSHAL) then
 		UnregisterScriptCallback("save_state",save_state)

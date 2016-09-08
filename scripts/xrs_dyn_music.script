@@ -25,19 +25,17 @@ local themes_inited = false
 local prev_fade_time = 0
 local force_fade = false
 local was_in_silence = false
+local _tmr
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+feature_is_active = nil
 local function main_loop()
 	local tg = time_global()
 	if (_tmr and tg < _tmr) then 
 		return false 
 	end
 	_tmr = tg + 1000
-	
-	if not (feature_is_active) then 
-		return true 
-	end
 	
 	if not (db.actor) then
 		return false
@@ -86,13 +84,12 @@ local function main_loop()
 	return false
 end
 
-feature_is_active = nil
 function activate_feature()
 	if (feature_is_active) then
 		return 
 	end
 	feature_is_active = true
-	level.add_call(main_loop,function() return end)
+	AddUniqueCall(main_loop)
 	RegisterScriptCallback("on_game_end",on_actor_destroy)
 end 
 
@@ -101,6 +98,7 @@ function deactivate_feature()
 		return 
 	end
 	feature_is_active = false
+	RemoveUniqueCall(main_loop)
 	UnregisterScriptCallback("on_game_end",on_actor_destroy)
 	finish_theme()
 end
