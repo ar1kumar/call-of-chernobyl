@@ -11,10 +11,12 @@ function opt_gameplay:InitControls(x, y, xml, handler)
 	self:SetWndSize(vector2():set(738,416))
 	self:SetAutoDelete(true)
 	
+	--[[
 	if (db.actor) then
 		handler.char_icon = xml:InitStatic("tab_gameplay:char_icon",self)
 		handler.char_icon:InitTexture(db.actor_binder and db.actor_binder.character_icon or "ui_inGame2_Strelok")
 	end
+	]]--
 	
 	self.scroll_v = xml:InitScrollView("tab_gameplay:scroll_v", self)
 	handler.gameplay_scroll_v = self.scroll_v
