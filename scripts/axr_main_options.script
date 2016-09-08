@@ -38,7 +38,7 @@ function opt_menu_on_init(menu)
 		end
 	end}
 	-- art_degrade
-	menu.gameplay_options["art_degrade"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
+	menu.gameplay_options["art_degrade"]		= {default=true, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
 		if (level.present() and artefact_degradation) then
 			if (ctrl:GetCheck()) then
 				artefact_degradation.activate_feature()
