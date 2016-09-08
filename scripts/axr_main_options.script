@@ -64,6 +64,8 @@ function opt_menu_on_init(menu)
 	menu.gameplay_options["quicksave_cnt"]		= {default=5, 		debug_only=false, 	typ="list", list={1,5,10,20}}
 	
 	if (db.actor) then -- Options will only show while in-game
+	
+		--[[
 		local l = ui_mm_faction_select.get_icon_list()
 		local selected = nil 
 		
@@ -82,6 +84,8 @@ function opt_menu_on_init(menu)
 			end
 		}
 		
+		]]
+		
 		menu.gameplay_options["outfit_portrait"]	= {default=false, 	debug_only=false, 	typ="check", 
 			on_accept=function(handler,optMgr,ctrl)
 				if (ctrl:GetCheck()) then
@@ -97,7 +101,8 @@ function opt_menu_on_init(menu)
 				end
 			end
 		}
-	end 
+		
+	end
 	
     -- axr option default config
     local need_save
