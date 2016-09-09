@@ -143,9 +143,46 @@ function action.debug_test(p)
 	if not (DEV_DEBUG) then 
 		return 
 	end 
-	if (p==1) then 
+	if (p==1) then
 	
-	xrs_dyn_music.deactivate_feature()
+		local valid = {
+			["string"] = true,
+			["number"] = true,
+			["table"] = true,
+			["function"] = true,
+			["userdata"] = false		
+		}
+		
+		local function addTab(s,n)
+			local l = string.len(s)
+			for i=1,n-l do
+				s = s .. " "
+			end
+			return s
+		end
+	
+		local txt = ""
+		for k,v in pairs(_G) do 
+			if (valid[type(k)] == true) then 
+				txt = txt .. addTab(tostring(k),40)
+			elseif (valid[type(k)] == false) then 
+				txt = txt .. addTab("userdata",40)
+			end
+			
+			if (valid[type(v)] == true) then 
+				txt = txt ..  " = " .. tostring(v) .. "\n"
+			elseif (valid[type(v)] == false) then 
+				txt = txt .. " = userdata\n"
+			else 
+				txt = txt .. "\n"
+			end
+		end
+		
+		local f = io.open("_g_print_table.txt","wb")
+		if (f) then 
+			f:write(txt)
+			f:close()
+		end
 	
 		--[[ clones active weapon
 		if (db.actor) then 

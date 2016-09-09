@@ -100,17 +100,17 @@ function add_task_companion(actor,npc,p)
 end
 
 function inc_task_stage(actor,npc,p)
-	local task = p[1] and task_manager.get_task_manager().task_info[p[1]]
-	if (task and task.stage) then
-		--printf("inc_task_stage=%s stage=%s",p[1],task.stage)
-		task.stage = task.stage + 1
+	local tsk = p[1] and task_manager.get_task_manager().task_info[p[1]]
+	if (tsk and tsk.stage) then
+		--printf("inc_task_stage=%s stage=%s",p[1],tsk.stage)
+		tsk.stage = tsk.stage + 1
 	end
 end 
 
 function dec_task_stage(actor,npc,p)
-	local task = p[1] and task_manager.get_task_manager().task_info[p[1]]
-	if (task and task.stage) then
-		task.stage = task.stage - 1
+	local tsk = p[1] and task_manager.get_task_manager().task_info[p[1]]
+	if (tsk and tsk.stage) then
+		tsk.stage = tsk.stage - 1
 	end
 end
 
@@ -1123,9 +1123,9 @@ function send_tip(actor, npc, p)
 end
 
 function send_tip_task(actor,npc,p)
-	local task = p[1] and task_manager.get_task_manager().task_info[p[1]]
-	if (task and p[2]) then
-		news_manager.send_task(actor, p[2], task)
+	local tsk = p[1] and task_manager.get_task_manager().task_info[p[1]]
+	if (tsk and p[2]) then
+		news_manager.send_task(actor, p[2], tsk)
 	end
 end
 --[[

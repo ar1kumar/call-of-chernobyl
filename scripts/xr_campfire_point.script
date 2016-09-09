@@ -186,8 +186,8 @@ function action_point_campfire:execute()
 		end
 	end
 
-	local anim = self:get_camp_action() or xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anim)
-	state_mgr.set_state(self.object, anim, nil, nil, {look_position = self.st.look_position})
+	local anm = self:get_camp_action() or xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anm)
+	state_mgr.set_state(self.object, anm, nil, nil, {look_position = self.st.look_position})
 end
 
 function action_point_campfire:get_camp_action()
@@ -239,7 +239,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.sound_idle= ini:r_string_ex(section,"sound_idle")
 	st.smart = ini:r_string_ex(section,"smart")
-	st.anim	= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "hide")
+	st.anm	= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "hide")
 	st.reach_movement = xr_logic.parse_condlist(npc, "reach_movement", "reach_movement", ini:r_string_ex(section,"reach_movement") or "patrol")
 
 	local use_camp = xr_logic.parse_condlist(npc, "use_camp", "use_camp", ini:r_string_ex(section,"use_camp") or "true")

@@ -140,16 +140,16 @@ function has_completed_task_prerequisites(actor,npc,p)
 	
 	prereq = alun_utils.str_explode(prereq,",")
 	
-	local task 
+	local tsk 
 	for i=1,#prereq do
-		task = prereq[i]
-		if not (info[task]) then
-			--printf("no task %s",task)
+		tsk = prereq[i]
+		if not (info[tsk]) then
+			--printf("no tsk %s",tsk)
 			return false 
 		end 
 		
-		if (info[task].status ~= "completed" and info[task].status ~= "fail") then
-			--printf("task %s not completed %s",task,info[task].status)
+		if (info[tsk].status ~= "completed" and info[tsk].status ~= "fail") then
+			--printf("task %s not completed %s",task,info[tsk].status)
 			return false 
 		end	
 	end
@@ -2759,11 +2759,11 @@ function task_giver_alive(actor,npc,p)
 		return false 
 	end
 	local tm = task_manager.get_task_manager()
-	local task = tm.task_info[p[1]]
-	if not (task) then
+	local tsk = tm.task_info[p[1]]
+	if not (tsk) then
 		return true 
 	end
-	local se_obj = task.task_giver_id and alife():object(task.task_giver_id)
+	local se_obj = tsk.task_giver_id and alife():object(tsk.task_giver_id)
 	if (se_obj) then
 		if (se_obj:clsid() == clsid.online_offline_group_s) then
 			return true -- if squad exist then atleast 1 npc should be alive

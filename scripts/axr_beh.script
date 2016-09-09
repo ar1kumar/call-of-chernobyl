@@ -589,13 +589,13 @@ function action_beh:beh_path()
 					end
 				end
 
-				local anim = found and t[math.random(#t)]
-				if (anim and anim ~= "") then
+				local anm = found and t[math.random(#t)]
+				if (anm and anm ~= "") then
 					if (self.st.desired_target.animpoint) then
-						printf("camp_action = %s",anim)
-						state_mgr.set_state(self.object, anim, nil, nil, nil, {animation_position = self.st.desired_target.animpoint, animation_direction = self.st.desired_target.animpoint_dir})
+						printf("camp_action = %s",anm)
+						state_mgr.set_state(self.object, anm, nil, nil, nil, {animation_position = self.st.desired_target.animpoint, animation_direction = self.st.desired_target.animpoint_dir})
 					else
-						state_mgr.set_state(self.object, anim)
+						state_mgr.set_state(self.object, anm)
 					end
 					return
 				end

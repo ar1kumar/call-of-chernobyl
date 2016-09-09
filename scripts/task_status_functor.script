@@ -6,7 +6,7 @@
 -- Status Functors
 ----------------------------------------------------------------------------------------------
 -- checks smart from pstor variable
-function check_smart_under_faction_control(task,task_id)
+function check_smart_under_faction_control(tsk,task_id)
 	local smart_id = utils.load_var(db.actor,task_id.."_id")
 	if not (smart_id) then 
 		return "fail"
@@ -22,7 +22,7 @@ function check_smart_under_faction_control(task,task_id)
 		return "fail"
 	end 
 	
-	--in case sim_avail is set true during the player's task
+	--in case sim_avail is set true during the player's tsk
 	if not(smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then 
 		return "fail"
 	end
@@ -30,10 +30,10 @@ function check_smart_under_faction_control(task,task_id)
 	local faction_list = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	
 	local tg = time_global()
-	if (task.__check_smart_time and tg < task.__check_smart_time) then 
+	if (tsk.__check_smart_time and tg < tsk.__check_smart_time) then 
 		return
 	end
-	task.__check_smart_time = tg+3000
+	tsk.__check_smart_time = tg+3000
 	
 	utils.save_var(db.actor,task_id.."_target_id",nil)
 	
@@ -88,7 +88,7 @@ function check_smart_under_faction_control(task,task_id)
 end
 
 -- to check a specific smart given as a param 
-function specific_check_smart_under_faction_control(task,task_id)
+function specific_check_smart_under_faction_control(tsk,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	local smart = p[1] and SIMBOARD.smarts_by_names[p[1]]
 	if not (smart) then 
@@ -100,16 +100,16 @@ function specific_check_smart_under_faction_control(task,task_id)
 		return "fail"
 	end 
 	
-	--in case sim_avail is set true during the player's task
+	--in case sim_avail is set true during the player's tsk
 	if not(smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then 
 		return "fail"
 	end
 	
 	local tg = time_global()
-	if (task.__check_smart_time and tg < task.__check_smart_time) then 
+	if (tsk.__check_smart_time and tg < tsk.__check_smart_time) then 
 		return
 	end
-	task.__check_smart_time = tg+1500
+	tsk.__check_smart_time = tg+1500
 	
 	utils.save_var(db.actor,task_id.."_target_id",nil)
 	
@@ -163,38 +163,38 @@ function specific_check_smart_under_faction_control(task,task_id)
 	return "complete"	
 end
 
-function check_smart_under_faction_control_staged(task,task_id)
+function check_smart_under_faction_control_staged(tsk,task_id)
 	if not (db.actor) then 
 		return 
 	end
-	if (task.stage == 1) then -- already completed
+	if (tsk.stage == 1) then -- already completed
 		return 
 	end
-	local status = check_smart_under_faction_control(task,task_id)
+	local status = check_smart_under_faction_control(tsk,task_id)
 	if (status == "fail") then 
 		return "fail"
-	elseif (status == "complete" and task.stage == 0) then
-		task.stage = 1
+	elseif (status == "complete" and tsk.stage == 0) then
+		tsk.stage = 1
 	end
 end
 
-function check_specific_smart_under_faction_control_staged(task,task_id)
+function check_specific_smart_under_faction_control_staged(tsk,task_id)
 	if not (db.actor) then 
 		return 
 	end
-	if (task.stage == 1) then -- already completed
+	if (tsk.stage == 1) then -- already completed
 		return 
 	end
-	local status = specific_check_smart_under_faction_control(task,task_id)
+	local status = specific_check_smart_under_faction_control(tsk,task_id)
 	if (status == "fail") then 
 		return "fail"
-	elseif (status == "complete" and task.stage == 0) then
-		task.stage = 1
+	elseif (status == "complete" and tsk.stage == 0) then
+		tsk.stage = 1
 		--printf("set %s on complete stage",task_id)
 	end
 end
 
-function hostage_task(task,task_id)
+function hostage_task(tsk,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then
 		printf("task_status_function not set up properly! check_if_looted_enough needs an extra param for squad story id! task_id=%s",task_id)
@@ -212,31 +212,31 @@ function hostage_task(task,task_id)
 		smart.locked = true
 	end
 
-	if (task.stage == 0) then 
+	if (tsk.stage == 0) then 
 		if (xrs_kill_wounded) then 
 			xrs_kill_wounded.hostage_list[squad:commander_id()] = true
 		end
 		if (db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then 
-			task.stage = 1
+			tsk.stage = 1
 			alun_utils.execute_script_on_squad(squad,axr_companions.set_companion_allow_teleport)
 		end
-	elseif (task.stage == 1) then
+	elseif (tsk.stage == 1) then
 		if (xrs_kill_wounded) then 
 			xrs_kill_wounded.hostage_list[squad:commander_id()] = nil
 		end
 		
-		if not (axr_task_manager.is_task_giver_valid(task)) then 
+		if not (axr_task_manager.is_task_giver_valid(tsk)) then 
 			return "complete" -- complete task even though giver is dead/missing/deleted
 		end 
 	end
 end 
 
-function bounty_task(task,task_id)
-	if not (axr_task_manager.is_task_giver_valid(task)) then 
+function bounty_task(tsk,task_id)
+	if not (axr_task_manager.is_task_giver_valid(tsk)) then 
 		return "fail"
 	end 
 	
-	if (task.stage == 0) then
+	if (tsk.stage == 0) then
 		local id = axr_task_manager.bounties_by_id[task_id]
 		if not (id) then
 			return "fail"
@@ -249,19 +249,19 @@ function bounty_task(task,task_id)
 			return "fail"
 		end
 		if not (se_obj:alive()) then 
-			task.stage = 1
+			tsk.stage = 1
 		end
-	elseif (task.stage == 254) then 
+	elseif (tsk.stage == 254) then 
 		return "fail"
 	end
 end 
 
 
-function actor_has_fetch_item(task,task_id)
+function actor_has_fetch_item(tsk,task_id)
 	if not (db.actor) then 
 		return 
 	end
-	--if not (axr_task_manager.is_task_giver_valid(task)) then 
+	--if not (axr_task_manager.is_task_giver_valid(tsk)) then 
 	--	return "fail"
 	--end
 	local section = db.actor and utils.load_var(db.actor,task_id.."_fetch")
@@ -269,9 +269,9 @@ function actor_has_fetch_item(task,task_id)
 	if (item ~= nil) then 
 		if (task_id == "esc_2_12_stalker_nimble_task_1" or task_id == "jup_b220_trapper_task_3") then 
 			if (item:condition() >= 0.9) then 
-				task.stage = 1
+				tsk.stage = 1
 			else 
-				task.stage = 0
+				tsk.stage = 0
 			end
 		else 
 			local count = utils.load_var(db.actor,task_id.."_fetch_count")
@@ -284,18 +284,18 @@ function actor_has_fetch_item(task,task_id)
 				end
 				db.actor:iterate_inventory(section_count, nil)
 				if (cnt >= count) then
-					task.stage = 1
+					tsk.stage = 1
 				end
 				return
 			end
-			task.stage = 1
+			tsk.stage = 1
 		end 
 	else 
-		task.stage = 0 
+		tsk.stage = 0 
 	end 
 end
 
-function check_if_enough_time_passed(task,task_id)
+function check_if_enough_time_passed(tsk,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then
 		printf("task_status_function not set up properly! check_if_killed_enough needs an extra param for squad story id! task_id=%s",task_id)
@@ -304,14 +304,14 @@ function check_if_enough_time_passed(task,task_id)
 	
 	local gt = utils.load_ctime(db.actor,task_id)
 	if (gt and game.get_game_time():diffSec(gt) > tonumber(p[1])) then 
-		task.stage = 2
+		tsk.stage = 2
 		return
 	end
 
-	task.stage = 1
+	tsk.stage = 1
 end 
 
-function check_if_killed_enough(task,task_id)
+function check_if_killed_enough(tsk,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then
 		printf("task_status_function not set up properly! check_if_killed_enough needs an extra param for squad story id! task_id=%s",task_id)
@@ -342,7 +342,7 @@ function check_if_killed_enough(task,task_id)
 	end
 end
 
-function check_if_looted_enough(task,task_id)
+function check_if_looted_enough(tsk,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then
 		printf("task_status_function not set up properly! check_if_looted_enough needs an extra param for squad story id! task_id=%s",task_id)
@@ -373,21 +373,21 @@ function check_if_looted_enough(task,task_id)
 	end
 end
 
-function task_type_ecolog_gathered_tissue_samples(task,task_id)
-	if (db.actor and task.stage == 0) then 
+function task_type_ecolog_gathered_tissue_samples(tsk,task_id)
+	if (db.actor and tsk.stage == 0) then 
 		local count = utils.load_var(db.actor,task_id.."_tissue_count",0)
 		local need = utils.load_var(db.actor,task_id.."_tissue_need",0)
 		
 		if (count >= need) then 
-			task.stage = 1
+			tsk.stage = 1
 		else 
-			task.stage = 0
+			tsk.stage = 0
 		end
 	end
 	return
 end
 --------------------------------------------------------------
-function kill_strelok(task,task_id)
+function kill_strelok(tsk,task_id)
 	local squad = get_story_squad("legendary_strelok")
 	if (squad) then
 		for k in squad:squad_members() do

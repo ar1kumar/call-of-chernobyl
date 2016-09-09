@@ -17,13 +17,13 @@ function cam_effector_set:__init(set,storage)
 end
 
 function cam_effector_set:start_effect(eff)
-	--printf("playing effect [camera_effects\\"..eff.anim..".anm], time [%s]", device():time_global())
+	--printf("playing effect [camera_effects\\"..eff.anm..".anm], time [%s]", device():time_global())
 	--callstack()
 
 	if not (eff.global_cameffect) then
-		level.add_cam_effector("camera_effects\\"..eff.anim..".anm", 210408, false, "sr_cutscene.effector_callback")
+		level.add_cam_effector("camera_effects\\"..eff.anm..".anm", 210408, false, "sr_cutscene.effector_callback")
 	else
-		level.add_cam_effector2("camera_effects\\"..eff.anim..".anm", 210408, false, "sr_cutscene.effector_callback", self.st.fov or db.actor:fov()*0.75)
+		level.add_cam_effector2("camera_effects\\"..eff.anm..".anm", 210408, false, "sr_cutscene.effector_callback", self.st.fov or db.actor:fov()*0.75)
 	end
 	self.playing = true
 end
@@ -194,8 +194,8 @@ end
 function action_cutscene:select_next_motion()
 	local motion = self.st.cam_effector[self.motion_id]
 
-	if cam_effector_sets[motion] == nil then --Это имя файла, а не имя таблицы.
-		self.motion = cam_effector_set({start={},idle={{anim=motion, looped=false, global_cameffect = self.st.global_cameffect}},finish={}}, self.st)
+	if (cam_effector_sets == nil or cam_effector_sets[motion] == nil) then --Это имя файла, а не имя таблицы.
+		self.motion = cam_effector_set({start={},idle={{anm=motion, looped=false, global_cameffect = self.st.global_cameffect}},finish={}}, self.st)
 	else
 		self.motion = cam_effector_set(cam_effector_sets[motion], self.st)
 	end

@@ -86,14 +86,14 @@ function action_remark_activity:update()
 		local cb = { obj = self, func = self.time_callback }
 		local target = self:get_target()
 		if target == nil then
-			local anim = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anim)
-			state_mgr.set_state(self.object, anim, cb, 0)
+			local anm = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anm)
+			state_mgr.set_state(self.object, anm, cb, 0)
 			self.state = state_animation
 			return
 		end
 
-		local anim = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anim)
-		state_mgr.set_state(self.object, anim, cb, 0, target)
+		local anm = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anm)
+		state_mgr.set_state(self.object, anm, cb, 0, target)
 		self.state = state_animation
 
 	--' Ожидание колбека от стейтменеджера
@@ -199,7 +199,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.snd_anim_sync = ini:r_bool_ex(section,"snd_anim_sync") or false
 
 	st.snd			= ini:r_string_ex(section,"snd")
-	st.anim			= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "wait")
+	st.anm			= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "wait")
 	st.tips_id		= ini:r_string_ex(section,"tips")
 	if st.tips_id then
 		st.sender	= ini:r_string_ex(section,"tips_sender")

@@ -56,7 +56,7 @@ function act_state_mgr_animation_start:__init(name, st) super (nil, name)
 end
 function act_state_mgr_animation_start:initialize()
 	action_base.initialize(self)
-	--alun_utils.debug_write(strformat("act_state_mgr_animation_start:initialize %s anim=%s",self.object:name(),state_lib.states[self.st.target_state].animation))
+	--alun_utils.debug_write(strformat("act_state_mgr_animation_start:initialize %s anm=%s",self.object:name(),state_lib.states[self.st.target_state].animation))
 	self.st.animation:set_state(state_lib.states[self.st.target_state].animation)
 	self.st.animation:set_control()
 end
@@ -130,10 +130,10 @@ function animation:set_control()
 end
 -- Инициализируем выбор анимации
 function animation:update_anim()
-	local anim, state = self:select_anim()
+	local anm, state = self:select_anim()
 
-	if anim ~= nil then
-		self:add_anim(anim, state)
+	if anm ~= nil then
+		self:add_anim(anm, state)
 	end
 end
 -- Установка цели, какую анимацию нужно отыгрывать.
@@ -284,19 +284,19 @@ function animation:select_anim()
 		--printf("		select rnd")
 		local wpn_slot = self:weapon_slot()
 		local state = self.anim_path.animations[self.states.current_state]
-		local anim
+		local anm
 		if state.rnd ~= nil then
-			anim = self:select_rnd(state, wpn_slot, time_global() >= states.next_rnd)
+			anm = self:select_rnd(state, wpn_slot, time_global() >= states.next_rnd)
 		end
 
 		-- Если не выбрали рандомную, то играем айдл
-		if anim == nil and state.idle ~= nil then
-			anim = self:anim_for_slot(wpn_slot, state.idle)
+		if anm == nil and state.idle ~= nil then
+			anm = self:anim_for_slot(wpn_slot, state.idle)
 		end
-		if anim ~= nil then
+		if anm ~= nil then
 			states.anim_marker = MARKER_IDLE
 		end
-		return anim, state
+		return anm, state
 	end
 end
 --' Возвращает текущий оружейный слот
@@ -354,10 +354,10 @@ end
 
 
 -- Добавление анимации, установка коллбека
-function animation:add_anim(anim, state)
+function animation:add_anim(anm, state)
 	local npc = self.npc
 	local animation_props = state.prop
-	--printf("[%s][%s] add_anim[%s] time[%s] no_rootmove[%s] %s", self.npc:name(), self.name, tostring(anim), time_global(), tostring(animation_props == nil or animation_props.moving ~= true), device():time_global())
+	--printf("[%s][%s] add_anim[%s] time[%s] no_rootmove[%s] %s", self.npc:name(), self.name, tostring(anm), time_global(), tostring(animation_props == nil or animation_props.moving ~= true), device():time_global())
 
 	--if (state_mgr_weapon.weapon_locked(npc)) then
 		--printf("state_mgr_animation: weapon_locked can't add animation")
@@ -365,7 +365,7 @@ function animation:add_anim(anim, state)
 	--end
 
 	if animation_props == nil or animation_props.moving ~= true then
-		npc:add_animation(anim, true, false)
+		npc:add_animation(anm, true, false)
 		return
 	end
 
@@ -374,7 +374,7 @@ function animation:add_anim(anim, state)
 		-- Анимация с передвижением.
 		--npc:set_sight(CSightParams.eSightTypeAnimationDirection, false,false)
 --		printf("%s no pos", npc:name())
-		npc:add_animation(anim, true, true)
+		npc:add_animation(anm, true, true)
 	else
 		-- Сюда передается дирекшн (единичный вектор. нужно его перевести в вектор ротейшнов по костям)
 		local rot_y = -math.deg(math.atan2(self.mgr.animation_direction.x, self.mgr.animation_direction.z))
@@ -383,7 +383,7 @@ function animation:add_anim(anim, state)
 
 		--printf("%s UGOL %s", npc:name(), rot_y)
 		-- Нижеследующая строка - это когда нужно отыграть анимацию в глобальных координатах.
-		npc:add_animation			(anim, true, self.mgr.animation_position, vector():set(0, rot_y, 0), false)
+		npc:add_animation			(anm, true, self.mgr.animation_position, vector():set(0, rot_y, 0), false)
 
 		self.mgr.pos_direction_applied = true
 	end

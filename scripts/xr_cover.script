@@ -101,8 +101,8 @@ function action_cover:execute()
 	end
 
 	if self.cover_position:distance_to_sqr(self.object:position()) <= 0.4 then
-		local anim = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anim)
-		state_mgr.set_state(self.object, anim)
+		local anm = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anm)
+		state_mgr.set_state(self.object, anm)
 	else
 		self.object:set_dest_level_vertex_id(self.cover_vertex_id)
 		state_mgr.set_state(self.object, "assault")
@@ -164,7 +164,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.smart	= ini:r_string_ex(section,"smart")
 	st.path_center	= ini:r_string_ex(section,"path_center")
-	st.anim		= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "hide")
+	st.anm		= xr_logic.parse_condlist(npc, "anim", "anim", ini:r_string_ex(section,"anim") or "hide")
 	st.sound_idle= ini:r_string_ex(section,"sound_idle")
 
 	if (st.smart== nil and st.path_center == nil) then

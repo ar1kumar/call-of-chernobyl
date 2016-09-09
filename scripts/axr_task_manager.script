@@ -1,6 +1,7 @@
 ---------------------------
 -- task manager extender
 -- by Alundaio
+-- IMPORTANT 'task' is global namespace! use 'tsk' or something
 
 --actor_tagged_squad_by_id = {}
 bounties_by_id = {}
@@ -18,16 +19,16 @@ local function npc_on_death_callback(npc,who)
 		if (npc_id == id) then 
 			if (db.storage[id] and db.storage[id].tagged_by_actor == true) or (who and (who:id() == 0 or who:has_info("npcx_is_companion"))) then
 				local tm = task_manager.get_task_manager()
-				local task = tm.task_info[task_id]
-				if (task and task.stage == 0) then 
-					task.stage = 1
+				local tsk = tm.task_info[task_id]
+				if (tsk and tsk.stage == 0) then 
+					tsk.stage = 1
 				end
 			else 
 				local tm = task_manager.get_task_manager()
-				local task = tm.task_info[task_id]
-				if (task and task.stage == 0) then 
-					--task.stage = 3
-					task.stage = 1 -- complete task anyway instead of failing
+				local tsk = tm.task_info[task_id]
+				if (tsk and tsk.stage == 0) then 
+					--tsk.stage = 3
+					tsk.stage = 1 -- complete task anyway instead of failing
 				end			
 			end
 			return
@@ -264,20 +265,20 @@ function trigger_fetch_func(task_id)
 	end
 end 
 
-function is_task_on_complete_stage(task)
+function is_task_on_complete_stage(tsk)
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
 	if not (task_info[task_id]) then 
 		return false 
 	end 
-	return task_info[task_id].stage ~= nil and task_info[task_id].stage == (task_manager.task_ini:r_float_ex(task,"stage_complete") or 255)
+	return task_info[task_id].stage ~= nil and task_info[task_id].stage == (task_manager.task_ini:r_float_ex(tsk,"stage_complete") or 255)
 end
 
-function is_task_giver_valid(task)
-	local id = task.task_giver_id
+function is_task_giver_valid(tsk)
+	local id = tsk.task_giver_id
 	local se_obj = id and alife():object(id)
 	if not (se_obj) then 
-		--printf("is_task_giver_valid se_obj nil id=%s   %s",id,task.id)
+		--printf("is_task_giver_valid se_obj nil id=%s   %s",id,tsk.id)
 		return false 
 	end 
 	
@@ -286,7 +287,7 @@ function is_task_giver_valid(task)
 	end
 	
 	if not (IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
-		printf("is_task_giver_valid giver not alive %s",task.id)
+		printf("is_task_giver_valid giver not alive %s",tsk.id)
 		return false
 	end
 

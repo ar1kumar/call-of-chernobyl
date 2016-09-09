@@ -73,8 +73,8 @@ function check_light(stalker)
     local torch = stalker:object("device_torch")
 
 	-- Stalker dead or sleep animstate; release torch
-	local anim = state_mgr.get_state(stalker)
-	if (not stalker:alive() or anim == "zat_b106_wounded_idle" or anim == "sleep" or anim == "play_guitar" or string.find(anim,"animpoint") or string.find(anim,"sneak")) then
+	local anm = state_mgr.get_state(stalker)
+	if (not stalker:alive() or anm == "zat_b106_wounded_idle" or anm == "sleep" or anm == "play_guitar" or string.find(anm,"animpoint") or string.find(anm,"sneak")) then
 		if (torch) then
 			if (torch:attachable_item_enabled()) then
 				torch:enable_attachable_item(false)

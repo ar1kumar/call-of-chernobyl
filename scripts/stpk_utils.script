@@ -705,14 +705,14 @@ function set_smart_cover_data(t,sobj)
 	end
 end
 
-function spawn_smart_cover(anim,sec,pos,lvid,gvid)
+function spawn_smart_cover(anm,sec,pos,lvid,gvid)
 	local se_cover = alife():create(sec,pos,lvid,gvid)
-	se_cover.last_description = anim
-	se_cover.loopholes[anim] = 1
+	se_cover.last_description = anm
+	se_cover.loopholes[anm] = 1
 	local data = alun_utils.get_smart_cover_data(se_cover)
-	data.description = anim
-	data.last_description = anim
-	data.loopholes[anim] = 1
+	data.description = anm
+	data.last_description = anm
+	data.loopholes[anm] = 1
 	alun_utils.set_smart_cover_data(data,se_cover)
 	return se_cover
 end

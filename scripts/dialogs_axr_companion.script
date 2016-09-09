@@ -311,10 +311,10 @@ function is_hostage_task_giver(a,b)
 	end
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
-	local task
+	local tsk
 	for k,task_id in pairs(t) do
-		task = task_info[task_id]
-		if (task) and (task.task_giver_id == se_obj.group_id or task.task_giver_id == id) then
+		tsk = task_info[task_id]
+		if (tsk) and (tsk.task_giver_id == se_obj.group_id or tsk.task_giver_id == id) then
 			return true
 		end
 	end

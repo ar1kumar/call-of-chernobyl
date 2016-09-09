@@ -73,11 +73,11 @@ end
 ---------------------------------------------------------
 -- TASK FUNCTORS
 ---------------------------------------------------------
-function general_bounty_task(task_id,field,p,task)
+function general_bounty_task(task_id,field,p,tsk)
 	if (field == "target") then
-		if (task) then
-			if (task.stage == 1) then
-				return task.task_giver_id or nil
+		if (tsk) then
+			if (tsk.stage == 1) then
+				return tsk.task_giver_id or nil
 			end
 
 			return axr_task_manager.bounties_by_id[task_id] or nil
@@ -85,7 +85,7 @@ function general_bounty_task(task_id,field,p,task)
 	end
 end
 
-function general_fetch_task(task_id,field,p,task)
+function general_fetch_task(task_id,field,p,tsk)
 	if (field == "title") then
 		local fetch = alun_utils.get_inv_name(utils.load_var(db.actor,task_id.."_fetch",""))
 		local count = fetch and utils.load_var(db.actor,task_id.."_fetch_count") or 1
@@ -94,7 +94,7 @@ function general_fetch_task(task_id,field,p,task)
 		end
 		return strformat(game.translate_string(p) or "",fetch)
 	elseif (field == "descr") then
-		if (task.stage == 1) then
+		if (tsk.stage == 1) then
 			return game.translate_string("st_return_for_reward")
 		end
 		local fetch = alun_utils.get_inv_name(utils.load_var(db.actor,task_id.."_fetch",""))
@@ -104,8 +104,8 @@ function general_fetch_task(task_id,field,p,task)
 		end
 		return strformat(game.translate_string(p) or "",fetch)
 	elseif (field == "target") then
-		if (task.stage == 1) then
-			local id = utils.load_var(db.actor,task_id.."_target_id") or task.task_giver_id
+		if (tsk.stage == 1) then
+			local id = utils.load_var(db.actor,task_id.."_target_id") or tsk.task_giver_id
 			if (id) then
 				return id
 			end
@@ -118,10 +118,10 @@ function general_fetch_task(task_id,field,p,task)
 	end
 end
 
-function general_under_faction_control(task_id,field,p,task)
+function general_under_faction_control(task_id,field,p,tsk)
 	if (field == "target") then
-		if (task and task.stage == 1 and task.task_giver_id) then
-			return task.task_giver_id
+		if (tsk and tsk.stage == 1 and tsk.task_giver_id) then
+			return tsk.task_giver_id
 		end
 
 		return under_faction_control_target_id(task_id)
@@ -129,24 +129,24 @@ function general_under_faction_control(task_id,field,p,task)
 end
 
 -- Yantar
-function yan_ecolog_semenov_task_target(task_id,field,p,task)
+function yan_ecolog_semenov_task_target(task_id,field,p,tsk)
 	if (task_id == "yan_ecolog_semenov_task_1") then
 		local squad = get_story_squad("yan_ecolog_semenov_squad")
 		if (squad and squad.dist_to_actor and squad.dist_to_actor > 50) then
 			return squad.id
 		end
 
-		if (task.stage >= 1) then
+		if (tsk.stage >= 1) then
 			return squad.id
 		end
 	end
 end
 
 -- Marsh
-function mar_base_stalker_barmen_task_target(task_id,field,p,task)
+function mar_base_stalker_barmen_task_target(task_id,field,p,tsk)
 
-	if (task and task.stage == 1 and task.task_giver_id) then
-		return task.task_giver_id
+	if (tsk and tsk.stage == 1 and tsk.task_giver_id) then
+		return tsk.task_giver_id
 	end
 
 	if (task_id == "mar_base_stalker_barmen_task_1") then
@@ -187,11 +187,11 @@ function mar_base_owl_stalker_trader_task_target(task_id,field,p)
 end
 
 -- Escape
-function esc_m_trader_task_target(task_id,field,p,task)
+function esc_m_trader_task_target(task_id,field,p,tsk)
 	if (field == "target") then
 		if (task_id == "esc_m_trader_task_1") then
-			if (task.stage == 1) then
-				return task.task_giver_id
+			if (tsk.stage == 1) then
+				return tsk.task_giver_id
 			end
 
 			local smart = SIMBOARD.smarts_by_names["esc_smart_terrain_7_11"]
@@ -208,7 +208,7 @@ function esc_m_trader_task_target(task_id,field,p,task)
 end
 
 -- Darkvalley
-function val_smart_terrain_7_4_bandit_trader_stalker_task_target(task_id,field,p,task)
+function val_smart_terrain_7_4_bandit_trader_stalker_task_target(task_id,field,p,tsk)
 	if (task_id == "val_smart_terrain_7_4_bandit_trader_stalker_task_3") then
 		local squad = get_story_squad("bandit_companion_task_1")
 		if (squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
@@ -221,7 +221,7 @@ end
 
 
 -- Jupiter
-function jup_b6_scientist_tech_task_target(task_id,field,p,task)
+function jup_b6_scientist_tech_task_target(task_id,field,p,tsk)
 	if (task_id == "jup_b6_scientist_tech_task_1") then
 		local squad = get_story_squad("ecolog_companion_task_2")
 		if (squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
@@ -242,13 +242,13 @@ function jup_b6_scientist_tech_task_target(task_id,field,p,task)
 	end
 end
 
-function jup_b19_freedom_yar_task_target(task_id,field,p,task)
+function jup_b19_freedom_yar_task_target(task_id,field,p,tsk)
 	if (task_id == "jup_b19_freedom_yar_task_1") then 
-		if (task) then 
+		if (tsk) then 
 			local squad
-			if (task.stage == 0) then 
+			if (tsk.stage == 0) then 
 				squad = get_story_squad("jup_a6_freedom_trader_ashot_squad")
-			elseif (task.stage == 1) then 
+			elseif (tsk.stage == 1) then 
 				squad = get_story_squad("jup_b19_freedom_yar_squad")
 			end	
 			return squad and squad.id or nil
@@ -264,18 +264,18 @@ function zat_b7_bandit_boss_sultan_task_target(task_id,field,p)
 end
 
 -- Simulation
-function simulation_task_target(task_id,field,p,task)
+function simulation_task_target(task_id,field,p,tsk)
 	if (task_id == "simulation_task_7" or task_id == "simulation_task_8" or task_id == "simulation_task_9" or task_id == "simulation_task_10") then
 		local squad = get_story_squad("hostage_companion_task_1")
 		if not (squad and squad:clsid() == clsid.online_offline_group_s) then
 			return -- quest will auto-fail via section condition
 		end
 
-		if (task) then
-			if (task.stage == 0) or (squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
+		if (tsk) then
+			if (tsk.stage == 0) or (squad and squad.dist_to_actor and squad.dist_to_actor > 60) then
 				return squad and squad.id
-			elseif (task.stage >= 1 or db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then
-				local id = task.task_giver_id
+			elseif (tsk.stage >= 1 or db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then
+				local id = tsk.task_giver_id
 				if (id) then
 					return id
 				end
