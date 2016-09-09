@@ -341,10 +341,15 @@ function on_game_start()
 	if not (DEV_DEBUG) then 
 		return 
 	end
+	
+	if (axr_main.config:r_value("mm_options","enable_debug_hud",1,false) and level.present() and db.actor) then
+		activate_feature()
+	end
+	
 	if (keybinds) then 
 		return -- obviously on_game_start already triggered if this exists
 	end
-	
+
 	local ini = ini_file("debug\\xrs_debug_tools.ltx")
 
 	RegisterScriptCallback("main_menu_on_keyboard",main_menu_on_keyboard)
@@ -361,10 +366,6 @@ function on_game_start()
 					["toggle_left_hud"] = ini:r_string_ex(sect,"keybind_toggle_left_hud","F2"),
 					["toggle_right_hud"] = ini:r_string_ex(sect,"keybind_toggle_right_hud","F3")
 				}
-
-	if (axr_main.config:r_value("mm_options","enable_debug_hud",1,false)) then
-		activate_feature() 
-	end
 end 
 
 -- NPC target for hud display ( nil = off )
