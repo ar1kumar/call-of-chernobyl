@@ -65,15 +65,21 @@ function opt_menu_on_init(menu)
 	
 	if (db.actor) then -- Options will only show while in-game
 	
-		--[[
-		local l = ui_mm_faction_select.get_icon_list()
+		local l = get_character_icon_list()
 		local selected = nil 
 		
-		menu.gameplay_options["char_portrait"]	= {default=db.actor_binder.character_icon or l[1], debug_only=false, typ="list", list=l, 
+		menu.gameplay_options["char_portrait"]	= {default=db.actor_binder.character_icon or "ui_inGame2_Strelok", debug_only=false, typ="list", list=l, 
 			on_accept=function(handler,optMgr,ctrl)
 				if (selected) then
 					db.actor_binder.character_icon = ctrl:GetText()
-					db.actor:set_character_icon(db.actor_binder.character_icon)
+					if (axr_main.config:r_value("mm_options","enable_outfit_portrait",1,false)) then
+						local outfit = db.actor:item_in_slot(7)
+						if (outfit == nil) then
+							db.actor:set_character_icon(db.actor_binder.character_icon)
+						end
+					else 
+						db.actor:set_character_icon(db.actor_binder.character_icon)
+					end
 				end
 			end, 
 			on_list_item_select=function(handler,ctrl)
@@ -83,8 +89,6 @@ function opt_menu_on_init(menu)
 				end
 			end
 		}
-		
-		]]
 		
 		menu.gameplay_options["outfit_portrait"]	= {default=false, 	debug_only=false, 	typ="check", 
 			on_accept=function(handler,optMgr,ctrl)
@@ -97,7 +101,7 @@ function opt_menu_on_init(menu)
 						end
 					end
 				else 
-					db.actor:set_character_icon(db.actor_binder.character_icon)
+					db.actor:set_character_icon(db.actor_binder.character_icon or "ui_inGame2_Strelok")
 				end
 			end
 		}
@@ -169,4 +173,18 @@ function opt_menu_on_set_values(menu,optMgr)
 			end
 		end
     end
+end
+
+function get_character_icon_list()
+	local t = {"ui_inGame2_Strelok"}
+	local faction = character_community(db.actor):sub(7)
+	local ini = ini_file("plugins\\faction_portraits.ltx")
+	local section = faction.."_portraits"
+	local n = ini:section_exist(section) and ini:line_count(section) or 0
+	for i=0, n-1 do
+		local result, id, value = ini:r_line(section,i,"","" )
+		table.insert(t,id)
+	end
+
+	return t
 end
