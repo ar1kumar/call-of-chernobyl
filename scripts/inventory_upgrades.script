@@ -514,12 +514,18 @@ local function how_much_repair( item_name, item_condition )
 end
 
 function can_repair_item( item_name, item_condition, mechanic ) --( string, float, string )
-	if(item_name=="pri_a17_gauss_rifle") then
+	if (item_name=="pri_a17_gauss_rifle") then
 		return false
 	end
+	
 	local price = how_much_repair( item_name, item_condition )
 	if db.actor:money() < price then
 		return false
+	end
+	
+	local obj = db.actor:object(item_name)
+	if (obj and IsArtefact(obj)) then 
+		return false 
 	end
 
 	mechanic_name = mechanic

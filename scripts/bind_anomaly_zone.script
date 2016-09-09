@@ -9,10 +9,12 @@ function bind(obj)
 	obj:bind_object(anomaly_zone_binder(obj))
 end
 
+local anom_sect = "anomal_zone"
+
 class "anomaly_zone_binder" (object_binder)
 function anomaly_zone_binder:__init(obj) super(obj)
 	local spawn_ini = obj:spawn_ini()
-	local filename = spawn_ini and spawn_ini:r_string_ex("anomal_zone","cfg")
+	local filename = spawn_ini and spawn_ini:r_string_ex(anom_sect,"cfg")
 	if not filename then
 		printf("WARNING: anomaly_zone_binder: 'anomal_zone' section missing from spawn ini")
 		self.disabled = true
@@ -45,20 +47,20 @@ function anomaly_zone_binder:__init(obj) super(obj)
 	self.forced_spawn = false
 	self.forced_spawn_override = false
 	self.forced_artefact = ""
-	self.layers_count = self.ini:r_float_ex("anomal_zone","layers_count") or 1
+	self.layers_count = self.ini:r_float_ex(anom_sect,"layers_count") or 1
 	self.cur_layer = "layer_"..math.random(1,self.layers_count)
 	self.custom_placement = self.layers_count>1
 
-	local def_respawn_tries		= self.ini:r_float_ex("anomal_zone","respawn_tries") or 2
-	local def_max_artefacts		= self.ini:r_float_ex("anomal_zone","max_artefacts") or 3
-	local def_app_force_xz 		= self.ini:r_float_ex("anomal_zone","applying_force_xz") or 200
-	local def_app_force_y 		= self.ini:r_float_ex("anomal_zone","applying_force_y") or 400
-	local def_arts 				= self.ini:r_string_ex("anomal_zone","artefacts")
-	local def_start_arts		= self.ini:r_string_ex("anomal_zone","start_artefact")
-	local def_ways 				= self.ini:r_string_ex("anomal_zone","artefact_ways")
- 	local def_field_name		= self.ini:r_string_ex("anomal_zone","field_name")
- 	local def_coeff_sect_name	= self.ini:r_string_ex("anomal_zone","coeffs_section") or "coeff"
-	local def_coeffs			= self.ini:r_string_ex("anomal_zone","coeff")
+	local def_respawn_tries		= self.ini:r_float_ex(anom_sect,"respawn_tries") or 2
+	local def_max_artefacts		= self.ini:r_float_ex(anom_sect,"max_artefacts") or 3
+	local def_app_force_xz 		= self.ini:r_float_ex(anom_sect,"applying_force_xz") or 200
+	local def_app_force_y 		= self.ini:r_float_ex(anom_sect,"applying_force_y") or 400
+	local def_arts 				= self.ini:r_string_ex(anom_sect,"artefacts")
+	local def_start_arts		= self.ini:r_string_ex(anom_sect,"start_artefact")
+	local def_ways 				= self.ini:r_string_ex(anom_sect,"artefact_ways")
+ 	local def_field_name		= self.ini:r_string_ex(anom_sect,"field_name")
+ 	local def_coeff_sect_name	= self.ini:r_string_ex(anom_sect,"coeffs_section") or "coeff"
+	local def_coeffs			= self.ini:r_string_ex(anom_sect,"coeff")
 
 
 	local section, arts, start_arts, parsed_condlist, coeffs_sect_name, coeffs, path, field, mines_section

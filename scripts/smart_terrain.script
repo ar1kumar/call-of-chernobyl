@@ -7,13 +7,10 @@
 -- How many jobs are checked per update per npc, for a job
 local STEP_SIZE 			= 10
 local STEP_SIZE_OFFLINE 	= 5
-
-------------------------------------------
-local level,alife,game_graph,math,pairs,tostring,tonumber = level,alife,game_graph,math,pairs,tostring,tonumber
-------------------------------------------
-
 local locations_ini	= ini_file("misc\\smart_terrain_masks.ltx")
 nearest_to_actor_smart = {id = nil , dist = math.huge}
+
+local smart_sect = "smart_terrain"
 
 local function job_avail_to_npc(npc_info, job, smart)
 	--[[
@@ -141,7 +138,7 @@ end
 function se_smart_terrain:read_params()
 	--alun_utils.debug_write(strformat("%s:%s:se_smart_terrain:read_params BEFORE",self:name(),self.id))
 	local spawn_ini = self:spawn_ini()
-	local filename = spawn_ini:r_string_ex("smart_terrain","cfg")
+	local filename = spawn_ini:r_string_ex(smart_sect,"cfg")
 	if not (filename) then
 		printf("ERROR!: smart_terrain: no configuration file defined in spawn ini for %s",self:name())
 		self.disabled = true
@@ -165,25 +162,25 @@ function se_smart_terrain:read_params()
 	
 	local ini = self.ini
 	
-	self.arrive_dist			= ini:r_float_ex("smart_terrain","arrive_dist") or 50
-	self.death_idle_time 		= ini:r_float_ex("smart_terrain","death_idle_time") or 600
-	self.def_restr				= ini:r_string_ex("smart_terrain","def_restr")	-- default out_restrictor for npc on jobs here
-	self.default_faction 		= ini:r_string_ex("smart_terrain","default_faction")
-	self.faction_controlled 	= ini:r_string_ex("smart_terrain","faction_controlled")
-	self.max_population 		= tonumber(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, xr_logic.parse_condlist(nil, "smart_terrain", "max_population", ini:r_string_ex("smart_terrain","max_population") or ""))) or 0
-	self.respawn_idle 			= ini:r_float_ex("smart_terrain","respawn_idle") or 43200
-	self.respawn_only_level 	= ini:r_bool_ex("smart_terrain","respawn_only_level",false)
-	self.respawn_only_smart 	= ini:r_bool_ex("smart_terrain","respawn_only_smart",false)
+	self.arrive_dist			= ini:r_float_ex(smart_sect,"arrive_dist") or 50
+	self.death_idle_time 		= ini:r_float_ex(smart_sect,"death_idle_time") or 600
+	self.def_restr				= ini:r_string_ex(smart_sect,"def_restr")	-- default out_restrictor for npc on jobs here
+	self.default_faction 		= ini:r_string_ex(smart_sect,"default_faction")
+	self.faction_controlled 	= ini:r_string_ex(smart_sect,"faction_controlled")
+	self.max_population 		= tonumber(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, xr_logic.parse_condlist(nil, smart_sect, "max_population", ini:r_string_ex(smart_sect,"max_population") or ""))) or 0
+	self.respawn_idle 			= ini:r_float_ex(smart_sect,"respawn_idle") or 43200
+	self.respawn_only_level 	= ini:r_bool_ex(smart_sect,"respawn_only_level",false)
+	self.respawn_only_smart 	= ini:r_bool_ex(smart_sect,"respawn_only_smart",false)
 	self.respawn_point 			= false
-	self.respawn_radius  		= ini:r_float_ex("smart_terrain","respawn_radius") or 150
-	self.safe_restr				= ini:r_string_ex("smart_terrain","safe_restr")	-- npc with jobs inside are invulnerable
-	self.spawn_point			= ini:r_string_ex("smart_terrain","spawn_point")
-	self.squad_id				= ini:r_float_ex("smart_terrain","squad_id") or 0	
+	self.respawn_radius  		= ini:r_float_ex(smart_sect,"respawn_radius") or 150
+	self.safe_restr				= ini:r_string_ex(smart_sect,"safe_restr")	-- npc with jobs inside are invulnerable
+	self.spawn_point			= ini:r_string_ex(smart_sect,"spawn_point")
+	self.squad_id				= ini:r_float_ex(smart_sect,"squad_id") or 0	
 	
 	if (self.faction_controlled) then
-		local spawn_num = ini:r_string_ex("smart_terrain","faction_respawn_num")
+		local spawn_num = ini:r_string_ex(smart_sect,"faction_respawn_num")
 		if (spawn_num) then 
-			spawn_num = xr_logic.parse_condlist(nil, "smart_terrain", "faction_respawn_num", spawn_num)
+			spawn_num = xr_logic.parse_condlist(nil, smart_sect, "faction_respawn_num", spawn_num)
 			self.respawn_params 	= {}
 			
 			self.already_spawned	= {}
@@ -219,7 +216,7 @@ function se_smart_terrain:read_params()
 		return --alun_utils.debug_write(strformat("%s:%s:se_smart_terrain:read_params AFTER 1",self:name(),self.id))
 	end
 	
-	local respawn_params = ini:r_string_ex("smart_terrain","respawn_params")
+	local respawn_params = ini:r_string_ex(smart_sect,"respawn_params")
 	if not (respawn_params) then 
 		return --alun_utils.debug_write(strformat("%s:%s:se_smart_terrain:read_params AFTER 2",self:name(),self.id))
 	end
