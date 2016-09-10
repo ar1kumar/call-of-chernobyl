@@ -434,12 +434,14 @@ function faction_ui:load_icon_list()
 	
 	self.icon_list:ClearList()
 	self.icon_list:AddItem(def_icon)
+	self.icon_table = empty_table(self.icon_table)
 	
 	local section = self.selected_faction.."_portraits"
 	local n = loc_ini:section_exist(section) and loc_ini:line_count(section) or 0
 	for i=0, n-1 do
 		local result, id, value = loc_ini:r_line(section,i,"","" )
 		self.icon_list:AddItem(id,i)
+		table.insert(self.icon_table,id)
 	end
 	
 	self.icon_list:SetText(def_icon)
