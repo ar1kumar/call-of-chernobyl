@@ -347,7 +347,7 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 		infop_conditions_met = true -- изначально считаем, что все условия переключения удовлетворены
 		for inum, infop in pairs(cond.infop_check) do
 			if infop.prob then
-				if math.random(100) < infop.prob then
+				if infop.prob < math.random(100) then
 					infop_conditions_met = false -- инфопоршен есть, но он не должен присутствовать
 					break
 				end
@@ -357,30 +357,15 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 				if not xr_conditions[infop.func] then
 					printf("pick_section_from_condlist: function '%s' is not defined in xr_conditions.script",infop.func)
 				end
-				--if xr_conditions[infop.func](actor, npc) then
-				if infop.params then
-					if xr_conditions[infop.func](actor, npc, infop.params) then
-						if not infop.expected then
-							infop_conditions_met = false -- инфопоршен есть, но не должен присутствовать
-							break
-						end
-					else
-						if infop.expected then
-							infop_conditions_met = false -- инфопоршен есть, но не должен присутствовать
-							break
-						end
+				if xr_conditions[infop.func](actor, npc, infop.params) then
+					if not infop.expected then
+						infop_conditions_met = false -- инфопоршен есть, но не должен присутствовать
+						break
 					end
 				else
-					if xr_conditions[infop.func](actor, npc) then
-						if not infop.expected then
-							infop_conditions_met = false -- инфопоршен есть, но не должен присутствовать
-							break
-						end
-					else
-						if infop.expected then
-							infop_conditions_met = false -- инфопоршен есть, но не должен присутствовать
-							break
-						end
+					if infop.expected then
+						infop_conditions_met = false -- инфопоршен есть, но не должен присутствовать
+						break
 					end
 				end
 			elseif (has_alife_info(infop.name)) then
