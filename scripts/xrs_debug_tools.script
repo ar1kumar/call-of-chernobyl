@@ -28,6 +28,10 @@ local toggle_hud_list = 	{
 							}
 --------------------------------------------------------------------------------------------------
 
+local toggle_left_key = 1
+local toggle_top_key = 1
+local toggle_right_key = 1
+local debug_ui
 
 -- used for debugging
 NEAREST_STALKER_ID = nil
@@ -243,10 +247,6 @@ function hud_tool:clear()
 end
 
 -- Callback main_menu_on_keyboard
-local toggle_left_key = 1
-local toggle_top_key = 1
-local toggle_right_key = 1
-local debug_ui
 local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present)
 	if keyboard_action ~= ui_events.WINDOW_KEY_RELEASED then return end
 	if (level_present and keybinds["print_position"] and dik == DIK_keys["DIK_"..keybinds["print_position"]]) then
