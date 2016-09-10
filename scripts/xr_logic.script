@@ -339,7 +339,6 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 		return
 	end
 	
-	local rval = nil
 	local infop_conditions_met
 	
 	local npc_id = npc and (type(npc.id) == "function" and npc:id() or npc.id) or nil
@@ -348,10 +347,7 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 		infop_conditions_met = true -- изначально считаем, что все условия переключения удовлетворены
 		for inum, infop in pairs(cond.infop_check) do
 			if infop.prob then
-				if not rval then
-					rval = math.random(100)
-				end
-				if infop.prob < rval then
+				if math.random(100) < infop.prob then
 					infop_conditions_met = false -- инфопоршен есть, но он не должен присутствовать
 					break
 				end
