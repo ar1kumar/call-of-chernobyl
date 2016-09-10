@@ -514,13 +514,14 @@ sim_avail = false
 sim_avail = true
 
 [agr_smart_terrain_1_3]:default_lair
-sim_avail = true
+sim_avail 	= {+faction_base_defense_active} false, true
 
 ;bigger base, courtyard
 [agr_smart_terrain_1_6]:default_base
 sim_avail 	= true
 surge		= 1
 army		= 1 
+lair 		= 1
 
 ;bigger base, gate
 [agr_smart_terrain_1_6_near_1]:default_base
@@ -574,7 +575,7 @@ ecolog		= 1
 bandit		= 1
 
 [agr_smart_terrain_4_6]:default_lair
-sim_avail = true
+sim_avail 	= {+faction_base_defense_active} false, true
 
 [agr_smart_terrain_5_2]:default_lair
 sim_avail = true
@@ -3350,4 +3351,13 @@ sim_avail = false
 sim_avail = false
 
 [faction_base_defense_dog_squad]:default_squad
+sim_avail = false
+
+[faction_base_defense_flesh_second_squad]:default_squad
+sim_avail = false
+
+[faction_base_defense_boar_second_squad]:default_squad
+sim_avail = false
+
+[faction_base_defense_dog_second_squad]:default_squad
 sim_avail = false
