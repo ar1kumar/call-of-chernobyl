@@ -64,8 +64,10 @@ local function npc_on_update(npc,st)
 			return
 		end
 
-		st.victim_surrender = db.actor:id()
-		xr_statistic.inc_enemies_surrendered_counter()
+		if (st.victim_surrender ~= db.actor:id()) then
+			st.victim_surrender = db.actor:id()
+			xr_statistic.inc_enemies_surrendered_counter()
+		end
 	end
 end
 
