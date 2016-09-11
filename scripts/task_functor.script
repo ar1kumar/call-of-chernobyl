@@ -286,6 +286,33 @@ function simulation_task_target(task_id,field,p,tsk)
 	end
 end
 
+function faction_base_defense_target(task_id,field,p,tsk)
+	local squad = get_story_squad("faction_base_defense_flesh_squad")
+	if (squad) then 
+		return squad.id 
+	end
+	squad = get_story_squad("faction_base_defense_boar_squad")
+	if (squad) then 
+		return squad.id 
+	end 
+	squad = get_story_squad("faction_base_defense_dog_squad")
+	if (squad) then 
+		return squad.id 
+	end 
+	squad = get_story_squad("faction_base_defense_flesh_second_squad")
+	if (squad) then 
+		return squad.id 
+	end 
+	squad = get_story_squad("faction_base_defense_boar_second_squad")
+	if (squad) then 
+		return squad.id 
+	end 
+	squad = get_story_squad("faction_base_defense_dog_second_squad")
+	if (squad) then 
+		return squad.id
+	end 	
+end 
+
 --[[
 ==================================================================
 
