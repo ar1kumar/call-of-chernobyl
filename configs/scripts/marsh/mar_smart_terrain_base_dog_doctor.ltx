@@ -8,19 +8,17 @@ monster_job = true
 [mob_walker@stand]
 path_walk = dog_1_walk 
 path_look = dog_1_look
-;out_restr = 
-npc_friendly = true
-combat_ignore_cond = true
+;npc_friendly = true
+combat_ignore_cond = {=check_squad_name(faction_base_defense_flesh_squad)} false, {=check_squad_name(faction_base_defense_boar_squad)} false, {=check_squad_name(faction_base_defense_dog_squad)} false, true
 aggressive = false
 on_info = {!is_day} mob_walker@waiting_sleep
 
 [mob_walker@waiting_sleep]
 path_walk = dog_1_walk 
 path_look = dog_1_look
-;out_restr = 
-npc_friendly = true
+;npc_friendly = true
 on_timer = 3500 | {~50} mob_walker@sleep, mob_walker@sit
-combat_ignore_cond = true
+combat_ignore_cond = {=check_squad_name(faction_base_defense_flesh_squad)} false, {=check_squad_name(faction_base_defense_boar_squad)} false, {=check_squad_name(faction_base_defense_dog_squad)} false, true
 aggressive = false
 
 [mob_walker@sit]
@@ -29,8 +27,8 @@ path_look = dog_sit_look
 on_timer = 30000 | mob_walker@waiting_sleep
 aggressive = false
 on_actor_dist_le_nvis = 2 | mob_walker@waiting_sleep
-combat_ignore_cond = true
-npc_friendly = true
+combat_ignore_cond = {=check_squad_name(faction_base_defense_flesh_squad)} false, {=check_squad_name(faction_base_defense_boar_squad)} false, {=check_squad_name(faction_base_defense_dog_squad)} false, true
+;npc_friendly = true
 
 [mob_walker@sleep]
 path_walk = dog_1_walk
@@ -38,9 +36,8 @@ path_look = dog_sleep_look
 on_timer = 30000 | mob_walker@waiting_sleep
 aggressive = false
 on_actor_dist_le_nvis = 2 | mob_walker@waiting_sleep
-;out_restr = 
-combat_ignore_cond = true
-npc_friendly = true
+combat_ignore_cond = {=check_squad_name(faction_base_defense_flesh_squad)} false, {=check_squad_name(faction_base_defense_boar_squad)} false, {=check_squad_name(faction_base_defense_dog_squad)} false, true
+;npc_friendly = true
 on_info = {=is_day} mob_walker@stand
 
 ;[hit]
