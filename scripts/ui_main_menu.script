@@ -293,27 +293,22 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	SendScriptCallback("main_menu_on_keyboard",dik,keyboard_action,self,level.present())
 
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
-		if (dik == DIK_keys.DIK_ESCAPE and level.present()) then
-			if (db.actor and db.actor:alive()) or (IsGameTypeSingle() ~= true) then
-				self.OnButton_return_game()
-			end
-		elseif (dik == DIK_keys.DIK_F5 and level.present()) then
-			if (db.actor and db.actor:alive()) then
-				local console = get_console()
-				local fname = user_name() .. " - quicksave"
-				console:execute("save " .. fname)
-			end
-		elseif (dik == DIK_keys.DIK_F9) then
-			local fname = user_name() .. " - quicksave"
-			if (getFS():exist("$game_saves$", fname..".scop")) then
-				if (alife() == nil) then
-					console:execute	("disconnect")
-					console:execute	("start server(" .. fname .. "/single/alife/load) client(localhost)")
-				else
-					console:execute	("load " .. fname)
+		if (level.present()) then 
+			if (dik == DIK_keys.DIK_ESCAPE) then
+				if (db.actor and db.actor:alive()) or (IsGameTypeSingle() ~= true) then
+					self.OnButton_return_game()
 				end
+				return true
+			elseif (bind == key_bindings.kQUICK_SAVE) then
+				level_input.action_quick_save()
+				return true
+			elseif (bind == key_bindings.kQUICK_LOAD) then 
+				level_input.action_quick_load()
+				return true
 			end
-		elseif (dik == DIK_keys.DIK_Q) then
+		end
+
+		if (dik == DIK_keys.DIK_Q) then
 			self:OnMessageQuitWin()
 		elseif (dik == DIK_keys.DIK_NUMPAD0) then
 			if (reload_system_ini) then
