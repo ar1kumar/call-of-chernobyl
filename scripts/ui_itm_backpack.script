@@ -20,7 +20,8 @@ function backpack_ui:InitControls()
 	if(device().width/device().height>(1024/768+0.01)) then
 		wide = true
 	end
-	self:Enable					(true)
+	self:SetAutoDelete(true)
+	self:Enable(true)
 
 	local xml					= CScriptXmlInit()
 	xml:ParseFile				("ui_itm_main.xml")
