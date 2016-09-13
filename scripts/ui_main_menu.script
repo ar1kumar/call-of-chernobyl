@@ -115,19 +115,29 @@ function main_menu:LoadLastSave()
 end
 
 function main_menu:OnButton_last_save()
-	if ( alife() == nil) then
-		self:LoadLastSave	()
-		return
-	end
-
-	if ( (db.actor ~= nil) and (db.actor:alive() == false) ) then
-		self:LoadLastSave	()
-		return
-	end
-
-	self.mbox_mode			= 1
-	self.message_box:InitMessageBox	("message_box_confirm_load_save")
-	self.message_box:ShowDialog(true)
+    if ( alife() == nil) then
+        local flist = getFS():file_list_open_ex("$game_saves$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*"..".scop")
+        flist:Sort(FS.FS_sort_by_modif_down)
+        local file = flist:GetAt(0)
+		if not (file) then 
+			return
+		end
+        local file_name = string.sub(file:NameFull(), 0, (string.len(file:NameFull()) - string.len(".scop")))
+       
+        local console = get_console()
+        console:execute("main_menu off")
+        console:execute("start server("..file_name.."/single/alife/load) client(localhost)")
+        return
+    end
+ 
+    if ( (db.actor ~= nil) and (db.actor:alive() == false) ) then
+        self:LoadLastSave   ()
+        return
+    end
+ 
+    self.mbox_mode          = 1
+    self.message_box:InitMessageBox ("message_box_confirm_load_save")
+    self.message_box:ShowDialog(true)
 end
 
 function main_menu:OnButton_credits_clicked()
