@@ -1175,32 +1175,31 @@ end
 -- INI Reader
 function file_to_table(fname,parent,simple)
 	local root = parent and parent.root or {}
-	local sec,t,key,val
+	local sec,t,key
 	for line in io.lines(fname) do
+		line = trim(trim_comment(line))
 		if (line ~= "" and line ~= "\n") then
 			if (startsWith(line, "#include")) then
-				t = str_explode(line,";")
-				t = str_explode(t[1],[["]])
-
 				if (simple ~= true and parent ~= nil) then
-					file_to_table(get_path(fname)..t[2],parent,simple)
+					local inc = string.match(line,[["(.-)"]]) or ""
+					if (inc ~= "" and file_exists(get_path(fname)..inc)) then
+						file_to_table(get_path(fname)..inc,parent,simple)
+					end
 				end
 			elseif (startsWith(line, "[")) then
-				t = str_explode(line,";")
-				t = str_explode(t[1],":")
-
-				sec = string.sub(t[1],2,-2)
-
+				sec = string.match(line,"%[(.-)%]")
+				
 				if (root[sec]) then
 					printf("ERROR: Duplicate section exists! %s",line)
 				end
 
-				root[sec] = {}
-				
-				if (t[2]) then
-					root[sec]["_____link"] = t[2]
+				root[sec] = root[sec] or {}
+
+				local inc = get_section_includes(line)
+				if (inc) then
+					root[sec]["_____link"] = inc
 					if (simple ~= true) then
-						local a = str_explode(t[2],",")
+						local a = str_explode(inc,",")
 						for k,v in pairs(a) do
 							if (root[v]) then
 								for kk,vv in pairs(root[v]) do
@@ -1210,28 +1209,27 @@ function file_to_table(fname,parent,simple)
 						end
 					end
 				end
-			elseif (not startsWith(line, ";") and not startsWith(line,"	") and not startsWith(line," ")) then
-				t = str_explode(line,";")
-				key = trim(string.match(t[1],"(.-)=") or t[1])
-				if (key and key ~= "") then
-					key = trim(key)
-					val = string.match(t[1],"=(.+)")
-					if (val) then
-						val = trim(val)
-					end
-
-					if (sec) then
-						root[sec] = root[sec] or {}
-						root[sec][key] = val or ""
-					else
-						root[key] = val or ""
-					end
+			elseif (sec) then
+				key = trim(string.match(line,"(.-)=") or line)
+				if (key ~= "") then
+					root[sec] = root[sec] or {}
+					root[sec][key] = trim(string.match(line,"=(.+)") or "")
 				end
 			end
 		end
 	end
 
 	return root
+end
+
+function trim_comment(str)
+	local a = string.find(str,";")
+	return a and trim(string.sub(str,1,a-1)) or str
+end
+
+function get_comment(str)
+	local a = string.find(str,";")
+	return a and " " .. string.sub(str,a) or ""
 end
 
 class "cfg_file"
@@ -1305,7 +1303,7 @@ end
 
 -- Save ini by preserving original file. Cannot insert new keys or sections
 function cfg_file:SaveExt()
-	local t,sec,comment
+	local t,sec,key,comment
 	local str = ""
 	
 	local function addTab(s,n)
@@ -1319,26 +1317,21 @@ function cfg_file:SaveExt()
 	for ln in io.lines(self.fname) do
 		ln = trim(ln)
 		if (startsWith(ln,"[")) then
-			t = str_explode(ln,";")
-			t = str_explode(t[1],":")
-
-			sec = string.sub(t[1],2,-2)
-		elseif (not startsWith(ln,";") and self.root[sec]) then
-			comment = string.find(ln,";")
-			comment = comment and string.sub(ln,comment) or ""
-
-			if (comment ~= "") then
-				comment = addTab("\t",40) .. comment
-			end 
-			
-			t = str_explode(ln,"=")
-			if (self.root[sec][t[1]] ~= nil) then
-				if (self.root[sec][t[1]] == "") then
-					ln = addTab(t[1],40) .. " =" .. comment
-					 
-				else
-					ln = addTab(t[1],40) .. " = " .. tostring(self.root[sec][t[1]]) .. comment
+			sec = string.match(trim_comment(ln),"%[(.-)%]")
+		elseif (sec and self.root[sec]) then
+			key = trim(trim_comment(string.match(ln,"(.-)=") or ln))
+			if (key and self.root[sec][key]) then
+				comment = get_comment(ln) or ""
+				if (comment ~= "") then 
+					comment = addTab(comment,20)
 				end
+				if (self.root[sec][key] == "") then
+					str = str .. addTab(key,40) .. " =" .. comment .. "\n"
+				else
+					str = str .. addTab(key,40) .. " = " .. tostring(self.root[sec][key]) .. comment .. "\n"
+				end
+			else 
+				str = str .. ln .. "\n"
 			end
 		end
 		str = str .. ln .. "\n"
