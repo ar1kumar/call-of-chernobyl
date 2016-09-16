@@ -154,14 +154,17 @@ function CGeneralTask:give_task()
 	self.stage = 0
 	self.forced_status = nil
 	
-	self:check_task(true)
+	if (db.actor) then
+		self:check_task()
+	end
+	
 	db.actor:give_task(t, time*10, false, time)
 end
 --' ѕроверка текущего выполнени€ квеста
-function CGeneralTask:check_task(bforce)
+function CGeneralTask:check_task()
 	local tg = time_global()
 	
-	if not (bforce) then
+	if (self.first_update) then
 		if (self.check_time and self.last_check_task ~= nil and tg < self.check_time) then
 			return
 		end
@@ -192,42 +195,39 @@ function CGeneralTask:check_task(bforce)
 	end
 
 	local t_target = task_functor[self.target_functor](self.id, "target", self.target, self)
-	self:check_level(t_target)
-	if self.current_target ~= t_target then
-		--printf("task [%s] updated due to target change from [%s] to [%s]", tostring(self.id), tostring(self.current_target), tostring(t_target))
-		if self.current_target == nil then
-			task_updated = true
-			self.t:change_map_location(self.spot, t_target)
-			if(self.storyline) then
-				level.map_add_object_spot(t_target, "ui_storyline_task_blink", "")
-			else
-				level.map_add_object_spot(t_target, "ui_secondary_task_blink", "")
-			end
-		else
-			if t_target == nil then
-				self.t:remove_map_locations(false)
-				task_updated = true
-			else
-				if(self.storyline) then
+	if (self.current_target ~= t_target) then
+		self.t:remove_map_locations(false)
+		if (t_target) then 
+			self:check_level(t_target)
+			if (self.storyline) then
+				if (level.map_has_object_spot(t_target,"ui_storyline_task_blink") == 0) then
 					level.map_add_object_spot(t_target, "ui_storyline_task_blink", "")
-				else
+				end
+			else
+				if (level.map_has_object_spot(t_target,"ui_secondary_task_blink") == 0) then
 					level.map_add_object_spot(t_target, "ui_secondary_task_blink", "")
 				end
-				self.t:change_map_location(self.spot, t_target)
-				task_updated = true
+			end
+			
+			if not (self.current_target) then 
+				self.t:set_map_location(self.spot)
+				self.t:set_map_object_id(t_target)
+			else 
+				self.t:change_map_location(self.spot,t_target)
 			end
 		end
+		
 		self.current_target = t_target
+		task_updated = true
 	end
 	
-	if not (bforce) then
-		if task_updated and not(self.dont_send_update_news) then
-			news_manager.send_task(db.actor, "updated", self.t)
-		end
-	end
-	
-	if (bforce) then 
+	if not (self.first_update) then
+		self.first_update = true 
 		return -- because we only wanted to update title, descr and target
+	end
+	
+	if task_updated and not(self.dont_send_update_news) then
+		news_manager.send_task(db.actor, "updated", self.t)
 	end
 	
 	for k,v in pairs(self.condlist) do
