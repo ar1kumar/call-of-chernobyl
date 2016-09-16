@@ -615,9 +615,6 @@ function se_detector:on_register()
 	-- Проверяем кастомдату обьекта на наличие стори айди.
 	story_objects.check_spawn_ini_for_story_id(self)
 	-- Собираем статистику по предметам.
-
-
-
 end
 function se_detector:on_unregister()
 	--' Отрегистрация в таскменеджере
@@ -640,3 +637,30 @@ function se_detector:STATE_Read(stpk,size)
 
 	cse_alife_item_detector.STATE_Read(self,stpk,size)
 end
+
+---------------------
+class "se_mgun" (cse_alife_mounted_weapon)
+function se_mgun:__init (section) super (section)
+end
+function se_mgun:on_register()
+	cse_alife_mounted_weapon.on_register( self )
+	story_objects.check_spawn_ini_for_story_id(self)
+end
+function se_mgun:on_unregister()
+	unregister_story_object_by_id(self.id)
+	cse_alife_mounted_weapon.on_unregister( self )
+end
+function se_mgun:can_switch_online()
+	return cse_alife_mounted_weapon.can_switch_online(self)
+end
+
+function se_mgun:STATE_Write(stpk)
+
+	cse_alife_mounted_weapon.STATE_Write(self,stpk)
+end
+
+function se_mgun:STATE_Read(stpk,size)
+
+	cse_alife_mounted_weapon.STATE_Read(self,stpk,size)
+end
+
