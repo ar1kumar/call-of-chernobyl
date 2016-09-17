@@ -284,11 +284,11 @@ function sim_squad_scripted:specific_update(script_target_id)
 		end
 	end
 	
+	se_target:on_reach_target(self)
+	
 	self.assigned_target_id = nil
 	self.current_target_id = nil
 	self.current_action = 0
-	
-	se_target:on_reach_target(self)
 	
 	for k in self:squad_members() do
 		local se_obj = k.object or k.id and sim:object(k.id)
@@ -330,24 +330,23 @@ function sim_squad_scripted:generic_update()
 		end
 	end
 	
-	-- No action; time to find new target
-	self.assigned_target_id = nil
-	self.current_target_id = nil
-	self.current_action = nil
-
 	-- Find a new target
 	local target = SIMBOARD:get_squad_target(self)
 	if not (target) then
-		--printf("no target %s",self:name())
 		self:on_reach_target(self)
+		
+		-- we have to clear AFTER on_reach_target, not BEFORE so we can get location mask of old smart
+		self.assigned_target_id = nil
+		self.current_target_id = nil
+		self.current_action = nil
 		return 
 	end
 
-	self.assigned_target_id = target.id
-	
-	self.current_action = 0
-	
 	target:on_reach_target(self)
+	
+	self.assigned_target_id = target.id
+	self.current_target_id = nil
+	self.current_action = 0
 	
 	local sim = alife()
 	for k in self:squad_members() do
@@ -527,23 +526,15 @@ function sim_squad_scripted:set_location_types_section (section)
 end
 
 function sim_squad_scripted:set_location_types(new_smart_name)
-	local default_location = "stalker_terrain"
 	self:clear_location_types()
-
+	
 	local sim = alife()
-	local target = self.assigned_target_id and sim:object(self.assigned_target_id)
-	if (target and target:clsid() == clsid.smart_terrain) then
-		self:set_location_types_section(default_location)
-		local old_smart = self.smart_id and sim:object(self.smart_id)
-		local old_smart_name = old_smart and old_smart:name()
-		if old_smart_name then
-			self:set_location_types_section(old_smart_name)
-		end
-
-		if new_smart_name then
-			self:set_location_types_section(new_smart_name)
-		end
-	else
+	local old_target = self.assigned_target_id and sim:object(self.assigned_target_id)
+	if (old_target and old_target:clsid() == clsid.smart_terrain) then 
+		self:set_location_types_section(old_target:name())
+	end 
+	
+	if not (new_smart_name) then 
 		self:set_location_types_section("squad_terrain")
 
 		for k,v in pairs(simulation_objects.get_sim_obj_registry().objects) do
@@ -555,7 +546,10 @@ function sim_squad_scripted:set_location_types(new_smart_name)
 				end
 			end
 		end
+		return
 	end
+	
+	self:set_location_types_section("stalker_terrain")
 end
 
 function sim_squad_scripted:add_new_member_forced(section,pos,lvid,gvid)

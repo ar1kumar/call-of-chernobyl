@@ -432,6 +432,13 @@ function actor_on_item_use(obj)
 			SetHudMsg(game.translate_string("st_lamp_equipped"),4)
 		end
 	end
+	
+	-- Deployable mgun
+	if (obj:section() == "itm_deployable_mgun") then
+		local pos = vector():set(device().cam_pos)
+		pos:add(device().cam_dir:mul(3))
+		alife():create("deployable_mgun",pos,level.vertex_id(pos),db.actor:game_vertex_id())
+	end
 end
 
 function check_actor_backpack()

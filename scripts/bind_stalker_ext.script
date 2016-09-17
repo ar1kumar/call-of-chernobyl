@@ -237,11 +237,12 @@ function actor_on_before_death(binder,whoID)
 	-- if you want to keep actor alive, then use db.actor:set_health_ex(1) and do not use db.actor:kill(db.actor,true)
 	--db.actor:set_health_ex(1)
 	
+	-- FIXED IN ENGINE NOW AS OF 9/16/2016
 	-- This is necessary to avoid engine crash when player dies with holder
-	local car = db.actor and db.actor:get_attached_vehicle()
-	if (car) then 
-		db.actor:detach_vehicle()
-	end
+	-- local car = db.actor and db.actor:get_attached_vehicle()
+	-- if (car) then 
+		-- db.actor:detach_vehicle()
+	-- end
 	
 	db.actor:kill(db.actor, true)
 	
@@ -260,6 +261,13 @@ end
 ---------------------------------------------
 function actor_on_detach_vehicle(binder,obj)
 	SendScriptCallback("actor_on_detach_vehicle",obj)
+	if (obj:section() == "deployable_mgun") then 
+		local se_obj = alife():object(obj:id())
+		if (se_obj) then 
+			alife():release(se_obj)
+		end
+		alife():create("itm_deployable_mgun",vector(),0,0,0)
+	end
 end
 
 ---------------------------------------------
