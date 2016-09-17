@@ -6,6 +6,7 @@ on_actor_inside = sr_idle@check_conditions
 
 [sr_idle@check_conditions]
 on_info = {=is_dark_night -actor_is_sleeping !is_faction_enemy_to_actor(army)} sr_idle@decide
+on_actor_outside = sr_idle@wait_for_actor
 
 [sr_idle@decide]
 on_info = {~50} sr_idle@timer, sr_idle@spawn_random %=give_task(faction_base_defense)%
