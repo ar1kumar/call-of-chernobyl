@@ -48,6 +48,7 @@ end
 
 -- called from engine!
 function CALifeStorageManager_before_save(fname)
+	--[[
 	local sim = alife()
 	for i=1,65534 do
 		local se_obj = sim:object(i)
@@ -56,6 +57,7 @@ function CALifeStorageManager_before_save(fname)
 			sim:release(se_obj,true)
 		end
 	end
+	--]]
 	
 	if not (USE_MARSHAL) then 
 		return 
