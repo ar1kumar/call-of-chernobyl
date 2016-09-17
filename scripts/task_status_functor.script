@@ -7,6 +7,9 @@
 ----------------------------------------------------------------------------------------------
 -- checks smart from pstor variable
 function check_smart_under_faction_control(tsk,task_id)
+	if not (db.actor) then 
+		return 
+	end
 	local smart_id = utils.load_var(db.actor,task_id.."_id")
 	if not (smart_id) then 
 		return "fail"
@@ -89,6 +92,9 @@ end
 
 -- to check a specific smart given as a param 
 function specific_check_smart_under_faction_control(tsk,task_id)
+	if not (db.actor) then 
+		return 
+	end
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	local smart = p[1] and SIMBOARD.smarts_by_names[p[1]]
 	if not (smart) then 
@@ -195,6 +201,9 @@ function check_specific_smart_under_faction_control_staged(tsk,task_id)
 end
 
 function hostage_task(tsk,task_id)
+	if not (db.actor) then 
+		return 
+	end
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then
 		printf("task_status_function not set up properly! check_if_looted_enough needs an extra param for squad story id! task_id=%s",task_id)
@@ -296,6 +305,9 @@ function actor_has_fetch_item(tsk,task_id)
 end
 
 function check_if_enough_time_passed(tsk,task_id)
+	if not (db.actor) then 
+		return 
+	end
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	if not (p[1]) then
 		printf("task_status_function not set up properly! check_if_killed_enough needs an extra param for squad story id! task_id=%s",task_id)

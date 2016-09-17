@@ -30,7 +30,6 @@ C++ class task {
 
 class "CGeneralTask"
 function CGeneralTask:__init(id)
-	printf("CGameTask %s",id)
 	self.loaded = false
 	
 	local task_ini 		= task_manager.task_ini
@@ -82,6 +81,9 @@ function CGeneralTask:__init(id)
 	--' Статус квеста, может быть: "normal", "selected", "completed", "fail", "reversed"
 	self.status = "normal"
 
+	self.current_title = task_functor[self.title_functor](self.id, "title", self.title,self)
+	self.current_descr = task_functor[self.descr_functor](self.id, "descr", self.descr,self)
+
 	local time = 0
 	if self.wait_time ~= nil then
 		time = self.wait_time  -- Тут время задано в игровых секундах
@@ -104,6 +106,7 @@ function CGeneralTask:__init(id)
 		printf("task_id=%s | target_functor not set properly, it's either missing or misnamed, check tm_*.ltx and task_functor.script",id)
 	end 
 	
+	self.current_target = self.target_functor and task_functor[self.target_functor](self.id, "target", self.target,self)
 	self.dont_send_update_news = task_ini:r_bool_ex(id,"dont_send_update_news",false)
 end
 
@@ -133,6 +136,16 @@ function CGeneralTask:give_task()
 
 	xr_logic.pick_section_from_condlist(db.actor, db.actor, self.on_init)
 
+	if self.current_target ~= nil then
+		t:set_map_location(self.spot)
+		t:set_map_object_id(self.current_target)
+
+		if(self.storyline) then
+			level.map_add_object_spot(self.current_target, "ui_storyline_task_blink", "")
+		else
+			level.map_add_object_spot(self.current_target, "ui_secondary_task_blink", "")
+		end
+	end
 	local time = 0
 	if self.wait_time ~= nil then
 		time = self.wait_time  -- Тут время задано в игровых секундах
@@ -141,40 +154,30 @@ function CGeneralTask:give_task()
 	self.status = "selected"
 	self.inited_time = game.get_game_time()
 
+	db.actor:give_task(t, time*10, false, time)
 	self.t = t
 	self.stage = 0
 	self.forced_status = nil
-	
-	t:set_map_location(self.spot)
-	
-	if (db.actor) then
-		self:check_task()
-	end
-	
-	db.actor:give_task(t, time*10, false, time)
 end
 --' Проверка текущего выполнения квеста
-function CGeneralTask:check_task()
+function CGeneralTask:check_task(tm)
 	local tg = time_global()
 	
-	if (self.first_update) then
-		if (self.check_time and self.last_check_task ~= nil and tg < self.check_time) then
-			return
-		end
+	if (self.check_time and self.last_check_task ~= nil and tg < self.check_time) then
+		return
 	end
-	
+	local task_updated = false
 	self.t = self.t or db.actor and db.actor:get_task(self.id,true)
 	
 	if (self.t == nil) then -- task is most likely in timeout
 		return
 	end
-	
-	local task_updated = false
 
 	self.check_time = tg + 1000 + math.random() + (self.prior*100)
 
 	local t_tile = task_functor[self.title_functor](self.id, "title", self.title, self)
 	if self.current_title ~= t_tile then
+		--printf("task [%s] updated due to title change from [%s] to [%s]", tostring(self.id), tostring(self.current_title), tostring(t_tile))
 		task_updated = true
 		self.current_title = t_tile
 		self.t:set_title(game.translate_string(t_tile))
@@ -182,41 +185,39 @@ function CGeneralTask:check_task()
 
 	local t_descr = task_functor[self.descr_functor](self.id, "descr", self.descr, self)
 	if self.current_descr ~= t_descr then
+		--printf("task [%s] updated due to description change from [%s] to [%s]", tostring(self.id), tostring(self.current_descr), tostring(t_descr))
 		task_updated = true
 		self.current_descr = t_descr
 		self.t:set_description(game.translate_string(t_descr))
 	end
 
 	local t_target = task_functor[self.target_functor](self.id, "target", self.target, self)
-	if (self.current_target ~= t_target) then
-		self.t:remove_map_locations(false)
-		if (t_target) then 
-			self:check_level(t_target)
-			if (self.storyline) then
-				if (level.map_has_object_spot(t_target,"ui_storyline_task_blink") == 0) then
-					level.map_add_object_spot(t_target, "ui_storyline_task_blink", "")
-				end
+	self:check_level(t_target)
+	if self.current_target ~= t_target then
+		--printf("task [%s] updated due to target change from [%s] to [%s]", tostring(self.id), tostring(self.current_target), tostring(t_target))
+		if self.current_target == nil then
+			task_updated = true
+			self.t:change_map_location(self.spot, t_target)
+			if(self.storyline) then
+				level.map_add_object_spot(t_target, "ui_storyline_task_blink", "")
 			else
-				if (level.map_has_object_spot(t_target,"ui_secondary_task_blink") == 0) then
+				level.map_add_object_spot(t_target, "ui_secondary_task_blink", "")
+			end
+		else
+			if t_target == nil then
+				self.t:remove_map_locations(false)
+				task_updated = true
+			else
+				if(self.storyline) then
+					level.map_add_object_spot(t_target, "ui_storyline_task_blink", "")
+				else
 					level.map_add_object_spot(t_target, "ui_secondary_task_blink", "")
 				end
-			end
-			
-			if not (self.current_target) then 
-				self.t:set_map_location(self.spot)
-				self.t:set_map_object_id(t_target)
-			else 
-				self.t:change_map_location(self.spot,t_target)
+				self.t:change_map_location(self.spot, t_target)
+				task_updated = true
 			end
 		end
-		
 		self.current_target = t_target
-		task_updated = true
-	end
-	
-	if not (self.first_update) then
-		self.first_update = true 
-		return -- because we only wanted to update title, descr and target
 	end
 	
 	if task_updated and not(self.dont_send_update_news) then
