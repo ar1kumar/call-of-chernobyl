@@ -137,9 +137,9 @@ function action_wounded:execute()
 	end
 
 	local wound_manager_sound = utils.load_var(npc, "wounded_sound")
-	if (wound_manager_sound) then 
+	if (wound_manager_sound and wound_manager_sound ~= "nil") then 
 		xr_sound.set_sound_play(npc:id(), wound_manager_sound)
-	end 
+	end
 
 	if tostring(wound_manager_state) == "nil" then
 --		print_table(self.a.hp_state)

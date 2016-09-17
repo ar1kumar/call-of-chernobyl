@@ -30,6 +30,7 @@ C++ class task {
 
 class "CGeneralTask"
 function CGeneralTask:__init(id)
+	printf("CGameTask %s",id)
 	self.loaded = false
 	
 	local task_ini 		= task_manager.task_ini
@@ -132,16 +133,6 @@ function CGeneralTask:give_task()
 
 	xr_logic.pick_section_from_condlist(db.actor, db.actor, self.on_init)
 
-	if self.current_target ~= nil then
-		t:set_map_location(self.spot)
-		t:set_map_object_id(self.current_target)
-
-		if(self.storyline) then
-			level.map_add_object_spot(self.current_target, "ui_storyline_task_blink", "")
-		else
-			level.map_add_object_spot(self.current_target, "ui_secondary_task_blink", "")
-		end
-	end
 	local time = 0
 	if self.wait_time ~= nil then
 		time = self.wait_time  -- Тут время задано в игровых секундах
@@ -153,6 +144,8 @@ function CGeneralTask:give_task()
 	self.t = t
 	self.stage = 0
 	self.forced_status = nil
+	
+	t:set_map_location(self.spot)
 	
 	if (db.actor) then
 		self:check_task()
