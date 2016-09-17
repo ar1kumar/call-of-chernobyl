@@ -821,11 +821,11 @@ sim_avail = false
 ;---------	SIMULATION	--------
 ;sim smarties
 [bar_zastava_dogs_lair]:default_lair
-sim_avail 	= true
+sim_avail 	= {+faction_base_defense_active} false, true
 territory	= 0
 
 [bar_zastava_dogs_lair_2]:default_lair
-sim_avail 	= true
+sim_avail 	= {+faction_base_defense_active} false, true
 territory	= 0
 
 [bar_dolg_bunker]:default_base
@@ -851,11 +851,13 @@ dolg		= 1
 sim_avail = {+bar_zastava_minigunner_dead +bar_zastava_duty_guard1_dead +bar_zastava_duty_guard2_dead +bar_zastava_duty_guard3_dead +bar_zastava_duty_guard4_dead +bar_zastava_duty_guard5_dead +bar_zastava_duty_guard6_dead +bar_zastava_duty_guard7_dead +bar_zastava_duty_guard8_dead +bar_zastava_duty_guard9_dead} true, false
 surge = 1
 dolg = 1
+lair = 1
 
 [bar_zastava_2]:default_base
 sim_avail = {+bar_zastava_2_minigunner_dead +bar_zastava_2_duty2_guard1_dead +bar_zastava_2_duty2_guard2_dead +bar_zastava_2_duty2_guard3_dead +bar_zastava_2_duty2_guard4_dead +bar_zastava_2_duty2_guard5_dead} true, false
 surge = 1
 dolg = 1
+lair = 1
 
 ;---------	BAR UNIQUE SQUADS	--------
 [bar_visitors_barman_stalker_trader_squad]:default_squad
@@ -1121,7 +1123,7 @@ bandit		= 1
 monolith 	= 1
 
 [mil_smart_terrain_4_7]:default_lair
-sim_avail 	= true
+sim_avail 	= {+faction_base_defense_active} false, true
 territory	= 1
 
 ;SOC Freedom outpost to Radar, wagon
@@ -1173,6 +1175,7 @@ freedom		= 5
 dolg		= 2
 bandit		= 1
 monolith 	= 1
+lair 		= 1
 
 ;SOC Freedom base, entrance
 [mil_smart_terrain_7_8]:default_base
