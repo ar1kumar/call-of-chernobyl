@@ -272,13 +272,6 @@ function simulation_board:fill_start_position()
 	end
 	self.start_position_filled = true
 	
-	--alun_utils.debug_write(strformat("simulation_board:fill_start_position"))
-
-	local gg = game_graph()
-	local sim = alife()
-
-	local n, result, id, value, smart, smrt_names, section_name, squad
-	
 	local setting_ini
 	if (IsSurvivalMode()) then 
 		setting_ini = ini_file("misc\\simulation_survival_mode.ltx")
@@ -286,24 +279,23 @@ function simulation_board:fill_start_position()
 		setting_ini = ini_file("misc\\simulation.ltx")
 	end 
 	
-	for level in gg:levels() do
-		section_name = "start_position_" .. sim:level_name(level.id)
-		if setting_ini:section_exist(section_name) then
-			n = setting_ini:line_count(section_name)
-			for i=0,n-1 do
-				result, id, value	= setting_ini:r_line(section_name,i,"","")
-				smrt_names = utils.parse_names(value)
-				for k,v in pairs(smrt_names) do
-					smart = self.smarts_by_names[v]
-					if (smart) then
-						squad = self:create_squad(smart, id)
-					else
-						printf("Wrong smart name [%s] in start position", tostring(v))
-					end
+	local result, squad_section, count, li, lc
+	setting_ini:section_for_each(function(section)
+		lc = setting_ini:line_count(section)
+		for li=0,lc-1 do
+			local smart = self.smarts_by_names[section]
+			if (smart) then
+				result, squad_section, count = setting_ini:r_line(section,li,"","")
+				count = tonumber(count) or 1
+				for i=1,count do
+					self:create_squad(smart,squad_section)
 				end
+			else 
+				printf("sim_board:fill_start_position incorrect smart by name %s",section)
 			end
 		end
 	end
+	)
 end
 
 --' Возвратить смарт по его имени.
