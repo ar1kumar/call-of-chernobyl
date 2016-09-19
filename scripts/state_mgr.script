@@ -392,7 +392,7 @@ function state_manager:set_state(state_name, callback, timeout, target, extra)
 
 	if (state_lib.states[self.target_state].weapon == "fire" or state_lib.states[self.target_state].weapon == "sniper_fire") then
 		if (state_lib.states[state_name].weapon ~= "fire" and state_lib.states[state_name].weapon ~= "sniper_fire") then
-			if (self.npc:weapon_unstrapped()) then
+			if (self.npc:active_item() and self.npc:best_weapon() and self.npc:weapon_unstrapped()) then
 				self.npc:set_item(object.idle, state_mgr_weapon.get_weapon(self.npc, state_name))
 			end
 		end

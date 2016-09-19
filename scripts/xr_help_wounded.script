@@ -104,13 +104,6 @@ function evaluator_wounded_exist:find_valid_target()
 		self.a.selected_id = nil
 	end
 
-	local tg = time_global()
-	self.a.__dtimer = not self.a.__dtimer and tg + 250 or self.a.__dtimer
-	if (tg < self.a.__dtimer) then
-		return false 
-	end
-	self.a.__dtimer = nil
-	
 	if not (db.OnlineStalkers) then
 		return false
 	end
@@ -179,7 +172,7 @@ function evaluator_wounded_exist:find_valid_target()
 		return false 
 	end
 
-	local vo_position = vo:position()
+	local vo_position = utils.vector_copy_by_val(vo:position())
 	local dist = npc:position():distance_to_sqr(vo_position)	
 	if (has_enemy(npc) and not combat_can_help(npc,vo,dist)) then 
 		return false 
@@ -294,7 +287,7 @@ local function help_wounded_execute(npc,st)
 				--alife():create("medkit_script",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 			--end
 
-			if (npc:weapon_unstrapped()) then
+			if (npc:active_item() and npc:best_weapon() and npc:weapon_unstrapped()) then
 				state_mgr.set_state(npc, "help_victim_"..AnimCombat,nil,nil,nil,{fast_set = true})
 			else
 				state_mgr.set_state(npc, "help_victim_"..AnimFree,nil,nil,nil,{fast_set = true})
