@@ -364,6 +364,10 @@ function actor_item_to_ruck(binder,obj)
     end
 end
 
+function actor_on_weapon_jammed(binder,wpn)
+	SendScriptCallback("actor_on_weapon_jammed",wpn)
+end 
+
 function actor_on_weapon_magazine_empty(binder,wpn,ammo_total)
 	--printf("weapon_no_ammo wpn=%s ammo_total=%s",wpn and wpn:name(),ammo_total)
 	SendScriptCallback("actor_on_weapon_no_ammo",wpn,ammo_total)
