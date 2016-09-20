@@ -279,6 +279,9 @@ function simulation_board:fill_start_position()
 		setting_ini = ini_file("misc\\simulation.ltx")
 	end 
 	
+	local stalker_pop_factor = (axr_main.config:r_value("mm_options","alife_stalker_pop",2) or 1)
+	local monster_pop_factor = (axr_main.config:r_value("mm_options","alife_mutant_pop",2) or 1)
+		
 	local result, squad_section, count, li, lc
 	setting_ini:section_for_each(function(section)
 		lc = setting_ini:line_count(section)
@@ -287,6 +290,13 @@ function simulation_board:fill_start_position()
 			if (smart) then
 				result, squad_section, count = setting_ini:r_line(section,li,"","")
 				count = tonumber(count) or 1
+				
+				if (string.find(squad_section,"sim_squad")) then
+					count = utils.round(count*stalker_pop_factor)
+				elseif (string.find(squad_section,"simulation")) then
+					count = utils.round(count*monster_pop_factor)
+				end
+					
 				for i=1,count do
 					self:create_squad(smart,squad_section)
 				end
