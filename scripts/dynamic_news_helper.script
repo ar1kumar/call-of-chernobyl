@@ -40,7 +40,7 @@ local all_points={
   [14]={p_daleko="the dredge station",p_blizko="at the dredge station",p={394.4182,-5.8341,228.9845}},
   [15]={p_daleko="the dock cranes",p_blizko="at the dock cranes",p={212.8967,6.8029,14.0857}},
   [16]={p_daleko="the Oakpine anomaly",p_blizko="at the Oakpine anomaly",p={-283.9678,21.0929,-136.5675}},
-  [17]={p_daleko="the refueling station",p_blizko="at the refueling station",p={-103.5785,-5.4548,-220.5178}},
+  [17]={p_daleko="the refuelling station",p_blizko="at the refuelling station",p={-103.5785,-5.4548,-220.5178}},
   [18]={p_daleko="the old barge",p_blizko="at the old barge",p={152.5881,-6.8237,-139.0262}},
   [19]={p_daleko="the Scar anomaly",p_blizko="at the Scar anomaly",p={323.3748,-5.2372,-219.5806}},
   [20]={p_daleko="Preobrazhensky bridge",p_blizko="at Preobrazhensky bridge",p={429.9237,20.2642,-182.6681}},
@@ -195,10 +195,10 @@ local all_points={
   [2]={p_daleko="the helicopters",p_blizko="by the helicopters",p={85.541,4.834,62.382}},
   [3]={p_daleko="the fire trucks",p_blizko="by the fire trucks",p={87.560,6.566,203.660}},
   [4]={p_daleko="the radioactive hills",p_blizko="on the radioactive hills",p={-39.466,10.116,340.233}},
-  [5]={p_daleko="the northeastern checkpoint",p_blizko="by the northeast checkpoint",p={219.70,7.659,304.560}},
+  [5]={p_daleko="the north eastern checkpoint",p_blizko="by the north east checkpoint",p={219.70,7.659,304.560}},
   [6]={p_daleko="the hill in the woods",p_blizko="by the hill in the woods",p={-10.543,24.334,-88.519}},
   [7]={p_daleko="the valley",p_blizko="in the valley",p={-139.040,1.867,-37.843}},
-  [8]={p_daleko="the containers",p_blizko="by the contianers",p={-91.354,6.600,-299.094}},
+  [8]={p_daleko="the containers",p_blizko="by the containers",p={-91.354,6.600,-299.094}},
   [9]={p_daleko="the southern parking lot",p_blizko="at the southern parking lot",p={50.707,13.272,-371.740}}
  },
  ["k00_marsh"]={
@@ -286,19 +286,19 @@ function GetPointDescription(obj)
 	if(angle>=330 or angle<=30)then
 		return m_s .. " east of " .. m_str
 	elseif(angle>30 and angle<=60)then
-		return m_s .. " northeast of " .. m_str
+		return m_s .. " north east of " .. m_str
 	elseif(angle>60 and angle<=120)then
 		return m_s .. " north of " .. m_str
 	elseif(angle>120 and angle<=150)then
-		return m_s .. " northwest of " .. m_str
+		return m_s .. " north west of " .. m_str
 	elseif(angle>150 and angle<=210)then
 		return m_s .. " west of " .. m_str
 	elseif(angle>210 and angle<=240)then
-		return m_s .. " southwest of " .. m_str
+		return m_s .. " south west of " .. m_str
 	elseif(angle>240 and angle<= 300)then
 		return m_s .. " south of " .. m_str
 	elseif(angle>300 and angle<=330)then
-		return m_s .. " southeast of " .. m_str
+		return m_s .. " south east of " .. m_str
 	end
 		
 	return m_s .. " close to " .. m_str
