@@ -201,17 +201,19 @@ function animpoint:position_riched()
 	if (self.current_action and dist <= self.st.reach_distance) then
 		return true
 	end
-		if (dist <= self.st.reach_distance+2) then
-		local dir = vector():set(self.smart_direction:normalize())
-		npc:set_desired_direction(dir)
-		local v1 = -math.deg(math.atan2(dir.x, dir.z))
-		local v2 = -math.deg(math.atan2(npc:direction().x, npc:direction().z))
-		local rot_y = math.min( math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2) )
-		if (rot_y <= 90 and dist <= self.st.reach_distance) then
+	if (dist <= self.st.reach_distance) then
+		local dir1 = vector():set(self.smart_direction)
+		local dir2 = vector():set(npc:direction())
+		npc:set_desired_direction(dir1)
+		npc:set_sight(look.direction, dir1:normalize(), true)
+		local v1 = -math.deg(math.atan2(dir1.x, dir1.z))
+		local v2 = -math.deg(math.atan2(dir2.x, dir2.z))
+		local rot_y = math.abs(math.min(math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2)))
+		if (rot_y <= 25) then
 			return true
 		end
 	end
-		return false
+	return false
 end
 function animpoint:fill_approved_actions()
 	local is_in_camp = self.camp ~= nil
@@ -381,7 +383,7 @@ function animpoint:update()
 		self.current_action = action
 		local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
 	if (npc) then
-		state_mgr.set_state(npc, action, nil, nil, {fast_set = true, look_position = self.look_position},{animation_position = self.position, animation_direction = self.smart_direction} )		
+		state_mgr.set_state(npc, action, nil, nil, {look_position = self.look_position},{animation_position = self.position, animation_direction = self.smart_direction} )		
 	end
 end
 
