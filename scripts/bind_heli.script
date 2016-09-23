@@ -225,7 +225,7 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	end
 	
 	if (get_heli_health(self.st.heliObject,self.st) < 0.005) then
-		xr_statistic.inc_heli_kills()
+		xr_statistic.inc_counter("heli_kills")
 	end
 	
 	-- Down to Earth achievement
@@ -234,7 +234,7 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 		if (itm and itm:section() == "wpn_rpg7") then
 			local health = get_heli_health(self.st.heliObject,self.st)
 			if (health <= 0.005) then
-				xr_statistic.inc_heli_rocket_kills()
+				xr_statistic.inc_counter("heli_rocket_kills")
 			end
 		end
 	end

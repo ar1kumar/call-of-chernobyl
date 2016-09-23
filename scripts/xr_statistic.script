@@ -6,13 +6,13 @@ actor_statistic = {
 					actual_reputation = 0,
 					arena_battles = 0,
 					artefacts_detected = 0,
-					artefacts_founded = 0,
+					artefacts_found = 0,
 					best_monster = nil,
 					boxes_smashed = 0,
 					enemies_surrendered = 0,
 					favorite_weapon_sect = nil,
 					field_dressings = 0,
-					founded_secrets = 0,
+					stashes_found = 0,
 					heli_kills = 0,
 					heli_rocket_kills = 0,
 					help_wounded = 0,
@@ -88,24 +88,24 @@ rank_rep = {
 			arena_chal			=	{rnk=50,	rpt=100},
 			arena_boro			=	{rnk=75,	rpt=150},
 			arena_trad			=	{rnk=100,	rpt=200},
+			artefacts_found		=	{rnk=5,		rpt=0},
+			artefacts_detected	=	{rnk=5,		rpt=0},
 			surges				=	{rnk=5,		rpt=0},
-			dressing			=	{rnk=1,		rpt=0},
-			boxes				=	{rnk=5,		rpt=0},
-			forfeits			=	{rnk=5,		rpt=0},
-			levels				=	{rnk=0,		rpt=0},
+			field_dressings		=	{rnk=1,		rpt=0},
+			boxes_smashed		=	{rnk=5,		rpt=0},
+			enemies_surrendered	=	{rnk=5,		rpt=0},
+			level_changes		=	{rnk=0,		rpt=0},
 			storms				=	{rnk=5,		rpt=0},
-			tasks				=	{rnk=50,	rpt=100},
-			tasks_fail			=	{rnk=0,		rpt=-100},
-			tasks_cancel		=	{rnk=0,		rpt=-100},
-			monsters			=	{rnk=5,		rpt=0},
-			stalkers			=	{rnk=0,		rpt=0}, -- Handled in game_relations.ltx
-			found_arts			=	{rnk=5,		rpt=0},
-			detect_arts			=	{rnk=5,		rpt=0},
-			secrets				=	{rnk=10,	rpt=0},
-			pdas				=	{rnk=10,	rpt=20},
-			heli				=	{rnk=50,	rpt=50},
-			heli_rocket			=	{rnk=50,	rpt=50},
-			wounded				=	{rnk=25,	rpt=50},
+			tasks_completed		=	{rnk=50,	rpt=100},
+			tasks_failed		=	{rnk=0,		rpt=-100},
+			tasks_cancelled		=	{rnk=0,		rpt=-100},
+			killed_monsters		=	{rnk=5,		rpt=0},
+			killed_stalkers		=	{rnk=0,		rpt=0}, -- Handled in game_relations.ltx
+			stashes_found		=	{rnk=10,	rpt=0},
+			pdas_delivered		=	{rnk=10,	rpt=20},
+			heli_kills			=	{rnk=50,	rpt=50},
+			heli_rocket_kills	=	{rnk=50,	rpt=50},
+			help_wounded		=	{rnk=25,	rpt=50},
 			
 			-- Gain/loss based on faction relations.
 			-- Used instead of 'stalkers' or game_relations.ltx
@@ -170,7 +170,7 @@ function on_game_start()
 end
 
 function on_level_changing()
-	inc_level_changes_counter()
+	inc_counter("level_changes")
 end
 
 function on_game_load()
@@ -184,12 +184,12 @@ function actor_on_item_take(item)
 			local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
 			if anomal_zone ~= nil then
 				anomal_zone:on_artefact_take(item)
-				inc_artefacts_detected_counter()
+				inc_counter("artefacts_detected")
 			else
 				bind_anomaly_zone.artefact_ways_by_id[item:id()] = nil
 			end
 			artefact:FollowByPath("NULL",0,vector():set(500,500,500))
-			inc_founded_artefacts_counter(item:id())
+			inc_counter_artefacts(item:id())
 		end
 	end
 end
@@ -225,54 +225,21 @@ function load_state(data)
 	data.xr_statistic = nil
 end
 
-function inc_achievements_counter()
-	actor_statistic.achievements = actor_statistic.achievements + 1
-	inc_actor_rank(rank_rep.achievements.rnk)
-	inc_actor_reputation(rank_rep.achievements.rpt)
-end
-function inc_surges_counter()
-	actor_statistic.surges = actor_statistic.surges + 1
-	inc_actor_rank(rank_rep.surges.rnk)
-	inc_actor_reputation(rank_rep.surges.rpt)
-end
-function inc_storms_counter()
-	actor_statistic.storms = actor_statistic.storms + 1
-	inc_actor_rank(rank_rep.storms.rnk)
-	inc_actor_reputation(rank_rep.storms.rpt)
-end
-function inc_tasks_completed_counter()
-	actor_statistic.tasks_completed = actor_statistic.tasks_completed + 1
-	inc_actor_rank(rank_rep.tasks.rnk)
-	inc_actor_reputation(rank_rep.tasks.rpt)
+function inc_achievement(achievement)
+	inc_counter("achievements")
+	inc_actor_rank(rank_rep[achievement].rnk)
+	inc_actor_rank(rank_rep[achievement].rpt)
 end
 
-function inc_tasks_failed_counter()
-	actor_statistic.tasks_failed = actor_statistic.tasks_failed + 1
-	inc_actor_rank(rank_rep.tasks_fail.rnk)
-	inc_actor_reputation(rank_rep.tasks_fail.rpt)
+function inc_counter(statistic)
+	actor_statistic[statistic] = actor_statistic[statistic] + 1
+	inc_actor_rank(rank_rep[statistic].rnk)
+	inc_actor_rank(rank_rep[statistic].rpt)
 end
 
-function inc_tasks_cancelled_counter()
-	actor_statistic.tasks_cancelled = actor_statistic.tasks_cancelled + 1
-	inc_actor_rank(rank_rep.tasks_cancel.rnk)
-	inc_actor_reputation(rank_rep.tasks_cancel.rpt)
-end
-
-function inc_killed_monsters_counter()
-	actor_statistic.killed_monsters = actor_statistic.killed_monsters + 1
-	inc_actor_rank(rank_rep.monsters.rnk)
-	inc_actor_reputation(rank_rep.monsters.rpt)
-end
-function inc_killed_stalkers_counter()
-	actor_statistic.killed_stalkers = actor_statistic.killed_stalkers + 1
-	inc_actor_rank()
-	inc_actor_reputation()
-end
-function inc_founded_artefacts_counter(art_id)
+function inc_counter_artefacts(art_id)
 	if(taken_artefacts[art_id]==nil) then
-		actor_statistic.artefacts_founded = actor_statistic.artefacts_founded + 1
-		inc_actor_rank(rank_rep.found_arts.rnk)
-		inc_actor_reputation(rank_rep.found_arts.rpt)
+		inc_counter("artefacts_found")
 		taken_artefacts[art_id] = art_id
 		local s_art = alife():object(art_id)
 		if(s_art and s_art:section_name()) then
@@ -280,56 +247,7 @@ function inc_founded_artefacts_counter(art_id)
 		end
 	end
 end
-function inc_boxes_smashed_counter()
-	actor_statistic.boxes_smashed = actor_statistic.boxes_smashed + 1
-	inc_actor_rank(rank_rep.boxes.rnk)
-	inc_actor_reputation(rank_rep.boxes.rpt)
-end
-function inc_field_dressings_counter()
-	actor_statistic.field_dressings = actor_statistic.field_dressings + 1
-	inc_actor_rank(rank_rep.dressing.rnk)
-	inc_actor_reputation(rank_rep.dressing.rpt)
-end
-function inc_enemies_surrendered_counter()
-	actor_statistic.enemies_surrendered = actor_statistic.enemies_surrendered + 1
-	inc_actor_rank(rank_rep.forfeits.rnk)
-	inc_actor_reputation(rank_rep.forfeits.rpt)
-end
-function inc_level_changes_counter()
-	actor_statistic.level_changes = actor_statistic.level_changes + 1
-	inc_actor_rank(rank_rep.levels.rnk)
-	inc_actor_reputation(rank_rep.levels.rpt)
-end
-function inc_founded_secrets_counter()
-	actor_statistic.founded_secrets = actor_statistic.founded_secrets + 1
-	inc_actor_rank(rank_rep.secrets.rnk)
-	inc_actor_reputation(rank_rep.secrets.rpt)
-end
-function inc_pdas_delivered_counter()
-	actor_statistic.pdas_delivered = actor_statistic.pdas_delivered + 1
-	inc_actor_rank(rank_rep.pdas.rnk)
-	inc_actor_reputation(rank_rep.pdas.rpt)
-end
-function inc_heli_kills()
-	actor_statistic.heli_kills = actor_statistic.heli_kills + 1
-	inc_actor_rank(rank_rep.heli.rnk)
-	inc_actor_reputation(rank_rep.heli.rpt)
-end
-function inc_heli_rocket_kills()
-	actor_statistic.heli_rocket_kills = actor_statistic.heli_rocket_kills + 1
-	inc_actor_rank(rank_rep.heli_rocket.rnk)
-	inc_actor_reputation(rank_rep.heli_rocket.rpt)
-end
-function inc_artefacts_detected_counter()
-	actor_statistic.artefacts_detected = actor_statistic.artefacts_detected + 1
-	inc_actor_rank(rank_rep.detect_arts.rnk)
-	inc_actor_reputation(rank_rep.detect_arts.rpt)
-end
-function inc_help_wounded_counter()
-	actor_statistic.help_wounded = actor_statistic.help_wounded + 1
-	inc_actor_rank(rank_rep.wounded.rnk)
-	inc_actor_reputation(rank_rep.wounded.rpt)
-end
+
 function inc_arena_battles_counter(mode)
 	actor_statistic.arena_battles = actor_statistic.arena_battles + 1
 	-- Invalid.
@@ -354,7 +272,8 @@ function npc_on_death_callback(victim,who)
 	if not (who and victim) then return end
 	if not (who:id() == db.actor:id()) then return end
 	
-	inc_killed_stalkers_counter()
+	-- Increment kill stalkers stat.
+	inc_counter("killed_stalkers")
 	
 	local npc_faction = character_community(victim)
 	local actor_faction = character_community(who)
@@ -429,8 +348,8 @@ function save(package)
 	package:w_u16(actor_statistic.tasks_cancelled)
 	package:w_u32(actor_statistic.killed_monsters)
 	package:w_u32(actor_statistic.killed_stalkers)
-	package:w_u16(actor_statistic.founded_secrets)
-	package:w_u16(actor_statistic.artefacts_founded)
+	package:w_u16(actor_statistic.stashes_found)
+	package:w_u16(actor_statistic.artefacts_found)
 	package:w_u16(actor_statistic.pdas_delivered)
 	package:w_u16(actor_statistic.heli_kills)
 	package:w_u16(actor_statistic.heli_rocket_kills)
@@ -498,8 +417,8 @@ function load(package)
 	actor_statistic.tasks_cancelled		= package:r_u16()
 	actor_statistic.killed_monsters  	= package:r_u32()
 	actor_statistic.killed_stalkers  	= package:r_u32()
-	actor_statistic.founded_secrets  	= package:r_u16()
-	actor_statistic.artefacts_founded	= package:r_u16()
+	actor_statistic.stashes_found	  	= package:r_u16()
+	actor_statistic.artefacts_found		= package:r_u16()
 	actor_statistic.pdas_delivered 		= package:r_u16()
 	actor_statistic.heli_kills			= package:r_u16()
 	actor_statistic.heli_rocket_kills	= package:r_u16()

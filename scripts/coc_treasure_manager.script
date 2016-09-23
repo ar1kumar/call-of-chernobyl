@@ -72,7 +72,7 @@ local function actor_on_item_take_from_box(box,itm)
 			hud:HideActorMenu()
 		end
 		level.map_remove_object_spot(box:id(), "treasure")
-		xr_statistic.inc_founded_secrets_counter()
+		xr_statistic.inc_counter("stashes_found")
 		news_manager.send_treasure(1)
 	end
 end

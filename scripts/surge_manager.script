@@ -254,7 +254,7 @@ function CSurgeManager:skip_surge()
 	self:toggle_level_artefact_respawns()
 	self:respawn_artefacts_and_replace_anomaly_zone()
 	
-	xr_statistic.inc_surges_counter()
+	xr_statistic.inc_counter("surges")
 	if not (self.skip_message) and (atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_blowout",2,1)==1) then
 		news_manager.send_tip(db.actor, "st_surge_while_asleep", nil, "recent_surge", nil, nil)
 		self.skip_message = true
@@ -338,7 +338,7 @@ function CSurgeManager:end_surge(manual)
 		self:toggle_level_artefact_respawns()
 	--end
 
-	xr_statistic.inc_surges_counter()
+	xr_statistic.inc_counter("surges")
 end
 
 function CSurgeManager:toggle_level_artefact_respawns()

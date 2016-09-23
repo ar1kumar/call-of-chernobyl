@@ -167,7 +167,7 @@ function generic_object_binder:death_callback(victim, who)
 
 	if (who) then
 		if (who:id() == db.actor:id()) then
-			xr_statistic.inc_killed_monsters_counter()
+			xr_statistic.inc_counter("killed_monsters")
 		elseif (IsStalker(who) and who:alive()) then
 			local se_who = alife():object(who:id())
 			-- npc_statistic
