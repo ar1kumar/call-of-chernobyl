@@ -85,9 +85,7 @@ monster_classes = {
 rank_rep = {
 			-- Gameplay mechanics.
 			achievements		=	{rnk=0,		rpt=0},
-			arena_chal			=	{rnk=50,	rpt=100},
-			arena_boro			=	{rnk=75,	rpt=150},
-			arena_trad			=	{rnk=100,	rpt=200},
+			arena_battles		=	{rnk=50,	rpt=100},
 			artefacts_found		=	{rnk=5,		rpt=0},
 			artefacts_detected	=	{rnk=5,		rpt=0},
 			surges				=	{rnk=5,		rpt=0},
@@ -245,26 +243,6 @@ function inc_counter_artefacts(art_id)
 		if(s_art and s_art:section_name()) then
 			artefacts_table[s_art:section_name()] = true
 		end
-	end
-end
-
-function inc_arena_battles_counter(mode)
-	actor_statistic.arena_battles = actor_statistic.arena_battles + 1
-	-- Invalid.
-	if (mode == nil) then
-		return
-	-- Challenge arena.
-	elseif (mode == "challenge") then
-		inc_actor_rank(rank_rep.arena_chal.rnk)
-		inc_actor_reputation(rank_rep.arena_chal.rpt)
-	-- Traditional arena.
-	elseif (mode == "traditional") then
-		inc_actor_rank(rank_rep.arena_trad.rnk)
-		inc_actor_reputation(rank_rep.arena_trad.rpt)
-	-- Borovos' arena.
-	elseif (mode == "borovos") then
-		inc_actor_rank(rank_rep.arena_boro.rnk)
-		inc_actor_reputation(rank_rep.arena_boro.rpt)
 	end
 end
 
