@@ -87,3 +87,206 @@ close_distance  = 0
 far_distance 	= 0
 close_snd_distance = 3
 use = {=actor_enemy} false, true
+
+;camping
+[logic@cit_killers_camp_work_1]
+active = animpoint@cit_killers_camp_work_1
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_2]
+active = animpoint@cit_killers_camp_work_2
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_3]
+active = animpoint@cit_killers_camp_work_3
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_4]
+active = animpoint@cit_killers_camp_work_4
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_5]
+active = animpoint@cit_killers_camp_work_5
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_6]
+active = animpoint@cit_killers_camp_work_6
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_7]
+active = animpoint@cit_killers_camp_work_7
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_8]
+active = animpoint@cit_killers_camp_work_8
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_9]
+active = animpoint@cit_killers_camp_work_9
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_10]
+active = animpoint@cit_killers_camp_work_10
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_11]
+active = animpoint@cit_killers_camp_work_11
+suitable = {=is_night} true
+prior = 41
+
+[logic@cit_killers_camp_work_12]
+active = animpoint@cit_killers_camp_work_12
+suitable = {=is_night} true
+prior = 41
+
+[animpoint@cit_killers_camp_work_1]
+cover_name = cit_killers_animpoint_camp1
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_2]
+cover_name = cit_killers_animpoint_camp2
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_3]
+cover_name = cit_killers_animpoint_camp3
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_4]
+cover_name = cit_killers_animpoint_camp4
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_5]
+cover_name = cit_killers_animpoint_camp5
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_6]
+cover_name = cit_killers_animpoint_camp6
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_7]
+cover_name = cit_killers_animpoint_camp7
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_8]
+cover_name = cit_killers_animpoint_camp8
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_9]
+cover_name = cit_killers_animpoint_camp9
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_10]
+cover_name = cit_killers_animpoint_camp10
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_11]
+cover_name = cit_killers_animpoint_camp11
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_12]
+cover_name = cit_killers_animpoint_camp12
+use_camp = true
+turn_on_campfire = true
+
+;------------------------------
+;------- Mutant swarm ----------
+;------------------------------
+
+[logic@faction_base_defense_enemy1]
+active = mob_home@faction_base_defense_enemy1
+suitable = {=target_squad_name(faction_base_defense_flesh_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy1]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy2]
+active = mob_home@faction_base_defense_enemy2
+suitable = {=target_squad_name(faction_base_defense_boar_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy2]
+path_home = home_attackers
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy3]
+active = mob_home@faction_base_defense_enemy3
+suitable = {=target_squad_name(faction_base_defense_dog_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy3]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy4]
+active = mob_home@faction_base_defense_enemy4
+suitable = {=target_squad_name(faction_base_defense_flesh_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy4]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy5]
+active = mob_home@faction_base_defense_enemy5
+suitable = {=target_squad_name(faction_base_defense_boar_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy5]
+path_home = home_attackers
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy6]
+active = mob_home@faction_base_defense_enemy6
+suitable = {=target_squad_name(faction_base_defense_dog_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy6]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
