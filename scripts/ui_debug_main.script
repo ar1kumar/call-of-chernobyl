@@ -1022,7 +1022,7 @@ end
 function debug_ui:OnBtnExecuteString()
 	local txt = self.fld_execute_string:GetText()
 	if (txt ~= "") then
-		assert(loadstring(txt))
+		assert(loadstring(txt))()
 	end
 end
 
