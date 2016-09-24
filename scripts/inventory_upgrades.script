@@ -41,7 +41,7 @@ function lend_item_for_repair(itm,mechanic_name,rt)
 		else
 			for id,t in pairs(RepairItemList[mechanic_name]) do
 				if (t.gt ~= nil) then
-					rt = rt + (t.rt - game.get_game_time():diffSec(t.gt))
+					rt = rt + utils.clamp(t.rt - game.get_game_time():diffSec(t.gt),0,t.rt)
 				end
 			end
 		end
