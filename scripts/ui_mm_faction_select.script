@@ -67,10 +67,6 @@ local function on_game_load(binder)
 	local faction = config:r_value("temp","new_game_faction",3) or ""
 	
 	if (faction and faction ~= "") then
-		local supply_id = config:r_value("temp","new_game_supplies",2) or 1
-		supply_id = supply_id > 0 and supply_id or 1
-		
-		config:w_value("temp","new_game_supplies")
 		config:w_value("temp","new_game_faction")
 		need_save = true
 		
@@ -728,7 +724,6 @@ function faction_ui:OnStartGame()
 	axr_main.config:w_value("temp","new_game_faction_position",self.start_location or nil)
 	axr_main.config:w_value("temp","new_game_loadout",self.loadout_str or nil)
 	axr_main.config:w_value("temp","new_game_character_icon",self.icon_list:GetText())
-	axr_main.config:w_value("temp","new_game_supplies",tostring(self.supplies_id or 1))
 	
 	-- Store info in temp config so it can be read on next game load
 	axr_main.config:w_value("temp","new_game_character_name", character_name:gsub(" ","_") )
