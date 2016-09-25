@@ -52,15 +52,11 @@ function actor_has_bad_psi_helmet(a,b)
 end
 
 function actor_can_afford_bad_psi_helmet(a,b)
-	-- return false because actor gets a free good psi helmet
-	if (db.actor:has_info("yan_stalker_sakharov_offer_free_upgrade")) then 
-		return false
-	end
 	return db.actor:money() >= 10000
 end
 
 function actor_can_afford_good_psi_helmet(a,b)
-	return db.actor:has_info("yan_stalker_sakharov_offer_free_upgrade") or db.actor:money() >= 17500
+	return db.actor:money() >= 17500
 end
 
 function actor_can_afford_bad_to_good_psi_helmet(a,b)
