@@ -186,6 +186,7 @@ function actor_on_save(binder,packet)
 	
 	if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
 		--printf("DEBUG: actor changing level")
+		task_manager.get_task_manager():set_task_cancelled("faction_base_defense")
 		SendScriptCallback("on_level_changing")
 	end
 

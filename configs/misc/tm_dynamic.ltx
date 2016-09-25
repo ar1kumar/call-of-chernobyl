@@ -471,6 +471,6 @@ target_functor = faction_base_defense_target
 condlist_0 = {+faction_base_defense_enemy_killed +faction_base_defense_2nd_enemy_killed} complete
 condlist_1 = {+yantar_faction_base_defense_quest_started !actor_on_level(l08_yantar)} fail
 on_init = %+faction_base_defense_active%
-on_complete = %-faction_base_defense_active%
-on_fail = %-faction_base_defense_active%
-on_cancel = %-faction_base_defense_active%
+on_complete = %-faction_base_defense_active =actor_surge_immuned(false)%
+on_fail = %-faction_base_defense_active =actor_surge_immuned(false)%
+on_cancel = %-faction_base_defense_active =actor_surge_immuned(false)%
