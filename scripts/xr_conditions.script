@@ -2943,3 +2943,7 @@ end
 function is_actor_surge_immuned(actor,npc,p)
 	return utils.load_var(db.actor,"surge_immuned",false) == true
 end
+
+function get_start_time_elapsed_ge(actor,npc,p)
+	return p[1] and tonumber(p[1]) >= tonumber(game.get_game_time():diffSec(level.get_start_time()))
+end
