@@ -8,6 +8,7 @@ bounties_by_id = {}
 available_tasks = {}
 ongoing_tasks = {} 
 finished_tasks = {}
+hostages_by_id = {}
 -----------------------------------------------------------------------------
 --								PRIVATE
 -----------------------------------------------------------------------------
@@ -66,12 +67,17 @@ end
 
 local function save_state(m_data)
 	m_data.bounties_by_id = bounties_by_id
+	m_data.hostages_by_id = hostages_by_id
 end 
 
 local function load_state(m_data)
 	if (m_data.bounties_by_id) then 
 		bounties_by_id = m_data.bounties_by_id
 		m_data.bounties_by_id = nil
+	end
+	if (m_data.hostages_by_id) then 
+		hostages_by_id = m_data.hostages_by_id
+		m_data.hostages_by_id = nil 
 	end
 end
 -----------------------------------------------------------------------------

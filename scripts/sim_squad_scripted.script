@@ -90,6 +90,8 @@ function sim_squad_scripted:get_script_target()
 	local new_target 
 	if (self.scripted_target) then 
 		new_target = self.scripted_target
+	elseif (axr_task_manager.hostages_by_id[self.id]) then 
+		return axr_task_manager.hostages_by_id[self.id]
 	elseif (self.random_targets) then
 		if (self.current_action == 0 and self.assigned_target_id == nil) then 
 			new_target = self.random_targets[math.random(#self.random_targets)]
@@ -1021,7 +1023,7 @@ function sim_squad_scripted:can_switch_online()
 		
 		if (db.actor and db.spawned_vertex_by_id[self:commander_id()] == nil) then
 			local dist = axr_main.config:r_value("mm_options","excl_dist",2) or 0
-			if (dist > 0) then 
+			if (dist > 0 and not db.actor:has_info("actor_is_sleeping")) then 
 				local actor = alife():actor()
 				if (self.position:distance_to(actor.position) <= dist) then
 					return false
@@ -1035,10 +1037,9 @@ function sim_squad_scripted:switch_offline()
 	cse_alife_online_offline_group.switch_offline(self)
 end
 function sim_squad_scripted:switch_online()
-	if (DEV_DEBUG) then
-		printf("sim_squad_scripted:switch_online() [%s]",self:name())
-		--get_console():execute("flush")
-	end
+	-- if (DEV_DEBUG) then
+		-- printf("sim_squad_scripted:switch_online() [%s]",self:name())
+	-- end
 	cse_alife_online_offline_group.switch_online(self)
 end
 

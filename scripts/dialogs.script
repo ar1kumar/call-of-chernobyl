@@ -17,6 +17,18 @@ function npc_is_tech(a,b)
 	end
 end
 
+function rescue_hostage(a,b)
+	local npc = who_is_npc(a,b)
+	local se_npc = alife():object(npc:id())
+	if (se_npc) then
+		utils.se_obj_save_var(se_npc.id,se_npc:name(),"companion_cannot_teleport",nil)
+		local squad = se_npc.group_id and se_npc.group_id ~= 65535 and alife():object(se_npc.group_id)
+		if (squad) then 
+			axr_task_manager.hostages_by_id[squad.id] = nil
+		end
+	end
+end 
+
 -- Dynamic Ordered Task dialog
 -- AVAILABLE TASKS
 function generate_available_tasks(a,b)

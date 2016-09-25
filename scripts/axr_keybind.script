@@ -40,6 +40,9 @@ function action.companion_move_to_point(p)
 end
 
 function action.companion_cycle_stealth(p)
+	if not (p==1) then
+		return 
+	end
 	for id,squad in pairs(axr_companions.companion_squads) do 
 		if (squad and squad.commander_id) then
 			for k in squad:squad_members() do
@@ -47,10 +50,12 @@ function action.companion_cycle_stealth(p)
 					st = db.storage[k.id]
 					local member = st and st.object
 					if (member and member:alive()) then
-						if ( member:has_info("npcx_beh_hide_in_cover") ) then
-							member:disable_info_portion("npcx_beh_hide_in_cover")
+						if ( member:has_info("npcx_beh_substate_stealth") ) then
+							member:disable_info_portion("npcx_beh_substate_stealth")
+							SetHudMsg("Companion stealth mode disabled",8)
 						else
-							member:give_info_portion("npcx_beh_hide_in_cover")
+							member:give_info_portion("npcx_beh_substate_stealth")
+							SetHudMsg("Companion stealth mode enabled",8)
 						end
 					end
 				end
@@ -60,6 +65,9 @@ function action.companion_cycle_stealth(p)
 end
 
 function action.companion_cycle_looting(p)
+	if not (p==1) then
+		return 
+	end
 	for id,squad in pairs(axr_companions.companion_squads) do 
 		if (squad and squad.commander_id) then
 			for k in squad:squad_members() do
