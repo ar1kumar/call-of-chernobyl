@@ -2,10 +2,10 @@
 active = sr_idle@wait_for_actor
 
 [sr_idle@wait_for_actor]
-on_actor_inside = sr_idle@check_conditions
+on_actor_inside = sr_idle@check_conditions, {+warlab_deactivate_generators_done} sr_idle@nil
 
 [sr_idle@check_conditions]
-on_info = {=is_dark_night -actor_is_sleeping !is_faction_enemy_to_actor(killer)} sr_idle@decide
+on_info = {=is_dark_night -actor_is_sleeping !is_faction_enemy_to_actor(killer) -warlab_deactivate_generators_done} sr_idle@decide
 on_actor_outside = sr_idle@wait_for_actor
 
 [sr_idle@decide]
@@ -28,3 +28,5 @@ on_info = {+faction_base_defense_enemy_killed +faction_base_defense_2nd_enemy_ki
 
 [sr_idle@timer]
 on_game_timer = 86400 | sr_idle@wait_for_actor %-mar_smart_terrain_5_12_mutants_to_base -faction_base_defense_enemy_killed -faction_base_defense_2nd_enemy_killed -faction_base_defense_flesh_squad_spawned -faction_base_defense_boar_squad_spawned -faction_base_defense_dog_squad_spawned%
+
+[sr_idle@nil]
