@@ -49,20 +49,21 @@ function init_drop_settings()
 	end
 end
 
+-- this will actually occur every time corpse spawn unless already looted
 function decide_items_to_keep(npc)
-	local death_dropped = tonumber(utils.se_obj_load_var(npc:id(),npc:name(),"death_dropped") or 0) or 0
-	if (death_dropped == 0) then
-		utils.se_obj_save_var(npc:id(),npc:name(),"death_dropped",1)
-		npc:iterate_inventory(keep_item, npc)
-	end
-end 
-
-function create_release_item(npc)
-	local death_dropped = tonumber(utils.se_obj_load_var(npc:id(),npc:name(),"death_dropped") or 0) or 0
-	if (death_dropped > 1) then
+	local death_dropped = utils.se_obj_load_var(npc:id(),npc:name(),"death_dropped")
+	if (death_dropped) then
 		return
 	end
-	utils.se_obj_save_var(npc:id(),npc:name(),"death_dropped",2)
+	npc:iterate_inventory(keep_item, npc)
+end
+
+function create_release_item(npc)
+	local death_dropped = utils.se_obj_load_var(npc:id(),npc:name(),"death_dropped")
+	if (death_dropped) then
+		return
+	end
+	utils.se_obj_save_var(npc:id(),npc:name(),"death_dropped",true)
 	
 	-- spawn items by story id
 	local sid = item_by_story_id and get_object_story_id(npc:id())
@@ -150,31 +151,27 @@ function keep_item(npc, item)
 		return 
 	end 
 	
+	local se_item = alife():object(item:id())
+	if not (se_item) then 
+		return
+	end
+	
 	local ini = npc:spawn_ini()
 	if ini and ini:section_exist("dont_keep_items") then
-		local se_item = alife():object(item:id())
-		if (se_item) then
-			alife():release(se_item, true)
-		end
+		alife():release(se_item, true)
 		return
 	end
 	
 	local st = db.storage[npc:id()]
 	if (st and st.ini and st.section_logic and st.ini:line_exist(st.section_logic,"dont_keep_items")) then
-		local se_item = alife():object(item:id())
-		if (se_item) then
-			alife():release(se_item, true)
-		end
+		alife():release(se_item, true)
 		return
 	end 
 	
 	-- release all animation objects
 	if (section == "bolt" or section == "medkit_script" or section == "guitar_a" or section == "harmonica_a" or section == "wpn_binoc" or section == "anim_binoc" or section == "anim_knife" 
 		or section == "device_torch" or section == "device_pda" or section == "hand_radio" or section == "hand_radio_r") then
-		local se_item = alife():object(item:id())
-		if (se_item) then
-			alife():release(se_item, true)
-		end
+		alife():release(se_item, true)
 		return 
 	end
 	
@@ -183,10 +180,7 @@ function keep_item(npc, item)
 		local r = math.random(0,m)
 		item:set_remaining_uses(r)
 		if (r == 0) then 
-			local se_item = alife():object(item:id())
-			if (se_item) then
-				alife():release(se_item, true)
-			end
+			alife():release(se_item, true)
 		end
 		return
 	end
@@ -205,10 +199,7 @@ function keep_item(npc, item)
 		return
 	end
 	
-	local se_item = alife():object(item:id())
-	if (se_item) then
-		alife():release(se_item, true)
-	end
+	alife():release(se_item, true)
 end
 
 function set_weapon_drop_condition(item)
