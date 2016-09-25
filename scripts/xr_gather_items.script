@@ -118,6 +118,9 @@ end
 
 
 function gather_item(npc)
+	if not (db.actor) then 
+		return 
+	end
 	local id = npc:id()
 	local st = id and db.storage[id] and db.storage[id].gather_items
 

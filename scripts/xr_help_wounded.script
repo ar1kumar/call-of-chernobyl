@@ -20,6 +20,9 @@ local HelpInCombatVisuals = alun_utils.collect_sections(ini,{"help_in_combat_vis
 ini = nil
 
 function help_wounded(npc)
+	if not (db.actor) then 
+		return 
+	end
 	--state_mgr.set_state(npc,"guard")
 	--printf("%s Helping wounded.",npc:name())
 	local id = npc and npc:id()

@@ -159,6 +159,9 @@ function get_loot_table(ini)
 end
 
 function get_all_from_corpse(npc)
+	if not (db.actor) then 
+		return 
+	end
 	local id = npc:id()
 	local st = db.storage[id] and db.storage[id].corpse_detection
 
