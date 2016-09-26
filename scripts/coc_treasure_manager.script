@@ -207,11 +207,11 @@ function create_random_stash(no_spot,hint,bonus_items)
 			-- decide for each section based on chance, weight and item classification
 			if (cost <= 500) then
 				if (is_consumable(section)) then
-					try_spawn_item(section,1,4,0.25,15)
+					try_spawn_item(section,1,4,0.3,15)
 				elseif (bOutfit) then
 					try_spawn_item(section,1,1,0.10,40)
 				else
-					try_spawn_item(section,1,1,0.25,15)
+					try_spawn_item(section,1,1,0.25,30)
 				end
 			elseif (cost <= 1000) then
 				if (is_consumable(section)) then
@@ -219,7 +219,7 @@ function create_random_stash(no_spot,hint,bonus_items)
 				elseif (bOutfit) then
 					try_spawn_item(section,1,1,0.18,45)
 				else
-					try_spawn_item(section,1,1,0.18,20)
+					try_spawn_item(section,1,1,0.18,30)
 				end
 			elseif (cost <= 3000) then
 				if (bOutfit) then
@@ -234,9 +234,13 @@ function create_random_stash(no_spot,hint,bonus_items)
 					try_spawn_item(section,1,1,0.010,50)
 				end
 			elseif (cost <= 10000) then
+				try_spawn_item(section,1,1,0.003,90)
+			elseif (cost <= 15000) then 
 				try_spawn_item(section,1,1,0.003,100)
+			elseif (cost <= 20000) then
+				try_spawn_item(section,1,1,0.003,110)
 			else
-				try_spawn_item(section,1,1,0.001,100)
+				try_spawn_item(section,1,1,0.003,120)
 			end
 		end 
 		

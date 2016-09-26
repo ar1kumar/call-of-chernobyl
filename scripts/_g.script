@@ -1395,7 +1395,7 @@ function CALifeUpdateManager__on_before_change_level(packet)
 	-- reset read pointer
 	packet:r_seek(2)
 		
-		if (bind_container.containers) then
+	if (bind_container.containers) then
 		for id,t in pairs(bind_container.containers) do
 			if (t.id) then
 				pos.y = pos.y+100
