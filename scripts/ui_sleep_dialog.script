@@ -80,18 +80,17 @@ function sleep_dialog:__finalize()
 end
 
 function sleep_dialog:TestAndShow()
-
 	local bleeding = db.actor.bleeding > 0
 	local radiation = db.actor.radiation > 0
-
-	if (sleep_control.ph_sleepbag_id and sleep_control.item_section) then
+	
+	if (self.ph_sleepbag_id and self.item_section) then
 		local sim = alife()
-		sim:create(sleep_control.item_section,db.actor:position(),0,0,0)
-		local se_bag = sim:object(sleep_control.ph_sleepbag_id)
+		sim:create(self.item_section,db.actor:position(),0,0,0)
+		local se_bag = sim:object(self.ph_sleepbag_id)
 		if (se_bag) then
 			sim:release(se_bag,true)
 		end
-		sleep_control.ph_sleepbag_id = nil
+		self.ph_sleepbag_id = nil
 	end
 
 	-- Prevent sleep if not tired, but only if sleep deprivation is enabled.
@@ -162,7 +161,7 @@ function sleep_dialog:OnButtonSleep()
 	_G.amb_vol = get_console():get_float("snd_volume_eff")
 	get_console():execute("snd_volume_music 0")
 	get_console():execute("snd_volume_eff 0")
-	if sleep_control.forced then
+	if self.forced then
 		level.add_cam_effector("camera_effects\\surge_02.anm", 10, false, "ui_sleep_dialog.dream_callback")
 	else
 		level.add_cam_effector("camera_effects\\sleep.anm", 10, false, "ui_sleep_dialog.dream_callback")

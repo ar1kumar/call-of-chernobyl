@@ -373,7 +373,6 @@ function actor_on_item_use(obj)
 		if (SleepBagPlaceable) then
 			local ph_sec = system_ini():r_string_ex(sec,"placeable_section")
 			local se_obj = alife():create(ph_sec or "ph_sleepbag",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
-			se_obj.sleepbag_section = sec
 		else
 			local se_obj = alife():create(sec,db.actor:position(),0,0,0)
 			local hud = get_hud()
@@ -550,8 +549,7 @@ function physic_object_on_use_callback(obj,who)
 		if (hud) then
 			hud:HideActorMenu()
 		end
-		local se_obj = alife():object(obj:id())
-		local ui = ui_sleep_dialog.sleep_bag(obj:id(),se_obj.sleepbag_section)
+		ui_sleep_dialog.sleep_bag(obj:id(),SleepBagPlaceableSections[obj:section()])
 	end
 end
 
