@@ -950,7 +950,7 @@ end
 function debug_ui:OnBtnSpawnSquad()
 	local sec = self.fld_spawn_squad:GetText()
 	local smrt = self.fld_spawn_smart:GetText()
-	if (sec ~= "" and smrt ~= "") then
+	if (sec ~= "") then
 		self:spawn_squad(sec,smrt)
 	end
 end
@@ -1182,24 +1182,42 @@ function debug_ui:spawn_section(text)
 	return true
 end
 
-function debug_ui:spawn_squad(section,smart)
+function debug_ui:spawn_squad(section,smart_name)
 	if not system_ini():section_exist(section) then
 		self:SendOutput("UISpawner: Section %s does not exist in system INI.",section)
 		return false
 	end
+	
+	printf("section=%s smart_name=%s", section, smart_name)
 
-	if not (smart) then
-		self:SendOutput("UISpawner: Smart by name %s does not exist.",smart)
-		return false
+	local sim = alife()
+	local smart = smart_name and smart_name ~= "" and SIMBOARD.smarts_by_names[smart_name]
+	local squad
+	if (smart) then 
+		squad = sim:create(section,smart.position,smart.m_level_vertex_id,smart.m_game_vertex_id)
+		if (squad) then 
+			squad:create_npc(smart)
+		end
+	else 
+		squad = sim:create(section,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+		if (squad) then 
+			squad:create_npc(nil,db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+		end
 	end
-	local sim = SIMBOARD
-	if not (sim.smarts_by_names[smart]) then
-		self:SendOutput("UISpawner: Smart by name %s does not exist.",smart)
-		return false
-	end
-	local squad = alun_utils.create_squad(section,smart)
-	self:SendOutput("UISpawner: Squad %s created as ID %s at %s.",squad:name(),squad.id,smart)
-	return true
+	
+	if (squad) then
+		for k in squad:squad_members() do
+			local se_obj = k.object or k.id and sim:object(k.id)
+			if (se_obj) then
+				SIMBOARD:setup_squad_and_group(se_obj)
+			end 
+		end 
+		
+		self:SendOutput("UISpawner: Squad %s created as ID %s at %s.",squad:name(),squad.id,smart and smart_name or "actor")
+		return true
+	end 
+	self:SendOutput("UISpawner: failed to create %s",section)
+	return false
 end
 
 function debug_ui:FindNearest(txt)
@@ -1895,7 +1913,7 @@ function debug_ui_spawner:InitControls(x, y, xml, owner)
 	local board = SIMBOARD
 	local smrts = {}
 	for id,t in pairs(board.smarts) do
-		if (t.smrt and self.is_on_actor_level) then
+		if (t.smrt and t.smrt.online) then
 			smrts[#smrts+1] = t.smrt:name()
 		end
 	end
