@@ -6,16 +6,20 @@ end
 
 function upgrade_player_bad_psi_helmet(a,b)
 	local o = db.actor:object("bad_psy_helmet")
-	if (o) then 
-		local se_itm = alife():object(o:id())
-		alife():release(se_itm,true)
+	if (o) then
 		news_manager.relocate_item(db.actor, "out", "bad_psy_helmet")
-		if not (db.actor:has_info("yan_stalker_sakharov_offer_free_upgrade")) then
-			dialogs.relocate_money_from_actor(a,b,8000)
+		local se_itm = alife():object(o:id())
+		if (se_itm) then
+			alife():release(se_itm,true)
 		end
-		task_manager.get_task_manager():give_task("yan_stalker_sakharov_psi_helmet_upgrade")
-		utils.save_ctime(db.actor,"yan_stalker_sakharov_psi_helmet_upgrade",game.get_game_time())
 	end
+	
+	if not (db.actor:has_info("yan_stalker_sakharov_offer_free_upgrade")) then
+		dialogs.relocate_money_from_actor(a,b,8000)
+	end
+	
+	task_manager.get_task_manager():give_task("yan_stalker_sakharov_psi_helmet_upgrade")
+	utils.save_ctime(db.actor,"yan_stalker_sakharov_psi_helmet_upgrade",game.get_game_time())
 end
 
 function take_money_good_psi_helmet(a,b)
@@ -65,7 +69,7 @@ end
 
 function actor_has_good_psi_helmet_task_completed(a,b)
 	local tsk = task_manager.get_task_manager().task_info["yan_stalker_sakharov_psi_helmet_upgrade"]
-	return tsk and tsk.stage == 2
+	return tsk and tsk.stage >= 2
 end
 
 function actor_dont_has_good_psi_helmet_task_completed(a,b)

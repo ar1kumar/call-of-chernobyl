@@ -315,13 +315,11 @@ function check_if_enough_time_passed(tsk,task_id)
 	end 
 	
 	local gt = utils.load_ctime(db.actor,task_id)
-	if (gt and game.get_game_time():diffSec(gt) > tonumber(p[1])) then 
+	if (gt == nil or game.get_game_time():diffSec(gt) >= tonumber(p[1])) then 
 		tsk.stage = 2
 		return
 	end
-
-	tsk.stage = 1
-end 
+end
 
 function check_if_killed_enough(tsk,task_id)
 	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
