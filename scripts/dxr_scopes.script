@@ -42,16 +42,9 @@ function on_game_start()
 		get_console():execute("snd_restart")
 		RegisterScriptCallback("actor_on_item_use", on_item_use)
 		RegisterScriptCallback("CUIActorMenu_OnItemFocusReceive",on_item_focus)
-		RegisterScriptCallback("CUIActorMenu_OnItemDropped",drag_scope)
 	end
 end
 
-function drag_scope(scope,wpn,from_slot,to_slot)
-	if check_addon(wpn, scope) and from_slot == EDDListType.iActorBag and 
-	  (to_slot == EDDListType.iActorSlot or to_slot == EDDListType.iActorBag) then
-		attach_addon(wpn,scope, true)
-	end
-end
 
 -- Transfers an item to the actor.
 local function transfer_item(id)
