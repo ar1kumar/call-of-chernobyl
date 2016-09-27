@@ -832,14 +832,14 @@ end
 
 function se_obj_save_var(id,name,varname,val)
 	local m_data = alife_storage_manager.get_state()
-	if (m_data.se_object[id] and m_data.se_object[id].name == name) then
+	if (m_data.se_object[id]) then
 		m_data.se_object[id][varname] = val 
 	end
 end
 
 function se_obj_load_var(id,name,varname)
 	local m_data = alife_storage_manager.get_state()
-	if (m_data.se_object[id] and m_data.se_object[id].name == name) then
+	if (m_data.se_object[id]) then
 		return m_data.se_object[id][varname]
 	end
 end
