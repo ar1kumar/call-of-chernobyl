@@ -377,6 +377,15 @@ function options_dialog:Update()
 			self:OnDiscardChanges()
 		end
 	end
+	
+	if (self.dlg_video) then
+		if (self.dlg_video.fov_track) then 
+			self.dlg_video.fov_value:TextControl():SetText(tostring(self.dlg_video.fov_track:GetFValue()))
+		end
+		if (self.dlg_video.hud_fov_track) then 
+			self.dlg_video.hud_fov_value:TextControl():SetText( string.format("%.2f",self.dlg_video.hud_fov_track:GetFValue()) )
+		end
+	end
 end
 
 function options_dialog:OnApplyChanges()
