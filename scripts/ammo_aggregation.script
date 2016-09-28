@@ -31,8 +31,11 @@ local function actor_on_item_take(obj)
 
 	local fill = math.floor(size/box_size)
 	local remainder = size - (box_size*fill)
-	
-	obj:ammo_set_count(remainder)
+	if (remainder > 0) then 
+		obj:ammo_set_count(remainder)
+	else 
+		table.insert(ammos,obj:id())
+	end
 	
 	local sim = alife()
 	for i=1,#ammos do 
