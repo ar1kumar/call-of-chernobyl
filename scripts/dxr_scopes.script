@@ -95,6 +95,11 @@ end
 
 -- Called when the cursor focuses on an item.
 function on_item_focus(item)
+	local p = item:parent()
+	if not (p and p:id() == db.actor:id()) then 
+		return 
+	end
+	
 	-- No "scopes" section found for the weapon.
 	if not (system_ini():line_exist(item:section(),"scopes")) then return end
 	
