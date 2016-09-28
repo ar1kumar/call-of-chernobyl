@@ -152,6 +152,11 @@ function heli_combat:find_valid_target()
 					return true
 				end
 				
+				db.storage[self.st.enemy_id].heli_enemy_flag = nil
+				if (self.st.enemy_id == 0) then
+					utils.save_var(db.actor,"heli_enemy_flag",false)
+				end 
+				
 				current_target = nil
 			elseif (tg-self.enemy_last_seen_time > self.forget_timeout) then 
 				self:forget_enemy()
@@ -193,7 +198,7 @@ function heli_combat:find_valid_target()
 	
 	if (self.heliObject:isVisible(target)) then
 		local target_pos = target:position()
-		if (id == 0 and utils.load_var(db.actor,"heli_enemy_flag",false) and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 14400) or (id ~= 0 and db.storage[id].heli_enemy_flag and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 62500) then
+		if (id == 0 and utils.load_var(db.actor,"heli_enemy_flag",false) and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 10000) or (id ~= 0 and db.storage[id].heli_enemy_flag and heli_alife.distance_2d_sqr(target:position(),self.object:position()) <= 10000) then
 			if (self.st.ini and self.st.active_section) then
 				local smart = xr_gulag.get_npc_smart(self.object)
 				if (smart) then
