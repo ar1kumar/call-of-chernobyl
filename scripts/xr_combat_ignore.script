@@ -185,8 +185,8 @@ function is_enemy(obj,enemy,no_memory)
 		local comm = character_community(obj)
 		local ene_comm = character_community(enemy)
 		if (comm == "army" and ene_comm == "stalker") or (comm == "stalker" and comm == "army") then 
-			-- In Cordon prevent stalker v military combat with distances greater than 70m
-			if (level.name() == "l01_escape" and pos1:distance_to_sqr(pos2) >= 4900) then
+			-- In Cordon prevent stalker v military combat with distances greater than 60m
+			if (level.name() == "l01_escape" and pos1:distance_to_sqr(pos2) >= 3600) then
 				return false
 			end
 		end
