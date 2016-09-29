@@ -455,6 +455,7 @@ function faction_ui:OnCheckSet()
 		end
 	end
 
+	--[[
 	if (ck == "ck_survival") then
 		if (value == true and self.ck_hardcore) then
 			self.ck_hardcore:SetCheck(true)
@@ -466,6 +467,7 @@ function faction_ui:OnCheckSet()
 			self.ck_states["ck_survival"] = false
 		end
 	end
+	--]]
 	
 	if (self[ck] and self[ck]:GetCheck()) then
 		self.desc_text:SetText(game.translate_string("st_mm_"..ck.."_desc"))
