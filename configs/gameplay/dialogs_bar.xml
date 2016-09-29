@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <game_dialogs>
-    <!------------------ bar_visitors_barman_stalker_trader ----------->
+    <!-- bar_visitors_barman_stalker_trader -->
     <dialog id="bar_visitors_barman_stalker_trader_start_dialog">
         <phrase_list>
             <phrase id="1">
@@ -24,7 +24,7 @@
             </phrase>
         </phrase_list>
     </dialog>
-    <!------------- bar_visitors_stalker_mechanic ---------->
+    <!-- bar_visitors_stalker_mechanic -->
     <dialog id="bar_visitors_stalker_mechanic_start">
         <phrase_list>
             <phrase id="0">
@@ -99,8 +99,8 @@
             </phrase>
         </phrase_list>
     </dialog>
-    <!------------- old arena ---------->
-    <!------------- new arena ---------->
+    <!-- old arena -->
+    <!-- new arena -->
     <dialog id="bar_arena_manager_rules">
         <phrase_list>
             <phrase id="0">
@@ -254,7 +254,18 @@
                 <next>8</next>
                 <next>9</next>
                 <next>10</next>
+				<next>111111</next>
             </phrase>
+			<phrase id="111111">
+				<text></text>
+                <dont_has_info>bar_arena_start</dont_has_info>
+                <dont_has_info>bar_arena_actor_victory</dont_has_info>
+                <dont_has_info>bar_arena_actor_lose</dont_has_info>
+				<next>111112</next>
+			</phrase>
+			<phrase id="111112">
+				<text>bar_arena_man_start_111112</text>
+			</phrase>			
             <phrase id="11">
                 <text>bar_arena_manager_start_11</text>
             </phrase>
@@ -485,9 +496,11 @@
             <phrase id="140">
                 <text>bar_arena_manager_game_140</text>
                 <next>141</next>
+				<next>1011115</next>
                 <next>145</next>
             </phrase>
             <phrase id="141">
+				<dont_has_info>bar_arena_5000_r</dont_has_info>
                 <text>bar_arena_manager_game_141</text>
                 <precondition>dialogs_bar.actor_has_5000</precondition>
                 <action>dialogs_bar.give_money_5000</action>
@@ -518,28 +531,60 @@
                 <next>300</next>
             </phrase>
             <phrase id="131">
+				<dont_has_info>bar_arena_4000_r</dont_has_info>
                 <text>bar_arena_manager_game_131</text>
-                <precondition>dialogs_bar.actor_has_5000</precondition>
-                <action>dialogs_bar.give_money_5000</action>
-                <give_info>bar_arena_5000_r</give_info>
+                <precondition>dialogs_bar.actor_has_4000</precondition>
+                <action>dialogs_bar.give_money_4000</action>
+                <give_info>bar_arena_4000_r</give_info>
                 <next>200</next>
             </phrase>
             <phrase id="130">
                 <text>bar_arena_manager_game_130</text>
                 <next>131</next>
+				<next>1011114</next>
                 <next>135</next>
             </phrase>
             <phrase id="100">
                 <text>bar_arena_manager_game_100</text>
                 <next>101</next>
+				<next>1011111</next>
                 <next>105</next>
             </phrase>
+			
+			<phrase id="1011111">
+				<has_info>bar_arena_1000_r</has_info>
+				<text>bar_arena_manager_game_11111112</text>
+				<next>200</next>
+			</phrase>
+			<phrase id="1011112">
+				<has_info>bar_arena_2000_r</has_info>
+				<text>bar_arena_manager_game_11111112</text>
+				<next>200</next>
+			</phrase>
+			<phrase id="1011113">
+				<has_info>bar_arena_3000_r</has_info>
+				<text>bar_arena_manager_game_11111112</text>
+				<next>200</next>
+			</phrase>
+			<phrase id="1011114">
+				<has_info>bar_arena_4000_r</has_info>
+				<text>bar_arena_manager_game_11111112</text>
+				<next>200</next>
+			</phrase>
+			<phrase id="1011115">
+				<has_info>bar_arena_5000_r</has_info>
+				<text>bar_arena_manager_game_11111112</text>
+				<next>200</next>
+			</phrase>
+			
             <phrase id="110">
                 <text>bar_arena_manager_game_110</text>
                 <next>111</next>
+				<next>1011112</next>
                 <next>115</next>
             </phrase>
             <phrase id="111">
+				<dont_has_info>bar_arena_2000_r</dont_has_info>
                 <text>bar_arena_manager_game_111</text>
                 <precondition>dialogs_bar.actor_has_2000</precondition>
                 <action>dialogs_bar.give_money_2000</action>
@@ -564,9 +609,11 @@
             <phrase id="120">
                 <text>bar_arena_manager_game_120</text>
                 <next>121</next>
+				<next>1011113</next>
                 <next>125</next>
             </phrase>
             <phrase id="121">
+				<dont_has_info>bar_arena_3000_r</dont_has_info>
                 <text>bar_arena_manager_game_121</text>
                 <precondition>dialogs_bar.actor_has_3000</precondition>
                 <action>dialogs_bar.give_money_3000</action>
@@ -658,6 +705,7 @@
                 <next>100</next>
             </phrase>
             <phrase id="101">
+				<dont_has_info>bar_arena_1000_r</dont_has_info>
                 <text>bar_arena_manager_game_101</text>
                 <precondition>dialogs_bar.actor_has_1000</precondition>
                 <action>dialogs_bar.give_money_1000</action>
