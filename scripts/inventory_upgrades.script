@@ -404,7 +404,7 @@ function property_functor_a(param1, name)
 		elseif (name == "prop_dispersion") then
 			val = char_ini:r_float_ex(section_table[i],"fire_dispersion_base") or 0
 			if (val ~= 0) then
-				sum = sum + (ui_wpn_params.normalize(val,1.5,0)-100)
+				sum = sum + (ui_wpn_params.normalize(val,1.0,0)-100)
 			end
 		elseif (name == "prop_bullet_speed") then
 			val = char_ini:r_float_ex(section_table[i],"bullet_speed") or 0
