@@ -161,9 +161,11 @@ function mar_base_owl_stalker_trader_task_target(task_id,field,p)
 		local se_npc = get_story_se_object("esc_2_12_stalker_nimble")
 		return se_npc and se_npc.id or nil
 	elseif (task_id == "mar_base_owl_stalker_trader_task_2") then
-		for id,obj in pairs(db.heli) do
-			if (obj and obj.id) then
-				return id
+		if (level.name() == "k00_marsh") then
+			for id,obj in pairs(db.heli) do
+				if (obj and obj.id) then
+					return id
+				end
 			end
 		end
 	elseif (task_id == "mar_base_owl_stalker_trader_task_3") then

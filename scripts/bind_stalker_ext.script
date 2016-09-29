@@ -49,6 +49,15 @@ function actor_on_net_spawn()
 	end
 	--]]
 	
+	local sim = alife()
+	for i=1,65534 do
+		local se_obj = sim:object(i)
+		if (se_obj and se_obj:clsid() == clsid.phantom) then
+			--printf("release phantom")
+			sim:release(se_obj,true)
+		end
+	end
+	
 	if (axr_main.config:r_value("mm_options","enable_heli_spawn",1,true) == false) then 
 		for k,v in pairs(se_heli.se_helicopters) do 
 			alife():release(v,true)

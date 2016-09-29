@@ -20,11 +20,9 @@ end
 
 --------------------------------------------------------------------------------------
 
-function spawn_dynamic_phantom(sec,pos,lvid,enemy)
-	if (level.spawn_item) then
-		--alun_utils.debug_write("spawn_dynamic_phantom")
-		level.spawn_item(sec,pos,lvid,65535,false)
-	end
+function spawn_dynamic_phantom(sec,pos,lvid,gvid)
+	--alun_utils.debug_write("spawn_dynamic_phantom")
+	level.spawn_item(sec,pos,lvid,gvid,false)
 end
 
 function dynamic_phantom_count(sec)
@@ -68,7 +66,7 @@ local function monster_on_update(npc,st)
 		return
 	end
 	
-	phantom_manager.spawn_dynamic_phantom(sec,npc:position(),npc:level_vertex_id(),npc:get_enemy())
+	phantom_manager.spawn_dynamic_phantom(sec,npc:position(),npc:level_vertex_id(),npc:game_vertex_id())
 end 
 
 function on_game_start()
@@ -91,7 +89,7 @@ function PhantomManager:remove_phantom()
 	self.phantom_count = self.phantom_count - 1;
 end
 function PhantomManager:spawn_phantom(pos)
-	level.spawn_phantom(pos);
+	level.spawn_phantom(pos)
 end
 
 class "Phantom"	(object_binder)
