@@ -207,16 +207,15 @@ function is_enemy(obj,enemy,no_memory)
 			end
 		else
 			local dist = pos1:distance_to_sqr(pos2)
-			if (dist > 10000) and (level.get_time_hours() < 4 or level.get_time_hours() > 19) then 
-				-- limit combat range to 100m during night hours for stalker v stalker
+			if (dist > 10000) then -- 100m max combat range for stalker v stalker
+				return 
+			end
+			if (dist > 5625) and (level.rain_factor() > 0 or level.get_time_hours() < 4 or level.get_time_hours() > 19) then 
+				-- limit combat range to 75m during night hours for stalker v stalker or rain
 				return false
 			end
-			if (dist > 22500 and level.rain_factor() > 0) then
-				-- limit combat range to 150m when it rains
-				return false
-			end
-			if (dist > 4900) then
-				-- limit combat range to 70m during heavy rain, surges or if they are story related
+			if (dist > 3600) then
+				-- limit combat range to 60m during heavy rain, surges or if they are story related
 				if (xr_conditions.surge_started() or level.rain_factor() >= 0.5 or get_object_story_id(id) or get_object_story_id(ene_id)) then 
 					return false
 				end

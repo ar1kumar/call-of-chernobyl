@@ -97,10 +97,12 @@ function CALifeStorageManager_before_save(fname)
 	
 	path = path .. fname:sub(0,-6):lower() .. ".scoc"
 	
-	local savegame = io.open(path,"wb+")
+	local savegame = io.open(path,"w+b")
 	if not (savegame) then
 		return 
 	end
+	
+	lfs.unlock(savegame) -- Because I think anti-virus for some is locking file handle and not letting us write
 	
 	printf("axr_main: saving custom data %s",path)
 	savegame:write(data)
@@ -158,7 +160,7 @@ end
 -- storage based on ID but verified by object name
 function get_game_object_state(obj,create_if_dont_exist)
 	local id = obj:id()
-	local name = obj:name()
+	--local name = obj:name()
 	if not (m_data.game_object[id]) then
 		if not (create_if_dont_exist) then
 			return 
@@ -171,7 +173,7 @@ end
 
 function get_se_obj_state(se_obj,create_if_dont_exist)
 	local id = se_obj.id
-	local name = se_obj:name()
+	--local name = se_obj:name()
 	if not (m_data.se_object[id]) then
 		if not (create_if_dont_exist) then
 			return 
