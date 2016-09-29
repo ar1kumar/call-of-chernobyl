@@ -98,12 +98,49 @@ class "Phantom"	(object_binder)
 function Phantom:__init(obj) super(obj)
 	g_PhantomManager:add_phantom()
 end
+
+function bind(obj)
+	obj:bind_object(Phantom(obj))
+end
+
+function Phantom:reinit()
+	object_binder.reinit(self)
+end
+
+function Phantom:net_spawn(sobject)
+	if not object_binder.net_spawn(self, sobject) then
+		return false
+	end
+	return true
+end
+
+function Phantom:update(delta)
+	object_binder.update(self, delta)
+end
+
 function Phantom:net_destroy()
 	g_PhantomManager:remove_phantom()
 	object_binder.net_destroy(self)
 end
-function bind(obj)
-	obj:bind_object(Phantom(obj))
+
+function Phantom:reload(section)
+	object_binder.reload(self, section)
+end
+
+function Phantom:net_save_relevant()
+	return true
+end
+
+function Phantom:save(packet)
+	set_save_marker(packet, "save", false, "Phantom")
+	object_binder.save(self, packet)
+	set_save_marker(packet, "save", true, "Phantom")
+end
+
+function Phantom:load(reader)
+	set_save_marker(reader, "load", false, "Phantom")
+	object_binder.load(self, reader)
+	set_save_marker(reader, "load", true, "Phantom")
 end
 
 function spawn_phantom(pos)
