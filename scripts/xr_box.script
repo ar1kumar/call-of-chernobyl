@@ -62,17 +62,9 @@ function ph_item_box:spawn_items(obj,who,spawn_ini)
 
 	local community
 	if (spawn_ini) then
-		local items = r_items(spawn_ini, "drop_box", "items", obj)
-		if items then
-			for k,v in pairs(items) do
-				if (v.count > 0) then
-					create_obligatory_items(obj, v.section, v.count)
-				end
-			end
-			return
-		end
+		create_obligatory_items(obj,spawn_ini)
 		community = spawn_ini:r_string_ex("drop_box","community")
-	else 
+	else
 		local community_list = {"small_box_generic", "small_box_ussr", "small_box_nato", "small_box_army", "small_box_science"}
 		community = community_list[math.random(#community_list)]
 	end
@@ -115,56 +107,25 @@ function create_items(obj, section, number, rnd)
 	end
 end
 
-function parse_names( s )
-	local t = {}
-	for name in string.gmatch( s, "([%w_%-.\\]+)%p*" ) do
-		table.insert( t, name )
+function create_obligatory_items(obj, spawn_ini)
+	if not (spawn_ini and spawn_ini:line_exist("drop_box","items")) then
+		return
 	end
-	return t
-end
-
-function r_items( spawn_ini, section, line, obj)
-	if (spawn_ini and spawn_ini:line_exist( section, line )) then
-		local t = parse_names( spawn_ini:r_string_ex( section, line ) )
-		local n = #t
-		local ret_table = {}
-		local k = 1
-		while k <= n do
-			local item = {}
-			item.section = t[k]
-			if item_by_community["def_box"][item.section] then
-				if t[k+1] ~= nil then
-					local p = tonumber(t[k+1])
-					if p then
-						item.count = p
-						k = k + 2
-					else
-						item.count = 1
-						k = k + 1
-					end
-				else
-					item.count	 = 1
-					k = k + 1
-				end
-				table.insert(ret_table, item)
-			else 
-				printf("xr_box: no such item exists for def_box %s",k)
-			end
-		end
-		return ret_table
-	end
-	return nil
-end
-
-function create_obligatory_items(obj, item , count)
-	if not (system_ini():section_exist(item)) then 
-		return 
-	end
-	for i = 1,count do
+	
+	local items = parse_names(spawn_ini:r_string_ex("drop_box", "items"))
+	
+	if (#items > 0) then
 		local position = vector():set(0,0,0)
-		position.x = obj:position().x --+ math.random(-30,30)/100
-		position.z = obj:position().z --+ math.random(-30,30)/100
-		position.y = obj:position().y + 0.3 --+ math.random(30,50)/100 + 2
-		alife():create(item,position,obj:level_vertex_id(),obj:game_vertex_id())
+		position.x = obj:position().x
+		position.z = obj:position().z
+		position.y = obj:position().y + 0.3
+			
+		local sim = alife()
+		for i,section in ipairs(items) do
+			if not (system_ini():section_exist(section)) then 
+				return 
+			end
+			sim:create(section,position,obj:level_vertex_id(),obj:game_vertex_id())
+		end
 	end
 end
