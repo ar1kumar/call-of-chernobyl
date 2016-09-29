@@ -6,7 +6,7 @@ local weather_manager = nil
 local prev_sec = 0
 local diff_sec = 0
 valid_levels = {}
-
+bLevelUnderground = false
 function atmosfear_init()
 	if not (is_empty(valid_levels)) then 
 		return 
@@ -150,6 +150,8 @@ function WeatherManager:__init()
 	
 	atmosfear_options.config = atmosfear_options.config or ini_file_ex("atmosfear_options.ltx",true)
 	atmosfear_init()
+	
+	bLevelUnderground = valid_levels[level.name()] == nil
 end
 
 -- Вызывается после load(). Состояние погоды уже загружено.
