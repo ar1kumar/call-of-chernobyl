@@ -1176,6 +1176,12 @@ end
 function file_to_table(fname,parent,simple)
 	local root = parent and parent.root or {}
 	local sec,t,key
+	
+	local function get_section_includes(str)
+		local a = string.find(str,"]")
+		return a and " " .. string.sub(str,a+2) or ""
+	end
+
 	for line in io.lines(fname) do
 		line = trim(trim_comment(line))
 		if (line ~= "" and line ~= "\n") then
@@ -1241,6 +1247,7 @@ function cfg_file:__init(fname,simple_mode)
 	self.directory = fname:match("(.*\\)") or ""
 	
 	self.root = {}
+	self.insert = {}
 	file_to_table(fname,self,simple_mode)
 end
 
@@ -1278,6 +1285,13 @@ function cfg_file:SetValue(sec,key,val)
 	if not (self.root[sec]) then
 		self.root[sec] = {}
 	end
+	
+	if (self.root[sec][key] == nil) then
+		if not (self.insert[sec]) then 
+			self.insert[sec] = {}
+		end
+		table.insert(self.insert[sec],key)
+	end
 
 	self.root[sec][key] = val == nil and "" or tostring(val)
 end
@@ -1305,21 +1319,34 @@ end
 function cfg_file:SaveExt()
 	local t,sec,key,comment
 	local str = ""
-	
+
 	local function addTab(s,n)
+		local padding = {}
 		local l = string.len(s)
-		for i=1,n-l do
-			s = s .. " "
-		end
-		return s
+		for i=1,n-l do 
+			table.insert(padding," ")
+		end 
+		return s .. table.concat(padding)
 	end
 
 	for ln in io.lines(self.fname) do
 		ln = trim(ln)
 		if (startsWith(ln,"[")) then
 			sec = string.match(trim_comment(ln),"%[(.-)%]")
+			-- inject new fields that previously didn't exist
+			if (sec and self.root[sec] and self.insert[sec]) then
+				for i=1,#self.insert[sec] do
+					local k = self.insert[sec][i]
+					if (k ~= "_____link") then
+						str = str .. addTab(k,40) .. " = " .. tostring(self.root[sec][k]) .. "\n"
+					end
+				end
+			end
+			
+			str = str .. ln .. "\n"
 		elseif (sec and self.root[sec]) then
 			key = trim(trim_comment(string.match(ln,"(.-)=") or ln))
+			
 			if (key and self.root[sec][key]) then
 				comment = get_comment(ln) or ""
 				if (comment ~= "") then 
@@ -1333,9 +1360,13 @@ function cfg_file:SaveExt()
 			else 
 				str = str .. ln .. "\n"
 			end
+		else 
+			str = str .. ln .. "\n"
 		end
-		str = str .. ln .. "\n"
 	end
+	
+	empty_table(self.insert)
+	
 	local cfg = io.open(self.fname,"w+")
 	cfg:write(str)
 	cfg:close()
