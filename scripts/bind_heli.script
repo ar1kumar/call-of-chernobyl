@@ -118,6 +118,9 @@ function heli_binder:net_spawn( sobject )
 end
 
 function heli_binder:net_destroy()
+	self.object:set_callback(callback.helicopter_on_point,nil)
+	self.object:set_callback(callback.helicopter_on_hit,nil)
+	
 	db.del_obj( self.object )
 	db.del_heli( self.object )
 
@@ -280,10 +283,13 @@ function heli_die( obj )
 		end
 	end
 
+	self.object:set_callback(callback.helicopter_on_point,nil)
+	self.object:set_callback(callback.helicopter_on_hit,nil)
+	
 	local heli = obj:get_helicopter()
 	local st   = db.storage[obj:id()]
 	heli:Die()
-	db.del_heli( obj )
+	db.del_heli(obj)
 	st.last_alt       = heli:GetRealAltitude()
 	st.alt_check_time = time_global() + 1000
 end
