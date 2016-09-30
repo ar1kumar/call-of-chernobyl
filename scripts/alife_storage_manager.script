@@ -160,26 +160,26 @@ end
 -- storage based on ID but verified by object name
 function get_game_object_state(obj,create_if_dont_exist)
 	local id = obj:id()
-	--local name = obj:name()
+	local name = obj:name()
 	if not (m_data.game_object[id]) then
 		if not (create_if_dont_exist) then
 			return 
 		end
 		m_data.game_object[id] = {}
-		--m_data.game_object[id].name = name
+		m_data.game_object[id].name = name
 	end
 	return m_data.game_object[id]
 end	
 
 function get_se_obj_state(se_obj,create_if_dont_exist)
 	local id = se_obj.id
-	--local name = se_obj:name()
+	local name = se_obj:name()
 	if not (m_data.se_object[id]) then
 		if not (create_if_dont_exist) then
 			return 
 		end
 		m_data.se_object[id] = {}
-		--m_data.se_object[id].name = name
+		m_data.se_object[id].name = name
 	end
 	return m_data.se_object[id]
 end

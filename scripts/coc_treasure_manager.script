@@ -184,7 +184,8 @@ function create_random_stash(no_spot,hint,bonus_items)
 	
 	local function try_spawn_item(sec,min,max,chance,weight)
 		if (max_weight >= weight) then 
-			for i=min,max do
+			local new_max = math.random(min,max)
+			for i=1,new_max do
 				if (math.random() <= chance) then 
 					table.insert(spawned_item,sec)
 					max_weight = max_weight - weight
@@ -194,8 +195,9 @@ function create_random_stash(no_spot,hint,bonus_items)
 	end
 	
 	local allow_item = true
-	-- iterate most expensive to least expensive. Highest cost has highest weight. Consumables have higher max. Outfits have high weights.
-	for section,cost in spairs(valid_item_list,function(t,a,b) return t[a] > t[b] end) do
+	-- iterate most expensive to least expensive or visa versa. Highest cost has highest weight. Consumables have higher max. Outfits have high weights.
+	local functor = random_choice(function(t,a,b) return t[a] > t[b] end,function(t,a,b) return t[a] < t[b] end)
+	for section,cost in spairs(valid_item_list,functor) do
 		
 		-- prevent a stash from having more than a single outfit or weapon
 		local skip = false
@@ -223,7 +225,7 @@ function create_random_stash(no_spot,hint,bonus_items)
 				end
 			elseif (cost <= 1000) then
 				if (is_consumable(section)) then
-					try_spawn_item(section,1,3,0.06,15)
+					try_spawn_item(section,1,4,0.06,15)
 				elseif (bOutfit) then
 					try_spawn_item(section,1,1,0.18,50)
 				elseif (bWeapon) then
