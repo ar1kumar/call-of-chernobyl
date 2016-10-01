@@ -233,18 +233,20 @@ end
 function text_actor_has_valuable_item(a,b)
 	local npc = who_is_npc(a, b)
 
+	local story_done = has_alife_info("story_mode_disabled") or has_alife_info("warlab_deactivate_generators_done") or false
+	
 	local valuable = {
-		"main_story_1_quest_case",
-		"main_story_2_lab_x18_documents",
-		"main_story_3_lab_x16_documents",
-		"main_story_4_lab_x10_documents",
-		"main_story_5_lab_x8_documents",
-		"main_story_6_jup_ug_documents",
-		"main_story_7_mon_con_documents"
+		["main_story_1_quest_case"] = story_done,
+		["main_story_2_lab_x18_documents"] = story_done,
+		["main_story_3_lab_x16_documents"] = story_done,
+		["main_story_4_lab_x10_documents"] = story_done,
+		["main_story_5_lab_x8_documents"] = story_done,
+		["main_story_6_jup_ug_documents"] = story_done,
+		["main_story_7_mon_con_documents"] = story_done
 	}
 	
-	for i=1,#valuable do 
-		if (db.actor:object(valuable[i])) then 
+	for k,v in pairs(valuable) do 
+		if (v == true and db.actor:object(k)) then 
 			return game.translate_string("st_broker_query_valuable")
 		end
 	end
@@ -269,19 +271,19 @@ end
 function text_trade_npc_pda(a,b)
     local npc = who_is_npc(a, b)
 
-	
+	local story_done = has_alife_info("story_mode_disabled") or has_alife_info("warlab_deactivate_generators_done") or false
 	local valuable = {
-		"main_story_1_quest_case",
-		"main_story_2_lab_x18_documents",
-		"main_story_3_lab_x16_documents",
-		"main_story_4_lab_x10_documents",
-		"main_story_5_lab_x8_documents",
-		"main_story_6_jup_ug_documents",
-		"main_story_7_mon_con_documents"
+		["main_story_1_quest_case"] = story_done,
+		["main_story_2_lab_x18_documents"] = story_done,
+		["main_story_3_lab_x16_documents"] = story_done,
+		["main_story_4_lab_x10_documents"] = story_done,
+		["main_story_5_lab_x8_documents"] = story_done,
+		["main_story_6_jup_ug_documents"] = story_done,
+		["main_story_7_mon_con_documents"] = story_done
 	}
 	
-	for i=1,#valuable do 
-		local item = db.actor:object(valuable[i])
+	for k,v in pairs(valuable) do 
+		local item = v == true and db.actor:object(k)
 		if (item) then 
 			db.actor:transfer_item(item,npc)
 			news_manager.relocate_item(db.actor, "out", item:section())
@@ -289,7 +291,7 @@ function text_trade_npc_pda(a,b)
 			local name = game.translate_string(system_ini():r_string_ex(item:section(),"inv_name") or "")
 			return strformat(game.translate_string("st_broker_trade_valuable"),name)
 		end
-	end	
+	end
 	
     local tbl = { common = 0, uncommon = 0, rare = 0}
     local function itr(actor,itm)
