@@ -74,14 +74,14 @@ function CALifeStorageManager_before_save(fname)
 	
 	-- clean out se_object table of empty sub tables
 	for k,v in pairs(m_data.se_object) do 
-		if (is_empty(v)) then 
-			v = nil 
+		if (type(v) == "table" and is_empty(v)) then 
+			v = nil
 		end
 	end
 	
 	-- clean out game_object table of empty sub tables
 	for k,v in pairs(m_data.game_object) do 
-		if (is_empty(v)) then 
+		if (type(v) == "table" and is_empty(v)) then 
 			v = nil 
 		end
 	end

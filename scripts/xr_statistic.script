@@ -282,17 +282,10 @@ function set_best_weapon(hit_amount)
 	local active_item = db.actor:active_item()
 	
 	-- If equipped is not a weapon or does not exist, return.
-	if (not active_item) or (not IsWeapon(active_item)) then
+	if not (active_item and IsWeapon(active_item)) then
 		return
 	end
 
-	-- Trigger notifications for wounding.
-	-- I don't think this works, needs looking at.
-	if (hit_amount > 0) then
-		check_actor_rank_change()
-		check_actor_reputation_change()
-	end
-	
 	-- A section called 'parent_section' is used by AO3 and STCoP.
 	-- It tells them which weapon is the 'parent' of a modified weapon.
 	-- Example: An AK-74 with an EKP sight attach has a parent_section of 'wpn_ak74'.
