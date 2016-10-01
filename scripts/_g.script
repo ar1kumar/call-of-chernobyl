@@ -14,7 +14,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.4.03"
+GAME_VERSION = "1.4.04"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -306,16 +306,19 @@ end
 -- Serialization of userdata for Marshal Library
 --------------------------------------------------------------------
 if (marshal) then
-	function game_CTime___persist(self)
-		local Y, M, D, h, m, s, ms = 0,0,0,0,0,0,0
-		Y, M, D, h, m, s, ms = self:get(Y, M, D, h, m, s, ms)
+	getmetatable(game.CTime()).__persist = function(self)
+		local Y, M, D, h, m, s, ms = self:get(0,0,0,0,0,0,0)
 		return function ()
-			local t = game.CTime()
-			t:set(Y, M, D, h, m, s, ms)
-			return t
+			return game.CTime():set(Y or 0, M or 0, D or 0, h or 0, m or 0, s or 0, ms or 0)
 		end
 	end
-	getmetatable(game.CTime()).__persist = game_CTime___persist
+	
+	getmetatable(vector()).__persist = function(self)
+		local x,y,z = self.x,self.y,self.z
+		return function()
+			return vector():set(x or 0,y or 0,z or 0)
+		end
+	end
 end
 
 -- debug to find objects that shouldn't be calling game_object:alive()
