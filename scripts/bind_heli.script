@@ -283,8 +283,8 @@ function heli_die( obj )
 		end
 	end
 
-	self.object:set_callback(callback.helicopter_on_point,nil)
-	self.object:set_callback(callback.helicopter_on_hit,nil)
+	obj:set_callback(callback.helicopter_on_point,nil)
+	obj:set_callback(callback.helicopter_on_hit,nil)
 	
 	local heli = obj:get_helicopter()
 	local st   = db.storage[obj:id()]
