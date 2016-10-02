@@ -98,7 +98,7 @@ function msg_box_ui:OnMsgOk()
 			local cpoint = cpath and patrol(cpath)
 			
 			local cp = cpos and alun_utils.str_explode(cpos,",")
-			cpos = cp and vector():set(tonumber(cp[1]),tonumber(cp[2]),tonumber(cp[3]))
+			cpos = cp and vector():set(tonumber(cp[1]) or 0,tonumber(cp[2]) or 0,tonumber(cp[3]) or 0)
 
 			if (cpos or cpoint) then
 				TeleportObject(car:id(),cpos or cpoint and cpoint:point(0),cpoint and cpoint:level_vertex_id(0),cpoint and cpoint:game_vertex_id(0))
@@ -108,7 +108,7 @@ function msg_box_ui:OnMsgOk()
 	end
 
 	if (pos and p[4]) then
-		db.actor:set_actor_direction(tonumber(p[4]))
+		db.actor:set_actor_direction(tonumber(p[4]) or 0)
 	end
 end
 
@@ -122,11 +122,11 @@ function msg_box_ui:OnMsgCancel()
 	end
 
 	local p = pos and alun_utils.str_explode(pos,",")
-	pos = p and vector():set(tonumber(p[1]),tonumber(p[2]),tonumber(p[3]))
+	pos = p and vector():set(tonumber(p[1]) or 0,tonumber(p[2]) or 0,tonumber(p[3]) or 0)
 
-	db.actor:set_actor_position(pos or point and point:point(0))
+	db.actor:set_actor_position(pos or point and point:point(0) or db.actor:position())
 	if (pos and p[4]) then
-		db.actor:set_actor_direction(tonumber(p[4]))
+		db.actor:set_actor_direction(tonumber(p[4]) or 0)
 		return
 	end
 	db.actor:set_actor_direction(-device().cam_dir:getH())
