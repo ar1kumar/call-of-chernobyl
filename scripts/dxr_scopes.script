@@ -60,30 +60,32 @@ function on_game_start()
 	end
 end
 
-function drag_scope(scope,wpn,from_slot,to_slot)
-	-- not an addon scope
-	if not (addons_table[scope:section()]) then 
+-- Attaches a scope to a weapon via drag-and-drop.
+function drag_scope(addon, weapon, from_slot, to_slot)
+	-- Return if not an addon scope
+	if not (addons_table[addon:section()]) then 
 		return
 	end
 	
-	-- validate that the object on the 'to_slot' is a weapon
-	if not (wpn and IsWeapon(wpn)) then 
+	-- Validate that the object on the 'to_slot' is a weapon
+	if not (weapon and IsWeapon(weapon)) then 
 		return 
 	end
 	
-	-- can only drag scope to a weapon actor owns
-	local p = wpn:parent()
-	if not (p and p:id() == db.actor:id()) then 
+	-- Can only drag scope to a weapon actor owns
+	local parent = weapon:parent()
+	if not (parent and parent:id() == db.actor:id()) then 
 		return 
 	end
 
 	-- Not a supported addon
-	if not (check_addon(scope:section(), wpn:section())) then 
+	if not (check_addon(addon:section(), weapon:section())) then 
 		return 
 	end
 
+	-- Attach the addon.
 	if (from_slot == EDDListType.iActorBag) and (to_slot == EDDListType.iActorSlot or to_slot == EDDListType.iActorBag) then
-		attach_addon(scope,wpn)
+		attach_addon(addon, weapon)
 	end
 end
 
@@ -175,7 +177,7 @@ end
 ----------------------------
 
 -- Attaches an addon to the weapon.
-function attach_addon(item,weapon)
+function attach_addon(item, weapon)
 	
 	if not (item and weapon) then 
 		return 
