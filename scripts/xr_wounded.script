@@ -130,8 +130,8 @@ function action_wounded:execute()
 	end
 	
 	local id = npc:id()
-	local po = db.storage[id].victim_surrender and level.object_by_id(db.storage[id].victim_surrender)
-	if (po and po:alive() and not utils.load_var(npc,"victim_surrender",nil)) then
+	local po = db.storage[id].victim_surrender and db.storage[id].victim_surrender  ~= 65535 and level.object_by_id(db.storage[id].victim_surrender)
+	if (po and po:alive() and not utils.load_var(npc,"victim_surrender")) then
 		state_mgr.set_state(npc,"prisoner",nil,nil,nil,{fast_set = true})
 		return
 	end
