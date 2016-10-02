@@ -65,7 +65,7 @@ local function on_game_load()
 end
 
 local function actor_on_item_take_from_box(box,itm)
-	if (caches[box:id()] == true and box:is_inv_box_empty()) then
+	if (caches[box:id()] == true) then
 		caches[box:id()] = false
 		local hud = get_hud()
 		if (hud) then
@@ -288,7 +288,8 @@ function try_spawn_treasure(box)
 
 	if not (type(caches[id]) == "string") then 
 		return
-	end 
+	end
+	caches[id] = true
 	
 	local spawned_item = alun_utils.str_explode(caches[id],",")
 	local sec,ammos,ct,ammo_type,ammo_section
@@ -347,8 +348,6 @@ function try_spawn_treasure(box)
 			printf("coc_treasure_manager.script: invalid section %s",sec)
 		end
 	end
-	
-	caches[id] = true
 end
 
 function save(pk)
