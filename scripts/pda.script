@@ -1,99 +1,29 @@
 local coc_ranking_array_size = 100
 local coc_ranking_list = {}
 
-
-
--- 0 = 	Undefined
--- 1 = 	Inventory
--- 2 = 	Trade
--- 3 = 	Upgrade
--- 4 = 	DeadBodySearch
+-- use actor_menu for other modes
 -- 10 =  Talk dialog  show
 -- 11 =  Talk dialog  hide
-local last_mode = 0
 dialog_closed = false
-trade_closed = false
-upgrade_closed = false
 function actor_menu_mode(mode)
-	if(mode==0) then
-		if(last_mode==1) then
-			inventory_wnd_closed()
-		elseif(last_mode==2) then
-			trade_wnd_closed()
-		elseif(last_mode==3) then
-			upgrade_wnd_closed()
-		elseif(last_mode==4) then
-			dead_body_search_wnd_closed()
-		end
-		last_mode = 0
-	elseif(mode==1) then
-		last_mode = 1
-		inventory_wnd_opened()
-	elseif(mode==2) then
-		last_mode = 2
-		trade_wnd_opened()
-	elseif(mode==3) then
-		last_mode = 3
-		upgrade_wnd_opened()
-	elseif(mode==4) then
-		last_mode = 4
-		dead_body_search_wnd_opened()
-	elseif(mode==10) then
+	if(mode==10) then
 		dialog_wnd_showed()
 	elseif(mode==11) then
 		dialog_wnd_closed()
 	end
 end
 
-function inventory_wnd_opened()
-	--printf("---:>Inventory opened")
-end
-
-function inventory_wnd_closed()
-	--printf("---:>Inventory closed")
-end
-
-function trade_wnd_opened()
-	dialog_closed = false
-	--printf("---:>Trade opened")
-end
-
-function trade_wnd_closed()
-	--printf("---:>Trade closed")
-	trade_closed = true
-end
-
-function upgrade_wnd_opened()
-	dialog_closed = false
-	--printf("---:>Upgrade opened")
-end
-
-function upgrade_wnd_closed()
-	--printf("---:>Upgrade closed")
-	upgrade_closed = true
-end
-
-function dead_body_search_wnd_opened()
-	--printf("---:>DeadBodySearch opened")
-end
-
-function dead_body_search_wnd_closed()
-	--printf("---:>DeadBodySearch closed")
-end
-
 function dialog_wnd_showed()
 	dialog_closed = false
-	for k,v in pairs(db.storage) do
-		local npc = v.object
-		if npc ~= nil then
-			local npc_id = npc:id()
-			if npc:is_talking() and npc_id ~= db.actor:id() then
-				local sound_theme = xr_sound.sound_table[npc_id]
-				if sound_theme and sound_theme.reset then
-					sound_theme:reset(npc_id)
-				end
-				break
+	for k,st in pairs(db.storage) do
+		if st.object:is_talking() and st.object:id() ~= db.actor:id() then
+			local id = st.object:id()
+			inventory_upgrades.victim_id = id -- stupid hack since sidorovich and forester don't have use_callback
+			local sound_theme = xr_sound.sound_table[id]
+			if sound_theme and sound_theme.reset then
+				sound_theme:reset(id)
 			end
+			break
 		end
 	end
 	--printf("---:>Talk Dialog show")
@@ -101,6 +31,7 @@ end
 
 function dialog_wnd_closed()
 	--printf("---:>Talk Dialog hide")
+	inventory_upgrades.victim_id = nil
 	dialog_closed = true
 	SendScriptCallback("actor_on_leave_dialog")
 end

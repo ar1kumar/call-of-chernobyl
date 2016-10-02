@@ -7,7 +7,6 @@
 
 cur_hint = nil
 local issue_condlist = true
-local mechanic_name = ""
 local char_ini = ini_file("item_upgrades.ltx")
 local param_ini = ini_file("misc\\stalkers_upgrade_info.ltx")
 local cur_price_percent = 1
@@ -216,6 +215,9 @@ function precondition_functor_a( param1, section )
 	if not (victim) then 
 		return 2 
 	end
+	
+	local mechanic_name = victim:section()
+	
 	local ret = 0
 	if(param_ini:line_exist(mechanic_name.."_upgr", section)) then
 		local param = param_ini:r_string_ex(mechanic_name.."_upgr", section)
@@ -279,6 +281,8 @@ function prereq_functor_a( param3, section )
 	if not (victim) then 
 		return ""
 	end
+	
+	local mechanic_name = victim:section()
 	local str = ""
 	if(param_ini:line_exist(mechanic_name.."_upgr", section)) then
 		local param = param_ini:r_string_ex(mechanic_name.."_upgr", section)
@@ -528,7 +532,6 @@ function can_repair_item( item_name, item_condition, mechanic ) --( string, floa
 		return false 
 	end
 
-	mechanic_name = mechanic
 	return true
 end
 
@@ -548,7 +551,10 @@ function effect_upgrade_item(item,upgrade_section) -- Alundaio: called from engi
 		return
 	end
 	
-	lend_item_for_repair(item,mechanic_name,1500)
+	local victim = victim_id and (db.storage[victim_id] and db.storage[victim_id].object or level.object_by_id(victim_id))
+	if (victim) then
+		lend_item_for_repair(item,victim:section(),1500)
+	end
 end 
 
 function effect_repair_item( item_name, item_condition)
@@ -571,12 +577,14 @@ function effect_repair_item( item_name, item_condition)
 	db.actor:iterate_inventory(itr,db.actor)
 
 	if (item) then
-		lend_item_for_repair(item,mechanic_name,1500)
+		local victim = victim_id and (db.storage[victim_id] and db.storage[victim_id].object or level.object_by_id(victim_id))
+		if (victim) then
+			lend_item_for_repair(item,victim:section(),1500)
+		end
 	end
 end
 
 function can_upgrade_item( item_name, mechanic )
-	mechanic_name = mechanic
 	setup_discounts()
 	--[[
 	if param_ini:line_exist(mechanic, "he_upgrade_nothing") then
@@ -591,6 +599,11 @@ function can_upgrade_item( item_name, mechanic )
 end
 
 function setup_discounts()
+	local victim = victim_id and (db.storage[victim_id] and db.storage[victim_id].object or level.object_by_id(victim_id))
+	if not (victim) then 
+		return 
+	end
+	local mechanic_name = victim:section()
 	if param_ini:line_exist(mechanic_name, "discount_condlist") then
 		local condlist = param_ini:r_string_ex(mechanic_name, "discount_condlist")
 		local parsed = xr_logic.parse_condlist(db.actor, nil, nil, condlist)
