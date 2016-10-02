@@ -186,7 +186,7 @@ function create_random_stash(no_spot,hint,bonus_items)
 		if (max_weight >= weight) then 
 			local new_max = math.random(min,max)
 			for i=1,new_max do
-				if (math.random() <= chance) then 
+				if ((math.random(1,100)/100) <= chance) then 
 					table.insert(spawned_item,sec)
 					max_weight = max_weight - weight
 				end

@@ -1569,7 +1569,7 @@ function se_smart_terrain:try_respawn()
 	
 	-- first spawn after game load
 	--[[
-	if (self.last_respawn_update == nil and math.random() < 0.3) then 
+	if (self.last_respawn_update == nil and (math.random(1,100)/100) < 0.3) then 
 		self.last_respawn_update = curr_time
 		return
 	end

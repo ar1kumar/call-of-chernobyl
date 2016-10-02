@@ -202,7 +202,7 @@ function action_radio_in_heli:execute()
 				alun_utils.execute_script_on_squad(be,set_heli_flag)
 			end
 			
-			if (dynamic_news_manager and math.random() < 0.5) then 
+			if (dynamic_news_manager and (math.random(1,100)/100) < 0.5) then 
 				dynamic_news_manager.get_dynamic_news():RadioInHeli(npc,be)
 			end
 		end

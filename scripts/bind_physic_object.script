@@ -148,7 +148,7 @@ function generic_physics_binder:death_callback(victim, who)
 	local ini = self.object:spawn_ini()
 	if (ini and ini:section_exist("drop_box")) then
 		xr_box.get_box_manager():spawn_items(self.object,who,ini)
-	elseif (math.random() < 0.5) then
+	elseif ((math.random(1,100)/100) < 0.5) then
 		local visual = self.object:get_visual_name()
 		if (visual == [[dynamics\box\box_metall_01]]) then 
 			xr_box.get_box_manager():spawn_items(self.object,who)

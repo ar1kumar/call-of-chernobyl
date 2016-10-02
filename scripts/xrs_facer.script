@@ -228,7 +228,7 @@ function action_facer:execute()
 				bone = "bip01_l_foot"
 			end
 		elseif ysub < 1.2 and ysub > -1.8 then
-			if math.random() > 0.4 then
+			if (math.random(1,100)/100) > 0.4 then
 				bone = "bip01_spine"
 			else
 				bone = "bip01_head"
@@ -258,7 +258,7 @@ function action_facer:execute()
 			hi.impulse = math.random(50)*2
 			hi.draftsman = npc
 			hi.direction = alun_utils.safe_bone_pos(target,bone):sub(npc:bone_position("bip01_neck"))
-			if math.random() < hi.power*2 then
+			if (math.random(1,100)/100) < hi.power*2 then
 				if (enable_drop_item and alun_utils.is_actor(nil,cls)) then
 					local item,slot = target:active_item(),target:active_slot()
 					if item and (slot == 2 or slot == 3) then
@@ -266,7 +266,7 @@ function action_facer:execute()
 					end
 				end
 			end
-			if math.random() < 0.33 then
+			if (math.random(1,100)/100) < 0.33 then
 				hi.type = hit.wound
 				hi.power = hi.power+math.random(3)/10
 				hi.impulse = hi.impulse+math.random(100)
@@ -442,7 +442,7 @@ function get_anim(npc) -- не буду связываться со ст манагер
 	end
 	if npc:mental_state() == anim.free then
 		a1 = "free_facer_"..slot
-		if slot == 0 and math.random() < 0.5 then
+		if slot == 0 and (math.random(1,100)/100) < 0.5 then
 			a1 = "udar_0"
 		end
 	else

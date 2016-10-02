@@ -1759,8 +1759,7 @@ function is_actor_immune()
 	end
 	-- 'Radiotherapy' achievement has been unlocked.
 	if (has_alife_info("achieved_radiotherapy")) then
-		local survive_chance = math.random()
-		if (survive_chance < 0.25) then
+		if ((math.random(1,100)/100) < 0.25) then
 			return true
 		end
 	end

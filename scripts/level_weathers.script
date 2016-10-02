@@ -191,7 +191,7 @@ function WeatherManager:reset()
 	if self.next_hour>23 then
 		self.next_hour=self.next_hour-24
 	end
-	local rnd = math.random()
+	local rnd = (math.random(1,100)/100)
 	if rnd<=self.distant_storm_prob then
 		self.distant_storm_on = true
 	else
@@ -511,7 +511,7 @@ function get_next_state(graph,state)
 		--if state==st then prob=prob*2 end
 		sum=sum+prob
 	end
-	local rnd=math.random()*sum
+	local rnd=(math.random(1,100)/100)*sum
 	local next_state
 	for st,prob in pairs(graph) do
 		--if state==st then prob=prob*2 end
@@ -708,7 +708,7 @@ function WeatherManager:distant_storm()
 	--atmosfear.debugMessages[1]:SetText("diff_sec ="..tostring(diff_sec))
 
 	if self.distant_storm_on==nil and (self.next_weather=="cloudy"  and level.get_time_minutes()>=30) then
-		local rnd = math.random()
+		local rnd = (math.random(1,100)/100)
 		if rnd<=self.distant_storm_prob then
 			self.distant_storm_on = true
 			self.thunders={}

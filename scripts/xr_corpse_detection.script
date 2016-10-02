@@ -245,7 +245,7 @@ function get_all_from_corpse(npc)
 
 	if items_value >= 100 then
 		xr_sound.set_sound_play(id,"corpse_loot_good")
-	elseif items_value > 0 and math.random() < 0.5 then
+	elseif items_value > 0 and (math.random(1,100)/100) < 0.5 then
 		xr_sound.set_sound_play(id,"corpse_loot_bad")
 	end
 
@@ -459,7 +459,7 @@ function action_search_corpse:execute()
 	local tg = time_global()
 	if (npc:level_vertex_id() == self.a.vertex_id) then
 		if not self.sound then
-			if math.random() < 0.60 then
+			if (math.random(1,100)/100) < 0.60 then
 				xr_sound.set_sound_play(npc:id(),"corpse_loot_begin")
 			end
 			self.sound = true

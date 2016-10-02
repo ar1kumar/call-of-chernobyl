@@ -11,20 +11,20 @@ actid = 188112
 hostage_list = {}
 local ini = ini_file("ai_tweaks\\xrs_kill_wounded.ltx")
 local Enable = ini:r_bool_ex("settings","enable",false)
-local ActorKillWoundedChance = Enable and ini:r_float_ex("settings","actor_cause_surrender_chance") or 0.25
-local ActorKillWoundedMaxDist = Enable and ini:r_float_ex("settings","actor_cause_surrender_max_dist") or 7
-local MinDistanceRunState = Enable and ini:r_float_ex("settings","state_run_min_distance") or 8
-local MinDistance = Enable and ini:r_float_ex("settings","min_distance") or 3
-local MaxDistance = Enable and ini:r_float_ex("settings","max_distance") or 5
-local MinVectorRotateY = Enable and ini:r_float_ex("settings","min_vector_rotate_y") or 1
-local MaxVectorRotateY = Enable and ini:r_float_ex("settings","max_vector_rotate_y") or 95
-local MinTriggerTimer = Enable and ini:r_float_ex("settings","min_timer","float") or 3000
-local MaxTriggerTimer = Enable and ini:r_float_ex("settings","max_timer","float") or 5000
-local SurrenderMinTriggerTimer = Enable and ini:r_float_ex("settings","surrender_min_timer") or 5000
-local SurrenderMaxTriggerTimer = Enable and ini:r_float_ex("settings","surrender_max_timer") or 5000
-local KillWoundedSoundChance = Enable and ini:r_float_ex("settings","chance_to_play_sound") or 0.25
-local SurrenderChance = Enable and ini:r_float_ex("settings","chance_to_play_surrender") or 0.25
-local CauseSurrenderCommunities = Enable and alun_utils.parse_list(ini,"settings","cause_surrender_communities",true)
+local ActorKillWoundedChance = ini:r_float_ex("settings","actor_cause_surrender_chance") or 0.25
+local ActorKillWoundedMaxDist = ini:r_float_ex("settings","actor_cause_surrender_max_dist") or 7
+local MinDistanceRunState = ini:r_float_ex("settings","state_run_min_distance") or 8
+local MinDistance = ini:r_float_ex("settings","min_distance") or 3
+local MaxDistance = ini:r_float_ex("settings","max_distance") or 5
+local MinVectorRotateY = ini:r_float_ex("settings","min_vector_rotate_y") or 1
+local MaxVectorRotateY = ini:r_float_ex("settings","max_vector_rotate_y") or 95
+local MinTriggerTimer = ini:r_float_ex("settings","min_timer","float") or 3000
+local MaxTriggerTimer = ini:r_float_ex("settings","max_timer","float") or 5000
+local SurrenderMinTriggerTimer = ini:r_float_ex("settings","surrender_min_timer") or 5000
+local SurrenderMaxTriggerTimer = ini:r_float_ex("settings","surrender_max_timer") or 5000
+local KillWoundedSoundChance = ini:r_float_ex("settings","chance_to_play_sound") or 0.25
+local SurrenderChance = ini:r_float_ex("settings","chance_to_play_surrender") or 0.25
+local CauseSurrenderCommunities = alun_utils.parse_list(ini,"settings","cause_surrender_communities",true)
 ini = nil
 
 ----------------------------
@@ -59,7 +59,7 @@ local function npc_on_update(npc,st)
 			return
 		end
 
-		if (math.random() >= ActorKillWoundedChance) then
+		if ( (math.random(1,100)/100) >= ActorKillWoundedChance) then
 			st.victim_surrender = 65535
 			return
 		end
@@ -280,7 +280,7 @@ end
 function act_kill_wounded:begin_kill_wounded(vo)
 	if not (db.storage[vo:id()].victim_surrender) then
 		if (character_community(vo) ~= "monolith" and character_community(vo) ~= "zombied") then
-			if (CauseSurrenderCommunities[character_community(self.object)] and SurrenderChance > math.random() ) then
+			if (CauseSurrenderCommunities[character_community(self.object)] and SurrenderChance > (math.random(1,100)/100) ) then
 				db.storage[vo:id()].victim_surrender = self.object:id()
 			else
 				db.storage[vo:id()].victim_surrender = 65535
@@ -298,7 +298,7 @@ function act_kill_wounded:begin_kill_wounded(vo)
 	if not (self.st.timer) then
 		local tg = time_global()
 
-		if (math.random() < KillWoundedSoundChance) then
+		if ((math.random(1,100)/100) < KillWoundedSoundChance) then
 			xr_sound.set_sound_play(self.object:id(),"kill_wounded")
 		end
 
