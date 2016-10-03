@@ -21,24 +21,24 @@ precondition = true
 ;--------------------------------------------------------------------------------------------------
 ; ASSAULT TERRITORY FOR MERCS TASK-
 
-[cit_killers_merc_trader_stalker_task_2_name]
+[cit_killers_merc_trader_stalker_task_2]
 icon = ui_inGame2_Odin_vistrel
 prior = 2
 storyline = false
-title = cit_killers_merc_trader_stalker_task_2_name_name
-descr = cit_killers_merc_trader_stalker_task_2_name_text
-job_descr = cit_killers_merc_trader_stalker_task_2_name_about
-task_complete_descr = cit_killers_merc_trader_stalker_task_2_name_finish
+title = cit_killers_merc_trader_stalker_task_2_name
+descr = cit_killers_merc_trader_stalker_task_2_text
+job_descr = cit_killers_merc_trader_stalker_task_2_about
+task_complete_descr = cit_killers_merc_trader_stalker_task_2_finish
 repeat_timeout = 86400
 target_functor = general_under_faction_control
 status_functor = check_smart_under_faction_control_staged
 status_functor_params = stalker,bandit,dolg,army
 stage_complete = 1
-on_init = %=find_smart_under_faction_control_ex(cit_killers_merc_trader_stalker_task_2_name_id:stalker:bandit:dolg:army)%
+on_init = %=find_smart_under_faction_control_ex(cit_killers_merc_trader_stalker_task_2_id:stalker:bandit:dolg:army)%
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:stalker:bandit:dolg:army)} true, false
-on_complete = %=complete_task_inc_goodwill(50:killer) =reward_random_money(7500:9000) =reward_stash(true) =inc_task_stage(cit_killers_merc_trader_stalker_task_2_name) =pstor_reset(cit_killers_merc_trader_stalker_task_2_name_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_name_target_id)%
-on_fail = %=pstor_reset(cit_killers_merc_trader_stalker_task_2_name_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_name_target_id)%
-on_cancel = %=pstor_reset(cit_killers_merc_trader_stalker_task_2_name_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_name_target_id)%
+on_complete = %=complete_task_inc_goodwill(50:killer) =reward_random_money(7500:9000) =reward_stash(true) =inc_task_stage(cit_killers_merc_trader_stalker_task_2) =pstor_reset(cit_killers_merc_trader_stalker_task_2_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_target_id)%
+on_fail = %=pstor_reset(cit_killers_merc_trader_stalker_task_2_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_target_id)%
+on_cancel = %=pstor_reset(cit_killers_merc_trader_stalker_task_2_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_target_id)%
 
 
 ;--------------------------------------------------------------------------------------------------
