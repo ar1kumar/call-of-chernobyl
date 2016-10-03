@@ -16,7 +16,7 @@ end
 function dialog_wnd_showed()
 	dialog_closed = false
 	for k,st in pairs(db.storage) do
-		if st.object:is_talking() and st.object:id() ~= db.actor:id() then
+		if (st.object and st.object:is_talking() and st.object:id() ~= db.actor:id()) then
 			local id = st.object:id()
 			inventory_upgrades.victim_id = id -- stupid hack since sidorovich and forester don't have use_callback
 			local sound_theme = xr_sound.sound_table[id]
