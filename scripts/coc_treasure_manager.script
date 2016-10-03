@@ -289,9 +289,10 @@ function try_spawn_treasure(box)
 	if not (type(caches[id]) == "string") then 
 		return
 	end
-	caches[id] = true
 	
 	local spawned_item = alun_utils.str_explode(caches[id],",")
+	caches[id] = true
+	
 	local sec,ammos,ct,ammo_type,ammo_section
 	local ini = system_ini()
 	local sim = alife()
