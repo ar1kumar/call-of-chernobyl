@@ -39,8 +39,6 @@ local function npc_on_update(npc,st)
 	if not (IsWounded(npc)) then
 		return
 	end
-
-	printf("IsWounded")
 	
 	if not (st.victim_surrender) then
 		local active_item = db.actor:active_item()

@@ -14,7 +14,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.4.06"
+GAME_VERSION = "1.4.08"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -1348,6 +1348,12 @@ end
 -- returning false will ignore the hit completely
 function CActor__BeforeHitCallback(actor,shit,bone_id)
 	--printf("power=%s impuse=%s type=%s dir=%s who=%s",shit.power,shit.impulse,shit.type,shit.direction and vec_to_str(shit.direction),shit.draftsman and shit.draftsman:name())
+	if (shit.power > 0) then 
+		if (shit.draftsman and IsStalker(shit.draftsman) and shit.draftsman:relation(db.actor) == game_object.friend) then 
+			return false 
+		end
+	end
+	
 	local return_flag = true
 	SendScriptCallback("actor_on_before_hit",shit,bone_id,return_flag)
 	return return_flag
