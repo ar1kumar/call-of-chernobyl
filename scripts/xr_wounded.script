@@ -76,24 +76,6 @@ function action_wounded:execute()
 	local npc = self.object
 	local wound_manager = self.a.wound_manager
 
-	-- Swartz
-	if (monolith_suicide) then
-		local obj_community = self.object:character_community()
-		if obj_community == "monolith" then
-		   local posit = self.object:position()
-		   local enemy = npc:relation(db.actor) >= game_object.enemy and db.actor
-		   if enemy and posit:distance_to(enemy:position()) < 2.5 and self.object:see(enemy) then
-	        rnd = math.random(1,4)
-				if rnd == 3 then
-					monolith_suicide.monolith_die()
-					monolith_suicide.monolith_explode(self.object)
-					return
-				end
-		   end
-		end
-	end
-  -- Swartz	
-
 	-- Проверяем возможность скушать аптечку.
 	if self.a.autoheal == true then
 		if wound_manager.can_use_medkit ~= true then
@@ -130,8 +112,9 @@ function action_wounded:execute()
 	end
 	
 	local id = npc:id()
-	local po = db.storage[id].victim_surrender and db.storage[id].victim_surrender  ~= 65535 and level.object_by_id(db.storage[id].victim_surrender)
-	if (po and po:alive() and not utils.load_var(npc,"victim_surrender")) then
+	local pid = db.storage[id].victim_surrender
+	local po = pid and pid ~= 65535 and db.storage[pid] and db.storage[pid].object
+	if (po and not utils.load_var(npc,"victim_surrender")) then
 		state_mgr.set_state(npc,"prisoner",nil,nil,nil,{fast_set = true})
 		return
 	end

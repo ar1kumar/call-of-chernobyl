@@ -40,21 +40,23 @@ local function npc_on_update(npc,st)
 		return
 	end
 
+	printf("IsWounded")
+	
 	if not (st.victim_surrender) then
 		local active_item = db.actor:active_item()
-		if (not active_item or not IsWeapon(active_item)) then
+		if not (active_item and IsWeapon(active_item)) then
 			return
 		end
 
-		if (IsStalker(npc) == false or character_community(npc) == "zombied" or character_community(npc) == "monolith") then
+		if (character_community(npc) == "zombied" or character_community(npc) == "monolith") then
 			return
 		end
 
-		if (npc:relation(db.actor) ~= game_object.enemy) then
+		if (npc:relation(db.actor) < game_object.enemy) then
 			return
 		end
 
-		if (not npc_in_actor_frustrum(npc) or npc:position():distance_to(db.actor:position()) >  ActorKillWoundedMaxDist) then
+		if (npc:position():distance_to(db.actor:position()) >  ActorKillWoundedMaxDist) then
 		--if (alun_utils.angle_diff(db.actor:direction(), db.actor:position():sub(npc:position())) < 90 or npc:position():distance_to(db.actor:position()) >  7) then
 			return
 		end
