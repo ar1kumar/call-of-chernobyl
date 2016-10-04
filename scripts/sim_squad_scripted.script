@@ -90,8 +90,8 @@ function sim_squad_scripted:get_script_target()
 	local new_target 
 	if (self.scripted_target) then 
 		new_target = self.scripted_target
-	elseif (axr_task_manager.hostages_by_id[self.id]) then 
-		return axr_task_manager.hostages_by_id[self.id]
+	elseif (xrs_kill_wounded.hostage_list[self:commander_id()]) then
+		return xrs_kill_wounded.hostage_list[self:commander_id()]
 	elseif (self.random_targets) then
 		if (self.current_action == 0 and self.assigned_target_id == nil) then 
 			new_target = self.random_targets[math.random(#self.random_targets)]

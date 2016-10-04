@@ -137,6 +137,12 @@ function is_enemy(obj,enemy,no_memory)
 		
 		-- Ignore enemies with the safe_zone flag
 		if (is_actor ~= true) then
+		
+			-- ignore hostages
+			if (xrs_kill_wounded.hostage_list[ene_id]) then 
+				return true 
+			end
+			
 			if (obj_is_stalker and not is_monster) then
 				local se_obj = sim:object(id)
 				if not (se_obj) then 

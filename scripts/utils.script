@@ -784,7 +784,11 @@ function save_var(obj,varname,val)
 		end
 	end
 	
-	db.storage[id].pstor[varname] = val
+	if (type(val) == "userdata") then
+		printf("WARNING: utils.save_var ONLY USE LUA DATA TYPES!!! %s",varname)
+	else
+		db.storage[id].pstor[varname] = val
+	end
 end
 
 function load_var(obj,varname,defval)

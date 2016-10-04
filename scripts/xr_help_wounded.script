@@ -155,6 +155,11 @@ function evaluator_wounded_exist:find_valid_target()
 		return false 
 	end 
 	
+	local se_obj = alife():object(id)
+	if not (se_obj) then
+		return false 
+	end
+	
 	if not (IsStalker(vo)) then 
 		return false 
 	end 
@@ -181,7 +186,7 @@ function evaluator_wounded_exist:find_valid_target()
 		return false 
 	end
 
-	local see = dist <= 900 or npc:see(vo) or npc:memory_time(vo) <= 30000
+	local see = dist <= 900 --or npc:see(vo) or npc:memory_time(vo) <= 30000
 	if (see) and (self.a.nearest_dist == nil or dist < self.a.nearest_dist) then 
 		local vertex = level.vertex_id(vo_position)
 		if (vertex and vertex < 4294967295) then
@@ -258,9 +263,12 @@ function action_help_wounded:initialize()
 	db.storage[self.a.selected_id].wounded_already_selected = npc:id()
 end
 
-
-
-local function help_wounded_execute(npc,st)
+function action_help_wounded:execute()
+	action_base.execute(self)
+	
+	local npc = self.object 
+	local st = self.a 
+	
 	local state = state_mgr.get_state(npc)
 	if (state == "help_victim_"..AnimCombat or state == "help_victim_"..AnimFree or state == "help_wounded") then
 		return
@@ -314,11 +322,6 @@ local function help_wounded_execute(npc,st)
 	end
 end
 
-function action_help_wounded:execute()
-	help_wounded_execute(self.object,self.a)
-	action_base.execute(self)
-end
-
 function action_help_wounded:finalize()
 	--state_mgr.set_state(self.object, "idle")
 	local st = self.a
@@ -334,11 +337,14 @@ function action_help_wounded:finalize()
 	st.nearest_id = nil
 	st.index = 1
 
+	--[[
 	local medkit = self.object:object("medkit_script")
 	local se_obj = medkit and alife():object(medkit:id())
 	if (se_obj) then
 		alife():release(se_obj,true)
 	end
+	--]]
+	
 	action_base.finalize(self)
 end
 

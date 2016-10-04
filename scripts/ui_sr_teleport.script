@@ -7,11 +7,11 @@ local ini = ini_file("sr_teleport_sections.ltx")
 class "msg_box_ui" (CUIScriptWnd)
 function msg_box_ui:__init(obj,disable_msg,item) super()
 	self:SetWndRect(Frect():set(0,0,1024,768))
-
+	self:SetAutoDelete(true)
+	
 	self.name = obj and obj:name()
 	self.disable_msg = disable_msg
 	self.item = item
-
 
 	if (string.find(self.name,obj:id())) then
 		local story_name = story_objects.get_story_objects_registry():get_story_id(obj:id())

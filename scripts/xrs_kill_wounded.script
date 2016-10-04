@@ -86,9 +86,12 @@ local function get_rand_vertex(npc,vo)
 end
 
 local function is_wounded(npc)
-	if (hostage_list[npc:id()] == true) then 
-		return true 
-	end 
+	if (hostage_list[npc:id()]) then
+		local squad = get_object_squad(npc)
+		if (squad and squad:commander_id() == npc:id()) then
+			return true
+		end
+	end
 	
 	if (npc:id() ~= 0 and IsStalker(npc) and npc:wounded()) then
 		return true 
@@ -246,7 +249,7 @@ function act_kill_wounded:execute()
 	
 	local tg = time_global()
 	if (st.timer and tg > st.timer) then
-		if (hostage_list[vo:id()] ~= true) then
+		if not (hostage_list[vo:id()]) then
 			if (npc:see(vo)) then
 				state_mgr.set_state(npc,"threat_sniper_fire",nil,nil,{look_object = vo, look_dir = dir})
 			end
@@ -287,7 +290,7 @@ function act_kill_wounded:begin_kill_wounded(vo)
 			end
 		end
 	end
-	if (hostage_list[vo:id()] == true) then
+	if (hostage_list[vo:id()]) then
 		-- force squad enemy to actor because they have a hostage
 		local squad = get_object_squad(self.object)
 		if (squad) then 
@@ -310,7 +313,7 @@ function act_kill_wounded:begin_kill_wounded(vo)
 		end
 		
 		if not (self.st.news_triggered) then
-			if (hostage_list[vo:id()] == true) then 
+			if (hostage_list[vo:id()]) then 
 				if (dynamic_news_manager) then 
 					dynamic_news_manager.get_dynamic_news():KillWounded(self.object,vo,true)
 				end		

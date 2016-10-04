@@ -222,8 +222,8 @@ function hostage_task(tsk,task_id)
 	end
 
 	if (tsk.stage == 0) then 
-		if (xrs_kill_wounded) then 
-			xrs_kill_wounded.hostage_list[squad:commander_id()] = true
+		if (xrs_kill_wounded) then
+			xrs_kill_wounded.hostage_list[squad:commander_id()] = smart.id
 		end
 		if (db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then 
 			tsk.stage = 1
