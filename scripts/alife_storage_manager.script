@@ -97,12 +97,11 @@ function CALifeStorageManager_before_save(fname)
 	
 	path = path .. fname:sub(0,-6):lower() .. ".scoc"
 	
-	local savegame = io.open(path,"w+b")
-	if not (savegame) then
+	local savegame = io.open(path,"wb")
+	if not (io.type(savegame) == "file") then
+		printf("Error: Unable to write to %s",path)
 		return 
 	end
-	
-	lfs.unlock(savegame) -- Because I think anti-virus for some is locking file handle and not letting us write
 	
 	printf("axr_main: saving custom data %s",path)
 	savegame:write(data)
@@ -125,15 +124,15 @@ function CALifeStorageManager_load(fname)
 	--alun_utils.debug_write(strformat("CALifeStorageManager_load %s",path))
 	
 	local savegame = io.open(path,"rb")
-	if not (savegame) then
+	if not (io.type(savegame) == "file") then
 		return
 	end
 
 	local data = savegame:read("*all")
 	savegame:close()
 
-	if not (data) then
-		error("Failed to read %s",path)
+	if not (data and data ~= "") then
+		printf("Error: Failed to read %s",path)
 		return
 	end
 
