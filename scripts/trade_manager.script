@@ -32,8 +32,8 @@ function setup_buy_sell_conditions(npc,id)
 		return
 	end
 	
-	npc:buy_condition(tm[id].config, str)
-	tm[id].current_buy_condition = str
+	npc:sell_condition(tm[id].config, str)
+	tm[id].current_sell_condition = str
 
 	condlist = xr_logic.parse_condlist(npc, "trader", "buy_condition", tm[id].config:r_string_ex("trader", "buy_condition") or "")
 	str = condlist and xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
@@ -42,8 +42,8 @@ function setup_buy_sell_conditions(npc,id)
 		return
 	end
 
-	npc:sell_condition(tm[id].config, str)
-	tm[id].current_sell_condition = str
+	npc:buy_condition(tm[id].config, str)
+	tm[id].current_buy_condition = str
 
 	condlist = xr_logic.parse_condlist(npc, "trader", "buy_item_condition_factor", tm[id].config:r_string_ex("trader", "buy_item_condition_factor") or "0.7")
 	str = condlist and xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
