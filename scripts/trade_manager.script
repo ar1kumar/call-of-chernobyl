@@ -24,21 +24,21 @@ function trade_init(npc, cfg)
 end
 
 function setup_buy_sell_conditions(npc,id)
-	
-	local condlist = xr_logic.parse_condlist(npc, "trader", "buy_condition", tm[id].config:r_string_ex("trader", "buy_condition") or "")
+	-- intentionally swapped
+	local condlist = xr_logic.parse_condlist(npc, "trader", "sell_condition", tm[id].config:r_string_ex("trader", "sell_condition") or "")
 	local str = condlist and xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
 	if (str == nil or str == "") then
-		printf("Wrong section in buy_condition condlist for npc [%s]!", npc:name())
+		printf("Wrong section in sell_condition condlist for npc [%s]!", npc:name())
 		return
 	end
 	
 	npc:buy_condition(tm[id].config, str)
 	tm[id].current_buy_condition = str
 
-	condlist = xr_logic.parse_condlist(npc, "trader", "sell_condition", tm[id].config:r_string_ex("trader", "sell_condition") or "")
+	condlist = xr_logic.parse_condlist(npc, "trader", "buy_condition", tm[id].config:r_string_ex("trader", "buy_condition") or "")
 	str = condlist and xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
 	if(str == nil or str == "") then
-		printf("Wrong section in sell_condition condlist for npc [%s]!", npc:name())
+		printf("Wrong section in buy_condition condlist for npc [%s]!", npc:name())
 		return
 	end
 
