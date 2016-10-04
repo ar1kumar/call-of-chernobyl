@@ -68,9 +68,9 @@ local function actor_on_item_take_from_box(box,itm)
 	if (caches[box:id()] == true) then
 		caches[box:id()] = false
 		local hud = get_hud()
-		if (hud) then
-			hud:HideActorMenu()
-		end
+--		if (hud) then
+--			hud:HideActorMenu()
+--		end
 		level.map_remove_object_spot(box:id(), "treasure")
 		xr_statistic.inc_counter("stashes_found")
 		news_manager.send_treasure(1)
