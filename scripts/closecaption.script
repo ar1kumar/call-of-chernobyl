@@ -324,7 +324,7 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 			printf("Missing CC: " .. cc_id)
 		end
 		
-		if cc_text ~= cc_id then
+		if sender:id() ~= db.actor:id() then
 			local distance_limit = 10001
 			local cc_type
 			if sender_faction == "object" then
