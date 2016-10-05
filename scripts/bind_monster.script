@@ -191,8 +191,7 @@ function generic_object_binder:death_callback(victim, who)
 	if (victim:clsid() == clsid.poltergeist_s) then
 		local se_obj = alife():object(id)
 		if (se_obj) then
-			--alife():release(se_obj, true)
-			safe_release_manager.release(se_obj)
+			alife():release(se_obj, true)
 		end
 	else
 		release_body_manager.get_release_body_manager():moving_dead_body(victim)
