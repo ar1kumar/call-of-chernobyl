@@ -62,23 +62,23 @@ end
 
 -- Attaches a scope to a weapon via drag-and-drop.
 function drag_scope(addon, weapon, from_slot, to_slot)
-	-- Return if not an addon scope
+	-- Return if not an addon scope.
 	if not (addons_table[addon:section()]) then 
 		return
 	end
 	
-	-- Validate that the object on the 'to_slot' is a weapon
+	-- Validate that the object on the 'to_slot' is a weapon.
 	if not (weapon and IsWeapon(weapon)) then 
 		return 
 	end
 	
-	-- Can only drag scope to a weapon actor owns
+	-- Can only drag scope to a weapon actor owns.
 	local parent = weapon:parent()
 	if not (parent and parent:id() == db.actor:id()) then 
 		return 
 	end
 
-	-- Not a supported addon
+	-- Not a supported addon.
 	if not (check_addon(addon:section(), weapon:section())) then 
 		return 
 	end
