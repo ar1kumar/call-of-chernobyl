@@ -28,6 +28,8 @@ function execute_destroy_callback()
 					-- force offline
 					if (se_obj:can_switch_offline()) then
 						se_obj:switch_offline()
+					else 
+						printf("Warning: Can't switch offline %s",se_obj:name())
 					end
 				else
 					-- binder has not been destroyed yet...or error
