@@ -145,12 +145,12 @@ control_inertion_factor     = 1.0
 zoom_rotate_time            = 0.25
 
 
-[common_ph_friction_params_on_npc_death] ;ѕараметры дл€ задани€ изменени€ трени€ в момент смерти персонажа
+[common_ph_friction_params_on_npc_death] ; Parameters for setting change of friction at the time of the death of a character
 
-ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
-ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
-ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
-ph_skeleton_ddelay	     	  = 0 ;¬рем€ изменени€ значени€ трени€ в суставе с момента создани€ шелла, сек
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (Precisely because of the fact that the multiplication factor of 0.002 removed from the code)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (Precisely because of the fact that removed the multiplication by a factor of 0.3 from the code (0.0 * 0.3 = 0.0))
+ph_skeleton_hinger_factor1    = 1.0 ;1.0 (Because of the fact that the multiplication factor removed from the code 5.0)
+ph_skeleton_ddelay	     	  = 15.0 ;Time changes in friction values ??in the joint since the inception of the shell, s
 
 ph_skel_fatal_impulse_factor  = 6.0
 ph_after_death_velocity_factor= 0.75
@@ -158,13 +158,13 @@ ph_skel_shot_up_factor        = 0.25
 
 
 
-ph_skeleton_skin_friction_start	= 0.0   ;—тартовое значение трени€ дл€ оболочки
-ph_skeleton_skin_friction_end	= 2.0   ;‘инальное значение трени€ дл€ оболочки
-ph_skeleton_skin_ddelay			= 0.0		;¬рем€ изменени€ значени€ трени€ с момента создани€ шелла, сек.
-ph_skeleton_skin_ddelay_after_wound = 0.0 ;¬рем€ изменени€ значени€ трени€ с момента создани€ шелла, сек.(дл€ персонажа после ранени€)
-ph_pelvis_factor_low_pose_detect =0.3	;длинна луча на коллизию с землЄй из центра пелвиса
-										;если коллизитьс€, то персонаж находитьс€ в нижней позе(или ранен)(в этом случае дл€ него задаютьс€ другие параметры
-										;трени€ и отсутствует домножение импульса дл€ первого хита)
+ph_skeleton_skin_friction_start	= 0.0   ; The starting value for the shell friction
+ph_skeleton_skin_friction_end	= 2.0   ; The final value for the shell friction
+ph_skeleton_skin_ddelay			= 6.0		; Time changes in friction values since the inception of the shell, s.
+ph_skeleton_skin_ddelay_after_wound = 2.0 ; Changes in the friction values time since the creation of shell, s (for the character after injury).
+ph_pelvis_factor_low_pose_detect =0.3	; Length of the beam in the collision with the ground from the center pelvisa
+										; If the collision, the character is in the lower position (or hurt) (in this case zadayutsya other options for him
+										; Friction and no pulse multiplication for the first hit)
 ph_character_have_wounded_state = false; имеет ли персонаж состо€ние раненый
 
 [monster_base]:common_ph_friction_params_on_npc_death
