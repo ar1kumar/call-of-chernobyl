@@ -374,7 +374,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 								self.humanParticles[k.."_"..kk]=particles_object("crommcruac\\electrocute_human")
 								self.humanParticles[k.."_"..kk]:play_at_pos(cl_obj:position())
 								if fate=="turntozombie" then
-									self:turn_to_zombie(obj)
+									self:turn_to_zombie(obj,squad)
 								else
 									cl_obj:kill(cl_obj)
 								end
@@ -384,7 +384,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 								self.humanParticles[k.."_"..kk]=particles_object("crommcruac\\electrocute_human")
 								self.humanParticles[k.."_"..kk]:play_at_pos(obj:position())
 								if fate=="turntozombie" then
-									self:turn_to_zombie(obj)
+									self:turn_to_zombie(obj,squad)
 								else
 									obj:kill()
 								end
@@ -398,7 +398,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 									self.humanParticles[k.."_"..kk]=particles_object("crommcruac\\electrocute_human")
 									self.humanParticles[k.."_"..kk]:play_at_pos(cl_obj:position())
 									if fate=="turntozombie" then
-										self:turn_to_zombie(obj)
+										self:turn_to_zombie(obj,squad)
 									else
 										cl_obj:kill(cl_obj)
 									end
@@ -408,7 +408,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 									self.humanParticles[k.."_"..kk]=particles_object("crommcruac\\electrocute_human")
 									self.humanParticles[k.."_"..kk]:play_at_pos(obj:position())
 									if fate=="turntozombie" then
-										self:turn_to_zombie(obj)
+										self:turn_to_zombie(obj,squad)
 									else
 										obj:kill()
 									end
@@ -423,9 +423,32 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 	--self.debugMessages[10]:SetText("obj to kill:"..tostring(#self.objects_to_kill))
 end
 
-function CPsiStormManager:turn_to_zombie(obj)
-	CreateTimeEvent(obj.id,"turn_to_zombie",math.random(1,8),surge_manager.make_zombied,obj.id)
-	--self.debugMessages[1]:SetText("type: "..tostring(zombie_type))
+function CPsiStormManager:turn_to_zombie(se_obj,squad)
+	if not (squad) then
+		se_obj:kill()
+		return 
+	end
+	
+	self.zombie_count = self.zombie_count and self.zombie_count + 1 or 0
+	if (self.zombie_count > 12) then
+		se_obj:kill()
+		return
+	end
+	
+	local zombie_type
+	local section_number = string.sub(se_obj:section_name(), -1)
+	if section_number=="4" then
+		zombie_type="sim_default_zombied_4"
+	elseif section_number=="3" then
+		zombie_type="sim_default_zombied_3"
+	elseif section_number=="2" or section_number=="1" then
+		zombie_type="sim_default_zombied_2"
+	else
+		zombie_type="sim_default_zombied_1"
+	end
+	
+	squad:remove_npc(se_obj.id)
+	alife():create(zombie_type,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id)
 end
 
 function CPsiStormManager:kill_crows_at_pos(pos)
