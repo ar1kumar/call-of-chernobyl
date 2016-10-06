@@ -239,7 +239,7 @@ function tourist_functor()
 	-- A second infoportion delays the achievement.
 	-- Without this it often unlocks during level transition.
 	if (tourist_requirements()) then
-		give_info_portion("achieved_tourist_delay")
+		db.actor:give_info_portion("achieved_tourist_delay")
 		return true
 	end
 end
