@@ -113,9 +113,5 @@ function slot_hud:update_hud(item)
 	for i=cnt+1,5 do
 		self.slot[i]:Show(false)
 	end
-	if table.size(belted_arts) > 0 then
-		self.static_back:Show(true)
-	else
-		self.static_back:Show(false)
-	end
+	self.static_back:Show(table.size(belted_arts) > 0)
 end
