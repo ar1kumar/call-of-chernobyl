@@ -22,6 +22,10 @@ function evaluator_end:evaluate()
 		return false 
 	end
 	
+	if (IsWounded(self.object)) then 
+		return false 
+	end
+	
 	return not xr_logic.is_active(self.object, self.a)
 end
 
@@ -36,10 +40,6 @@ function evaluator_close_combat:evaluate()
 		return true
 	end
 	
-	if (IsWounded(self.object)) then 
-		return true 
-	end
-
 	local st = db.storage[self.object:id()]
 	if (st) and (st.rx_dont_shoot) then 
 		return true 

@@ -363,6 +363,7 @@ function actor_item_to_slot(binder,obj)
 			end
 		end
 	end
+	SendScriptCallback("actor_item_to_slot",obj)
 end 
 
 function actor_item_to_ruck(binder,obj)
@@ -372,6 +373,7 @@ function actor_item_to_ruck(binder,obj)
             db.actor:set_character_icon(db.actor_binder.character_icon)
         end
     end
+	SendScriptCallback("actor_item_to_ruck",obj)
 end
 
 function actor_on_weapon_jammed(binder,wpn)

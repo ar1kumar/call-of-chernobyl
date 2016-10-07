@@ -84,8 +84,8 @@ function action_wounded:execute()
 			if begin_wounded == nil then
 				utils.save_var(self.object, "begin_wounded", current_time)
 			elseif current_time - begin_wounded > 60000 then
-				local sim = alife()
-				sim:create("medkit_script",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
+				--local sim = alife()
+				--sim:create("medkit_script",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 				wound_manager:unlock_medkit()
 			end
 		end
@@ -105,10 +105,8 @@ function action_wounded:execute()
 		return
 	end
 
-	if self.a.use_medkit == true then
-		if (wound_manager:eat_medkit() == true) then 
-			return 
-		end
+	if (self.a.use_medkit and wound_manager:eat_medkit()) then
+		return 
 	end
 	
 	local id = npc:id()
@@ -130,6 +128,7 @@ function action_wounded:execute()
 --		print_table(self.a.hp_state)
 --		print_table(self.a.hp_state_see)
 		printf("wrong wounded animation %s", self.object:name())
+		return
 	end
 
 	--[[
@@ -204,20 +203,23 @@ end
 function Cwound_manager:eat_medkit()
 	--printf("EAT MEDKIT %s", self.npc:name())
 	if self.can_use_medkit == true then
-		--printf("can use medkit")
+		--[[
 		if self.npc:object("medkit_script") ~= nil then
-			--printf("eat medkit")
 			self.npc:eat(self.npc:object("medkit_script"))
 		end
-
-		if self.npc:object("medkit") ~= nil then
+		--]]
+		
+		self.npc:set_health_ex(1)
+		
+		if self.npc:object("medkit_script") ~= nil then
+			alife():release(alife():object(self.npc:object("medkit_script"):id()), true)
+		elseif self.npc:object("medkit") ~= nil then
 			alife():release(alife():object(self.npc:object("medkit"):id()), true)
 		elseif self.npc:object("medkit_army") ~= nil then
 			alife():release(alife():object(self.npc:object("medkit_army"):id()), true)
 		elseif self.npc:object("medkit_scientic") ~= nil then
 			alife():release(alife():object(self.npc:object("medkit_scientic"):id()), true)
 		end
-
 
 		local begin_wounded = utils.load_var(self.npc, "begin_wounded")
 		local current_time = time_global()

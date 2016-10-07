@@ -38,7 +38,6 @@ function motivator_binder:reinit()
 	self.st = {}
 	db.storage[self.object:id()] = self.st
 
-	self.st.state_mgr = state_mgr.bind_manager(self.object)
 	self.object:enable_vision(false)
 		
 	if (USE_MARSHAL) then
@@ -96,6 +95,7 @@ function motivator_binder:net_spawn(sobject)
 		return true
 	end
 	
+	self.st.state_mgr = state_mgr.bind_manager(self.object)
 	self.st.move_mgr = move_mgr.move_mgr(self.object)
 	self.st.move_mgr:initialize()
 	
@@ -397,7 +397,7 @@ function motivator_binder:update(delta)
 		if (self.st.active_scheme) then
 			xr_logic.try_switch_to_another_section(object, self.st[self.st.active_scheme], db.actor)
 		end
-		--alun_utils.debug_write("motivator_bind:update %s END 1",self.object and self.object:name())
+		--alun_utils.debug_write(strformat("motivator_bind:update %s END 1",self.object and self.object:name()))
 		return
 	end
 	
@@ -419,7 +419,7 @@ function motivator_binder:update(delta)
 	
 	local tg = time_global()
 	if (self.__tmr and tg < self.__tmr) then
-		--alun_utils.debug_write("motivator_bind:update %s END 2",self.object and self.object:name())
+		--alun_utils.debug_write(strformat("motivator_bind:update %s END 2",self.object and self.object:name()))
 		return
 	end
 	self.__tmr = tg+500
@@ -458,12 +458,12 @@ function motivator_binder:update(delta)
 	elseif (self.st.combat) then
 		xr_combat.set_combat_type(object, db.actor, self.st.combat)
 	end
-	--alun_utils.debug_write("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name())
+	--alun_utils.debug_write(strformat("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name()))
 
 	-- Start [Alundaio]
 	SendScriptCallback("npc_on_update",object,db.storage[id])
 	-- End [Alundaio]
-	--alun_utils.debug_write("motivator_bind:update %s END 3 AFTER AXR_MAIN",self.object and self.object:name())
+	--alun_utils.debug_write(strformat("motivator_bind:update %s END 3 AFTER AXR_MAIN",self.object and self.object:name()))
 end
 
 function motivator_binder:reload(section)
@@ -563,7 +563,7 @@ function motivator_binder:load_state()
 	xr_sound.npc_load_state(id,state)
 	trade_manager.load_state(id,state)
 	if (state.pstor_all) then
-		db.storage[id].pstor = state.pstor_all
+		--db.storage[id].pstor = state.pstor_all
 		state.pstor_all = nil
 	end
 

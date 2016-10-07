@@ -869,10 +869,12 @@ function planner_hud_show(hud)
 	local obj = get_debug_npc()
 	hud:set_header("-[Planner Info]-")
 	if (obj and obj:id() ~= 0 and obj:alive()) then
+		hud:add_msg("Name",obj:name())
+		
 		local manager = obj.motivation_action_manager and obj:motivation_action_manager()
+		hud:add_msg("motivation_action_manager",manager == nil and "doesn't exist!" or manager:initialized())
+		
 		if (manager and manager:initialized()) then
-			hud:add_msg("Name",obj:name())
-			
 			local s = obj:sight_params()
 			if (s) then 
 				local t = {
