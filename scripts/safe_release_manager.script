@@ -21,10 +21,10 @@ function execute_destroy_callback()
 		for id,v in pairs(objects_to_release) do
 			local se_obj = alife():object(id)
 			if (se_obj) then
-				-- prevent from coming online ever again
-				sim:set_switch_online(id,false)
-				sim:set_switch_offline(id,true)
 				if (se_obj.online) then
+					-- prevent from coming online ever again
+					sim:set_switch_online(id,false)
+					sim:set_switch_offline(id,true)
 					-- force offline
 					if (se_obj:can_switch_offline()) then
 						se_obj:switch_offline()
