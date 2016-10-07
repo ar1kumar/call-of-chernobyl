@@ -1349,7 +1349,7 @@ end
 function CActor__BeforeHitCallback(actor,shit,bone_id)
 	--printf("power=%s impuse=%s type=%s dir=%s who=%s",shit.power,shit.impulse,shit.type,shit.direction and vec_to_str(shit.direction),shit.draftsman and shit.draftsman:name())
 	if (shit.power > 0) then 
-		if (shit.draftsman and IsStalker(shit.draftsman) and shit.draftsman:relation(db.actor) == game_object.friend) then 
+		if (shit.draftsman and shit.draftsman:id() ~= 0 and IsStalker(shit.draftsman) and shit.draftsman:relation(db.actor) == game_object.friend) then 
 			return false 
 		end
 	end
