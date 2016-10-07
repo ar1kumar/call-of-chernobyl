@@ -1,27 +1,27 @@
 ;camping
 [logic@esc_smart_terrain_5_7_camp_work_1]
 active = animpoint@esc_smart_terrain_5_7_camp_work_1
-suitable = {=is_night !surge_started} true
+suitable = {!surge_started} true
 prior = 45
 
 [logic@esc_smart_terrain_5_7_camp_work_2]
 active = animpoint@esc_smart_terrain_5_7_camp_work_2
-suitable = {=is_night !surge_started} true
+suitable = {!surge_started} true
 prior = 45
 
 [logic@esc_smart_terrain_5_7_camp_work_3]
 active = animpoint@esc_smart_terrain_5_7_camp_work_3
-suitable = {=is_night !surge_started} true
+suitable = {!surge_started} true
 prior = 45
 
 [logic@esc_smart_terrain_5_7_camp_work_4]
 active = animpoint@esc_smart_terrain_5_7_camp_work_4
-suitable = {=is_night !surge_started} true
+suitable = {!surge_started} true
 prior = 45
 
 [logic@esc_smart_terrain_5_7_camp_work_5]
 active = animpoint@esc_smart_terrain_5_7_camp_work_5
-suitable = {=is_night !surge_started} true
+suitable = {!surge_started} true
 prior = 45
 
 
@@ -70,6 +70,7 @@ reach_distance = 10
 gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
+enemy_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
 
 [meet@mechanic]
 close_snd_hello = esc_mech_meet
