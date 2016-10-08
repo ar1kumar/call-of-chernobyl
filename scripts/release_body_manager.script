@@ -4,7 +4,7 @@
 -- This table is also used by xr_corpse_detection.script
 
 local MIN_RELEASE_DISTANCE = 10100		-- dist*dist away from actor required before releasing
-local BODY_MAX_COUNT = 10				-- The max amount of corpses that can exist before checking for releasable corpses.
+local BODY_MAX_COUNT = 15				-- The max amount of corpses that can exist before checking for releasable corpses.
 
 local RB_manager = nil
 function get_release_body_manager()
@@ -96,12 +96,12 @@ end
 
 
 function Crelease_body:moving_dead_body(obj,net_spawn)
+	self:add_corpse(obj)
+	
 	--alun_utils.debug_write("moving_dead_body %s",obj and obj:name())
 	if (not net_spawn and self.size > BODY_MAX_COUNT) then
 		self:clear()
 	end
-
-	self:add_corpse(obj)
 end
 
 local safety_time
