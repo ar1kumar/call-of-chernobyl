@@ -640,7 +640,7 @@ function object_sound:callback(npc_id)
 		return 
 	end 
 	
-	--printf("START object_sound:callback() %s scheme=%s st=%s signals=%s",st.object and st.object:name(),st.active_scheme,st[st.active_scheme],st[st.active_scheme].signals)
+	printf("START object_sound:callback() %s scheme=%s st=%s signals=%s",st.object and st.object:name(),st.active_scheme,st[st.active_scheme],st[st.active_scheme].signals)
 
 	if st.active_scheme == nil then
 		return
@@ -654,7 +654,7 @@ function object_sound:callback(npc_id)
 	else
 		st[st.active_scheme].signals["sound_end"] = true
 	end
-	--printf("END object_sound:callback() %s",st.object and st.object:name())
+	printf("END object_sound:callback() %s",st.object and st.object:name())
 end
 function object_sound:is_playing ()
 	if(self.snd_obj~=nil) then

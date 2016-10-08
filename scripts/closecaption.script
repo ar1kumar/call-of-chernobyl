@@ -317,14 +317,12 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 				return false
 			end
 		end
-
+		
 		local cc_text = game.translate_string(cc_id)
 		if cc_text == cc_id then
 			cc_text = "[...]"
-			printf("Missing CC: " .. cc_id)
-		end
-		
-		if sender:id() ~= db.actor:id() then
+			printf("Missing CC: %s",cc_id)
+		else
 			local distance_limit = 10001
 			local cc_type
 			if sender_faction == "object" then
@@ -356,7 +354,11 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 				cc_display_tutorial(cc_id)
 				return true
 			elseif cc_type > 0 then
-				if distance_between_safe(sender, db.actor) < distance_limit then
+				if type(sender) == "userdata" then
+					if distance_between_safe(sender, db.actor) < distance_limit then
+						cc_display_normal(cc_id, showtime, cc_type)
+					end
+				else 
 					cc_display_normal(cc_id, showtime, cc_type)
 				end
 				return true
@@ -434,15 +436,14 @@ local msgtypes = {"st_tip", "st_memo", "st_sending_msg", ""}
 function cc_display_radio(sender, sender_faction, sender_id, showtime, cc_text, delay_sound, cc_type)
 	local msg_type = msgtypes[-cc_type]
 	local texture, faction, name
-	if type(sender) == "userdata" then
+	if (type(sender) == "userdata" and IsStalker(sender) and sender:id() ~= 0) then
 		texture = sender:character_icon()
 		if sender:profile_name() ~= "actor" then
 			faction = game.translate_string(sender:character_community())
 		end
 		name = sender:character_name()
-	else
-		if type(sender) == "table" then sender = sender[math.random(1, #sender)] end
-		texture = string.sub(sender, 1)
+	elseif type(sender) == "table" then 
+		texture = string.sub(sender[math.random(1, #sender)], 1)
 	end
 	if sender_faction then
 		faction = game.translate_string(sender_faction)

@@ -874,6 +874,11 @@ end
 
 function teleport_actor(actor, npc, p)
 	local point = patrol(p[1])
+	if not (point) then 
+		printf("xr_effects.teleport_actor no patrol path %s exists!",p[1])
+		return 
+	end 
+	
 	local dir
 	if p[2] ~= nil then
 		local look = patrol(p[2])
@@ -2026,11 +2031,14 @@ end
 function play_sound(actor, obj, p)
 	local theme = p[1]
 	local faction = p[2]
-	local point = SIMBOARD.smarts_by_names[p[3]]
-	if point ~= nil then
-		point = point.id
-	elseif p[3]~=nil then
-		point = p[3]
+	local point
+	if (p[3]) then
+		local smart = SIMBOARD.smarts_by_names[p[3]]
+		if (smart) then 
+			point = smart.id
+		else 
+			point = p[3]
+		end
 	end
 
 	if obj and IsStalker(obj) then
@@ -4177,9 +4185,11 @@ function make_a_wish(actor,npc,p)
 		for k,v in pairs(ui_debug_main.id_to_spawn_table) do
 			if (valid_ids[k]) then
 				local list = ui_debug_main.get_spawn_table(v)
-				for kk,vv in pairs(list) do 
-					if (sysini:section_exist(vv)) then
-						sim:create(vv,vector(),0,0,0)
+				if (list) then
+					for kk,vv in pairs(list) do 
+						if (sysini:section_exist(vv)) then
+							sim:create(vv,vector(),0,0,0)
+						end
 					end
 				end
 			end

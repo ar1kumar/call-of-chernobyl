@@ -14,7 +14,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.4.09"
+GAME_VERSION = "1.4.10"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -46,6 +46,9 @@ function start_game_callback()
 	if (USE_MARSHAL) then
 		printf("using marshal library")
 	end
+	
+	sound_theme.load_sound()
+		
 	-- Alundaio
 	if (axr_main) then axr_main.on_game_start() end
 	-- End Alundaio
@@ -55,7 +58,6 @@ function start_game_callback()
 
 	smart_names.init_smart_names_table()
 	task_manager.clear_task_manager()
-	sound_theme.load_sound()
 	--xr_sound.start_game_callback()
 	dialog_manager.fill_phrase_table()
 
