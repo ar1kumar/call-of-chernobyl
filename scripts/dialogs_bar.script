@@ -52,15 +52,27 @@ end
 
 function arena_give_reward(first_speaker, second_speaker)
 	local m = 0
-	if has_alife_info("bar_arena_1000_r") then
-		m = 1000
-	elseif has_alife_info("bar_arena_2000_r") then
-		m = 2000
-	elseif has_alife_info("bar_arena_3000_r") then
-		m = 3000
-	elseif has_alife_info("bar_arena_5000_r") then
-		m = 5000
+	
+	if (has_alife_info("bar_arena_pseudodog_defeated")) then 
+		m = m + 1000 
+	end 
+	
+	if (has_alife_info("bar_arena_snork_defeated")) then 
+		m = m + 1000 
+	end 
+	
+	if (has_alife_info("bar_arena_bloodsucker_defeated")) then 
+		m = m + 1000
+	end 
+	
+	if (has_alife_info("bar_arena_burer_defeated")) then 
+		m = m + 1000
 	end
+	
+	if (has_alife_info("bar_arena_savage_defeated")) then 
+		m = m + 1000
+	end
+
 	local p = 0
 	if has_alife_info("bar_arena_20_p") then
 		p = 1.5
