@@ -61,8 +61,20 @@ function GetRPM(wpn_section, upgr_sections) --' скорострельность
 end
 
 function GetDamage(wpn_section, upgr_sections) --' повреждение
-	local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
-	return normalize(hit_power, 0, 1)
+   local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
+
+   local ltx = system_ini()
+   if ltx:line_exist(wpn_section, "ammo_class") then
+		local ammo_list = ltx:r_string(wpn_section, "ammo_class")
+		if (ammo_list) then
+			local pos = string.find(ammo_list, ",", 1)
+			local ammo = (pos ~= nil) and string.sub(ammo_list, 1, pos-1) or ammo_list
+			local k_hit = ltx:r_float_ex(ammo, "k_hit") or 1
+			hit_power = (hit_power ~= 0) and (k_hit*hit_power) or k_hit
+		end
+   end
+
+   return normalize(hit_power, 0, 1.5)
 end
 
 function GetDamageMP(wpn_section, upgr_sections) -- ??? (повреждениеMP)
