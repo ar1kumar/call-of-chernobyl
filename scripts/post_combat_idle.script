@@ -90,7 +90,9 @@ function action_post_combat_wait:initialize()
 	self.object:set_body_state(move.crouch)
 	self.object:set_movement_type(move.stand)
 	self.object:set_sight(look.danger, nil, 0)
-
+	self.object:set_desired_position()
+	self.object:set_desired_direction()
+	
 	self.anim_st = { animstate = { states = {anim_marker = nil } } }
 
 	self.st.animation = state_mgr_animation.animation(self.object, self.anim_st, "state_mgr_animation_list")
