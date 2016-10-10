@@ -8,11 +8,7 @@
 
 -- Check if achievements can be unlocked.
 function can_unlock()
-	if (db.actor and db.actor.afterFirstUpdate) then
-		return true
-	else
-		return false
-	end
+	return (db.actor and db.actor.afterFirstUpdate)
 end
 
 -- Returns how many achievements are available.
@@ -24,7 +20,8 @@ function get_achievements_available()
 	end
 	-- 'Radiotherapy'.
 	if (character_community(db.actor) == "actor_monolith"
-	or character_community(db.actor) == "actor_zombied") then
+	or (character_community(db.actor) == "actor_zombied" and
+	not has_alife_info("actor_made_wish_immortal"))) then
 		available = available - 1
 	end
 	return available
@@ -381,7 +378,8 @@ end
 function radiotherapy_requirements()
 	return (
 				(not character_community(db.actor) == "actor_monolith")
-			and (not character_community(db.actor) == "actor_zombied")
+			and (not character_community(db.actor) == "actor_zombied"
+			or   has_alife_info("actor_made_wish_immortal"))
 			and (xr_statistic.actor_statistic.surges >= 25)
 			and (xr_statistic.actor_statistic.storms >= 25)
 		)
