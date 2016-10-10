@@ -1377,12 +1377,15 @@ function CALifeUpdateManager__on_before_change_level(packet)
 --]]
 -- Here you can do stuff when level changes BEFORE save is called, even change destination!. Packet is constructed as stated above
 
-	-- Release dead bodies on level change
+	-- Release dead bodies on level change (TODO: Determine if it's a bad idea to do this here)
+	--[[
 	local rbm = release_body_manager.get_release_body_manager()
 	if (rbm) then
 		rbm:clear(true)
 	end
-		-- READ PACKET
+	--]]
+	
+	-- READ PACKET
 	local pos,angle = vector(),vector()
 	local gvid = packet:r_u16()
 	local lvid = packet:r_u32()

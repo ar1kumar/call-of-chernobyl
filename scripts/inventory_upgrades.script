@@ -438,11 +438,15 @@ function property_functor_a(param1, name)
 		elseif (name == "prop_reliability") then 
 			val = char_ini:r_float_ex(section_table[i],"misfire_start_prob") or 0
 			if (val ~= 0) then
-				sum = sum + (ui_wpn_params.normalize(val,0.01,0)-100)/2
+				sum = sum + (ui_wpn_params.normalize(val,0.01,0)-100)/3
 			end
 			val = char_ini:r_float_ex(section_table[i],"misfire_end_prob") or 0
 			if (val ~= 0) then
-				sum = sum + (ui_wpn_params.normalize(val,0.1,0)-100)/2
+				sum = sum + (ui_wpn_params.normalize(val,0.1,0)-100)/3
+			end
+			val = char_ini:r_float_ex(section_table[i],"condition_shot_dec") or 0
+			if (val ~= 0) then
+				sum = sum + (ui_wpn_params.normalize(val,0.005,0)-100)/3
 			end
 		else
 			sum = sum + (char_ini:r_float_ex(section_table[i], "value") or 0)
@@ -529,7 +533,7 @@ function can_repair_item( item_name, item_condition, mechanic ) --( string, floa
 	
 	local obj = db.actor:object(item_name)
 	if (obj and IsArtefact(obj)) then 
-		return false 
+		return false
 	end
 
 	return true
@@ -585,20 +589,6 @@ function effect_repair_item( item_name, item_condition)
 end
 
 function can_upgrade_item( item_name, mechanic )
-	setup_discounts()
-	--[[
-	if param_ini:line_exist(mechanic, "he_upgrade_nothing") then
-		return false
-	end
-	if not param_ini:line_exist(mechanic, item_name) then
-		return false
-	end
-	--]]
-	--printf("can_upgrade_item")
-	return true
-end
-
-function setup_discounts()
 	local victim = victim_id and (db.storage[victim_id] and db.storage[victim_id].object or level.object_by_id(victim_id))
 	if not (victim) then 
 		return 
@@ -609,6 +599,7 @@ function setup_discounts()
 		local parsed = xr_logic.parse_condlist(db.actor, nil, nil, condlist)
 		xr_logic.pick_section_from_condlist(db.actor, nil, parsed)
 	end
+	return true
 end
 
 function mech_discount(perc)

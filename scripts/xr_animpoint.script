@@ -73,6 +73,7 @@ function action_reach_animpoint:execute()
 end
 function action_reach_animpoint:finalize()
 	action_base.finalize(self)
+	self.st.am_i_reached = false
 end
 --------------------------------------------------------------------------------
 class "action_animpoint" (action_base)
@@ -194,24 +195,28 @@ function animpoint:position_riched()
 	if not (npc) then
 		return false
 	end
-		if not (self.position) then
+	if not (self.position) then
 		return false
 	end
-		local dist = npc:position():distance_to_sqr(self.position)
+	local dist = npc:position():distance_to_sqr(self.position)
 	if (self.current_action and dist <= self.st.reach_distance) then
 		return true
 	end
 	if (dist <= self.st.reach_distance) then
 		local dir1 = vector():set(self.smart_direction)
 		local dir2 = vector():set(npc:direction())
-		npc:set_desired_direction(dir1)
-		npc:set_sight(look.direction, dir1:normalize(), true)
+		--npc:set_desired_direction()
+		--npc:set_sight(look.direction, dir1:normalize(), true)
+		state_mgr.set_state(npc, "animpoint_reach", {turn_end_func=function() self.st.am_i_reached = true return end}, nil, {look_dir = dir1})
+		--[[
 		local v1 = -math.deg(math.atan2(dir1.x, dir1.z))
 		local v2 = -math.deg(math.atan2(dir2.x, dir2.z))
 		local rot_y = math.abs(math.min(math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2)))
-		if (rot_y <= 25) then
+		if (rot_y <= 30) then
 			return true
 		end
+		--]]
+		return self.st.am_i_reached
 	end
 	return false
 end
@@ -243,9 +248,9 @@ function animpoint:start()
 		printf("xr_animpoint: ERROR: NPC don't exist!")
 		return
 	end
-		local state = state_mgr.get_state(npc)
+	local state = state_mgr.get_state(npc)
 	local camp = sr_camp.get_current_camp(self.vertex_position)
-		if (camp) then
+	if (camp) then
 		if (self.st.use_camp == true and not string.find(state,"sleep")) then
 			self.camp = camp
 			self.camp:register_npc(self.npc_id)
@@ -380,8 +385,8 @@ function animpoint:update()
 			self.st.base_action = descr
 		end
 	end
-		self.current_action = action
-		local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
+	self.current_action = action
+	local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
 	if (npc) then
 		state_mgr.set_state(npc, action, nil, nil, {look_position = self.look_position},{animation_position = self.position, animation_direction = self.smart_direction} )		
 	end
