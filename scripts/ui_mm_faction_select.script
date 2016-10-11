@@ -22,7 +22,6 @@ local function on_game_load(binder)
 	if (USE_MARSHAL) then
 		if (config:r_value("temp","new_game_hardcore_mode",1) == true) then
 			-- shitty way to make a uuid but should be good enough to track the same saves
-			math.randomseed(os.time())
 			alife_storage_manager.get_state().uuid = GAME_VERSION .. "_" .. tostring(math.random(100)) .. tostring(math.random()) .. tostring(math.random(1000))
 			config:w_value("temp","new_game_hardcore_mode")
 			need_save = true

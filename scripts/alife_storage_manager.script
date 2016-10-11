@@ -53,9 +53,13 @@ function CALifeStorageManager_before_save(fname)
 		return 
 	end
 
+	printf("CALifeStorageManager_before_save BEFORE callback")
+	
 	m_data.GAME_VERSION = GAME_VERSION
 	
 	SendScriptCallback("save_state",m_data)
+	
+	printf("CALifeStorageManager_before_save AFTER callback")
 	
 	-- save pstor
 	for id,t in pairs(db.storage) do
@@ -107,11 +111,13 @@ function CALifeStorageManager_before_save(fname)
 	printf("axr_main: saving custom data %s",path)
 	savegame:write(data)
 	savegame:close()
+	
+	printf("CALifeStorageManager_before_save FINISHED")
 end 
 
 -- called from engine!
 function CALifeStorageManager_save(fname)
-
+	printf("CALifeStorageManager_save START FINISHED")
 end 
 
 -- called from engine
