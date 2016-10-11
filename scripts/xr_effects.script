@@ -4239,16 +4239,25 @@ function make_a_wish(actor,npc,p)
 --		end
 
 --		Teleports the player to a smashed open grave in the Great Swamp.
---		Goodwill is increased with the zombied faction to ensure they aren't hostile.
+--		Goodwill is increased with the Monolith and Zombified faction to ensure they aren't hostile.
+		inc_faction_goodwill_to_actor(db.actor, nil, {"monolith", 5000})
 		inc_faction_goodwill_to_actor(db.actor, nil, {"zombied", 5000})
 		ChangeLevel(vector():set(266.99, 0.00, -131.07), 310937, 181, vector():set(0,0,0))
 		return 
 	end
 	
-	-- Hide and disable the immortality wish if the actor is already zombified.
-	-- While they won't be made immortal, allowing this wish to be made would
-	-- break the idea behind the wish's irony, as they are already undead.
-	if (character_community(db.actor) == "actor_zombied") then
+	-- Hide and disable the immortality wish if already in the Zombified faction.
+	if (character_community(db.actor) == "actor_zombied"
+	
+	-- Achievement counter makes an exception to Radiotherapy not being available to Zombified players if
+	-- they wished for immortality, as they may have already unlocked it in their non-Zombified playthrough.
+	
+	-- However Monolith is the only non-Zombified faction not allowed access to the achievement, meaning it is
+	-- possible to unlock Completionist before becoming a Zombie and then making Radiotherapy available for unlock.
+	
+	-- To avoid this, if the player already has the Completionist achievement and is in Monolith, prevent them
+	-- from wishing for immortality and becoming a zombie, as this will also screw the achievement counter up.
+	or (character_community(db.actor) == "actor_monolith" and has_alife_info("achieved_completionist"))) then
 		action_list[5] = nil
 		ui_dyn_msg_box.multi_choice(action_list,"st_wish_1","st_wish_2","st_wish_3","st_wish_4","st_wish_99")
 	else
