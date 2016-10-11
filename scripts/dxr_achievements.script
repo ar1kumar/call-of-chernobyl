@@ -375,6 +375,7 @@ end
 -- Radiotherapy.
 -- Requires 25 emissions and 25 psi-storms to be survived.
 -- Requires the player not be in the Monolith of Zombified factions.
+-- Exception if the player converted to Zombified faction via immortality wish.
 function radiotherapy_requirements()
 	return (
 				(not character_community(db.actor) == "actor_monolith")
