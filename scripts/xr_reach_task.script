@@ -178,7 +178,7 @@ function action_reach_task_location:single_execute(se_obj)
 	end
 end
 
-function action_reach_task_location:fake_target()
+function action_reach_task_location:fake_target(squad)
 	
 	if (self.st.timer and time_global() < self.st.timer) then 
 		return 
@@ -186,7 +186,6 @@ function action_reach_task_location:fake_target()
 	self.st.timer = nil 
 	
 	local npc = self.object
-
 	if (npc:path_type() ~= game_object.level_path) then 
 		npc:set_path_type(game_object.level_path)
 	end
@@ -244,7 +243,7 @@ function action_reach_task_location:commander_execute(squad)
 	end 
 	
 	if (squad.assigned_target_id == squad.id) then 
-		return self:fake_target() -- this is for squads who can't find open smart
+		return self:fake_target(squad) -- this is for squads who can't find open smart
 	end
 	
 	local squad_target = simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
@@ -316,7 +315,7 @@ end
 function action_reach_task_location:soldier_execute(squad)
 
 	if (squad.assigned_target_id == squad.id) then 
-		return self:fake_target() -- this is for squads who can't find open smart
+		return self:fake_target(squad) -- this is for squads who can't find open smart
 	end
 	
 	local npc = self.object

@@ -335,40 +335,20 @@ function get_sim_board()
 	return _G.SIMBOARD
 end
 
-local available_targets = {}
 function simulation_board:get_squad_target(squad)
-	empty_table(available_targets)
-
 	local most_priority_task = nil
-	local max_prior = 0
+	local most_priority_task_prior = nil
 	local curr_prior = 0
-	local target_tbl
-	local size = 0
-	
-	local pairs = pairs
 	local object_registry = simulation_objects.get_sim_obj_registry().objects
 	for k,v in pairs(object_registry) do
-		curr_prior = 0
+		curr_prior = -1
 		if v.id ~= squad.id and not v.locked == true then
 			curr_prior = v:evaluate_prior(squad)
 		end
-		if (curr_prior > 0 and v:target_precondition(squad)) then
-			target_tbl = {prior = curr_prior, target = v}
-			tinsert(available_targets, target_tbl)
-			size = size + 1
+		if (curr_prior >= 0 and v:target_precondition(squad)) and (most_priority_task_prior == nil or curr_prior > most_priority_task_prior) then
+			most_priority_task = v 
+			most_priority_task_prior = curr_prior
 		end
-	end
-
-	if size > 0 then
-		tsort(available_targets, function(a,b) return a.prior > b.prior end)
-
-		if (xr_conditions.surge_started() or is_squad_monster[squad.player_id]) then
-			return available_targets[1].target
-		end
-
-		local max_id = math.floor(0.25 * size)
-		if max_id == 0 then max_id = 1 end
-		most_priority_task = available_targets[math.random(max_id)].target
 	end
 
 	return most_priority_task

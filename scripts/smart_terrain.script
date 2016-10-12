@@ -84,13 +84,14 @@ end
 function se_smart_terrain:on_register()
 	--alun_utils.debug_write(strformat("%s:%s:ON_REGISTER start",self:name(),self.id))
 	cse_alife_smart_zone.on_register(self)
+	db.add_smart_terrain(self)
 
 	local sim = alife()
 	local gg = game_graph()
 	local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
-	local smart_level = alife():level_name(game_graph():vertex(self.m_game_vertex_id):level_id())
+	local smart_level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
 	
-	self.is_on_actor_level = actor_level == actor_level or nil
+	self.is_on_actor_level = actor_level == smart_level or nil
 
 	-- Disable any smart terrain that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
 	if not (self.is_on_actor_level) then
@@ -129,6 +130,7 @@ function se_smart_terrain:on_unregister()
 	SIMBOARD:unregister_smart(self)
 	unregister_story_object_by_id(self.id)
 	simulation_objects.get_sim_obj_registry():unregister(self)
+	db.del_smart_terrain(self)
 	--if (USE_MARSHAL) then 
 	--	UnregisterScriptCallback("save_state",self)
 	--end
@@ -149,6 +151,7 @@ function se_smart_terrain:read_params()
 		local fs = getFS()
 		if fs:exist("$game_config$",filename) then
 			self.ini = ini_file(filename)
+			self.fname = filename
 		else
 			printf("ERROR: There is no configuration file [%s] in smart_terrain [%s]", filename, 	self:name())
 			self.disabled = true
@@ -402,7 +405,7 @@ end
 
 function se_smart_terrain:task(obj)
 	--alun_utils.debug_write(strformat("%s:task %s",self:name(),obj and obj:name()))
-	if (self.disabled) then
+	if (self.disabled or not self.online) then
 		return self.smart_alife_task
 	end
 
@@ -598,7 +601,7 @@ function se_smart_terrain:update_jobs()
 end
 
 function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
-	if (self.disabled) then
+	if (self.disabled or not self.online) then
 		return
 	end
 	
@@ -775,7 +778,7 @@ function se_smart_terrain:idNPCOnJob(job_name)
 	return self.npc_by_job_section[job_name]
 end
 function se_smart_terrain:switch_to_desired_job(npc)
-	if (self.disabled) then
+	if (self.disabled or not self.online) then
 		return
 	end
 
@@ -1468,13 +1471,14 @@ end
 function surge_stats()
 end
 
-function se_smart_terrain:target_precondition(squad, ignore_population)
+function se_smart_terrain:target_precondition(squad, ignore_population, skip_props)
 	--alun_utils.debug_write(strformat("%s:target_precondition",squad and squad:name()))
 	
-	if (self.job_count == 0) then 
-		-- can't target a smart that doesn't have any simulation jobs available
-		return false 
-	end 
+	-- commented out because smarts on other levels don't load job table and that means squads won't target them
+	-- if (self.job_count == 0) then 
+		-- -- can't target a smart that doesn't have any simulation jobs available
+		-- return false 
+	-- end
 	
 	if self.respawn_only_smart == true then
 		return false
@@ -1496,6 +1500,10 @@ function se_smart_terrain:target_precondition(squad, ignore_population)
 		
 		local is_monster = is_squad_monster[squad.player_id]
 		if (is_monster ~= true and squad.player_id ~= "zombied") then
+			if (skip_props) and (self.props.base > 0 or self.props.resource > 0 or self.props.territory > 0) then
+				return true 
+			end
+	
 			-- surge
 			if (xr_conditions.surge_started()) then
 				if (self.props.surge > 0) then 
@@ -1514,6 +1522,11 @@ function se_smart_terrain:target_precondition(squad, ignore_population)
 				return true 
 			end
 		else
+		
+			if (skip_props) and (self.props.lair > 0 or self.props.territory > 0) then
+				return true 
+			end
+			
 			-- lair
 			if (self.props.lair > 0 and sim_board.general_lair_precondition(squad,self)) then 
 				return true 
