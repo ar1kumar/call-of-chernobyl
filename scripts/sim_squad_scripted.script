@@ -306,7 +306,7 @@ function sim_squad_scripted:generic_update()
 	self.assigned_target_id = get_help_target_id(self) or self.assigned_target_id or self.current_target_id
 
 	if (self.current_action) then
-		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
+		local se_target = self.assigned_target_id and (simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id] or self.assigned_target_id == self.id and self)
 
 		-- Evaluate current assigned target; make sure it is still valid
 		if (se_target and se_target:target_precondition(self,true)) then
@@ -335,12 +335,14 @@ function sim_squad_scripted:generic_update()
 	-- Find a new target
 	local target = SIMBOARD:get_squad_target(self)
 	if not (target) then
+	
+		printf("squad %s has no target",self:name())
 		self:on_reach_target(self)
 		
 		-- we have to clear AFTER on_reach_target, not BEFORE so we can get location mask of old smart
-		self.assigned_target_id = nil
+		self.assigned_target_id = self.id
 		self.current_target_id = nil
-		self.current_action = nil
+		self.current_action = 0
 		return 
 	end
 
@@ -997,6 +999,12 @@ function sim_squad_scripted:can_switch_online()
     if (not get_object_story_id(self.id)) then
 	
 		if (is_squad_monster[self.player_id]) then
+		
+			-- monster doesn't have a target smart so just leave it offline
+			if (self.assigned_target_id == self.id) then
+				return false
+			end
+			
 			local hour = level.get_time_hours()
 			if (self.player_id == "monster_predatory_day") then 
 				-- Monster will not come online during the hours of (9PM till 5AM)
@@ -1228,6 +1236,10 @@ function sim_squad_scripted:sim_available()
 end
 
 function sim_squad_scripted:target_precondition(squad)
+	if (self.id == squad.id) then 
+		return true 
+	end 
+	
 	if (sim_board.general_squad_precondition(squad,self)) then 
 		return true 
 	end

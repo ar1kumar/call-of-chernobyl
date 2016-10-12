@@ -499,22 +499,24 @@ function get_nearest_stalker(npc)
 	local stalker
 	local dist
 	local nearest_stalker,nearest_dist
-	local pos = npc == "cam" and device().cam_pos or npc:position()
+	local is_cam = npc == "cam"
+	local pos = is_cam and device().cam_pos or npc:position()
 	local st
 	for i=1, #db.OnlineStalkers do
 		st = db.storage[db.OnlineStalkers[i]]
 		stalker = st and st.object or level.object_by_id(db.OnlineStalkers[i])
 		if (stalker and IsStalker(stalker) and stalker:alive()) then
-			
-			dist = pos:distance_to_sqr(stalker:position())
-			if not (nearest_dist) then
-				nearest_dist = dist
-				nearest_stalker = stalker
-			end
+			if (is_cam or npc:id() ~= stalker:id()) then
+				dist = pos:distance_to_sqr(stalker:position())
+				if not (nearest_dist) then
+					nearest_dist = dist
+					nearest_stalker = stalker
+				end
 
-			if (dist < nearest_dist) then
-				nearest_dist = dist
-				nearest_stalker = stalker
+				if (dist < nearest_dist) then
+					nearest_dist = dist
+					nearest_stalker = stalker
+				end
 			end
 		end
 	end
