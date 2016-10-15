@@ -16,55 +16,57 @@ function options_dialog:__init() super()
 	
 	-- add UI elements to scroll view in specific order
 	for cap,t in pairs(self.gameplay_options) do
-		_st = self.xml:InitStatic("tab_gameplay:templ_item", nil)
-		
-		-- caption
-		local ctrl = self.xml:InitStatic("tab_gameplay:cap_check_axr",_st) -- ctrl needs scoped here because we pass it to wrapper or else ref will get replaced
-		
-		-- set caption text
-		ctrl:TextControl():SetText(game.translate_string("ui_mm_"..cap))
-		
-		-- control
-		if (t.typ == "check") then
-			-- sort by name and type
-			table.insert(checks,ctrl:TextControl():GetText())
-			elements[ctrl:TextControl():GetText()] = _st
-		
-			-- create control
-			ctrl = self.xml:InitCheck(t.tag or "tab_gameplay:check_axr",_st)
+		if not (t.disabled) then
+			_st = self.xml:InitStatic("tab_gameplay:templ_item", nil)
 			
-			-- register for callbacks
-			if (t.default ~= nil) then -- obviously dynamic axr option
-				self:Register(ctrl,"ck_"..cap)
-			end
-		elseif(t.typ == "list") then 
-			-- sort by name and type
-			table.insert(lists,ctrl:TextControl():GetText())
-			elements[ctrl:TextControl():GetText()] = _st
+			-- caption
+			local ctrl = self.xml:InitStatic("tab_gameplay:cap_check_axr",_st) -- ctrl needs scoped here because we pass it to wrapper or else ref will get replaced
 			
-			-- create control
-			ctrl = self.xml:InitComboBox(t.tag or "tab_gameplay:list_axr",_st)
+			-- set caption text
+			ctrl:TextControl():SetText(game.translate_string("ui_mm_"..cap))
 			
-			-- setup the list
-			if (t.list) then
-				for i,v in ipairs(t.list) do 
-					ctrl:AddItem(v,i-1)
+			-- control
+			if (t.typ == "check") then
+				-- sort by name and type
+				table.insert(checks,ctrl:TextControl():GetText())
+				elements[ctrl:TextControl():GetText()] = _st
+			
+				-- create control
+				ctrl = self.xml:InitCheck(t.tag or "tab_gameplay:check_axr",_st)
+				
+				-- register for callbacks
+				if (t.default ~= nil) then -- obviously dynamic axr option
+					self:Register(ctrl,"ck_"..cap)
 				end
-			end
-	
-			-- register for callbacks
-			if (t.default ~= nil) then -- obviously dynamic axr option
-				self:Register(ctrl,"lst_"..cap)
-				if (t.on_list_item_select) then
-					local _wrapper = function(handler) -- we need wrapper in order to pass ctrl to method
-						t.on_list_item_select(handler,ctrl)
+			elseif(t.typ == "list") then 
+				-- sort by name and type
+				table.insert(lists,ctrl:TextControl():GetText())
+				elements[ctrl:TextControl():GetText()] = _st
+				
+				-- create control
+				ctrl = self.xml:InitComboBox(t.tag or "tab_gameplay:list_axr",_st)
+				
+				-- setup the list
+				if (t.list) then
+					for i,v in ipairs(t.list) do 
+						ctrl:AddItem(v,i-1)
 					end
-					self:AddCallback("lst_"..cap,ui_events.LIST_ITEM_SELECT,_wrapper,self)
+				end
+		
+				-- register for callbacks
+				if (t.default ~= nil) then -- obviously dynamic axr option
+					self:Register(ctrl,"lst_"..cap)
+					if (t.on_list_item_select) then
+						local _wrapper = function(handler) -- we need wrapper in order to pass ctrl to method
+							t.on_list_item_select(handler,ctrl)
+						end
+						self:AddCallback("lst_"..cap,ui_events.LIST_ITEM_SELECT,_wrapper,self)
+					end
 				end
 			end
+			
+			self.gameplay_options[cap].ctrl = ctrl
 		end
-		
-		self.gameplay_options[cap].ctrl = ctrl
 	end 
 	
 	-- sort ui elements to display in alphabetical order

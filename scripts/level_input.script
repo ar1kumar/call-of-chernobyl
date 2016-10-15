@@ -18,11 +18,11 @@ function action_quick_save()
 	end
 	
 	-- if game isn't already paused, then force a pause here
-	local force_pause
-	if not (device():is_paused()) then 
-		device():pause(true)
-		force_pause = true
-	end
+	-- local force_pause
+	-- if not (device():is_paused()) then 
+		-- device():pause(true)
+		-- force_pause = true
+	-- end
 	
 	-- get list of savegames with most recently modified first.
 	local flist = getFS():file_list_open_ex("$game_saves$",	bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*".. ui_load_dialog.saved_game_extension)
@@ -33,11 +33,10 @@ function action_quick_save()
 		flist:Sort(FS.FS_sort_by_modif_down)
 		
 		for it=0, f_cnt-1 do
-			local file = flist:GetAt(it)
-			local file_name = file:NameFull():sub(0,-6):lower()
+			local file_name = flist:GetAt(it):NameFull():sub(0,-6):lower()
 			
 			-- grab last modified quicksave increment count
-			local d = tonumber( string.match(file_name,".* %- quicksave(%d+)") )
+			local d = tonumber( string.match(file_name,"quicksave(%d+)") )
 			if (d) then
 				inc = d
 				break 
@@ -47,11 +46,11 @@ function action_quick_save()
 	
 	inc = inc >= axr_main.config:r_value("mm_options","quicksave_cnt",2,5) and 1 or inc + 1
 	
-	get_console():execute("save " .. user_name() .. " - quicksave" .. inc)
+	get_console():execute("save " .. (user_name() or "") .. " - quicksave" .. inc)
 	
-	if (force_pause) then 
-		device():pause(false)
-	end
+	-- if (force_pause) then 
+		-- device():pause(false)
+	-- end
 	
 	return true
 end 
@@ -60,25 +59,18 @@ function action_quick_load()
 	local flist = getFS():file_list_open_ex("$game_saves$",	bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*".. ui_load_dialog.saved_game_extension)
 	local f_cnt = flist and flist:Size() or 0
 	
-	local last_modif = user_name() .. " - quicksave1"
-	
 	if (f_cnt > 0) then
 		flist:Sort(FS.FS_sort_by_modif_down)
 		
 		for it=0, f_cnt-1 do
-			local file = flist:GetAt(it)
-			local file_name = file:NameFull():sub(0,-6):lower()
+			local file_name = flist:GetAt(it):NameFull():sub(0,-6):lower()
 			
 			-- grab last modified quicksave
 			if (string.match(file_name,".* %- quicksave(%d+)")) then
-				last_modif = file_name
-				break
+				get_console():execute("load " .. file_name)
+				return true
 			end
 		end
-	end
-	
-	if (getFS():exist("$game_saves$", last_modif..".scop")) then
-		get_console():execute("load " .. last_modif)
 	end
 	
 	return true

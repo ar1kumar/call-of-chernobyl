@@ -78,7 +78,7 @@ function sim_squad_scripted:init_squad_on_load()
 	self:set_squad_sympathy()
 	sim_board.get_sim_board():assign_squad_to_smart(self, self.smart_id)
 	self.current_action = 0
-	self.need_to_reset_location_masks = true
+	--self.need_to_reset_location_masks = true
 	--alun_utils.debug_write(self:name().."init_squad_on_load end")
 end
 --***********************************************************************************************
@@ -151,8 +151,7 @@ function sim_squad_scripted:update()
 
 				-- Disable any squad that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
 				if (level ~= actor_level) and (self:commander_id() and not sim:has_info(self:commander_id(),"npcx_is_companion")) then
-					local sfind = string.find
-					if not (sfind(simulation_objects.config:r_value(actor_level,"target_maps",0,""),level)) then
+					if not (string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),level)) then
 						if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
 							SIMBOARD.squads[self.id] = nil
 							if (self.smart_id) then
@@ -212,21 +211,6 @@ end
 --***********************************************************************************************
 --*										SIMULATION_TARGET_SELECTION		       		*
 --***********************************************************************************************
-
-function sim_squad_scripted:clear_assigned_target()
-	self.assigned_target_id = nil
-end
-
-function sim_squad_scripted:assigned_target_avaliable()
-	local target_obj = self.assigned_target_id and alife():object(self.assigned_target_id)
-	if (target_obj == nil or self.assigned_target_id == self.id) then
-		return false
-	end
-
-	-- In this case, you need to check population minus one, because squad already committed Smart.
-	return target_obj:target_precondition(self,true)
-end
-
 local function can_help_actor(squad)
 	if is_empty(xr_combat_ignore.fighting_with_actor_npcs) then
 		return false
@@ -306,7 +290,7 @@ function sim_squad_scripted:generic_update()
 	self.assigned_target_id = get_help_target_id(self) or self.assigned_target_id or self.current_target_id
 
 	if (self.current_action) then
-		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
+		local se_target = self.assigned_target_id and (simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id] or self.assigned_target_id == self.id and self)
 
 		-- Evaluate current assigned target; make sure it is still valid
 		if (se_target and se_target:target_precondition(self,true)) then
@@ -333,14 +317,15 @@ function sim_squad_scripted:generic_update()
 	end
 	
 	-- Find a new target
-	local target = SIMBOARD:get_squad_target(self)
+	local target = SIMBOARD:get_squad_target(self) or SIMBOARD:get_squad_target(self,false,true)
 	if not (target) then
+		printf("squad %s has no target",self:name())
 		self:on_reach_target(self)
 		
 		-- we have to clear AFTER on_reach_target, not BEFORE so we can get location mask of old smart
-		self.assigned_target_id = nil
+		self.assigned_target_id = self.id
 		self.current_target_id = nil
-		self.current_action = nil
+		self.current_action = 0
 		return 
 	end
 
@@ -530,28 +515,24 @@ end
 function sim_squad_scripted:set_location_types(new_smart_name)
 	self:clear_location_types()
 	
-	local sim = alife()
-	local old_target = self.assigned_target_id and sim:object(self.assigned_target_id)
-	if (old_target and old_target:clsid() == clsid.smart_terrain) then 
-		self:set_location_types_section(old_target:name())
-	end 
+	self:set_location_types_section("stalker_terrain")
 	
-	if not (new_smart_name) then 
-		self:set_location_types_section("squad_terrain")
-
-		for k,v in pairs(simulation_objects.get_sim_obj_registry().objects) do
-			local se_obj = sim:object(k)
-			if (se_obj and se_obj:clsid() == clsid.smart_terrain) then
-				local props_base = se_obj.props and se_obj.props["base"]
-				if (props_base and tonumber(props_base) == 0) then
-					self:set_location_types_section(se_obj:name())
-				end
-			end
-		end
-		return
+	local old_target = self.assigned_target_id and db.smart_terrain_by_id[self.assigned_target_id]
+	if (old_target) then 
+		self:set_location_types_section(old_target:name())
 	end
 	
-	self:set_location_types_section("stalker_terrain")
+	if (new_smart_name) then 
+		self:set_location_types_section(new_smart_name)
+	else
+		--self:set_location_types_section("squad_terrain")
+		for id,se_obj in pairs(db.smart_terrain_by_id) do
+			local props_base = se_obj.props and se_obj.props["base"]
+			if (props_base and tonumber(props_base) == 0) then
+				self:set_location_types_section(se_obj:name())
+			end
+		end
+	end
 end
 
 function sim_squad_scripted:add_new_member_forced(section,pos,lvid,gvid)
@@ -997,6 +978,12 @@ function sim_squad_scripted:can_switch_online()
     if (not get_object_story_id(self.id)) then
 	
 		if (is_squad_monster[self.player_id]) then
+		
+			-- monster doesn't have a target smart so just leave it offline
+			if (self.assigned_target_id == self.id) then
+				return false
+			end
+			
 			local hour = level.get_time_hours()
 			if (self.player_id == "monster_predatory_day") then 
 				-- Monster will not come online during the hours of (9PM till 5AM)
@@ -1158,7 +1145,7 @@ end
 local function get_current_task(squad)
 	--alun_utils.debug_write("sim_squad_scripted:get_current_task")
 	local smart = squad.assigned_target_id and alife():object(squad.assigned_target_id)
-	if (smart) then
+	if (smart and smart:clsid() == clsid.smart_terrain) then
 		if (smart.arriving_npc and not smart.arriving_npc[squad:commander_id()]) then
 			local npc_info = smart.npc_info and smart.npc_info[squad:commander_id()]
 			if (npc_info and npc_info.job) then
@@ -1214,7 +1201,7 @@ function sim_squad_scripted:sim_available()
 		return true
 	end
 
-	local smart = db.smart_terrain_by_id[self.smart_id]
+	local smart = simulation_objects.get_sim_obj_registry().objects[self.smart_id]
 	if not (smart) then
 		return false
 	end
@@ -1228,6 +1215,10 @@ function sim_squad_scripted:sim_available()
 end
 
 function sim_squad_scripted:target_precondition(squad)
+	if (self.id == squad.id) then 
+		return true 
+	end 
+	
 	if (sim_board.general_squad_precondition(squad,self)) then 
 		return true 
 	end

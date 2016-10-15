@@ -26,15 +26,16 @@ function execute_destroy_callback()
 					sim:set_switch_online(id,false)
 					sim:set_switch_offline(id,true)
 					-- force offline
-					if (se_obj:can_switch_offline()) then
+					--if (se_obj:can_switch_offline()) then
 						se_obj:switch_offline()
-					else 
-						printf("Warning: Can't switch offline %s",se_obj:name())
-					end
+					--else 
+						-- printf("Warning: Can't switch offline %s",se_obj:name())
+					-- end
 				else
 					-- binder has not been destroyed yet...or error
 					local obj = db.storage[id] and db.storage[id].object 
 					if not (obj) then
+						--printf("release %s",se_obj:name())
 						sim:release(se_obj)
 						objects_to_release[id] = nil
 					end

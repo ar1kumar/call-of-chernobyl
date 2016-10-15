@@ -42,6 +42,7 @@ b_discard_settings_shown = false
 ----------------------------------------------------------------------
 
 function start_game_callback()
+	math.randomseed(device():time_global ())
 	printf("Call of Chernobyl version %s",GAME_VERSION)
 	if (USE_MARSHAL) then
 		printf("using marshal library")
@@ -546,7 +547,6 @@ function random_choice(...)
 end
 
 function random_number (min_value, max_value)
-	math.randomseed (device ():time_global ())
 	if min_value == nil and max_value == nil then
 		return math.random ()
 	else
