@@ -1206,8 +1206,8 @@ function file_to_table(fname,parent,simple)
 
 				root[sec] = root[sec] or {}
 
-				local inc = get_section_includes(line)
-				if (inc) then
+				local inc = trim(get_section_includes(line))
+				if (inc and inc ~= "") then
 					root[sec]["_____link"] = inc
 					if (simple ~= true) then
 						local a = str_explode(inc,",")

@@ -525,7 +525,7 @@ function sim_squad_scripted:set_location_types(new_smart_name)
 	if (new_smart_name) then 
 		self:set_location_types_section(new_smart_name)
 	else
-		--self:set_location_types_section("squad_terrain")
+		self:set_location_types_section("squad_terrain")
 		for id,se_obj in pairs(db.smart_terrain_by_id) do
 			local props_base = se_obj.props and se_obj.props["base"]
 			if (props_base and tonumber(props_base) == 0) then
