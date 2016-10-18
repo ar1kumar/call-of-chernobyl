@@ -1282,7 +1282,7 @@ function stalker_info_hud_show(hud)
 
 		local vo = near:best_enemy()
 		if (vo and vo:alive() and IsStalker(vo) and IsWounded(vo)) then
-			if (db.storage[vo:id()] and db.storage[vo:id()].victim_surrender and db.storage[vo:id()].victim_surrender ~= 65535) then
+			if (db.storage[vo:id()] and db.storage[vo:id()].victim_surrender and db.storage[vo:id()].victim_surrender < 65534) then
 				hud:add_msg("Kill wounded",vo:name())
 			end
 		end

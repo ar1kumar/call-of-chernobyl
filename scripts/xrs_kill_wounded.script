@@ -40,7 +40,7 @@ local function npc_on_update(npc,st)
 		return
 	end
 	
-	if not (st.victim_surrender) then
+	if not (st.victim_surrender) or (st.victim_surrender ~= 0 and st.victim_surrender ~= 65535) then -- override NPC roll
 		local active_item = db.actor:active_item()
 		if not (active_item and IsWeapon(active_item)) then
 			return
@@ -281,12 +281,17 @@ function act_kill_wounded:execute()
 end
 
 function act_kill_wounded:begin_kill_wounded(vo)
-	if not (db.storage[vo:id()].victim_surrender) then
+	local vst = db.storage[vo:id()]
+	if not (vst) then 
+		return
+	end 
+	
+	if not (vst.victim_surrender) then
 		if (character_community(vo) ~= "monolith" and character_community(vo) ~= "zombied") then
 			if (CauseSurrenderCommunities[character_community(self.object)] and SurrenderChance > (math.random(1,100)/100) ) then
-				db.storage[vo:id()].victim_surrender = self.object:id()
+				vst.victim_surrender = self.object:id()
 			else
-				db.storage[vo:id()].victim_surrender = 65535
+				vst.victim_surrender = 65534
 			end
 		end
 	end
@@ -305,7 +310,7 @@ function act_kill_wounded:begin_kill_wounded(vo)
 			xr_sound.set_sound_play(self.object:id(),"kill_wounded")
 		end
 
-		if (db.storage[vo:id()].victim_surrender) then
+		if (vst.victim_surrender) then
 			self.st.timer = tg + math.random(SurrenderMinTriggerTimer,SurrenderMaxTriggerTimer)
 			--printf("%s--%s",vo:name(),vo:get_visual_name())
 		else

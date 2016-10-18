@@ -2146,7 +2146,7 @@ end
 -- Returns true if calling NPC has the surrender flag
 function npc_surrendered_any(actor,npc,p)
 	local st = db.storage[npc:id()]
-	return st and st.victim_surrender >= 0 or false
+	return st and st.victim_surrender >= 0 and st.victim_surrender < 65534 or false
 end
 
 function actor_class(actor,npc,p)

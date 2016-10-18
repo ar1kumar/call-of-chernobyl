@@ -111,7 +111,7 @@ function action_wounded:execute()
 	
 	local id = npc:id()
 	local pid = db.storage[id].victim_surrender
-	local po = pid and pid ~= 65535 and db.storage[pid] and db.storage[pid].object
+	local po = pid and pid < 65534 and db.storage[pid] and db.storage[pid].object
 	if (po and not utils.load_var(npc,"victim_surrender")) then
 		state_mgr.set_state(npc,"prisoner",nil,nil,nil,{fast_set = true})
 		return
