@@ -4,7 +4,7 @@
 Copyright (C) 2012 Alundaio
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
 --]]
-UI_ICON_EQUIPMENT_WIDTH = 1024 
+UI_ICON_EQUIPMENT_WIDTH = 1024
 UI_ICON_EQUIPMENT_HEIGHT = 2048
 
 id_to_spawn_table = {
@@ -155,6 +155,10 @@ function debug_ui:InitControls()
 	-- Teleport Button
 	btn = xml:Init3tButton("main_dialog:btn_tp", self.dialog)
 	self:Register(btn,"btn_tp")
+	
+	-- Display Animation on Hud Button
+	btn = xml:Init3tButton("main_dialog:btn_anim_onHud",self.dialog)
+	self:Register(btn, "btn_hud_anim")
 
 	-- Console
 	self.console = xml:InitStatic("console",self)
@@ -256,6 +260,10 @@ function debug_ui:InitCallBacks()
 	
 	-- level jump tab
 	self:AddCallback("list_levels_window",	  ui_events.WINDOW_LBUTTON_DB_CLICK, self.JumpLevel,	self)
+	
+	self:AddCallback("list",ui_events.LIST_ITEM_CLICKED,self.OnListItemClicked,self)
+	self:AddCallback("list", ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnStartAnim,self)
+	self:AddCallback("btn_hud_anim", ui_events.BUTTON_CLICKED, self.OnStartHudAnim,self)
 end
 
 function debug_ui:OnConsoleInput()
@@ -1002,8 +1010,8 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	self.fld_icon_height:SetText(tostring(inv_grid_height))
 	
 	pos = self.ui_icon_equipment:GetWndPos()
-	self.icon_square:SetWndPos(vector2():set( pos.x+x1/4 , pos.y+y1/4 ))
-	self.icon_square:SetWndSize(vector2():set(w/4,h/4))
+	self.icon_square:SetWndPos(vector2():set( pos.x+x1/2.2 , pos.y+y1/3 ))
+	self.icon_square:SetWndSize(vector2():set(w/2.2,h/3))
 	
 	self.editor_icon_addon:SetTextureRect(Frect():set(0,0,0,0))
 	self.fld_addon_offset_x:SetText("")
@@ -1130,8 +1138,8 @@ function debug_ui:OnEditIcon()
 	self.editor_icon:SetWndSize(vector2():set(w*scale,h*scale))
 	
 	local pos = self.ui_icon_equipment:GetWndPos()
-	self.icon_square:SetWndPos(vector2():set( pos.x+x1/4 , pos.y+y1/4 ))
-	self.icon_square:SetWndSize(vector2():set(w/4,h/4))
+	self.icon_square:SetWndPos(vector2():set( pos.x+x1/2.2 , pos.y+y1/3 ))
+	self.icon_square:SetWndSize(vector2():set(w/2.2,h/3))
 	
 	local name = self.addon_list:GetText()
 	if not (name and name ~= "" and name ~= "Select Attachment") then
@@ -1260,6 +1268,51 @@ function debug_ui:OnEditorSave()
 	self.need_save_offset_y = nil
 end
 
+-- ANIMATIONS UI
+function debug_ui:FillAnim()
+	local anim_tbl = {}
+	local function fill_tbl(path,filename)
+		local s,e = path:find("anims")
+		path = string.sub(path,e+2,string.len(path))
+		if path ~= "" then path = path.."\\" end
+		table.insert(anim_tbl,{path = path,fn = filename})
+	end	
+	local sp = getFS():update_path('$game_anims$', '')
+	sp = string.sub(sp,0,string.len(sp)-1)
+	lua_extensions.recurse_subdirectories_and_execute(sp,{"ppe","anm"},fill_tbl)
+	-------
+	self.anims_list:Clear()
+	for i=1, #anim_tbl do
+		local _itm = set_list_text(22)
+		_itm.sect:SetText(anim_tbl[i].fn)
+		_itm.name = anim_tbl[i].path..anim_tbl[i].fn
+		self.anims_list:AddExistingItem(_itm)
+	end
+end
+
+function debug_ui:OnListItemClicked()
+	local item = self.anims_list:GetSelectedItem()
+	local idx = self.anims_list:GetSelectedIndex()
+	printf("index = %s table size = %s", idx, self.anims_list:GetSize())
+	if not item then printf("missing list item") end
+end
+
+function debug_ui:OnStartAnim()
+	local item = self.anims_list:GetSelectedItem()
+	local name = item.name
+	printf("name %s",name)
+	if name:find(".anm") then
+		level.add_cam_effector(name, 8010, false, "")
+	elseif name:find(".ppe") then
+		level.add_pp_effector(name, 999, false)
+	end
+	self:OnQuit()
+end
+
+function debug_ui:OnStartHudAnim()
+	self:OnQuit()
+	anim_ui(get_hud()):ShowDialog(true)
+end
 
 -- SPAWNER UI
 class "debug_ui_spawner" (CUIWindow)
@@ -1284,11 +1337,10 @@ function debug_ui_spawner:InitControls(x, y, xml, owner)
 	end
 
 	owner:Register(owner.sections_list, "list_sections")
-
+	
 	owner.spawn_list_frame = xml:InitFrame("tab_spawner:list_frame",self)
 	owner.spawn_list = xml:InitListBox("tab_spawner:list",self)
 	owner.spawn_list:ShowSelectedItem(true)
-
 	owner:Register(owner.spawn_list, "list_window")
 
 	owner.check_to_actor = xml:InitCheck("tab_spawner:check_own_to_actor",self)
@@ -1296,7 +1348,6 @@ function debug_ui_spawner:InitControls(x, y, xml, owner)
 
 	--local ctrl = xml:Init3tButton("tab_spawner:btn_create",self)
 	--owner:Register(ctrl, "btn_create")
-
 
 	owner.smarts_list = xml:InitComboBox("tab_spawner:list_smarts", self)
 	owner.smarts_list:ClearList()
@@ -1328,7 +1379,7 @@ function debug_ui_spawner:InitControls(x, y, xml, owner)
 	-- Set defaults
 	owner.sections_list:SetText(owner.sections_list:GetTextOf(0))
 	owner:FillList(owner.sections_list:GetTextOf(0))
-
+	
 	------------------------- manual input 
 	xml:InitStatic("tab_spawner:cap_spawn", self)
 	owner.fld_spawn = xml:InitEditBox("tab_spawner:fld_spawn", self)
@@ -1439,6 +1490,13 @@ function debug_ui_advanced:InitControls(x, y, xml, owner)
 	owner:Register(owner.levels_list, "list_levels_window")
 	
 	owner:FillLevelList()
+----------------------------------------------------------------------------------
+	xml:InitStatic("tab_advanced:cap_anim", self)
+	owner.anims_list = xml:InitFrame("tab_advanced:anim_frame",self)
+	owner.anims_list = xml:InitListBox("tab_advanced:anim_list",self)
+	owner.anims_list:ShowSelectedItem(true)
+	owner:Register(owner.anims_list, "list")
+	owner:FillAnim()
 end
 
 -- ICON EDITOR
@@ -1503,8 +1561,8 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	owner.ui_icon_equipment = xml:InitStatic("ui_icon_equipment",owner)
 	
 	owner.ui_icon_equipment:InitTexture("ui\\ui_icon_equipment")
-	owner.ui_icon_equipment:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/4,UI_ICON_EQUIPMENT_HEIGHT/4))
-	owner.ui_icon_equipment_back:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/4+20,UI_ICON_EQUIPMENT_HEIGHT/4+20))
+	owner.ui_icon_equipment:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/2.2,UI_ICON_EQUIPMENT_HEIGHT/3))
+	owner.ui_icon_equipment_back:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/2.2+25,UI_ICON_EQUIPMENT_HEIGHT/3+20))
 	
 	
 	owner.icon_square = xml:InitFrame("square",owner)
@@ -1883,5 +1941,83 @@ function debug_ui_attach:OnAttach()
 	end
 end 
 function debug_ui_attach:OnQuit()
+	self:HideDialog()
+end
+------------------------------------------------------------------------------------
+class "anim_ui" (CUIScriptWnd)
+function anim_ui:__init() super()
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function anim_ui:__finalize() end
+
+function anim_ui:Update()
+	CUIScriptWnd.Update(self)
+end
+
+function anim_ui:InitCallBacks()
+	self:AddCallback("list", ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnStartAnim,self)
+end
+
+function anim_ui:InitControls()
+	self:SetWndRect				(Frect():set(0,0,1024,768))
+	self:Enable					(true)
+	local xml					= CScriptXmlInit()
+	xml:ParseFile				("ui_debug_main.xml")
+	self:SetWndPos(vector2():set(884,0))
+	self:SetWndSize(vector2():set(140,768))
+	
+	self.anims_list = xml:InitFrame("anim_frame",self)
+	self.anims_list = xml:InitListBox("anim_list",self)
+	self.anims_list:ShowSelectedItem(true)
+	self:Register(self.anims_list, "list")
+	self:FillAnim()
+end
+
+function anim_ui:FillAnim()
+	local anim_tbl = {}
+	local function fill_tbl(path,filename)
+		local s,e = path:find("anims")
+		path = string.sub(path,e+2,string.len(path))
+		if path ~= "" then path = path.."\\" end
+		table.insert(anim_tbl,{path = path,fn = filename})
+	end	
+	local sp = getFS():update_path('$game_anims$', '')
+	sp = string.sub(sp,0,string.len(sp)-1)
+	lua_extensions.recurse_subdirectories_and_execute(sp,{"ppe","anm"},fill_tbl)
+	-------
+	self.anims_list:Clear()
+	for i=1, #anim_tbl do
+		local _itm = set_list_text(22)
+		_itm.sect:SetText(anim_tbl[i].fn)
+		_itm.name = anim_tbl[i].path..anim_tbl[i].fn
+		self.anims_list:AddExistingItem(_itm)
+	end
+end
+
+function anim_ui:OnStartAnim()
+	local item = self.anims_list:GetSelectedItem()
+	local name = item.name
+	printf("name %s",name)
+	if name:find(".anm") then
+		level.add_cam_effector(name, 8010, false, "")
+	elseif name:find(".ppe") then
+		level.add_pp_effector(name, 999, false)
+	end
+end
+
+function anim_ui:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_RELEASED then
+		local keybinds = self.binds or {}
+		if (dik == DIK_keys.DIK_ESCAPE) then
+			self:OnQuit()
+		end
+	end
+	return true
+end
+
+function anim_ui:OnQuit()
 	self:HideDialog()
 end
