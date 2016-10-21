@@ -288,7 +288,7 @@ end
 function sim_squad_scripted:generic_update()
 	--alun_utils.debug_write(strformat("%s:generic_update",self:name()))
 	self.assigned_target_id = get_help_target_id(self) or self.assigned_target_id or self.current_target_id
-
+	
 	if (self.current_action) then
 		local se_target = self.assigned_target_id and (simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id] or self.assigned_target_id == self.id and self)
 
@@ -980,7 +980,7 @@ function sim_squad_scripted:can_switch_online()
 		if (is_squad_monster[self.player_id]) then
 		
 			-- monster doesn't have a target smart so just leave it offline
-			if (self.assigned_target_id == self.id) then
+			if (self.assigned_target_id == nil or self.assigned_target_id == self.id) then
 				return false
 			end
 			
@@ -1154,7 +1154,8 @@ local function get_current_task(squad)
 		end
 		return smart:get_alife_task()
 	end
-	return squad:get_alife_task()
+	--return squad:get_alife_task() -- causes 'unspecified level' crash when target squads
+	return nil
 end 
 
 -- called from engine

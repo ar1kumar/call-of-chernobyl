@@ -108,8 +108,7 @@ function generic_object_binder:update(delta)
 
 		local commander = db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object
 		if (commander == nil or commander:id() == id) then
-			local target_pos, target_lv_id, target_gv_id = squad_target:get_location()
-			action(self.object, move(move.walk_with_leader, target_pos),cond(cond.move_end))
+			action(self.object, move(move.walk_with_leader, squad_target.position),cond(cond.move_end))
 		else
 			local pos = commander:position()
 			if (pos:distance_to(self.object:position()) > 10) then

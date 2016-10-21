@@ -244,25 +244,16 @@ function simulation_board:setup_squad_and_group(obj)
 	local sim = alife()
 
 	--' Сквад берем из смарта.
-	local squad = sim:object(obj.group_id)
-	if squad == nil then
+	local squad = obj.group_id and obj.group_id ~= 65535 and sim:object(obj.group_id)
+	if not (squad) then
 		change_team_squad_group(obj, obj.team, 0, obj.group)
 		return
 	end
 	
-	local gg = game_graph()
-	local group = obj.group --gg and gg:vertex(squad.m_game_vertex_id):level_id() or obj.group
-	
 	local smart = squad.assigned_target_id and sim:object(squad.assigned_target_id) or squad.smart_id and sim:object(squad.smart_id)
-	if smart == nil then
-		change_team_squad_group(obj, obj.team, obj.squad, group)
-		return
-	end
-	local obj_sq = 0
-	if smart:clsid() == clsid.smart_terrain then
-		obj_sq = smart.squad_id
-	end
-	change_team_squad_group(obj, obj.team, obj_sq, group)
+	local obj_sq = smart and smart.squad_id or obj.squad or 0
+	
+	change_team_squad_group(obj, obj.team, obj_sq, obj.group)
 end
 
 --' Заполнение стартового расположения
