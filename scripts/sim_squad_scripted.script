@@ -323,9 +323,9 @@ function sim_squad_scripted:generic_update()
 		self:on_reach_target(self)
 		
 		-- we have to clear AFTER on_reach_target, not BEFORE so we can get location mask of old smart
-		self.assigned_target_id = self.id
+		self.assigned_target_id = nil
 		self.current_target_id = nil
-		self.current_action = 0
+		self.current_action = nil
 		return 
 	end
 
