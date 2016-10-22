@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <game_dialogs>
-<!------------- esc_2_12_stalker_trader ---------------->
+<!-- esc_2_12_stalker_trader -->
    <dialog id="esc_2_12_stalker_trader_start_dialog">
         <phrase_list>
 		    <phrase id="0">
@@ -23,7 +23,7 @@
             </phrase>
           </phrase_list>
     </dialog>
-<!--------------------------- esc_2_12_stalker_wolf_start ------------>
+<!-- esc_2_12_stalker_wolf_start -->
    <dialog id="esc_2_12_stalker_wolf_start_dialog">
         <phrase_list>
 		    <phrase id="0">
@@ -532,8 +532,10 @@
                 <text>esc_2_12_stalker_nimble_place_order_0</text>
                 <next>1</next>
                 <next>2</next>
+				<next>9999999</next>
             </phrase>
             <phrase id="1">
+				<precondition>dialogs_escape.nimble_cant_trade</precondition>
                 <text>esc_2_12_stalker_nimble_place_order_1</text>
                 <dont_has_info>esc_2_12_finished_categories_all</dont_has_info>
                 <next>11</next>
@@ -545,6 +547,11 @@
                 <next>17</next>
                 <next>18</next>
             </phrase>
+			<phrase id="9999999">
+				<precondition>dialogs_escape.nimble_can_trade</precondition>
+				<text/>
+				<action>dialogs.npc_is_trader</action>
+			</phrase>
             <phrase id="1112">
                 <text>esc_2_12_stalker_nimble_place_order_1112</text>
                 <precondition>dialogs_escape.esc_2_12_hasnt_prepay</precondition>
@@ -838,17 +845,17 @@
     </dialog>
 	<dialog id="esc_2_12_stalker_nimble_about_quest">
 		<phrase_list>
-			<phrase id="0">							<!-- actor -->
+			<phrase id="0">	
 				<text>esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1_about</text>
 				<next>1</next>
 				<next>2</next>
-			</phrase>
-		    <phrase id="1">							<!-- npc -->
+			</phrase> 
+		    <phrase id="1">
 				<precondition>dialogs_escape.actor_has_mar_base_owl_stalker_trader_task_1_pda</precondition>
                 <text>esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1</text>
 				<action>dialogs_escape.mar_base_owl_stalker_trader_task_1_give_reward</action>
             </phrase>
-		    <phrase id="2">							<!-- npc -->
+		    <phrase id="2">	
 				<precondition>dialogs_escape.actor_dont_has_mar_base_owl_stalker_trader_task_1_pda</precondition>
                 <text>esc_2_12_stalker_nimble_no</text>
             </phrase>
