@@ -101,14 +101,20 @@ function generic_object_binder:update(delta)
 	if (squad and squad.current_action and squad.current_action == 0) then
 		local squad_target = squad.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
 		if not (squad_target) then
+			xr_logic.mob_release(self.object)
 			return
+		end
+		
+		if not (simulation_objects.is_on_the_same_level(squad_target, se_obj)) then 
+			TeleportSquad(squad,squad_target.position,squad_target.m_level_vertex_id,squad_target.m_game_vertex_id)
+			return 
 		end
 		
 		xr_logic.mob_capture(self.object, true)
 
 		local commander = db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object
 		if (commander == nil or commander:id() == id) then
-			action(self.object, move(move.walk_with_leader, squad_target.position),cond(cond.move_end))
+			action(self.object, move(move.walk_with_leader, squad_target.position or self.object:position()),cond(cond.move_end))
 		else
 			local pos = commander:position()
 			if (pos:distance_to(self.object:position()) > 10) then
@@ -378,7 +384,7 @@ function generic_object_binder:save_state(m_data)
 	--alun_utils.debug_write(strformat("generic_object_binder:save_state %s BEFORE",self.object:name()))
 	local id = self.object and self.object:id()
 	local st = id and db.storage[id]
-	if not (st) then
+	if not (st and m_data) then
 		return
 	end
 	local state = alife_storage_manager.get_game_object_state(self.object,true)

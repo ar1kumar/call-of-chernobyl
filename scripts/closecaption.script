@@ -160,7 +160,7 @@ local last_caption_category = ""
 local longest_caption_ends = 0
 local delayed_cc = {}
 
-function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
+function sound(_sound, showtime, sender, sender_faction, sender_id, delay_sound)
 	if not (ini) then
 		ini = axr_main and axr_main.config
 		if not (ini) then
@@ -176,7 +176,7 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 		local current_time = time_global()
 		local split_sound_string = {}
 		local i = 1
-		for w in string.gmatch(sound, "[%w_]+") do
+		for w in string.gmatch(_sound, "[%w_]+") do
 			split_sound_string[i] = w
 			i = i + 1
 		end
@@ -201,7 +201,7 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 									if delay_sound < 0 then delay_sound = -delay_sound - 501 end
 								else
 									local gt = time_global() + 500
-									table.insert(delayed_cc, {sound, showtime, sender, sender_faction, sender_id, -delay_sound - 1, dt = gt})
+									table.insert(delayed_cc, {_sound, showtime, sender, sender_faction, sender_id, -delay_sound - 1, dt = gt})
 									RegisterScriptCallback("actor_on_update", on_actor_update_cc)
 									return true
 								end
@@ -297,7 +297,7 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 
 		else
 			-- add any special full soundpath match cases here
-			if sound == "anomaly\\steam_blowout" then
+			if _sound == "anomaly\\steam_blowout" then
 				if cc_icc then
 					cc_category = "cc_effect"
 					cc_id = cc_category .. "-anomaly-steam_blowout"
@@ -305,7 +305,7 @@ function sound(sound, showtime, sender, sender_faction, sender_id, delay_sound)
 					return true
 				end
 
-			elseif sound == "weapons\\n_desert_eagle_shot" then
+			elseif _sound == "weapons\\n_desert_eagle_shot" then
 				if cc_icc then
 					cc_category = "cc_effect"
 					cc_id = cc_category .. "-weapons-n_desert_eagle_shot"

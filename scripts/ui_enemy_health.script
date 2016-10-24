@@ -55,6 +55,13 @@ function on_hit(obj,power,dir,who,bi)
 		progress = xml:InitProgressBar("enemy_health", w)
 	end
 	
+	if (bi == "from_death_callback") then
+		last_id = nil
+		progress = nil
+		hud:RemoveCustomStatic("cs_enemy_health")
+		return
+	end
+	
 	local cls = obj:clsid()
 	local is_heli = IsHelicopter(nil,cls)
 	local v = is_heli and obj:get_helicopter():GetfHealth() or obj.health or 0

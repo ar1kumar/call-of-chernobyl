@@ -1092,7 +1092,7 @@ function check_squad_smart_props(squad_id)
 		local board = SIMBOARD
 		if(board and squad.smart_id and board.smarts[squad.smart_id]) then
 			local smart = board.smarts[squad.smart_id].smrt
-			if(tonumber(smart.props["surge"])<=0) then
+			if(smart.props and tonumber(smart.props["surge"])<=0) then
 				return true
 			end
 		end

@@ -47,7 +47,6 @@ function actor_binder:net_spawn(data)
 	end
 
 	death_manager.init_drop_settings()
-	self.task_manager = task_manager.get_task_manager()
 	self.spawn_frame = device().frame
 	self.already_jumped = false
 	self.loaded = false
@@ -229,7 +228,7 @@ function actor_binder:update(delta)
 		--alun_utils.debug_write("actor first_update END")
 	end
 	
-	self.task_manager:update()
+	task_manager.get_task_manager():update()
 	level_weathers.get_weather_manager():update()
 	xr_sound.update(self.object:id())
 

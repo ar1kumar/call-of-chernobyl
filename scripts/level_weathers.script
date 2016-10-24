@@ -361,9 +361,9 @@ end
 
 -- Обновляем погоду раз в час.
 function WeatherManager:update()
-	--alun_utils.debug_write("WeatherManager:update")
+	--alun_utils.debug_write("WeatherManager:update start")
 	if (self.___timer and time_global() < self.___timer) then 
-		return 
+		return --alun_utils.debug_write("WeatherManager:update end 1")
 	end
 	self.___timer = time_global() + 3000
 	
@@ -395,6 +395,8 @@ function WeatherManager:update()
 			self:distant_storm()
 		end
 	end
+	
+	--alun_utils.debug_write("WeatherManager:update end 2")
 end
 
 function WeatherManager:get_moon_phase()

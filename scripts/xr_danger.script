@@ -125,7 +125,7 @@ local function npc_on_death_callback(npc,who)
 end
 
 local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
-	if (amount <= 0) then
+	if (bone_index == "from_death_callback") then
 		return
 	end 
 	

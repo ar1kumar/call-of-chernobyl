@@ -90,8 +90,8 @@ function evaluator_reached_task_location:evaluate()
 	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and sim:object(se_obj.group_id)
 	if (squad) then 
 		local target = squad.assigned_target_id and sim:object(squad.assigned_target_id)
-		if not (target) then 
-			return false 
+		if not (target) then
+			return true
 		end  
 		return not target:am_i_reached(squad)
 	end
@@ -242,7 +242,7 @@ function action_reach_task_location:commander_execute(squad)
 		return
 	end 
 	
-	if (squad.assigned_target_id == squad.id) then 
+	if not (squad.assigned_target_id) then 
 		return self:fake_target(squad) -- this is for squads who can't find open smart
 	end
 	
@@ -314,7 +314,7 @@ end
 
 function action_reach_task_location:soldier_execute(squad)
 
-	if (squad.assigned_target_id == squad.id) then 
+	if not (squad.assigned_target_id) then 
 		return self:fake_target(squad) -- this is for squads who can't find open smart
 	end
 	

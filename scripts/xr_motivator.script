@@ -119,6 +119,10 @@ function motivator_binder:net_spawn(sobject)
 
 	sound_theme.init_npc_sound(self.object)
 
+	-- HACK! Not sure why this is needed now. If this isn't here then there will be
+	-- Cannot build GAME path! error
+	self.object:set_dest_game_vertex_id(self.object:game_vertex_id()) 
+	
 	xr_reach_task.add_reach_task_action(self.object)
 	
 	if (utils.se_obj_load_var(sobject.id,sobject:name(),"companion")) then
@@ -524,7 +528,7 @@ function motivator_binder:save_state(m_data)
 	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",self.object:name()))
 	local id = self.object and self.object:id()
 	local st = id and db.storage[id]
-	if not (st) then
+	if not (st and m_data) then
 		return
 	end
 	local state = alife_storage_manager.get_game_object_state(self.object,true)

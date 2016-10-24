@@ -99,6 +99,7 @@ function CRandomTask:set_task_cancelled(task_id)
 end
 
 function CRandomTask:update()
+	--alun_utils.debug_write("CRandomTask:update() - START")
 	for k,v in pairs(self.task_info) do
 		local tsk = self.task_info[k]
 		tsk:check_task()
@@ -111,6 +112,7 @@ function CRandomTask:update()
 			end
 		end
 	end
+	--alun_utils.debug_write("CRandomTask:update() - END")
 end 
 
 --' Проверяем, не выполнен ли таск

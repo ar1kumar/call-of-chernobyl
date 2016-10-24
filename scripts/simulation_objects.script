@@ -51,9 +51,12 @@ function simulation_objects_registry:update_avaliability(obj)
 end
 
 function simulation_objects_registry:get_props(obj)
-	obj.props = {}
-	
 	local cls = obj:clsid()
+	if (cls == clsid.online_offline_group_s) then 
+		return
+	end
+	
+	obj.props = {}
 	
 	local props_section
 	if (cls == clsid.online_offline_group_s) then

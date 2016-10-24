@@ -173,6 +173,7 @@ function sim_squad_scripted:update()
 	self:refresh()
 	
 	if (self.disabled) then
+		--alun_utils.debug_write("sim_squad_scripted:update END 4")
 		return
 	end
 	
@@ -287,10 +288,15 @@ end
 -- This update is called for all squads with no scripted assigned target
 function sim_squad_scripted:generic_update()
 	--alun_utils.debug_write(strformat("%s:generic_update",self:name()))
+	
+	if (self.__lock) then 
+		return -- so that squad doesn't continously try to find target which lowers FPS
+	end 
+	
 	self.assigned_target_id = get_help_target_id(self) or self.assigned_target_id or self.current_target_id
 	
 	if (self.current_action) then
-		local se_target = self.assigned_target_id and (simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id] or self.assigned_target_id == self.id and self)
+		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
 
 		-- Evaluate current assigned target; make sure it is still valid
 		if (se_target and se_target:target_precondition(self,true)) then
@@ -326,6 +332,7 @@ function sim_squad_scripted:generic_update()
 		self.assigned_target_id = nil
 		self.current_target_id = nil
 		self.current_action = nil
+		self.__lock = true
 		return 
 	end
 
@@ -980,7 +987,7 @@ function sim_squad_scripted:can_switch_online()
 		if (is_squad_monster[self.player_id]) then
 		
 			-- monster doesn't have a target smart so just leave it offline
-			if (self.assigned_target_id == nil or self.assigned_target_id == self.id) then
+			if (self.assigned_target_id == nil) then
 				return false
 			end
 			
@@ -1025,7 +1032,7 @@ function sim_squad_scripted:switch_offline()
 end
 function sim_squad_scripted:switch_online()
 	-- if (DEV_DEBUG) then
-		-- printf("sim_squad_scripted:switch_online() [%s]",self:name())
+		printf("sim_squad_scripted:switch_online() [%s]",self:name())
 	-- end
 	cse_alife_online_offline_group.switch_online(self)
 end
@@ -1142,25 +1149,22 @@ function sim_squad_scripted:get_location()
 	return self.position, self.m_level_vertex_id, self.m_game_vertex_id
 end
 
-local function get_current_task(squad)
-	--alun_utils.debug_write("sim_squad_scripted:get_current_task")
-	local smart = squad.assigned_target_id and alife():object(squad.assigned_target_id)
-	if (smart and smart:clsid() == clsid.smart_terrain) then
-		if (smart.arriving_npc and not smart.arriving_npc[squad:commander_id()]) then
-			local npc_info = smart.npc_info and smart.npc_info[squad:commander_id()]
-			if (npc_info and npc_info.job) then
-				return npc_info.job.alife_task or smart:get_alife_task() or squad:get_alife_task()
-			end
-		end
-		return smart:get_alife_task()
-	end
-	--return squad:get_alife_task() -- causes 'unspecified level' crash when target squads
-	return nil
-end 
-
 -- called from engine
 function sim_squad_scripted:get_current_task()
-	return get_current_task(self)
+	--alun_utils.debug_write("sim_self_scripted:get_current_task")
+	local se_target = self.assigned_target_id and alife():object(self.assigned_target_id)
+	if (se_target) then
+		if (se_target:clsid() == clsid.smart_terrain) then
+			local npc_info = se_target.npc_info and se_target.npc_info[self:commander_id()]
+			if (npc_info and npc_info.job) then
+				return npc_info.job.alife_task or se_target:get_alife_task() or self:get_alife_task()
+			end
+		end
+		if (se_target.get_alife_task) then 
+			return se_target:get_alife_task()
+		end
+	end
+	return self:get_alife_task()
 end
 
 function sim_squad_scripted:am_i_reached(squad)
@@ -1184,8 +1188,6 @@ function sim_squad_scripted:on_reach_target(squad)
 	end
 	SIMBOARD:assign_squad_to_smart(squad, nil)
 end
-
-
 
 function sim_squad_scripted:get_alife_task()
 	return CALifeSmartTerrainTask(self.m_game_vertex_id, self.m_level_vertex_id)
