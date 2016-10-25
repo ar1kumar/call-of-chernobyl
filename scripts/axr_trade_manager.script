@@ -93,13 +93,13 @@ function npc_trade_buy_sell(npc)
 		npc_info.job.idle = time_global() + 6000
 	end
 
-	printf("trade_job_sell_items")
+	--printf("trade_job_sell_items")
 
 	local sim = alife()
 
 	-- increase NPC rank because he is a good boy
 	npc:set_character_rank(npc:character_rank()+math.random(20,30))
-	local se_obj = alife():object(id)
+	local se_obj = alife():object(npc:id())
 	if not (se_obj) then 
 		return 
 	end
