@@ -1291,14 +1291,20 @@ function debug_ui:FillAnim()
 end
 
 function debug_ui:OnListItemClicked()
-	local item = self.anims_list:GetSelectedItem()
+	local item = self.anims_list:GetSize() > 0 and self.anims_list:GetSelectedItem()
+	if not (item) then 
+		return 
+	end
 	local idx = self.anims_list:GetSelectedIndex()
 	printf("index = %s table size = %s", idx, self.anims_list:GetSize())
 	if not item then printf("missing list item") end
 end
 
 function debug_ui:OnStartAnim()
-	local item = self.anims_list:GetSelectedItem()
+	local item = self.anims_list:GetSize() > 0 and self.anims_list:GetSelectedItem()
+	if not (item) then 
+		return 
+	end
 	local name = item.name
 	printf("name %s",name)
 	if name:find(".anm") then
