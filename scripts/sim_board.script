@@ -258,6 +258,9 @@ end
 
 --' «аполнение стартового расположени€
 function simulation_board:fill_start_position()
+
+	SendScriptCallback("fill_start_position")
+	
 	if self.start_position_filled == true then
 		return
 	end

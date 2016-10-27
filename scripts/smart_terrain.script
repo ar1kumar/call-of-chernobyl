@@ -1230,6 +1230,8 @@ function se_smart_terrain:update()
 		return 
 	end
 	
+	SendScriptCallback("smart_terrain_on_update", self)
+	
 	--alun_utils.debug_write(strformat("%s:update ",self:name()))
 	
 	simulation_objects.get_sim_obj_registry():update_avaliability(self)
