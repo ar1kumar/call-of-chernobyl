@@ -90,9 +90,9 @@ function heli_binder:update( delta )
 	
 	-- heli alife simulation
 	if (heli_alife) then
-		self.sobject = not self.sobject and alife():object(self.object:id()) or self.sobject
-		if (self.sobject and self.sobject.player_id) then
-			heli_alife.update(self.object,self.sobject,self.st.heliObject)
+		local se_obj = alife():object(self.object:id())
+		if (se_obj and se_obj.player_id) then
+			heli_alife.update(self.object,se_obj,self.st.heliObject)
 		end
 	end
 	--alun_utils.debug_write("heli update end")
@@ -112,8 +112,6 @@ function heli_binder:net_spawn( sobject )
 	
 	self.st.heliObject = self.object:get_helicopter()
 	
-	self.sobject = not self.sobject and alife():object(self.object:id()) or self.sobject
-
 	return true
 end
 
@@ -210,7 +208,8 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 	end
 	
 	-- is simulation heli
-	if (self.sobject and self.sobject.player_id) then
+	local se_obj = alife():object(self.object:id())
+	if (se_obj and se_obj.player_id) then
 		if (enemy_id == 0) then 
 			utils.save_var(db.actor,"heli_enemy_flag",true)
 		else 

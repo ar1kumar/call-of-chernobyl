@@ -57,14 +57,15 @@ function trader_object_binder:net_spawn(sobject)
 		return true
 	end
 	
-	if alife():object(self.object:id()) == nil then
-		return false
+	local se_obj = alife():object(self.object:id())
+	if not (se_obj) then 
+		return false 
 	end
 	
 	db.add_obj(self.object)
 	if self.object:clsid() == clsid.script_trader then
 	      --self.object:set_trader_global_anim("idle_spinka")
-		smart_terrain.setup_gulag_and_logic_on_spawn( self.object, self.st, sobject, modules.stype_trader, self.loaded)
+		smart_terrain.setup_gulag_and_logic_on_spawn( self.object, self.st, se_obj, modules.stype_trader, self.loaded)
 	end
 	
 	return true

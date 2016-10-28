@@ -51,6 +51,11 @@ function motivator_binder:net_spawn(sobject)
 	if not object_binder.net_spawn(self, sobject) then
 		return false
 	end
+	
+	local se_obj = alife():object(self.object:id())
+	if not (se_obj) then 
+		return false 
+	end
 
 	self.object:enable_vision(true)
 	local visual = system_ini():r_string_ex(self.object:section(),"set_visual")
@@ -71,9 +76,9 @@ function motivator_binder:net_spawn(sobject)
 	db.add_obj(self.object)
 	if not self.object:alive() then
 		self.object:death_sound_enabled(false)
-		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body...")
+		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body...")
 		release_body_manager.get_release_body_manager():moving_dead_body(self.object,true)
-		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body done")
+		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body done")
 		
 		if not (self.loaded) then
 			local ini = self.object:spawn_ini()
@@ -85,9 +90,9 @@ function motivator_binder:net_spawn(sobject)
 		end
 		
 		-- fix for 'Invalid vertex for object'
-		if not (sobject.m_level_vertex_id < 4294967295 and self.object:accessible(sobject.m_level_vertex_id)) then
-			printf("npc %s has invalid spawning vertex, correcting",sobject:name())
-			local v_id = self.object:accessible_nearest(level.vertex_position(sobject.m_level_vertex_id), vector())
+		if not (se_obj.m_level_vertex_id < 4294967295 and self.object:accessible(se_obj.m_level_vertex_id)) then
+			printf("npc %s has invalid spawning vertex, correcting",se_obj:name())
+			local v_id = self.object:accessible_nearest(level.vertex_position(se_obj.m_level_vertex_id), vector())
 			self.object:set_npc_position(level.vertex_position(v_id))
 		end
 		
@@ -125,15 +130,15 @@ function motivator_binder:net_spawn(sobject)
 	
 	xr_reach_task.add_reach_task_action(self.object)
 	
-	if (utils.se_obj_load_var(sobject.id,sobject:name(),"companion")) then
+	if (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion")) then
 		axr_companions.setup_companion_logic(self.object,self.st,self.loaded)
 	else
 		self.object:disable_info_portion("npcx_is_companion")
 		self.object:disable_info_portion("npcx_beh_cannot_dismiss")
-		smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_stalker, self.loaded)
+		smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, se_obj, modules.stype_stalker, self.loaded)
 	end
 	
-	local id = sobject.id
+	local id = se_obj.id
 	local force_set_position
 	
 	if (db.offline_objects[id] and db.offline_objects[id].level_vertex_id) then
@@ -155,10 +160,10 @@ function motivator_binder:net_spawn(sobject)
 	self.object:group_throw_time_interval(2000)
 
 	-- start [Alundaio]
-	SendScriptCallback("npc_on_net_spawn",self.object,sobject)
+	SendScriptCallback("npc_on_net_spawn",self.object,se_obj)
 	-- End [Alundaio]
 
-	--alun_utils.debug_write(sobject:name()..":net_spawn() end")
+	--alun_utils.debug_write(se_obj:name()..":net_spawn() end")
 	return true
 end
 function motivator_binder:on_item_take(item)

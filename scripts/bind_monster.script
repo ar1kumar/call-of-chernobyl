@@ -193,10 +193,16 @@ function generic_object_binder:death_callback(victim, who)
 		xr_logic.issue_event(victim, self.st[self.st.active_scheme], "death_callback", victim, who)
 	end
 
+	victim:set_callback(callback.death,nil)
+	victim:set_callback(callback.patrol_path_in_point,nil)
+	victim:set_callback(callback.hit,nil)
+	victim:set_callback(callback.sound,nil)
+	
 	if (victim:clsid() == clsid.poltergeist_s) then
 		local se_obj = alife():object(id)
 		if (se_obj) then
-			alife():release(se_obj, true)
+			--alife():release(se_obj, true)
+			safe_release_manager.release(se_obj)
 		end
 	else
 		release_body_manager.get_release_body_manager():moving_dead_body(victim)
@@ -206,10 +212,6 @@ function generic_object_binder:death_callback(victim, who)
 		self.st.death_by_id = who:id()
 		-- End Alundaio
 	end
-	victim:set_callback(callback.death,nil)
-	victim:set_callback(callback.patrol_path_in_point,nil)
-	victim:set_callback(callback.hit,nil)
-	victim:set_callback(callback.sound,nil)
 end
 
 function generic_object_binder:hit_callback(obj, amount, local_direction, who, bone_index)
@@ -257,22 +259,32 @@ function generic_object_binder:net_spawn(sobject)
 		--alun_utils.debug_write(sobject:name()..":net_spawn()  FAILURE FAILURE object_binder.net_spawn returned false!!!")
 		return false
 	end
+	
+	local se_obj = alife():object(self.object:id())
+	if not (se_obj) then 
+		return false 
+	end
 
 	-- Alundaio
-	SendScriptCallback("monster_on_net_spawn",self.object,sobject)
+	SendScriptCallback("monster_on_net_spawn",self.object,se_obj)
 	-- Alundaio
 	
 	db.add_obj(self.object)
 	if not self.object:alive() then
-		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body...")
+	
+		if (victim:clsid() == clsid.poltergeist_s) then
+			
+			return true
+		end
+		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body...")
 		release_body_manager.get_release_body_manager():moving_dead_body(self.object,true)
-		--alun_utils.debug_write(sobject:name()..":net_spawn() Moving dead body done")
-		--alun_utils.debug_write(sobject:name()..":net_spawn()  END")
+		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body done")
+		--alun_utils.debug_write(se_obj:name()..":net_spawn()  END")
 		
 		-- fix for 'Invalid vertex for object'
-		if not (sobject.m_level_vertex_id < 4294967295 and self.object:accessible(sobject.m_level_vertex_id)) then
-			printf("npc %s has invalid spawning vertex, correcting",sobject:name())
-			local v_id = self.object:accessible_nearest(level.vertex_position(sobject.m_level_vertex_id), vector())
+		if not (se_obj.m_level_vertex_id < 4294967295 and self.object:accessible(se_obj.m_level_vertex_id)) then
+			printf("npc %s has invalid spawning vertex, correcting",se_obj:name())
+			local v_id = self.object:accessible_nearest(level.vertex_position(se_obj.m_level_vertex_id), vector())
 			self.object:set_npc_position(level.vertex_position(v_id))
 		end
 		
@@ -282,22 +294,22 @@ function generic_object_binder:net_spawn(sobject)
 	
 	db.add_enemy(self.object)
 
-	smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_mobile, self.loaded)
+	smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, se_obj, modules.stype_mobile, self.loaded)
 	
 	local force_set_position
-	if (db.offline_objects[sobject.id] and db.offline_objects[sobject.id].level_vertex_id) then
-		force_set_position = level.vertex_position(db.offline_objects[sobject.id].level_vertex_id)
-		db.offline_objects[sobject.id].level_vertex_id = nil
-	elseif db.spawned_vertex_by_id[sobject.id] ~= nil then
-		force_set_position = level.vertex_position(db.spawned_vertex_by_id[sobject.id])
-		db.spawned_vertex_by_id[sobject.id] = nil
+	if (db.offline_objects[se_obj.id] and db.offline_objects[se_obj.id].level_vertex_id) then
+		force_set_position = level.vertex_position(db.offline_objects[se_obj.id].level_vertex_id)
+		db.offline_objects[se_obj.id].level_vertex_id = nil
+	elseif db.spawned_vertex_by_id[se_obj.id] ~= nil then
+		force_set_position = level.vertex_position(db.spawned_vertex_by_id[se_obj.id])
+		db.spawned_vertex_by_id[se_obj.id] = nil
 	end
 
 	if (force_set_position) then
 		self.object:set_npc_position(force_set_position)
 	end
 	
-	--alun_utils.debug_write(sobject:name()..":net_spawn()  END")
+	--alun_utils.debug_write(se_obj:name()..":net_spawn()  END")
 	return true
 end
 

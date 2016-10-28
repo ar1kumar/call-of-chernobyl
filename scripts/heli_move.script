@@ -9,7 +9,7 @@ class "heli_move"
 
 function heli_move:__init( obj, storage )
 	self.object     = obj
-	self.sobject 	= alife():object(obj:id())
+	local se_obj 	= alife():object(obj:id())
 	self.heliObject = obj:get_helicopter()
 	self.a          = storage
 	self.st			= db.storage[obj:id()]
@@ -20,7 +20,7 @@ function heli_move:__init( obj, storage )
     self.a.increment = 1
 	
 	-- using alife simulation
-	if (self.sobject and self.sobject.respawn_point_prop_section) then 
+	if (se_obj and se_obj.respawn_point_prop_section) then 
 		self.a.use_combat = true
 	end
 end
