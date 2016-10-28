@@ -242,7 +242,9 @@ function get_all_from_corpse(npc)
 	end
 
 	corpse_npc:iterate_inventory(get_item,corpse_npc)
-
+	if lootmoney then
+		lootmoney.lootmoney_effect(npc, corpse_npc)
+	end
 	if items_value >= 100 then
 		xr_sound.set_sound_play(id,"corpse_loot_good")
 	elseif items_value > 0 and (math.random(1,100)/100) < 0.5 then
@@ -550,7 +552,7 @@ end
 function configure_actions(npc,ini,scheme,section,stype,temp)
 	temp.action:add_precondition(world_property(xr_gather_items.evaid,false))
 	temp.action:add_precondition(world_property(stalker_ids.property_items,false))
-	temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
+	--temp.action:add_precondition(world_property(xr_evaluators_id.wounded_exist,false))
 	temp.action:add_precondition(world_property(xr_evaluators_id.stohe_meet_base + 1,false))
 	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action:add_precondition(world_property(xr_evaluators_id.abuse_base, false))
