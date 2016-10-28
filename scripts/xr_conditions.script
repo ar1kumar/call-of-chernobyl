@@ -572,16 +572,12 @@ function actor_in_zone(actor, npc, p)
 	if not (db.actor) then 
 		return false 
 	end
-	local zone
 	for i=1,#p do
-		if (db.zone_by_name[p[1]]) then 
-			if (utils.npc_in_zone(db.actor,db.zone_by_name[p[i]])) then 
-				return true 
-			end 
-		else 
-			printf("actor_in_zone: zone by name %s does not exist! %s",p[1])
+		local zone = db.zone_by_name[p[i]]
+		if (zone and zone:inside(db.actor:position())) then 
+			return true
 		end
-	end 
+	end
 	return false
 end
 
@@ -593,23 +589,16 @@ function actor_out_zone(actor, npc, p)
 	return not utils.npc_in_zone(db.actor, db.zone_by_name[p[1]])
 end
 function npc_in_zone(actor, npc, p)
-	local zone = db.zone_by_name[p[1]]
-
-	local npc_obj
-	if type(npc.id) ~= "function" then
-		npc_obj = db.storage[npc.id] and db.storage[npc.id].object
-		if zone == nil then
+	if not (npc and type(npc.position) == "function") then 
+		return false 
+	end
+	for i=1,#p do
+		local zone = db.zone_by_name[p[i]]
+		if (zone and zone:inside(npc:position())) then 
 			return true
 		end
-
-		if npc_obj == nil then
-			return zone:inside(npc.position)
-		end
-	else
-		npc_obj = npc
 	end
-
-	return utils.npc_in_zone(npc_obj, zone)
+	return false
 end
 
 -- true, если здоровье npc <= заданному значению
