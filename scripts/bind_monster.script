@@ -271,9 +271,8 @@ function generic_object_binder:net_spawn(sobject)
 	
 	db.add_obj(self.object)
 	if not self.object:alive() then
-	
-		if (victim:clsid() == clsid.poltergeist_s) then
-			
+		if (self.object:clsid() == clsid.poltergeist_s) then
+			safe_release_manager.release(se_obj)
 			return true
 		end
 		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body...")
