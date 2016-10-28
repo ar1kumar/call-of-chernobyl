@@ -309,19 +309,18 @@ end
 -- Serialization of userdata for Marshal Library
 --------------------------------------------------------------------
 if (marshal) then
-	getmetatable(game.CTime()).__persist = function(self)
-		local Y, M, D, h, m, s, ms = self:get(0,0,0,0,0,0,0)
+	function game_CTime___persist(self)
+		local Y, M, D, h, m, s, ms = 0,0,0,0,0,0,0
+		if (self and self.get) then
+			Y, M, D, h, m, s, ms = self:get(Y, M, D, h, m, s, ms)
+		end
 		return function ()
-			return game.CTime():set(Y or 0, M or 0, D or 0, h or 0, m or 0, s or 0, ms or 0)
+			local t = game.CTime()
+			t:set(Y, M, D, h, m, s, ms)
+			return t
 		end
 	end
-	
-	getmetatable(vector()).__persist = function(self)
-		local x,y,z = self.x,self.y,self.z
-		return function()
-			return vector():set(x or 0,y or 0,z or 0)
-		end
-	end
+	getmetatable(game.CTime()).__persist = game_CTime___persist
 end
 
 -- debug to find objects that shouldn't be calling game_object:alive()
