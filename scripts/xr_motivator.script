@@ -16,7 +16,7 @@ function motivator_binder:extrapolate_callback(cur_pt)
 		printf("CRITICAL ERROR: game object is nil! %s",self.name)
 		return false
 	end
-		if self.st.active_section then
+	if (self.st.active_section and self.st.active_scheme) then
 		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "extrapolate_callback")
 		if (self.st.move_mgr) then
 			self.st.move_mgr:extrapolate_callback(self.object)
@@ -257,7 +257,7 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		xr_statistic.set_best_weapon(amount)
 	end
 
-	if self.st.active_section then
+	if (self.st.active_section and self.st.active_scheme) then
 		xr_logic.issue_event(obj, self.st[self.st.active_scheme], "hit_callback", obj, amount, local_direction, who, bone_index)
 	end
 	if self.st.combat_ignore then

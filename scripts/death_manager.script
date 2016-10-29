@@ -24,8 +24,10 @@ function init_drop_settings()
 	for i=0,n-1 do
 		local result, id, value	= death_ini:r_line_ex("item_count",i,"","")
 		local p = alun_utils.str_explode(value,",")
-		if (p and p[1] and p[2]) then
-			item_count[id] = {tonumber(p[1]) or 0,tonumber(p[2]) or 0}
+		if (p) then
+			p[1] = tonumber(p[1]) or 0
+			p[2] = tonumber(p[2]) or p[1]
+			item_count[id] = {p[1],p[2]}
 		end
 	end
 	
