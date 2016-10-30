@@ -138,8 +138,8 @@ end
 
 -- Called when the cursor focuses on an item.
 function on_item_focus(item)
-	local p = item:parent()
-	if not (p and p:id() == db.actor:id()) then 
+	local parent = item:parent()
+	if not (parent and parent:id() == db.actor:id()) then 
 		return 
 	end
 	
@@ -178,7 +178,7 @@ end
 
 -- Attaches an addon to the weapon.
 function attach_addon(item, weapon)
-	
+	-- Return if the addon or weapon aren't valid.
 	if not (item and weapon) then 
 		return 
 	end 
@@ -214,8 +214,7 @@ end
 
 -- Detaches an addon from the weapon.
 function detach_addon(weapon)
-
-	-- Return if the item is invalid.
+	-- Return if the weapon is not valid.
 	if not (weapon) then
 		return
 	end
