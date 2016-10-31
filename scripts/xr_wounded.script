@@ -15,27 +15,28 @@ function evaluator_wound:__init(name, storage) super(nil, name)
 	self.a = storage
 end
 function evaluator_wound:evaluate ()
-	if not (self.object:alive()) then 
+
+	local o = self.object
+	if not (o:alive()) then 
 		return false 
 	end 
-	if self.object:in_smart_cover() then return false end
-
+	
+	if (o:critically_wounded() or o:in_smart_cover()) then 
+		return false 
+	end
+	
 	if self.a.wounded_set ~= true then return false end
-
+	
 	self.a.wound_manager:update()
-
-	if self.object:critically_wounded() == true then
+	
+	if o:best_enemy() and utils.load_var(o, "wounded_fight") == "true" then
 		return false
 	end
-
-	if self.object:best_enemy() and utils.load_var(self.object, "wounded_fight") == "true" then
+	
+	local state = tostring(utils.load_var(o, "wounded_state"))
+	if (state == "nil") then
 		return false
 	end
-
-	local state = utils.load_var(self.object, "wounded_state")
-	if (state == nil or state == "nil") then 
-		return false
-	end 
 	
 	return true
 end

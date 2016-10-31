@@ -723,16 +723,30 @@ end
 ----------------------------------------
 function IsWounded(o)
 	--[[
-	local st = o and db.storage[o:id()]
-	return st and st.wounded and st.wounded.wound_manager and tostring(st.wounded.wound_manager.state) ~= "nil" or false
-	local c = o:clsid()
-	return c and c == clsid.script_stalker and o:alive() and o:wounded() or false
-	--]]
 	if (IsStalker(o) and o:alive()) then
 		local st = db.storage[o:id()]
 		return st and st.wounded and st.wounded.wound_manager and tostring(st.wounded.wound_manager.state) ~= "nil" or false
 	end
 	return false
+	--]]
+	if not (IsStalker(o) and o:alive()) then 
+		return false 
+	end 
+	
+	if (o:critically_wounded() or o:in_smart_cover()) then 
+		return false 
+	end
+	
+	if o:best_enemy() and utils.load_var(o, "wounded_fight") == "true" then
+		return false
+	end
+	
+	local state = tostring(utils.load_var(o, "wounded_state"))
+	if (state == "nil") then
+		return false
+	end
+	
+	return true
 end
 -------------------------------------------------------------------------------------------
 -- 										CLASS TESTING
