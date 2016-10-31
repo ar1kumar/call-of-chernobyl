@@ -17,7 +17,7 @@ end
 function evaluator_wound:evaluate ()
 
 	local o = self.object
-	if not (o:alive()) then 
+	if not (IsStalker(o) and o:alive()) then 
 		return false 
 	end 
 	
@@ -84,7 +84,7 @@ function action_wounded:execute()
 			local current_time = time_global()
 			if begin_wounded == nil then
 				utils.save_var(self.object, "begin_wounded", current_time)
-			elseif current_time - begin_wounded > 60000 then
+			elseif current_time - begin_wounded > 90000 then
 				--local sim = alife()
 				--sim:create("medkit_script",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
 				wound_manager:unlock_medkit()
@@ -92,9 +92,11 @@ function action_wounded:execute()
 		end
 	end
 
-	local wound_manager_state = utils.load_var(npc, "wounded_state")
-	
-	if wound_manager_state == "true" then
+	local wound_manager_state = tostring(utils.load_var(npc, "wounded_state"))
+	if wound_manager_state == "nil" then
+		printf("wrong wounded animation %s", self.object:name())
+		return
+	elseif wound_manager_state == "true" then
 		local h = hit()
 		h.power = 0
 		h.direction = self.object:direction()
@@ -125,25 +127,6 @@ function action_wounded:execute()
 		xr_sound.set_sound_play(npc:id(), wound_manager_sound)
 	end
 
-	if tostring(wound_manager_state) == "nil" then
---		print_table(self.a.hp_state)
---		print_table(self.a.hp_state_see)
-		printf("wrong wounded animation %s", self.object:name())
-		return
-	end
-
-	--[[
-	local state = state_mgr.get_state(npc)
-	if (state ~= wound_manager_state) then
-		local mgr = db.storage[npc:id()].state_mgr
-		if (mgr) then
-			npc:clear_animations()
-			mgr:set_state(wound_manager_state, nil, nil, nil, {fast_set = true})
-			mgr.animation:set_state(nil,true)
-			mgr.animation:set_control()
-		end
-	end
-	--]]
 	state_mgr.set_state(npc,wound_manager_state,nil,nil,nil,{fast_set = true})
 end
 function action_wounded:finalize()

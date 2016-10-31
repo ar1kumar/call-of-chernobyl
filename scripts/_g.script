@@ -722,14 +722,7 @@ function store_table(table, subs)
 end
 ----------------------------------------
 function IsWounded(o)
-	--[[
-	if (IsStalker(o) and o:alive()) then
-		local st = db.storage[o:id()]
-		return st and st.wounded and st.wounded.wound_manager and tostring(st.wounded.wound_manager.state) ~= "nil" or false
-	end
-	return false
-	--]]
-	if not (IsStalker(o) and o:alive()) then 
+	if not (o:clsid() == clsid.script_stalker and o:alive()) then 
 		return false 
 	end 
 	
