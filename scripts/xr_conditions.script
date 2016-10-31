@@ -88,6 +88,14 @@ function check_nearest_smart_dist_le(actor,npc,p)
 	return false
 end 
 
+function check_smart_dist_le(actor,npc,p)
+	local smart = p[2] and SIMBOARD.smarts_by_names[p[2]]
+	if (smart and smart.position:distance_to(npc:position()) <= (tonumber(p[1]) or 0)) then 
+		return true
+	end
+	return false
+end
+
 -----------------------
 -- Task
 -----------------------
