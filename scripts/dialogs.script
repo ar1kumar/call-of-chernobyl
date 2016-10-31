@@ -19,7 +19,13 @@ end
 
 function rescue_hostage(a,b)
 	local npc = who_is_npc(a,b)
-	if (npc) then
+	local squad = get_object_squad(npc)
+	if (squad) then 
+		for k in squad:squad_members() do
+			utils.se_obj_save_var(k.id,k.object:name(),"companion_cannot_teleport",nil)
+			xrs_kill_wounded.hostage_list[k.id] = nil
+		end
+	else 
 		local se_npc = alife():object(npc:id())
 		if (se_npc) then
 			utils.se_obj_save_var(se_npc.id,se_npc:name(),"companion_cannot_teleport",nil)

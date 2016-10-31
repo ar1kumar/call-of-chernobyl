@@ -204,39 +204,21 @@ function hostage_task(tsk,task_id)
 	if not (db.actor) then 
 		return 
 	end
-	local p = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
-	if not (p[1]) then
-		printf("task_status_function not set up properly! check_if_looted_enough needs an extra param for squad story id! task_id=%s",task_id)
-		return 
-	end 
 	
-	local squad = get_story_squad(p[1])
-	if not (squad and squad:clsid() == clsid.online_offline_group_s) then 
-		return
-	end
-	
-	local id = utils.load_var(db.actor,task_id .. "_id")
+	local id = tonumber(utils.load_var(db.actor,task_id .. "_id"))
 	local smart = id and alife():object(id)
 	if (smart) then 
 		smart.locked = true
 	end
 
 	if (tsk.stage == 0) then 
-		if (xrs_kill_wounded) then
-			xrs_kill_wounded.hostage_list[squad:commander_id()] = smart.id
-		end
 		if (db.actor:has_info("hostage_companion_task_1_hostage_rescued")) then 
 			tsk.stage = 1
-			alun_utils.execute_script_on_squad(squad,axr_companions.set_companion_allow_teleport)
 		end
 	elseif (tsk.stage == 1) then
-		if (xrs_kill_wounded) then 
-			xrs_kill_wounded.hostage_list[squad:commander_id()] = nil
-		end
-		
 		if not (axr_task_manager.is_task_giver_valid(tsk)) then 
 			return "complete" -- complete task even though giver is dead/missing/deleted
-		end 
+		end
 	end
 end 
 
