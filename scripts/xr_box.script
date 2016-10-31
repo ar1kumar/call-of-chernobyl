@@ -85,7 +85,8 @@ function ph_item_box:spawn_items(obj,who,spawn_ini)
 end
 
 function create_items(obj, section, number, rnd)
-	if not (system_ini():section_exist(section)) then 
+	local sys_ini = system_ini()
+	if not (sys_ini:section_exist(section) and sys_ini:line_exist(section,"cform")) then 
 		return 
 	end
 	if (utils.is_ammo(section)) then
@@ -121,8 +122,9 @@ function create_obligatory_items(obj, spawn_ini)
 		position.y = obj:position().y + 0.3
 			
 		local sim = alife()
+		local sys_ini = system_ini()
 		for i,section in ipairs(items) do
-			if not (system_ini():section_exist(section)) then 
+			if not (sys_ini:section_exist(section) and sys_ini:line_exist(section,"cform")) then 
 				return 
 			end
 			sim:create(section,position,obj:level_vertex_id(),obj:game_vertex_id())
