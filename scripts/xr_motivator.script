@@ -210,6 +210,7 @@ function motivator_binder:net_destroy()
 	xr_sound.stop_sounds_by_id(self.object:id())
 	
 	if (self.object:is_talking()) then
+		db.actor:stop_talk()
 		self.object:stop_talk()
 	end
 
