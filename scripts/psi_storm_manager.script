@@ -174,6 +174,9 @@ function CPsiStormManager:finish(manual)
 
 	xr_statistic.inc_counter("storms")
 	level.set_time_factor(self.game_time_factor)
+	
+	surge_manager.get_surge_manager():respawn_artefacts_and_replace_anomaly_zone()
+	surge_manager.get_surge_manager():toggle_level_artefact_respawns()
 end
 
 function distance_2d(p1, p2)
