@@ -1,39 +1,54 @@
-local coc_ranking_array_size = 100
+local coc_ranking_array_size = 100				-- Top100
 local coc_ranking_list = {}
+local actor_rank_place
+dialog_closed = false
+
+----------------------------------------------------------------------------
+-- Engine->lua function calls 
+----------------------------------------------------------------------------
+local map_spot_property = {}
+function property_box_clicked(property_ui)
+	local list_item = property_ui:GetSelectedItem()
+	if not (list_item) then 
+		return 
+	end
+	local textControl = list_item:GetTextItem()
+	local prop = textControl:GetText()
+	--printf("prop=%s",prop)
+	SendScriptCallback("map_spot_menu_property_clicked",property_ui,map_spot_property.id,map_spot_property.level_name,prop)
+end 
+
+function property_box_add_properties(property_ui,id,level_name)
+	map_spot_property.id = id 
+	map_spot_property.level_name = level_name
+	--property_ui:AddItem("Test")
+	SendScriptCallback("map_spot_menu_add_property",property_ui,id,level_name)
+end
 
 -- use actor_menu for other modes
 -- 10 =  Talk dialog  show
 -- 11 =  Talk dialog  hide
-dialog_closed = false
 function actor_menu_mode(mode)
 	if(mode==10) then
-		dialog_wnd_showed()
-	elseif(mode==11) then
-		dialog_wnd_closed()
-	end
-end
-
-function dialog_wnd_showed()
-	dialog_closed = false
-	for k,st in pairs(db.storage) do
-		if (st.object and st.object:is_talking() and st.object:id() ~= db.actor:id()) then
-			local id = st.object:id()
-			inventory_upgrades.victim_id = id -- stupid hack since sidorovich and forester don't have use_callback
-			local sound_theme = xr_sound.sound_table[id]
-			if sound_theme and sound_theme.reset then
-				sound_theme:reset(id)
+		dialog_closed = false
+		for k,st in pairs(db.storage) do
+			if (st.object and st.object:is_talking() and st.object:id() ~= db.actor:id()) then
+				local id = st.object:id()
+				inventory_upgrades.victim_id = id -- stupid hack since sidorovich and forester don't have use_callback
+				local sound_theme = xr_sound.sound_table[id]
+				if sound_theme and sound_theme.reset then
+					sound_theme:reset(id)
+				end
+				break
 			end
-			break
 		end
+		--printf("---:>Talk Dialog show")
+	elseif(mode==11) then
+		--printf("---:>Talk Dialog hide")
+		inventory_upgrades.victim_id = nil
+		dialog_closed = true
+		SendScriptCallback("actor_on_leave_dialog")
 	end
-	--printf("---:>Talk Dialog show")
-end
-
-function dialog_wnd_closed()
-	--printf("---:>Talk Dialog hide")
-	inventory_upgrades.victim_id = nil
-	dialog_closed = true
-	SendScriptCallback("actor_on_leave_dialog")
 end
 
 function get_time_elapsed()
@@ -94,6 +109,9 @@ function get_stat(index) -- index= int        return string
 	return ""
 end
 
+----------------------------------------------------------------------------
+-- Engine->lua function calls 
+----------------------------------------------------------------------------
 function fill_primary_objects()
 	local primary_objects_tbl =
 	{	{target="mar_2c_01_anomaly_spot",					hint="st_mar_2c_01_anomaly_spot_name"},
@@ -297,6 +315,9 @@ function add_quick_slot_items_on_game_start()
 	end
 end
 
+----------------------------------------------------------------------------
+-- Scripted Callback Register
+----------------------------------------------------------------------------
 local function npc_on_net_spawn(npc,se_obj)
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"last_seen_level",level.name())
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"last_seen_level",game.get_game_time())
@@ -305,11 +326,10 @@ end
 function on_game_start()
 	RegisterScriptCallback("npc_on_net_spawn",npc_on_net_spawn)
 end
----------------------------------------------
--- Character Ranking
----------------------------------------------
 
-local actor_rank_place
+----------------------------------------------------------------------------
+-- Character Ranking
+----------------------------------------------------------------------------
 -- called from info_portions.script
 function calculate_rankings()
 	local t = {}

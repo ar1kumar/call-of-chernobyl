@@ -14,10 +14,13 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.4.14"
+GAME_VERSION = "1.4.15"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
+end
+if string.find(command_line(), "-dbgdev") then -- because users all using dbg, need to hide OP features
+	DEV_DEBUG_DEV = true
 end
 
 USE_INI_MEMOIZE = true
@@ -253,18 +256,19 @@ function JumpToLevel(new_level)
 	if (level_name == new_level) then
 		return false
 	end
-		local sim,gg = alife(),game_graph()
-		-- first try to find a smart_terrain on specified level
-	if (SIMBOARD) then
-		for name,smart in pairs(SIMBOARD.smarts_by_names) do
-			cvertex = smart and gg:vertex(smart.m_game_vertex_id)
-			if (cvertex and sim:level_name(cvertex:level_id()) == new_level) then
-				ChangeLevel(cvertex:level_point(),cvertex:level_vertex_id(),smart.m_game_vertex_id,vector():set(0,0,0))
-				return true
-			end
+	
+	local cvertex
+	local sim,gg = alife(),game_graph()
+	-- first try to find a smart_terrain on specified level
+	for id,smart in pairs(db.smart_terrain_by_id) do
+		cvertex = smart and gg:vertex(smart.m_game_vertex_id)
+		if (cvertex and sim:level_name(cvertex:level_id()) == new_level) then
+			ChangeLevel(cvertex:level_point(),cvertex:level_vertex_id(),smart.m_game_vertex_id,vector():set(0,0,0))
+			return true
 		end
 	end
-		-- in case level has no smarts then just teleport to first found gvid for level
+
+	-- in case level has no smarts then just teleport to first found gvid for level
 	for gvid=0, 4860 do
 		if gg:valid_vertex_id(gvid) then
 			cvertex = gg:vertex(gvid)

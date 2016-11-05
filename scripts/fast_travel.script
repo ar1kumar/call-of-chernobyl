@@ -1,0 +1,36 @@
+------------------------------
+-- Fast Travel system
+-- author: Alundaio
+------------------------------
+
+local function map_spot_menu_add_property(property_ui,id,level_name)
+	local se_obj = alife():object(id)
+	if not (se_obj) then 
+		return 
+	end
+	
+	-- TODO: develop this feature for normal usage
+	if (DEV_DEBUG_DEV) then 
+		property_ui:AddItem("Fast Travel")
+	end
+end 
+
+local function map_spot_menu_property_clicked(property_ui,id,level_name,prop)
+	if (prop == "Fast Travel") then 
+		local se_obj = alife():object(id)
+		if not (se_obj) then 
+			return 
+		end
+		
+		if (level_name == level.name()) then 
+			db.actor:set_actor_position(se_obj.position)
+		else
+			ChangeLevel(se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,vector():set(0,0,0))
+		end
+	end
+end
+
+function on_game_start()
+	RegisterScriptCallback("map_spot_menu_add_property",map_spot_menu_add_property)
+	RegisterScriptCallback("map_spot_menu_property_clicked",map_spot_menu_property_clicked)
+end
