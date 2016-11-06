@@ -91,10 +91,7 @@ function CPsiStormManager:start(manual)
 	end
 end
 
-function CPsiStormManager:new_psi_storm_time(reset)
-	if reset then
-		self.last_psi_storm_time 	= game.get_game_time()
-	end
+function CPsiStormManager:new_psi_storm_time()
 	self.last_psi_storm_time 	= game.get_game_time()
 	
 	local freq = atmosfear_options.config and atmosfear_options.config:r_value("atmosfear_current_parameters","opt_psi_storm_freq",2,24) or 24
@@ -194,6 +191,10 @@ end
 -- ###############################################################################################
 
 function CPsiStormManager:update()
+	if (surge_manager.is_started()) then 
+		return 
+	end 
+	
 	if not (self._state_loaded) then 
 		self:initialize()
 	end 

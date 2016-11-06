@@ -67,6 +67,11 @@ local function actor_on_info_callback(actor,info,obj)
 	proceed()
 end
 
+local function on_game_load()
+	db.actor:give_info_portion("ui_pda_hide")	-- because if you change level while PDA is open
+end 
+
 function on_game_start()
 	RegisterScriptCallback("actor_on_info_callback",actor_on_info_callback)
+	RegisterScriptCallback("on_game_load",on_game_load)
 end

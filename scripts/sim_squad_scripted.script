@@ -102,15 +102,6 @@ function sim_squad_scripted:get_script_target()
 		new_target = xr_logic.pick_section_from_condlist(db.actor, self, self.action_condlist)
 	end 
 	
-	if (new_target == "actor") then
-		return 0 
-	end
-	
-	local smart = new_target and SIMBOARD.smarts_by_names[new_target]
-	if (smart) then
-		return smart.id
-	end
-	
 	-- prevent companions from moving to actor if they cannot teleport and actor is not on same level
 	if (axr_companions.companion_squads[self.id]) then
 		local gg = game_graph()
@@ -121,6 +112,15 @@ function sim_squad_scripted:get_script_target()
 			end
 		end
 		return 0
+	end
+		
+	if (new_target == "actor") then
+		return 0
+	end
+	
+	local smart = new_target and SIMBOARD.smarts_by_names[new_target]
+	if (smart) then
+		return smart.id
 	end
 end
 

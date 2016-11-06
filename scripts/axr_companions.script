@@ -25,15 +25,18 @@ local function on_fighting_actor(npc)
 		return 
 	end
 	--alun_utils.debug_write(strformat("axr_companions.on_fighting_actor"))
-	if (db.actor:has_info("axr_has_companion")) then
-		for i=1,max_actor_squad_size do
-			local c = utils.load_var(db.actor,"companion_"..i,nil)
-			local obj = c and level.object_by_id(c)
+
+	for i=1,max_actor_squad_size do
+		local c = utils.load_var(db.actor,"companion_"..i,nil)
+		if (c) then
+			local obj = level.object_by_id(c)
 			if (obj) then
-				alun_utils.set_squad_relation_to_squad(obj,npc,game_object.enemy)
+				obj:set_relation(game_object.enemy,npc)
+				npc:set_relation(game_object.enemy,obj)
 			end
 		end
 	end
+
 	for id,squad in pairs(companion_squads) do 
 		xr_combat_ignore.safe_zone_npcs[id] = nil
 		if (squad and squad.commander_id) then
@@ -53,7 +56,7 @@ local function squad_on_npc_death(squad,se_npc)
 	if (se_npc and alife():has_info(se_npc.id,"npcx_is_companion") ) then
 		for i=1,max_actor_squad_size do
 			local c = utils.load_var(db.actor,"companion_"..i,nil)
-			if (c == se_npc.id) then
+			if (c and c == se_npc.id) then
 				utils.save_var(db.actor,"companion_"..i,nil)
 			end
 		end
