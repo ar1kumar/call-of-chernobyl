@@ -18,11 +18,11 @@ function property_box_clicked(property_ui)
 	SendScriptCallback("map_spot_menu_property_clicked",property_ui,map_spot_property.id,map_spot_property.level_name,prop)
 end 
 
-function property_box_add_properties(property_ui,id,level_name)
+function property_box_add_properties(property_ui,id,level_name,hint)
 	map_spot_property.id = id 
 	map_spot_property.level_name = level_name
 	--property_ui:AddItem("Test")
-	SendScriptCallback("map_spot_menu_add_property",property_ui,id,level_name)
+	SendScriptCallback("map_spot_menu_add_property",property_ui,id,level_name,hint)
 end
 
 -- use actor_menu for other modes
