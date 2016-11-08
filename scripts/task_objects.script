@@ -173,7 +173,7 @@ function CGeneralTask:check_task(tm)
 		return
 	end
 
-	self.check_time = tg + math.random(1000,5000) + (self.prior*100)
+	self.check_time = tg + math.random(500,1000) --+ (self.prior*10)
 	local task_updated = false
 	
 	local t_tile = task_functor[self.title_functor](self.id, "title", self.title, self)

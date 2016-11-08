@@ -321,8 +321,7 @@ end
 
 -- param 1 zone name
 function enemy_in_zone(enemy, npc, p)
-	local zone = p[1] and db.zone_by_name[p[1]]
-	return zone and utils.npc_in_zone(enemy, zone) or false
+	return utils.npc_in_zone(enemy, p[1]) or false
 end
 
 -- param 1 - Community to match
@@ -590,11 +589,7 @@ function actor_in_zone(actor, npc, p)
 end
 
 function actor_out_zone(actor, npc, p)
-	local zone = db.actor ~= nil and db.zone_by_name[p[1]]
-	if not (zone) then
-		return false
-	end
-	return not utils.npc_in_zone(db.actor, db.zone_by_name[p[1]])
+	return not utils.npc_in_zone(db.actor, p[1])
 end
 function npc_in_zone(actor, npc, p)
 	if not (npc and type(npc.position) == "function") then 
@@ -1964,7 +1959,7 @@ function zat_b29_rivals_dialog_precond(actor, npc)
 	end
 
 	for k,v in pairs(zones_table) do
-		if utils.npc_in_zone(npc, db.zone_by_name[v]) then
+		if utils.npc_in_zone(npc, v) then
 			return true
 		end
 	end

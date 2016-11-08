@@ -485,10 +485,8 @@ function get_nearest_waypoint(obj, pathname, ptr, cnt)
 end
 
 function npc_in_zone(npc, zone)
-	if (type(zone) == "string") then
-		zone = db.zone_by_name[zone]
-	end
-	return npc ~= nil and zone ~= nil and zone:inside(npc:position())
+	zone = type(zone) == "string" and db.zone_by_name[zone] or zone
+	return npc and zone and zone.inside and zone:inside(npc:position())
 end
 
 ------------------------- запись/загрузка CTime ---------------------------

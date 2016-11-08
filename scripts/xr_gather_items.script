@@ -151,7 +151,7 @@ function gather_item(npc)
 	local itm = selected_id and selected_id ~= 0 and selected_id ~=65535 and level.object_by_id(selected_id)
 	local loot_table = UseCorpseLootTable ~= true and LootTable or xr_corpse_detection.lootable_table
 	if (itm == nil or loot_table[itm:section()] == nil) then
-		printf("nooooo!  itm=%s lootable=%s",itm and itm:name(), itm and loot_table[itm:section()])
+		--printf("nooooo!  itm=%s lootable=%s",itm and itm:name(), itm and loot_table[itm:section()])
 		return
 	end
 
