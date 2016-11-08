@@ -16,7 +16,7 @@ function on_game_start()
 	RegisterScriptCallback("npc_on_update",npc_update)
 
 	local sect = "plugin"
-	eating.exc_comms = alun_utils.parse_list(ini,sect,"excluded_communities",true)
+	--eating.exc_comms = alun_utils.parse_list(ini,sect,"excluded_communities",true)
 	eating.ic = ini:r_bool_ex(sect,"in_combat",false)
 	eating.oc = ini:r_bool_ex(sect,"out_combat",false)
 	eating.max_h = (ini:r_float_ex(sect,"medkit_health") or 50)/100
@@ -92,7 +92,7 @@ function eat_medkit:update()
 					local d_max = eating.medkit_delay[self.rank][2] or 15000
 					self.timer = time_global()+math.random(d_min,d_max)
 					self.item = eating.medkits[i]
-					self.stage = self.stage + 1
+					self.stage = 1
 					return
 				end
 			end
@@ -105,7 +105,7 @@ function eat_medkit:update()
 					local d_max = eating.bandage_delay[self.rank][2] or 15000
 					self.timer = time_global()+math.random(d_min,d_max)
 					self.item = eating.bandages[i]
-					self.stage = self.stage + 1
+					self.stage = 1
 					return
 				end
 			end
