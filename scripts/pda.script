@@ -21,7 +21,9 @@ end
 function property_box_add_properties(property_ui,id,level_name,hint)
 	map_spot_property.id = id 
 	map_spot_property.level_name = level_name
-	--property_ui:AddItem("Test")
+	-- if (hint and hint ~= "") then
+		-- property_ui:AddItem(hint)
+	-- end
 	SendScriptCallback("map_spot_menu_add_property",property_ui,id,level_name,hint)
 end
 
