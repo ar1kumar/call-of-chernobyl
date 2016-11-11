@@ -430,8 +430,9 @@ function WeatherManager:select_weather(now)
 	--alun_utils.debug_write("WeatherManager:select_weather")
 	
 	local weather = xr_logic.pick_section_from_condlist(db.actor, db.actor, self.weather_list)
+	
 	-- CC add period to name
-	if weather=="atmosfear" then
+	if (weather=="atmosfear") then
 		local level_name = level.name()
 		if self.transition_period==true then
 			weather = weather.."_transition"
@@ -836,6 +837,9 @@ function WeatherManager:lightning()
 end
 
 function WeatherManager:save_state(m_data)
+	if (bLevelUnderground) then 
+		return 
+	end
 	--alun_utils.debug_write("WeatherManager:save_state BEFORE")
 	local wm = get_weather_manager()
 	m_data.weather_manager = {}
@@ -843,15 +847,19 @@ function WeatherManager:save_state(m_data)
 	m_data.weather_manager.period = self.period
 	m_data.weather_manager.last_period_change_hour = self.last_period_change_hour
 	m_data.weather_manager.next_period_change_hour = self.next_period_change_hour
+	--TODO: Load as table but it will require newgame
 	m_data.weather_manager.state = wm:get_state_as_string()
 	m_data.weather_manager.update_time = self.update_time
-	m_data.weather_manager.weather_fx = self.weather_fx
-	m_data.weather_manager.weather_fx_time = self.weather_fx and level.get_wfx_time() or 0
+	m_data.weather_manager.weather_fx = level.is_wfx_playing() and level.get_weather()
+	m_data.weather_manager.weather_fx_time = level.is_wfx_playing() and level.get_wfx_time() or 0
 	--alun_utils.debug_write("WeatherManager:save_state AFTER")
 end 
 
 function WeatherManager:load_state(m_data)
 	if not (m_data.weather_manager) then 
+		return
+	end
+	if (bLevelUnderground) then 
 		return 
 	end
 	--alun_utils.debug_write("WeatherManager:load_state BEFORE")
@@ -860,6 +868,7 @@ function WeatherManager:load_state(m_data)
 	self.period = m_data.weather_manager.period
 	self.last_period_change_hour = m_data.weather_manager.last_period_change_hour
 	self.next_period_change_hour = m_data.weather_manager.next_period_change_hour
+	--TODO: Store as table but it will require newgame
 	wm:set_state_as_string(m_data.weather_manager.state)
 	self.update_time = m_data.weather_manager.update_time
 	self.weather_fx = m_data.weather_manager.weather_fx
@@ -869,5 +878,6 @@ function WeatherManager:load_state(m_data)
 	elseif (self.levelWeather == "atmosfear_pre_blowout") then
 		self.pre_blowout_period = true
 	end
+	
 	--alun_utils.debug_write("WeatherManager:load_state AFTER")
 end 
