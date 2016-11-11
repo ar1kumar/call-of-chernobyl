@@ -138,12 +138,6 @@ function CSurgeManager:initialize()
 	self.surge_task_sect = ""
 	
 	--printf("level=%s   artefact_respawn_levels=%s",level.name(),m_data.artefact_respawn_levels[level.name()])
-	-- check if artefacts can respawn for this level
-	if (m_data.artefact_respawn_levels[level.name()] == true) then 
-		--printf("DEBUG: surge_manager respawn artefacts")
-		self:respawn_artefacts_and_replace_anomaly_zone()
-		m_data.artefact_respawn_levels[level.name()] = false	
-	end 
 	
 	--alun_utils.debug_write("CSurgeManager:initialize() end")
 end
