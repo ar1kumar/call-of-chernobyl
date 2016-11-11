@@ -257,7 +257,7 @@ function get_buy_discount(npc_id)
 		return 1
 	end
 
-	local sect = xr_logic.pick_section_from_condlist(db.actor, nil, xr_logic.parse_condlist(nil, "trader", "discounts", str))
+	local sect = xr_logic.pick_section_from_condlist(db.actor, nil, xr_logic.parse_condlist(db.actor, "trader", "discounts", str))
 	if (sect == nil or sect == "") then 
 		return 1 
 	end
