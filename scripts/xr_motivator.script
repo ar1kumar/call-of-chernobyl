@@ -130,7 +130,7 @@ function motivator_binder:net_spawn(sobject)
 	
 	xr_reach_task.add_reach_task_action(self.object)
 	
-	if (self.object:has_info("npcx_is_companion")) then
+	if (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion")) then
 		axr_companions.setup_companion_logic(self.object,self.st,self.loaded)
 	else
 		self.object:disable_info_portion("npcx_is_companion")
