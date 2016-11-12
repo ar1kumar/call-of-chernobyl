@@ -80,7 +80,7 @@ end
 function actor_on_first_update(binder,delta)
 	local m_data = alife_storage_manager.get_state()
 	-- check if artefacts can respawn for this level
-	if (m_data.artefact_respawn_levels[level.name()] == true) then 
+	if (m_data.artefact_respawn_levels and m_data.artefact_respawn_levels[level.name()] == true) then 
 		--printf("DEBUG: surge_manager respawn artefacts")
 		surge_manager.get_surge_manager():respawn_artefacts_and_replace_anomaly_zone()
 		m_data.artefact_respawn_levels[level.name()] = false
