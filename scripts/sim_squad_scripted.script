@@ -104,12 +104,9 @@ function sim_squad_scripted:get_script_target()
 	
 	-- prevent companions from moving to actor if they cannot teleport and actor is not on same level
 	if (axr_companions.companion_squads[self.id]) then
-		local gg = game_graph()
-		if (gg:vertex(self.m_game_vertex_id):level_id() ~= gg:vertex(alife().actor().m_game_vertex_id):level_id()) then
-			local se_obj = alife():object(self:commander_id())
-			if (se_obj and utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_teleport")) then
-				return self.id 
-			end
+		local se_obj = alife():object(self:commander_id())
+		if (self.online ~= true) and (se_obj and utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_teleport")) then
+			return self.id
 		end
 		return 0
 	end
@@ -245,7 +242,10 @@ function sim_squad_scripted:specific_update(script_target_id)
 	end
 	
 	self.assigned_target_id = script_target_id
-		
+	if (self.assigned_target_id == self.id) then 
+		return 
+	end 
+	
 	if (self.smart_id ~= self.assigned_target_id and se_target:clsid() == clsid.smart_terrain) then 
 		self:assign_smart(se_target,self.smart_id)
 	end
@@ -253,9 +253,9 @@ function sim_squad_scripted:specific_update(script_target_id)
 	if (self.current_action) then
 		-- If current action is not finished, then return
 		if (self.current_action == 0) then
-			if not (self.online) then
-				TeleportSquad(self,se_target.position,se_target.m_level_vertex_id,se_target.m_game_vertex_id)
-			end
+			-- if not (self.online) then
+				-- TeleportSquad(self,se_target.position,se_target.m_level_vertex_id,se_target.m_game_vertex_id)
+			-- end
 			if (se_target:am_i_reached(self)) then
 				se_target:on_after_reach(self)
 				self.current_target_id = self.assigned_target_id
