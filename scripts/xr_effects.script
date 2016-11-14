@@ -301,7 +301,8 @@ end
 -- param3+ - sections
 function setup_generic_fetch_task(actor,npc,p)
 	if (p[1] and p[2] and p[3]) then 
-		local sec = utils.load_var(db.actor,p[1])
+		local sec = DIALOG_LAST_ID and DIALOG_LAST_ID == inventory_upgrades.victim_id and utils.load_var(db.actor,p[1])
+		DIALOG_LAST_ID = inventory_upgrades.victim_id
 		if (sec and system_ini():section_exist(sec)) then
 			dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
 		else

@@ -411,7 +411,7 @@ function coc_rankings_set_hint(index)
 			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
 			if (m_data) then
 				local last_seen_level = m_data.last_seen_level
-				local last_seen_time = m_data.last_seen_time and m_data.last_seen_time:dateToString(game.CTime.DateToDay)
+				local last_seen_time = m_data.last_seen_time and m_data.last_seen_time.dateToString and m_data.last_seen_time:dateToString(game.CTime.DateToDay)
 				
 				if (last_seen_level and last_seen_time) then
 					return_str = return_str .. game.translate_string("st_last_seen") .. ": " .. game.translate_string(last_seen_level) .. " on " .. last_seen_time
