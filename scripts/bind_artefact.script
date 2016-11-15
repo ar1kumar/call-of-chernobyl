@@ -32,6 +32,7 @@ function artefact_binder:net_spawn(server_object)
 	local m_data = alife_storage_manager.get_state()
 	if (m_data and m_data.artefact_condition and m_data.artefact_condition[self.object:id()]) then 
 		self.object:set_condition(tonumber(m_data.artefact_condition[self.object:id()]) or 1)
+		m_data.artefact_condition[self.object:id()] = nil
 	end
 
 	return true
