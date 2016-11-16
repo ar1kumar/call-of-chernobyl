@@ -226,7 +226,10 @@ function act_kill_wounded:execute()
 
 	local dist = npc:position():distance_to(vo:position())
 	if (dist < MinDistance) then
-		self:reset()
+		--self:reset()
+		state_mgr.set_state(npc,"raid",nil,nil,{look_object = vo})
+		alun_utils.try_go_backward(npc,6)
+		return
 	end
 	
 	local dst = db.storage[npc:id()]
