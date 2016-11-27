@@ -6,6 +6,27 @@ dialog_closed = false
 ----------------------------------------------------------------------------
 -- Engine->lua function calls 
 ----------------------------------------------------------------------------
+
+-- PDA Tabs 
+-- It's now possible to add new button tabs to pda*.xml. Then call your CUIScriptWnd
+-- Use ActorMenu.get_pda_menu():SetActiveDialog(CUIWindow) to set the active dialog
+-- The passed pdaWnd is same as ActorMenu.get_pda_menu() 
+-- You can use ActorMenu.get_pda_menu():GetActiveSection() to find out active pda tab
+function set_active_subdialog(pdaWnd,section)
+	if (section == "eptTasks") then 
+	
+	elseif (section == "eptRanking") then 
+	
+	elseif (section == "eptLogs") then 
+	
+	--elseif (section == "eptExample") then 
+	--	local ui = ui_example.my_ui()
+	--	if (ui) then
+	--		pdaWnd:SetActiveDialog(ui)
+	--	end
+	end
+end 
+
 local map_spot_property = {}
 function property_box_clicked(property_ui)
 	local list_item = property_ui:GetSelectedItem()
