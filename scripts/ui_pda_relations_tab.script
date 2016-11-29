@@ -15,6 +15,7 @@ function pda_relations_tab:__init() super()
 				}
 	self.char_icon 	= {}
 	self.name		= {}
+	self.comm		= {}
 	self.rank		= {}
 	self.dist		= {}
 	self:InitControls()
@@ -80,19 +81,14 @@ function pda_relations_tab:InitControls()
 		end
 	end
 
-	if (db.actor:has_info("axr_has_companion")) then
-		local x = 40
-		self.cnt = axr_companions.list_actor_squad_by_id()
-		local wnd = xml:InitListBox("companion_wnd", self)
-		for i=1,#self.cnt do
-			local itm = xml:InitStatic("companion_itm", self)
-			itm:SetWndPos(vector2():set(x,567))
-			self.char_icon[i] = xml:InitStatic("companion_itm:icon", itm)
-			self.name[i] = xml:InitTextWnd("companion_itm:name", itm)
-			self.rank[i] = xml:InitTextWnd("companion_itm:rank", itm)
-			self.dist[i] = xml:InitTextWnd("companion_itm:dist", itm)
-			x = x + 140
-		end
+	self.companion_listbox = xml:InitListBox("companion_wnd", self)
+	self.companion_listbox:SetItemHeight(140)
+	
+	for row=1,4 do
+		local row_form = ui_companion_row(self,row)
+		row_form:SetWndRect(Frect():set(0, 0, 1024, 768))
+		row_form:SetWndSize(vector2():set(740,140))
+		self.companion_listbox:AddExistingItem(row_form)
 	end
 end
 
@@ -112,18 +108,64 @@ function pda_relations_tab:Reset()
 		end
 	end
 
-	if (self.cnt and db.actor:has_info("axr_has_companion")) then
-		for i=1,#self.cnt do
-			local se_obj = alife():object(self.cnt[i])
-			if (se_obj) then
-				local npc = db.storage[se_obj.id] and db.storage[se_obj.id].object
-				local icon_name = npc and npc:character_icon() or se_obj:character_icon()
-				icon_name = icon_name and icon_name ~= "" and icon_name or "ui\\ui_noise"
-				self.char_icon[i]:InitTexture(icon_name)
-				self.name[i]:SetText(se_obj:character_name())
-				self.rank[i]:SetText(game.translate_string(se_obj:community()).." "..game.translate_string("st_rank_"..ranks.get_se_obj_rank_name(se_obj)).." ("..se_obj:rank()..")")
-				self.dist[i]:SetText(string.format("Distance to: %.2f", se_obj.position:distance_to(db.actor:position())))
-			end
+	local clist = axr_companions.list_actor_squad_by_id()
+	for i=1,24 do 
+		local se_obj = clist[i] and alife():object(clist[i])
+		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
+			local npc = db.storage[se_obj.id] and db.storage[se_obj.id].object
+			local icon_name = npc and npc:character_icon() or se_obj:character_icon()
+			icon_name = icon_name and icon_name ~= "" and icon_name or "ui\\ui_noise"
+			self.char_icon[i]:InitTexture(icon_name)
+			self.name[i]:SetText(se_obj:character_name())
+			self.comm[i]:SetText(game.translate_string(se_obj:community()))
+			self.rank[i]:SetText(game.translate_string("st_rank_"..ranks.get_se_obj_rank_name(se_obj)).." ("..se_obj:rank()..")")
+			self.dist[i]:SetText(string.format("Distance to: %.2f", se_obj.position:distance_to(db.actor:position())))
+		else 
+			self.char_icon[i]:Show(false)
+			self.name[i]:SetText("")
+			self.comm[i]:SetText("")
+			self.rank[i]:SetText("")
+			self.dist[i]:SetText("")
 		end
-	end	
+	end
+end
+---------
+class "ui_companion_row" (CUIListBoxItem)
+function ui_companion_row:__init(owner,row) super(owner,row)
+	self:GetTextItem():SetText("")
+
+	local x = 25
+	local y = 0
+	
+	for i=1,6 do 
+		local n = i+(6*(row-1))
+		
+		owner.char_icon[n] = self:AddIconField(i+10)
+		owner.char_icon[n]:InitTexture("ui\\ui_noise")
+		owner.char_icon[n]:SetStretchTexture(true)
+		owner.char_icon[n]:SetWndSize(vector2():set(64,64))
+		owner.char_icon[n]:SetWndPos(vector2():set(x,y))
+		
+		owner.name[n] = self:AddTextField("",i+11)
+		owner.name[n]:SetFont(GetFontLetterica18Russian())
+		owner.name[n]:SetWndSize(vector2():set(120,22))
+		owner.name[n]:SetWndPos(vector2():set(x,y+65))
+
+		owner.comm[n] = self:AddTextField("",i+12)
+		owner.comm[n]:SetFont(GetFontLetterica16Russian())
+		owner.comm[n]:SetWndSize(vector2():set(120,20))
+		owner.comm[n]:SetWndPos(vector2():set(x,y+90))
+		
+		owner.rank[n] = self:AddTextField("",i+12)
+		owner.rank[n]:SetFont(GetFontLetterica16Russian())
+		owner.rank[n]:SetWndSize(vector2():set(120,20))
+		owner.rank[n]:SetWndPos(vector2():set(x,y+105))
+		
+		owner.dist[n] = self:AddTextField("",i+13)
+		owner.dist[n]:SetFont(GetFontLetterica16Russian())
+		owner.dist[n]:SetWndSize(vector2():set(120,20))
+		owner.dist[n]:SetWndPos(vector2():set(x,y+120))
+		
+		x = x + 120
+	end
 end

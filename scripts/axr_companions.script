@@ -167,6 +167,7 @@ end
 
 function list_actor_squad_by_id()
 	local t = {}
+	--[[
 	for i=1,max_actor_squad_size do
 		local c = utils.load_var(db.actor,"companion_"..i,nil)
 		if (c) then
@@ -175,6 +176,15 @@ function list_actor_squad_by_id()
 				table.insert(t,c)
 			else 
 				utils.save_var(db.actor,"companion_"..i,nil)
+			end
+		end
+	end
+	--]]
+	for id,squad in pairs(companion_squads) do 
+		if (squad and squad.commander_id) then
+			for k in squad:squad_members() do
+				--printf("member %s",k.id)
+				table.insert(t,k.id)
 			end
 		end
 	end
