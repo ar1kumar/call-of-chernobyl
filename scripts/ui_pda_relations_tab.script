@@ -44,37 +44,19 @@ function pda_relations_tab:InitControls()
 		local iobj = xml:InitTextWnd("tab:faction", self.tab)
 		iobj:SetWndPos(vector2():set(x,65))
 		iobj:SetText(game.translate_string(self.list[i]))
-		local actor_rel = relation_registry.community_relation(db.actor:character_community(), self.list[i])
-		--[[
-		if actor_rel >= game_relations.FRIENDS then
-			iobj:SetTextColor(GetARGB(255, 1, 255, 1))
-		elseif actor_rel <= game_relations.ENEMIES then
-			iobj:SetTextColor(GetARGB(255, 255, 1, 1))
-		else
-			iobj:SetTextColor(GetARGB(255, 255, 255, 1))
-		end
-		]]
+		
 		self.relations[i] = {}
 		local y = 60
 		for k=0, #self.list do
 			y = y + c_height
-			
-			local kobj = xml:InitTextWnd("tab:faction", self.tab)
-			kobj:SetWndPos(vector2():set(40,y))
-			if k > 0 then
-				kobj:SetText(game.translate_string(self.list[k]))
-				actor_rel = relation_registry.community_relation(db.actor:character_community(), self.list[k])
-				--[[
-				if actor_rel >= game_relations.FRIENDS then
-					kobj:SetTextColor(GetARGB(255, 1, 255, 1))
-				elseif actor_rel <= game_relations.ENEMIES then
-					kobj:SetTextColor(GetARGB(255, 255, 1, 1))
-				else
-					kobj:SetTextColor(GetARGB(255, 255, 255, 1))
+			if (i == 1) then
+				local kobj = xml:InitTextWnd("tab:faction", self.tab)
+				kobj:SetWndPos(vector2():set(40,y))
+				if k > 0 then
+					kobj:SetText(game.translate_string(self.list[k]))
+				else 
+					kobj:SetText(game.translate_string("st_actor_generic_name"))
 				end
-				]]
-			else 
-				kobj:SetText(game.translate_string("st_actor_generic_name"))
 			end
 			self.relations[i][k] = xml:InitTextWnd("tab:cell",self.tab)
 			self.relations[i][k]:SetWndPos(vector2():set(x,y))
@@ -97,13 +79,18 @@ function pda_relations_tab:Reset()
 		for k=0, #self.list do
 			local comm = self.list[k] or db.actor:character_community()
 			local r_val = relation_registry.community_relation(comm, self.list[i])
-			self.relations[i][k]:SetText(tostring(r_val))
 			if r_val >= game_relations.FRIENDS then
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_friendly"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 1, 255, 1))
 			elseif r_val <= game_relations.ENEMIES then
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_enemy"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 255, 1, 1))
 			else
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_indifferent"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 255, 255, 1))
+			end
+			if (DEV_DEBUG and axr_main.config:r_value("mm_options","enable_debug_hud",1,false) == true) then
+				self.relations[i][k]:SetText(tostring(r_val))
 			end
 		end
 	end
