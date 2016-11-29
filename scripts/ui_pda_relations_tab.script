@@ -13,6 +13,10 @@ function pda_relations_tab:__init() super()
 				"bandit",
 				"monolith"
 				}
+	self.char_icon 	= {}
+	self.name		= {}
+	self.rank		= {}
+	self.dist		= {}
 	self:InitControls()
 	self:Reset()
 end
@@ -20,15 +24,16 @@ end
 function pda_relations_tab:__finalize() end
 
 function pda_relations_tab:InitControls()
-
 	self:SetWndRect(Frect():set(0, 0, 1024, 768))
-	xml = CScriptXmlInit()
+	local xml = CScriptXmlInit()
 	xml:ParseFile("ui_pda_relations_tab.xml")
 	xml:InitFrame("frame",self)
 	xml:InitStatic("center_background", self)
 	self.tab = xml:InitStatic("tab", self)
 	xml:InitStatic("tab:caption", self.tab)
 	
+	xml:InitFrame("companion_frame",self)
+	xml:InitStatic("companion_background", self)
 	
 	self.relations = {}
 	local x = 40
@@ -36,9 +41,10 @@ function pda_relations_tab:InitControls()
 	for i=1, #self.list do
 		x = x + c_width
 		local iobj = xml:InitTextWnd("tab:faction", self.tab)
-		iobj:SetWndPos(vector2():set(x,75))
+		iobj:SetWndPos(vector2():set(x,65))
 		iobj:SetText(game.translate_string(self.list[i]))
-		local actor_rel = relation_registry.community_relation( db.actor:character_community(), self.list[i] )
+		local actor_rel = relation_registry.community_relation(db.actor:character_community(), self.list[i])
+		--[[
 		if actor_rel >= game_relations.FRIENDS then
 			iobj:SetTextColor(GetARGB(255, 1, 255, 1))
 		elseif actor_rel <= game_relations.ENEMIES then
@@ -46,8 +52,9 @@ function pda_relations_tab:InitControls()
 		else
 			iobj:SetTextColor(GetARGB(255, 255, 255, 1))
 		end
+		]]
 		self.relations[i] = {}
-		local y = 75
+		local y = 60
 		for k=0, #self.list do
 			y = y + c_height
 			
@@ -55,7 +62,8 @@ function pda_relations_tab:InitControls()
 			kobj:SetWndPos(vector2():set(40,y))
 			if k > 0 then
 				kobj:SetText(game.translate_string(self.list[k]))
-				actor_rel = relation_registry.community_relation( db.actor:character_community(), self.list[k] )
+				actor_rel = relation_registry.community_relation(db.actor:character_community(), self.list[k])
+				--[[
 				if actor_rel >= game_relations.FRIENDS then
 					kobj:SetTextColor(GetARGB(255, 1, 255, 1))
 				elseif actor_rel <= game_relations.ENEMIES then
@@ -63,11 +71,27 @@ function pda_relations_tab:InitControls()
 				else
 					kobj:SetTextColor(GetARGB(255, 255, 255, 1))
 				end
+				]]
 			else 
 				kobj:SetText(game.translate_string("st_actor_generic_name"))
 			end
 			self.relations[i][k] = xml:InitTextWnd("tab:cell",self.tab)
 			self.relations[i][k]:SetWndPos(vector2():set(x,y))
+		end
+	end
+
+	if (db.actor:has_info("axr_has_companion")) then
+		local x = 40
+		self.cnt = axr_companions.list_actor_squad_by_id()
+		local wnd = xml:InitListBox("companion_wnd", self)
+		for i=1,#self.cnt do
+			local itm = xml:InitStatic("companion_itm", self)
+			itm:SetWndPos(vector2():set(x,567))
+			self.char_icon[i] = xml:InitStatic("companion_itm:icon", itm)
+			self.name[i] = xml:InitTextWnd("companion_itm:name", itm)
+			self.rank[i] = xml:InitTextWnd("companion_itm:rank", itm)
+			self.dist[i] = xml:InitTextWnd("companion_itm:dist", itm)
+			x = x + 140
 		end
 	end
 end
@@ -87,4 +111,19 @@ function pda_relations_tab:Reset()
 			end
 		end
 	end
+
+	if (self.cnt and db.actor:has_info("axr_has_companion")) then
+		for i=1,#self.cnt do
+			local se_obj = alife():object(self.cnt[i])
+			if (se_obj) then
+				local npc = db.storage[se_obj.id] and db.storage[se_obj.id].object
+				local icon_name = npc and npc:character_icon() or se_obj:character_icon()
+				icon_name = icon_name and icon_name ~= "" and icon_name or "ui\\ui_noise"
+				self.char_icon[i]:InitTexture(icon_name)
+				self.name[i]:SetText(se_obj:character_name())
+				self.rank[i]:SetText(game.translate_string(se_obj:community()).." "..game.translate_string("st_rank_"..ranks.get_se_obj_rank_name(se_obj)).." ("..se_obj:rank()..")")
+				self.dist[i]:SetText(string.format("Distance to: %.2f", se_obj.position:distance_to(db.actor:position())))
+			end
+		end
+	end	
 end
