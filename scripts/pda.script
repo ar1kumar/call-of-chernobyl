@@ -10,20 +10,26 @@ dialog_closed = false
 -- PDA Tabs 
 -- It's now possible to add new button tabs to pda*.xml. Then call your CUIScriptWnd
 -- Use ActorMenu.get_pda_menu():SetActiveDialog(CUIWindow) to set the active dialog
--- The passed pdaWnd is same as ActorMenu.get_pda_menu() 
 -- You can use ActorMenu.get_pda_menu():GetActiveSection() to find out active pda tab
-function set_active_subdialog(pdaWnd,section)
+-- your new UI window tab should be a CUIWindow not CUIScriptWnd
+-- because UI is passed as pointer it is mandatory to set active dialog to hardcoded ui like eptTasks on game load
+function set_active_subdialog(section)
+
+	printf("section=%s",section)
 	if (section == "eptTasks") then 
 	
 	elseif (section == "eptRanking") then 
 	
 	elseif (section == "eptLogs") then 
 	
-	--elseif (section == "eptExample") then 
-	--	local ui = ui_example.my_ui()
-	--	if (ui) then
-	--		pdaWnd:SetActiveDialog(ui)
-	--	end
+	elseif (section == "eptRelations") then 
+		if not (ui_pda_relations_tab.UIRelations) then
+			ui_pda_relations_tab.UIRelations = ui_pda_relations_tab.pda_relations_tab()
+			ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
+		else 
+			ui_pda_relations_tab.UIRelations:Reset()
+			ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
+		end
 	end
 end 
 

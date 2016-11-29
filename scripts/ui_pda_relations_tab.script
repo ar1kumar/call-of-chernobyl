@@ -1,0 +1,90 @@
+-- PDA_Custom
+UIRelations = nil
+class "pda_relations_tab" (CUIWindow)
+function pda_relations_tab:__init() super()
+	self.list = {
+				"stalker",
+				"dolg",
+				"freedom",
+				"csky",
+				"ecolog",
+				"killer",
+				"army",
+				"bandit",
+				"monolith"
+				}
+	self:InitControls()
+	self:Reset()
+end
+
+function pda_relations_tab:__finalize() end
+
+function pda_relations_tab:InitControls()
+
+	self:SetWndRect(Frect():set(0, 0, 1024, 768))
+	xml = CScriptXmlInit()
+	xml:ParseFile("ui_pda_relations_tab.xml")
+	xml:InitFrame("frame",self)
+	xml:InitStatic("center_background", self)
+	self.tab = xml:InitStatic("tab", self)
+	xml:InitStatic("tab:caption", self.tab)
+	
+	
+	self.relations = {}
+	local x = 40
+	local c_width, c_height = 75, 35
+	for i=1, #self.list do
+		x = x + c_width
+		local iobj = xml:InitTextWnd("tab:faction", self.tab)
+		iobj:SetWndPos(vector2():set(x,75))
+		iobj:SetText(self.list[i])
+		local actor_rel = relation_registry.community_relation( db.actor:character_community(), self.list[i] )
+		if actor_rel >= game_relations.FRIENDS then
+			iobj:SetTextColor(GetARGB(255, 1, 255, 1))
+		elseif actor_rel <= game_relations.ENEMIES then
+			iobj:SetTextColor(GetARGB(255, 255, 1, 1))
+		else
+			iobj:SetTextColor(GetARGB(255, 255, 255, 1))
+		end
+		self.relations[i] = {}
+		local y = 75
+		for k=0, #self.list do
+			y = y + c_height
+			
+			local kobj = xml:InitTextWnd("tab:faction", self.tab)
+			kobj:SetWndPos(vector2():set(40,y))
+			if k > 0 then
+				kobj:SetText(self.list[k])
+				actor_rel = relation_registry.community_relation( db.actor:character_community(), self.list[k] )
+				if actor_rel >= game_relations.FRIENDS then
+					kobj:SetTextColor(GetARGB(255, 1, 255, 1))
+				elseif actor_rel <= game_relations.ENEMIES then
+					kobj:SetTextColor(GetARGB(255, 255, 1, 1))
+				else
+					kobj:SetTextColor(GetARGB(255, 255, 255, 1))
+				end
+			else 
+				kobj:SetText("actor")
+			end
+			self.relations[i][k] = xml:InitTextWnd("tab:cell",self.tab)
+			self.relations[i][k]:SetWndPos(vector2():set(x,y))
+		end
+	end
+end
+
+function pda_relations_tab:Reset()
+	for i=1, #self.list do
+		for k=0, #self.list do
+			local comm = self.list[k] or db.actor:character_community()
+			local r_val = relation_registry.community_relation(comm, self.list[i])
+			self.relations[i][k]:SetText(tostring(r_val))
+			if r_val >= game_relations.FRIENDS then
+				self.relations[i][k]:SetTextColor(GetARGB(255, 1, 255, 1))
+			elseif r_val <= game_relations.ENEMIES then
+				self.relations[i][k]:SetTextColor(GetARGB(255, 255, 1, 1))
+			else
+				self.relations[i][k]:SetTextColor(GetARGB(255, 255, 255, 1))
+			end
+		end
+	end
+end
