@@ -37,7 +37,7 @@ function pda_relations_tab:InitControls()
 		x = x + c_width
 		local iobj = xml:InitTextWnd("tab:faction", self.tab)
 		iobj:SetWndPos(vector2():set(x,75))
-		iobj:SetText(self.list[i])
+		iobj:SetText(game.translate_string(self.list[i]))
 		local actor_rel = relation_registry.community_relation( db.actor:character_community(), self.list[i] )
 		if actor_rel >= game_relations.FRIENDS then
 			iobj:SetTextColor(GetARGB(255, 1, 255, 1))
@@ -54,7 +54,7 @@ function pda_relations_tab:InitControls()
 			local kobj = xml:InitTextWnd("tab:faction", self.tab)
 			kobj:SetWndPos(vector2():set(40,y))
 			if k > 0 then
-				kobj:SetText(self.list[k])
+				kobj:SetText(game.translate_string(self.list[k]))
 				actor_rel = relation_registry.community_relation( db.actor:character_community(), self.list[k] )
 				if actor_rel >= game_relations.FRIENDS then
 					kobj:SetTextColor(GetARGB(255, 1, 255, 1))
@@ -64,7 +64,7 @@ function pda_relations_tab:InitControls()
 					kobj:SetTextColor(GetARGB(255, 255, 255, 1))
 				end
 			else 
-				kobj:SetText("actor")
+				kobj:SetText(game.translate_string("st_actor_generic_name"))
 			end
 			self.relations[i][k] = xml:InitTextWnd("tab:cell",self.tab)
 			self.relations[i][k]:SetWndPos(vector2():set(x,y))
