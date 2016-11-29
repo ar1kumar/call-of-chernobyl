@@ -83,14 +83,17 @@ function pda_relations_tab:Reset()
 		for k=0, #self.list do
 			local comm = self.list[k] or db.actor:character_community()
 			local r_val = relation_registry.community_relation(comm, self.list[i])
-			self.relations[i][k]:SetText(tostring(r_val))
 			if r_val >= game_relations.FRIENDS then
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_friendly"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 1, 255, 1))
 			elseif r_val <= game_relations.ENEMIES then
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_enemy"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 255, 1, 1))
 			else
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_indifferent"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 255, 255, 1))
 			end
+--			self.relations[i][k]:SetText(tostring(r_val))
 		end
 	end
 
