@@ -39,7 +39,7 @@ function pda_relations_tab:InitControls()
 	local xml = CScriptXmlInit()
 	xml:ParseFile("pda_relations.xml")
 	
-	xml:InitFrame("frame",self)
+	local frame = xml:InitFrame("frame",self)
 	xml:InitStatic("center_background", self)
 	self.tab = xml:InitStatic("tab", self)
 	xml:InitStatic("tab:caption", self.tab)
@@ -92,11 +92,10 @@ function pda_relations_tab:InitControls()
 	-- Hint Window
 	self.hint_wnd = xml:InitFrame("hint_wnd:background",self)
 	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text", self.hint_wnd)
-	
-	--self.hint_wnd:SetColor(GetARGB(255,0,0,0))
 end
 
 function pda_relations_tab:Update()
+	CUIScriptWnd.Update(self)
 	for i=1, 20 do -- should be row*col from ui_companion_row
 		if (self.char_icon[i]:IsShown()) then 
 			local pos = GetCursorPosition()
@@ -256,7 +255,7 @@ function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 	for i=1,5 do 
 		local n = i+(5*(row-1))
 		
-		owner.hint[n] = "This is a test\n\nHint my dude"
+		owner.hint[n] = ""
 		
 		owner.char_icon[n] = self:AddIconField(i+10)
 		owner.char_icon[n]:InitTexture("ui\\ui_noise")
