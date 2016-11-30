@@ -25,17 +25,12 @@ end
 function pda_relations_tab:__finalize() end
 
 function pda_relations_tab:InitControls()
-	local aspectRatio = 1
-	if(device().width / device().height > (1024 / 768 + 0.01)) then
-		aspectRatio = 0.8
-	end
-
 	self:SetWndRect(Frect():set(0, 0, 1024, 768))
 	local xml = CScriptXmlInit()
-	if (aspectRatio == 1) then
-		xml:ParseFile("pda_relations.xml")
-	else
+	if (WIDESCREEN) then
 		xml:ParseFile("pda_relations_16.xml")
+	else
+		xml:ParseFile("pda_relations.xml")
 	end
 	xml:InitFrame("frame",self)
 	xml:InitStatic("center_background", self)
@@ -46,8 +41,9 @@ function pda_relations_tab:InitControls()
 	xml:InitStatic("companion_background", self)
 	
 	self.relations = {}
-	local x = 40
-	local c_width, c_height = 75, 35
+	local x = WIDESCREEN and 40 or 80
+	local c_width = WIDESCREEN and 75 or 150
+	local c_height = WIDESCREEN and 35 or 70
 	for i=1, #self.list do
 		x = x + c_width
 		local iobj = xml:InitTextWnd("tab:faction", self.tab)
