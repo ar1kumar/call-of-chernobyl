@@ -41,8 +41,12 @@ function pda_relations_tab:InitControls()
 	xml:InitStatic("companion_background", self)
 
 	self.relations = {}
-	local x = 40
-	local c_width, c_height = 75, 35
+	
+	local is_widescreen = WIDESCREEN()
+	local x = is_widescreen and 40 or 80
+	local c_width = is_widescreen and 75 or 150
+	local c_height = is_widescreen and 35 or 70
+	
 	for i=1, #self.list do
 		x = x + c_width
 		local iobj = xml:InitTextWnd("tab:faction", self.tab)
