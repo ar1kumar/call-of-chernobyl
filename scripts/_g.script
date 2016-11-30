@@ -16,7 +16,9 @@ end
 
 GAME_VERSION = "1.4.17"
 
-WIDESCREEN = (device().width / device().height > (1024 / 768 + 0.01))
+WIDESCREEN = function()
+	(device().width / device().height > (1024 / 768 + 0.01))
+end
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
