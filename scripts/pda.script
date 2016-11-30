@@ -14,8 +14,7 @@ dialog_closed = false
 -- your new UI window tab should be a CUIWindow not CUIScriptWnd
 -- because UI is passed as pointer it is mandatory to set active dialog to hardcoded ui like eptTasks on game load
 function set_active_subdialog(section)
-
-	printf("section=%s",section)
+	--printf("section=%s",section)
 	if (section == "eptTasks") then 
 	
 	elseif (section == "eptRanking") then 
@@ -25,11 +24,12 @@ function set_active_subdialog(section)
 	elseif (section == "eptRelations") then 
 		if not (ui_pda_relations_tab.UIRelations) then
 			ui_pda_relations_tab.UIRelations = ui_pda_relations_tab.pda_relations_tab()
-			ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
-		else 
+			--ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
+		else
 			ui_pda_relations_tab.UIRelations:Reset()
-			ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
+			--ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
 		end
+		return ui_pda_relations_tab.UIRelations
 	end
 end 
 
