@@ -3,16 +3,30 @@ UIRelations = nil
 class "pda_relations_tab" (CUIScriptWnd)
 function pda_relations_tab:__init() super()
 	self.list = {
-				"stalker",
-				"dolg",
-				"freedom",
-				"csky",
-				"ecolog",
-				"killer",
-				"army",
-				"bandit",
-				"monolith"
-				}
+		"stalker",
+		"dolg",
+		"freedom",
+		"csky",
+		"ecolog",
+		"killer",
+		"army",
+		"bandit",
+		"monolith"
+	}
+	self.companion_infos = {
+		-- movement mode
+		["npcx_beh_wait"] = "Wait",
+		["npcx_beh_follow"] = "Follow",
+		-- movement behaviour
+		["npcx_beh_hide_in_cover"] = "Take Cover",
+		["npcx_beh_patrol_mode"] = "Patrol",
+		-- non combat behaviour
+		["npcx_beh_substate_stealth"] = "Stealth",
+		["npcx_beh_distance_far"] = "Keep Far Distance",
+		["npcx_beh_gather_items"] = "Can Gather Items",
+		["npcx_beh_loot_corpses"] = "Can Loot Corpses"
+	}
+
 	self.char_icon 		= {}
 	self.name			= {}
 	self.comm			= {}
@@ -20,11 +34,17 @@ function pda_relations_tab:__init() super()
 	self.dist			= {}
 	self.leader_icon 	= {}
 	self.health		 	= {}
+	self.hint 			= {}
+	
 	self:InitControls()
 	self:Reset()
 end
 
 function pda_relations_tab:__finalize() end
+
+local function pos_in_rect(p,r)
+	return (p.x >= r.x1) and (p.x <= r.x2) and (p.y >= r.y1) and (p.y <= r.y2)
+end 
 
 function pda_relations_tab:InitControls()
 	self:SetWndRect(Frect():set(0, 0, 1024, 768))
@@ -37,9 +57,7 @@ function pda_relations_tab:InitControls()
 	self.tab = xml:InitStatic("tab", self)
 	xml:InitStatic("tab:caption", self.tab)
 	
-	xml:InitFrame("companion_frame",self)
-	xml:InitStatic("companion_background", self)
-
+	-- Relation Matrix
 	self.relations = {}
 	
 	local is_widescreen = WIDESCREEN()
@@ -71,16 +89,49 @@ function pda_relations_tab:InitControls()
 		end
 	end
 
+	-- Companion ListView
+	xml:InitFrame("companion_frame",self)
+	xml:InitStatic("companion_background", self)
+	
 	self.companion_listbox = xml:InitListBox("companion_wnd", self)
 	self.companion_listbox:SetItemHeight(140)
 	
 	for row=1,4 do
 		local row_form = ui_companion_row(self,row,xml)
-		--row_form:SetWndRect(Frect():set(0, 0, 1024, 768))
 		row_form:SetWndSize(vector2():set(740,140))
 		self.companion_listbox:AddExistingItem(row_form)
 	end
+	
+	-- Hint Window
+	self.hint_wnd = xml:InitFrame("hint_wnd:background",self)
+	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text", self.hint_wnd)
+	
+	--self.hint_wnd:SetColor(GetARGB(255,0,0,0))
 end
+
+function pda_relations_tab:Update()
+	for i=1, 20 do -- should be row*col from ui_companion_row
+		if (self.char_icon[i]:IsShown()) then 
+			local pos = GetCursorPosition()
+			local rect = Frect():set(0,0,0,0)
+			self.char_icon[i]:GetAbsoluteRect(rect)
+
+			if (pos_in_rect(pos,rect)) then 
+				self.hint_wnd_text:SetText(self.hint[i])
+				self.hint_wnd_text:AdjustHeightToText()
+				self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
+				
+				pos.y = pos.y - self.hint_wnd:GetHeight()
+				pos.x = pos.x - self.hint_wnd:GetWidth()
+				self.hint_wnd:SetWndPos(pos)
+
+				--FitInRect(self.background,self.rect,0,0)
+				return
+			end
+		end
+	end
+	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
+end 
 
 function pda_relations_tab:Reset()
 	for i=1, #self.list do
@@ -146,6 +197,54 @@ function pda_relations_tab:Reset()
 					self.health[i]:SetTextColor(GetARGB(200, 255, 255, 255))
 				end
 			end
+			
+			-- hint 
+			local state_str = "%c[255,215,215,215]States:%c[default] \\n"
+			
+			if (alife():has_info(se_obj.id,"npcx_beh_ignore_actor_enemies")) then 
+				state_str = state_str .. game.translate_string("st_set_companion_to_attack_only_actor_combat_enemy_state") .. "\\n"
+			elseif (alife():has_info(se_obj.id,"npcx_beh_ignore_combat")) then 
+				state_str = state_str .. game.translate_string("st_set_companion_to_ignore_combat_state") .. "\\n"
+			else 
+				state_str = state_str .. game.translate_string("st_set_companion_to_attack_state") .. "\\n"
+			end
+			
+			if (alife():has_info(se_obj.id,"npcx_beh_substate_stealth")) then 
+				state_str = state_str .. game.translate_string("st_set_companion_to_stealth_state") .. "\\n"
+			end 
+			
+			if (alife():has_info(se_obj.id,"npcx_beh_wait")) then 
+				state_str = state_str .. game.translate_string("st_set_companion_to_wait_state") .. "\\n"
+			elseif (alife():has_info(se_obj.id,"npcx_beh_patrol_mode")) then 
+				state_str = state_str .. game.translate_string("st_set_companion_to_patrol_state") .. "\\n"
+			else 
+				state_str = state_str .. game.translate_string("st_set_companion_to_follow_state") .. "\\n"
+			end
+
+			if (alife():has_info(se_obj.id,"npcx_beh_gather_items")) then 
+				state_str = state_str .. game.translate_string("st_set_companion_to_loot_corpse_state") .. "\\n"
+			end 
+			
+			if (alife():has_info(se_obj.id,"npcx_beh_loot_corpses")) then 
+				state_str = state_str .. game.translate_string("st_set_companion_to_loot_items_state") .. "\\n"
+			end		
+			
+			state_str = state_str .. " \\n%c[255,215,215,215]Stats:%c[default] \\n"
+			
+			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+			if (m_data) then 
+				if (m_data.stalkers_killed) then 
+					state_str = state_str .. game.translate_string("st_stalkers_killed") .. ": " .. tostring(m_data.stalkers_killed) .. "\\n"
+				end
+				if (m_data.mutants_killed) then 
+					state_str = state_str .. game.translate_string("st_mutants_killed") .. ": " .. tostring(m_data.mutants_killed) .. "\\n"
+				end
+				if (m_data.artefacts_found) then 
+					state_str = state_str .. game.translate_string("st_artefacts_found") .. ": " .. tostring(m_data.artefacts_found) .. "\\n"
+				end				
+			end
+			
+			self.hint[i] = state_str
 		else 
 			self.char_icon[i]:Show(false)
 			self.leader_icon[i]:Show(false)
@@ -167,6 +266,8 @@ function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 	
 	for i=1,5 do 
 		local n = i+(5*(row-1))
+		
+		owner.hint[n] = "This is a test\n\nHint my dude"
 		
 		owner.char_icon[n] = self:AddIconField(i+10)
 		owner.char_icon[n]:InitTexture("ui\\ui_noise")
