@@ -501,11 +501,11 @@ function sim_squad_scripted:check_invulnerability()
 		return
 	end
 	local invulnerability = xr_logic.pick_section_from_condlist(db.actor, self, self.invulnerability) == "true"
-	for k in self:squad_members() do
-		local npc_st = db.storage[k.id]
-		local npc = npc_st and npc_st.ini and npc_st.active_section and npc_st.object or nil
-		if (npc) then
-			if npc:invulnerable() ~= invulnerabilty and npc_st.ini:r_bool_ex(npc_st.active_section,"invulnerable",false) then
+	if (invulnerability) then
+		for k in self:squad_members() do
+			local npc_st = db.storage[k.id]
+			local npc = npc_st and npc_st.object
+			if (npc) then
 				npc:invulnerable(invulnerability)
 			end
 		end
