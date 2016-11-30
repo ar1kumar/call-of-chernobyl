@@ -25,9 +25,18 @@ end
 function pda_relations_tab:__finalize() end
 
 function pda_relations_tab:InitControls()
+	local aspectRatio = 1
+	if(device().width / device().height > (1024 / 768 + 0.01)) then
+		aspectRatio = 0.8
+	end
+
 	self:SetWndRect(Frect():set(0, 0, 1024, 768))
 	local xml = CScriptXmlInit()
-	xml:ParseFile("ui_pda_relations_tab.xml")
+	if (aspectRatio == 1) then
+		xml:ParseFile("pda_relations.xml")
+	else
+		xml:ParseFile("pda_relations_16.xml")
+	end
 	xml:InitFrame("frame",self)
 	xml:InitStatic("center_background", self)
 	self.tab = xml:InitStatic("tab", self)
