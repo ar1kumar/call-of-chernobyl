@@ -1,3 +1,5 @@
+local mouse_over_id = nil
+
 -- PDA_Custom
 UIRelations = nil
 class "pda_relations_tab" (CUIScriptWnd)
@@ -14,14 +16,9 @@ function pda_relations_tab:__init() super()
 		"monolith"
 	}
 
-	self.char_icon 		= {}
-	self.name			= {}
-	self.comm			= {}
-	self.rank			= {}
-	self.dist			= {}
-	self.leader_icon 	= {}
-	self.health		 	= {}
-	self.hint 			= {}
+	self.companion_info = {}
+	self.to_text		= true
+	self._tmr 			= time_global()
 	
 	self:InitControls()
 	self:Reset()
@@ -35,15 +32,19 @@ end
 
 function pda_relations_tab:InitControls()
 	self:SetWndRect(Frect():set(0, 0, 1024, 768))
-	
+
 	local xml = CScriptXmlInit()
 	xml:ParseFile("pda_relations.xml")
-	
-	local frame = xml:InitFrame("frame",self)
+
+	xml:InitFrame("frame",self)
 	xml:InitStatic("center_background", self)
 	self.tab = xml:InitStatic("tab", self)
 	xml:InitStatic("tab:caption", self.tab)
 	
+	self.btn = xml:Init3tButton("btn_to_text", self)
+	self:Register(self.btn, "btn")
+	self:AddCallback("btn", ui_events.BUTTON_CLICKED, self.btn_to_text, self)
+
 	-- Relation Matrix
 	self.relations = {}
 	
@@ -51,7 +52,7 @@ function pda_relations_tab:InitControls()
 	local x = is_widescreen and 40 or 55
 	local c_width = is_widescreen and 75 or 90
 	local c_height = 35
-	
+
 	for i=1, #self.list do
 		x = x + c_width
 		local iobj = xml:InitTextWnd("tab:faction", self.tab)
@@ -79,9 +80,12 @@ function pda_relations_tab:InitControls()
 	-- Companion ListView
 	xml:InitFrame("companion_frame",self)
 	xml:InitStatic("companion_background", self)
-	
+
 	self.companion_listbox = xml:InitListBox("companion_wnd", self)
 	self.companion_listbox:SetItemHeight(140)
+	
+	self.auto_chk = xml:InitCheck("auto_check",self)
+	self.auto_chk:SetCheck(false)
 	
 	for row=1,4 do
 		local row_form = ui_companion_row(self,row,xml)
@@ -94,16 +98,36 @@ function pda_relations_tab:InitControls()
 	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text", self.hint_wnd)
 end
 
+function pda_relations_tab:btn_to_text()
+	self.to_text = not self.to_text
+	if self.to_text then
+		self.btn:TextControl():SetText(game.translate_string("pda_table_value_off"))
+	else
+		self.btn:TextControl():SetText(game.translate_string("pda_table_value_on"))
+	end
+	
+	self:Reset()
+end
+
 function pda_relations_tab:Update()
 	CUIScriptWnd.Update(self)
+	-- option to auto update values
+	if self.auto_chk:GetCheck() then
+		local tg = time_global()
+		if self._tmr < tg then
+			self._tmr = tg + 2000
+			self:autoupdate()
+		end
+	end
+
 	for i=1, 20 do -- should be row*col from ui_companion_row
-		if (self.char_icon[i]:IsShown()) then 
+		if (self.companion_info[i].icon_wnd:IsShown()) then 
 			local pos = GetCursorPosition()
 			local rect = Frect():set(0,0,0,0)
-			self.char_icon[i]:GetAbsoluteRect(rect)
+			self.companion_info[i].icon_wnd:GetAbsoluteRect(rect)
 
 			if (pos_in_rect(pos,rect)) then 
-				self.hint_wnd_text:SetText(self.hint[i])
+				self.hint_wnd_text:SetText(self.companion_info[i].hint)
 				self.hint_wnd_text:AdjustHeightToText()
 				self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
 				
@@ -112,12 +136,16 @@ function pda_relations_tab:Update()
 				self.hint_wnd:SetWndPos(pos)
 
 				--FitInRect(self.background,self.rect,0,0)
+				
+				mouse_over_id = i
+				
 				return
 			end
 		end
 	end
+	mouse_over_id = nil
 	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
-end 
+end
 
 function pda_relations_tab:Reset()
 	for i=1, #self.list do
@@ -125,63 +153,72 @@ function pda_relations_tab:Reset()
 			local comm = self.list[k] or db.actor:character_community()
 			local r_val = relation_registry.community_relation(comm, self.list[i])
 			if r_val >= game_relations.FRIENDS then
-				self.relations[i][k]:SetText(game.translate_string("st_goodwill_friendly"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 1, 255, 1))
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_friendly"))
+
 			elseif r_val <= game_relations.ENEMIES then
-				self.relations[i][k]:SetText(game.translate_string("st_goodwill_enemy"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 255, 1, 1))
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_enemy"))
+
 			else
-				self.relations[i][k]:SetText(game.translate_string("st_goodwill_indifferent"))
 				self.relations[i][k]:SetTextColor(GetARGB(255, 255, 255, 1))
+				self.relations[i][k]:SetText(game.translate_string("st_goodwill_indifferent"))
+
 			end
-			if (DEV_DEBUG and axr_main.config:r_value("mm_options","enable_debug_hud",1,false) == true) then
-				self.relations[i][k]:SetText(tostring(r_val))
-			end
+			--if xrs_debug_tools.feature_is_active then self.relations[i][k]:SetText(tostring(r_val)) end
+
+			if not (self.to_text) then self.relations[i][k]:SetText(tostring(r_val)) end
+
 		end
 	end
 
+	self:autoupdate()
+	
+end
+
+function pda_relations_tab:autoupdate()
 	local clist = axr_companions.list_actor_squad_by_id()
 	for i=1,20 do -- should be row*col from ui_companion_row
 		local se_obj = clist[i] and alife():object(clist[i])
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
 			local npc = db.storage[se_obj.id] and db.storage[se_obj.id].object
-			
+
 			local icon_name = npc and npc:character_icon() or se_obj:character_icon()
 			icon_name = icon_name and icon_name ~= "" and icon_name or "ui\\ui_noise"
-			self.char_icon[i]:InitTexture(icon_name)
-			self.char_icon[i]:Show(true)
+			self.companion_info[i].icon_wnd:InitTexture(icon_name)
+			self.companion_info[i].icon_wnd:Show(true)
 			
-			self.name[i]:SetText(se_obj:character_name())
-			self.comm[i]:SetText(game.translate_string(se_obj:community()))
-			self.rank[i]:SetText(game.translate_string("st_rank_"..ranks.get_se_obj_rank_name(se_obj)).." ("..se_obj:rank()..")")
-			self.dist[i]:SetText(string.format("Distance to: %.2f", se_obj.position:distance_to(db.actor:position())))
-			
+			self.companion_info[i].name_wnd:SetText(se_obj:character_name())
+			self.companion_info[i].comm_wnd:SetText(game.translate_string(se_obj:community()))
+			self.companion_info[i].rank_wnd:SetText(game.translate_string("st_rank_"..ranks.get_se_obj_rank_name(se_obj)).." ("..se_obj:rank()..")")
+			self.companion_info[i].dist_wnd:SetText(string.format("Distance to: %.2f", se_obj.position:distance_to(db.actor:position())))
+
 			-- leader and relation status
 			local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife():object(se_obj.group_id)
 			if (squad and squad:commander_id() == se_obj.id) then
-				self.leader_icon[i]:Show(true)
+				self.companion_info[i].leader_wnd:Show(true)
 				if (npc) then 
 					local rel = npc:relation(db.actor)
 					if (rel == game_object.friend) then 
-						self.leader_icon[i]:SetTextureColor(GetARGB(255,0,255,0))
+						self.companion_info[i].leader_wnd:SetTextureColor(GetARGB(255,0,255,0))
 					elseif (rel == game_object.neutral) then
-						self.leader_icon[i]:SetTextureColor(GetARGB(255,193,193,193))
+						self.companion_info[i].leader_wnd:SetTextureColor(GetARGB(255,193,193,193))
 					end
 				end
 			else
-				self.leader_icon[i]:Show(false)
+				self.companion_info[i].leader_wnd:Show(false)
 			end
 			
 			-- health status
 			if (npc) then 
 				local hp = math.floor(npc.health*100)
-				self.health[i]:SetText(hp.."%")
+				self.companion_info[i].health_wnd:SetText(hp.."%")
 				if (hp > 70) then 
-					self.health[i]:SetTextColor(GetARGB(200, 0, 255, 0))
+					self.companion_info[i].health_wnd:SetTextColor(GetARGB(200, 0, 255, 0))
 				elseif (hp < 30) then
-					self.health[i]:SetTextColor(GetARGB(200, 255, 0, 0))
+					self.companion_info[i].health_wnd:SetTextColor(GetARGB(200, 255, 0, 0))
 				else
-					self.health[i]:SetTextColor(GetARGB(200, 255, 255, 255))
+					self.companion_info[i].health_wnd:SetTextColor(GetARGB(200, 255, 255, 255))
 				end
 			end
 			
@@ -207,6 +244,7 @@ function pda_relations_tab:Reset()
 			else 
 				state_str = state_str .. game.translate_string("st_set_companion_to_follow_state") .. "\\n"
 			end
+	
 
 			if (alife():has_info(se_obj.id,"npcx_beh_gather_items")) then 
 				state_str = state_str .. game.translate_string("st_set_companion_to_loot_corpse_state") .. "\\n"
@@ -231,15 +269,15 @@ function pda_relations_tab:Reset()
 				end				
 			end
 			
-			self.hint[i] = state_str
+			self.companion_info[i].hint = state_str
 		else 
-			self.char_icon[i]:Show(false)
-			self.leader_icon[i]:Show(false)
-			self.health[i]:SetText("")
-			self.name[i]:SetText("")
-			self.comm[i]:SetText("")
-			self.rank[i]:SetText("")
-			self.dist[i]:SetText("")
+			self.companion_info[i].icon_wnd:Show(false)
+			self.companion_info[i].leader_wnd:Show(false)
+			self.companion_info[i].health_wnd:SetText("")
+			self.companion_info[i].name_wnd:SetText("")
+			self.companion_info[i].comm_wnd:SetText("")
+			self.companion_info[i].rank_wnd:SetText("")
+			self.companion_info[i].dist_wnd:SetText("")
 		end
 	end
 end
@@ -255,45 +293,48 @@ function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 	for i=1,5 do 
 		local n = i+(5*(row-1))
 		
-		owner.hint[n] = ""
+		owner.companion_info[n] = {
+			["id"]				= nil,
+			["icon_wnd"] 		= self:AddIconField(i+10),
+			["leader_wnd"] 		= self:AddIconField(i+11),
+			["name_wnd"]		= self:AddTextField("",i+12),
+			["comm_wnd"]		= self:AddTextField("",i+13),
+			["rank_wnd"]		= self:AddTextField("",i+14),
+			["health_wnd"]		= self:AddTextField("",i+15),
+			["dist_wnd"]		= self:AddTextField("",i+16),
+			["hint"]			= ""
+		}
 		
-		owner.char_icon[n] = self:AddIconField(i+10)
-		owner.char_icon[n]:InitTexture("ui\\ui_noise")
-		owner.char_icon[n]:SetStretchTexture(true)
-		owner.char_icon[n]:SetWndSize(vector2():set(64,64))
-		owner.char_icon[n]:SetWndPos(vector2():set(x,y))
+		owner.companion_info[n].icon_wnd:InitTexture("ui\\ui_noise")
+		owner.companion_info[n].icon_wnd:SetStretchTexture(true)
+		owner.companion_info[n].icon_wnd:SetWndSize(vector2():set(64,64))
+		owner.companion_info[n].icon_wnd:SetWndPos(vector2():set(x,y))
 		
-		owner.leader_icon[n] = self:AddIconField(i+11)
-		owner.leader_icon[n]:InitTexture("ui_minimap_squad_leader")
-		owner.leader_icon[n]:SetStretchTexture(true)
-		owner.leader_icon[n]:SetWndSize(vector2():set(10,10))
-		owner.leader_icon[n]:SetWndPos(vector2():set(x,y))
-		
-		owner.health[n] = self:AddTextField("",i+12)
-		owner.health[n]:SetFont(GetFontSmall())
-		owner.health[n]:SetWndSize(vector2():set(50,10))
-		owner.health[n]:SetWndPos(vector2():set(x+50,y+55))
+		owner.companion_info[n].leader_wnd:InitTexture("ui_minimap_squad_leader")
+		owner.companion_info[n].leader_wnd:SetStretchTexture(true)
+		owner.companion_info[n].leader_wnd:SetWndSize(vector2():set(10,10))
+		owner.companion_info[n].leader_wnd:SetWndPos(vector2():set(x,y))
 
-		owner.name[n] = self:AddTextField("",i+13)
-		owner.name[n]:SetFont(GetFontLetterica18Russian())
-		owner.name[n]:SetWndSize(vector2():set(120,22))
-		owner.name[n]:SetWndPos(vector2():set(x,y+65))
+		owner.companion_info[n].name_wnd:SetFont(GetFontLetterica18Russian())
+		owner.companion_info[n].name_wnd:SetWndSize(vector2():set(120,22))
+		owner.companion_info[n].name_wnd:SetWndPos(vector2():set(x,y+65))
 
-		owner.comm[n] = self:AddTextField("",i+14)
-		owner.comm[n]:SetFont(GetFontLetterica16Russian())
-		owner.comm[n]:SetWndSize(vector2():set(120,20))
-		owner.comm[n]:SetWndPos(vector2():set(x,y+90))
+		owner.companion_info[n].comm_wnd:SetFont(GetFontLetterica16Russian())
+		owner.companion_info[n].comm_wnd:SetWndSize(vector2():set(120,20))
+		owner.companion_info[n].comm_wnd:SetWndPos(vector2():set(x,y+90))
 		
-		owner.rank[n] = self:AddTextField("",i+15)
-		owner.rank[n]:SetFont(GetFontLetterica16Russian())
-		owner.rank[n]:SetWndSize(vector2():set(120,20))
-		owner.rank[n]:SetWndPos(vector2():set(x,y+105))
+		owner.companion_info[n].rank_wnd:SetFont(GetFontLetterica16Russian())
+		owner.companion_info[n].rank_wnd:SetWndSize(vector2():set(120,20))
+		owner.companion_info[n].rank_wnd:SetWndPos(vector2():set(x,y+105))
 		
-		owner.dist[n] = self:AddTextField("",i+16)
-		owner.dist[n]:SetFont(GetFontLetterica16Russian())
-		owner.dist[n]:SetWndSize(vector2():set(120,20))
-		owner.dist[n]:SetWndPos(vector2():set(x,y+120))
-	
+		owner.companion_info[n].health_wnd:SetFont(GetFontSmall())
+		owner.companion_info[n].health_wnd:SetWndSize(vector2():set(50,10))
+		owner.companion_info[n].health_wnd:SetWndPos(vector2():set(x+50,y+55))
+
+		owner.companion_info[n].dist_wnd:SetFont(GetFontLetterica16Russian())
+		owner.companion_info[n].dist_wnd:SetWndSize(vector2():set(120,20))
+		owner.companion_info[n].dist_wnd:SetWndPos(vector2():set(x,y+120))
+
 		x = x + (is_widescreen and 150 or 180)
 	end
 end
