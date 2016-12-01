@@ -59,9 +59,15 @@ function init(self,npc,id)
 					[3] = function()
 						axr_companions.set_companion_squad_move_mode(1,npc,squad)
 						self:Reset()
-					end				
+					end,
+					[4] = function()
+						local mode = npc:has_info("npcx_beh_substate_stealth") and 0 or 1
+						axr_companions.set_companion_squad_stealth_mode(mode,npc,squad)
+						self:Reset()
+					end
 				}
-				ui_dyn_msg_box.context_menu(self,pos,action_list_4,"st_pda_context_opt_0","st_pda_context_opt_cmd_2_1","st_pda_context_opt_cmd_2_2")
+				local st_stealth = npc:has_info("npcx_beh_substate_stealth") and "st_pda_context_opt_cmd_2_3_off" or "st_pda_context_opt_cmd_2_3_on"
+				ui_dyn_msg_box.context_menu(self,pos,action_list_4,"st_pda_context_opt_0","st_pda_context_opt_cmd_2_1","st_pda_context_opt_cmd_2_2",st_stealth)
 			end,
 			[4] = function()
 				-- GATHER ITEMS
