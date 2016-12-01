@@ -598,14 +598,12 @@ function set_companion_squad_combat_mode(mode,npc,squad)
 	local f = this[t[mode]]
 	if (f) then 
 		squad = squad or get_object_squad(npc)
-		for id,squad in pairs(companion_squads) do 
-			if (squad and squad.commander_id) then
-				for k in squad:squad_members() do
-					if not (xrs_kill_wounded.hostage_list[k.id]) then
-						local member = db.storage[k.id] and db.storage[k.id].object
-						if (member and member:alive()) then
-							f(member)
-						end
+		if (squad and squad.commander_id) then
+			for k in squad:squad_members() do
+				if not (xrs_kill_wounded.hostage_list[k.id]) then
+					local member = db.storage[k.id] and db.storage[k.id].object
+					if (member and member:alive()) then
+						f(member)
 					end
 				end
 			end
@@ -615,17 +613,15 @@ end
 
 function set_companion_squad_stealth_mode(mode,npc,squad)
 	squad = squad or get_object_squad(npc)
-	for id,squad in pairs(companion_squads) do 
-		if (squad and squad.commander_id) then
-			for k in squad:squad_members() do
-				if not (xrs_kill_wounded.hostage_list[k.id]) then
-					local member = db.storage[k.id] and db.storage[k.id].object
-					if (member and member:alive()) then
-						if (mode == 1) then
-							member:give_info_portion("npcx_beh_substate_stealth")
-						else 
-							member:disable_info_portion("npcx_beh_substate_stealth")
-						end
+	if (squad and squad.commander_id) then
+		for k in squad:squad_members() do
+			if not (xrs_kill_wounded.hostage_list[k.id]) then
+				local member = db.storage[k.id] and db.storage[k.id].object
+				if (member and member:alive()) then
+					if (mode == 1) then
+						member:give_info_portion("npcx_beh_substate_stealth")
+					else 
+						member:disable_info_portion("npcx_beh_substate_stealth")
 					end
 				end
 			end
