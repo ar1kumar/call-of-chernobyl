@@ -270,6 +270,8 @@ function remove_from_actor_squad(npc)
 		return 
 	end
 	
+	companion_squads[squad.id] = nil
+	
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion",nil)
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss",nil)
 	utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",nil)
