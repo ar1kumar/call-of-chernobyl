@@ -320,8 +320,8 @@ end
 
 function context_menu:InitCallBacks()
 	self:AddCallback("button_ok",ui_events.BUTTON_CLICKED,self.OnButton_ok,self)
-	self:AddCallback("context_menu_list_view",ui_events.LIST_ITEM_CLICKED,self.OnListItemClicked,self)
-	self:AddCallback("context_menu_list_view",ui_events.WINDOW_LBUTTON_DB_CLICK,self.OnListItemDbClicked,self)
+	self:AddCallback("context_menu_list_view",ui_events.LIST_ITEM_CLICKED,self.OnListItemDbClicked,self)
+	--self:AddCallback("context_menu_list_view",ui_events.WINDOW_LBUTTON_DB_CLICK,self.OnListItemDbClicked,self)
 end
 
 function context_menu:AddItemToList(index,str_id,func)
