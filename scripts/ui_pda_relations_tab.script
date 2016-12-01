@@ -15,7 +15,21 @@ function pda_relations_tab:__init() super()
 		"bandit",
 		"monolith"
 	}
-
+	
+	self.color_codes = {
+		GetARGB(255,255,255,255),
+		GetARGB(255,255,128,0),
+		GetARGB(255,0,255,255),
+		GetARGB(255,0,255,128),
+		GetARGB(255,0,128,255),
+		GetARGB(255,255,0,128),
+		GetARGB(255,128,255,0),
+		GetARGB(255,255,0,0),
+		GetARGB(255,0,255,0),
+		GetARGB(255,0,0,255),
+		GetARGB(255,128,0,255),
+	}
+	
 	self.companion_info = {}
 	self.to_text		= true
 	self._tmr 			= time_global()
@@ -213,28 +227,22 @@ function pda_relations_tab:autoupdate()
 			local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife():object(se_obj.group_id)
 			if (squad and squad:commander_id() == se_obj.id) then
 				self.companion_info[i].leader_wnd:Show(true)
-				if (npc) then 
-					local rel = npc:relation(db.actor)
-					if (rel == game_object.friend) then 
-						self.companion_info[i].leader_wnd:SetTextureColor(GetARGB(255,0,255,0))
-					elseif (rel == game_object.neutral) then
-						self.companion_info[i].leader_wnd:SetTextureColor(GetARGB(255,193,193,193))
-					end
-				end
+				self.companion_info[i].leader_wnd:InitTexture("ui_minimap_squad_leader")
 			else
-				self.companion_info[i].leader_wnd:Show(false)
+				self.companion_info[i].leader_wnd:Show(true)
+				self.companion_info[i].leader_wnd:InitTexture("ui_minimap_point")
 			end
 			
-			if (id_to_code[se_obj.group_id]) then 
-				self.companion_info[i].code_wnd:SetText(id_to_code[se_obj.group_id])
-			else
-				local n = 65
+			-- Set color code
+			if not (id_to_code[se_obj.group_id]) then 
+				local n = 1
 				for k,v in pairs(id_to_code) do 
 					n = n + 1
 				end
-				id_to_code[se_obj.group_id] = string.char(n)
-				self.companion_info[i].code_wnd:SetText(id_to_code[se_obj.group_id])
+				id_to_code[se_obj.group_id] = self.color_codes[n] or self.color_codes[1]
 			end
+			self.companion_info[i].leader_wnd:SetTextureColor(id_to_code[se_obj.group_id])
+			
 			
 			-- health status
 			if (npc) then 
@@ -306,7 +314,6 @@ function pda_relations_tab:autoupdate()
 			self.companion_info[i].comm_wnd:SetText("")
 			self.companion_info[i].rank_wnd:SetText("")
 			self.companion_info[i].dist_wnd:SetText("")
-			self.companion_info[i].code_wnd:SetText("")
 		end
 	end
 end
@@ -342,7 +349,7 @@ function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 		
 		owner.companion_info[n].leader_wnd:InitTexture("ui_minimap_squad_leader")
 		owner.companion_info[n].leader_wnd:SetStretchTexture(true)
-		owner.companion_info[n].leader_wnd:SetWndSize(vector2():set(10,10))
+		owner.companion_info[n].leader_wnd:SetWndSize(vector2():set(is_widescreen and 8 or 10,10))
 		owner.companion_info[n].leader_wnd:SetWndPos(vector2():set(x,y))
 
 		owner.companion_info[n].name_wnd:SetFont(GetFontLetterica18Russian())
@@ -364,11 +371,6 @@ function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 		owner.companion_info[n].dist_wnd:SetFont(GetFontLetterica16Russian())
 		owner.companion_info[n].dist_wnd:SetWndSize(vector2():set(120,20))
 		owner.companion_info[n].dist_wnd:SetWndPos(vector2():set(x,y+120))
-		
-		owner.companion_info[n].code_wnd:SetFont(GetFontLetterica16Russian())
-		owner.companion_info[n].code_wnd:SetWndSize(vector2():set(50,16))
-		owner.companion_info[n].code_wnd:SetWndPos(vector2():set(x+2,y+51))
-		owner.companion_info[n].code_wnd:SetTextColor(GetARGB(255, 0, 255, 0))
 
 		x = x + (is_widescreen and 150 or 180)
 	end
