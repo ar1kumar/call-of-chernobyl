@@ -181,6 +181,8 @@ function pda_relations_tab:autoupdate()
 	for i=1,20 do -- should be row*col from ui_companion_row
 		local se_obj = clist[i] and alife():object(clist[i])
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
+			self.companion_info[i].id = se_obj.id 
+			
 			local npc = db.storage[se_obj.id] and db.storage[se_obj.id].object
 
 			local icon_name = npc and npc:character_icon() or se_obj:character_icon()
@@ -271,6 +273,7 @@ function pda_relations_tab:autoupdate()
 			
 			self.companion_info[i].hint = state_str
 		else 
+			self.companion_info[i].id = nil
 			self.companion_info[i].icon_wnd:Show(false)
 			self.companion_info[i].leader_wnd:Show(false)
 			self.companion_info[i].health_wnd:SetText("")
