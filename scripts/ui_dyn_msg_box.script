@@ -202,23 +202,30 @@ end
 -----------------------------------------------------------------
 
 class "context_menu" (CUIScriptWnd)
-function context_menu:__init(action_list,...) super()
+function context_menu:__init(owner,pos_override,action_list,...) super()
+	self.owner = owner 
+	
 	self:InitControls()
 	self:InitCallBacks()
 	
 	self:FillList(action_list,...)
 	
+	local pos = GetCursorPosition() -- because ShowDialog moves mouse cursor to center
+	
 	self:ShowDialog()
 	
-	local pos = GetCursorPosition()
+	SetCursorPosition(pos)
+	pos = pos_override and vector2():set(pos_override.x,pos_override.y) or GetCursorPosition()
 	pos.x = pos.x - self.form:GetWidth()/2
 	pos.y = pos.y - 22
 	self.form:SetWndPos(pos)
 end 
 
 function context_menu:__finalize()
-
-end 
+	if (self.owner) then
+		self.owner.disabled = false
+	end
+end
 
 function context_menu:InitControls()
 	self:SetWndRect(Frect():set(0,0,1024,768))
@@ -257,8 +264,15 @@ function context_menu:Update()
 
 	if not (utils.pos_in_rect(pos,rect)) then
 		if (self:IsShown()) then
+			if (self.owner) then
+				self.owner.disabled = false
+			end
 			self:HideDialog()
+			return
 		end
+	end
+	if (self.owner) then
+		self.owner.disabled = true
 	end
 end
 
@@ -289,6 +303,10 @@ function context_menu:OnListItemDbClicked()
 
 	if not (item) then
 		return
+	end
+	
+	if (self.owner) then
+		self.owner.disabled = false
 	end
 	
 	if (item.func) then 
@@ -326,6 +344,9 @@ function context_menu:OnKeyboard(dik, keyboard_action)
 
 		elseif (dik == DIK_keys.DIK_ESCAPE) then
 			if (self:IsShown()) then
+				if (self.owner) then
+					self.owner.disabled = false
+				end
 				self:HideDialog()
 			end
 		end
@@ -338,7 +359,7 @@ class "context_item" (CUIListBoxItem)
 function context_item:__init() super()
 	self:SetTextColor(GetARGB(255, 170, 170, 170))
 	self.textControl = self:GetTextItem()
-	self.textControl:SetFont(GetFontMedium())
+	self.textControl:SetFont(GetFontLetterica16Russian())
 	self.textControl:SetEllipsis(true)
 end
 

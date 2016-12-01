@@ -1,0 +1,87 @@
+function init(self,npc,id)
+	local pos = GetCursorPosition()
+	local squad = get_object_squad(npc)
+	local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_context_opt_cmd_3_on" or "st_pda_context_opt_cmd_3_off"
+	local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_context_opt_cmd_4_on" or "st_pda_context_opt_cmd_4_off"
+	
+	local action_list_1 = nil
+	local action_list_2 = nil
+	local action_list_3 = nil
+	local action_list_4 = nil
+	
+	-- MAIN
+	action_list_1 = {
+		-- [1] = function()
+			-- db.actor:run_talk_dialog(npc,true)
+		-- end,
+		[1] = function()
+			npc:use(db.actor)
+		end,
+		[2] = function()
+			-- COMMANDS
+			action_list_2 = action_list_2 or {
+			[1] = function()
+				ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_context_opt_2","st_pda_context_opt_3")
+			end,
+			[2] = function()
+				-- COMBAT
+				action_list_3 = action_list_3 or {
+					[1] = function()
+						ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
+					end,
+					[2] = function()
+						axr_companions.set_companion_squad_combat_mode(2,npc,squad)
+						self:Reset()
+					end,
+					[3] = function()
+						axr_companions.set_companion_squad_combat_mode(3,npc,squad)
+						self:Reset()
+					end,
+					[4] = function()
+						axr_companions.set_companion_squad_combat_mode(1,npc,squad)
+						self:Reset()
+					end
+				}
+				ui_dyn_msg_box.context_menu(self,pos,action_list_3,"st_pda_context_opt_0","st_pda_context_opt_cmd_1_1","st_pda_context_opt_cmd_1_2","st_pda_context_opt_cmd_1_3")
+			end,
+			[3] = function()
+				-- MOVEMENT
+				action_list_4 = action_list_4 or {
+					[1] = function()
+						ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
+					end,
+					[2] = function()
+						axr_companions.set_companion_squad_move_mode(2,npc,squad)
+						self:Reset()
+					end,
+					[3] = function()
+						axr_companions.set_companion_squad_move_mode(1,npc,squad)
+						self:Reset()
+					end				
+				}
+				ui_dyn_msg_box.context_menu(self,pos,action_list_4,"st_pda_context_opt_0","st_pda_context_opt_cmd_2_1","st_pda_context_opt_cmd_2_2")
+			end,
+			[4] = function()
+				-- GATHER ITEMS
+				if ( npc:has_info("npcx_beh_gather_items") ) then
+					npc:disable_info_portion("npcx_beh_gather_items")
+				else
+					npc:give_info_portion("npcx_beh_gather_items")
+				end
+				self:Reset()
+			end,
+			[5] = function()
+				-- LOOT CORPSES
+				if ( npc:has_info("npcx_beh_loot_corpses") ) then
+					npc:disable_info_portion("npcx_beh_loot_corpses")
+				else
+					npc:give_info_portion("npcx_beh_loot_corpses")
+				end
+				self:Reset()
+			end
+			}
+			ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
+		end
+	}
+	ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_context_opt_2","st_pda_context_opt_3")
+end

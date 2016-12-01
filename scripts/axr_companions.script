@@ -363,7 +363,7 @@ end
 
 function set_companion_to_attack_state(npc)
 	npc:disable_info_portion("npcx_beh_ignore_combat")
-	--npc:disable_info_portion("npcx_beh_ignore_actor_enemies")
+	npc:disable_info_portion("npcx_beh_ignore_actor_enemies")
 end
 
 function set_companion_to_ignore_combat_state(npc)
@@ -451,13 +451,15 @@ function companion_add_waypoints(npc,pos)
 	utils.se_obj_load_var(npc:id(),npc:name(),"pathpoint"..i,s)--utils.save_var(npc,"pathpoint"..tostring(i),s)
 end
 
-function cycle_companions_combat_mode()
+function cycle_companions_combat_mode(force_mode)
 	local t = {"set_companion_to_attack_state","set_companion_to_ignore_combat_state","set_companion_to_attack_only_actor_combat_enemy_state"}
 	if (_current_combat_mode+1 > #t) then 
 		_current_combat_mode = 1
 	else 
 		_current_combat_mode = _current_combat_mode + 1
 	end
+	
+	_current_combat_mode = force_mode or _current_combat_mode
 	
 	SetHudMsg(game.translate_string("st_"..t[_current_combat_mode]),8)
 	
@@ -478,7 +480,7 @@ function cycle_companions_combat_mode()
 	end
 end 
 
-function cycle_companions_move_mode()
+function cycle_companions_move_mode(force_mode)
 	local t = {"set_companion_to_wait_state","set_companion_to_follow_state"}
 	
 	if (_current_move_mode+1 > #t) then 
@@ -486,6 +488,8 @@ function cycle_companions_move_mode()
 	else 
 		_current_move_mode = _current_move_mode + 1
 	end
+	
+	_current_move_mode = force_mode or _current_move_mode
 	
 	SetHudMsg(game.translate_string("st_"..t[_current_move_mode]),8)
 	
@@ -564,3 +568,48 @@ function move_to_point(p)
 		end
 	end
 end
+
+function set_companion_squad_move_mode(mode,npc,squad)
+	local t = {"set_companion_to_wait_state","set_companion_to_follow_state"}
+	local f = this[t[mode]]
+	if (f) then
+		squad = squad or get_object_squad(npc)
+		if (squad and squad.commander_id) then
+			for k in squad:squad_members() do
+				if not (xrs_kill_wounded.hostage_list[k.id]) then
+					st = db.storage[k.id]
+					if (k.id == squad:commander_id()) then 
+						if (st and st.beh) then 
+							st.beh.rally_lvid = nil
+						end
+					end
+					local member = st and st.object
+					if (member and member:alive()) then
+						f(member)
+					end
+				end
+			end
+		end
+	end
+end
+
+function set_companion_squad_combat_mode(mode,npc,squad)
+	local t = {"set_companion_to_attack_state","set_companion_to_ignore_combat_state","set_companion_to_attack_only_actor_combat_enemy_state"}
+	local f = this[t[mode]]
+	if (f) then 
+		squad = squad or get_object_squad(npc)
+		for id,squad in pairs(companion_squads) do 
+			if (squad and squad.commander_id) then
+				for k in squad:squad_members() do
+					if not (xrs_kill_wounded.hostage_list[k.id]) then
+						local member = db.storage[k.id] and db.storage[k.id].object
+						if (member and member:alive()) then
+							f(member)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+

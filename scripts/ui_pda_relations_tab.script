@@ -118,27 +118,7 @@ function pda_relations_tab:OnSelectCompanionList()
 		return 
 	end 
 	
-	local action_list_1 = {}
-	action_list_1[1] = function()
-		db.actor:run_talk_dialog(npc,true)
-	end 
-	action_list_1[2] = function()
-		npc:use(db.actor)
-	end
-	action_list_1[3] = function()
-		local action_list_2 = {}
-		action_list_2[1] = function()
-			printf("order 1")
-		end
-		action_list_2[2] = function()
-			printf("order 2")
-		end
-		action_list_2[3] = function()
-			printf("order 3")
-		end	
-		ui_dyn_msg_box.context_menu(action_list_2,"st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2","st_pda_context_opt_cmd_3")
-	end
-	ui_dyn_msg_box.context_menu(action_list_1,"st_pda_context_opt_1","st_pda_context_opt_2","st_pda_context_opt_3")
+	pda_relations_context_actions.init(self,npc,id)
 end 
 
 function pda_relations_tab:Update()
@@ -152,26 +132,28 @@ function pda_relations_tab:Update()
 		end
 	end
 
-	for i=1, 20 do -- should be row*col from ui_companion_row
-		if (self.companion_info[i].icon_wnd:IsShown()) then 
-			local pos = GetCursorPosition()
-			local rect = Frect():set(0,0,0,0)
-			self.companion_info[i].icon_wnd:GetAbsoluteRect(rect)
+	if not (self.disabled) then
+		for i=1, 20 do -- should be row*col from ui_companion_row
+			if (self.companion_info[i].icon_wnd:IsShown()) then 
+				local pos = GetCursorPosition()
+				local rect = Frect():set(0,0,0,0)
+				self.companion_info[i].icon_wnd:GetAbsoluteRect(rect)
 
-			if (utils.pos_in_rect(pos,rect)) then 
-				self.hint_wnd_text:SetText(self.companion_info[i].hint)
-				self.hint_wnd_text:AdjustHeightToText()
-				self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
-				
-				pos.y = pos.y - self.hint_wnd:GetHeight()
-				pos.x = pos.x - self.hint_wnd:GetWidth()
-				self.hint_wnd:SetWndPos(pos)
+				if (utils.pos_in_rect(pos,rect)) then 
+					self.hint_wnd_text:SetText(self.companion_info[i].hint)
+					self.hint_wnd_text:AdjustHeightToText()
+					self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
+					
+					pos.y = pos.y - self.hint_wnd:GetHeight()
+					pos.x = pos.x - self.hint_wnd:GetWidth()
+					self.hint_wnd:SetWndPos(pos)
 
-				--FitInRect(self.background,self.rect,0,0)
-				
-				mouse_over_id = i
-				
-				return
+					--FitInRect(self.background,self.rect,0,0)
+					
+					mouse_over_id = i
+					
+					return
+				end
 			end
 		end
 	end
@@ -205,7 +187,6 @@ function pda_relations_tab:Reset()
 	end
 
 	self:autoupdate()
-	
 end
 
 function pda_relations_tab:autoupdate()
@@ -259,10 +240,10 @@ function pda_relations_tab:autoupdate()
 			-- hint 
 			local state_str = "%c[255,215,215,215]States:%c[default] \\n"
 			
-			if (alife():has_info(se_obj.id,"npcx_beh_ignore_actor_enemies")) then 
-				state_str = state_str .. game.translate_string("st_set_companion_to_attack_only_actor_combat_enemy_state") .. "\\n"
-			elseif (alife():has_info(se_obj.id,"npcx_beh_ignore_combat")) then 
+			if (alife():has_info(se_obj.id,"npcx_beh_ignore_actor_enemies") and alife():has_info(se_obj.id,"npcx_beh_ignore_combat")) then 
 				state_str = state_str .. game.translate_string("st_set_companion_to_ignore_combat_state") .. "\\n"
+			elseif (alife():has_info(se_obj.id,"npcx_beh_ignore_combat")) then 
+				state_str = state_str .. game.translate_string("st_set_companion_to_attack_only_actor_combat_enemy_state") .. "\\n"
 			else 
 				state_str = state_str .. game.translate_string("st_set_companion_to_attack_state") .. "\\n"
 			end
