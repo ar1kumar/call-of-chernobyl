@@ -1,8 +1,6 @@
 function init(self,npc,id)
 	local pos = GetCursorPosition()
 	local squad = get_object_squad(npc)
-	local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_context_opt_cmd_3_on" or "st_pda_context_opt_cmd_3_off"
-	local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_context_opt_cmd_4_on" or "st_pda_context_opt_cmd_4_off"
 	
 	local action_list_1 = nil
 	local action_list_2 = nil
@@ -27,6 +25,8 @@ function init(self,npc,id)
 				-- COMBAT
 				action_list_3 = action_list_3 or {
 					[1] = function()
+						local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_context_opt_cmd_3_on" or "st_pda_context_opt_cmd_3_off"
+						local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_context_opt_cmd_4_on" or "st_pda_context_opt_cmd_4_off"
 						ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
 					end,
 					[2] = function()
@@ -48,6 +48,8 @@ function init(self,npc,id)
 				-- MOVEMENT
 				action_list_4 = action_list_4 or {
 					[1] = function()
+						local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_context_opt_cmd_3_on" or "st_pda_context_opt_cmd_3_off"
+						local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_context_opt_cmd_4_on" or "st_pda_context_opt_cmd_4_off"
 						ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
 					end,
 					[2] = function()
@@ -80,6 +82,8 @@ function init(self,npc,id)
 				self:Reset()
 			end
 			}
+			local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_context_opt_cmd_3_on" or "st_pda_context_opt_cmd_3_off"
+			local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_context_opt_cmd_4_on" or "st_pda_context_opt_cmd_4_off"
 			ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
 		end
 	}
