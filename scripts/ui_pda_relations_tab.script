@@ -190,6 +190,7 @@ function pda_relations_tab:Reset()
 end
 
 function pda_relations_tab:autoupdate()
+	local id_to_code = {}
 	local clist = axr_companions.list_actor_squad_by_id()
 	for i=1,20 do -- should be row*col from ui_companion_row
 		local se_obj = clist[i] and alife():object(clist[i])
@@ -222,6 +223,17 @@ function pda_relations_tab:autoupdate()
 				end
 			else
 				self.companion_info[i].leader_wnd:Show(false)
+			end
+			
+			if (id_to_code[se_obj.group_id]) then 
+				self.companion_info[i].code_wnd:SetText(id_to_code[se_obj.group_id])
+			else
+				local n = 65
+				for k,v in pairs(id_to_code) do 
+					n = n + 1
+				end
+				id_to_code[se_obj.group_id] = string.char(n)
+				self.companion_info[i].code_wnd:SetText(id_to_code[se_obj.group_id])
 			end
 			
 			-- health status
@@ -294,6 +306,7 @@ function pda_relations_tab:autoupdate()
 			self.companion_info[i].comm_wnd:SetText("")
 			self.companion_info[i].rank_wnd:SetText("")
 			self.companion_info[i].dist_wnd:SetText("")
+			self.companion_info[i].code_wnd:SetText("")
 		end
 	end
 end
@@ -318,6 +331,7 @@ function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 			["rank_wnd"]		= self:AddTextField("",i+14),
 			["health_wnd"]		= self:AddTextField("",i+15),
 			["dist_wnd"]		= self:AddTextField("",i+16),
+			["code_wnd"] 		= self:AddTextField("",i+17),
 			["hint"]			= ""
 		}
 		
@@ -350,6 +364,11 @@ function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 		owner.companion_info[n].dist_wnd:SetFont(GetFontLetterica16Russian())
 		owner.companion_info[n].dist_wnd:SetWndSize(vector2():set(120,20))
 		owner.companion_info[n].dist_wnd:SetWndPos(vector2():set(x,y+120))
+		
+		owner.companion_info[n].code_wnd:SetFont(GetFontLetterica16Russian())
+		owner.companion_info[n].code_wnd:SetWndSize(vector2():set(50,16))
+		owner.companion_info[n].code_wnd:SetWndPos(vector2():set(x+2,y+51))
+		owner.companion_info[n].code_wnd:SetTextColor(GetARGB(255, 0, 255, 0))
 
 		x = x + (is_widescreen and 150 or 180)
 	end
