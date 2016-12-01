@@ -26,10 +26,6 @@ end
 
 function pda_relations_tab:__finalize() end
 
-local function pos_in_rect(p,r)
-	return (p.x >= r.x1) and (p.x <= r.x2) and (p.y >= r.y1) and (p.y <= r.y2)
-end 
-
 function pda_relations_tab:InitControls()
 	self:SetWndRect(Frect():set(0, 0, 1024, 768))
 
@@ -79,10 +75,12 @@ function pda_relations_tab:InitControls()
 
 	-- Companion ListView
 	xml:InitFrame("companion_frame",self)
-	xml:InitStatic("companion_background", self)
+	xml:InitStatic("companion_background",self)
 
-	self.companion_listbox = xml:InitListBox("companion_wnd", self)
+	self.companion_listbox = xml:InitListBox("companion_wnd",self)
 	self.companion_listbox:SetItemHeight(140)
+	self:Register(self.companion_listbox, "list_companion")
+	self:AddCallback("list_companion",ui_events.LIST_ITEM_CLICKED,self.OnSelectCompanionList,self)
 	
 	self.auto_chk = xml:InitCheck("auto_check",self)
 	self.auto_chk:SetCheck(false)
@@ -95,7 +93,7 @@ function pda_relations_tab:InitControls()
 	
 	-- Hint Window
 	self.hint_wnd = xml:InitFrame("hint_wnd:background",self)
-	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text", self.hint_wnd)
+	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text",self.hint_wnd)
 end
 
 function pda_relations_tab:btn_to_text()
@@ -108,6 +106,40 @@ function pda_relations_tab:btn_to_text()
 	
 	self:Reset()
 end
+
+function pda_relations_tab:OnSelectCompanionList()
+	if not (mouse_over_id) then 
+		return 
+	end 
+	
+	local id = self.companion_info[mouse_over_id].id
+	local npc = id and db.storage[id] and db.storage[id].object 
+	if not (npc) then 
+		return 
+	end 
+	
+	local action_list_1 = {}
+	action_list_1[1] = function()
+		db.actor:run_talk_dialog(npc,true)
+	end 
+	action_list_1[2] = function()
+		npc:use(db.actor)
+	end
+	action_list_1[3] = function()
+		local action_list_2 = {}
+		action_list_2[1] = function()
+			printf("order 1")
+		end
+		action_list_2[2] = function()
+			printf("order 2")
+		end
+		action_list_2[3] = function()
+			printf("order 3")
+		end	
+		ui_dyn_msg_box.context_menu(action_list_2,"st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2","st_pda_context_opt_cmd_3")
+	end
+	ui_dyn_msg_box.context_menu(action_list_1,"st_pda_context_opt_1","st_pda_context_opt_2","st_pda_context_opt_3")
+end 
 
 function pda_relations_tab:Update()
 	CUIScriptWnd.Update(self)
@@ -126,7 +158,7 @@ function pda_relations_tab:Update()
 			local rect = Frect():set(0,0,0,0)
 			self.companion_info[i].icon_wnd:GetAbsoluteRect(rect)
 
-			if (pos_in_rect(pos,rect)) then 
+			if (utils.pos_in_rect(pos,rect)) then 
 				self.hint_wnd_text:SetText(self.companion_info[i].hint)
 				self.hint_wnd_text:AdjustHeightToText()
 				self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))

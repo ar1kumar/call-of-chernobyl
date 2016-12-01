@@ -845,3 +845,7 @@ function se_obj_load_var(id,name,varname)
 		return m_data.se_object[id][varname]
 	end
 end
+
+function pos_in_rect(p,r)
+	return (p.x >= r.x1) and (p.x <= r.x2) and (p.y >= r.y1) and (p.y <= r.y2)
+end 
