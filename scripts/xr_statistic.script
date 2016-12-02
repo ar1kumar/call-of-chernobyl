@@ -240,7 +240,7 @@ function inc_counter_artefacts(art_id)
 	if(taken_artefacts[art_id]==nil) then
 		inc_counter("artefacts_found")
 		taken_artefacts[art_id] = art_id
-		local s_art = alife():object(art_id)
+		local s_art = alife_object(art_id)
 		if(s_art and s_art:section_name()) then
 			artefacts_table[s_art:section_name()] = true
 		end

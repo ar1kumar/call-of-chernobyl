@@ -19,7 +19,7 @@ function execute_destroy_callback()
 	if not (is_empty(objects_to_release)) then
 		local sim = alife()
 		for id,v in pairs(objects_to_release) do
-			local se_obj = alife():object(id)
+			local se_obj = alife_object(id)
 			if (se_obj) then
 				if (se_obj.online) then
 					-- prevent from coming online ever again

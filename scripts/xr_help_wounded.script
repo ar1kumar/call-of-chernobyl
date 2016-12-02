@@ -155,7 +155,7 @@ function evaluator_wounded_exist:find_valid_target()
 		return false 
 	end 
 	
-	local se_obj = alife():object(id)
+	local se_obj = alife_object(id)
 	if not (se_obj) then
 		return false 
 	end
@@ -339,7 +339,7 @@ function action_help_wounded:finalize()
 
 	--[[
 	local medkit = self.object:object("medkit_script")
-	local se_obj = medkit and alife():object(medkit:id())
+	local se_obj = medkit and alife_object(medkit:id())
 	if (se_obj) then
 		alife():release(se_obj,true)
 	end

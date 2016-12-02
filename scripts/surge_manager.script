@@ -1071,7 +1071,7 @@ end
 
 function get_squad_members(squad_id)
 	local npcs_tbl = {}
-	local squad = alife():object(squad_id)
+	local squad = alife_object(squad_id)
 	if(squad) then
 		for k in squad:squad_members() do
 			npcs_tbl[k.id] = true
@@ -1081,7 +1081,7 @@ function get_squad_members(squad_id)
 end
 
 function check_squad_level(squad_id)
-	local squad = alife():object(squad_id)
+	local squad = alife_object(squad_id)
 	if(squad) then
 		local squad_level = alife():level_name(game_graph():vertex(squad.m_game_vertex_id):level_id())
 		if(squad_level==level.name()) then
@@ -1092,7 +1092,7 @@ function check_squad_level(squad_id)
 end
 
 function check_squad_smart_props(squad_id)
-	local squad = alife():object(squad_id)
+	local squad = alife_object(squad_id)
 	if(squad) then
 		local board = SIMBOARD
 		if(board and squad.smart_id and board.smarts[squad.smart_id]) then
@@ -1114,7 +1114,7 @@ function CSurgeManager:kill_crows_at_pos(pos)
 	h.direction = vector():set(0,0,1)
 	h.draftsman = db.actor
 	for k,v in pairs(bind_crow.crow_storage) do
-		local obj = alife():object(v)
+		local obj = alife_object(v)
 		if obj then
 			local crow = level.object_by_id(obj.id)
 			if(crow and crow:alive() and pos<crow:position().z) then
@@ -1262,7 +1262,7 @@ function make_dead(id)
 	if (obj and obj:alive()) then
 		obj:kill(obj)
 	else
-		local se_obj = id and alife():object(id)
+		local se_obj = id and alife_object(id)
 		if (se_obj and se_obj:alive()) then
 			se_obj:kill()
 		end

@@ -248,7 +248,7 @@ end
 -- param 5 - is a hostage
 function setup_companion_task(actor,npc,p)
 	local id = p[3] and p[3] ~= "nil" and utils.load_var(db.actor,p[3])
-	local smart = id and alife():object(id) or p[2] and p[2] ~= "nil" and SIMBOARD.smarts_by_names[p[2]]
+	local smart = id and alife_object(id) or p[2] and p[2] ~= "nil" and SIMBOARD.smarts_by_names[p[2]]
 	if not (smart) then 
 		return 
 	end 
@@ -469,7 +469,7 @@ end
 
 function unlock_smart(actor,npc,p)
 	local id = p[1] and p[1] ~= "nil" and utils.load_var(db.actor,p[1])
-	local smart = id and alife():object(id)
+	local smart = id and alife_object(id)
 	if (smart) then 
 		smart.locked = nil
 	end
@@ -1040,7 +1040,7 @@ function teleport_npc_by_story_id(actor, npc, p)
 		reset_animation(cl_object)
 		cl_object:set_npc_position(position)
 	else
-		alife():object(npc_id).position = position
+		alife_object(npc_id).position = position
 	end
 end
 
@@ -1126,7 +1126,7 @@ function give_item(actor, npc, p)
 	else
 		npc_id = npc:id()
 	end
-	local se_npc = alife():object(npc_id)
+	local se_npc = alife_object(npc_id)
 	if not (se_npc) then 
 		return 
 	end
@@ -1476,7 +1476,7 @@ function remove_npc(actor, npc, p)
 		npc_id = get_story_object_id(p[1])
 	end
 	if npc_id ~= nil then
-		local se_obj = alife():object(npc_id)
+		local se_obj = alife_object(npc_id)
 		if (se_obj) then
 			safe_release_manager.release(se_obj)
 			--alife():release(se_obj, true)
@@ -1875,7 +1875,7 @@ function jup_b219_save_pos()
 	else
 		return
 	end
-	sobj = alife():object(obj:id())
+	sobj = alife_object(obj:id())
 	if sobj then
 		alife():release(sobj, true)
 	end
@@ -1928,14 +1928,14 @@ function spawn_object_in(actor, obj, p)
 	if p[2] == nil then
 		printf("Wrong target_name for 'spawn_object_in' function %s. For object %s", tostring(target_name), obj:name())
 	end
---	local box = alife():object(target_name)
+--	local box = alife_object(target_name)
 --	if(box==nil) then
 
 	printf("xr_effects.spawn_object_in trying to find object %s", tostring(p[2]))
 
 	local target_obj_id = get_story_object_id(p[2])
 	if target_obj_id ~= nil then
-		box = alife():object(target_obj_id)
+		box = alife_object(target_obj_id)
 		if box == nil then
 			printf("xr_effects.spawn_object_in There is no such object %s", p[2])
 		end
@@ -1974,13 +1974,13 @@ end
 function destroy_object(actor, obj, p)
 	local sobj
 	if (p == nil or p[1] == nil) then
-		sobj = alife():object(obj:id())
+		sobj = alife_object(obj:id())
 	elseif (p[1] == "story" and p[2] ~= nil) then
 		local id = get_story_object_id(p[2])
 		if not (id) then 
 			printf("destroy_object %s story id doesn't exist!",p[2])
 		end
-		sobj = id and alife():object(id)
+		sobj = id and alife_object(id)
 	end
 	
 	if not (sobj) then
@@ -2213,19 +2213,19 @@ function create_squad_member(actor, obj, p)
 		level_vertex_id = patrol(spawn_point):level_vertex_id(0)
 		game_vertex_id 	= patrol(spawn_point):game_vertex_id(0)
 	else
-		local commander = alife():object(squad:commander_id())
+		local commander = alife_object(squad:commander_id())
 		position		= commander.position
 		level_vertex_id = commander.m_level_vertex_id
 		game_vertex_id	= commander.m_game_vertex_id
 	end
 	local new_member_id = squad:add_squad_member(squad_member_sect, position,  level_vertex_id, game_vertex_id)
 	
-	local se_obj = new_member_id and alife():object(new_member_id)
+	local se_obj = new_member_id and alife_object(new_member_id)
 	if (se_obj) then 
 		squad_smart:register_npc(se_obj)
 	end
 
-	board:setup_squad_and_group(alife():object(new_member_id))
+	board:setup_squad_and_group(alife_object(new_member_id))
 	--squad_smart:refresh()
 	squad:update()
 end
@@ -2260,7 +2260,7 @@ function kill_squad(actor, obj, p)
 	for k,v in pairs(squad_npcs) do
 		local cl_obj = db.storage[k] and db.storage[k].object
 		if cl_obj == nil then
-			alife():object(tonumber(k)):kill()
+			alife_object(tonumber(k)):kill()
 		else
 			cl_obj:kill(cl_obj)
 		end
@@ -2340,11 +2340,11 @@ function flush_smart_terrain(actor,obj,p)
 		squad.current_action = nil
 		board:assign_squad_to_smart(squad, nil)
 		for k in squad:squad_members() do
-			local se_obj = alife():object(k.id)
+			local se_obj = alife_object(k.id)
 			if (se_obj) then
 				local smart_id = se_obj.m_smart_terrain_id
 				if (smart_id and smart_id ~= 65535) then
-					local smart = alife():object(smart_id)
+					local smart = alife_object(smart_id)
 					if (smart) then
 						smart:unregister_npc(se_obj)
 					end
@@ -2732,7 +2732,7 @@ function add_map_spot(actor, npc, p)
 		local story_id = tonumber(p[1])
 		local id = id_by_sid(story_id)
 		if(id==nil) then
-			local obj = alife():object(p[1])
+			local obj = alife_object(p[1])
 			id = obj and obj.id
 		end
 		if(id~=nil) then
@@ -2758,7 +2758,7 @@ function remove_map_spot(actor, npc, p)
 		local story_id = tonumber(p[1])
 		local id = id_by_sid(story_id)
 		if(id==nil) then
-			local obj = alife():object(p[1])
+			local obj = alife_object(p[1])
 			id = obj and obj.id
 		end
 		if(id~=nil) then
@@ -3140,7 +3140,7 @@ function clear_box(actor, npc, p)
 	inv_box:iterate_inventory_box(add_items, inv_box)
 
 	for k,v in pairs(items_table) do
-		alife():release(alife():object(v:id()), true)
+		alife():release(alife_object(v:id()), true)
 	end
 end
 
@@ -3253,7 +3253,7 @@ function jup_b10_spawn_drunk_dead_items(actor, npc, p)
 		for k,v in pairs(items[cnt]) do
 			local target_obj_id = get_story_object_id(p[1])
 			if target_obj_id ~= nil then
-				box = alife():object(target_obj_id)
+				box = alife_object(target_obj_id)
 				if box == nil then
 					printf("There is no such object %s", p[1])
 				end
@@ -3297,7 +3297,7 @@ function pick_artefact_from_anomaly(actor, npc, p)
 		if npc_id == nil then
 			printf("Couldn't relocate item to NULL in function 'pick_artefact_from_anomaly!'")
 		end
-		se_obj = alife():object(npc_id)
+		se_obj = alife_object(npc_id)
 		if se_obj and (not IsStalker(nil,se_obj:clsid()) or not se_obj:alive()) then
 			printf("Couldn't relocate item to NULL (dead or not stalker) in function 'pick_artefact_from_anomaly!'")
 		end
@@ -3313,14 +3313,14 @@ function pick_artefact_from_anomaly(actor, npc, p)
 	end
 
 	for k,v in pairs(anomal_zone.artefact_ways_by_id) do
-		if alife():object(tonumber(k)) and af_name == alife():object(tonumber(k)):section_name() then
+		if alife_object(tonumber(k)) and af_name == alife_object(tonumber(k)):section_name() then
 			af_id = tonumber(k)
-			af_obj = alife():object(tonumber(k))
+			af_obj = alife_object(tonumber(k))
 			break
 		end
 		if af_name == nil then
 			af_id = tonumber(k)
-			af_obj = alife():object(tonumber(k))
+			af_obj = alife_object(tonumber(k))
 			af_name = af_obj:section_name()
 			break
 		end
@@ -3915,7 +3915,7 @@ function create_cutscene_actor_with_weapon(actor, npc, p)
 		end
 	end
 
-	local actor_weapon = alife():object(active_item:id())
+	local actor_weapon = alife_object(active_item:id())
 	local section_name = actor_weapon:section_name()
 	if section_name == "pri_a17_gauss_rifle" then
 		section_name = "wpn_gauss"
@@ -4090,7 +4090,7 @@ function pri_a28_check_zones()
 	for k,v in pairs(zones_tbl) do
 		story_obj_id = get_story_object_id(v)
 		if story_obj_id then
-			local se_obj = alife():object(story_obj_id)
+			local se_obj = alife_object(story_obj_id)
 			local curr_dist = se_obj.position:distance_to(db.actor:position())
 			if index == 0 then
 				dist = curr_dist
@@ -4220,7 +4220,7 @@ function make_a_wish(actor,npc,p)
 		local function remove_backpack(id)
 			local function itr(npc,itm)
 				if (itm:section() == "itm_actor_backpack" or itm:section() == "itm_backpack") then
-					local se_itm = alife():object(itm:id())
+					local se_itm = alife_object(itm:id())
 					if (se_itm) then 
 						alife():release(se_itm,true)
 					end
@@ -4357,7 +4357,7 @@ function change_visual(actor,npc,p)
 	if (not axr_main) then
 		return
 	end
-	local sobj = alife():object(npc:id())
+	local sobj = alife_object(npc:id())
 	if not (sobj) then
 		return
 	end
@@ -4367,7 +4367,7 @@ function change_visual(actor,npc,p)
 end
 
 function switch_offline(actor,npc,p)
-	local se_obj = npc and alife():object(npc:id())
+	local se_obj = npc and alife_object(npc:id())
 	if (se_obj and se_obj:can_switch_offline()) then 
 		se_obj:switch_offline()
 	end
@@ -4375,7 +4375,7 @@ end
 
 ------------------- util functions
 function update_visual(id,vis)
-	local se_npc = id and alife():object(id)
+	local se_npc = id and alife_object(id)
 	if not (se_npc) then
 		return true
 	end

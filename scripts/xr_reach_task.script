@@ -160,7 +160,7 @@ function action_reach_task_location:single_execute(se_obj)
 	npc:set_mental_state(anim.free)
 	npc:set_movement_type(move.walk)
 	
-	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and alife():object(se_obj.m_smart_terrain_id)
+	local smart = se_obj.m_smart_terrain_id and se_obj.m_smart_terrain_id ~= 65535 and alife_object(se_obj.m_smart_terrain_id)
 	if (smart == nil or npc:is_talking()) then
 		npc:set_movement_type(move.stand)
 		return 
@@ -248,7 +248,7 @@ function action_reach_task_location:commander_execute(squad)
 	
 	local squad_target = simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
 	if squad_target == nil and squad:get_script_target() ~= nil then
-	 	squad_target = alife():object(squad.assigned_target_id)
+	 	squad_target = alife_object(squad.assigned_target_id)
 	end
 	
 	if (squad_target == nil) then 
@@ -333,7 +333,7 @@ function action_reach_task_location:soldier_execute(squad)
 	
 	local squad_target = simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
 	if squad_target == nil and squad:get_script_target() ~= nil then
-		squad_target = alife():object(squad.assigned_target_id)
+		squad_target = alife_object(squad.assigned_target_id)
 	end
 
 	local lvid,desired_direction = get_npc_command(npc)

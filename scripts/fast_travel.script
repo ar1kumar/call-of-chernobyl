@@ -6,7 +6,7 @@ local enabled = false 			-- change under settings in plugins\faction_quick_trave
 quick_travel_smarts = nil
 
 local function map_spot_menu_add_property(property_ui,id,level_name)
-	local se_obj = alife():object(id)
+	local se_obj = alife_object(id)
 	if not (se_obj) then 
 		return 
 	end
@@ -18,7 +18,7 @@ end
 
 local function map_spot_menu_property_clicked(property_ui,id,level_name,prop)
 	if (prop == "Fast Travel") then 
-		local se_obj = alife():object(id)
+		local se_obj = alife_object(id)
 		if not (se_obj) then 
 			return 
 		end

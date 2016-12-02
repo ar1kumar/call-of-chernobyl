@@ -104,7 +104,7 @@ function se_stalker:on_unregister()
 	--alun_utils.debug_write("se_stalker:on_unregister()")
 	local strn_id = self:smart_terrain_id()
 	if strn_id ~= 65535 then
-		local smart = alife():object(strn_id)
+		local smart = alife_object(strn_id)
 		if smart ~= nil then
 			smart:unregister_npc(self)
 		end
@@ -129,7 +129,7 @@ function se_stalker:on_death(killer)
 
 	smart_terrain.on_death(self)
 
-	local squad = self.group_id and self.group_id < 65535 and alife():object(self.group_id)
+	local squad = self.group_id and self.group_id < 65535 and alife_object(self.group_id)
 	if (squad) then
 		squad:on_npc_death(self,killer)
 	end

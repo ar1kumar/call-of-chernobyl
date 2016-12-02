@@ -52,7 +52,7 @@ function motivator_binder:net_spawn(sobject)
 		return false
 	end
 	
-	local se_obj = alife():object(self.object:id())
+	local se_obj = alife_object(self.object:id())
 	if not (se_obj) then 
 		return false 
 	end
@@ -322,7 +322,7 @@ function motivator_binder:death_callback(victim, who)
 		utils.save_var(who,"s_kill_count",count)
 		
 		-- npc_statistic
-		local se_obj = alife():object(who:id())
+		local se_obj = alife_object(who:id())
 		if (se_obj) then
 			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
 			if (m_data) then

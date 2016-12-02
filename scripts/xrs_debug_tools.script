@@ -549,7 +549,7 @@ function heli_hud_show(hud)
 					end
 				end
 				
-				local smart = se_heli.m_smart_terrain_id and alife():object(se_heli.m_smart_terrain_id)
+				local smart = se_heli.m_smart_terrain_id and alife_object(se_heli.m_smart_terrain_id)
 				if (smart) then 
 					hud:add_msg("Smart",smart:name())
 					local npc_info = smart.npc_info[se_heli.id]
@@ -595,7 +595,7 @@ function heli_hud_show(hud)
 	hud:add_msg("------------")
 	
 	if (smart_terrain.nearest_to_actor_smart and smart_terrain.nearest_to_actor_smart.id) then
-		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
+		local smart = alife_object(smart_terrain.nearest_to_actor_smart.id)
 		if (smart) then
 			local npc,job,sec
 			if (smart.heli_jobs) then 
@@ -641,7 +641,7 @@ function monster_hud_show(hud)
 	local near = get_nearest_monster("cam")
 	if (near and near:alive()) then
 		st = db.storage[near:id()]
-		local sobj = alife():object(near:id())
+		local sobj = alife_object(near:id())
 		if not (sobj) then 
 			return 
 		end
@@ -676,7 +676,7 @@ function monster_hud_show(hud)
 			hud:add_msg("CombatIgnoreCond",xr_logic.pick_section_from_condlist(be, near, st.overrides.combat_ignore.condlist))
 		end
 
-		local smart = sobj.m_smart_terrain_id and sobj.m_smart_terrain_id ~= 65535 and alife():object(sobj.m_smart_terrain_id)
+		local smart = sobj.m_smart_terrain_id and sobj.m_smart_terrain_id ~= 65535 and alife_object(sobj.m_smart_terrain_id)
 		local npc_info = smart and smart.npc_info[near:id()]
 		if (npc_info) then 
 			if (npc_info.job) then
@@ -699,7 +699,7 @@ function position_other_hud_show(hud)
 
 	hud:set_header("-[Pos. Info]-")
 	if (obj and obj:alive()) then
-		local se_obj = alife():object(obj:id())
+		local se_obj = alife_object(obj:id())
 		if (se_obj) then
 			local lvid, gvid = obj:level_vertex_id(), obj:game_vertex_id()
 			local pos = obj:position()
@@ -766,7 +766,7 @@ function actor_feel_touch_hud_show(hud)
 	hud:set_header("-[ACTOR FEEL TOUCH]-")
 	if (db.actor and db.actor:alive()) then
 		local itr = function(id)
-			local o = id and alife():object(id)
+			local o = id and alife_object(id)
 			if (o) then
 				hud:add_msg("-",strformat("ID=%s Name=%s",id,o:name()))
 			end
@@ -784,7 +784,7 @@ function feel_touch_hud_show(hud)
 	hud:set_header(strformat("-[FEEL TOUCH for %s]-",obj and obj:name()))
 	if (obj and obj:alive()) then
 		local itr = function(id)
-			local o = id and alife():object(id)
+			local o = id and alife_object(id)
 			if (o) then
 				hud:add_msg("",strformat("ID=%s Name=%s",id,o:name()))
 			end
@@ -801,7 +801,7 @@ function stalker_data_hud_show(hud)
 	if (obj and obj:alive()) then
 		if (stalker_id ~= obj:id()) then
 			stalker_id = obj:id()
-			local se_obj = alife():object(stalker_id)
+			local se_obj = alife_object(stalker_id)
 			if not (se_obj) then 
 				return 
 			end
@@ -1010,7 +1010,7 @@ function position_hud_show(hud)
 	local pos2 = level.vertex_position(lvid)
 	local valid = lvid < 4294967295 and pos2:distance_to(pos) <= 0.7
 
-	local se_actor = not cam and alife():object(db.actor:id())
+	local se_actor = not cam and alife_object(db.actor:id())
 
 	hud:set_header("-[Actor Info]-")
 	hud:add_msg("Lvid",lvid)
@@ -1031,7 +1031,7 @@ function position_hud_show(hud)
 	
 	hud:add_msg("","------nearest campfires------")
 	if (smart_terrain.nearest_to_actor_smart and smart_terrain.nearest_to_actor_smart.id) then
-		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
+		local smart = alife_object(smart_terrain.nearest_to_actor_smart.id)
 		if (smart) then
 			local campfires = db.campfire_table_by_smart_names[smart:name()]
 			if (campfires) then
@@ -1073,7 +1073,7 @@ end
 
 function gulag_info_hud_show(hud)
 	if (smart_terrain.nearest_to_actor_smart and smart_terrain.nearest_to_actor_smart.id) then
-		local smart = alife():object(smart_terrain.nearest_to_actor_smart.id)
+		local smart = alife_object(smart_terrain.nearest_to_actor_smart.id)
 		if (smart and smart.stalker_jobs) then
 			if (smart.faction_controlled) then
 				hud:add_msg("Is Faction Controlled",true)
@@ -1105,9 +1105,9 @@ function squad_info_hud_show(hud)
 		if (st) then
 			local squad = get_object_squad(near)
 			if (squad) then
-				local smart = squad.smart_id and alife():object(squad.smart_id)
-				local current_target = squad.current_target_id and alife():object(squad.current_target_id)
-				local assigned_target = squad.assigned_target_id and alife():object(squad.assigned_target_id)
+				local smart = squad.smart_id and alife_object(squad.smart_id)
+				local current_target = squad.current_target_id and alife_object(squad.current_target_id)
+				local assigned_target = squad.assigned_target_id and alife_object(squad.assigned_target_id)
 
 				hud:add_msg("Section Name",squad:section_name())
 				hud:add_msg("ID",squad.id)
@@ -1153,7 +1153,7 @@ function stalker_info_hud_show(hud)
 
 	local st = near and near:alive() and db.storage[near:id()]
 	if (st) then
-		local sobj = alife():object(near:id())
+		local sobj = alife_object(near:id())
 		if not (sobj) then 
 			return 
 		end
@@ -1177,7 +1177,7 @@ function stalker_info_hud_show(hud)
 		hud:add_msg("rx_dont_shoot",st.rx_dont_shoot)
 		local sight_type = near:sight_params()
 		hud:add_msg("Sight Type",sight_type and sight_type.m_sight_type)
-		local smrt = sobj.m_smart_terrain_id and sobj.m_smart_terrain_id ~= 65535 and alife():object(sobj.m_smart_terrain_id)
+		local smrt = sobj.m_smart_terrain_id and sobj.m_smart_terrain_id ~= 65535 and alife_object(sobj.m_smart_terrain_id)
 		hud:add_msg("m_smart_terrain_id",smrt and smrt:name())
 		if (smrt) then
 			local arriving = smrt.arriving_npc[sobj.id]
@@ -1302,7 +1302,7 @@ function enemy_hud_show(hud)
 	local near = get_debug_npc()
 	if (near and near:alive()) then
 		local id = near:id()
-		local se_obj = alife():object(id)
+		local se_obj = alife_object(id)
 		if not (se_obj) then 
 			return 
 		end
@@ -1424,7 +1424,7 @@ function anim_hud_show(hud)
 	if (near and near:alive()) then
 		local st = db.storage[near:id()]
 		if (st) then
-			local sobj = alife():object(near:id())
+			local sobj = alife_object(near:id())
 			if not (sobj) then 
 				return 
 			end
@@ -1530,7 +1530,7 @@ function weapon_hud_show(hud)
 	local wpn = near and near:alive() and near:active_item() or db.actor:active_item()
 
 	if (wpn) then
-		local sobj = alife():object(wpn:id())
+		local sobj = alife_object(wpn:id())
 		if not (sobj) then 
 			return 
 		end
@@ -1611,7 +1611,7 @@ function task_hud_show(hud)
 	for k,v in pairs(debug_task_infos) do
 		hud:add_msg("======["..k.."]======","")
 		if (v.task_giver_id) then 
-			local se_obj = alife():object(v.task_giver_id)
+			local se_obj = alife_object(v.task_giver_id)
 			if (se_obj) then 
 				hud:add_msg("Giver",se_obj:name())
 			end
@@ -1622,9 +1622,9 @@ function task_hud_show(hud)
 		end
 		
 		local id = utils.load_var(db.actor,k.."_target_id")
-		local o = id and alife():object(id)
+		local o = id and alife_object(id)
 		local smart_id = utils.load_var(db.actor,k.."_id")
-		local smart = smart_id and alife():object(smart_id)
+		local smart = smart_id and alife_object(smart_id)
 		
 		hud:add_msg("Has CTaskObject",v.t ~= nil)
 		if (v.status ~= "selected") then

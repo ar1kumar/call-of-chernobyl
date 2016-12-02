@@ -90,7 +90,7 @@ function action_npc_vs_box:execute()
 	
 	self.st.__tmr = self.st.__tmr or time_global()+8000
 	if (time_global() > self.st.__tmr) then 
-		local se_obj = alife():object(obj:id())
+		local se_obj = alife_object(obj:id())
 		if (se_obj) then 
 			alife():release(se_obj,true)
 		end

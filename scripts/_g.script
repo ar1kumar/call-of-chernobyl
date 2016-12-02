@@ -3,7 +3,7 @@
 	1. 	NEVER keep userdata (ie. engine classes) in global scope, instead keep track of game object id, and grab object in the scope you need it in by using level.object_by_id or db.storage table. 
 		Otherwise object can't deconstruct and you will end up with instances were script binder exists but object doesn't or level object exists but server object doesn't. This is because variables in lua are all references.
 			Ex. _G.npc = level.object_by_id(2342) 
-				alife():release(alife():object(2342))
+				alife():release(alife_object(2342))
 		Above, 'npc' will not be nil but se_obj will be! scripts will blow up. Pure Virtual Function calls may occur! Or quite possibly silent errors like for example when player goes to talk to npc game crashes because self.object is nil
 		Such thing is 'okay' in db.storage, but that is because on net_destroy db.storage[id] is set nil. So if you are keeping track of objects directly in a table, instead of ID 
 		then you absolutely must rid of every single reference to the userdata so that it can be destroy and garbage collected. Otherwise you end up with undetectable issues.
@@ -70,6 +70,14 @@ function start_game_callback()
 	pda.add_quick_slot_items_on_game_start()
 end
 
+function alife_object(id)
+	if (id == nil) then
+		callstack()
+		printf("ALIFE OBJECT ID IS NIL!")
+		return
+	end
+	return alife():object(id)
+end
 -------------------------------------------------------------------------------------------------------
 -- 											SCRIPTED CALLBACKS
 -------------------------------------------------------------------------------------------------------
@@ -332,7 +340,7 @@ end
 game_object.alive = function(self)
 	callstack()
 	printf("alive %s",self:name())
-	local se_obj = alife():object(self:id())
+	local se_obj = alife_object(self:id())
 	return se_obj:alive()
 end
 --]]
@@ -1273,7 +1281,7 @@ end
 function get_story_se_object(story_obj_id)
 	local obj_id = story_obj_id and story_objects.get_story_objects_registry():get(story_obj_id)
 	if obj_id == nil then return nil end
-	return alife():object(obj_id)
+	return alife_object(obj_id)
 end
 
 function get_story_object(story_obj_id)
@@ -1305,7 +1313,7 @@ function get_object_squad(object,caller)
 		return
 	end
 		if (object.group_id ~= nil and object.group_id ~= 65535) then
-		return alife():object(object.group_id)
+		return alife_object(object.group_id)
 	end
 		local sim = alife()
 	local se_obj = type(object.id) == "function" and sim:object(object:id())
@@ -1314,7 +1322,7 @@ end
 
 function get_story_squad(story_id)
 	local squad_id = get_story_object_id(story_id)
-	return squad_id and alife():object(squad_id)
+	return squad_id and alife_object(squad_id)
 end
 
 --Проверка по временному интервалу.

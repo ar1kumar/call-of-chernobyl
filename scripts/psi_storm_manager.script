@@ -464,7 +464,7 @@ function CPsiStormManager:kill_crows_at_pos(pos)
 	h.direction = vector():set(0,0,1)
 	h.draftsman = db.actor
 	for k,v in pairs(bind_crow.crow_storage) do
-		local obj = alife():object(v)
+		local obj = alife_object(v)
 		if obj then
 			local crow = level.object_by_id(obj.id)
 			if(crow and crow:alive() and distance_2d(pos, crow:position())<25) then

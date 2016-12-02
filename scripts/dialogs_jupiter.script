@@ -856,16 +856,16 @@ end
 function jup_b6_stalker_dialog_precond(first_speaker, second_speaker)
 	--local npc = dialogs.who_is_npc(first_speaker, second_speaker)
 
-	se_npc = alife():object(npc:id())
+	se_npc = alife_object(npc:id())
 
 	if not(se_npc) then
 		return false
 	end
-	if alife():object(se_npc.group_id) == nil then
+	if alife_object(se_npc.group_id) == nil then
 		return false
 	end
 
-	local squad_name = alife():object(se_npc.group_id):section_name()
+	local squad_name = alife_object(se_npc.group_id):section_name()
 
 	if squad_name ~= nil and squad_name ~= "" then
 		if not has_alife_info("jup_b1_squad_is_dead") and squad_name == "jup_b1_stalker_squad" then

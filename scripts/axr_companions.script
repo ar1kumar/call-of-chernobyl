@@ -155,7 +155,7 @@ function get_companion_count()
 	local count = 0
 	for i=1,max_actor_squad_size do
 		local c = utils.load_var(db.actor,"companion_"..i,nil)
-		local se_obj = c and alife():object(c)
+		local se_obj = c and alife_object(c)
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
 			count = count + 1
 		else 
@@ -267,7 +267,7 @@ function remove_from_actor_squad(npc)
 		squad.scripted_target = nil
 	end 
 	
-	local se_obj = alife():object(npc:id())
+	local se_obj = alife_object(npc:id())
 	if not (se_obj) then 
 		return 
 	end
@@ -310,7 +310,7 @@ function can_join_actor(npc)
 end
 
 function set_companion_allow_teleport(npc)
-	local se_obj = alife():object(npc:id())
+	local se_obj = alife_object(npc:id())
 	if not (se_obj) then 
 		return 
 	end
@@ -318,7 +318,7 @@ function set_companion_allow_teleport(npc)
 end 
 
 function set_companion_disable_teleport(npc)
-	local se_obj = alife():object(npc:id())
+	local se_obj = alife_object(npc:id())
 	if not (se_obj) then 
 		return 
 	end
@@ -439,7 +439,7 @@ function companion_add_waypoints(npc,pos)
 	end
 	local pos = db.actor:position()
 	local s = "5000,patrol | pos:"..pos.x..","..pos.y..","..pos.z
-	utils.se_obj_load_var(npc:id(),npc:name(),"pathpoint"..i,s)--utils.save_var(npc,"pathpoint"..tostring(i),s)
+	utils.se_obj_save_var(npc:id(),npc:name(),"pathpoint"..i,s)--utils.save_var(npc,"pathpoint"..tostring(i),s)
 end
 
 function cycle_companions_combat_mode(force_mode)

@@ -206,7 +206,7 @@ function hostage_task(tsk,task_id)
 	end
 	
 	local id = tonumber(utils.load_var(db.actor,task_id .. "_id"))
-	local smart = id and alife():object(id)
+	local smart = id and alife_object(id)
 	if (smart) then 
 		smart.locked = true
 	end
@@ -236,7 +236,7 @@ function bounty_task(tsk,task_id)
 		if not (id) then
 			return "fail"
 		end
-		local se_obj = id and alife():object(id)
+		local se_obj = id and alife_object(id)
 		if not (se_obj) then 
 			return "fail"
 		end
@@ -387,7 +387,7 @@ function kill_strelok(tsk,task_id)
 	local squad = get_story_squad("legendary_strelok")
 	if (squad) then
 		for k in squad:squad_members() do
-			local se_obj = alife():object(k.id)
+			local se_obj = alife_object(k.id)
 			if (se_obj and not se_obj:alive()) then 
 				return "complete"
 			end 

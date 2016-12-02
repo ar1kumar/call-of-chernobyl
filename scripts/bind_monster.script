@@ -174,7 +174,7 @@ function generic_object_binder:death_callback(victim, who)
 		if (who:id() == db.actor:id()) then
 			xr_statistic.inc_counter("killed_monsters")
 		elseif (IsStalker(who) and who:alive()) then
-			local se_who = alife():object(who:id())
+			local se_who = alife_object(who:id())
 			-- npc_statistic
 			if (se_who) then
 				who:set_character_rank(who:character_rank()+math.random(5,15))
@@ -199,7 +199,7 @@ function generic_object_binder:death_callback(victim, who)
 	victim:set_callback(callback.sound,nil)
 	
 	if (victim:clsid() == clsid.poltergeist_s) then
-		local se_obj = alife():object(id)
+		local se_obj = alife_object(id)
 		if (se_obj) then
 			--alife():release(se_obj, true)
 			safe_release_manager.release(se_obj)
@@ -260,7 +260,7 @@ function generic_object_binder:net_spawn(sobject)
 		return false
 	end
 	
-	local se_obj = alife():object(self.object:id())
+	local se_obj = alife_object(self.object:id())
 	if not (se_obj) then 
 		return false 
 	end

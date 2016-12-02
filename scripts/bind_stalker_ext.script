@@ -279,7 +279,7 @@ end
 function actor_on_detach_vehicle(binder,obj)
 	SendScriptCallback("actor_on_detach_vehicle",obj)
 	if (obj:section() == "deployable_mgun") then 
-		local se_obj = alife():object(obj:id())
+		local se_obj = alife_object(obj:id())
 		if (se_obj) then 
 			alife():release(se_obj)
 		end

@@ -99,7 +99,7 @@ function npc_trade_buy_sell(npc)
 
 	-- increase NPC rank because he is a good boy
 	npc:set_character_rank(npc:character_rank()+math.random(20,30))
-	local se_obj = alife():object(npc:id())
+	local se_obj = alife_object(npc:id())
 	if not (se_obj) then 
 		return 
 	end

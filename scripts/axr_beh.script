@@ -258,7 +258,7 @@ function action_beh:set_desired_target()
 	local t = self.st.desired_target and empty_table(self.st.desired_target) or {}
 	local function set_position_data(id)
 		local obj = level.object_by_id(id)
-		local sobj = alife():object(id)
+		local sobj = alife_object(id)
 		if (obj) then
 			t.level_vertex_id = obj:level_vertex_id()
 			t.game_vertex_id = obj:game_vertex_id()

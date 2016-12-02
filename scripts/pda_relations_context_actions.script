@@ -1,10 +1,10 @@
 function init(self,npc,id)
 	local pos = GetCursorPosition()
-	local se_obj = alife():object(id)
+	local se_obj = alife_object(id)
 	if not (se_obj) then 
 		return 
 	end
-	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife():object(se_obj.group_id)
+	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife_object(se_obj.group_id)
 
 	-- Actions 
 	local action_1 = nil -- Main
