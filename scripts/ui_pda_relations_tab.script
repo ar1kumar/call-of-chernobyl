@@ -170,7 +170,8 @@ function pda_relations_tab:autoupdate()
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
 			self.companion_info[i].id = se_obj.id 
 			
-			local npc = db.storage[se_obj.id] and db.storage[se_obj.id].object
+			local st = db.storage[se_obj.id]
+			local npc = st and st.object
 
 			local icon_name = npc and npc:character_icon() or se_obj:character_icon()
 			icon_name = icon_name and icon_name ~= "" and icon_name or "ui\\ui_noise"
@@ -251,8 +252,21 @@ function pda_relations_tab:autoupdate()
 				s_combat = game.translate_string("st_set_companion_to_attack_state")
 			end
 			
-			s_gather = alife():has_info(se_obj.id,"npcx_beh_gather_items") and game.translate_string("st_pda_mode_on") or game.translate_string("st_pda_mode_off")
-			s_loot = alife():has_info(se_obj.id,"npcx_beh_loot_corpses") and game.translate_string("st_pda_mode_on") or game.translate_string("st_pda_mode_off")
+			local can_gather = alife():has_info(se_obj.id,"npcx_beh_gather_items") 
+			local can_loot = alife():has_info(se_obj.id,"npcx_beh_loot_corpses")
+			s_gather = can_gather and game.translate_string("st_pda_mode_on") or game.translate_string("st_pda_mode_off")
+			s_loot = can_loot and game.translate_string("st_pda_mode_on") or game.translate_string("st_pda_mode_off")
+			
+			if (npc) then
+				-- If looting is set false in logic
+				if (can_gather and st.gather_items and st.gather_items.gather_items_enabled and xr_logic.pick_section_from_condlist(db.actor, npc, st.gather_items.gather_items_enabled) == "false") then 
+					s_gather = game.translate_string("st_pda_mode_disabled")	
+				end
+				if (can_loot and st.corpse_detection and st.corpse_detection.corpse_detection_enabled and xr_logic.pick_section_from_condlist(db.actor, npc, st.corpse_detection.corpse_detection_enabled) == "false") then 
+					s_loot = game.translate_string("st_pda_mode_disabled")
+				end
+			end
+			
 			s_dist = alife():has_info(se_obj.id,"npcx_beh_distance_far") and game.translate_string("st_pda_mode_dist_far") or game.translate_string("st_pda_mode_dist_near")
 			s_stealth = alife():has_info(se_obj.id,"npcx_beh_substate_stealth") and game.translate_string("st_pda_mode_on") or game.translate_string("st_pda_mode_off")
 			
@@ -263,8 +277,8 @@ function pda_relations_tab:autoupdate()
 				s_arte = m_data.artefacts_found or 0
 			end
 			
-			s_dismiss = utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss") and game.translate_string("st_pda_mode_dismiss_off") or game.translate_string("st_pda_mode_dismiss_on")
-			s_tele = utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_teleport") and game.translate_string("st_pda_mode_tele_off") or game.translate_string("st_pda_mode_tele_on")
+			s_dismiss = utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss") and game.translate_string("st_pda_mode_false") or game.translate_string("st_pda_mode_true")
+			s_tele = utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_teleport") and game.translate_string("st_pda_mode_disabled") or game.translate_string("st_pda_mode_enabled")
 	
 			state_str = strformat(state_str,s_move,s_combat,s_gather,s_loot,s_dist,s_stealth,s_dismiss,s_tele,s_stalker,s_mutant,s_arte)
 			self.companion_info[i].hint = state_str
