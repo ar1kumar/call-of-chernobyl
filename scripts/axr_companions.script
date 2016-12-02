@@ -338,7 +338,7 @@ function set_companion_combat_type_default(npc)
 	npc:disable_info_portion("npcx_beh_combat_tactics_camper")
 end
 
-function set_companion_to_wait_state(npc)
+function set_companion_to_wait_state(npc)	
 	npc:give_info_portion("npcx_beh_wait")
 	utils.save_var(npc,"fight_from_point",npc:level_vertex_id())
 end
@@ -618,3 +618,56 @@ function set_companion_squad_stealth_mode(mode,npc,squad)
 	end
 end
 
+function set_companion_squad_distance_mode(mode,npc,squad)
+	squad = squad or get_object_squad(npc)
+	if (squad and squad.commander_id) then
+		for k in squad:squad_members() do
+			if not (xrs_kill_wounded.hostage_list[k.id]) then
+				local member = db.storage[k.id] and db.storage[k.id].object
+				if (member and member:alive()) then
+					if (mode == 1) then
+						member:give_info_portion("npcx_beh_distance_far")
+					else 
+						member:disable_info_portion("npcx_beh_distance_far")
+					end
+				end
+			end
+		end
+	end
+end
+
+function set_companion_squad_gather_mode(mode,npc,squad)
+	squad = squad or get_object_squad(npc)
+	if (squad and squad.commander_id) then
+		for k in squad:squad_members() do
+			if not (xrs_kill_wounded.hostage_list[k.id]) then
+				local member = db.storage[k.id] and db.storage[k.id].object
+				if (member and member:alive()) then
+					if (mode == 1) then
+						member:give_info_portion("npcx_beh_gather_items")
+					else 
+						member:disable_info_portion("npcx_beh_gather_items")
+					end
+				end
+			end
+		end
+	end
+end
+
+function set_companion_squad_loot_mode(mode,npc,squad)
+	squad = squad or get_object_squad(npc)
+	if (squad and squad.commander_id) then
+		for k in squad:squad_members() do
+			if not (xrs_kill_wounded.hostage_list[k.id]) then
+				local member = db.storage[k.id] and db.storage[k.id].object
+				if (member and member:alive()) then
+					if (mode == 1) then
+						member:give_info_portion("npcx_beh_loot_corpses")
+					else 
+						member:disable_info_portion("npcx_beh_loot_corpses")
+					end
+				end
+			end
+		end
+	end
+end

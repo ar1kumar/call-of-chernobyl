@@ -2,96 +2,138 @@ function init(self,npc,id)
 	local pos = GetCursorPosition()
 	local squad = get_object_squad(npc)
 	
-	local action_list_1 = nil
-	local action_list_2 = nil
-	local action_list_3 = nil
-	local action_list_4 = nil
+	-- Actions 
+	local action_1 = nil -- Main
+	local action_1__1 = nil -- Trade
+	local action_1__2 = nil -- Commands
+		local action_1__2_1 = nil -- Back 
+		local action_1__2_2 = nil -- Movement
+			local action_1__2_2_1 = nil -- Back 
+			local action_1__2_2_2 = nil -- Follow/Wait
+			local action_1__2_2_3 = nil -- Far/Near Distance
+		local action_1__2_3 = nil -- Combat 
+			local action_1__2_3_1 = nil -- Back 
+			local action_1__2_3_2 = nil -- Passive 
+			local action_1__2_3_3 = nil -- Defensive 
+			local action_1__2_3_4 = nil -- Aggressive
+		local action_1__2_4 = nil -- Looting
+			local action_1__2_4_1 = nil -- Back
+			local action_1__2_4_2 = nil -- Gather Items (toggle)
+			local action_1__2_4_3 = nil -- Loot Corpses (toggle)
+		local action_1__2_5 = nil -- Stealth
 	
-	-- MAIN
-	action_list_1 = {
-		-- [1] = function()
-			-- db.actor:run_talk_dialog(npc,true)
-		-- end,
-		[1] = function()
-			npc:use(db.actor)
-		end,
-		[2] = function()
-			-- COMMANDS
-			action_list_2 = action_list_2 or {
-			[1] = function()
-				ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_context_opt_2","st_pda_context_opt_3")
-			end,
-			[2] = function()
-				-- COMBAT
-				action_list_3 = action_list_3 or {
-					[1] = function()
-						local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_context_opt_cmd_3_off" or "st_pda_context_opt_cmd_3_on"
-						local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_context_opt_cmd_4_off" or "st_pda_context_opt_cmd_4_on"
-						ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
-					end,
-					[2] = function()
-						axr_companions.set_companion_squad_combat_mode(2,npc,squad)
-						self:Reset()
-					end,
-					[3] = function()
-						axr_companions.set_companion_squad_combat_mode(3,npc,squad)
-						self:Reset()
-					end,
-					[4] = function()
-						axr_companions.set_companion_squad_combat_mode(1,npc,squad)
-						self:Reset()
-					end
-				}
-				ui_dyn_msg_box.context_menu(self,pos,action_list_3,"st_pda_context_opt_0","st_pda_context_opt_cmd_1_1","st_pda_context_opt_cmd_1_2","st_pda_context_opt_cmd_1_3")
-			end,
-			[3] = function()
-				-- MOVEMENT
-				action_list_4 = action_list_4 or {
-					[1] = function()
-						local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_context_opt_cmd_3_off" or "st_pda_context_opt_cmd_3_on"
-						local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_context_opt_cmd_4_off" or "st_pda_context_opt_cmd_4_on"
-						ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
-					end,
-					[2] = function()
-						axr_companions.set_companion_squad_move_mode(2,npc,squad)
-						self:Reset()
-					end,
-					[3] = function()
-						axr_companions.set_companion_squad_move_mode(1,npc,squad)
-						self:Reset()
-					end,
-					[4] = function()
-						local mode = npc:has_info("npcx_beh_substate_stealth") and 0 or 1
-						axr_companions.set_companion_squad_stealth_mode(mode,npc,squad)
-						self:Reset()
-					end
-				}
-				local st_stealth = npc:has_info("npcx_beh_substate_stealth") and "st_pda_context_opt_cmd_2_3_off" or "st_pda_context_opt_cmd_2_3_on"
-				ui_dyn_msg_box.context_menu(self,pos,action_list_4,"st_pda_context_opt_0","st_pda_context_opt_cmd_2_1","st_pda_context_opt_cmd_2_2",st_stealth)
-			end,
-			[4] = function()
-				-- GATHER ITEMS
-				if ( npc:has_info("npcx_beh_gather_items") ) then
-					npc:disable_info_portion("npcx_beh_gather_items")
-				else
-					npc:give_info_portion("npcx_beh_gather_items")
-				end
-				self:Reset()
-			end,
-			[5] = function()
-				-- LOOT CORPSES
-				if ( npc:has_info("npcx_beh_loot_corpses") ) then
-					npc:disable_info_portion("npcx_beh_loot_corpses")
-				else
-					npc:give_info_portion("npcx_beh_loot_corpses")
-				end
-				self:Reset()
-			end
-			}
-			local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_context_opt_cmd_3_off" or "st_pda_context_opt_cmd_3_on"
-			local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_context_opt_cmd_4_off" or "st_pda_context_opt_cmd_4_on"
-			ui_dyn_msg_box.context_menu(self,pos,action_list_2,"st_pda_context_opt_0","st_pda_context_opt_cmd_1","st_pda_context_opt_cmd_2",st_gather,st_loot)
-		end
-	}
-	ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_context_opt_2","st_pda_context_opt_3")
+	-- Action Trees
+	local action_list_1 = nil
+	local action_list_1__2 = nil
+	local action_list_1__2_2 = nil
+	local action_list_1__2_3 = nil
+	local action_list_1__2_4 = nil
+	
+	-- Action definitions
+	action_1 = function()
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_action_1__1","st_pda_action_1__2")
+	end 
+	
+	action_1__1 = function()
+		npc:use(db.actor)
+	end 
+	
+	action_1__2 = function()
+		local st_stealth = npc:has_info("npcx_beh_substate_stealth") and "st_pda_action_1__2_5_on" or "st_pda_action_1__2_5_off"
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1__2,"st_pda_action_back","st_pda_action_1__2_2","st_pda_action_1__2_3","st_pda_action_1__2_4",st_stealth)
+	end
+	
+	action_1__2_1 = function()
+		action_1()
+	end
+	
+	action_1__2_2 = function()
+		local st_movement_state = npc:has_info("npcx_beh_wait") and "st_pda_action_1__2_2_2_on" or "st_pda_action_1__2_2_2_off"
+		local st_distance_state = npc:has_info("npcx_beh_distance_far") and "st_pda_action_1__2_2_3_on" or "st_pda_action_1__2_2_3_off"
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1__2_2,"st_pda_action_back",st_movement_state,st_distance_state)
+	end
+	
+	action_1__2_3 = function()
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1__2_3,"st_pda_action_back","st_pda_action_1__2_3_2","st_pda_action_1__2_3_3","st_pda_action_1__2_3_4")
+	end
+
+	action_1__2_4 = function()
+		local st_gather = npc:has_info("npcx_beh_gather_items") and "st_pda_action_1__2_4_2_on" or "st_pda_action_1__2_4_2_off"
+		local st_loot = npc:has_info("npcx_beh_loot_corpses") and "st_pda_action_1__2_4_3_on" or "st_pda_action_1__2_4_3_off"
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1__2_4,"st_pda_action_back",st_gather,st_loot)
+	end
+	
+	action_1__2_5 = function()
+		local mode = npc:has_info("npcx_beh_substate_stealth") and 0 or 1
+		axr_companions.set_companion_squad_stealth_mode(mode,npc,squad)
+		self:Reset()		
+	end
+	
+	action_1__2_2_1 = function()
+		action_1__2()
+	end
+	
+	action_1__2_2_2 = function()
+		local mode = npc:has_info("npcx_beh_wait") and 2 or 1
+		axr_companions.set_companion_squad_move_mode(mode,npc,squad)
+		self:Reset()	
+	end
+	
+	action_1__2_2_3 = function()
+		local mode = npc:has_info("npcx_beh_distance_far") and 0 or 1
+		axr_companions.set_companion_squad_distance_mode(mode,npc,squad)
+		self:Reset()	
+	end
+	
+	action_1__2_3_1 = function()
+		action_1__2()
+	end
+	
+	action_1__2_3_2 = function()
+		axr_companions.set_companion_squad_combat_mode(2,npc,squad)
+		self:Reset()
+	end
+
+	action_1__2_3_3 = function()
+		axr_companions.set_companion_squad_combat_mode(3,npc,squad)
+		self:Reset()
+	end
+
+	action_1__2_3_4 = function()
+		axr_companions.set_companion_squad_combat_mode(1,npc,squad)
+		self:Reset()
+	end
+	
+	action_1__2_4_1 = function()
+		action_1__2()
+	end
+	
+	action_1__2_4_2 = function()
+		local mode = npc:has_info("npcx_beh_gather_items") and 0 or 1
+		axr_companions.set_companion_squad_gather_mode(mode,npc,squad)
+		self:Reset()	
+	end
+
+	action_1__2_4_3 = function()
+		local mode = npc:has_info("npcx_beh_loot_corpses") and 0 or 1
+		axr_companions.set_companion_squad_loot_mode(mode,npc,squad)
+		self:Reset()	
+	end
+	
+	action_1__2_5 = function()
+		local mode = npc:has_info("npcx_beh_substate_stealth") and 0 or 1
+		axr_companions.set_companion_squad_stealth_mode(mode,npc,squad)
+		self:Reset()	
+	end
+	
+	-- Action List definitions
+	action_list_1 		= {action_1__1,action_1__2}
+	action_list_1__2 	= {action_1__2_1,action_1__2_2,action_1__2_3,action_1__2_4,action_1__2_5}
+	action_list_1__2_2 	= {action_1__2_2_1,action_1__2_2_2,action_1__2_2_3}
+	action_list_1__2_3	= {action_1__2_3_1,action_1__2_3_2,action_1__2_3_3,action_1__2_3_4}
+	action_list_1__2_4 	= {action_1__2_4_1,action_1__2_4_2,action_1__2_4_3}
+	
+	-- Create Main Context Menu
+	ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_action_1__1","st_pda_action_1__2")
 end
+

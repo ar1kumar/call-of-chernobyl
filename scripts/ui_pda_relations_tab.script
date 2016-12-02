@@ -279,6 +279,12 @@ function pda_relations_tab:autoupdate()
 			else 
 				state_str = state_str .. game.translate_string("st_set_companion_to_follow_state") .. "\\n"
 			end
+			
+			if (alife():has_info(se_obj.id,"npcx_beh_distance_far")) then 
+				state_str = state_str .. game.translate_string("st_pda_distance_state_far") .. "\\n"
+			else 
+				state_str = state_str .. game.translate_string("st_pda_distance_state_near") .. "\\n"
+			end
 	
 
 			if (alife():has_info(se_obj.id,"npcx_beh_gather_items")) then 
