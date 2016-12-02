@@ -1,7 +1,11 @@
 function init(self,npc,id)
 	local pos = GetCursorPosition()
-	local squad = get_object_squad(npc)
-	
+	local se_obj = alife():object(id)
+	if not (se_obj) then 
+		return 
+	end
+	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife():object(se_obj.group_id)
+
 	-- Actions 
 	local action_1 = nil -- Main
 	local action_1__1 = nil -- Trade
@@ -35,7 +39,11 @@ function init(self,npc,id)
 	end 
 	
 	action_1__1 = function()
-		npc:use(db.actor)
+		if not (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss")) then
+			npc:use(db.actor)
+		else 
+			self:SetMsg(game.translate_string("st_pda_cant_trade"),3)
+		end
 	end 
 	
 	action_1__2 = function()
@@ -125,7 +133,7 @@ function init(self,npc,id)
 		axr_companions.set_companion_squad_stealth_mode(mode,npc,squad)
 		self:Reset()	
 	end
-	
+
 	-- Action List definitions
 	action_list_1 		= {action_1__1,action_1__2}
 	action_list_1__2 	= {action_1__2_1,action_1__2_2,action_1__2_3,action_1__2_4,action_1__2_5}

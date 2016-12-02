@@ -169,9 +169,11 @@ function list_actor_squad_by_id()
 	local t = {}
 	for id,squad in spairs(companion_squads, function(t,a,b) return a < b end) do 
 		if (squad and squad.commander_id) then
-			for k in squad:squad_members() do
-				--printf("member %s",k.id)
-				table.insert(t,k.id)
+			if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+				for k in squad:squad_members() do
+					--printf("member %s",k.id)
+					table.insert(t,k.id)
+				end
 			end
 		end
 	end
@@ -456,8 +458,8 @@ function cycle_companions_combat_mode(force_mode)
 	if (f) then 
 		for id,squad in pairs(companion_squads) do 
 			if (squad and squad.commander_id) then
-				for k in squad:squad_members() do
-					if not (xrs_kill_wounded.hostage_list[k.id]) then
+				if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+					for k in squad:squad_members() do
 						local member = db.storage[k.id] and db.storage[k.id].object
 						if (member and member:alive()) then
 							f(member)
@@ -486,8 +488,8 @@ function cycle_companions_move_mode(force_mode)
 	if (f) then 
 		for id,squad in pairs(companion_squads) do 
 			if (squad and squad.commander_id) then
-				for k in squad:squad_members() do
-					if not (xrs_kill_wounded.hostage_list[k.id]) then
+				if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+					for k in squad:squad_members() do
 						st = db.storage[k.id]
 						if (k.id == squad:commander_id()) then 
 							if (st and st.beh) then 
@@ -538,16 +540,18 @@ function move_to_point(p)
 				SetHudMsg(game.translate_string("st_move_to_point"),8)
 				for id,squad in pairs(companion_squads) do 
 					if (squad and squad.commander_id) then
-						for k in squad:squad_members() do
-							st = db.storage[k.id]
-							local member = st and st.object
-							if (member and member:alive()) then
-								set_companion_to_follow_state(member)
-								utils.save_var(member,"fight_from_point",lvid)
-							end
-							if (k.id == squad:commander_id() and not xrs_kill_wounded.hostage_list[k.id]) then 
-								if (st and st.beh) then 
-									st.beh.rally_lvid = lvid
+						if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+							for k in squad:squad_members() do
+								st = db.storage[k.id]
+								local member = st and st.object
+								if (member and member:alive()) then
+									set_companion_to_follow_state(member)
+									utils.save_var(member,"fight_from_point",lvid)
+								end
+								if (k.id == squad:commander_id()) then 
+									if (st and st.beh) then 
+										st.beh.rally_lvid = lvid
+									end
 								end
 							end
 						end
@@ -564,8 +568,8 @@ function set_companion_squad_move_mode(mode,npc,squad)
 	if (f) then
 		squad = squad or get_object_squad(npc)
 		if (squad and squad.commander_id) then
-			for k in squad:squad_members() do
-				if not (xrs_kill_wounded.hostage_list[k.id]) then
+			if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+				for k in squad:squad_members() do
 					st = db.storage[k.id]
 					if (k.id == squad:commander_id()) then 
 						if (st and st.beh) then 
@@ -588,8 +592,8 @@ function set_companion_squad_combat_mode(mode,npc,squad)
 	if (f) then 
 		squad = squad or get_object_squad(npc)
 		if (squad and squad.commander_id) then
-			for k in squad:squad_members() do
-				if not (xrs_kill_wounded.hostage_list[k.id]) then
+			if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+				for k in squad:squad_members() do
 					local member = db.storage[k.id] and db.storage[k.id].object
 					if (member and member:alive()) then
 						f(member)
@@ -603,8 +607,8 @@ end
 function set_companion_squad_stealth_mode(mode,npc,squad)
 	squad = squad or get_object_squad(npc)
 	if (squad and squad.commander_id) then
-		for k in squad:squad_members() do
-			if not (xrs_kill_wounded.hostage_list[k.id]) then
+		if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+			for k in squad:squad_members() do
 				local member = db.storage[k.id] and db.storage[k.id].object
 				if (member and member:alive()) then
 					if (mode == 1) then
@@ -621,8 +625,8 @@ end
 function set_companion_squad_distance_mode(mode,npc,squad)
 	squad = squad or get_object_squad(npc)
 	if (squad and squad.commander_id) then
-		for k in squad:squad_members() do
-			if not (xrs_kill_wounded.hostage_list[k.id]) then
+		if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+			for k in squad:squad_members() do
 				local member = db.storage[k.id] and db.storage[k.id].object
 				if (member and member:alive()) then
 					if (mode == 1) then
@@ -639,8 +643,8 @@ end
 function set_companion_squad_gather_mode(mode,npc,squad)
 	squad = squad or get_object_squad(npc)
 	if (squad and squad.commander_id) then
-		for k in squad:squad_members() do
-			if not (xrs_kill_wounded.hostage_list[k.id]) then
+		if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+			for k in squad:squad_members() do
 				local member = db.storage[k.id] and db.storage[k.id].object
 				if (member and member:alive()) then
 					if (mode == 1) then
@@ -657,8 +661,8 @@ end
 function set_companion_squad_loot_mode(mode,npc,squad)
 	squad = squad or get_object_squad(npc)
 	if (squad and squad.commander_id) then
-		for k in squad:squad_members() do
-			if not (xrs_kill_wounded.hostage_list[k.id]) then
+		if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+			for k in squad:squad_members() do
 				local member = db.storage[k.id] and db.storage[k.id].object
 				if (member and member:alive()) then
 					if (mode == 1) then
