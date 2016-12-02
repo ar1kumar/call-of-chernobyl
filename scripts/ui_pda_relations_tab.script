@@ -1,9 +1,8 @@
-local mouse_over_id = nil
-
 -- PDA_Custom
 UIRelations = nil
 class "pda_relations_tab" (CUIScriptWnd)
 function pda_relations_tab:__init() super()
+	self.mouse_over_id = nil
 	self.list = {
 		"stalker",
 		"dolg",
@@ -122,11 +121,11 @@ function pda_relations_tab:btn_to_text()
 end
 
 function pda_relations_tab:OnSelectCompanionList()
-	if not (mouse_over_id) then 
+	if not (self.mouse_over_id) then 
 		return 
 	end 
 	
-	local id = self.companion_info[mouse_over_id].id
+	local id = self.companion_info[self.mouse_over_id].id
 	local npc = id and db.storage[id] and db.storage[id].object 
 	if not (npc) then 
 		return 
@@ -164,14 +163,14 @@ function pda_relations_tab:Update()
 
 					--FitInRect(self.background,self.rect,0,0)
 					
-					mouse_over_id = i
+					self.mouse_over_id = i
 					
 					return
 				end
 			end
 		end
 	end
-	mouse_over_id = nil
+	self.mouse_over_id = nil
 	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
 end
 
