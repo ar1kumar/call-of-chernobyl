@@ -108,6 +108,15 @@ local function on_level_changing()
 	end
 end
 
+local function actor_on_item_drop(item)
+	if (ActorMenu.get_menu_mode() == 4) then 
+		local m_data = alife_storage_manager.get_state()
+		if not (m_data.companion_borrow_item) then
+			m_data.companion_borrow_item = {}
+		end
+		m_data.companion_borrow_item[item:id()] = true
+	end
+end
 ---------------------------------
 -- Register Callbacks
 ---------------------------------
@@ -129,6 +138,7 @@ function on_game_start()
 	RegisterScriptCallback("squad_on_unregister",squad_on_unregister)
 	RegisterScriptCallback("on_level_changing",on_level_changing)
 	RegisterScriptCallback("on_game_load",on_game_load)
+	RegisterScriptCallback("actor_on_item_drop",actor_on_item_drop)
 
 	allow_only_friends_as_companions = ini:r_bool_ex("main","allow_only_friends_as_companions",false)
 	allow_simulation_squads_as_companions = ini:r_bool_ex("main","allow_simulation_squads_as_companions",false)
