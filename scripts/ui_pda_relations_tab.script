@@ -1,4 +1,3 @@
--- PDA_Custom
 UIRelations = nil
 class "pda_relations_tab" (CUIScriptWnd)
 function pda_relations_tab:__init() super()
@@ -106,6 +105,7 @@ function pda_relations_tab:InitControls()
 	-- Hint Window
 	self.hint_wnd = xml:InitFrame("hint_wnd:background",self)
 	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text",self.hint_wnd)
+	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
 	
 	-- Message Window 
 	self.msg_wnd = xml:InitFrame("hint_wnd:background",self)
@@ -141,18 +141,9 @@ function pda_relations_tab:Update()
 				self.companion_info[i].icon_wnd:GetAbsoluteRect(rect)
 
 				if (utils.pos_in_rect(pos,rect)) then 
-					self.hint_wnd_text:SetText(self.companion_info[i].hint)
-					self.hint_wnd_text:AdjustHeightToText()
-					self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
-					
-					pos.y = pos.y - self.hint_wnd:GetHeight()
-					pos.x = pos.x - self.hint_wnd:GetWidth()
-					self.hint_wnd:SetWndPos(pos)
-
+					self:SetHint(self.companion_info[i].hint)
 					--FitInRect(self.background,self.rect,0,0)
-					
 					self.mouse_over_id = i
-					
 					return
 				end
 			end
@@ -313,10 +304,8 @@ function pda_relations_tab:Reset()
 				self.relations[i][k]:SetText(game.translate_string("st_goodwill_indifferent"))
 
 			end
-			--if xrs_debug_tools.feature_is_active then self.relations[i][k]:SetText(tostring(r_val)) end
 
 			if not (self.to_text) then self.relations[i][k]:SetText(tostring(r_val)) end
-
 		end
 	end
 
@@ -359,6 +348,16 @@ function pda_relations_tab:SetMsg(text,tmr)
 
 	self.msg_wnd_timer = time_global() + 1000*tmr
 end
+
+function pda_relations_tab:SetHint(text)
+	self.hint_wnd_text:SetText(text)
+	self.hint_wnd_text:AdjustHeightToText()
+	self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
+	
+	pos.y = pos.y - self.hint_wnd:GetHeight()
+	pos.x = pos.x - self.hint_wnd:GetWidth()
+	self.hint_wnd:SetWndPos(pos)
+end
 ---------
 class "ui_companion_row" (CUIListBoxItem)
 function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
@@ -373,14 +372,14 @@ function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 		
 		owner.companion_info[n] = {
 			["id"]				= nil,
-			["icon_wnd"] 		= self:AddIconField(i+10),
-			["leader_wnd"] 		= self:AddIconField(i+11),
-			["name_wnd"]		= self:AddTextField("",i+12),
-			["comm_wnd"]		= self:AddTextField("",i+13),
-			["rank_wnd"]		= self:AddTextField("",i+14),
-			["health_wnd"]		= self:AddTextField("",i+15),
-			["dist_wnd"]		= self:AddTextField("",i+16),
-			["code_wnd"] 		= self:AddTextField("",i+17),
+			["icon_wnd"] 		= self:AddIconField(1),
+			["leader_wnd"] 		= self:AddIconField(1),
+			["name_wnd"]		= self:AddTextField("",1),
+			["comm_wnd"]		= self:AddTextField("",1),
+			["rank_wnd"]		= self:AddTextField("",1),
+			["health_wnd"]		= self:AddTextField("",1),
+			["dist_wnd"]		= self:AddTextField("",1),
+			["code_wnd"] 		= self:AddTextField("",1),
 			["hint"]			= ""
 		}
 		
