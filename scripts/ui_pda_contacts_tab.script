@@ -40,7 +40,7 @@ function pda_contacts_tab:Reset()
 	
 	-- Stalker information.
 	local stalker = nil
-	local stalker_fact = nil
+	local stalker_comm = nil
 	local stalker_icon = nil
 	local stalker_name = nil
 	local stalker_rank = nil
@@ -56,9 +56,12 @@ function pda_contacts_tab:Reset()
 	for i = 1, (column_limit * row_limit) do
 		if (self.contact_info[i]) then
 			self.contact_info[i].comm_field:SetText("")
+			self.contact_info[i].comm_label:SetText("")
 			self.contact_info[i].icon_field:Show(false)
 			self.contact_info[i].name_field:SetText("")
 			self.contact_info[i].rank_field:SetText("")
+			self.contact_info[i].rept_field:SetText("")
+			self.contact_info[i].rept_label:SetText("")
 		end
 	end
 		
@@ -72,7 +75,7 @@ function pda_contacts_tab:Reset()
 			distance = db.actor:position():distance_to_sqr(stalker:position())
 			if (distance <= (radius * radius)) then
 				-- Retrieve required information.
-				stalker_fact = character_community(stalker)
+				stalker_comm = character_community(stalker)
 				stalker_icon = stalker:character_icon()
 				stalker_name = stalker:character_name()
 				stalker_rank = ranks.get_se_obj_rank_name(stalker)
@@ -85,14 +88,17 @@ function pda_contacts_tab:Reset()
 				stalker_name = string.len(stalker_name) <= 20 and stalker_name or string.sub(stalker_name, 0, 17) .. "..."
 				self.contact_info[index].name_field:SetText(stalker_name)
 				
-				self.contact_info[index].comm_field:SetText("Faction: " .. game.translate_string(stalker_fact))
+				self.contact_info[index].comm_label:SetText("Faction: ")
+				self.contact_info[index].rept_label:SetText("Reputation: ")
+				
+				self.contact_info[index].comm_field:SetText(game.translate_string(stalker_comm))
 				self.contact_info[index].rank_field:SetText("Rank: " .. game.translate_string("st_rank_" .. stalker_rank))
-				self.contact_info[index].rept_field:SetText("Reputation: " .. game.translate_string(stalker_rept))
+				self.contact_info[index].rept_field:SetText(game.translate_string(stalker_rept))
 				
 				-- Display relation by colouring the stalker's faction name appropriately.
-				if (xr_conditions.is_factions_friends(nil, nil, { stalker_fact, character_community(db.actor) })) then
+				if (xr_conditions.is_factions_friends(nil, nil, { stalker_comm, character_community(db.actor) })) then
 					self.contact_info[index].comm_field:SetTextColor(GetARGB(255,1,255,1))
-				elseif (xr_conditions.is_factions_enemies(nil, nil, { stalker_fact, character_community(db.actor) })) then
+				elseif (xr_conditions.is_factions_enemies(nil, nil, { stalker_comm, character_community(db.actor) })) then
 					self.contact_info[index].comm_field:SetTextColor(GetARGB(255,255,1,1))
 				else 
 					self.contact_info[index].comm_field:SetTextColor(GetARGB(255,255,255,1))
@@ -124,6 +130,8 @@ function ui_contact_row:__init(parent, row, xml) super(parent, row, xml)
 
 	local index = 0
 	local is_widescreen = utils.is_widescreen()
+	local offset_comm = is_widescreen and 36 or 49
+	local offset_rept = is_widescreen and 51 or 68
 	local x = is_widescreen and 40 or 55
 	
 	-- Five stalkers are listed on each row.
@@ -135,8 +143,10 @@ function ui_contact_row:__init(parent, row, xml) super(parent, row, xml)
 		-- Create the components for each entry.
 		parent.contact_info[index] = {
 			["comm_field"] = self:AddTextField("", 1),
+			["comm_label"] = self:AddTextField("", 1),
 			["icon_field"] = self:AddIconField(1),
 			["name_field"] = self:AddTextField("", 1),
+			["rept_label"] = self:AddTextField("", 1),
 			["rept_field"] = self:AddTextField("", 1),
 			["rank_field"] = self:AddTextField("", 1),
 		}
@@ -154,13 +164,21 @@ function ui_contact_row:__init(parent, row, xml) super(parent, row, xml)
 		parent.contact_info[index].rank_field:SetWndSize(vector2():set(120, 20))
 		parent.contact_info[index].rank_field:SetWndPos(vector2():set(x, 80))
 		
+		parent.contact_info[index].rept_label:SetFont(GetFontLetterica16Russian())
+		parent.contact_info[index].rept_label:SetWndSize(vector2():set(120, 20))
+		parent.contact_info[index].rept_label:SetWndPos(vector2():set(x, 95))
+		
 		parent.contact_info[index].rept_field:SetFont(GetFontLetterica16Russian())
 		parent.contact_info[index].rept_field:SetWndSize(vector2():set(120, 20))
-		parent.contact_info[index].rept_field:SetWndPos(vector2():set(x, 95))
+		parent.contact_info[index].rept_field:SetWndPos(vector2():set(x + offset_rept, 95))
+		
+		parent.contact_info[index].comm_label:SetFont(GetFontLetterica16Russian())
+		parent.contact_info[index].comm_label:SetWndSize(vector2():set(120, 20))
+		parent.contact_info[index].comm_label:SetWndPos(vector2():set(x, 110))
 		
 		parent.contact_info[index].comm_field:SetFont(GetFontLetterica16Russian())
 		parent.contact_info[index].comm_field:SetWndSize(vector2():set(120, 20))
-		parent.contact_info[index].comm_field:SetWndPos(vector2():set(x, 110))
+		parent.contact_info[index].comm_field:SetWndPos(vector2():set(x + offset_comm, 110))
 		
 		x = x + (is_widescreen and 150 or 180)
 	end
