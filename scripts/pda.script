@@ -82,7 +82,7 @@ function actor_menu_mode(mode)
 		--printf("---:>Talk Dialog show")
 	elseif(mode==11) then
 		--printf("---:>Talk Dialog hide")
-		SendScriptCallback("actor_on_leave_dialog")
+		SendScriptCallback("actor_on_leave_dialog",inventory_upgrades.victim_id)
 		inventory_upgrades.victim_id = nil
 		dialog_closed = true
 	end
