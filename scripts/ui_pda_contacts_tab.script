@@ -82,7 +82,7 @@ function pda_contacts_tab:Reset()
 				self.contact_info[index].icon_field:InitTexture(stalker_icon)
 				self.contact_info[index].icon_field:Show(true)
 				
-				stalker_name = string.len(stalker_name) <= 25 and stalker_name or string.sub(stalker_name, 0, 22) .. "..."
+				stalker_name = string.len(stalker_name) <= 20 and stalker_name or string.sub(stalker_name, 0, 17) .. "..."
 				self.contact_info[index].name_field:SetText(stalker_name)
 				
 				self.contact_info[index].comm_field:SetText("Faction: " .. game.translate_string(stalker_fact))
