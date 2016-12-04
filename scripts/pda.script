@@ -76,15 +76,19 @@ function actor_menu_mode(mode)
 				if sound_theme and sound_theme.reset then
 					sound_theme:reset(id)
 				end
+				local m_data = alife_storage_manager.get_state()
+				if (m_data and m_data.actor_contacts) then 
+					m_data.actor_contacts[id] = true
+				end
 				break
 			end
 		end
 		--printf("---:>Talk Dialog show")
 	elseif(mode==11) then
 		--printf("---:>Talk Dialog hide")
+		SendScriptCallback("actor_on_leave_dialog")
 		inventory_upgrades.victim_id = nil
 		dialog_closed = true
-		SendScriptCallback("actor_on_leave_dialog")
 	end
 end
 
