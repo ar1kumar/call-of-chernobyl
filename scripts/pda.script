@@ -30,6 +30,14 @@ function set_active_subdialog(section)
 			--ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
 		end
 		return ui_pda_relations_tab.UIRelations
+		
+	elseif (section == "eptContacts") then
+		if not (ui_pda_contacts_tab.UIContacts) then
+			ui_pda_contacts_tab.UIContacts = ui_pda_contacts_tab.pda_contacts_tab()
+		else
+			ui_pda_contacts_tab.UIContacts:Reset()
+		end
+		return ui_pda_contacts_tab.UIContacts
 	end
 end 
 
