@@ -28,7 +28,9 @@ function evaluator_combat_enemy:evaluate()
 
 	local tg = time_global()
 	if (best_enemy == nil and self.st.timer == nil) then
-		if (xr_conditions.surge_started() ~= true and db.storage[npc:id()].active_scheme ~= "camper") then
+		if (npc:has_info("npcx_is_companion")) then
+			return false
+		elseif (xr_conditions.surge_started() ~= true and db.storage[npc:id()].active_scheme ~= "camper") then
 			local overrides = db.storage[npc:id()].overrides
 			local min = (overrides and overrides.min_post_combat_time*1000) or 20000
 			local max = (overrides and overrides.max_post_combat_time*1000) or 25000
