@@ -138,13 +138,17 @@ function pda_contacts_tab:Reset()
 	end
 	-- Special case for Sidorovich and Forester
 	local sor = story_objects.get_story_objects_registry()
-	local id = sor:get("esc_m_trader") or sor:get("red_tech_forester")
-	if (id) then
-		local npc = db.storage[id] and db.storage[id].object
-		if (npc) then
-			table.insert(display_list,npc)
+	local function add_by_sid(sid)
+		local id = sor:get(sid)
+		if (id) then 
+			local npc = db.storage[id] and db.storage[id].object 
+			if (npc) then 
+				table.insert(display_list,npc)
+			end
 		end
 	end
+	add_by_sid("esc_m_trader")
+	add_by_sid("red_tech_forester")
 	for index,stalker in ipairs(display_list) do
 		-- Retrieve required information.
 		local stalker_comm = stalker:character_community()
