@@ -1,6 +1,6 @@
+-- script
 ---------------------------------
 ----- Written by Darryl123 ------
---- Edited by Alundaio & Nuor ---
 ---------------------------------
 
 -- Column and row limits.
@@ -20,40 +20,84 @@ end
 function pda_contacts_tab:InitControls()
 	self:SetWndRect(Frect():set(0, 0, 1024, 768))
 	
+	-- Main frame
 	local xml = CScriptXmlInit()
 	xml:ParseFile("pda_contacts.xml")
 	xml:InitFrame("frame1", self)
 	xml:InitFrame("frame2", self)
 	
-	self.autocheck = xml:InitCheck("auto_check", self)
-	self.autocheck:SetCheck(false)
-	self.show_enemy = xml:InitCheck("show_enemy", self)
-	self.show_enemy:SetCheck(false)
+	-- Refresh checkbox
+	self.auto_chk = xml:InitCheck("auto_check",self)
+	self.auto_chk:SetCheck(axr_main.config:r_value("pda_contacts","check_refresh",1,false))
+	self:Register(self.auto_chk, "check_refresh")
+	self:AddCallback("check_refresh",ui_events.BUTTON_CLICKED,self.SaveCheckBoxSettings,self)
 	
+	-- Show Known checkbox
+	self.show_all = xml:InitCheck("show_all",self)
+	self.show_all:SetCheck(axr_main.config:r_value("pda_contacts","check_show_known",1,true))
+	self:Register(self.show_all, "check_show_known")
+	self:AddCallback("check_show_known",ui_events.BUTTON_CLICKED,self.SaveCheckBoxSettings,self)
+	
+	-- List of contact rows
 	self.listbox = xml:InitListBox("listbox", self)
 	self.listbox:SetItemHeight(140)
 	self:Register(self.listbox, "listbox")
 	for i = 1, row_limit do
 		self.listbox:AddExistingItem(ui_contact_row(self, i, xml))
 	end
+	
+	-- Hint Window
+	self.hint_wnd = xml:InitFrame("hint_wnd:background",self)
+	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text",self.hint_wnd)
+	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
 end
 
--- Automatically update the interface.
+function pda_contacts_tab:SaveCheckBoxSettings()
+	axr_main.config:w_value("pda_contacts","check_refresh",self.auto_chk:GetCheck())
+	axr_main.config:w_value("pda_contacts","check_show_known",self.show_all:GetCheck())
+	axr_main.config:save()
+end
+
+function pda_contacts_tab:SetHint(text,pos)
+	self.hint_wnd_text:SetText(text)
+	self.hint_wnd_text:AdjustHeightToText()
+	self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
+	
+	pos.y = pos.y - self.hint_wnd:GetHeight()
+	pos.x = pos.x - self.hint_wnd:GetWidth()
+	self.hint_wnd:SetWndPos(pos)
+end
+
 function pda_contacts_tab:Update()
 	CUIScriptWnd.Update(self)
-	if self.autocheck:GetCheck() then
+	-- option to auto update values
+	if self.auto_chk:GetCheck() then
 		local tg = time_global()
 		if not self._tmr or self._tmr < tg then
 			self._tmr = tg + 5000
 			self:Reset()
 		end
 	end
+	-- hint	
+	for i=1, (column_limit * row_limit) do
+		if (self.contact_info[i].icon_field:IsShown()) then 
+			local pos = GetCursorPosition()
+			local rect = Frect():set(0,0,0,0)
+			self.contact_info[i].icon_field:GetAbsoluteRect(rect)
+
+			if (utils.pos_in_rect(pos,rect)) then 
+				self:SetHint(self.contact_info[i].hint,pos)
+				return
+			end
+		end
+	end
+	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
 end
 
 -- Reset the interface.
 function pda_contacts_tab:Reset()
 	-- Retrieve the detection radius used by contact counter.
-	local radius = ((system_ini():r_float_ex("device_pda", "radius") or 68) ^ 2)
+	local radius = (system_ini():r_float_ex("device_pda", "radius") or 68)^2
 
 	-- Erase all pre-existing information.
 	for i = 1, (column_limit * row_limit) do
@@ -66,32 +110,44 @@ function pda_contacts_tab:Reset()
 			self.contact_info[i].rank_label:SetText("")
 			self.contact_info[i].rept_field:SetText("")
 			self.contact_info[i].rept_label:SetText("")
+			self.contact_info[i].hint = ""
 		end
 	end
 	
 	-- Loop through all currently online stalkers.
 	local display_list = {}
-	for i = 1, #db.OnlineStalkers do
+	local m_data = alife_storage_manager.get_state()
+	for i=1, #db.OnlineStalkers do
 		local npc = db.storage[db.OnlineStalkers[i]]
 		npc = npc and npc.object or level.object_by_id(db.OnlineStalkers[i])
 		if (npc and IsStalker(npc) and npc:alive()) then
 			-- Display stalkers who are within the PDA contact radius.
 			local distance = db.actor:position():distance_to_sqr(npc:position()) or 0
 			if (distance <= radius) then
-				if self.show_enemy:GetCheck() then
-					table.insert(display_list,npc)
-				else
-					if npc:relation(db.actor) ~= game_object.enemy then
-						table.insert(display_list, npc)
+				if npc:relation(db.actor) ~= game_object.enemy then
+					if self.show_all:GetCheck() then
+						if (m_data.actor_contacts and m_data.actor_contacts[db.OnlineStalkers[i]]) then
+							table.insert(display_list,npc)
+						end
+					else
+						table.insert(display_list,npc)
 					end
 				end
 			end
 		end
 	end
-	
-	-- Retrieve required information.
-	for index, stalker in ipairs(display_list) do
-		local stalker_comm = character_community(stalker)
+	-- Special case for Sidorovich and Forester
+	local sor = story_objects.get_story_objects_registry()
+	local id = sor:get("esc_m_trader") or sor:get("red_tech_forester")
+	if (id) then
+		local npc = db.storage[id] and db.storage[id].object
+		if (npc) then
+			table.insert(display_list,npc)
+		end
+	end
+	for index,stalker in ipairs(display_list) do
+		-- Retrieve required information.
+		local stalker_comm = stalker:character_community()
 		local stalker_icon = stalker:character_icon()
 		local stalker_name = stalker:character_name()
 		local stalker_rank = ranks.get_se_obj_rank_name(stalker)
@@ -101,15 +157,22 @@ function pda_contacts_tab:Reset()
 		self.contact_info[index].icon_field:InitTexture(stalker_icon)
 		self.contact_info[index].icon_field:Show(true)
 		
-		stalker_name = string.len(stalker_name) <= 20 and stalker_name or string.sub(stalker_name, 0, 17) .. "..."
-		self.contact_info[index].name_field:SetText(stalker_name)
+		local name = string.gsub(stalker_name,"Junior","Jr.")
+		name = string.gsub(name,"Senior","Sr.")
+		name = string.gsub(name,"Master ","M")
+		name = string.gsub(name,"Private","PVT")
+		name = string.gsub(name,"Sergeant","SGT")
+		name = string.gsub(name,"Lieutenant","LT")
+		name = string.gsub(name,"Captain","CPT")
+		name = string.len(name) <= 22 and name or string.sub(name, 0, 19) .. "..."
+		self.contact_info[index].name_field:SetText(name)
 		
 		self.contact_info[index].comm_label:SetText(game.translate_string("ui_st_community") .. ": ")
 		self.contact_info[index].rank_label:SetText(game.translate_string("ui_st_rank") .. ": ")
 		self.contact_info[index].rept_label:SetText(game.translate_string("ui_st_reputation") .. ": ")
 		
 		self.contact_info[index].comm_field:SetText(game.translate_string(stalker_comm))
-		self.contact_info[index].rank_field:SetText(game.translate_string("st_rank_" .. stalker_rank))
+		self.contact_info[index].rank_field:SetText(game.translate_string(stalker_rank))
 		self.contact_info[index].rept_field:SetText(game.translate_string(stalker_rept))
 		
 		-- Display relation by colouring the stalker's faction name appropriately.
@@ -129,6 +192,25 @@ function pda_contacts_tab:Reset()
 		else
 			self.contact_info[index].rept_field:SetTextColor(GetARGB(255,255,255,1))
 		end
+		-- Hint
+		local s_stalker,s_mutant,s_arte
+		local state_str = [[
+		%c[255,255,160,255]%c[default] %s \n
+		\n%c[255,215,215,215]Statistics:%c[default] \n
+		%c[255,160,160,160]Stalkers killed:%c[default] %s \n
+		%c[255,160,160,160]Mutants killed:%c[default] %s \n
+		%c[255,160,160,160]Artefacts found:%c[default] %s
+		]]	
+	
+		local m_data = alife_storage_manager.get_se_obj_state(alife_object(stalker:id()))
+		if (m_data) then
+			s_stalker = m_data.stalkers_killed or 0
+			s_mutant = m_data.mutants_killed or 0
+			s_arte = m_data.artefacts_found or 0
+		end
+		
+		state_str = strformat(state_str,stalker_name,s_stalker,s_mutant,s_arte)
+		self.contact_info[index].hint = state_str
 	end
 end
 
@@ -163,6 +245,7 @@ function ui_contact_row:__init(parent, row, xml) super(parent, row, xml)
 			["rept_field"] = self:AddTextField("", 1),
 			["rank_label"] = self:AddTextField("", 1),
 			["rank_field"] = self:AddTextField("", 1),
+			["hint"]       = ""
 		}
 		
 		parent.contact_info[index].icon_field:InitTexture("ui\\ui_noise")

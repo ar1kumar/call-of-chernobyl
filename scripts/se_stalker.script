@@ -111,7 +111,13 @@ function se_stalker:on_unregister()
 	end
 	db.offline_objects[self.id] = nil
 	-- If object unregisters before saving, it means it was removed from game
-	alife_storage_manager.get_state().se_object[self.id] = nil
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	if (m_data.actor_contacts) then
+		m_data.actor_contacts[self.id] = nil
+	end
 	unregister_story_object_by_id(self.id)
 	cse_alife_human_stalker.on_unregister(self)
 end
@@ -136,6 +142,10 @@ function se_stalker:on_death(killer)
 	if (level.map_has_object_spot(self.id,"red_location") == 1) then
 		level.map_remove_object_spot(self.id, "red_location")
 	end
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.actor_contacts) then
+		m_data.actor_contacts[self.id] = nil
+	end
 end
 --------------------
 function se_stalker:update()
@@ -156,6 +166,10 @@ end
 function se_trader:on_unregister()
 	unregister_story_object_by_id(self.id)
 	cse_alife_trader.on_unregister(self)
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.actor_contacts) then
+		m_data.actor_contacts[self.id] = nil
+	end
 end
 
 function se_trader:keep_saved_data_anyway()
