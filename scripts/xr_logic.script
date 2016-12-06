@@ -374,6 +374,12 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 						break
 					end
 				end
+			elseif (npc_id and alife():has_info(npc_id,infop.name)) then
+				if not infop.required then
+					--'printf("FAILED: actor has infop '%s', which is NOT needed [%s]", infop.name, tostring(has_alife_info(infop.name)))
+					infop_conditions_met = false -- инфопоршен есть, но он не должен присутствовать
+					break
+				end
 			elseif (has_alife_info(infop.name)) then
 				if not infop.required then
 					--'printf("FAILED: actor has infop '%s', which is NOT needed [%s]", infop.name, tostring(has_alife_info(infop.name)))
@@ -381,12 +387,6 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 					break
 				else
 					--'printf("PASSED: actor has infop '%s', which is needed [%s]", infop.name, tostring(has_alife_info(infop.name)))
-				end
-			elseif (npc_id and alife():has_info(npc_id,infop.name)) then
-				if not infop.required then
-					--'printf("FAILED: actor has infop '%s', which is NOT needed [%s]", infop.name, tostring(has_alife_info(infop.name)))
-					infop_conditions_met = false -- инфопоршен есть, но он не должен присутствовать
-					break
 				end
 			else
 				if infop.required then
