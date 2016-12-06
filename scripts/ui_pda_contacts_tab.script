@@ -59,6 +59,9 @@ function pda_contacts_tab:SaveCheckBoxSettings()
 end
 
 function pda_contacts_tab:SetHint(text,pos)
+	if (text == "") then 
+		return
+	end
 	self.hint_wnd_text:SetText(text)
 	self.hint_wnd_text:AdjustHeightToText()
 	self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
@@ -197,26 +200,26 @@ function pda_contacts_tab:Reset()
 			self.contact_info[index].rept_field:SetTextColor(GetARGB(255,255,255,1))
 		end
 		-- Hint
-		local s_stalker,s_mutant,s_arte,s_sold
-		local state_str = [[
-		%c[255,255,160,255]%c[default] %s \n
-		\n%c[255,215,215,215]Statistics:%c[default] \n
-		%c[255,160,160,160]Stalkers killed:%c[default] %s \n
-		%c[255,160,160,160]Mutants killed:%c[default] %s \n
-		%c[255,160,160,160]Artefacts found:%c[default] %s \n 
-		%c[255,160,160,160]Items sold:%c[default] %s
-		]]	
-	
 		local m_data = alife_storage_manager.get_se_obj_state(alife_object(stalker:id()))
 		if (m_data) then
+			local s_stalker,s_mutant,s_arte,s_sold
+			local state_str = [[
+			%c[255,255,160,255]%c[default] %s \n
+			\n%c[255,215,215,215]Statistics:%c[default] \n
+			%c[255,160,160,160]Stalkers killed:%c[default] %s \n
+			%c[255,160,160,160]Mutants killed:%c[default] %s \n
+			%c[255,160,160,160]Artefacts found:%c[default] %s \n
+			%c[255,160,160,160]Items sold:%c[default] %s
+			]]	
+		
 			s_stalker = m_data.stalkers_killed or 0
 			s_mutant = m_data.mutants_killed or 0
 			s_arte = m_data.artefacts_found or 0
 			s_sold = m_data.items_sold or 0
+			
+			state_str = strformat(state_str,stalker_name,s_stalker,s_mutant,s_arte,s_sold)
+			self.contact_info[index].hint = state_str
 		end
-		
-		state_str = strformat(state_str,stalker_name,s_stalker,s_mutant,s_arte,s_sold)
-		self.contact_info[index].hint = state_str
 	end
 end
 
