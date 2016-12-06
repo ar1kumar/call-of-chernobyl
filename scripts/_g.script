@@ -71,9 +71,9 @@ function start_game_callback()
 end
 
 function alife_object(id)
-	if (id == nil) then
+	if (id == nil or id >= 65535) then
 		callstack()
-		printf("ALIFE OBJECT ID IS NIL!")
+		printf("ALIFE OBJECT ID IS %s!",id)
 		return
 	end
 	return alife():object(id)
