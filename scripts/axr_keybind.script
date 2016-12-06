@@ -153,6 +153,11 @@ function action.debug_test(p)
 	end 
 	if (p==1) then
 	
+		local function itr(id,info)
+			printf(info)
+		end
+		alife():iterate_info(0,itr)
+	
 		--alun_utils.print_table(story_objects.get_story_objects_registry().story_id)
 		--[[ PRINT _G
 		local valid = {

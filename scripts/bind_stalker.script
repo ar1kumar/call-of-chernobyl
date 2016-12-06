@@ -38,6 +38,10 @@ function actor_binder:net_spawn(data)
 	db.add_actor(self.object)
 	db.add_enemy(self.object)
 
+	db.actor:disable_info_portion("npcx_is_companion")
+	db.actor:disable_info_portion("npcx_beh_wait")
+	db.actor:disable_info_portion("npcx_beh_cannot_dismiss")
+	
 	level_weathers.get_weather_manager():reset()
 	
 	db.actor.deimos_intensity = self.deimos_intensity
