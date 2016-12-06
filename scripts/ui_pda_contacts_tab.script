@@ -145,7 +145,7 @@ function pda_contacts_tab:Reset()
 		local id = sor:get(sid)
 		if (id) then 
 			local npc = db.storage[id] and db.storage[id].object 
-			if (npc) then 
+			if (npc and db.actor:position():distance_to_sqr(npc:position()) <= radius) then 
 				table.insert(display_list,npc)
 			end
 		end
