@@ -69,6 +69,8 @@ function CSurgeManager:__init()
 						body_tear	=sound_object("anomaly\\anomaly_body_tear_1"),
 						siren		=sound_object("ambient\\blowout\\blowout_siren")
 					}
+	self.blowout_waves 	= {}
+	self.body_tears 	= {}
 end
 
 function CSurgeManager:initialize()
@@ -181,6 +183,7 @@ function CSurgeManager:start(manual)
 		self.started = true
 		self.finished = false
 		self.task_given = nil
+		self:finalize()
 		self.blowout_waves = empty_table(self.blowout_waves)
 		self.objects_to_kill = empty_table(self.objects_to_kill)
 		self.stages = empty_table(self.stages)
@@ -972,6 +975,19 @@ function CSurgeManager:start_wave(num,inited_time)
 	end
 end
 
+function CSurgeManager:finalize()
+	for k,v in pairs(self.blowout_waves) do
+		if (v.effect and v.effect:playing()) then 
+			v.effect:stop()
+		end
+	end
+	for k,v in pairs(self.body_tears) do 
+		if (v:playing()) then 
+			v:stop()
+		end
+	end
+end 
+
 function CSurgeManager:kill_wave(num)
 	if self.blowout_waves[num] then
 		self.blowout_waves[num].effect:stop_deffered()
@@ -1563,7 +1579,7 @@ function actor_on_load(binder,packet)
 		--mgr.surge_message = packet:r_stringZ()
 		--mgr.surge_task_sect = packet:r_stringZ()
 		mgr.game_time_factor = packet:r_u32()
-		
+		mgr:finalize()
 		mgr.blowout_waves = empty_table(mgr.blowout_waves)
 		mgr.objects_to_kill = empty_table(mgr.objects_to_kill)
 		mgr.stages = empty_table(mgr.stages)
@@ -1628,7 +1644,7 @@ function load_state(m_data)
 		mgr.ui_disabled = m_data.SurgeManager.ui_disabled or false
 		mgr.blowout_sound = m_data.SurgeManager.blowout_sound or false
 		mgr.game_time_factor = m_data.SurgeManager.game_time_factor or level.get_time_factor()
-		
+		mgr:finalize()
 		mgr.blowout_waves = empty_table(mgr.blowout_waves)
 		mgr.objects_to_kill = empty_table(mgr.objects_to_kill)
 		mgr.stages = empty_table(mgr.stages)

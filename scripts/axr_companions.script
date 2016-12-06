@@ -539,7 +539,9 @@ function move_to_point(p)
 		end	
 	else
 		if (_draw_part) then
-			_draw_part:stop()
+			if (_draw_part:playing()) then
+				_draw_part:stop()
+			end
 			_draw_part = nil
 		end
 		local r = level.get_target_dist and level.get_target_dist()

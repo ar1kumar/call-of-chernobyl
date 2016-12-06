@@ -672,7 +672,7 @@ end
 --##################################################################################################
 
 function WeatherManager:launch_meteorites()
-	if self.meteorites_particle~=nil then
+	if self.meteorites_particle ~=nil then
 		self.meteorites_particle:stop()
 	end
 	self.meteorites_particle=particles_object("crommcruac\\meteorites")
@@ -886,3 +886,14 @@ function WeatherManager:load_state(m_data)
 	
 	--alun_utils.debug_write("WeatherManager:load_state AFTER")
 end 
+
+function WeatherManager:finalize()
+	if (self.meteorites_particle and self.meteorites_particle:playing()) then
+		self.meteorites_particle:stop()
+	end
+	for key,thunder in pairs(self.thunders) do
+		if (thunder.effect and thunder.effect:playing()) then 
+			thunder.effect:stop()
+		end
+	end
+end

@@ -66,6 +66,10 @@ spawn_heli
 [spawn_heli]
 spawn_helicopter = helicopter
 spawn_num = 1
+
+2. create <level_name>_heli_hide waypoint under map near edge
+3. create <level_name>_goto_hide path above map that leads to map edge. Heli will teleport to heli hide from this path
+If there is a heli hide waypoint helicopter will spawn here instead of over smart terrain that spawned them in
 -------------------------------------------------
 --]]
 
@@ -1122,6 +1126,7 @@ local function init_heli_hide_jobs(smart,heli_jobs,gname)
 	if (ltx) then 
 		job_ltx = [[
 [heli_move@hide]
+path_move		  = %s
 retreat_mode      = 2
 max_velocity      = 60
 max_mgun_dist     = 100
@@ -1136,7 +1141,7 @@ fire_trail        = false
 immortal     	  = true
 mute 			  = true	
 ]]
-		job_ltx = strformat(job_ltx)
+		job_ltx = strformat(job_ltx,level_name.."_heli_hide")
 		ltx = ltx.."\n\n"..job_ltx
 	end 
 	
@@ -1152,6 +1157,7 @@ mute 			  = true
 active = heli_move@%s
 
 [heli_move@%s]
+path_move		  = %s
 retreat_mode 	  = 1
 max_velocity      = 60
 max_mgun_dist     = 100
@@ -1165,7 +1171,7 @@ show_health       = false
 fire_trail        = false
 on_info			  = {=heli_dist_to_max_bounding_le(3)} heli_move@hide
 ]]
-			job_ltx = strformat(job_ltx,name,name,name)
+			job_ltx = strformat(job_ltx,name,name,name,level_name.."_goto_hide")
 
 			ltx = ltx.."\n\n"..job_ltx
 		end

@@ -24,7 +24,8 @@ local diff_game_sec			= -1
 
 class "CPsiStormManager"
 function CPsiStormManager:__init()
-
+	self.humanParticles = {}
+	self.vortexes 		= {}
 end
 
 function CPsiStormManager:initialize()
@@ -84,6 +85,11 @@ function CPsiStormManager:start(manual)
 		self.hitFactor=0
 		self.stages = empty_table(self.stages)
 		self.vortexes = empty_table(self.vortexes)
+		for k,v in pairs(self.humanParticles) do 
+			if (v:playing()) then
+				v:stop()
+			end
+		end 
 		self.humanParticles = empty_table(self.humanParticles)
 		self.next_vortex_at = nil
 		level.set_time_factor(10)
@@ -162,7 +168,9 @@ function CPsiStormManager:finish(manual)
 	prev_sec = 0
 	
 	for k,v in pairs(self.humanParticles) do 
-		v:stop()
+		if (v:playing()) then
+			v:stop()
+		end
 	end 
 	
 	self.humanParticles = empty_table(self.humanParticles)
@@ -304,6 +312,19 @@ function CPsiStormManager:vortex()
 	if self.vortexes[self.vortex_index].sound ~= nil then
 		self.vortexes[self.vortex_index].sound:play_at_pos(db.actor, self.vortexes[self.vortex_index].sound_pos)
 		self.vortexes[self.vortex_index].sound.volume = 1
+	end
+end
+
+function CPsiStormManager:finalize()
+	for k,v in pairs(self.vortexes) do 
+		if (v.effect and v.effect:playing()) then 
+			v.effect:stop()
+		end
+	end
+	for k,effect in pairs(self.humanParticles) do 
+		if (effect:playing()) then 
+			effect:stop()
+		end
 	end
 end
 
@@ -522,6 +543,11 @@ function load_state(m_data)
 		mgr.task_given = m_data.PsiStormManager.task_given or false
 		mgr.game_time_factor = m_data.PsiStormManager.game_time_factor or level.get_time_factor()
 		mgr.stages = empty_table(mgr.stages)
+		for k,v in pairs(mgr.humanParticles) do 
+			if (v:playing()) then
+				v:stop()
+			end
+		end 
 		mgr.humanParticles = empty_table(mgr.humanParticles)
 		mgr.vortexes = empty_table(mgr.vortexes)
 		mgr.stages = empty_table(mgr.stages)
@@ -573,6 +599,11 @@ function actor_on_load(binder,packet)
 		mgr.task_given = packet:r_bool()
 		mgr.game_time_factor = packet:r_u32()
 		mgr.stages = empty_table(mgr.stages)
+		for k,v in pairs(mgr.humanParticles) do 
+			if (v:playing()) then
+				v:stop()
+			end
+		end
 		mgr.humanParticles = empty_table(mgr.humanParticles)
 		mgr.vortexes = empty_table(mgr.vortexes)
 		mgr.stages = empty_table(mgr.stages)

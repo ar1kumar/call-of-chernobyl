@@ -80,6 +80,9 @@ function signal_light_binder:net_spawn(data)
 end
 
 function signal_light_binder:net_destroy()
+	if (self.slow_fly_started) then 
+		self:stop_light()
+	end
 	db.signal_light[self.object:name()] = nil
 	object_binder.net_destroy(self)
 end
