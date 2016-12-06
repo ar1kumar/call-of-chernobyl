@@ -50,8 +50,15 @@ function CInventory_ItemAvailableToTrade(npc,item)
 	-- if (xr_corpse_detection.lootable_table[item:section()]) then 
 		-- return true
 	-- end
-	local m_data = alife_storage_manager.get_state()
-	if (m_data and m_data.companion_borrow_item and m_data.companion_borrow_item[item:id()]) then 
+	if (db.actor:has_info("ui_pda") and npc:has_info("npcx_is_companion")) then
+		local m_data = alife_storage_manager.get_state()
+		if (m_data and m_data.companion_borrow_item and m_data.companion_borrow_item[item:id()]) then
+			printf("true %s",item:section())
+			return true
+		end
+		printf("false %s",item:section())
+		return false
+	else
 		return true
 	end
 	return false
