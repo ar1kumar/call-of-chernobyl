@@ -142,7 +142,6 @@ function pda_relations_tab:Update()
 
 				if (utils.pos_in_rect(pos,rect)) then 
 					self:SetHint(self.companion_info[i].hint,pos)
-					--FitInRect(self.background,self.rect,0,0)
 					self.mouse_over_id = i
 					return
 				end
@@ -371,6 +370,8 @@ function pda_relations_tab:SetHint(text,pos)
 	pos.y = pos.y - self.hint_wnd:GetHeight()
 	pos.x = pos.x - self.hint_wnd:GetWidth()
 	self.hint_wnd:SetWndPos(pos)
+	
+	FitInRect(self.hint_wnd,Frect():set(0,0,1024,768),0,0)
 end
 
 function pda_relations_tab:CreateContextMenu(npc,id)

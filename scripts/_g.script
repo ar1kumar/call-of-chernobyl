@@ -1380,7 +1380,7 @@ end
 -- returning false will ignore the hit completely
 function CActor__BeforeHitCallback(actor,shit,bone_id)
 	--printf("power=%s impuse=%s type=%s dir=%s who=%s",shit.power,shit.impulse,shit.type,shit.direction and vec_to_str(shit.direction),shit.draftsman and shit.draftsman:name())
-	if (bind_stalker_ext.invulnerable_time and tg < bind_stalker_ext.invulnerable_time) then 
+	if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
 		return false 
 	end
 	
