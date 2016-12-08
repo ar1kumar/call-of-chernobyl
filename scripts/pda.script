@@ -38,7 +38,14 @@ function set_active_subdialog(section)
 			ui_pda_contacts_tab.UIContacts:Reset()
 		end
 		return ui_pda_contacts_tab.UIContacts
+	
+	elseif (section == "eptEncyclopedia") then
+		if not (ui_pda_encyclopedia_tab.UIEncyclopedia) then
+			ui_pda_encyclopedia_tab.UIEncyclopedia = ui_pda_encyclopedia_tab.pda_encyclopedia_tab()
+		end
+		return ui_pda_encyclopedia_tab.UIEncyclopedia
 	end
+	
 end 
 
 local map_spot_property = {}
