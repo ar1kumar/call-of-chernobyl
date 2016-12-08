@@ -325,7 +325,7 @@ function sim_squad_scripted:generic_update()
 	-- Find a new target
 	local target = SIMBOARD:get_squad_target(self) or SIMBOARD:get_squad_target(self,false,true)
 	if not (target) then
-		printf("squad %s has no target",self:name())
+		--printf("squad %s has no target",self:name())
 		self:on_reach_target(self)
 		
 		-- we have to clear AFTER on_reach_target, not BEFORE so we can get location mask of old smart
