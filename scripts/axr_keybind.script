@@ -94,42 +94,44 @@ function action.pda_map(p)
 	if not (p==1) then
 		return 
 	end
-	if not (ActorMenu.get_pda_menu():IsShown()) then 
-		ActorMenu.get_pda_menu():ShowDialog(true)
+	local pda_menu = ActorMenu.get_pda_menu()
+	if not (pda_menu:IsShown()) then 
+		pda_menu:ShowDialog(true)
+		pda_menu:SetActiveSubdialog("eptTasks")
 	end
-	ActorMenu.get_pda_menu():SetActiveSubdialog("eptTasks")
 end 
 
 function action.pda_relations(p)
 	if not (p==1) then
 		return 
 	end
-	if not (ActorMenu.get_pda_menu():IsShown()) then 
-		ActorMenu.get_pda_menu():ShowDialog(true)
+	local pda_menu = ActorMenu.get_pda_menu()
+	if not (pda_menu:IsShown()) then 
+		pda_menu:ShowDialog(true)
+		pda_menu:SetActiveSubdialog("eptRelations")
 	end
-	printf("pda rleations 1")
-	ActorMenu.get_pda_menu():SetActiveSubdialog("eptRelations")
-	printf("pda rleations 2")
 end 
 
 function action.pda_contacts(p)
 	if not (p==1) then
 		return 
 	end
-	if not (ActorMenu.get_pda_menu():IsShown()) then 
-		ActorMenu.get_pda_menu():ShowDialog(true)
+	local pda_menu = ActorMenu.get_pda_menu()
+	if not (pda_menu:IsShown()) then 
+		pda_menu:ShowDialog(true)
+		pda_menu:SetActiveSubdialog("eptContacts")
 	end
-	ActorMenu.get_pda_menu():SetActiveSubdialog("eptContacts")
 end 
 
 function action.pda_stats(p)
 	if not (p==1) then
 		return 
 	end
-	if not (ActorMenu.get_pda_menu():IsShown()) then 
-		ActorMenu.get_pda_menu():ShowDialog(true)
+	local pda_menu = ActorMenu.get_pda_menu()
+	if not (pda_menu:IsShown()) then 
+		pda_menu:ShowDialog(true)
+		pda_menu:SetActiveSubdialog("eptRanking")
 	end
-	ActorMenu.get_pda_menu():SetActiveSubdialog("eptRanking")
 end
 
 function action.debug_demo_record(p)
