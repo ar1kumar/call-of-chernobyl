@@ -80,22 +80,6 @@ function CALifeStorageManager_before_save(fname)
 	
 	--ProcessEventQueueState(m_data,true)
 	
-	local function is_tbl_empty(tbl)
-		for kk,vv in pairs(tbl) do 
-			if kk ~= "name" then 
-				return false 
-			end
-		end
-		return true
-	end
-	
-	-- clean out se_object table of empty sub tables
-	-- for id,tbl in pairs(m_data.se_object) do 
-		-- if (type(v) == "table" and is_tbl_empty(v)) then 
-			-- m_data.se_object[k] = nil
-		-- end
-	-- end
-	
 	-- clean out game_object table of empty sub tables
 	for id,tbl in pairs(m_data.game_object) do 
 		for k,v in pairs(tbl) do
@@ -103,15 +87,9 @@ function CALifeStorageManager_before_save(fname)
 				m_data.game_object[id][k] = nil
 			end
 		end
-		if (is_tbl_empty(m_data.game_object[id])) then 
-			m_data.game_object[id] = nil
-		end
 	end
 	
 	local data = marshal.encode(m_data)
-	
-	m_data.game_object = nil
-	
 	if not (data) then 
 		return 
 	end

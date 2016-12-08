@@ -237,7 +237,11 @@ function motivator_binder:net_destroy()
 
 	db.del_obj(self.object)
 	db.delete_enemy(self.object)
-	alife_storage_manager.get_state().game_object[self.object:id()] = nil
+	
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.game_object) then
+		m_data.game_object[self.object:id()] = nil
+	end
 	
 	trade_manager.on_npc_death(self.object)
 	
