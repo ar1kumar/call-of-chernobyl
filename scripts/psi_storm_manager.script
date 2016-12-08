@@ -205,7 +205,7 @@ function CPsiStormManager:update()
 		return 
 	end 
 	
-	if not (self._state_loaded) then 
+	if not (surge_manager.SurgeManager and self._state_loaded) then 
 		self:initialize()
 	end 
 
