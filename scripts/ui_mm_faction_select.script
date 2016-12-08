@@ -634,6 +634,8 @@ function faction_ui:OnFactionSelect(faction)
 	
 	self.disp_faction_name:SetText(gs("st_faction_"..faction))
 	self.desc_text:SetText(desc)
+	self.desc_text:AdjustHeightToText()
+	self.desc_text:SetWndSize(vector2():set(self.desc_text:GetWidth(),self.desc_text:GetHeight()+45))
 	
 	if self.start_list then
 		self:load_start_positions()
