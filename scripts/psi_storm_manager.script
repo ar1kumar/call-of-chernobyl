@@ -689,9 +689,18 @@ function is_actor_immune()
 		return true
 	end
 	
+	-- invulnerability after game load
+	if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
+		return true 
+	end
+	
 	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
 		return true 
 	end 
+	
+	if (dialogs_yantar.actor_has_psi_helmet()) then 
+		return true 
+	end
 	
 	-- Actor is a member of the Monolith or Zombified factions.
 	if (character_community(db.actor) == "actor_monolith")
