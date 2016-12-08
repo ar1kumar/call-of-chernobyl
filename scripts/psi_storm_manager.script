@@ -242,7 +242,7 @@ function CPsiStormManager:update()
 	local actor_pos=db.actor:position()
 	if(prev_sec~=diff_sec) then
 		prev_sec = diff_sec
-		local level_name = level.name()
+
 		if(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_psi_storm",2,1)==0) then
 			self:finish()
 			return

@@ -573,10 +573,11 @@ function motivator_binder:load_state()
 	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
 	st.activation_time = state.xr_logic.activation_time and state.xr_logic.activation_time + time_global() or time_global()
 	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
+	state.xr_logic = nil
 	xr_sound.npc_load_state(id,state)
 	trade_manager.load_state(id,state)
 	if (state.pstor_all) then
-		--db.storage[id].pstor = state.pstor_all
+		db.storage[id].pstor = state.pstor_all
 		state.pstor_all = nil
 	end
 

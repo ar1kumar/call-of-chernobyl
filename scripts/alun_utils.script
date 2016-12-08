@@ -41,7 +41,11 @@ function print_table(tbl,header,format_only)
 			if (type(v) == "table") then
 				txt = txt .. tab(depth) .. key .. " =\n"..tab(depth).."{\n"
 				depth = depth + 1
-				table_to_string(v,tab(depth))
+				
+				if (depth < 4) then
+					table_to_string(v)
+				end 
+				
 				depth = depth - 1
 				txt = txt .. tab(depth) .. "}"
 			elseif (type(v) == "number" or type(v) == "boolean") then

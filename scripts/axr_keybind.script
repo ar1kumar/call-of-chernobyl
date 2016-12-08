@@ -11,12 +11,18 @@ keybinds = {
 					["companion_move_to_point"] 	= "kCUSTOM3",
 					["companion_cycle_stealth"] 	= "kCUSTOM4",
 					["companion_cycle_looting"] 	= "kCUSTOM5",
+					
+					["pda_map"]						= "kCUSTOM6",
+					["pda_relations"]				= "kCUSTOM7",
+					["pda_contacts"]				= "kCUSTOM8",
+					["pda_stats"]					= "kCUSTOM9",
+					
 					["debug_demo_record"]			= "DIK_NUMPAD0",
-					["debug_select_object"] 		= "DIK_NUMPAD9",
-					["debug_attachment_ui"] 		= "DIK_INSERT",
-					["debug_test"] 					= "DIK_NUMPADENTER",
+					--["debug_select_object"] 		= "DIK_NUMPAD9",
+					--["debug_attachment_ui"] 		= "DIK_INSERT",
+					--["debug_test"] 					= "DIK_NUMPADENTER",
 					--["debug_reload_game"]			= "DIK_END",
-					["debug_hold_action"]			= "DIK_NUMPAD8"
+					--["debug_hold_action"]			= "DIK_NUMPAD8"
 }
 
 action = {}
@@ -82,6 +88,48 @@ function action.companion_cycle_looting(p)
 			end
 		end
 	end
+end
+
+function action.pda_map(p)
+	if not (p==1) then
+		return 
+	end
+	if not (ActorMenu.get_pda_menu():IsShown()) then 
+		ActorMenu.get_pda_menu():ShowDialog(true)
+	end
+	ActorMenu.get_pda_menu():SetActiveSubdialog("eptTasks")
+end 
+
+function action.pda_relations(p)
+	if not (p==1) then
+		return 
+	end
+	if not (ActorMenu.get_pda_menu():IsShown()) then 
+		ActorMenu.get_pda_menu():ShowDialog(true)
+	end
+	printf("pda rleations 1")
+	ActorMenu.get_pda_menu():SetActiveSubdialog("eptRelations")
+	printf("pda rleations 2")
+end 
+
+function action.pda_contacts(p)
+	if not (p==1) then
+		return 
+	end
+	if not (ActorMenu.get_pda_menu():IsShown()) then 
+		ActorMenu.get_pda_menu():ShowDialog(true)
+	end
+	ActorMenu.get_pda_menu():SetActiveSubdialog("eptContacts")
+end 
+
+function action.pda_stats(p)
+	if not (p==1) then
+		return 
+	end
+	if not (ActorMenu.get_pda_menu():IsShown()) then 
+		ActorMenu.get_pda_menu():ShowDialog(true)
+	end
+	ActorMenu.get_pda_menu():SetActiveSubdialog("eptRanking")
 end
 
 function action.debug_demo_record(p)

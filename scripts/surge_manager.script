@@ -400,7 +400,7 @@ function CSurgeManager:calculate_best_surge_cover()
 		if (zone) then
 			local valid = type(condlist) == "boolean" or xr_logic.pick_section_from_condlist(db.actor, nil, condlist) ~= "false"
 			if (valid) then
-				dist = zone:position():distance_to(db.actor:position())
+				dist = zone:position():distance_to_sqr(db.actor:position())
 				if (near_dist == nil or dist < near_dist) then 
 					near = zone
 					near_dist = dist
@@ -462,19 +462,17 @@ function CSurgeManager:update()
 
 	--printf("diff_sec = %s",diff_sec)
 	if(prev_sec~=diff_sec) then
-		--self.debugMessages[1]:SetText("dif_sec: "..tostring(diff_sec))
-		--local rnd_sound = math_random(4000)
-		local rnd_sound= math.random(1,4)
 		prev_sec = diff_sec
-		local level_name = level.name()
+		
 		if (atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_blowout",2,1)==0) then
 			--printf("Surge stopped because of level!")
 			self:end_surge()
 			return
 		end
-
+		
+		local rnd_sound= math.random(1,4)
 		self:calculate_best_surge_cover()
-		--	self.loaded = false
+		
 		-- blowout begins -----------------------------------------------------------------------------------------------------------------------------------------
 		if (diff_sec>=0 and self.stages['beginning'] ~= true) then
 			if (level.get_time_hours() >= 5 and level.get_time_hours() <= 20) then
@@ -501,6 +499,7 @@ function CSurgeManager:update()
 		if (diff_sec>=30) then
 			if (self.task_given ~= true) then
 				if (warn=="radio" or warn =="radio_siren") then
+					local level_name = level.name()
 					if (level_name == "zaton") then
 						if not (utils.npc_in_zone(db.actor,"zat_a2_sr_noweap")) then
 							xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_surge_phase_1")
@@ -557,6 +556,7 @@ function CSurgeManager:update()
 		-- second message -----------------------------------------------------------------------------------------------------------------------------------------
 		if(diff_sec>=90) and not(self.second_message_given) then
 			if (warn=="radio" or warn=="radio_siren") then
+				local level_name = level.name()
 				if(level_name == "zaton" and not utils.npc_in_zone(db.actor,"zat_a2_sr_noweap")) then
 					xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_surge_phase_2")
 				elseif(level_name == "jupiter" and not utils.npc_in_zone(db.actor,"jup_a6_sr_noweap")) then
@@ -1533,13 +1533,6 @@ function actor_on_save(binder,packet)
 
 	if(mgr.started) then
 		alun_utils.w_stpk(packet,"CTime",mgr.inited_time,"CSurgeManager:inited_time")
-
-		--[[
-		for level,value in pairs(mgr.levels_respawn) do
-			alun_utils.w_stpk(packet,"bool",value or false,"CSurgeManager:levels_respawn."..level)
-		end
-		--]]
-
 		alun_utils.w_stpk(packet,"bool",mgr.task_given,"CSurgeManager:task_given")
 		alun_utils.w_stpk(packet,"bool",mgr.effector_set,"CSurgeManager:effector_set")
 		alun_utils.w_stpk(packet,"bool",mgr.second_message_given,"CSurgeManager:second_message_given")
@@ -1573,13 +1566,6 @@ function actor_on_load(binder,packet)
 	mgr.last_surge_time = utils.r_CTime(packet,"surge_manager") or game.get_game_time()
 	if(mgr.started) then
 		mgr.inited_time = utils.r_CTime(packet,"surge_manager") or game.get_game_time()
-
-		--[[
-		for level,value in pairs(mgr.levels_respawn) do
-			mgr.levels_respawn[level] = packet:r_bool()
-		end
-		--]]
-
 		mgr.task_given = packet:r_bool()
 		mgr.effector_set = packet:r_bool()
 		mgr.second_message_given = packet:r_bool()
