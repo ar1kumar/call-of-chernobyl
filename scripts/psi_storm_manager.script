@@ -341,7 +341,7 @@ function CPsiStormManager:finalize()
 end
 
 function CPsiStormManager:vortex_actor_hit(vortex)
-	if (is_actor_immune()) then 
+	if () then 
 		return 
 	end 
 	
@@ -351,13 +351,17 @@ function CPsiStormManager:vortex_actor_hit(vortex)
 		hit_power=math.cos(distance * math.pi / self.max_distance_psi_hit)+1
 		local h = hit()
 		h.type = hit.telepatic
-		h.power = surge_manager.SurgeManager:hit_power(hit_power, h.type)
+		if (is_actor_immune() or dialogs_yantar.actor_has_psi_helmet()) then 
+			h.power = 0
+		else 
+			h.power = surge_manager.SurgeManager:hit_power(hit_power, h.type)
+		end		
 		h.impulse = 0
 		h.direction = vector():set(0,0,1)
 		h.draftsman = db.actor
-		if not(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_god_mode",1,false) or utils.load_var(db.actor,"surge_immuned",false)) then
-			db.actor:hit(h)
-		end
+		
+		db.actor:hit(h)
+
 		level.remove_pp_effector(666)
 		level.add_pp_effector("psi_fade.ppe", 666, false)
 		level.set_pp_effector_factor(666,h.power)
@@ -366,13 +370,15 @@ function CPsiStormManager:vortex_actor_hit(vortex)
 		hit_power=math.cos(distance * math.pi / self.max_distance_electro_hit)+1
 		local h = hit()
 		h.type = hit.shock
-		h.power = surge_manager.SurgeManager:hit_power(hit_power, h.type)
+		if (is_actor_immune()) then 
+			h.power = 0
+		else 
+			h.power = surge_manager.SurgeManager:hit_power(hit_power, h.type)
+		end
 		h.impulse = 0
 		h.direction = vector():set(0,0,1)
 		h.draftsman = db.actor
-		if not(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_god_mode",1,false) or utils.load_var(db.actor,"surge_immuned",false)) then
-			db.actor:hit(h)
-		end
+		db.actor:hit(h)
 		level.remove_pp_effector(667)
 		level.add_pp_effector("electro_fade.ppe", 667, false)
 		level.set_pp_effector_factor(667,h.power)
@@ -689,16 +695,7 @@ function is_actor_immune()
 		return true
 	end
 	
-	-- invulnerability after game load
-	if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
-		return true 
-	end
-	
 	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
-		return true 
-	end 
-	
-	if (dialogs_yantar.actor_has_psi_helmet()) then 
 		return true 
 	end
 	
