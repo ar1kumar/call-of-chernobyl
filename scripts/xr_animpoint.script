@@ -204,7 +204,7 @@ function animpoint:position_riched()
 	end
 	if (dist <= self.st.reach_distance) then
 		local dir1 = vector():set(self.smart_direction)
-		local dir2 = vector():set(npc:direction())
+		--local dir2 = vector():set(npc:direction())
 		--npc:set_desired_direction()
 		--npc:set_sight(look.direction, dir1:normalize(), true)
 		state_mgr.set_state(npc, "animpoint_reach", {turn_end_func=function() self.st.am_i_reached = true return end}, nil, {look_dir = dir1})
@@ -217,6 +217,8 @@ function animpoint:position_riched()
 		end
 		--]]
 		return self.st.am_i_reached
+	else 
+		self.st.am_i_reached = false
 	end
 	return false
 end

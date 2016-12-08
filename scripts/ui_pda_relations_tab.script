@@ -361,6 +361,9 @@ function pda_relations_tab:SetMsg(text,tmr)
 end
 
 function pda_relations_tab:SetHint(text,pos)
+	if (text == "") then
+		return
+	end
 	self.hint_wnd_text:SetText(text)
 	self.hint_wnd_text:AdjustHeightToText()
 	self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
