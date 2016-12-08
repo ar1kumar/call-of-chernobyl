@@ -677,7 +677,7 @@ function debug_ui:FillList(name)
 		return
 	end
 
-	self.spawn_list:Clear()
+	self.spawn_list:RemoveAll()
 
 	local spawntbl = get_spawn_table(name)
 
@@ -740,7 +740,7 @@ function debug_ui:FillEditorList(name)
 		return
 	end
 
-	self.editor_spawn_list:Clear()
+	self.editor_spawn_list:RemoveAll()
 
 	local spawntbl = get_spawn_table(name)
 
@@ -1281,7 +1281,7 @@ function debug_ui:FillAnim()
 	sp = string.sub(sp,0,string.len(sp)-1)
 	lua_extensions.recurse_subdirectories_and_execute(sp,{"ppe","anm"},fill_tbl)
 	-------
-	self.anims_list:Clear()
+	self.anims_list:RemoveAll()
 	for i=1, #anim_tbl do
 		local _itm = set_list_text(22)
 		_itm.sect:SetText(anim_tbl[i].fn)
@@ -1993,7 +1993,7 @@ function anim_ui:FillAnim()
 	sp = string.sub(sp,0,string.len(sp)-1)
 	lua_extensions.recurse_subdirectories_and_execute(sp,{"ppe","anm"},fill_tbl)
 	-------
-	self.anims_list:Clear()
+	self.anims_list:RemoveAll()
 	for i=1, #anim_tbl do
 		local _itm = set_list_text(22)
 		_itm.sect:SetText(anim_tbl[i].fn)
