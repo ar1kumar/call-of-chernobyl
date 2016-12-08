@@ -77,6 +77,7 @@ end
 -------------------
 -- actor_on_update
 -------------------
+invulnerable_time = nil
 function actor_on_first_update(binder,delta)
 	local m_data = alife_storage_manager.get_state()
 	-- check if artefacts can respawn for this level
@@ -85,6 +86,7 @@ function actor_on_first_update(binder,delta)
 		surge_manager.get_surge_manager():respawn_artefacts_and_replace_anomaly_zone()
 		m_data.artefact_respawn_levels[level.name()] = false
 	end 
+	invulnerable_time = time_global() + 8000
 	SendScriptCallback("actor_on_first_update",binder,delta)
 end
 
@@ -202,7 +204,6 @@ function actor_on_save(binder,packet)
 	
 	if (actor_gv and actor_gv:level_id() ~= sim:level_id()) then
 		--printf("DEBUG: actor changing level")
-		task_manager.get_task_manager():set_task_cancelled("faction_base_defense")
 		SendScriptCallback("on_level_changing")
 	end
 

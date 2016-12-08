@@ -1,9 +1,10 @@
 function init(obj)
 	--printf("_bp: init(): name='%s'", obj:name())
-
-	db.storage[obj:id()] = db.storage[obj:id()] and empty_table(db.storage[obj:id()]) or {}
-	local new_binder = signal_light_binder(obj)
-	obj:bind_object(new_binder)
+	
+	-- I don't think signal light are handling particles properly and I think it's cause of a memory leak
+	-- db.storage[obj:id()] = db.storage[obj:id()] and empty_table(db.storage[obj:id()]) or {}
+	-- local new_binder = signal_light_binder(obj)
+	-- obj:bind_object(new_binder)
 end
 
 ---------------------------------------------------------------------------------------------
