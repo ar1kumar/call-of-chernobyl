@@ -105,6 +105,7 @@ function evaluator_wounded_exist:find_valid_target()
 			db.storage[self.a.selected_id].wounded_already_selected = nil
 		end
 		self.a.selected_id = nil
+		return false
 	end
 
 	if not (db.OnlineStalkers) then

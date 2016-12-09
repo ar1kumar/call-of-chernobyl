@@ -280,6 +280,8 @@ function evaluator_corpse:find_valid_target()
 		if (db.storage[self.a.selected_corpse_id]) then
 			db.storage[self.a.selected_corpse_id].corpse_already_selected = nil
 		end
+		self.a.selected_corpse_id = nil 
+		return false
 	end 
 	
 	local tg = time_global()

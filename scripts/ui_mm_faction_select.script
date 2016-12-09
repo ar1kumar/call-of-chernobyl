@@ -20,28 +20,28 @@ local function on_game_load(binder)
 	
 	-- IRONMAN MODE
 	if (USE_MARSHAL) then
-		if (config:r_value("temp","new_game_hardcore_mode",1) == true) then
+		if (config:r_value("character_creation","new_game_hardcore_mode",1) == true) then
 			-- shitty way to make a uuid but should be good enough to track the same saves
 			alife_storage_manager.get_state().uuid = GAME_VERSION .. "_" .. tostring(math.random(100)) .. tostring(math.random()) .. tostring(math.random(1000))
-			config:w_value("temp","new_game_hardcore_mode")
+			config:w_value("character_creation","new_game_hardcore_mode")
 			need_save = true
 		end
-		if (config:r_value("temp","new_game_survival_mode",1) == true) then
+		if (config:r_value("character_creation","new_game_survival_mode",1) == true) then
 			alife_storage_manager.get_state().enable_survival_mode = true
-			config:w_value("temp","new_game_survival_mode")
+			config:w_value("character_creation","new_game_survival_mode")
 			need_save = true
 		end
-		if (config:r_value("temp","new_game_hardcore_aim_mode",1) == true) then
+		if (config:r_value("character_creation","new_game_hardcore_aim_mode",1) == true) then
 			alife_storage_manager.get_state().enable_hardcore_ai_aim = true
-			config:w_value("temp","new_game_hardcore_aim_mode")
+			config:w_value("character_creation","new_game_hardcore_aim_mode")
 			need_save = true
 		end
 	end
 	
 	-- NEW CHARACTER NAME
-	local new_character_name = config:r_value("temp","new_game_character_name",3) or ""
+	local new_character_name = config:r_value("character_creation","new_game_character_name",3) or ""
 	if (new_character_name and new_character_name ~= "") then
-		config:w_value("temp","new_game_character_name")
+		config:w_value("character_creation","new_game_character_name")
 		need_save = true
 		
 		new_character_name = new_character_name:gsub("_"," ")
@@ -54,24 +54,30 @@ local function on_game_load(binder)
 	end
 	
 	-- NEW CHARACTER ICON
-	local new_character_icon = config:r_value("temp","new_game_character_icon",3)
+	local new_character_icon = config:r_value("character_creation","new_game_character_icon",3)
 	if (new_character_icon and new_character_icon ~= "") then
 		db.actor_binder.character_icon = new_character_icon
 		
-		config:w_value("temp","new_game_character_icon")
+		config:w_value("character_creation","new_game_character_icon")
 		need_save = true
 	end
+	-- CUSTOM Start Equipment
+	-- local supplies = config:r_value("character_creation","new_game_supplies",1)
+	-- if (supplies) then
+		-- config:w_value("character_creation","new_game_supplies")
+		-- need_save = true
+	-- end
 	
 	-- NEW FACTION
-	local faction = config:r_value("temp","new_game_faction",3) or ""
+	local faction = config:r_value("character_creation","new_game_faction",3) or ""
 	
 	if (faction and faction ~= "") then
-		config:w_value("temp","new_game_faction")
+		config:w_value("character_creation","new_game_faction")
 		need_save = true
 		
 		-- Faction Spawn Position
-		local start_location = config:r_value("temp","new_game_faction_position")
-		config:w_value("temp","new_game_faction_position")
+		local start_location = config:r_value("character_creation","new_game_faction_position")
+		config:w_value("character_creation","new_game_faction_position")
 		
 		if start_location and start_location ~= "" then
 			local loc_ini = ini_file("plugins\\faction_start_locations.ltx")
@@ -96,7 +102,7 @@ local function on_game_load(binder)
 		}
 		
 		-- Enable the story quests, or disable their components depending on player choice and faction.
-		if (config:r_value("temp","new_game_story_mode",1) == true and story_factions[faction] and not has_alife_info("story_mode_disabled")) then
+		if (config:r_value("character_creation","new_game_story_mode",1) == true and story_factions[faction] and not has_alife_info("story_mode_disabled")) then
 			task_manager.get_task_manager():give_task("mar_find_doctor_task") -- main quest
 			task_manager.get_task_manager():give_task("turn_off_brain_scorcher") -- brain scorcher quest
 			task_manager.get_task_manager():give_task("turn_off_brain_machine") -- miracle machine quest
@@ -116,7 +122,7 @@ local function on_game_load(binder)
 			-- Turns off the Generators.
 			give_info("warlab_deactivate_generators_done")
 		end
-		config:w_value("temp","new_game_story_mode") -- clear value
+		config:w_value("character_creation","new_game_story_mode") -- clear value
 		
 		db.actor:set_character_community("actor_"..faction, 0, 0)
 		
@@ -125,9 +131,9 @@ local function on_game_load(binder)
 		
 		-- money and loadout
 		local money_max
-		local loadout = config:r_value("temp","new_game_loadout",3)
+		local loadout = config:r_value("character_creation","new_game_loadout",3)
 		if (loadout and loadout ~= "") then
-			config:w_value("temp","new_game_loadout")
+			config:w_value("character_creation","new_game_loadout")
 			need_save = true
 			db.actor_binder.character_icon = new_character_icon
 			local ini = system_ini()
@@ -580,17 +586,30 @@ function faction_ui:OnFactionSelect(faction)
 	local sys_ini = system_ini()
 	
 	desc = desc .. "\\n \\n"
-	
-	self.default_loadout = alun_utils.collect_sections(self.ini,{faction,math.random(1,5)})
-	local weapon = alun_utils.collect_section(self.ini,"choose_only_one")
-	weapon = weapon[math.random(#weapon)]
+	if axr_main.config:r_value("character_creation","new_game_supplies",1) then
+		self.default_loadout = alun_utils.collect_sections(self.ini,{"custom"})
+		local weapons = alun_utils.str_explode(self.default_loadout["weapons"],",")
+		for _, w in ipairs(weapons) do
+			if sys_ini:section_exist(w) then
+				self.default_loadout[w] = 1
+				local ammo = sys_ini:r_string_ex(w,"ammo_class")
+				ammo = alun_utils.str_explode(ammo,",")
+				ammo = ammo[math.random(#ammo)]
+				self.default_loadout[ammo] = 2
+			end
+		end
+	else	
+		self.default_loadout = alun_utils.collect_sections(self.ini,{faction,math.random(1,5)})
+		local weapon = alun_utils.collect_section(self.ini,"choose_only_one")
+		weapon = weapon[math.random(#weapon)]
 
-	local ammo = sys_ini:r_string_ex(weapon,"ammo_class")
-	ammo = alun_utils.str_explode(ammo,",")
-	ammo = ammo[math.random(#ammo)]
+		local ammo = sys_ini:r_string_ex(weapon,"ammo_class")
+		ammo = alun_utils.str_explode(ammo,",")
+		ammo = ammo[math.random(#ammo)]
 
-	self.default_loadout[weapon] = 1
-	self.default_loadout[ammo] = 2
+		self.default_loadout[weapon] = 1
+		self.default_loadout[ammo] = 2
+	end
 
 	local money = alun_utils.str_explode(self.default_loadout["money"],",")
 	money = money[math.random(#money)]
@@ -735,17 +754,17 @@ function faction_ui:OnStartGame()
 --		self.start_list:SetText(game.translate_string("ui_st_"..self.start_table[index]))
 	end
 	
-	axr_main.config:w_value("temp","new_game_hardcore_mode",self.ck_hardcore and self.ck_hardcore:GetCheck() and true or nil)
-	axr_main.config:w_value("temp","new_game_story_mode",self.ck_story and self.ck_story:GetCheck() and true or nil)
-	axr_main.config:w_value("temp","new_game_hardcore_aim_mode",self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck() and true or nil)
-	axr_main.config:w_value("temp","new_game_survival_mode",self.ck_survival and self.ck_survival:GetCheck() and true or nil)
-	axr_main.config:w_value("temp","new_game_faction",self.selected_faction or nil)
-	axr_main.config:w_value("temp","new_game_faction_position",self.start_location or nil)
-	axr_main.config:w_value("temp","new_game_loadout",self.loadout_str or nil)
-	axr_main.config:w_value("temp","new_game_character_icon",self.icon_list:GetText())
+	axr_main.config:w_value("character_creation","new_game_hardcore_mode",self.ck_hardcore and self.ck_hardcore:GetCheck() and true or nil)
+	axr_main.config:w_value("character_creation","new_game_story_mode",self.ck_story and self.ck_story:GetCheck() and true or nil)
+	axr_main.config:w_value("character_creation","new_game_hardcore_aim_mode",self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck() and true or nil)
+	axr_main.config:w_value("character_creation","new_game_survival_mode",self.ck_survival and self.ck_survival:GetCheck() and true or nil)
+	axr_main.config:w_value("character_creation","new_game_faction",self.selected_faction or nil)
+	axr_main.config:w_value("character_creation","new_game_faction_position",self.start_location or nil)
+	axr_main.config:w_value("character_creation","new_game_loadout",self.loadout_str or nil)
+	axr_main.config:w_value("character_creation","new_game_character_icon",self.icon_list:GetText())
 	
 	-- Store info in temp config so it can be read on next game load
-	axr_main.config:w_value("temp","new_game_character_name", character_name:gsub(" ","_") )
+	axr_main.config:w_value("character_creation","new_game_character_name", character_name:gsub(" ","_") )
 	axr_main.config:save()
 	
 	-- Start the game
