@@ -276,6 +276,26 @@ function action_beh:set_desired_target()
 	local obj = get_story_object(target)
 	if (obj) then
 		set_position_data(obj:id())
+	elseif (target == "actor_squad") then 
+		local sim = alife()
+		local se_obj = sim:object(self.object:id())
+		if (se_obj) then
+			local prev_squad_id = 0
+			for _id,squad in spairs(axr_companions.companion_squads, function(t,a,b) return a < b end) do
+				if (squad and squad.commander_id) then
+					local cid = squad:commander_id()
+					if not (xrs_kill_wounded.hostage_list[cid]) then
+						if not (sim:has_info(cid,"npcx_beh_wait") or sim:has_info(cid,"npcx_beh_patrol_mode")) then 
+							if (se_obj.group_id == _id) then 
+								break
+							end
+							prev_squad_id = squad:commander_id()
+						end
+					end
+				end
+			end
+			set_position_data(prev_squad_id)
+		end
 	elseif (target == "enemy") then
 		local st = db.storage[self.object:id()]
 		local be = self.object:best_enemy() or st and st.enemy_id and level.object_by_id(st.enemy_id)

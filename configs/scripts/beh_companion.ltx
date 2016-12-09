@@ -34,13 +34,13 @@ gather_items_enabled = {+npcx_beh_gather_items}true, false
 corpse_detection_enabled = {+npcx_beh_loot_corpses} true, false
 actor_dialogs = actor_dialogs
 behavior_state = {+npcx_beh_wait} beh_wait, beh_move
-target = {!is_squad_commander} commander, {=is_squad_commander +npcx_beh_patrol_mode} waypoint, actor
+target = {!is_squad_commander} commander, {=is_squad_commander +npcx_beh_patrol_mode} waypoint, actor_squad
 walk_dist = {+npcx_beh_patrol_mode} 90, 4
 jog_dist = {+npcx_beh_patrol_mode} 150, 8
 run_dist = {+npcx_beh_patrol_mode} 250, {=surge_started} 40, 90
 keep_distance = {+npcx_beh_distance_far} far, near
-near_desired_dist = {+npcx_beh_patrol_mode =is_squad_commander} 1, {!is_squad_commander} 5, 2
-far_desired_dist = {+npcx_beh_patrol_mode =is_squad_commander} 1, {!is_squad_commander} 5, 8
+near_desired_dist = {+npcx_beh_patrol_mode =is_squad_commander} 1, {!is_squad_commander} 2, 3
+far_desired_dist = {+npcx_beh_patrol_mode =is_squad_commander} 1, {!is_squad_commander} 2, 9
 wait_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} hide, guard
 walk_anim = {=is_wounded} nil, {+npcx_beh_patrol_mode -npcx_beh_substate_stealth} patrol,{+npcx_beh_substate_stealth} sneak, patrol
 jog_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} sneak_run, rush
