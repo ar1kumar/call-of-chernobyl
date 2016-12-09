@@ -62,9 +62,9 @@ local function on_game_load(binder)
 		need_save = true
 	end
 	-- CUSTOM Start Equipment
-	-- local supplies = config:r_value("character_creation","new_game_supplies",1)
+	-- local supplies = config:r_value("character_creation","custom_loadout",1)
 	-- if (supplies) then
-		-- config:w_value("character_creation","new_game_supplies")
+		-- config:w_value("character_creation","custom_loadout")
 		-- need_save = true
 	-- end
 	
@@ -586,7 +586,7 @@ function faction_ui:OnFactionSelect(faction)
 	local sys_ini = system_ini()
 	
 	desc = desc .. "\\n \\n"
-	if axr_main.config:r_value("character_creation","new_game_supplies",1) then
+	if axr_main.config:r_value("character_creation","custom_loadout",1) then
 		self.default_loadout = alun_utils.collect_sections(self.ini,{"custom"})
 		local weapons = alun_utils.str_explode(self.default_loadout["weapons"],",")
 		for _, w in ipairs(weapons) do
