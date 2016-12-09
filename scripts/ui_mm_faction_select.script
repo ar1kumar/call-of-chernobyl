@@ -621,7 +621,7 @@ function faction_ui:OnFactionSelect(faction)
 	self.loadout_str = strformat("money = %s,",self.default_loadout["money"])
 	
 	for section, amt in pairs(self.default_loadout) do
-		if (section ~= "money" and sys_ini:section_exist(section)) then
+		if (section ~= "weapons" and section ~= "money" and sys_ini:section_exist(section)) then
 			local itm_name = gs(sys_ini:r_string_ex(section,"inv_name") or "")
 			amt = amt == "" and {1} or alun_utils.str_explode(amt,",")
 			amt = tonumber(amt[math.random(#amt)]) or 0

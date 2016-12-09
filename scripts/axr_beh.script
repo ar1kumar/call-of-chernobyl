@@ -813,7 +813,6 @@ end
 function add_to_binder(npc, ini, scheme, section, storage)
 	local manager = npc:motivation_action_manager()
 	local wp = world_property
-	
 	local evaluator = evaluator_beh(storage, "evaluator_beh")
 	local action = action_beh(npc, "action_beh", storage)
 	
@@ -833,10 +832,6 @@ function add_to_binder(npc, ini, scheme, section, storage)
 	action:add_precondition( wp(stalker_ids.property_anomaly,false) )
 
 	modules.add_common_precondition(scheme,action)
-	
-	action:add_precondition( wp(xr_evaluators_id.stohe_meet_base + 1, false) )
-	-- action:add_precondition( wp(xr_evaluators_id.sidor_wounded_base + 0, false) )
-	action:add_precondition( wp(xr_evaluators_id.abuse_base, false) )
 
 	action = manager:action(xr_actions_id.alife)
 	action:add_precondition( wp(beh_evid, false) )
