@@ -332,13 +332,15 @@ function faction_ui:InitControls(f)
 	self.scroll_v = xml:InitScrollView("main_dialog:description:scroll_v", self.dialog)
 	
 	-- Icon
-	local _st = xml:InitStatic("main_dialog:description:templ_item",nil)
-	self.char_icon = xml:InitStatic("main_dialog:description:char_icon",_st)
+	self.char_icon_base = xml:InitStatic("main_dialog:description:templ_item",nil)
+	self.char_icon = xml:InitStatic("main_dialog:description:char_icon",self.char_icon_base)
 	self.char_icon:InitTexture("ui_inGame2_Strelok")
-	self.scroll_v:AddWindow(_st, true)
+	self.scroll_v:AddWindow(self.char_icon_base, true)
+	self.char_icon_base:SetAutoDelete(false)
 	
 	self.desc_text = xml:InitTextWnd("main_dialog:description:desc_win", nil)
 	self.scroll_v:AddWindow(self.desc_text, true)
+	self.desc_text:SetAutoDelete(false)
 	
 	self:OnFaction_stalker()
 
@@ -470,6 +472,12 @@ function faction_ui:OnCheckSet()
 	
 	if (self[ck] and self[ck]:GetCheck()) then
 		self.desc_text:SetText(game.translate_string("st_mm_"..ck.."_desc"))
+		self.desc_text:AdjustHeightToText()
+		self.desc_text:SetWndSize(vector2():set(self.desc_text:GetWidth(),self.desc_text:GetHeight()+44))
+		
+		self.scroll_v:Clear()
+		self.scroll_v:AddWindow(self.desc_text, true)
+		self.desc_text:SetAutoDelete(false)
 	end
 end
 
@@ -635,8 +643,16 @@ function faction_ui:OnFactionSelect(faction)
 	self.disp_faction_name:SetText(gs("st_faction_"..faction))
 	self.desc_text:SetText(desc)
 	self.desc_text:AdjustHeightToText()
-	self.desc_text:SetWndSize(vector2():set(self.desc_text:GetWidth(),self.desc_text:GetHeight()+45))
+	self.desc_text:SetWndSize(vector2():set(self.desc_text:GetWidth(),self.desc_text:GetHeight()+44))
+
+	self.scroll_v:Clear()
 	
+	self.scroll_v:AddWindow(self.char_icon_base, true)
+	self.scroll_v:AddWindow(self.desc_text, true)
+	
+	self.char_icon_base:SetAutoDelete(false)
+	self.desc_text:SetAutoDelete(false)
+		
 	if self.start_list then
 		self:load_start_positions()
 	end
