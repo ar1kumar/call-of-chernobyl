@@ -120,7 +120,9 @@ function action_wounded:execute()
 		return
 	end
 	
-	db.storage[id].victim_surrender = 65535
+	if (pid ~= nil) then
+		db.storage[id].victim_surrender = 65535
+	end
 
 	local wound_manager_sound = utils.load_var(npc, "wounded_sound")
 	if (wound_manager_sound and wound_manager_sound ~= "nil") then 

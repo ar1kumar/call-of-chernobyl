@@ -40,7 +40,7 @@ local function npc_on_update(npc,st)
 		return
 	end
 	
-	if not (st.victim_surrender) or (st.victim_surrender ~= 0 and st.victim_surrender ~= 65535) then -- override NPC roll
+	if (st.victim_surrender == nil or st.victim_surrender == 65534) then -- override NPC roll
 		local active_item = db.actor:active_item()
 		if not (active_item and IsWeapon(active_item)) then
 			return
@@ -203,6 +203,9 @@ end
 
 function act_kill_wounded:reset()
 	self.st.timer = nil
+	if (self.st.vertex_id) then 
+		db.used_level_vertex_ids[self.st.vertex_id] = nil
+	end
 	self.st.vertex_id = nil 
 	self.st.vertex_position = nil
 end 
@@ -291,8 +294,9 @@ function act_kill_wounded:begin_kill_wounded(vo)
 	
 	if not (vst.victim_surrender) then
 		if (character_community(vo) ~= "monolith" and character_community(vo) ~= "zombied") then
-			if (CauseSurrenderCommunities[character_community(self.object)] and SurrenderChance > (math.random(1,100)/100) ) then
+			if (CauseSurrenderCommunities[character_community(self.object)] and SurrenderChance >= (math.random(1,100)/100) ) then
 				vst.victim_surrender = self.object:id()
+				printf("victim surrender to %s",vst.victim_surrender)
 			else
 				vst.victim_surrender = 65534
 			end

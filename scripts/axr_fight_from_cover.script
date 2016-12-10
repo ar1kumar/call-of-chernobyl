@@ -127,6 +127,7 @@ end
 function action_fight_from_cover:initialize()
 	action_base.initialize(self)
 	local npc = self.object
+	npc:clear_animations()
 	npc:set_desired_position()
 	npc:set_desired_direction()
 end
