@@ -84,6 +84,11 @@ function pda_relations_tab:InitControls()
 		end
 	end
 
+	-- Companion Issue Command to ALL
+	self.btn_all = xml:Init3tButton("btn_all", self)
+    self:Register(self.btn_all, "btn_all")
+    self:AddCallback("btn_all", ui_events.BUTTON_CLICKED, self.btn_msg_all, self)
+	
 	-- Companion ListView
 	xml:InitFrame("companion_frame",self)
 	xml:InitStatic("companion_background",self)
@@ -374,6 +379,10 @@ function pda_relations_tab:SetHint(text,pos)
 	FitInRect(self.hint_wnd,Frect():set(0,0,1024,768),0,100)
 end
 
+function pda_relations_tab:btn_msg_all()
+    self:CreateContextMenuAll()
+end
+
 function pda_relations_tab:CreateContextMenu(npc,id)
 	local pos = GetCursorPosition()
 	local se_obj = alife_object(id)
@@ -451,7 +460,7 @@ function pda_relations_tab:CreateContextMenu(npc,id)
 	action_1__2_5 = function()
 		local mode = npc:has_info("npcx_beh_substate_stealth") and 0 or 1
 		axr_companions.set_companion_squad_stealth_mode(mode,npc,squad)
-		self:Reset()		
+		self:Reset()	
 	end
 	
 	action_1__2_2_1 = function()
@@ -504,12 +513,6 @@ function pda_relations_tab:CreateContextMenu(npc,id)
 		axr_companions.set_companion_squad_loot_mode(mode,npc,squad)
 		self:Reset()	
 	end
-	
-	action_1__2_5 = function()
-		local mode = npc:has_info("npcx_beh_substate_stealth") and 0 or 1
-		axr_companions.set_companion_squad_stealth_mode(mode,npc,squad)
-		self:Reset()	
-	end
 
 	-- Action List definitions
 	action_list_1 		= {action_1__1,action_1__2}
@@ -520,6 +523,179 @@ function pda_relations_tab:CreateContextMenu(npc,id)
 	
 	-- Create Main Context Menu
 	ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_action_1__1","st_pda_action_1__2")
+end
+
+function pda_relations_tab:CreateContextMenuAll()
+	local pos = GetCursorPosition()
+
+	-- Actions 
+	local action_1 = nil -- Main
+	local action_1__2 = nil -- Commands
+		local action_1__2_1 = nil -- Back 
+		local action_1__2_2 = nil -- Movement
+			local action_1__2_2_1 = nil -- Back 
+			local action_1__2_2_2 = nil -- Follow
+			local action_1__2_2_3 = nil -- Wait 
+			local action_1__2_2_4 = nil -- Far 
+			local action_1__2_2_5 = nil -- Near
+		local action_1__2_3 = nil -- Combat 
+			local action_1__2_3_1 = nil -- Back 
+			local action_1__2_3_2 = nil -- Passive 
+			local action_1__2_3_3 = nil -- Defensive 
+			local action_1__2_3_4 = nil -- Aggressive
+		local action_1__2_4 = nil -- Looting
+			local action_1__2_4_1 = nil -- Back
+			local action_1__2_4_2 = nil -- Gather Items (on)
+			local action_1__2_4_3 = nil -- Gather Items (off)
+			local action_1__2_4_4 = nil -- Corpses (on)
+			local action_1__2_4_5 = nil -- Corpses (off)
+		local action_1__2_5 = nil -- Stealth (on)
+		local action_1__2_6 = nil -- Stealth (off)
+	
+	-- Action Trees
+	local action_list_1 = nil
+	local action_list_1__2 = nil
+	local action_list_1__2_2 = nil
+	local action_list_1__2_3 = nil
+	local action_list_1__2_4 = nil
+	
+	-- Action definitions
+	action_1 = function()
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_action_1__2")
+	end 
+	
+	action_1__2 = function()
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1__2,"st_pda_action_back","st_pda_action_1__2_2","st_pda_action_1__2_3","st_pda_action_1__2_4","st_pda_action_1__2_5_off","st_pda_action_1__2_5_on")
+	end
+	
+	action_1__2_1 = function()
+		action_1()
+	end
+	
+	action_1__2_2 = function()
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1__2_2,"st_pda_action_back","st_pda_action_1__2_2_2_on","st_pda_action_1__2_2_2_off","st_pda_action_1__2_2_3_off","st_pda_action_1__2_2_3_on")
+	end
+	
+	action_1__2_3 = function()
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1__2_3,"st_pda_action_back","st_pda_action_1__2_3_2","st_pda_action_1__2_3_3","st_pda_action_1__2_3_4")
+	end
+
+	action_1__2_4 = function()
+		ui_dyn_msg_box.context_menu(self,pos,action_list_1__2_4,"st_pda_action_back","st_pda_action_1__2_4_2_off","st_pda_action_1__2_4_2_on","st_pda_action_1__2_4_3_off","st_pda_action_1__2_4_3_on")
+	end
+	
+	action_1__2_5 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_stealth_mode(1,nil,squad)
+		end
+		self:Reset()
+	end
+
+	action_1__2_6 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_stealth_mode(2,nil,squad)
+		end
+		self:Reset()
+	end
+	
+	action_1__2_2_1 = function()
+		action_1__2()
+	end
+	
+	action_1__2_2_2 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_move_mode(2,nil,squad)
+		end
+		self:Reset()
+	end
+	
+	action_1__2_2_3 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_move_mode(1,nil,squad)
+		end
+		self:Reset()
+	end
+
+	action_1__2_2_4 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_distance_mode(1,nil,squad)
+		end
+		self:Reset()	
+	end
+	
+	action_1__2_2_5 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_distance_mode(2,nil,squad)
+		end
+		self:Reset()	
+	end
+	
+	action_1__2_3_1 = function()
+		action_1__2()
+	end
+	
+	action_1__2_3_2 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_combat_mode(2,nil,squad)
+		end
+		self:Reset()
+	end
+
+	action_1__2_3_3 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_combat_mode(3,nil,squad)
+		end
+		self:Reset()
+	end
+
+	action_1__2_3_4 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_combat_mode(1,nil,squad)
+		end
+		self:Reset()
+	end
+	
+	action_1__2_4_1 = function()
+		action_1__2()
+	end
+	
+	action_1__2_4_2 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_gather_mode(1,nil,squad)
+		end
+		self:Reset()	
+	end
+
+	action_1__2_4_3 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_gather_mode(2,nil,squad)
+		end
+		self:Reset()	
+	end
+	
+	action_1__2_4_4 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_loot_mode(1,nil,squad)
+		end
+		self:Reset()	
+	end
+	
+	action_1__2_4_5 = function()
+		for k,squad in pairs(axr_companions.companion_squads) do
+			axr_companions.set_companion_squad_loot_mode(2,nil,squad)
+		end
+		self:Reset()	
+	end
+
+	-- Action List definitions
+	action_list_1 		= {action_1__2}
+	action_list_1__2 	= {action_1__2_1,action_1__2_2,action_1__2_3,action_1__2_4,action_1__2_5,action_1__2_6}
+	action_list_1__2_2 	= {action_1__2_2_1,action_1__2_2_2,action_1__2_2_3,action_1__2_2_4,action_1__2_2_5}
+	action_list_1__2_3	= {action_1__2_3_1,action_1__2_3_2,action_1__2_3_3,action_1__2_3_4}
+	action_list_1__2_4 	= {action_1__2_4_1,action_1__2_4_2,action_1__2_4_3,action_1__2_4_4,action_1__2_4_5}
+	
+	-- Create Main Context Menu
+	ui_dyn_msg_box.context_menu(self,pos,action_list_1,"st_pda_action_1__2")
 end
 ---------------------------------------------------------------------------------------------------
 --
