@@ -91,14 +91,14 @@ function print_table(tbl,header,format_only)
 end
 
 function valid_vertex(npc,vid)
-	return vid and npc:accessible(vid) and vid < 4294967295 and vid
+	return vid and vid < 4294967295 and npc:accessible(vid) and vid
 end
 
 function accessible(npc,point)
 	if (type(point) == "number") then
-		return npc:accessible(point) and point < 4294967295
+		return point < 4294967295 and npc:accessible(point)
 	end
-	return npc:accessible(point) and level.vertex_id(point) < 4294967295
+	return level.vertex_id(point) < 4294967295 and npc:accessible(point)
 end
 
 function is_in_same_squad(obj,npc)

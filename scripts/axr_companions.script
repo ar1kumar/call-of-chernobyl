@@ -16,8 +16,8 @@ companion_squads = {}
 ------------------------------------------
 local _current_move_mode = 1
 local _current_combat_mode = 1
-local _draw_part
-
+local _particle_valid = nil
+local _particle_invalid = nil
 ------------------------------------------
 -- Localized Functions
 ------------------------------------------
@@ -518,53 +518,89 @@ function cycle_companions_move_mode(force_mode)
 	end
 end 
 
+function get_test_member()
+	for _,squad in pairs(companion_squads) do 
+		if (squad.online) then
+			local id = squad:commander_id()
+			local npc = db.storage[id] and db.storage[id].object 
+			if (npc) then 
+				return npc 
+			end
+		end
+	end
+end
+
 function move_to_point(p)
-	local lvid
 	if (p==1) then 
 		SetHudMsg(game.translate_string("st_hold_then_release"),8)
-		--_draw_part = particles_object("weapons\\light_signal")
-		_draw_part = particles_object("_samples_particles_\\flash_light")
-		--_draw_part = particles_object("static\\net_base_blue")
+		_particle_valid = particles_object("_samples_particles_\\flash_light")
+		_particle_invalid = particles_object("_samples_particles_\\flash_light_red")
 	elseif (p==2) then
-		if (_draw_part) then 
+		if (_particle_valid) then
 			local r = level.get_target_dist and level.get_target_dist()
 			if (r) then
-				lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
-				local pos = level.vertex_position(lvid)
-				--if not(_draw_part:playing()) then
-					_draw_part:play_at_pos(vector():set(pos.x,pos.y-0.5,pos.z))
-				--else 
-				--	_draw_part:move_to(pos,pos)
-				--end
+				local pos = vector():set(device().cam_pos)
+				pos:add(device().cam_dir:mul(r))
+				
+				local lvid = level.vertex_id(pos)
+				local npc = lvid and lvid < 4294967295 and get_test_member()
+				if (npc and npc:accessible(pos)) then 
+					if (_particle_invalid:playing()) then 
+						_particle_invalid:stop()
+					end
+					_particle_valid:play_at_pos(vector():set(pos.x,pos.y-0.5,pos.z))
+				else 
+					if (_particle_valid:playing()) then
+						_particle_valid:stop()
+					end
+					_particle_invalid:play_at_pos(vector():set(pos.x,pos.y-0.5,pos.z))
+				end
 			end
 		end	
 	else
-		if (_draw_part) then
-			if (_draw_part:playing()) then
-				_draw_part:stop()
-			end
-			_draw_part = nil
+		if (_particle_valid:playing()) then
+			_particle_valid:stop()
 		end
+		_particle_valid = nil
+		
+		if (_particle_invalid:playing()) then 
+			_particle_invalid:stop()
+		end 
+		_particle_invalid = nil
+		
 		local r = level.get_target_dist and level.get_target_dist()
 		if (r) then
-			lvid = level.vertex_in_direction(level.vertex_id(device().cam_pos),device().cam_dir,r)
-			if (lvid) then
-				_current_move_mode = 1
-				SetHudMsg(game.translate_string("st_move_to_point"),8)
-				for id,squad in pairs(companion_squads) do 
-					if (squad and squad.commander_id) then
-						if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
-							for k in squad:squad_members() do
-								st = db.storage[k.id]
-								local member = st and st.object
-								if (member and member:alive()) then
-									set_companion_to_follow_state(member)
-									utils.save_var(member,"fight_from_point",lvid)
+			local pos = vector():set(device().cam_pos)
+			pos:add(device().cam_dir:mul(r))
+		
+			local lvid = level.vertex_id(pos)
+				
+			_current_move_mode = 1
+			SetHudMsg(game.translate_string("st_move_to_point"),8)
+			for id,squad in pairs(companion_squads) do 
+				if (squad and squad.commander_id) then
+					if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
+						for k in squad:squad_members() do
+							st = db.storage[k.id]
+							local member = st and st.object
+							if (member and member:alive()) then
+								set_companion_to_follow_state(member)
+								if (lvid and lvid >= 4294967295) then
+									lvid = nil
 								end
-								if (k.id == squad:commander_id()) then 
-									if (st and st.beh) then 
-										st.beh.rally_lvid = lvid
+								utils.save_var(member,"fight_from_point",lvid)
+							end
+							if (k.id == squad:commander_id()) then
+								if (st and st.beh) then
+									if (lvid) then 
+										if (lvid >= 4294967295) then
+											lvid = nil
+										end
+										if not (member:accessible(lvid)) then
+											lvid = member:accessible_nearest(level.vertex_position(lvid),vector())
+										end
 									end
+									st.beh.rally_lvid = lvid
 								end
 							end
 						end
