@@ -138,7 +138,7 @@ local function get_rand_vertex(npc,vo)
 	return vo:vertex_in_direction(vo:level_vertex_id(),dir,math_random(MinDistance,MaxDistance))
 end
 
-local function danger_in_radius(npc,best_danger,bd_type)
+function danger_in_radius(npc,best_danger,bd_type)
 	local src = DangerIgnore[ bd_types[bd_type] ]
 	local condlist = xr_logic.parse_condlist(npc,bd_types[bd_type],"danger_object",src)
 	local ignore_distance = condlist and tonumber(xr_logic.pick_section_from_condlist(db.actor,npc,condlist)) or 0
