@@ -127,7 +127,11 @@ end
 function action_fight_from_cover:initialize()
 	action_base.initialize(self)
 	local npc = self.object
+	local st = db.storage[npc:id()].state_mgr
 	npc:clear_animations()
+	st:set_state("idle", nil, nil, nil, {fast_set = true})
+	st.animation:set_state(nil, true)
+	st.animation:set_control()
 	npc:set_desired_position()
 	npc:set_desired_direction()
 end
