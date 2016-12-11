@@ -564,16 +564,14 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	manager:add_evaluator(stalker_ids.property_items,evaluator_gather_items("gather_items",st,npc))
 	--manager:add_evaluator(stalker_ids.property_items, property_evaluator_const(false))
 	
-	if (character_community(npc) == "zombied" or npc:section() == "actor_visual_stalker") then
+	if (npc:character_community() == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
 		temp.needs_configured = false
-		return
+	else
+		manager:add_evaluator(evaid,eva_gather_itm("eva_gather_itm",st,npc))
 	end
-
-	manager:add_evaluator(evaid,eva_gather_itm("eva_gather_itm",st,npc))
 	
 	temp.action = act_gather_itm("act_gather_itm",st)
-
 	temp.action:add_precondition(wp(stalker_ids.property_alive,true))
 	temp.action:add_precondition(wp(stalker_ids.property_enemy,	false))
 	temp.action:add_precondition(wp(stalker_ids.property_danger,false))

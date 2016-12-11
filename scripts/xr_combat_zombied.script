@@ -16,7 +16,7 @@ function evaluator_combat_zombied:evaluate()
 		return false 
 	end 
 	
-	return character_community(self.object) == "zombied"
+	return self.object:character_community() == "zombied"
 end
 
 --------------------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ function action_zombie_shoot:initialize()
 	self.object:set_desired_direction   ()
 	self.object:set_detail_path_type    ( move.line )
 	self.last_state = nil
-	local be  = self.object:best_enemy()
+	local be = self.object:best_enemy()
 	if (be) then
 		self.enemy_last_seen_pos = be:position()
 		self.enemy_last_seen_vid = be:level_vertex_id()
@@ -261,20 +261,17 @@ end
 
 --------------------------------------------------------------------------------------------------------------
 
-function add_to_binder( npc, ini, st, planner )
-	local properties  = {}
-
-	properties["state_mgr_logic_active"] 	= xr_evaluators_id.state_mgr + 4
-
-	planner:add_evaluator( xr_evaluators_id.combat_zombied_base, evaluator_combat_zombied( "combat_zombied", db.storage[npc:id()] ) )
+function add_to_binder(npc,ini,scheme,section,st,temp)
+	local manager = npc:motivation_action_manager()
+	manager:add_evaluator( xr_evaluators_id.combat_zombied_base, evaluator_combat_zombied( "combat_zombied", db.storage[npc:id()] ) )
 
 	local action = action_zombie_shoot( "action_zombie_shoot", st )
 	action:add_precondition( world_property( stalker_ids.property_alive,           true  ) )
 	action:add_precondition( world_property( xr_evaluators_id.combat_zombied_base, true  ) )
 	action:add_precondition( world_property( xr_evaluators_id.script_combat,       true  ) )
-	action:add_effect      ( world_property( stalker_ids.property_enemy,           false ) )
-	action:add_effect (world_property(properties["state_mgr_logic_active"], false))
-	planner:add_action( xr_actions_id.combat_zombied_base, action )
+	action:add_effect( world_property( stalker_ids.property_enemy,           false ) )
+	action:add_effect(world_property(xr_evaluators_id.state_mgr + 4, false))
+	manager:add_action( xr_actions_id.combat_zombied_base, action )
 
 	xr_logic.subscribe_action_for_events( npc, st, action )
 
@@ -283,9 +280,9 @@ function add_to_binder( npc, ini, st, planner )
 	action:add_precondition( world_property( xr_evaluators_id.combat_zombied_base, true  ) )
 	action:add_precondition( world_property( stalker_ids.property_enemy,           false ) )
 	action:add_precondition( world_property( stalker_ids.property_danger,          true  ) )
-	action:add_effect      ( world_property( stalker_ids.property_danger,          false ) )
-	action:add_effect (world_property(properties["state_mgr_logic_active"], false))
-	planner:add_action( xr_actions_id.combat_zombied_base + 1, action )
+	action:add_effect( world_property( stalker_ids.property_danger,          false ) )
+	action:add_effect(world_property(xr_evaluators_id.state_mgr + 4, false))
+	manager:add_action( xr_actions_id.combat_zombied_base + 1, action )
 
 	xr_logic.subscribe_action_for_events( npc, st, action )
 end

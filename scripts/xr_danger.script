@@ -90,7 +90,7 @@ local function npc_on_hear_callback(npc,who_id,s_type,dist,sound_power,sound_pos
 
 	--alun_utils.debug_write("xr_danger:hear_callback",true)
 	
-	if (IsWounded(npc) or character_community(npc) == "zombied" or xr_combat_ignore.npc_in_safe_zone(npc)) then
+	if (IsWounded(npc) or npc:character_community() == "zombied" or xr_combat_ignore.npc_in_safe_zone(npc)) then
 		return
 	end
 	

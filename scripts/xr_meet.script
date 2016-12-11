@@ -703,7 +703,7 @@ function is_meet(npc)
 end
 
 function process_npc_usability(npc)
-	if (character_community(npc) == "zombied") then 
+	if (npc:character_community() == "zombied") then 
 		npc:disable_talk()
 		return 
 	end
