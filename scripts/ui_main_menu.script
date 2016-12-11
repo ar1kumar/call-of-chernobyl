@@ -30,9 +30,12 @@ end
 function main_menu:Update()
 	CUIScriptWnd.Update(self)
 	-- Warning messages timer 
-	if (self.msg_wnd_timer and time_global() > self.msg_wnd_timer) then 
-		self.msg_wnd_timer = nil
-		self.msg_wnd:SetWndPos(vector2():set(-2048,-2048))
+	if (self.msg_wnd_timer) then 
+		self.msg_wnd_timer = self.msg_wnd_timer - 1
+		if (self.msg_wnd_timer <= 0) then
+			self.msg_wnd_timer = nil
+			self.msg_wnd:SetWndPos(vector2():set(-2048,-2048))
+		end
 	end
 end 
 
@@ -363,5 +366,5 @@ function main_menu:SetMsg(text,tmr)
 	self.msg_wnd:SetWndSize(vector2():set(1024,self.msg_wnd_text:GetHeight()+44))
 	self.msg_wnd:SetWndPos(vector2():set(0,80))
 
-	self.msg_wnd_timer = time_global() + 1000*tmr
+	self.msg_wnd_timer = 100*tmr
 end
