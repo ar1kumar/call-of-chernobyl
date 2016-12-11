@@ -16,6 +16,7 @@ keybinds = {
 					["pda_relations"]				= "kCUSTOM7",
 					["pda_contacts"]				= "kCUSTOM8",
 					["pda_stats"]					= "kCUSTOM9",
+					["pda_logs"]					= "kCUSTOM10",
 					
 					["debug_demo_record"]			= "DIK_NUMPAD0",
 					--["debug_select_object"] 		= "DIK_NUMPAD9",
@@ -131,6 +132,17 @@ function action.pda_stats(p)
 	if not (pda_menu:IsShown()) then 
 		pda_menu:ShowDialog(true)
 		pda_menu:SetActiveSubdialog("eptRanking")
+	end
+end
+
+function action.pda_logs(p)
+	if not (p==1) then
+		return 
+	end
+	local pda_menu = ActorMenu.get_pda_menu()
+	if not (pda_menu:IsShown()) then 
+		pda_menu:ShowDialog(true)
+		pda_menu:SetActiveSubdialog("eptLogs")
 	end
 end
 
