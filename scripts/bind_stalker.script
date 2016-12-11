@@ -73,9 +73,12 @@ end
 function actor_binder:net_destroy()
 	--alun_utils.debug_write("actor net destroy start")
 	
-	surge_manager.get_surge_manager():finalize()
-	psi_storm_manager.get_psi_storm_manager():finalize()
-	level_weathers.get_weather_manager():finalize()
+	local sm = surge_manager.get_surge_manager()
+	if (sm) then sm:finalize() end
+	sm = psi_storm_manager.get_psi_storm_manager()
+	if (sm) then sm:finalize() end 
+	sm = level_weathers.get_weather_manager()
+	if (sm) then sm:finalize() end
 	
 	xr_sound.stop_sounds_by_id(self.object:id())
 
