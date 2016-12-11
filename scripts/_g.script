@@ -1379,6 +1379,7 @@ end
 function CActor__BeforeHitCallback(actor,shit,bone_id)
 	--printf("power=%s impuse=%s type=%s dir=%s who=%s",shit.power,shit.impulse,shit.type,shit.direction and vec_to_str(shit.direction),shit.draftsman and shit.draftsman:name())
 	if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
+		bind_stalker_ext.invulnerable_time - 1000
 		return false 
 	end
 	
