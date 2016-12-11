@@ -8,8 +8,6 @@
 		Such thing is 'okay' in db.storage, but that is because on net_destroy db.storage[id] is set nil. So if you are keeping track of objects directly in a table, instead of ID 
 		then you absolutely must rid of every single reference to the userdata so that it can be destroy and garbage collected. Otherwise you end up with undetectable issues.
 --]]
-
-
 if (jit == nil) then
 	profiler.setup_hook	()
 end
@@ -18,9 +16,9 @@ GAME_VERSION = "1.4.19"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
-end
-if string.find(command_line(), "-dbgdev") then -- because users all using dbg, need to hide OP features
-	DEV_DEBUG_DEV = true
+	if string.find(command_line(), "-dbgdev") then -- because users all using dbg, need to hide OP features
+		DEV_DEBUG_DEV = true
+	end
 end
 
 USE_INI_MEMOIZE = true

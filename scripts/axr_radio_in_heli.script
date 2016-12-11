@@ -232,7 +232,7 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	
 	if (not npc:alive()) or (npc:character_community() == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
-		temp.needs_configured = false
+		--temp.needs_configured = false
 	else
 		manager:add_evaluator(evaid,evaluator_radio_in_heli(npc,"eva_radio_in_heli",storage))
 	end 

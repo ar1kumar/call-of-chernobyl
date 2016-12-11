@@ -363,7 +363,7 @@ function add_to_binder(npc,char_ini,scheme,section,st,temp)
 
 	if (npc:character_community() == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(xr_evaluators_id.wounded_exist,property_evaluator_const(false))
-		temp.needs_configured = false
+		--temp.needs_configured = false
 	else
 		manager:add_evaluator(xr_evaluators_id.wounded_exist, evaluator_wounded_exist("wounded_exist", st))
 	end

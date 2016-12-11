@@ -151,6 +151,10 @@ end
 
 function action_reach_task_location:finalize()
 	self.object:set_movement_selection_type(game_object.alifeMovementTypeRandom)
+	if (self.st.animation) then
+		self.st.animation:set_state(nil,true)
+		self.st.animation = nil
+	end
 	action_base.finalize(self)
 end
 

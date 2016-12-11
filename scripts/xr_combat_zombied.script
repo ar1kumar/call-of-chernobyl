@@ -33,10 +33,10 @@ end
 function action_zombie_shoot:initialize()
 	action_base.initialize( self )
 
---	self.object:set_node_evaluator      ()
---	self.object:set_path_evaluator      ()
-	self.object:set_desired_direction   ()
-	self.object:set_detail_path_type    ( move.line )
+	self.object:set_path_type(game_object.level_path)
+	self.object:set_detail_path_type(move.line)
+	self.object:set_desired_direction()
+
 	self.last_state = nil
 	local be = self.object:best_enemy()
 	if (be) then
@@ -53,16 +53,12 @@ end
 
 function action_zombie_shoot:set_state( state, be, pos )
 	self.t.look_object = be
-
 	if be then
 		self.t.look_position = self.enemy_last_seen_pos
 	else
 		self.t.look_position = pos
 	end
-
-	state_mgr.set_state( self.object, state, nil, nil, self.t )
-
-	self.last_state = state
+	state_mgr.set_state( self.object, state, nil, nil, self.t, {fast_set = true } )
 end
 
 function action_zombie_shoot:execute()
@@ -110,7 +106,6 @@ function action_zombie_shoot:execute()
 			self.hit_reaction_end_time = time_global() + 5000
 
 			self:set_state( "raid_fire", nil, self.enemy_last_seen_pos )
-
 		elseif self.hit_reaction_end_time > time_global() then
 			--' продолжать идти и стрелять в точку, из которой был нанесён хит
 		else
@@ -194,13 +189,9 @@ function action_zombie_go_to_danger:initialize()
 end
 
 function action_zombie_go_to_danger:set_state( state, be, pos )
-	if state ~= self.last_state then
-		self.t.look_object   = be
-		self.t.look_position = pos
-		state_mgr.set_state( self.object, state, nil, nil, self.t )
-		self.last_state = state
---		printf( "set state !!!!!!!!!!!" )
-	end
+	self.t.look_object   = be
+	self.t.look_position = pos
+	state_mgr.set_state( self.object, state, nil, nil, self.t, {fast_set = true })
 end
 
 function action_zombie_go_to_danger:execute()

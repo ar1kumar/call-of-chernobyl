@@ -566,7 +566,7 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	
 	if (npc:character_community() == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
-		temp.needs_configured = false
+		--temp.needs_configured = false
 	else
 		manager:add_evaluator(evaid,eva_gather_itm("eva_gather_itm",st,npc))
 	end
