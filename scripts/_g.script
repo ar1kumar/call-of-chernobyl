@@ -1377,10 +1377,26 @@ end
 -- Called before actor hit callback
 -- returning false will ignore the hit completely
 function CActor__BeforeHitCallback(actor,shit,bone_id)
-	--printf("power=%s impuse=%s type=%s dir=%s who=%s",shit.power,shit.impulse,shit.type,shit.direction and vec_to_str(shit.direction),shit.draftsman and shit.draftsman:name())
-	if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
-		bind_stalker_ext.invulnerable_time = bind_stalker_ext.invulnerable_time - 500
-		return false 
+	--[[
+	local hit_to_section = {
+		[hit.light_burn] = "light_burn",
+		[hit.burn] = "burn",
+		[hit.strike] = "strike",
+		[hit.shock] = "shock",
+		[hit.wound] = "wound",
+		[hit.radiation] = "radiation",
+		[hit.telepatic] = "telepatic",
+		[hit.chemical_burn] = "chemical_burn",
+		[hit.explosion] = "explosion",
+		[hit.fire_wound] = "fire_wound",
+	}
+	printf("power=%s impuse=%s type=%s dir=%s who=%s",shit.power,shit.impulse,hit_to_section[shit.type],shit.direction and vec_to_str(shit.direction),shit.draftsman and shit.draftsman:name())
+	--]]
+	if (shit.type ~= hit.strike) then
+		if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
+			bind_stalker_ext.invulnerable_time = bind_stalker_ext.invulnerable_time - 500
+			return false
+		end
 	end
 	
 	if (shit.power > 0) then 
