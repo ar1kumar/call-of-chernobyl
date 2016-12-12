@@ -296,7 +296,7 @@ local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present
 		end
 		axr_main.config:w_value("xrs_debug_tools","toggle_top_key",toggle_top_key)
 		axr_main.config:save()
-		printf("TOP HUD = %s",toggle_hud_list["top"][toggle_top_key])
+		printf("MIDDLE HUD: %s",toggle_hud_list["top"][toggle_top_key])
 		main_menu:SetMsg(strformat("TOP HUD = %s",toggle_hud_list["top"][toggle_top_key]),5)
 	elseif (level_present and keybinds["toggle_left_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_left_hud"]]) then
 		if ( toggle_left_key < #toggle_hud_list["left"]) then
@@ -306,7 +306,7 @@ local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present
 		end
 		axr_main.config:w_value("xrs_debug_tools","toggle_left_key",toggle_left_key)
 		axr_main.config:save()
-		printf("LEFT HUD = %s",toggle_hud_list["left"][toggle_left_key])
+		printf("LEFT HUD: %s",toggle_hud_list["left"][toggle_left_key])
 		main_menu:SetMsg(strformat("LEFT HUD = %s",toggle_hud_list["left"][toggle_left_key]),5)
 	elseif (level_present and keybinds["toggle_right_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_right_hud"]]) then
 		if ( toggle_right_key < #toggle_hud_list["right"]) then
@@ -316,7 +316,7 @@ local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present
 		end
 		axr_main.config:w_value("xrs_debug_tools","toggle_right_key",toggle_right_key)
 		axr_main.config:save()
-		printf("right HUD = %s",toggle_hud_list["right"][toggle_right_key])
+		printf("RIGHT HUD: %s",toggle_hud_list["right"][toggle_right_key])
 		main_menu:SetMsg(strformat("right HUD = %s",toggle_hud_list["right"][toggle_right_key]),5)
 	elseif keybinds["debug_ui"] and dik == DIK_keys["DIK_"..keybinds["debug_ui"]] then
 		if not (debug_ui) then
