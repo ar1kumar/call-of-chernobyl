@@ -286,6 +286,7 @@ local function main_menu_on_keyboard(dik,keyboard_action,main_menu,level_present
 			write_file("direction HP 	= %s,%s",dir:getH(),dir:getP())
 			write_file("valid 			= %s",valid)
 			write_file("","")
+			main_menu:SetMsg(strformat("Positional data output to %s",position_file),5)
 		end
 	elseif (level_present and keybinds["toggle_top_hud"] and dik == DIK_keys["DIK_"..keybinds["toggle_top_hud"]]) then
 		if ( toggle_top_key < #toggle_hud_list["top"]) then
