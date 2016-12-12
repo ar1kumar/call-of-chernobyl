@@ -1,5 +1,31 @@
 function on_game_start()
 	if (IsSurvivalMode() == true) then
 		DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = false
+		RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
+	end
+end
+
+function actor_on_first_update()
+	game_relations.change_factions_community_num("zombied",0,-5000)
+	game_relations.change_factions_community_num("monolith",0,-5000)
+
+	local faction = character_community(db.actor):sub(7)
+	if (system_ini():section_exist("survival_squad_"..faction) and start_pos) then
+		local sim = alife()
+		local squad = sim:create("survival_squad_"..faction,start_pos[3],start_pos[1],start_pos[2])
+		if (squad) then
+			squad:create_npc(nil,start_pos[3],start_pos[1],start_pos[2])
+			local as
+			for k in squad:squad_members() do
+				local se_obj = k.object or k.id and sim:object(k.id)
+				if (se_obj) then
+					game_relations.change_factions_community_num("zombied",k.id,-5000)
+					SIMBOARD:setup_squad_and_group(se_obj)
+					
+					utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion",true)
+					utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss",true)
+				end
+			end
+		end
 	end
 end
