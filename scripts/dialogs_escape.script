@@ -115,11 +115,12 @@ function init_nimble_tables()
 		local sec = "buy_item_table_"..i
 		local count = ini:line_count(sec)
 		t = empty_table(t)
-		for n=0,count-1 do 
-			local result, id, value = ini:r_line(sec, n, "", "")
-			local item_list = value and value ~= "" and alun_utils.str_explode(value,",") or {}
-			table.insert(item_list,id)
-			table.insert(t,{item=item_list})
+		for n=1,count do 
+			local value = ini:r_string_ex(sec,"item"..n)
+			if (value) then
+				local item_list = value ~= "" and alun_utils.str_explode(value,",") or {}
+				table.insert(t,{item=item_list})
+			end
 		end
 		
 		esc_2_12_buy_item_table[i] = t
