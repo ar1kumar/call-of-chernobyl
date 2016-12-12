@@ -195,16 +195,13 @@ local function actor_on_first_update(binder,delta)
 		start_pos[2] = spawn_path:game_vertex_id(0)
 		start_pos[3] = spawn_path:point(0)
 	end
-	local faction = character_community(db.actor):sub(7)
 	
 	-- Survival mode
 	if (IsSurvivalMode()) then
-		if (faction == "zombied") then
-			game_relations.change_factions_community_num("zombied",0,-5000)
-			game_relations.change_factions_community_num("monolith",0,-5000)
-		elseif (faction == "monolith") then
-			game_relations.change_factions_community_num("zombied",0,-5000)
-		end
+		game_relations.change_factions_community_num("zombied",0,-5000)
+		game_relations.change_factions_community_num("monolith",0,-5000)
+
+		local faction = character_community(db.actor):sub(7)
 		if (system_ini():section_exist("survival_squad_"..faction) and start_pos) then
 			local sim = alife()
 			local squad = sim:create("survival_squad_"..faction,start_pos[3],start_pos[1],start_pos[2])
