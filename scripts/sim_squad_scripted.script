@@ -143,12 +143,12 @@ function sim_squad_scripted:update()
 
 			--printf("m_game_vertex_id=%s actor.m_game_vertex_id=%s",self.m_game_vertex_id,se_actor.m_game_vertex_id)
 			if (se_actor and gg:valid_vertex_id(self.m_game_vertex_id) and gg:valid_vertex_id(se_actor.m_game_vertex_id)) then
-				local level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
+				local level_name = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
 				local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
 
 				-- Disable any squad that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
-				if (level ~= actor_level) and (self:commander_id() and not sim:has_info(self:commander_id(),"npcx_is_companion")) then
-					if not (string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),level)) then
+				if (level_name ~= actor_level) and (self:commander_id() and not sim:has_info(self:commander_id(),"npcx_is_companion")) then
+					if not (string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),level_name)) then
 						if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
 							SIMBOARD.squads[self.id] = nil
 							if (self.smart_id) then
@@ -223,12 +223,11 @@ local function can_help_actor(squad)
 end
 
 local function get_help_target_id(squad)
-	if (IsSurvivalMode()) then
-		if (squad.player_id == "zombied" or _g.is_squad_monster[squad.player_id]) then
+	if (IsSurvivalMode() and squad.dist_to_actor <= 300) then
+		if (squad.player_id == "zombied" or is_squad_monster[squad.player_id]) then
 			return 0
 		end
-	end 
-
+	end
 	return
 end
 

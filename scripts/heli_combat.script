@@ -113,6 +113,10 @@ function heli_combat:is_enemy(obj)
 		end 
 	end 
 	
+	if (IsSurvivalMode()) then
+		return true 
+	end 
+	
 	if not (db.storage[obj:id()] and db.storage[obj:id()].heli_enemy_flag) then 
 		return false
 	end
