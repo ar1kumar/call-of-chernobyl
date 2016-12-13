@@ -225,8 +225,9 @@ function pda_relations_tab:autoupdate()
 			-- Hint
 			local s_move,s_combat,s_gather,s_loot,s_dist,s_stealth,s_arte,s_stalker,s_mutant,s_dismiss,s_tele
 			local state_str = [[
-			%c[255,255,215,255]%c[default]%s \n\n
-			%c[255,215,215,215]States:%c[default] \n
+			%c[255,255,215,255]%c[default]%s \n
+			\n%c[255,215,215,215]Location:%c[default] %s \n
+			\n%c[255,215,215,215]States:%c[default] \n
 			%c[255,160,160,160]Movement:%c[default] %s \n
 			%c[255,160,160,160]Combat:%c[default] %s \n
 			%c[255,160,160,160]Pickup items:%c[default] %s \n
@@ -235,7 +236,6 @@ function pda_relations_tab:autoupdate()
 			%c[255,160,160,160]Stealth:%c[default] %s \n
 			%c[255,160,160,160]Dismissable:%c[default] %s \n
 			%c[255,160,160,160]Level travel:%c[default] %s \n
-			
 			\n%c[255,215,215,215]Statistics:%c[default] \n
 			%c[255,160,160,160]Stalkers killed:%c[default] %s \n
 			%c[255,160,160,160]Mutants killed:%c[default] %s \n
@@ -286,7 +286,8 @@ function pda_relations_tab:autoupdate()
 			s_dismiss = utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss") and game.translate_string("st_pda_mode_false") or game.translate_string("st_pda_mode_true")
 			s_tele = utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_teleport") and game.translate_string("st_pda_mode_disabled") or game.translate_string("st_pda_mode_enabled")
 	
-			state_str = strformat(state_str,full_name,s_move,s_combat,s_gather,s_loot,s_dist,s_stealth,s_dismiss,s_tele,s_stalker,s_mutant,s_arte)
+			local s_location = game.translate_string(alife():level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id()))
+			state_str = strformat(state_str,full_name,s_location,s_move,s_combat,s_gather,s_loot,s_dist,s_stealth,s_dismiss,s_tele,s_stalker,s_mutant,s_arte)
 			self.companion_info[i].hint = state_str
 		else 
 			self.companion_info[i].id = nil
