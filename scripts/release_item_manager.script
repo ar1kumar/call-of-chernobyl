@@ -5,7 +5,9 @@
 local items_marked_for_removal = {}
 
 local function npc_on_item_drop(npc,item)
-	CreateTimeEvent(0,"evaluate_item",0,evaluate_item,npc:id(),item:id())
+	if (item:parent() == nil or item:parent():id() == npc:id()) then 
+		items_marked_for_removal[item:id()] = {item:name(),game.get_game_time()}
+	end
 end
 
 local function npc_on_item_take(npc,item)
@@ -13,7 +15,7 @@ local function npc_on_item_take(npc,item)
 end
 
 local function actor_on_item_drop(item)
-	CreateTimeEvent(0,"evaluate_item",0,evaluate_item,0,item:id())
+	npc_on_item_drop(db.actor,item)
 end
 
 local function actor_on_item_take(item)
@@ -34,7 +36,7 @@ local function load_state(m_data)
 end
 
 local function on_game_load()
-	CreateTimeEvent(0,"release_item",10,clear)
+	CreateTimeEvent(0,"release_item",5,clear)
 end
 --------------------------------------------------------
 -- ON GAME START 
@@ -52,33 +54,26 @@ end
 -----------------------------------------------------------
 --
 -----------------------------------------------------------
-function evaluate_item(npc_id,item_id)
-	local item = level.object_by_id(item_id)
-	if (item and item:parent() == nil) then
-		items_marked_for_removal[item_id] = {item:name(),game.get_game_time()}
-	end
-	return true
-end
+function clear()
 
-function clear(all)
-
-	if (axr_main.config:r_value("mm_options","release_dropped_items",1,false)) then
+	if (axr_main.config:r_value("mm_options","enable_release_dropped_items",1,false)) then
+		local sim = alife()
 		for id,t in pairs(items_marked_for_removal) do 
-			if (all or game.get_game_time():diffSec(t[2]) >= 86400) then
-				local se_obj = alife():object(id)
-				if (se_obj and se_obj:name() == t[1] and se_obj.parent_id == 65535) then
-					if not (se_obj.online) then
-						safe_release_manager.release(se_obj)
-						items_marked_for_removal[id] = nil
-					end
-				else 
+			local se_obj = sim:object(id)
+			if (se_obj and se_obj.parent_id == 65535 and se_obj:name() == t[1] and game.get_game_time():diffSec(t[2]) >= 86400) then
+				if not (se_obj.online) then
+					--printf("release %s",t[1])
+					safe_release_manager.release(se_obj)
 					items_marked_for_removal[id] = nil
 				end
+			else 
+				--printf("fail %s",t[1])
+				items_marked_for_removal[id] = nil
 			end
 		end
 	end
 	
-	ResetTimeEvent(0,"release",60)
+	ResetTimeEvent(0,"release",5)
 	
 	return false
 end
