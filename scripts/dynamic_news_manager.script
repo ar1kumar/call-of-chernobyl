@@ -106,7 +106,7 @@ function DynamicNewsManager:NewsTick()
 		return true
 	end
 	
-	ResetTimeEvent("DynamicNewsManager","NewsTick",math.random(5,10))
+	ResetTimeEvent("DynamicNewsManager","NewsTick",math.random(1,5))
 	
 	if (surge_manager.is_started()) then
 		return false
@@ -332,16 +332,23 @@ function DynamicNewsManager:GossipBounty()
 		end
 		
 		local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+		local sentences = {}
+		local string_count = 1
+		while true do 
+			local tr_s = game.translate_string("st_dyn_news_gossip_bounty_"..string_count)
+			if (tr_s == "st_dyn_news_gossip_bounty_"..string_count) then 
+				break 
+			else 
+				table.insert(sentences,tr_s)
+			end
+			string_count = string_count + 1
+		end
 		
-		local s = {	"I just seen %s, %s. I heard someone put a bounty on his head.", 
-					"I heard that someone put a bounty on %s's head",
-					"Anyone know what's up with %s lately? He's been hanging around %s. It's almost like he is hiding from someone.",
-					"I heard Sidorovich is looking for %s. I just saw him %s."
-		}
+		if (#sentences == 0) then 	
+			return false
+		end
 		
-		local a = strformat(s[math.random(#s)],bounty:character_name(),dynamic_news_helper.GetPointDescription(bounty))
-		
-		local msg = a
+		local msg = strformat(sentences[math.random(#sentences)],bounty:character_name(),dynamic_news_helper.GetPointDescription(bounty))
 		
 		self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
 		
@@ -358,40 +365,28 @@ end
 
 function DynamicNewsManager:RadioInHeli(sender,who)
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
-	
 	local msg = ""
-	
-	local r = math.random(1,2)
-	if (r == 1) then
-		local s = {	"Requesting chopper assistance. Bogey located %s.",  
-					"Requesting air support to our location; we need backup.",
-					"Enemy seen %s. Air assistance needed, over.",
-					"Ground to 'Airhog', we need backup ASAP!",
-		}
-		
-		msg = strformat(s[math.random(#s)],dynamic_news_helper.GetPointDescription(who))
-	elseif (r == 2) then 
-		if (IsStalker(who)) then 
-			local s = {	"Requesting chopper assistance %s. We are under attack by %s.",
-						"Enemies spotted %s. Our squad is under attack by %s.",
-						"Ground-unit to Air-unit, requesting aid %s. We are being assaulted by %s!"
-			}
-			local a = dynamic_news_helper.GetPointDescription(who) 
-			local b = dynamic_news_helper.GetCommunityDescription(who,math.random(1,2))
-			
-			msg = strformat(s[math.random(#s)],a,b)
-		elseif (IsMonster(who)) then
-			local s = {	"Requesting chopper assistance %s. We are under attack by %s.",
-						"Enemies spotted %s. Our squad is under attack by %s.",
-						"Ground-unit to Air-unit, requesting aid %s. We are being assaulted by %s."
-			}
-			local a = dynamic_news_helper.GetPointDescription(who) 
-			local b = dynamic_news_helper.GetMonsterDescription(who,6)
-			
-			msg = strformat(s[math.random(#s)],a,b)
+	local sentences = {}
+	local string_count = 1
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_gossip_heli_"..string_count)
+		if (tr_s == "st_dyn_news_gossip_heli_"..string_count) then 
+			break 
+		else 
+			table.insert(sentences,tr_s)
 		end
+		string_count = string_count + 1
 	end
+
+	if (#sentences == 0) then
+		return false
+	end 
 	
+	local a = dynamic_news_helper.GetPointDescription(who) 
+	local b = IsStalker(who) and dynamic_news_helper.GetCommunityDescription(who,math.random(1,2)) or dynamic_news_helper.GetMonsterDescription(who,6)
+	
+	msg = strformat(sentences[math.random(#sentences)],a,b)
+
 	self:PushToChannel("general",{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
 	return true
 end
@@ -436,13 +431,34 @@ function DynamicNewsManager:GossipDeathByStalker(victim,who)
 	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
 	
-	local TblTime = {"I heard","I just heard","A little while ago I heard","A few minutes ago I heard","A couple minutes ago I heard","I hear","I can hear","I'm hearing","Hey, I just heard","Guys, I'm hearing"}
-	local TblSaw = {"Stay alert.","Watch your fire, people.","Wonder what's up.","Sounds rough.","Anyone see what's happening?","Anyone nearby?","What the hell is going on?","Shit just got real.","Keep your eyes open.","Wonder if we are in any danger here.","","","","","",""}
+	local TblTime = {}
+	local string_count = 1
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_hear_"..string_count)
+		if (tr_s == "st_dyn_news_builder_hear_"..string_count) then 
+			break 
+		else 
+			table.insert(TblTime,tr_s)
+		end
+		string_count = string_count + 1
+	end
 	
-	local a = TblTime[math.random(#TblTime)]
+	local TblSaw = {}
+	string_count = 1 
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_ending_"..string_count)
+		if (tr_s == "st_dyn_news_builder_ending_"..string_count) then 
+			break 
+		else 
+			table.insert(TblSaw,tr_s)
+		end
+		string_count = string_count + 1
+	end
+	
+	local a = #TblTime > 0 and TblTime[math.random(#TblTime)] or ""
 	local b = dynamic_news_helper.GetWeaponDescription(who,2)
 	local c = dynamic_news_helper.GetPointDescription(victim)
-	local d = TblSaw[math.random(#TblSaw)]
+	local d = #TblSaw > 0 and TblSaw[math.random(#TblSaw)] or ""
 
 	local msg = strformat("%s %s %s. %s",a,b,c,d)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
@@ -486,10 +502,21 @@ function DynamicNewsManager:SeenDeathOfStalker(victim,who,comm)
 		return false
 	end
 	
-	local sentence = {"I saw","I just saw","Hey, I just saw","A little while ago I saw","A few minutes ago I saw","Just now I saw","Hey, uh, I just saw"}
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+
+	local sentences = {}
+	local string_count = 1 
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_sight_"..string_count)
+		if (tr_s == "st_dyn_news_builder_sight_"..string_count) then 
+			break 
+		else 
+			table.insert(sentences,tr_s)
+		end
+		string_count = string_count + 1
+	end
 	
-	local a = sentence[math.random(#sentence)]
+	local a = #sentences > 0 and sentences[math.random(#sentences)]
 	local b = dynamic_news_helper.GetCommunityDescription(who,math.random(1,2))
 	local c = dynamic_news_helper.GetWeaponDescription(who,math.random(4,8))
 	local d = dynamic_news_helper.GetCommunityDescription(sender,math.random(3,4))
@@ -513,10 +540,21 @@ function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 		return false
 	end
 	
-	local sentence = {"I saw","I just saw","Hey, I just saw","A little while ago I saw","A few minutes ago I saw","Just now I saw","Hey, uh, I just saw"}
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
 	
-	local a = sentence[math.random(#sentence)]
+	local sentences = {}
+	local string_count = 1 
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_sight_"..string_count)
+		if (tr_s == "st_dyn_news_builder_sight_"..string_count) then 
+			break 
+		else 
+			table.insert(sentences,tr_s)
+		end
+		string_count = string_count + 1
+	end
+	
+	local a = #sentences > 0 and sentences[math.random(#sentences)] or ""
 	local b = dynamic_news_helper.GetCommunityDescription(who,math.random(1,2))
 	local c = dynamic_news_helper.GetWeaponDescription(who,math.random(4,6))
 	local d = dynamic_news_helper.GetMonsterDescription(victim,1)
@@ -536,15 +574,47 @@ function DynamicNewsManager:SeenDeathByMutant(victim,who,comm)
 	end
 	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
-	
-	local start = {"I heard","I just heard","A little while ago I heard","A few minutes ago I heard","A couple minutes ago I heard","Hey, uh, I just heard","I'm hearing","Guys, I can hear"}
-	local middle = {"somebody screaming","screaming","cries for help","screaming and fighting","some fucked up noises"}
-	local ending = {"Watch out.", "Keep your eyes open.", "Stay safe.", "Be careful.","I'd stay away if I were you.","Anybody wanna check it out?","","","","","","","","","",""}
-	
-	local a = start[math.random(#start)]
-	local b = middle[math.random(#middle)]
+
+	local start = {}
+	local string_count = 1 
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_sight_"..string_count)
+		if (tr_s == "st_dyn_news_builder_sight_"..string_count) then 
+			break 
+		else 
+			table.insert(start,tr_s)
+		end
+		string_count = string_count + 1
+	end
+
+	local middle = {}
+	string_count = 1 
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_middle_"..string_count)
+		if (tr_s == "st_dyn_news_builder_middle_"..string_count) then 
+			break 
+		else 
+			table.insert(middle,tr_s)
+		end
+		string_count = string_count + 1
+	end
+
+	local ending = {}
+	string_count = 1 
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_ending_"..string_count)
+		if (tr_s == "st_dyn_news_builder_ending_"..string_count) then 
+			break 
+		else 
+			table.insert(ending,tr_s)
+		end
+		string_count = string_count + 1
+	end
+
+	local a = #start > 0 and start[math.random(#start)] or ""
+	local b = #middle > 0 and middle[math.random(#middle)] or ""
 	local c = dynamic_news_helper.GetPointDescription(victim)
-	local d = ending[math.random(#ending)]
+	local d = #ending > 0 and ending[math.random(#ending)] or ""
 	
 	local msg = strformat("%s %s %s.\\n%s",a,b,c,d)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})
@@ -565,14 +635,35 @@ function DynamicNewsManager:GossipDeathOfMutant(victim,who,comm)
 	end
 	
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+
+	local TblTime = {}
+	local string_count = 1
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_hear_"..string_count)
+		if (tr_s == "st_dyn_news_builder_hear_"..string_count) then 
+			break 
+		else 
+			table.insert(TblTime,tr_s)
+		end
+		string_count = string_count + 1
+	end
 	
-	local TblTime = {"I heard","I just heard","A little while ago I heard","A few minutes ago I heard","A couple minutes ago I heard","I hear","I can hear","I'm hearing","Hey, I just heard","Guys, I'm hearing"}
-	local TblSaw = {"Stay alert.","Watch your fire, people.","Wonder what's up.","Sounds rough.","Anyone see what's happening?","Anyone nearby?","","","","","","","","","",""}
+	local TblSaw = {}
+	string_count = 1 
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_ending_"..string_count)
+		if (tr_s == "st_dyn_news_builder_ending_"..string_count) then 
+			break 
+		else 
+			table.insert(TblSaw,tr_s)
+		end
+		string_count = string_count + 1
+	end	
 	
-	local a = TblTime[math.random(#TblTime)]
+	local a = #TblTime > 0 and TblTime[math.random(#TblTime)] or ""
 	local b = dynamic_news_helper.GetWeaponDescription(who,2)
 	local c = dynamic_news_helper.GetPointDescription(victim)
-	local d = TblSaw[math.random(#TblSaw)]
+	local d = #TblSaw > 0 and TblSaw[math.random(#TblSaw)] or ""
 
 	local msg = strformat("%s %s %s. %s",a,b,c,d)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
@@ -601,16 +692,26 @@ end
 
 function DynamicNewsManager:FoundArtefact(sender,itm)
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
-	local Tbl = {	
-					"My lucky day! I just found a %s",
-					"Anyone know the going rate for a %s?",
-					"A %s! Maybe I can finally retire!",
-					"Sakharov will want his hands on this %s!"
-	}
+
+	local sentences = {}
+	local string_count = 1
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_gossip_arte_"..string_count)
+		if (tr_s == "st_dyn_news_gossip_arte_"..string_count) then 
+			break 
+		else 
+			table.insert(sentences,tr_s)
+		end
+		string_count = string_count + 1
+	end
+	
+	if (#sentences == 0) then 	
+		return false
+	end
 	
 	local inv_name = game.translate_string(system_ini():r_string_ex(itm:section(),"inv_name") or "")
 
-	self:PushToChannel(sender:character_community(),{Mg=strformat(Tbl[math.random(#Tbl)],inv_name),Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	self:PushToChannel(sender:character_community(),{Mg=strformat(sentences[math.random(#sentences)],inv_name),Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
 	
 	return true
 end
@@ -623,25 +724,23 @@ function DynamicNewsManager:BoughtItems(sender,who,list)
 	local inv_name = game.translate_string(system_ini():r_string_ex(sec,"inv_name") or "")
 	
 	local r = math.random(1,2)
-	if (r == 1) then
-		local Tbl1 = {	
-						"%s has some very shitty deals. I think he ripped me off on a %s.",
-						"Anyone know when %s will get more %s in stock?",
-						"%s has some good deals on %s, today.",
-						"I'll be broke in no time if %s keeps raising his prices."
-		}
-		
-		msg = strformat(Tbl1[math.random(#Tbl1)],who:character_name(),inv_name)
-	elseif (r == 2) then 
-		local Tbl1 = {	
-						"%s costs too much... damn.",
-						"Anyone know where I can buy %s? %s is out of them.",
-						"Shit... Good deals on %s, today.",
-						"I just bought %s, just don't hope some asshole doesn't takes it from my stash..."
-		}
-		
-		msg = strformat(Tbl1[math.random(#Tbl1)],inv_name,who:character_name())	
+	local sentences = {}
+	local string_count = 1
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_gossip_buy_"..r.."_"..string_count)
+		if (tr_s == "st_dyn_news_gossip_buy_"..r.."_"..string_count) then 
+			break
+		else 
+			table.insert(sentences,tr_s)
+		end
+		string_count = string_count + 1
 	end
+	
+	if (#sentences == 0) then 	
+		return false
+	end
+		
+	msg = r == 1 and strformat(sentences[math.random(#sentences)],who:character_name(),inv_name) or strformat(sentences[math.random(#sentences)],inv_name,who:character_name())
 
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
 	return true
@@ -658,34 +757,47 @@ function DynamicNewsManager:KillWounded(sender,victim,is_hostage)
 	end
 	
 	if (self.spammer.show_about_kill_wounded == 0) then
-		local Tbl, Se
+		local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
 		if not (is_hostage) then
-			Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
-			Tbl = { 
-							"One is still alive. Put them out of their misery!",
-							"Quick! Over there, he is still alive.",
-							"This one thought he could get away by playing dead.",
-							"Time to put him down for good.",
-							"Let sleeping dogs lie.",
-							"There is still one left. Let's see if we can extract information.",
-							"Put this dog down!",
-							"Surrender, asshole! We know you are wounded!",
-							"He's wounded... Kill him!"
-			}
+			local sentences = {}
+			local string_count = 1
+			while true do 
+				local tr_s = game.translate_string("st_dyn_news_gossip_kill_wounded_"..string_count)
+				if (tr_s == "st_dyn_news_gossip_kill_wounded_"..string_count) then 
+					break
+				else 
+					table.insert(sentences,tr_s)
+				end
+				string_count = string_count + 1
+			end
+			
+			if (#sentences == 0) then 	
+				return false
+			end
+			
+			local msg = sentences[math.random(#sentences)]
+			self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+			return true
 		else 
-			Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
-			Tbl = { 
-							"Looks like we got ourselves a hostage, boys.",
-							"This punkass thought he could escape. Someone keep an eye on him.",
-							"Do you think those stalkers will pay his ransom?",
-							"I don't think your friends are coming for you "..vo:character_name() .. "!",
-							"Looking for offers on this dickhead, " .. vo:character_name() .. ". If not we'll kill him!",
-							"Let's see if we can extract information from this lowlife."
-			}			
+			local sentences = {}
+			local string_count = 1
+			while true do 
+				local tr_s = game.translate_string("st_dyn_news_gossip_hostage_"..string_count)
+				if (tr_s == "st_dyn_news_gossip_hostage_"..string_count) then 
+					break
+				else 
+					table.insert(sentences,tr_s)
+				end
+				string_count = string_count + 1
+			end
+			
+			if (#sentences == 0) then 	
+				return false
+			end
+			
+			local msg = sentences[math.random(#sentences)]
+			self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})			
 		end
-		
-		local msg = Tbl[math.random(#Tbl)]
-		self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
 		
 		return true
 	end
@@ -709,13 +821,23 @@ function DynamicNewsManager:GossipTaskRepeatTimeout(task_id)
 	end
 	
 	Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
-	local Tbl = {
-		"Looks like ol' %s is looking for stalkers to do some work.",
-		"Heads up, %s has some new work available.",
-		"Any need some work? I just heard %s is looking for stalkers for a job.",
-		"%s has new work, if anyone is interested..."
-	}
-	local msg = strformat(Tbl[math.random(#Tbl)],se_obj:character_name())
+	local sentences = {}
+	local string_count = 1
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_gossip_hostage_"..string_count)
+		if (tr_s == "st_dyn_news_gossip_hostage_"..string_count) then 
+			break
+		else 
+			table.insert(sentences,tr_s)
+		end
+		string_count = string_count + 1
+	end
+	
+	if (#sentences == 0) then 	
+		return false
+	end
+
+	local msg = strformat(sentences[math.random(#sentences)],se_obj:character_name())
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})	
 end
 
@@ -744,11 +866,25 @@ function DynamicNewsManager:BuildSentenceStalkerEnemy(victim,who,mn,mx)
 		end
 	end
 
-	local EnemyWord = {"We're under fire from","We're taking fire from","We're under attack by","We're getting shot at by"}
-
-	if (c >= 2) then 
-		return EnemyWord[math.random(#EnemyWord)], dynamic_news_helper.GetCommunityDescription(who,math.random(9,10))
+	local sentences = {}
+	local string_count = 1
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_builder_attacked_"..string_count)
+		if (tr_s == "st_dyn_news_builder_attacked_"..string_count) then 
+			break
+		else 
+			table.insert(sentences,tr_s)
+		end
+		string_count = string_count + 1
+	end
+	
+	if (#sentences == 0) then 	
+		return false
 	end
 
-	return EnemyWord[math.random(#EnemyWord)], dynamic_news_helper.GetCommunityDescription(who,math.random(7,8))
+	if (c >= 2) then 
+		return sentences[math.random(#sentences)], dynamic_news_helper.GetCommunityDescription(who,math.random(9,10))
+	end
+
+	return sentences[math.random(#sentences)], dynamic_news_helper.GetCommunityDescription(who,math.random(7,8))
 end
