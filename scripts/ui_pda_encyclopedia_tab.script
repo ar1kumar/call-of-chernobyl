@@ -9,10 +9,10 @@
 -- Initialises (if necessary) and returns the encyclopedia interface.
 -- Used by pda.script and dxr_encyclopedia.script.
 function get_encyclopedia_ui()
-	if not (ui_pda_encyclopedia_tab.UIEncyclopedia) then
-		ui_pda_encyclopedia_tab.UIEncyclopedia = ui_pda_encyclopedia_tab.pda_encyclopedia_tab()
+	if not (UIEncyclopedia) then
+		UIEncyclopedia = pda_encyclopedia_tab()
 	end
-	return ui_pda_encyclopedia_tab.UIEncyclopedia
+	return UIEncyclopedia
 end
 
 ------------------------
@@ -65,10 +65,14 @@ function pda_encyclopedia_tab:SelectArticle(index1, index2)
 	
 	-- Set the text of the article.
 	self.information:SetText(game.translate_string(section .. "_text"))
-	for k, v in pairs (self.locked) do
-		if (section == v) then
-			self.information:SetText(game.translate_string("pda_btn_encyclopedia_locked"))
-			break
+	
+	-- Lock the required articles if the guide wasn't cheated.
+	if not has_alife_info("guide_cheated") then
+		for k, v in pairs (self.locked) do
+			if (section == v) then
+				self.information:SetText(game.translate_string("pda_btn_encyclopedia_locked"))
+				break
+			end
 		end
 	end
 	
@@ -186,7 +190,7 @@ function pda_encyclopedia_tab:InitPlugin()
 			for k = 0, line_count - 1 do
 				local junk1, section, junk2 = ini:r_line(self.categories[i].section, k, "", "")
 				local unlocked_articles = xr_statistic.actor_statistic.guide_articles
-				if (unlocked_articles and unlocked_articles[section] == nil) then
+				if (unlocked_articles and unlocked_articles[section] == nil and not has_alife_info("guide_cheated")) then
 					table.insert(self.locked, section)
 				end
 				table.insert(self.categories[i].articles, section)
