@@ -38,10 +38,7 @@ function set_active_subdialog(section)
 		end
 		return ui_pda_contacts_tab.UIContacts
 	elseif (section == "eptEncyclopedia") then
-		if not (ui_pda_encyclopedia_tab.UIEncyclopedia) then
-			ui_pda_encyclopedia_tab.UIEncyclopedia = ui_pda_encyclopedia_tab.pda_encyclopedia_tab()
-		end
-		return ui_pda_encyclopedia_tab.UIEncyclopedia
+		return ui_pda_encyclopedia_tab.get_encyclopedia_ui()
 	end
 end 
 
