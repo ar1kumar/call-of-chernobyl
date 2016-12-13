@@ -392,7 +392,7 @@ function DynamicNewsManager:RadioInHeli(sender,who)
 						"Ground-unit to Air-unit, requesting aid %s. We are being assaulted by %s."
 			}
 			local a = dynamic_news_helper.GetPointDescription(who) 
-			local b = dynamic_news_helper.GetMonsterDescription(who,3)
+			local b = dynamic_news_helper.GetMonsterDescription(who,6)
 			
 			msg = strformat(s[math.random(#s)],a,b)
 		end
@@ -422,7 +422,7 @@ function DynamicNewsManager:DeathByMutant(victim,who,comm)
 	local a = victim:character_name()
 	local b = game.translate_string(comm)
 	local c = dynamic_news_helper.GetPointDescription(victim)
-	local d = dynamic_news_helper.GetMonsterDescription(who,2)
+	local d = string.gsub(dynamic_news_helper.GetMonsterDescription(who,1),"(%l)?",string.upper("%1"),1)
 	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]Found %s. %s.",a,b,c,d)
 	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se="Died:",It="gr"})
 	return true
@@ -525,10 +525,10 @@ function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 	local a = sentence[math.random(#sentence)]
 	local b = dynamic_news_helper.GetCommunityDescription(who,math.random(1,2))
 	local c = dynamic_news_helper.GetWeaponDescription(who,math.random(4,6))
-	local d = dynamic_news_helper.GetMonsterDescription(victim,3)
+	local d = dynamic_news_helper.GetMonsterDescription(victim,1)
 	local e = dynamic_news_helper.GetPointDescription(victim)
 	
-	local msg = strformat("%s %s %s %s %s.",a,b,c,d,e)
+	local msg = strformat("%s %s %s a %s %s.",a,b,c,d,e)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})
 	
 	return true
@@ -596,7 +596,7 @@ function DynamicNewsManager:SOSDeathByMutant(victim,who)
 	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
 	
 	local a = dynamic_news_helper.GetCommunityDescription(sender,math.random(11,14))
-	local b = dynamic_news_helper.GetMonsterDescription(who,math.random(5,9))
+	local b = dynamic_news_helper.GetMonsterDescription(who,math.random(2,6))
 	local c = dynamic_news_helper.GetPointDescription(victim)
 
 	local msg = strformat("%s %s %s!",a,b,c)

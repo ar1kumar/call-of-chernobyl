@@ -356,430 +356,57 @@ function send_tip(msg, header, timeout, showtime, sender, sound,icon_by)
 	return true
 end
 
-local Community = {
-
-	["actor"]={
-	"a stalker",
-	"a loner",
-	"some stalker",
-	"some loner",
-	"stalker",
-	"Loner",
-	"stalkers",
-	"loners",
-	"stalkers",
-	"loners",
-	"We need help!",
-	"Help us!",
-	"Need help, please.",
-	"Help!"},
-	
-	["stalker"]={
-	"a stalker",
-	"a loner",
-	"some stalker",
-	"some loner",
-	"stalker",
-	"Loner",
-	"stalkers",
-	"loners",
-	"some stalkers",
-	"loners",
-	"Guys, we need some help!",
-	"Help us!",
-	"Help us out!",
-	"Brothers, help!"},
-	
-	["monolith"]={
-	"a Monolith",
-	"one of the Monolith",
-	"some Monolith troop",
-	"a Monolith",
-	"default",
-	"Monolith",
-	"Monolith",
-	"Monolith troops",
-	"Monolith",
-	"Monolith forces",
-	"Brothers, help us!",
-	"Brothers, help!",
-	"We need help, brothers!",
-	"Help!"},
-	
-	["army"]={
-	"a soldier",
-	"an army guy",
-	"some soldier",
-	"some army guy",
-	"army",
-	"Military",
-	"soldiers",
-	"Spetsnaz",
-	"some soldiers",
-	"the military",
-	"Requesting support!",
-	"We need backup!",
-	"Requesting reinforcements!",
-	"Squad to base! Requesting immediate reinforcements!"},
-	
-	["killer"]={
-	"a merc",
-	"one of the mercs",
-	"some merc",
-	"one of the mercs",
-	"killer",
-	"Mercenary",
-	"mercs",
-	"mercenaries",
-	"some mercs",
-	"mercenaries",
-	"Requesting backup!",
-	"We need backup!",
-	"Requesting support!",
-	"Send backup!"},
-	
-	["ecolog"]={
-	"a scientist",
-	"an egghead",
-	"some ecologist",
-	"some egghead",
-	"default",
-	"Ecologist",
-	"scientists",
-	"ecologists",
-	"some scientists",
-	"eggheads",
-	"Help! Somebody please help us!",
-	"Please help! Someone!",
-	"This is a remote science team, requesting assistance!",
-	"Someone, help!"},
-	
-	["dolg"]={
-	"a Dutier",
-	"a guy from Duty",
-	"some guy from Duty",
-	"one of the guys from Duty",
-	"dolg",
-	"Duty",
-	"Duty",
-	"Duty soldiers",
-	"Duty",
-	"Duty forces",
-	"We need backup!",
-	"Requesting backup!",
-	"Requesting immediate support!",
-	"We need reinforcements!"},
-	
-	["freedom"]={
-	"a Freedomer",
-	"a guy from Freedom",
-	"some guy from Freedom",
-	"one of the guys from Freedom",
-	"freedom",
-	"Freedom",
-	"Freedom",
-	"Freedom stalkers",
-	"Freedom",
-	"Freedom forces",
-	"Guys, help!",
-	"We need some help over here!",
-	"Hey, help us out!",
-	"Shit, help!"},
-	
-	["bandit"]={
-	"a bandit",
-	"a bandit",
-	"a bandit",
-	"some bandit",
-	"bandit",
-	"Bandit",
-	"bandits",
-	"thugs",
-	"some bandits",
-	"thugs",
-	"Yo, help us out!",
-	"We need some fucking help!",
-	"We're in some deep shit here, boys!",
-	"Hey hey hey, we need help!"},
-	
-	["csky"]={
-	"a Clear Sky stalker",
-	"a guy from Clear Sky",
-	"one of the guys from Clear Sky",
-	"some guy from Clear Sky",
-	"Clear Sky",
-	"Clear Sky",
-	"Clear Sky",
-	"Clear Sky",
-	"Clear Sky",
-	"Clear Sky stalkers",
-	"Help us out!",
-	"This is Clear Sky, we need help!",
-	"Stalkers, help us!",
-	"Help!"},
-	
-	["zombied"]={
-	"a zombie",
-	"some zombie",
-	"some zombie",
-	"a zombie",
-	"zombie",
-	"Zombie",
-	"zombies",
-	"zombies",
-	"some zombies",
-	"zombies",
-	"Uuuuhh!",
-	"Urrr!",
-	"Hrrrr!",
-	"Uuurrh..."}
-}
-
-
 function GetCommunityDescription(obj,index)
 	local comm = obj:character_community()
 	if (obj:id() == 0 and comm ~= "actor") then 
 		comm = comm:sub(7)
 	end 
-	return Community[comm] and Community[comm][index] or "some asshole"
+	
+	local msg = game.translate_string("st_dyn_news_comm_" .. comm .. "_" .. index)
+	if (msg == "st_dyn_news_comm_" .. comm .. "_" .. index) then
+		return "some asshole"
+	end
+	
+	return msg
 end
 
-local monster_classes={
- [clsid.boar_s]={
- "boar",
- "Boar",
- "a boar",
- "boars",
- "We got attacked by a boar",
- "We ran into boars",
- "We were attacked by a pack of boars",
- "We ran into some boars",
- "A pack of wild boars",
- "a boar"},
- 
- [clsid.dog_s]={
- "dog",
- "Dog",
- "a dog",
- "dogs",
- "We got attacked by a dog",
- "We ran into a dog",
- "We were attacked by a pack of dogs",
- "We ran into a pack of dogs",
- "A pack of dogs",
- "a dog"},
- 
- [clsid.flesh_s]={
- "flesh",
- "Flesh",
- "a flesh",
- "flesh",
- "We were attacked by a flesh",
- "We ran into a flesh",
- "We got rushed by a pound of flesh",
- "We got attacked by flesh",
- "A pound of flesh",
- "a flesh"},
- 
- [clsid.pseudodog_s]={
- "pseudodog",
- "Pseudodog",
- "a pseudodog",
- "pseudodogs",
- "We were attacked by a pseudodog",
- "A pseudodog jumped us",
- "We got hit by a pack of pseudodogs",
- "We ran into a pack of pseudodogs",
- "A pack of pseudodogs",
- "a pseudodog"},
- 
- [clsid.snork_s]={
- "snork",
- "Snork",
- "a snork",
- "snorks",
- "We got jumped by a snork",
- "We ran into a snork",
- "We got attacked by a bunch of snorks",
- "We ran into a bunch of snorks",
- "A group of snorks",
- "a snork"},
- 
- [clsid.bloodsucker_s]={
- "bloodsucker",
- "Bloodsucker",
- "bloodsuckers",
- "bloodsucker",
- "We got ambushed by a bloodsucker",
- "A bloodsucker ambushed us",
- "We got attacked by bloodsuckers",
- "We got ambushed by a bunch of bloodsuckers",
- "A pack of bloodsuckers",
- "a bloodsucker"},
- 
- [clsid.burer_s]={
- "burer",
- "Burer",
- "a burer",
- "burers",
- "We were attacked by a burer",
- "We ran into a burer",
- "We got attacked by burers",
- "We ran into some burers",
- "A bunch of burers",
- "a burer"},
- 
- [clsid.chimera_s]={
- "chimera",
- "Chimera",
- "a chimera",
- "chimeras",
- "We were attacked by a chimera",
- "We got jumped by a chimera",
- "We were attacked by chimeras",
- "We got ambushed by chimeras",
- "A pack of chimeras",
- "a chimera"},
- 
- [clsid.controller_s]={
- "controller",
- "Controller",
- "a controller",
- "controllers",
- "We got attacked by a controller",
- "A controller ambushed us",
- "We got attacked by a couple controllers",
- "We ran into a school of controllers",
- "A school of controllers",
- "a controller"},
- 
- [clsid.poltergeist_s]={
- "poltergeist",
- "Poltergeist",
- "a poltergeist",
- "poltergeists",
- "We got hit by a poltergeist",
- "We ran into a poltergeist",
- "We got attacked by poltergeists",
- "We ran into poltergeists",
- "A couple poltergeists",
- "a poltergeist"},
- 
- [clsid.gigant_s]={
- "pseudo_gigant",
- "Pseudogiant",
- "a pseudogiant",
- "pseudogiants",
- "We got attacked by a pseudogiant",
- "We ran into a pseudogiant",
- "We got attacked by pseudogiants",
- "We were attacked by pseudogiants",
- "A couple pseudogiants",
- "a pseudogiant"},
- 
- [clsid.tushkano_s]={
- "tushkano",
- "Tushkano",
- "a tushkano",
- "tushkano",
- "We got rushed by tushkano",
- "Tushkano attacked us",
- "We got rushed by a pack of tushkano",
- "We got hit by a pack of tushkano",
- "A pack of tushkano",
- "a tushkano"},
- 
- [clsid.psy_dog_s]={
- "psy_dog",
- "Psy-dog",
- "a psy-dog",
- "psy-dogs",
- "We got attacked by a psy-dog",
- "We got ambushed by a psy-dog",
- "We ran into a pack of psy-dogs",
- "We got attacked by psy-dogs",
- "A pack of psy-dogs",
- "a psy-dog"},
- 
- [clsid.psy_dog_phantom_s]={
- "psy_dog_phantom",
- "Phantom",
- "a phantom",
- "phantoms",
- "We got attacked by a psy-dog",
- "We ran into a psy-dog",
- "We got ambushed by psy-dogs",
- "We ran into a pack of psy-dogs",
- "A pack of psy-dogs",
- "a psy-dog"},
- 
- [clsid.script_stalker]={
- "zombied",
- "Zombie",
- "a zombie",
- "zombies",
- "We got attacked by a zombie",
- "We ran into a zombie",
- "We got attacked by zombies",
- "We ran into a bunch of zombies",
- "A squad of zombies",
- "a zombie"},
- 
- [clsid.cat_s]={
- "cat",
- "Cat",
- "a cat",
- "cats",
- "We got ambushed by a cat",
- "We ran into a cat",
- "We were attacked by a pack of cats",
- "We got jumped by some fucking cats",
- "A group of cats",
- "a cat"}, 
-
- [clsid.fracture_s]={
- "fracture",
- "Fracture",
- "a fracture",
- "fractures",
- "We were attacked by a fracture",
- "We ran into a fracture",
- "We got attacked by a bunch of fractures",
- "Fractures attacked us",
- "A group of fractures",
- "a fracture"},
- 
- [clsid.zombie_s]={
- "zombie",
- "Zombie",
- "a zombie",
- "zombies",
- "We were attacked by a zombie",
- "We ran into a zombie",
- "We got attacked by zombies",
- "We ran into some zombies",
- "A bunch of zombies",
- "a zombie"},
- 
- [clsid.rat_s]={
- "rat",
- "Rat",
- "a rat",
- "rats",
- "We got attacked by rats",
- "Fucking rats attacked us",
- "We got rushed by a ton of rats",
- "We got attacked by a bunch of rats",
- "A bunch of rats",
- "a rat"}
-}
-
 function GetMonsterDescription(obj,index)
+	local sec = obj:section()
 	local cls = obj:clsid()
-	if not (IsMonster(nil,cls)) then 
-		return "not a monster"
+	local msg = game.translate_string("st_dyn_news_" .. sec .. "_" .. index)
+	if (msg == "st_dyn_news_" .. sec .. "_" .. index) then
+		msg = nil
 	end
-	return monster_classes[cls][index or 1] or ""
+	if msg then
+		return msg
+	elseif not (IsMonster(nil,cls)) then
+		if sec:find("_zombied") then
+			return game.translate_string("st_dyn_news_zombied_" .. index)
+		else
+			return "not a monster"
+		end
+	end
+	local m_class = {
+		[clsid.bloodsucker_s] 			= "bloodsucker",
+		[clsid.boar_s] 					= "boar",
+		[clsid.dog_s] 					= "dog",
+		[clsid.flesh_s] 				= "flesh",
+		[clsid.pseudodog_s] 			= "pseudodog",
+		[clsid.burer_s] 				= "burer",
+		[clsid.cat_s] 					= "cat",
+		[clsid.rat_s]					= "rat",
+		[clsid.chimera_s] 				= "chimera",
+		[clsid.controller_s] 			= "controller",
+		[clsid.fracture_s] 				= "fracture",
+		[clsid.poltergeist_s] 			= "poltergeist",
+		[clsid.gigant_s] 				= "gigant",
+		[clsid.zombie_s] 				= "zombie",
+		[clsid.snork_s] 				= "snork",
+		[clsid.tushkano_s] 				= "tushkano",
+		[clsid.psy_dog_s] 				= "psy_dog",
+		[clsid.psy_dog_phantom_s] 		= "psy_dog_phantom"
+	}
+	return game.translate_string("st_dyn_news_" .. m_class[cls] .. "_" .. index) or ""
 end
 
 local WpnClass ={

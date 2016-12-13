@@ -39,21 +39,23 @@ local function on_item_drop(npc,item)
 		return
 	end
 	-- unmark npc as having valuables if they were all removed by actor
-	local se_item = alife_object(item:id())
-	if (se_item and se_item.parent_id == db.actor:id()) then
-		local corpse_contain_any_valuable
-		HasValuableLoot[npc:id()] = nil
-		local function check_item(npc,item)
-			if (lootable_table[item:section()] ~= nil) then
-				corpse_contain_any_valuable = true
-			end
-		end
+	local parent = item:parent()
+	if not (parent and parent:id() == db.actor:id()) then 
+		return 
+	end
 
-		npc:iterate_inventory(check_item,npc)
-
-		if (corpse_contain_any_valuable) then
-			HasValuableLoot[npc:id()] = true
+	local corpse_contain_any_valuable
+	HasValuableLoot[npc:id()] = nil
+	local function check_item(npc,item)
+		if (lootable_table[item:section()] ~= nil) then
+			corpse_contain_any_valuable = true
 		end
+	end
+
+	npc:iterate_inventory(check_item,npc)
+
+	if (corpse_contain_any_valuable) then
+		HasValuableLoot[npc:id()] = true
 	end
 end
 
