@@ -4177,22 +4177,12 @@ function make_a_wish(actor,npc,p)
 	
 	action_list[3] = function()
 		local sim = alife()
-		local function remove_this_squad(id)
-			local squad = id and sim:object(id)
-			if not (squad) then
-				return true
-			end
-			
-			printf("DEBUG: removing squad %s from the game",squad:name())
-			SIMBOARD:assign_squad_to_smart(squad, nil)
-			squad:remove_squad()
-			return true
-		end
 		local squad
 		for i=1,65534 do
 			squad = sim:object(i)
 			if (squad and squad:clsid() == clsid.online_offline_group_s) then 
-				CreateTimeEvent(squad.id,"remove_this_squad",math.random(1,10),remove_this_squad,squad.id)
+				SIMBOARD:assign_squad_to_smart(squad, nil)
+				squad:remove_squad()
 			end
 		end
 		give_info("actor_made_wish_for_peace")
@@ -4230,7 +4220,7 @@ function make_a_wish(actor,npc,p)
 			db.actor:iterate_inventory(itr,db.actor)
 		end
 		
-		CreateTimeEvent(0,"remove_backpack",5,remove_backpack,0)
+		CreateTimeEvent(0,"remove_backpack",1,remove_backpack,0)
 		
 		give_info("actor_made_wish_for_riches")
 		give_info("actor_made_wish")
@@ -4362,7 +4352,7 @@ function change_visual(actor,npc,p)
 		return
 	end
 	if (axr_main) then
-		CreateTimeEvent(sobj.id,"update_visual",5,update_visual,sobj.id,p[1])
+		CreateTimeEvent(sobj.id,"update_visual",1,update_visual,sobj.id,p[1])
 	end
 end
 

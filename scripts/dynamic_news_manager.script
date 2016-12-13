@@ -79,8 +79,8 @@ function DynamicNewsManager:__init()
 		["show_about_death_mutant"] = 0
 	}
 	
-	CreateTimeEvent("DynamicNewsManager","NewsTick",10*level.get_time_factor(),self.NewsTick,self)
-	CreateTimeEvent("DynamicNewsManager","TickSpecialEvent",10*level.get_time_factor(),self.TickSpecialEvent,self)
+	CreateTimeEvent("DynamicNewsManager","NewsTick",10,self.NewsTick,self)
+	CreateTimeEvent("DynamicNewsManager","TickSpecialEvent",10,self.TickSpecialEvent,self)
 
 	RegisterScriptCallback("monster_on_death_callback",self)
 	--RegisterScriptCallback("monster_on_net_spawn",self)	
@@ -97,10 +97,6 @@ function DynamicNewsManager:destroy()
 end
 
 function DynamicNewsManager:NewsTick()
-	if (surge_manager.is_started()) then
-		return false
-	end 
-	
 	if (axr_main.config:r_value("mm_options","enable_dynamic_news",1,true) == false) then
 		return true
 	end
@@ -110,10 +106,11 @@ function DynamicNewsManager:NewsTick()
 		return true
 	end
 	
-	local function reset(dnm)
-		CreateTimeEvent("DynamicNewsManager","NewsTick",math.random(8,15)*level.get_time_factor(),dnm.NewsTick,dnm)
+	ResetTimeEvent("DynamicNewsManager","NewsTick",math.random(5,10))
+	
+	if (surge_manager.is_started()) then
+		return false
 	end
-	CreateTimeEvent("DynamicNewsManager","ResetNewsTick",1,reset,self)
 	
 	local c
 	for k,v in pairs(self.queue) do
@@ -121,26 +118,23 @@ function DynamicNewsManager:NewsTick()
 		if (c > 0) then
 			dynamic_news_helper.send_tip(v[c].Mg,v[c].Se, nil, nil,v[c].Ic,v[c].Snd,v[c].It)
 			v[c] = nil
-			return true
+			return false
 		end
 	end
 	
-	return true
+	return false
 end
 
 function DynamicNewsManager:TickSpecialEvent()
 	if (axr_main.config:r_value("mm_options","enable_dynamic_news",1,true) == false) then
 		return true
 	end
-	
-	local function reset(dnm)
-		CreateTimeEvent("DynamicNewsManager","TickSpecialEvent",math.random(120,240)*level.get_time_factor(),dnm.TickSpecialEvent,dnm)
-	end
-	CreateTimeEvent("DynamicNewsManager","ResetTickSpecialEvent",1,reset,self)
+
+	ResetTimeEvent("DynamicNewsManager","ResetTickSpecialEvent",math.random(120,240))
 	
 	self:GossipBounty()
 	
-	return true
+	return false
 end
 
 ----------------- callbacks
