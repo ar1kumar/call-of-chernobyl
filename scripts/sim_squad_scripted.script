@@ -944,6 +944,11 @@ function sim_squad_scripted:can_switch_offline()
 	if (IsSurvivalMode()) then
 		return false
 	end
+	
+	-- companions
+	if (axr_companions.companion_squads[self.id]) then 
+		return false 
+	end
 
 	return cse_alife_online_offline_group.can_switch_offline(self)
 end
