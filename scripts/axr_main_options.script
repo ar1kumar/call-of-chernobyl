@@ -15,25 +15,31 @@ function opt_menu_on_init(menu)
 			end
 		end
 	end}
-	menu.gameplay_options["actor_hud"]			= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
-		if (level.present() and dynamic_hud) then
-			if (ctrl:GetCheck()) then
-				dynamic_hud.activate_hud()
-			else 
-				dynamic_hud.deactivate_hud()
+	if (dynamic_hud) then
+		menu.gameplay_options["actor_hud"]			= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
+			if (level.present() and dynamic_hud) then
+				if (ctrl:GetCheck()) then
+					dynamic_hud.activate_hud()
+				else 
+					dynamic_hud.deactivate_hud()
+				end
 			end
-		end
-	end}
+		end}
+	end
 	-- slot Hud
-	menu.gameplay_options["slot_hud"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
-		if (level.present() and slot_hud) then
-			if (ctrl:GetCheck()) then
-				slot_hud.activate_hud()
-			else
-				slot_hud.deactivate_hud()
+	if (slot_hud) then
+		menu.gameplay_options["slot_hud"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
+			if (level.present() and slot_hud) then
+				if (ctrl:GetCheck()) then
+					slot_hud.activate_hud()
+				else
+					slot_hud.deactivate_hud()
+				end
 			end
-		end
-	end}
+		end}
+	end
+	-- release dropped items 
+	menu.gameplay_options["release_dropped_items"]	= {default=true, 	debug_only=false, 	typ="check"}
 	-- show_enemy_health
 	menu.gameplay_options["show_enemy_health"]	= {default=false, 	debug_only=true, 	typ="check"}
 	-- radio_mod

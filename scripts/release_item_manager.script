@@ -61,16 +61,19 @@ function evaluate_item(npc_id,item_id)
 end
 
 function clear(all)
-	for id,t in pairs(items_marked_for_removal) do 
-		if (all or game.get_game_time():diffSec(t[2]) >= 86400) then
-			local se_obj = alife():object(id)
-			if (se_obj and se_obj:name() == t[1] and se_obj.parent_id == 65535) then
-				if not (se_obj.online) then
-					safe_release_manager.release(se_obj)
+
+	if (axr_main.config:r_value("mm_options","release_dropped_items",1,false)) then
+		for id,t in pairs(items_marked_for_removal) do 
+			if (all or game.get_game_time():diffSec(t[2]) >= 86400) then
+				local se_obj = alife():object(id)
+				if (se_obj and se_obj:name() == t[1] and se_obj.parent_id == 65535) then
+					if not (se_obj.online) then
+						safe_release_manager.release(se_obj)
+						items_marked_for_removal[id] = nil
+					end
+				else 
 					items_marked_for_removal[id] = nil
 				end
-			else 
-				items_marked_for_removal[id] = nil
 			end
 		end
 	end
