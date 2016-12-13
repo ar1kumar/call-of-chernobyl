@@ -1,5 +1,74 @@
 function on_game_start()
-	if (IsSurvivalMode() == true) then
-		DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = false
+	-- Yes, it does work
+	--RegisterScriptCallback("actor_on_before_death",actor_on_before_death)
+end
+
+-- Respawn with no items on death if in IronMan mode too
+function actor_on_before_death(whoID,flags)
+	if not (IsSurvivalMode()) then 
+		return 
+	end 
+
+	local uuid = alife_storage_manager.get_state().uuid
+	if not (uuid) then
+		return -- not in hardcore mode
 	end
+	
+	xr_statistic.actor_statistic.deaths = xr_statistic.actor_statistic.deaths + 1
+	SetHudMsg(strformat(game.translate_string("st_death_count"),xr_statistic.actor_statistic.deaths),5)
+	
+	bind_stalker_ext.invulnerable_time = 10000
+	db.actor:set_health_ex(1)
+	db.actor.psy_health = 1
+	db.actor.bleeding = 1
+	db.actor.radiation = -1
+	db.actor.power = 1
+
+	local ignore_list = {	
+		["bolt"] = true,
+		["device_torch"] = true,
+		["device_pda"] = true,
+		["wpn_binoc"] = true,
+		["wpn_knife"] = true
+	}
+	local sim = alife()
+	local function release_actor_item(temp, item)
+		if not (ignore_list[item:section()]) then
+			local se_item = sim:object(item:id())
+			if (se_item) then
+				sim:release(se_item,true)
+			end
+		end
+	end
+	db.actor:iterate_inventory(release_actor_item,nil)
+	
+	local t = {}
+	for smart_name,tbl in pairs(db.campfire_table_by_smart_names) do 
+		for id,camp_binder in pairs(tbl) do 
+			table.insert(t,camp_binder.object)
+		end
+	end
+	if (#t > 0) then
+		local hud = get_hud()
+		hud:HidePdaMenu()
+		hud:HideActorMenu()
+		db.actor:give_money(-db.actor:money()+500)
+		db.actor:set_actor_position(t[math.random(#t)]:position())
+		give_object_to_actor("novice_outfit")
+		level.disable_input()
+		level.remove_cam_effector(210409)
+		level.add_cam_effector("camera_effects\\prison_1.anm", 210409, false, "survival_mode.cam_effector_end")
+		level.add_pp_effector("deimos1.ppe", 210410, false)
+		flags.ret_value = false
+	end
+end
+
+function cam_effector_end()
+	level.enable_input()
+	db.actor:set_health_ex(1)
+	db.actor.psy_health = 1
+	db.actor.bleeding = 1
+	db.actor.radiation = -1
+	db.actor.power = 1
+	bind_stalker_ext.invulnerable_time = nil
 end

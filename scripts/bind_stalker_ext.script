@@ -86,7 +86,7 @@ function actor_on_first_update(binder,delta)
 		surge_manager.get_surge_manager():respawn_artefacts_and_replace_anomaly_zone()
 		m_data.artefact_respawn_levels[level.name()] = false
 	end 
-	invulnerable_time = time_global() + 8000
+	invulnerable_time = time_global() + 7000
 	SendScriptCallback("actor_on_first_update",binder,delta)
 end
 
@@ -262,9 +262,11 @@ function actor_on_before_death(binder,whoID)
 		-- db.actor:detach_vehicle()
 	-- end
 	
-	db.actor:kill(db.actor, true)
-	
-	SendScriptCallback("actor_on_before_death",whoID)
+	local flags = { ret_value = true }
+	SendScriptCallback("actor_on_before_death",whoID,flags)
+	if (flags.ret_value == true) then 
+		db.actor:kill(db.actor, true)	
+	end
 end
 
 ---------------------------------------------

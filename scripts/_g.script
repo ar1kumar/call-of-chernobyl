@@ -1409,9 +1409,9 @@ function CActor__BeforeHitCallback(actor,shit,bone_id)
 		end
 	end
 	
-	local return_flag = true
-	SendScriptCallback("actor_on_before_hit",shit,bone_id,return_flag)
-	return return_flag
+	local flags = { ret_value = true }
+	SendScriptCallback("actor_on_before_hit",shit,bone_id,flags)
+	return flags.ret_value
 end
 
 -- called in CSE_ALifeDynamicObject::on_unregister()
