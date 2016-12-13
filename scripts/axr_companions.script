@@ -520,6 +520,13 @@ function cycle_companions_move_mode(force_mode)
 end 
 
 function cycle_companions_stealth_mode()
+	local mode = _current_stealth_mode
+	if (_current_stealth_mode == 1) then 
+		_current_stealth_mode = 2 
+	else 
+		_current_stealth_mode = 1 
+	end
+	
 	for id,squad in pairs(axr_companions.companion_squads) do 
 		if (squad and squad.commander_id) then
 			for k in squad:squad_members() do
@@ -527,14 +534,12 @@ function cycle_companions_stealth_mode()
 					st = db.storage[k.id]
 					local member = st and st.object
 					if (member and member:alive()) then
-						if (_current_stealth_mode == 1) then 
-							_current_stealth_mode = 2
+						if (mode == 1) then 
 							member:give_info_portion("npcx_beh_substate_stealth")
-							SetHudMsg(game.translate_string("st_companion_state_stealth_enabled"),8)
-						else 
-							_current_stealth_mode = 1
-							member:disable_info_portion("npcx_beh_substate_stealth")
 							SetHudMsg(game.translate_string("st_companion_state_stealth_disabled"),8)
+						else 
+							member:disable_info_portion("npcx_beh_substate_stealth")
+							SetHudMsg(game.translate_string("st_companion_state_stealth_enabled"),8)
 						end 
 					end
 				end
