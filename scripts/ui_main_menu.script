@@ -14,7 +14,7 @@ local SKIP_FACTION_SELECTION = false -- TRUE to disable faction selection menu a
 
 class "main_menu" (CUIScriptWnd)
 function main_menu:__init() super()
-	math.randomseed(device():time_global())
+	math.randomseed(os.time())
 	self.mbox_mode = 0
     self:InitControls()
     self:InitCallBacks()
