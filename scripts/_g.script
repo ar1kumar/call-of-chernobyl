@@ -1398,6 +1398,14 @@ function CActor__BeforeHitCallback(actor,shit,bone_id)
 	--]]
 	if (shit.type ~= hit.strike) then
 		if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
+			if (db.actor) then
+				if (db.actor.bleeding > 0) then 
+					db.actor.bleeding = 0.2
+				end
+				if (db.actor.radiation > 0) then 
+					db.actor.radiation = -1
+				end
+			end
 			bind_stalker_ext.invulnerable_time = bind_stalker_ext.invulnerable_time - 500
 			return false
 		end

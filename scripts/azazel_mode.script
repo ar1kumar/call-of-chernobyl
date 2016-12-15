@@ -7,8 +7,9 @@ function on_game_load()
 	if not (alife_storage_manager.get_state().enable_azazel_mode) then
 		return
 	end
-	local victim_id = axr_main.config:r_value("temp","azazel_death",2)
+	local victim_id = alife_storage_manager.get_state().azazel_death_id
 	if (victim_id) then
+		alife_storage_manager.get_state().azazel_death_id = nil
 		local se_obj = alife():object(victim_id)
 		if (se_obj) then
 			safe_release_manager.release(se_obj)
@@ -25,15 +26,12 @@ function on_game_load()
 		-- Heal 
 		bind_stalker_ext.invulnerable_time = 30000
 		db.actor:set_health_ex(1)
-		db.actor.psy_health = 1
-		db.actor.bleeding = 1
-		db.actor.radiation = -1
-		db.actor.power = 1
+
 		SetHudMsg(strformat(game.translate_string("st_death_count"),xr_statistic.actor_statistic.deaths),8)
-		axr_main.config:w_value("temp","azazel_death")
+		
 		level.disable_input()
 		level.remove_cam_effector(210409)
-		level.add_cam_effector("camera_effects\\prison_1.anm", 210409, false, "survival_mode.cam_effector_end")
+		level.add_cam_effector("camera_effects\\prison_1.anm", 210409, false, "azazel_mode.cam_effector_end")
 		level.add_pp_effector("deimos1.ppe", 210410, false)
 	end
 end
@@ -48,10 +46,6 @@ function actor_on_before_death(whoID,flags)
 	
 	bind_stalker_ext.invulnerable_time = 30000
 	db.actor:set_health_ex(1)
-	db.actor.psy_health = 1
-	db.actor.bleeding = 1
-	db.actor.radiation = -1
-	db.actor.power = 1
 
 	local ignore_list = {	
 		["bolt"] = true,
@@ -247,7 +241,7 @@ function actor_on_before_death(whoID,flags)
 			if not (se_obj) then
 				return false 
 			end
-			axr_main.config:w_value("temp","azazel_death",se_obj.id)
+			alife_storage_manager.get_state().azazel_death_id = se_obj.id
 			ChangeLevel(se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,vector():set(0,0,0))
 			return true
 		end
@@ -260,9 +254,5 @@ end
 function cam_effector_end()
 	level.enable_input()
 	db.actor:set_health_ex(1)
-	db.actor.psy_health = 1
-	db.actor.bleeding = 1
-	db.actor.radiation = -1
-	db.actor.power = 1
 	bind_stalker_ext.invulnerable_time = nil
 end

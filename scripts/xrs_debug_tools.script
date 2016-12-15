@@ -19,7 +19,7 @@ by Alundaio
 ---------------------------------------------------------------------------------------------------------
 
 local toggle_hud_list = 	{
-							["top"]  = { "feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
+							["top"]  = { "actor_condition_hud", "feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
 							["left"] = { "arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
 							["right"] = { "npc_info_hud", "actor_info_hud", "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
 							}
@@ -988,6 +988,18 @@ function actor_info_hud_show(hud)
 		hud:add_msg("",info)
 	end
 	alife():iterate_info(0,itr)
+	
+	hud:display()
+end 
+
+function actor_condition_hud_show(hud)
+	hud:set_header("-[Actor Condition]-")
+	
+	local t = {"health","bleeding","psy_health","radiation","power", "morale"}
+	
+	for i=1,#t do 
+		hud:add_msg(t[i],db.actor[t[i]])
+	end
 	
 	hud:display()
 end 
