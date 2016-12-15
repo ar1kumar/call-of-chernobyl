@@ -1227,7 +1227,7 @@ function set_save_marker(p, mode, check, prefix)
 		if mode == "save" then
 			save_marker_result[prefix] = p:w_tell() or 0
 			if p:w_tell() > 16000 then
-				abort("ERROR: You are saving too much")
+				printf("ERROR: You are saving too much")
 			end
 		else
 			save_marker_result[prefix] = p:r_tell() or 0

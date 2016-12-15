@@ -305,6 +305,33 @@ function remove_from_actor_squad(npc)
 	end
 end
 
+function remove_all_from_actor_squad()
+	for id,squad in pairs(companion_squads) do 
+		for k in squad:squad_members() do 
+			local se_obj = k.object or alife():object(k.id)
+			if (se_obj) then 
+				squad.scripted_target = nil
+				utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion",nil)
+				utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss",nil)
+				utils.se_obj_save_var(se_obj.id,se_obj:name(),"companion_cannot_teleport",nil)		
+					
+				local member = db.storage[se_obj.id] and db.storage[se_obj.id].object or level.object(se_obj.id)
+				if (member) then 
+					member:disable_info_portion("npcx_is_companion")
+					member:disable_info_portion("npcx_beh_cannot_dismiss")
+					axr_logic.restore_scheme_and_logic(member)
+				end
+			end
+		end
+		companion_squads[id] = nil
+	end
+
+	for i=1,max_actor_squad_size do
+		utils.save_var(db.actor,"companion_"..i,nil)
+	end
+	db.actor:disable_info_portion("axr_has_companion")
+end
+
 function can_join_actor(npc)
 	local squad = get_object_squad(npc)
 	if squad ~= nil and squad:commander_id() ~= npc:id() then

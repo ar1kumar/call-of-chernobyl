@@ -27,9 +27,9 @@ local function on_game_load(binder)
 			config:w_value("character_creation","new_game_survival_mode")
 			need_save = true
 		end
-		if (config:r_value("character_creation","new_game_hardcore_aim_mode",1) == true) then
-			alife_storage_manager.get_state().enable_hardcore_ai_aim = true
-			config:w_value("character_creation","new_game_hardcore_aim_mode")
+		if (config:r_value("character_creation","new_game_azazel_mode",1) == true) then
+			alife_storage_manager.get_state().enable_azazel_mode = true
+			config:w_value("character_creation","new_game_azazel_mode")
 			need_save = true
 		end
 	end
@@ -42,11 +42,7 @@ local function on_game_load(binder)
 		
 		new_character_name = new_character_name:gsub("_"," ")
 		
-		local data = stpk_utils.get_actor_data(se_actor)
-		if (data) then
-			data.character_name = new_character_name
-			stpk_utils.set_actor_data(data,se_actor)
-		end
+		se_actor:set_character_name(new_character_name)
 	end
 	
 	-- NEW CHARACTER ICON
@@ -160,15 +156,11 @@ local function on_game_load(binder)
 			end
 		end
 		
-		local data = stpk_utils.get_actor_data(se_actor)
-		if (data) then
-			if (money_max) then
-				data.money = money_max
-			end		
-	
-			data.specific_character = "actor_"..faction
-			stpk_utils.set_actor_data(data,se_actor)
-		end
+		se_actor:set_profile_name("actor_"..faction)
+		
+		if (money_max) then
+			db.actor:give_money(-db.actor:money()+money_max)
+		end 
 	end
 	
 	if (need_save) then
@@ -177,20 +169,6 @@ local function on_game_load(binder)
 end
 
 local function actor_on_first_update(binder,delta)
-	-- hardcore ai aim
-	local con = get_console()
-	if (alife_storage_manager.get_state().enable_hardcore_ai_aim) then
-		con:execute("ai_aim_max_angle 20.0")
-		con:execute("ai_aim_min_angle 17.0")
-		con:execute("ai_aim_min_speed 2.00")
-		con:execute("ai_aim_predict_time 0.28")
-	else
-		con:execute("ai_aim_max_angle 0.7854")
-		con:execute("ai_aim_min_angle 0.19635")
-		con:execute("ai_aim_min_speed 0.24")
-		con:execute("ai_aim_predict_time 0.40")
-	end
-	
 	if (spawn_path) then
 		start_pos = {}
 		start_pos[1] = spawn_path:level_vertex_id(0)
@@ -368,9 +346,9 @@ function faction_ui:InitControls(f)
 		self.ck_hardcore = xml:InitCheck("main_dialog:check_hardcore",	self.dialog)
 		self:Register(self.ck_hardcore,"check_hardcore")
 		
-		xml:InitStatic("main_dialog:cap_check_hardcore_aim",self.dialog)
-		self.ck_hardcore_aim = xml:InitCheck("main_dialog:check_hardcore_aim",	self.dialog)
-		self:Register(self.ck_hardcore_aim,"check_hardcore_aim")
+		xml:InitStatic("main_dialog:cap_check_azazel_mode",self.dialog)
+		self.ck_azazel_mode = xml:InitCheck("main_dialog:check_azazel_mode",	self.dialog)
+		self:Register(self.ck_azazel_mode,"check_azazel_mode")
 		
 		xml:InitStatic("main_dialog:cap_check_survival",self.dialog)
 		self.ck_survival = xml:InitCheck("main_dialog:check_survival",	self.dialog)
@@ -378,7 +356,7 @@ function faction_ui:InitControls(f)
 		
 		self.ck_states = { 	["ck_survival"] = false,
 							["ck_hardcore"] = false,
-							["ck_hardcore_aim"] = false ,
+							["ck_azazel_mode"] = false ,
 							["ck_story"] = false
 		}
 	end
@@ -776,7 +754,7 @@ function faction_ui:OnStartGame()
 	
 	axr_main.config:w_value("character_creation","new_game_hardcore_mode",self.ck_hardcore and self.ck_hardcore:GetCheck() and true or nil)
 	axr_main.config:w_value("character_creation","new_game_story_mode",self.ck_story and self.ck_story:GetCheck() and true or nil)
-	axr_main.config:w_value("character_creation","new_game_hardcore_aim_mode",self.ck_hardcore_aim and self.ck_hardcore_aim:GetCheck() and true or nil)
+	axr_main.config:w_value("character_creation","new_game_azazel_mode",self.ck_azazel_mode and self.ck_azazel_mode:GetCheck() and true or nil)
 	axr_main.config:w_value("character_creation","new_game_survival_mode",self.ck_survival and self.ck_survival:GetCheck() and true or nil)
 	axr_main.config:w_value("character_creation","new_game_faction",self.selected_faction or nil)
 	axr_main.config:w_value("character_creation","new_game_faction_position",self.start_location or nil)
