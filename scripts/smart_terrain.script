@@ -1635,7 +1635,7 @@ function se_smart_terrain:try_respawn()
 			
 			if (sect_to_spawn_params.squads) then
 				local squad
-				if (IsSurvivalMode()) then
+				if (IsSurvivalMode() and math.random(1,100) < 90) then
 					local t = {"simulation_zombie","simulation_zombie","simulation_zombie","simulation_zombie","simulation_zombie","zombied_sim_squad_novice","zombied_sim_squad_advanced","zombied_sim_squad_veteran","simulation_fracture","simulation_snork"}
 					squad = SIMBOARD:create_squad(self, t[math.random(#t)])
 				else 
