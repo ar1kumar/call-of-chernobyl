@@ -395,8 +395,6 @@ function property_functor_a(param1, name)
             sum = sum + char_ini:r_float_ex(section_table[i],"ammo_mag_size",0)
         elseif (name == "prop_rpm") then
             sum = sum + math.ceil(char_ini:r_float_ex(section_table[i],"rpm",0)/10)
-        elseif (name == "prop_bullet_speed") then
-            sum = sum + math.ceil(char_ini:r_float_ex(section_table[i],"bullet_speed",0)/10)
 		elseif (name == "prop_dispersion") then
 			val = char_ini:r_float_ex(section_table[i],"fire_dispersion_base") or 0
 			if (val ~= 0) then
