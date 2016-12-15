@@ -216,11 +216,11 @@ function pda_contacts_tab:Reset()
 			local s_stalker, s_mutant, s_arte, s_sold
 			local state_str = [[
 			%c[255, 255, 160, 255]%c[default] %s \n
-			\n%c[255, 215, 215, 215]Statistics:%c[default] \n
-			%c[255, 160, 160, 160]Stalkers killed:%c[default] %s \n
-			%c[255, 160, 160, 160]Mutants killed:%c[default] %s \n
-			%c[255, 160, 160, 160]Artefacts found:%c[default] %s \n
-			%c[255, 160, 160, 160]Items sold:%c[default] %s
+			\n%c[255, 215, 215, 215]st_mm_pda_statistics:%c[default] \n
+			%c[255, 160, 160, 160]st_mm_pda_stalkers_killed:%c[default] %s \n
+			%c[255, 160, 160, 160]st_mm_pda_mutants_killed:%c[default] %s \n
+			%c[255, 160, 160, 160]st_mm_pda_artes_found:%c[default] %s \n
+			%c[255, 160, 160, 160]st_mm_pda_items_sold:%c[default] %s
 			]]	
 		
 			s_stalker = m_data.stalkers_killed or 0
@@ -228,6 +228,10 @@ function pda_contacts_tab:Reset()
 			s_arte = m_data.artefacts_found or 0
 			s_sold = m_data.items_sold or 0
 			
+			for s in string.gmatch(state_str,"(st_mm_pda_[%w%d_]*)") do
+				state_str = string.gsub(state_str,s,game.translate_string(s))
+			end
+	
 			state_str = strformat(state_str, stalker_name, s_stalker, s_mutant, s_arte, s_sold)
 			self.contact_info[index].hint = state_str
 		end

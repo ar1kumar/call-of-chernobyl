@@ -314,7 +314,7 @@ function smart_terrain_mark_visited(smart)
 	actor_statistic.smart_terrain_visited[smart:name()] = true
 	if (fast_travel.quick_travel_smarts and fast_travel.quick_travel_smarts[smart:name()]) then 
 		if (level.map_has_object_spot(smart.id, "fast_travel") == 0) then 
-			level.map_add_object_spot(smart.id, "fast_travel", "Quick Travel")
+			level.map_add_object_spot(smart.id, "fast_travel", "st_pda_fast_travel")
 		end
 	end
 end 

@@ -455,7 +455,7 @@ function coc_rankings_set_hint(index)
 				local last_seen_time = m_data.last_seen_time and m_data.last_seen_time.dateToString and m_data.last_seen_time:dateToString(game.CTime.DateToDay)
 				
 				if (last_seen_level and last_seen_time) then
-					return_str = return_str .. game.translate_string("st_last_seen") .. ": " .. game.translate_string(last_seen_level) .. " on " .. last_seen_time
+					return_str = return_str .. game.translate_string("st_last_seen") .. ": " .. game.translate_string(last_seen_level) .. " (" .. last_seen_time .. ")"
 						
 					if (m_data.stalkers_killed) then
 						return_str = return_str .. [[ \n]] .. game.translate_string("st_stalkers_killed") .. ": " .. tostring(m_data.stalkers_killed)

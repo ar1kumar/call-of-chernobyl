@@ -224,6 +224,11 @@ end
 ------------------------ utility
 function DynamicNewsManager:PushToChannel(name,t)
 	if (self.queue[name]) then
+		if (t.Mg) then 
+			for s in string.gmatch(t.Mg,"(st_dyn_news_ch_[%w%d_]*)") do
+				t.Mg = string.gsub(t.Mg,s,game.translate_string(s))
+			end
+		end
 		table.insert(self.queue[name],t)
 	end
 end 
@@ -392,8 +397,8 @@ function DynamicNewsManager:RadioInHeli(sender,who)
 end
 
 function DynamicNewsManager:DeathBySurge(victim,who,comm)
-	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]Found %s. Blowout.",victim:character_name(),game.translate_string(comm),dynamic_news_helper.GetPointDescription(victim))
-	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se="Died:",It="gr"})
+	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]st_dyn_news_ch_found %s. st_dyn_news_ch_blowout.",victim:character_name(),game.translate_string(comm),dynamic_news_helper.GetPointDescription(victim))
+	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se=game.translate_string("st_dyn_news_ch_died"),It="gr"})
 	return true
 end
 
@@ -402,8 +407,8 @@ function DynamicNewsManager:DeathByStalker(victim,who,comm)
 	if (cls == 1 or cls == 9) then 
 		return false
 	end
-	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]Found %s. %s.",victim:character_name(),game.translate_string(comm),dynamic_news_helper.GetPointDescription(victim),dynamic_news_helper.GetWeaponDescription(victim,1))
-	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se="Died:",It="gr"})
+	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]st_dyn_news_ch_found %s. %s.",victim:character_name(),game.translate_string(comm),dynamic_news_helper.GetPointDescription(victim),dynamic_news_helper.GetWeaponDescription(victim,1))
+	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se=game.translate_string("st_dyn_news_ch_died"),It="gr"})
 	return true
 end
 
@@ -412,8 +417,8 @@ function DynamicNewsManager:DeathByMutant(victim,who,comm)
 	local b = game.translate_string(comm)
 	local c = dynamic_news_helper.GetPointDescription(victim)
 	local d = string.gsub(dynamic_news_helper.GetMonsterDescription(who,1),"(%l)?",string.upper("%1"),1)
-	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]Found %s. %s.",a,b,c,d)
-	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se="Died:",It="gr"})
+	local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]st_dyn_news_ch_found %s. %s.",a,b,c,d)
+	self:PushToChannel("general",{Mg=msg,Ic="deth",Snd="news",Se=game.translate_string("st_dyn_news_ch_died"),It="gr"})
 	return true
 end 
 

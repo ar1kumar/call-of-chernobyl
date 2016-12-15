@@ -342,7 +342,7 @@ function actor_on_item_use(obj)
 			if not (BackPackStashEnableUi) then
 				local count = utils.load_var(db.actor, level_name.."bpk_count", 0)
 				utils.save_var(db.actor, level_name.."bpk_count", count+1)
-				level.map_add_object_spot_ser(se_obj.id, BackPackStashSpot, level_name.." stash "..count+1)
+				level.map_add_object_spot_ser(se_obj.id, BackPackStashSpot, game.translate_string(level_name).." "..game.translate_string("st_itm_stash").." "..count+1)
 			else
 				local hud = get_hud()
 				if (hud) then
@@ -391,7 +391,7 @@ function actor_on_item_use(obj)
 
 		local se_obj = alife():create("inv_actor_backpack",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
 
-		level.map_add_object_spot_ser(se_obj.id, ActorBackPackSpot, db.actor:character_name().."'s backpack")
+		level.map_add_object_spot_ser(se_obj.id, ActorBackPackSpot, strformat(game.translate_string("st_itm_stash_of_character"),db.actor:character_name()))
 
 		utils.save_var(db.actor,"actor_inv_backpack_id",se_obj.id)
 	end
