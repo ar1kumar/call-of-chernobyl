@@ -7,28 +7,16 @@ function on_game_load()
 	if not (alife_storage_manager.get_state().enable_azazel_mode) then
 		return
 	end
-	local victim_id = alife_storage_manager.get_state().azazel_death_id
-	if (victim_id) then
-		alife_storage_manager.get_state().azazel_death_id = nil
-		local se_obj = alife():object(victim_id)
-		if (se_obj) then
-			safe_release_manager.release(se_obj)
-		end
-		-- cancel all not-story tasks
-		local task_info = task_manager.get_task_manager().task_info
-		local task_ini = task_manager.task_ini
-		for task_id,tbl in pairs(task_info) do
-			if not (tbl.storyline) then 
-				tbl.forced_status = "fail"
-				tbl.cancelled_by_actor = true
-			end
-		end
+	
+	if (alife_storage_manager.get_state().azazel_death) then
+		alife_storage_manager.get_state().azazel_death = nil
+		SetHudMsg(strformat(game.translate_string("st_death_count"),xr_statistic.actor_statistic.deaths),8)
+		
 		-- Heal 
 		bind_stalker_ext.invulnerable_time = 30000
 		db.actor:set_health_ex(1)
 
-		SetHudMsg(strformat(game.translate_string("st_death_count"),xr_statistic.actor_statistic.deaths),8)
-		
+		-- Transition
 		level.disable_input()
 		level.remove_cam_effector(210409)
 		level.add_cam_effector("camera_effects\\prison_1.anm", 210409, false, "azazel_mode.cam_effector_end")
@@ -44,10 +32,39 @@ function actor_on_before_death(whoID,flags)
 	xr_statistic.actor_statistic.deaths = xr_statistic.actor_statistic.deaths + 1
 	SetHudMsg(strformat(game.translate_string("st_death_count"),xr_statistic.actor_statistic.deaths),8)
 	
+	-- find victims
+	local sim = alife()
+	local gg = game_graph()
+	local avail_entities = {}
+	local squad_mates = {}
+	--local faction_mates = {}
+	for i=1,65534 do 
+		local se_obj = sim:object(i)
+		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and se_obj:community() ~= "zombied" and se_obj.group_id ~= 65535) then 
+			if (IsSurvivalMode() or get_object_story_id(se_obj.group_id) == nil) then
+				if (axr_companions.companion_squads[se_obj.group_id]) then 
+					table.insert(squad_mates,se_obj.id)
+				--elseif (se_obj:community() == character_community(db.actor):sub(7)) then 
+					--table.insert(faction_mates,se_obj.id)
+				else
+					table.insert(avail_entities,se_obj.id)
+				end
+			end
+		end
+	end
+
+	-- prior for victim is squad or faction or other
+	--local t = #squad_mates > 0 and squad_mates or #faction_mates > 0 and faction_mates or avail_entities
+	local t = #squad_mates > 0 and squad_mates or avail_entities
+	if (#t == 0) then 
+		SetHudMsg(strformat(game.translate_string("st_death_count").." " .. game.translate_string("st_nobody_left_to_replace"),xr_statistic.actor_statistic.deaths),10)
+		return
+	end
+	
 	bind_stalker_ext.invulnerable_time = 30000
 	db.actor:set_health_ex(1)
 
-	local ignore_list = {	
+	local ignore_list = {
 		["bolt"] = true,
 		["device_torch"] = true,
 		["device_pda"] = true,
@@ -62,9 +79,17 @@ function actor_on_before_death(whoID,flags)
 		["stick_bred"] = true,
 		["stick_kolbasa"] = true,
 		["stick_kolbasa_bred"] = true,
-		["wpn_knife"] = true
+		["wpn_knife"] = true,
+		["good_psy_helmet"] = true,
+		["bad_psy_helmet"] = true,
+		["main_story_1_quest_case"] = true,
+		["main_story_2_lab_x18_documents"] = true,
+		["main_story_3_lab_x16_documents"] = true,
+		["main_story_4_lab_x10_documents"] = true,
+		["main_story_5_lab_x8_documents"] = true,
+		["main_story_6_jup_ug_documents"] = true,
+		["main_story_7_mon_con_documents"] = true
 	}
-	local sim = alife()
 	local function release_actor_item(temp, item)
 		if not (ignore_list[item:section()]) then
 			local se_item = sim:object(item:id())
@@ -75,30 +100,12 @@ function actor_on_before_death(whoID,flags)
 	end
 	db.actor:iterate_inventory(release_actor_item,nil)
 	
-	local gg = game_graph()
-	local t = {}
-	for i=1,65534 do 
-		local se_obj = sim:object(i)
-		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and se_obj:community() ~= "zombied" and se_obj.group_id ~= 65535) then 
-			if (IsSurvivalMode() or get_object_story_id(se_obj.group_id) == nil) and (axr_companions.companion_squads[se_obj.group_id] == nil) then
-				--if (sim:level_name(gg:vertex(se_obj.m_game_vertex_id):level_id()) == level.name()) then
-					table.insert(t,se_obj.id)
-				--end
-			end
-		end
-	end
-
-	if (#t == 0) then 
-		SetHudMsg(strformat(game.translate_string("st_death_count").." " .. game.translate_string("st_nobody_left_to_replace"),xr_statistic.actor_statistic.deaths),10)
-		return
-	end
-	
 	axr_companions.remove_all_from_actor_squad()
 	
 	local se_obj = sim:object(t[math.random(#t)])
 	
 	-- make squad actor companions
-	local squad = alife():object(se_obj.group_id)
+	local squad = sim:object(se_obj.group_id)
 	if (squad) then 
 		for k in squad:squad_members() do 
 			if (k.id ~= se_obj.id) then
@@ -119,13 +126,28 @@ function actor_on_before_death(whoID,flags)
 		end
 	end
 	
+	local se_actor = sim:actor()
+	
+	-- actor corpse 
+	local se_mimic = sim:create("stalker_azazel",se_actor.position,se_actor.m_level_vertex_id,se_actor.m_game_vertex_id)
+	if (se_mimic) then 
+		se_mimic:set_character_name(se_actor:character_name())
+		se_mimic:kill()
+		
+		local m_data = alife_storage_manager.get_se_obj_state(se_mimic,true)
+		if (m_data) then
+			m_data.community = se_actor:community()
+			m_data.icon_name = se_actor:character_icon()
+			m_data.visual = db.actor:get_visual_name()
+		end
+	end
+	
 	-- copy data over to player
 	if (db.actor_binder and db.actor_binder.character_icon) then 
 		db.actor_binder.character_icon = se_obj:character_icon()
 		db.actor:set_character_icon(db.actor_binder.character_icon)
 	end
 	
-	local se_actor = sim:actor()
 	se_actor:set_character_name(se_obj:character_name())
 	
 	local faction = se_obj:community()
@@ -136,6 +158,7 @@ function actor_on_before_death(whoID,flags)
 	
 	game_relations.set_community_goodwill_for_faction("actor_"..faction)
 	
+	-- copy all items except ignored
 	for i=1,65534 do 
 		local se_item = sim:object(i)
 		if (se_item and se_item.parent_id == se_obj.id) then
@@ -146,6 +169,7 @@ function actor_on_before_death(whoID,flags)
 		end
 	end
 	
+	-- create outfit based on stalker visual type
 	local section = se_obj:section_name()
 	if (string.find(section,"_4")) then 
 		local f = {
@@ -214,40 +238,55 @@ function actor_on_before_death(whoID,flags)
 		give_object_to_actor(f[faction] or "novice_outfit")		
 	end 
 	
+	-- cancel all tasks
+	local task_info = task_manager.get_task_manager().task_info
+	local task_ini = task_manager.task_ini
+	for task_id,tbl in pairs(task_info) do
+		--if not (tbl.storyline) then 
+			tbl.forced_status = "fail"
+			tbl.cancelled_by_actor = true
+		--end
+	end
+	
+	-- game turns into freeplay
+	give_info("story_mode_disabled")
+	give_info("yan_labx16_switcher_1_off")
+	give_info("yan_labx16_switcher_2_off")
+	give_info("yan_labx16_switcher_3_off")
+	give_info("yan_labx16_switcher_primary_off")
+	give_info("bar_deactivate_radar_done")
+	give_info("warlab_deactivate_generators_done")
+		
+	-- initiate transitition and removal of victim
 	local level_name = sim:level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id())
 	if (level_name == level.name()) then 
-		-- cancel all not-story tasks
-		local task_info = task_manager.get_task_manager().task_info
-		local task_ini = task_manager.task_ini
-		for task_id,tbl in pairs(task_info) do
-			if not (tbl.storyline) then 
-				tbl.forced_status = "fail"
-				tbl.cancelled_by_actor = true
-			end
-		end
-	
 		local hud = get_hud()
 		hud:HidePdaMenu()
 		hud:HideActorMenu()
 		db.actor:set_actor_position(se_obj.position)
 		level.disable_input()
 		level.remove_cam_effector(210409)
-		level.add_cam_effector("camera_effects\\prison_1.anm", 210409, false, "survival_mode.cam_effector_end")
+		level.add_cam_effector("camera_effects\\prison_1.anm", 210409, false, "azazel_mode.cam_effector_end")
 		level.add_pp_effector("deimos1.ppe", 210410, false)
 		safe_release_manager.release(se_obj)
-	else 
+	else
+		local pos = se_obj.position
+		local lvid = se_obj.m_level_vertex_id
+		local gvid = se_obj.m_game_vertex_id
 		local function tele_me_now(id)
 			local se_obj = id and alife():object(id)
 			if not (se_obj) then
-				return false 
+				alife_storage_manager.get_state().azazel_death = true
+				ChangeLevel(pos,lvid,gvid,vector():set(0,0,0))
+				return true
 			end
-			alife_storage_manager.get_state().azazel_death_id = se_obj.id
-			ChangeLevel(se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,vector():set(0,0,0))
-			return true
+			return false
 		end
 		level.add_pp_effector("deimos1.ppe", 210410, false)
 		CreateTimeEvent(0,"tele",0,tele_me_now,se_obj.id)
+		safe_release_manager.release(se_obj)
 	end
+	
 	flags.ret_value = false
 end
 

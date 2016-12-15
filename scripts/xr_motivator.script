@@ -66,6 +66,20 @@ function motivator_binder:net_spawn(sobject)
 			self.object:set_visual_name(visual)
 		end
 	end
+	
+	-- overrides
+	local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+	if (m_data) then 
+		if (m_data.visual) then 
+			self.object:set_visual_name(m_data.visual)
+		end  
+		if (m_data.icon_name) then 
+			self.object:set_character_icon(m_data.icon_name)
+		end
+		if (m_data.community) then 
+			self.object:set_character_community(m_data.community)
+		end
+	end
 
 	self.object:apply_loophole_direction_distance(1.0)
 
