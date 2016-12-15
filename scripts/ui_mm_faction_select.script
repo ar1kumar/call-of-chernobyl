@@ -1,9 +1,5 @@
 -- Faction Select for Call of Chernobyl
 -- alundaio
---[[
-Copyright (C) 2015 Alundaio
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License-]]
---]]
 
 ------------------
 -- on_game_load()
@@ -386,6 +382,19 @@ function faction_ui:InitControls(f)
 							["ck_story"] = false
 		}
 	end
+	
+	-- Hint Window
+	self.hint_wnd = xml:InitFrame("hint_wnd:background",self)
+	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text",self.hint_wnd)
+	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
+	
+	-- Message Window 
+	self.msg_wnd = xml:InitFrame("hint_wnd:background",self)
+	self.msg_wnd_text = xml:InitTextWnd("hint_wnd:text",self.msg_wnd)
+	self.msg_wnd_text:SetTextAlignment(2)
+	
+	self.msg_wnd:SetWndPos(vector2():set(-2048,-2048))
+	self.msg_wnd:SetColor(GetARGB(255,0,0,0))
 end
 
 function faction_ui:InitCallBacks(f)
@@ -397,14 +406,54 @@ function faction_ui:InitCallBacks(f)
 	self:AddCallback("list_starts", ui_events.LIST_ITEM_SELECT, self.OnSelectStartLocation, self)
 	self:AddCallback("list_icon", ui_events.LIST_ITEM_SELECT, self.OnSelectPortrait, self)
 	
-	self:AddCallback("check_story", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
-	self:AddCallback("check_survival", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
-	self:AddCallback("check_hardcore", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
-	self:AddCallback("check_hardcore_aim", ui_events.BUTTON_CLICKED, self.OnCheckSet, self)
-	
 	for i=1,#f do
 		self:AddCallback("btn_"..f[i].."_inactive_select", ui_events.BUTTON_CLICKED, self["OnFaction_"..f[i]], self)
 	end
+end
+
+function faction_ui:Update()
+	CUIScriptWnd.Update(self)
+	-- Warning messages timer 
+	if (self.msg_wnd_timer and time_global() > self.msg_wnd_timer) then 
+		self.msg_wnd_timer = nil
+		self.msg_wnd:SetWndPos(vector2():set(-2048,-2048))
+	end
+	
+	for ck_name,v in pairs(self.ck_states) do 
+		if (self[ck_name] and self[ck_name]:IsCursorOverWindow()) then 
+			self:SetHint(game.translate_string("st_mm_"..ck_name.."_desc"))
+			return
+		end
+	end
+	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
+end 
+
+function faction_ui:SetMsg(text,tmr)
+	self.msg_wnd_text:SetText(text)
+	self.msg_wnd_text:AdjustHeightToText()
+	self.msg_wnd_text:SetWndSize(vector2():set(820,self.msg_wnd_text:GetHeight()))
+	self.msg_wnd_text:SetWndPos(vector2():set(0,20))
+	
+	self.msg_wnd:SetWndSize(vector2():set(820,self.msg_wnd_text:GetHeight()+44))
+	self.msg_wnd:SetWndPos(vector2():set(0,80))
+
+	self.msg_wnd_timer = time_global() + 1000*tmr
+end
+
+function faction_ui:SetHint(text,pos)
+	if (text == "") then
+		return
+	end
+	self.hint_wnd_text:SetText(text)
+	self.hint_wnd_text:AdjustHeightToText()
+	self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
+	
+	pos = pos or GetCursorPosition()
+	pos.y = pos.y - self.hint_wnd:GetHeight()
+	pos.x = pos.x - self.hint_wnd:GetWidth()
+	self.hint_wnd:SetWndPos(pos)
+	
+	FitInRect(self.hint_wnd,Frect():set(0,0,1024,768),0,100)
 end
 
 function faction_ui:OnSelectStartLocation()
@@ -452,42 +501,6 @@ function faction_ui:load_icon_list()
 	
 	self.icon_list:SetText(def_icon)
 	self.char_icon:InitTexture(def_icon)
-end
-
-function faction_ui:OnCheckSet()
-	local ck = nil
-	local value = nil
-	for k,v in pairs(self.ck_states) do
-		if (self[k] and self[k]:GetCheck() ~= v) then
-			self.ck_states[k] = self[k]:GetCheck()
-			ck = k
-			value = self[k]:GetCheck()
-		end
-	end
-
-	--[[
-	if (ck == "ck_survival") then
-		if (value == true and self.ck_hardcore) then
-			self.ck_hardcore:SetCheck(true)
-			self.ck_states["ck_hardcore"] = true
-		end
-	elseif (ck == "ck_hardcore") then
-		if (value == false and self.ck_survival) then
-			self.ck_survival:SetCheck(false)
-			self.ck_states["ck_survival"] = false
-		end
-	end
-	--]]
-	
-	if (self[ck] and self[ck]:GetCheck()) then
-		self.desc_text:SetText(game.translate_string("st_mm_"..ck.."_desc"))
-		self.desc_text:AdjustHeightToText()
-		self.desc_text:SetWndSize(vector2():set(self.desc_text:GetWidth(),self.desc_text:GetHeight()+44))
-		
-		self.scroll_v:Clear()
-		self.scroll_v:AddWindow(self.desc_text, true)
-		self.desc_text:SetAutoDelete(false)
-	end
 end
 
 function faction_ui:OnRandomize()
