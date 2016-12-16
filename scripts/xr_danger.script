@@ -471,10 +471,10 @@ local function script_action_danger_grenade(npc,st,bd,best_danger_object,depende
 		if (sm and sm.target_state ~= "threat_danger") then
 			npc:clear_animations()
 			sm:set_state("threat_danger",nil,nil,{look_position = bdo_pos}, {fast_set = true})
-			-- sm.animation:set_state(nil, true)
-			-- sm.animation:set_control()
-			-- sm.animstate:set_state(nil,true)
-			-- sm.animstate:set_control()
+			sm.animation:set_state(nil, true)
+			sm.animation:set_control()
+			sm.animstate:set_state(nil,true)
+			sm.animstate:set_control()
 		end	
 		st.lvid = utils.send_to_nearest_accessible_vertex(npc,npc:level_vertex_id())
 		return
@@ -508,8 +508,10 @@ local function script_action_danger_grenade(npc,st,bd,best_danger_object,depende
 			if (sm) then
 				npc:clear_animations()
 				sm:set_state("assault",nil,nil,{look_object = dist <= 100 and nil or bdo}, {fast_set = true})
-				-- sm.animation:set_state(nil, true)
-				-- sm.animation:set_control()
+				sm.animation:set_state(nil, true)
+				sm.animation:set_control()
+				sm.animstate:set_state(nil,true)
+				sm.animstate:set_control()
 			end	
 			
 			return
