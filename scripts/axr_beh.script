@@ -462,6 +462,7 @@ function action_beh:beh_path()
 		local mgr = db.storage[self.object:id()].state_mgr
 		if (mgr) then
 			mgr.animation:set_state(nil)
+			mgr.animstate:set_state(nil)
 			if (mgr.animation.states.anim_marker == nil) then
 				self:increment_waypoint_index()
 				return

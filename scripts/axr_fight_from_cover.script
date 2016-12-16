@@ -144,6 +144,8 @@ function action_fight_from_cover:initialize()
 	st:set_state("idle", nil, nil, nil, {fast_set = true})
 	st.animation:set_state(nil, true)
 	st.animation:set_control()
+	st.animstate:set_state(nil,true)
+	st.animstate:set_control()
 	npc:set_desired_position()
 	npc:set_desired_direction()
 end
