@@ -132,11 +132,11 @@ function actor_on_before_death(whoID,flags)
 	local se_mimic = sim:create("stalker_azazel",se_actor.position,se_actor.m_level_vertex_id,se_actor.m_game_vertex_id)
 	if (se_mimic) then 
 		se_mimic:set_character_name(se_actor:character_name())
+		se_mimic:set_profile_name(se_actor:profile_name())
 		se_mimic:kill()
 		
 		local m_data = alife_storage_manager.get_se_obj_state(se_mimic,true)
 		if (m_data) then
-			m_data.community = se_actor:community()
 			m_data.icon_name = se_actor:character_icon()
 			m_data.visual = db.actor:get_visual_name()
 		end
@@ -273,18 +273,14 @@ function actor_on_before_death(whoID,flags)
 		local pos = se_obj.position
 		local lvid = se_obj.m_level_vertex_id
 		local gvid = se_obj.m_game_vertex_id
-		local function tele_me_now(id)
-			local se_obj = id and alife():object(id)
-			if not (se_obj) then
-				alife_storage_manager.get_state().azazel_death = true
-				ChangeLevel(pos,lvid,gvid,vector():set(0,0,0))
-				return true
-			end
-			return false
-		end
 		level.add_pp_effector("deimos1.ppe", 210410, false)
-		CreateTimeEvent(0,"tele",0,tele_me_now,se_obj.id)
 		safe_release_manager.release(se_obj)
+		alife_storage_manager.get_state().azazel_death = true
+		local function tele_me_now(id)
+			ChangeLevel(pos,lvid,gvid,vector():set(0,0,0))
+			return true
+		end
+		CreateTimeEvent(0,"tele",0,tele_me_now,se_obj.id)
 	end
 	
 	flags.ret_value = false
