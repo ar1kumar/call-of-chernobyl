@@ -67,8 +67,6 @@ function create_release_item(npc)
 	end
 	utils.se_obj_save_var(npc:id(),npc:name(),"death_dropped",true)
 	
-	npc:iterate_inventory(keep_item, npc)
-	
 	-- spawn items by story id
 	local sid = item_by_story_id and get_object_story_id(npc:id())
 	if (sid and item_by_story_id[sid]) then
