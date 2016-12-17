@@ -265,6 +265,9 @@ function faction_ui:__init(owner) super()
 	
 	self:InitControls(self.f)
 	self:InitCallBacks(self.f)
+
+	local ini = ini_file("localization.ltx")
+	self.lang = ini:r_string_ex("string_table","language","eng")
 end
 
 function faction_ui:__finalize()
@@ -486,69 +489,21 @@ function faction_ui:OnRandomize()
 	local faction = random_choice("stalker","bandit","csky","ecolog","army","monolith","dolg","freedom","killer")
 	self:OnFactionSelect(faction)
 	
-	local new_name = ""
-	
-	if (faction == "army") then
-		new_name = random_choice("Pvt.","Sr. Pvt.","Jr. Sgt.","Sgt.","Sr. Sgt.","Mr. Sgt.","Jr. Lt.","Lt.","Sr. Lt.","Cpt.") .. " "
+	local subset
+	if (faction == "army" or faction == "dolg") then 
+		subset = random_choice("private","sergeant","senior_sergeant","lieutenant","captain")
+	else 
+		subset = random_choice("stalker","bandit","science")
 	end
-	local first_name = {
-				"Aleksandr","Alex","Alexey","Anatoly","Andrey","Andryukha","Anton","Antonio","Arkasha","Artem","Arthur",
-				"Bodya","Bohdan","Bohdan","Borka","Borya","Boryan",
-				"Danko","Danya","Dennis","Dima","Dimitri","Dimka","Dimon","Dimukha","Dmitro","Dmitry","Dumb",
-				"Edik","Egor","Egorka","Evgeniy",
-				"Fedka","Fedor","Fedya","Felka","Filka","Filya","Fima","Fimka",
-				"Gena","Genka","George","Gleb","Gosha","Grisha","Grishka","Grishka","Grishko","Grishko",
-				"Igorek","Ilya","Ilyukha","Ivan",
-				"Kiryukha","Kolya","Kolyan","Konstantin","Kostik","Kostya","Kostyan",
-				"Lekha","Lenya","Lenya","Leshka","Leva","Lyonka",
-				"Mark","Matvei","Max","Mikha","Mikhal","Mikhas","Misha","Mishka","Mitka","Mitya",
-				"Nik","Nikita","Nikolov","Novoska","Nickels",
-				"Oleg","Onion","Orion",
-				"Pasha","Pashka","Pavlukha","Petka","Petya",
-				"Roman","Rusik","Ruskie",
-				"Sanek","Sanek","Sanya","Sashok","Semen","Semyon","Serega","Sergey","Seva","Sevka","Shurik","Shurik","Slava","Slavik","Stepa","Stepan","Stepka","Stepukha",
-				"Temka","Tima","Timka","Timokha","Tokha","Tolik","Tolyan",
-				"Vadik","Vadim","Vadya","Vadya","Valera","Valik","Vanka","Vanya","Vasek","Vaska","Vasko","Vasya","Vasyan","Veniamin","Venya","Vetal","Vitalik","Vitaly","Vitka","Vitya","Vityukha","Vlad","Vladimir","Vova","Vovan","Vovka",
-				"Yara","Yarik","Yasha","Yashka","Yashka","Yuras","Yuri","Yurik","Yurka","Yurko",
-				"Zheka","Zhenka","Zhenya","Zhora","Zhorka"
-	}
-	new_name = new_name .. first_name[math.random(1,#first_name)] .. " "
-	
-	-- last name table split because it's too large
-	if ((math.random(1,100)/100) < 0.5) then
-		local last1 = {
-			"Abdurakhmanov","Ace","Alferov","Altynnik","Andreev","Andreychuk","Andruschenko","Anisiev","Antelope","Antipin","Ardashev","Arsonist","Artist","Aspic",
-			"Babich","Balan","Balitsky","Banana","Banker","Baranov","Baranovsky","Baron","Barsak","Bashakov","Bashmakov","Baul","Beast","Beaver","Bedbug","Belyavin","Berserk","Beshevly","Binoev","Biscuit","Bison","Blind","Bling-bling","Blinov","Boa","Boar","Bobrov","Bogdanov","Bogomolov","Boichenko","Boiko","Boldeskul","Bolt","Bondarev","Borisov","Bosun","Boulder","Bourbon","Bourgeois","Brich","Brigand","Broken","Bronshtein","Bruise","Bulldog","Buryak","Butcher","Butt","Butterfingers","Buturin","Byalo",
-			"Canary","Champ","Chapai","Charcoal","Chauffeur","Cheat","Chemist","Chernodub","Chili","Chirikov","Chisel","Coach","Conman","Connoisseur","Corpse","Counselor","Count","Cranky","Cripple","Crony","Crooked","Cross","Crosstie","Crowbar","Crucian",
-			"Dead Duck","Deadbeat","Defunct","Degree","Denisenko","Dombrik","Dotsenko","Dovgalyuk","Drozdush","Drum","Dubenchuk","Dudorov","Duka","Dumko","Dunaev","Dyakonov","Dyklov","Dynamite",
-			"Ears","Efremov","Erofeev","Erokhin","Executioner",
-			"Fadeev","Fatso","Feigelman","Fiend","Fierce","Fist","Flop","Fubar","Futzin",
-			"Galkin","Gangrene","Gangster","Ganzyuk","Garkovenko","Garkusha","Gatzula","Genghis","Georgov","Geshkenbein","Ghoul","Glebovsky","Glitch","Gnatyuk","Goblin","Godfather","Goncharenko","Gordienko","Gorlevoy","Gorokhin","Goryunov","Grabber","Grater","Gray","Grebenko","Greyhound","Grindstone","Grischuk","Grishachev","Gritzaenko","Gritzay","Gritzenkov","Gubar","Guerilla","Gunko","Gurevich",
-			"Hacker","Hipster","Hitman","Hobo","Homeboy","Hotshot","Humpback",
-			"Ignatenko","Ischuk","Ivanov","Ivchenko","Izhenko",
-			"Jackstraw","Jester","Jiggers","Joint","Junk",
-			"Kabanov","Kamikaze","Kandybabko","Kapuka","Kapustyanko","Katz","Kazakov","Kazantsev","Khaladze","Khan","Kicker","Kikabidze","Kireev","Koev","Kolontar","Kolontarev","Kondratenko","Korkin","Korneev","Koschei","Kovalchuk","Kozlov","Kravchenko","Krivda","Krivokhatsky","Kryga","Kucheruk","Kulchistky","Kulchitsky","Kuntsev","Kurvitz","Kushnarev","Kuzmich","Kuznetsov","Kuzyakin",
-		}	
-		new_name = new_name .. last1[math.random(1,#last1)]
-	else
-		local last2 = {
-			"Lame","Larin","Lavrik","Lavrov","Ledentsov","Leech","Lethal","Lisichansky","Litvin","Livshits","Loaf","Local","Long-John","Loudmouth","Lymarenko",
-			"Makarenko","Maltsev","Mamaev","Maniac","Manko","Mayhem","Mazepa","Merzlayev","Messenger","Met","Milchenko","Mironov","Mironyuk","Miser","Mohrer","Monocle","Moor","Moose","Mostovoi","Mukhamedov","Muntyan","Myskov",
-			"Nark","Navrotsky","Nepritsky","Nickel","Nikanorov","Nikeshin","Nikulin","Ninja","Nordiev","Nosan","Nickels",
-			"Oganesyan","Opolev","Orlevich","Orlov","Ox",
-			"Pacifist","Panadol","Papa","Pariah","Patty","Peddler","Percher","Petkevich","Petrenko","Petrov","Pigmy","Pimp","Pirate","Piston","Player","Plokhenko","Podyachev","Polyanin","Poplavsky","Popov","Portnykh","Prasolov","Prince","Prokopenko","Proskurin","Protsenko","Prudov","Psycho","Puchek","Punk","Pustovar",
-			"Rabinovich","Radkevich","Rambo","Rascal","Rat","Ravioli","Razor","Reefer","Rezun","Robust","Rodnyansky","Rogoza","Rotan","Rotten","Rublev","Rudik","Rusanov","Rychagirsky",
-			"Sagitov","Savage","Savchenko","Savchuk","Scherbin","Screw","Sedykh","Sereda","Shaven","Shifter","Shilov","Shiv","Shortstop","Shovel","Sidorenko","Sidorov","Sinaev","Sinitzyn","Siniy","Skameika","Skew","Slasher","Slime","Slutsky","Smelov","Smoly","Snot","Sock","Sorokin","Sparrow","Spike","Spirin","Spy","Squint","Squire","Stain","Statzura","Steklov","Stepanenko","Stepchin","Strangler","Stud","Sturdy","Stychinsky","Sviridov","Sykula",
-			"Tadpole","Tails","Tar","Tarnavsky","Tatarchuk","Terminator","Thief","Tightwad","Timchuk","Torn","Toupee","Tour Guide","Tramp","Trombone","Trump","Turd","Tyrant",
-			"Undertaker","Unorthodox",
-			"Valentinov","Vasilevich","Vasiliev","Veselov","Veteran","Vinogradov","Volanchuk","Volodar","Voloshin","Vorokhaev","Vorontsov","Vovnenko","Vyushinsky",
-			"Warlock","Warrior","Woodpecker",
-			"Zabyagoda","Zagorodnyuk","Zaikin","Zakharin","Zakharov","Zamosenchuk","Zarubin","Zhabenko","Zhmyev","Zhurakovsky","Zinoviev","Zolotar","Zozo","Zubarev","Zubkov","Zvonnitsky"
-		}	
-		new_name = new_name .. last2[math.random(1,#last2)]
-	end
-	
-	self.character_name:SetText(new_name)
+
+	local ini = system_ini()
+	local name_cnt = ini:r_float_ex("stalker_names_"..subset,"name_cnt")
+	local last_name_cnt = ini:r_float_ex("stalker_names_"..subset,"last_name_cnt")
+
+	local first_name = game.translate_string( strformat("name_%s_%s",subset,math.random(0,name_cnt-1)) )
+	local last_name = game.translate_string( strformat("lname_%s_%s",subset,math.random(0,last_name_cnt-1)) )
+
+	self.character_name:SetText(first_name .. " " .. last_name)
 	
 	-- set random portrait
 	if (self.icon_list and self.icon_table) then
