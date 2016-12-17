@@ -265,9 +265,6 @@ function faction_ui:__init(owner) super()
 	
 	self:InitControls(self.f)
 	self:InitCallBacks(self.f)
-
-	local ini = ini_file("localization.ltx")
-	self.lang = ini:r_string_ex("string_table","language","eng")
 end
 
 function faction_ui:__finalize()
@@ -300,7 +297,7 @@ function faction_ui:InitControls(f)
 	self.character_name = xml:InitEditBox("main_dialog:input_character_name",self.dialog)
 	self:Register(self.character_name,"input_character_name")
 	-- Set Default Name
-	self.character_name:SetText("Strelok")
+	self.character_name:SetText(game.translate_string("pri_b305_strelok_name"))
 	
 	-- Faction select menu
 	xml:InitStatic("main_dialog:cap_faction_name", self.dialog)
