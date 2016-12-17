@@ -140,6 +140,7 @@ local function on_game_load()
 				companion_squads[squad.id] = squad
 			end
 		end
+		alun_utils.save_var(db.actor,"companion_"..c_idx,nil)
 		c_idx = c_idx + 1
 		cid = alun_utils.load_var(db.actor,"companion_"..c_idx)
 	end
