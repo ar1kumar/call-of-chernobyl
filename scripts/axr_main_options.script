@@ -15,17 +15,17 @@ function opt_menu_on_init(menu)
 			end
 		end
 	end}
-	if (dynamic_hud) then
-		menu.gameplay_options["actor_hud"]			= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
-			if (level.present() and dynamic_hud) then
-				if (ctrl:GetCheck()) then
-					dynamic_hud.activate_hud()
-				else 
-					dynamic_hud.deactivate_hud()
-				end
-			end
-		end}
-	end
+	-- localization
+	menu.gameplay_options["localization"] = {default="eng", debug_only=false, typ="list", list={"eng","rus"}, on_accept=function(handler,optMgr,ctrl)
+		local language = ctrl:GetText()
+		if (language and language ~= "") then
+			local loc_ini = ini_file_ex("localization.ltx",true)
+			loc_ini:w_value("string_table","language",language)
+			loc_ini:save()
+			menu.b__require_restart = true
+		end
+	end}
+	
 	-- slot Hud
 	if (slot_hud) then
 		menu.gameplay_options["slot_hud"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)

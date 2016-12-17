@@ -186,7 +186,7 @@ function pda_relations_tab:autoupdate()
 			self.companion_info[i].name_wnd:SetText(name)
 			self.companion_info[i].comm_wnd:SetText(game.translate_string(se_obj:community()))
 			self.companion_info[i].rank_wnd:SetText(game.translate_string("st_rank_"..ranks.get_se_obj_rank_name(se_obj)).." ("..se_obj:rank()..")")
-			self.companion_info[i].dist_wnd:SetText(string.format("Distance to: %.2f", se_obj.position:distance_to(db.actor:position())))
+			self.companion_info[i].dist_wnd:SetText(string.format(game.translate_string("st_distance_to")..": %.2f", se_obj.position:distance_to(db.actor:position())))
 
 			-- leader and relation status
 			local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife_object(se_obj.group_id)

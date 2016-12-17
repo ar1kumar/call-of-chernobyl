@@ -565,7 +565,7 @@ function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 	local d = dynamic_news_helper.GetMonsterDescription(victim,1)
 	local e = dynamic_news_helper.GetPointDescription(victim)
 	
-	local msg = strformat("%s %s %s a %s %s.",a,b,c,d,e)
+	local msg = strformat("%s %s %s %s %s.",a,b,c,d,e)
 	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="danger",Se=Se,It="npc"})
 	
 	return true

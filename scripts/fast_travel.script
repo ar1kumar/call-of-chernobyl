@@ -12,12 +12,12 @@ local function map_spot_menu_add_property(property_ui,id,level_name)
 	end
 	
 	if (DEV_DEBUG_DEV) or (enabled and se_obj:clsid() == clsid.smart_terrain and quick_travel_smarts[se_obj:name()]) then 
-		property_ui:AddItem("Fast Travel")
+		property_ui:AddItem(game.translate_string("st_pda_fast_travel"))
 	end
 end 
 
 local function map_spot_menu_property_clicked(property_ui,id,level_name,prop)
-	if (prop == "Fast Travel") then 
+	if (prop == game.translate_string("st_pda_fast_travel")) then 
 		local se_obj = alife_object(id)
 		if not (se_obj) then 
 			return 
