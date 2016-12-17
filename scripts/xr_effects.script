@@ -96,6 +96,7 @@ function add_task_companion(actor,npc,p)
 	if not (squad) then 
 		return 
 	end
+	axr_companions.companion_squads[squad.id] = squad
 	for k in squad:squad_members() do
 		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object)
 		if (npc) then
@@ -264,6 +265,7 @@ function setup_companion_task(actor,npc,p)
 	squad:create_npc(smart)
 	squad:set_squad_relation()
 
+	axr_companions.companion_squads[squad.id] = squad
 	for k in squad:squad_members() do
 		local se_obj = k.object or k.id and sim:object(k.id)
 		if (se_obj) then

@@ -39,6 +39,7 @@ function set_esc_2_12_stalker_fanat_as_companion(a,b)
 	if not (squad) then
 		return
 	end
+	axr_companions.companion_squads[squad.id] = squad
 	for k in squad:squad_members() do
 		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id))
 		if (npc) then

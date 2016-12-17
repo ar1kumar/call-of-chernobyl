@@ -221,8 +221,20 @@ end
 	Become Companion Dialog Preconditions
 --]]
 
+function is_non_story(actor,npc)
+	local squad = get_object_squad(npc)
+	if not (squad) then 
+		return false 
+	end
+	if (get_object_story_id(squad.id)) then
+		return false
+	end
+	return true
+end 
+
 function is_room_in_actor_squad(actor,npc)
-	if (axr_companions.get_companion_count() + alun_utils.get_squad_count(npc) <= axr_companions.max_actor_squad_size) then
+	local max_size = axr_companions.max_actor_squad_size + (has_alife_info("achieved_patriarch") and 2 or 0)
+	if (axr_companions.get_companion_count() + alun_utils.get_squad_count(npc) <= max_size) then
 		return true
 	end
 	return false
@@ -283,6 +295,8 @@ function become_actor_companion(actor,npc)
 		return
 	end
 
+	axr_companions.companion_squads[squad.id] = squad
+	
 	SIMBOARD:assign_squad_to_smart(squad, nil)
 
 	for k in squad:squad_members() do

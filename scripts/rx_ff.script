@@ -169,7 +169,14 @@ function action_verso:execute()
 	local friend = self.st.friend_id and db.storage[self.st.friend_id] and db.storage[self.st.friend_id].object 
 	if not (self.st.vertex_id) then
 		local be_pos = be:position()
-		self.st.vertex_id = alun_utils.try_to_strafe(npc) or alun_utils.try_go_aside_object(npc,friend,be_pos) or alun_utils.try_go_position(npc,be_pos)
+		local rnd = math.random(1,100)
+		if (rnd < 33) then 
+			self.st.vertex_id = alun_utils.try_to_strafe(npc)
+		elseif (rnd < 66) then 
+			self.st.vertex_id = alun_utils.try_go_position(npc,be_pos)
+		else
+			self.st.vertex_id = alun_utils.try_go_aside_object(npc,friend,be_pos)
+		end
 	end
 	
 	if (self.st.vertex_id == nil or self.st.vertex_id == npc:level_vertex_id()) then

@@ -905,12 +905,13 @@ function sim_squad_scripted:on_register()
 	story_objects.check_spawn_ini_for_story_id(self)
 	sim_board.get_sim_board().squads[self.id] = self
 	simulation_objects.get_sim_obj_registry():register(self)
+	SendScriptCallback("squad_on_register",self)
 	--alun_utils.debug_write( strformat("%s:on_register end",self:name()) )
 end
 function sim_squad_scripted:on_unregister()
 	--alun_utils.debug_write("sim_squad_scripted:on_unregister")
-	unregister_story_object_by_id(self.id)
 	SendScriptCallback("squad_on_unregister",self)
+	unregister_story_object_by_id(self.id)
 	SIMBOARD.squads[self.id] = nil
 	SIMBOARD:assign_squad_to_smart(self, nil)
 	simulation_objects.get_sim_obj_registry():unregister(self)

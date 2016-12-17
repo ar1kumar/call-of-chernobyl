@@ -63,7 +63,7 @@ local function init_custom_data(npc, ini, section, st, scheme)
 	st.run_cond 			= xr_logic.parse_condlist(npc, section, "run_anim", ini:r_string_ex(section,"run_anim") or def.run_cond)
 	st.delay_cond 			= xr_logic.parse_condlist(npc, section, "delay_anim", ini:r_string_ex(section,"delay_anim") or def.delay_cond)
 	
-	st.path_end 			= xr_logic.parse_condlist(npc, section, "path_end", ini:r_string_ex(section,"keep_distance") or "nil")
+	st.path_end 			= xr_logic.parse_condlist(npc, section, "path_end", 	ini:r_string_ex(section,"path_end") or "nil")
 	st.sound_idle			= xr_logic.parse_condlist(npc, section, "sound_idle", 	ini:r_string_ex(section, "sound_idle") or "nil")
 	
 	st.use_camp			= ini:r_bool_ex(section,"use_camp",false)
@@ -622,14 +622,14 @@ function action_beh:increment_waypoint_index()
 		end
 	else
 		local new_section = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.path_end)
-		if (new_section and new_section ~= "nil") then
+		if (new_section and new_section ~= "nil" and new_section ~= "") then
 			if (new_section == "reverse") then
 				self.st.path_reverse = true
-			elseif (new_section ~= "loop") then
-				xr_logic.switch_to_section(self.object, st.ini, new_section)
-				self.st.am_i_reached = nil
+			elseif (new_section == "loop") then
 				self.st.path_index = 1
 			else
+				xr_logic.switch_to_section(self.object, st.ini, new_section)
+				self.st.am_i_reached = nil
 				self.st.path_index = 1
 			end
 		end

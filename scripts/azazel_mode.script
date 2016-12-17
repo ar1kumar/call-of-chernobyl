@@ -106,21 +106,16 @@ function actor_on_before_death(whoID,flags)
 	
 	-- make squad actor companions
 	local squad = sim:object(se_obj.group_id)
-	if (squad) then 
+	if (squad) then
+		SIMBOARD:assign_squad_to_smart(squad, nil)
+		axr_companions.companion_squads[squad.id] = squad
 		for k in squad:squad_members() do 
 			if (k.id ~= se_obj.id) then
-				for i=1,3 do
-					local c = utils.load_var(db.actor,"companion_"..i,nil)
-					if not (c) then
-						utils.save_var(db.actor,"companion_"..i,k.id)
-						db.actor:give_info_portion("axr_has_companion")
-						utils.se_obj_save_var(k.id,k.object:name(),"companion",true)
-						local member = db.storage[k.id] and db.storage[k.id].object 
-						if (member) then
-							axr_companions.setup_companion_logic(member,db.storage[k.id],false)
-						end
-						break
-					end
+				axr_companions.non_task_companions[k.id] = true
+				utils.se_obj_save_var(k.id,k.object:name(),"companion",true)
+				local member = db.storage[k.id] and db.storage[k.id].object 
+				if (member) then
+					axr_companions.setup_companion_logic(member,db.storage[k.id],false)
 				end
 			end
 		end
