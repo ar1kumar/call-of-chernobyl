@@ -141,11 +141,11 @@ local function precond_exclusive(se_obj,smart,job)
 end
 
 local function precond_heli_hide(se_obj,smart,job)
-	return xr_conditions.surge_started()
+	return xr_conditions.surge_started() or not utils.is_day()
 end 
 
 local function precond_heli(se_obj,smart,job)
-	return not xr_conditions.surge_started()
+	return not xr_conditions.surge_started() and utils.is_day()
 end
 
 local function precond_surge(se_obj, smart, job)

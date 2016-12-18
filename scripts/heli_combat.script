@@ -512,7 +512,7 @@ function heli_combat:update()
 	end
 	
 	if not (self.enemy_from_custom_data) then
-		if (not self:find_valid_target() or xr_conditions.surge_started()) then
+		if (not self:find_valid_target() or xr_conditions.surge_started() or not utils.is_day()) then
 			self:forget_enemy()
 			--alun_utils.debug_write(strformat("heli_combat:update end 3"))
 			return false

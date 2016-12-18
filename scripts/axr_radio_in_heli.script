@@ -93,6 +93,10 @@ function evaluator_radio_in_heli:evaluate()
 		return false 
 	end
 	
+	if not (utils.is_day()) then 
+		return false 
+	end
+	
 	local squad = get_object_squad(npc)
 	if not (squad) then 
 		return false 
