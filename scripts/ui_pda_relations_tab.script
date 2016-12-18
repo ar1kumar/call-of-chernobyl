@@ -1,4 +1,12 @@
-UIRelations = nil
+SINGLETON = nil
+function get_ui()
+	if not SINGLETON then 
+		SINGLETON = pda_relations_tab()
+	end
+	SINGLETON:Reset()
+	return SINGLETON
+end
+
 class "pda_relations_tab" (CUIScriptWnd)
 function pda_relations_tab:__init() super()
 	self.list = {
@@ -32,7 +40,6 @@ function pda_relations_tab:__init() super()
 	self._tmr 			= time_global()
 	
 	self:InitControls()
-	self:Reset()
 end
 
 function pda_relations_tab:__finalize() end

@@ -6,13 +6,19 @@
 local column_limit = 5
 local row_limit = 10
 
+SINGLETON = nil
+function get_ui()
+	if not SINGLETON then 
+		SINGLETON = pda_contacts_tab()
+	end
+	SINGLETON:Reset()
+	return SINGLETON
+end
 -- Constructor.
-UIContacts = nil
 class "pda_contacts_tab" (CUIScriptWnd)
 function pda_contacts_tab:__init() super()
 	self.contact_info = {}
 	self:InitControls()
-	self:Reset()
 end
 
 -- Initialise the interface.

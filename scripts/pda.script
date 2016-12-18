@@ -8,11 +8,9 @@ dialog_closed = false
 ----------------------------------------------------------------------------
 
 -- PDA Tabs 
--- It's now possible to add new button tabs to pda*.xml. Then call your CUIScriptWnd
--- Use ActorMenu.get_pda_menu():SetActiveDialog(CUIWindow) to set the active dialog
+-- It's now possible to add new button tabs to pda*.xml.
 -- You can use ActorMenu.get_pda_menu():GetActiveSection() to find out active pda tab
--- your new UI window tab should be a CUIWindow not CUIScriptWnd
--- because UI is passed as pointer it is mandatory to set active dialog to hardcoded ui like eptTasks on game load
+-- UI returned must be CUIScriptWnd
 function set_active_subdialog(section)
 	--printf("section=%s",section)
 	if (section == "eptTasks") then 
@@ -22,21 +20,9 @@ function set_active_subdialog(section)
 	elseif (section == "eptLogs") then 
 	
 	elseif (section == "eptRelations") then 
-		if not (ui_pda_relations_tab.UIRelations) then
-			ui_pda_relations_tab.UIRelations = ui_pda_relations_tab.pda_relations_tab()
-			--ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
-		else
-			ui_pda_relations_tab.UIRelations:Reset()
-			--ActorMenu.get_pda_menu():SetActiveDialog(ui_pda_relations_tab.UIRelations)
-		end
-		return ui_pda_relations_tab.UIRelations
+		return ui_pda_relations_tab.get_ui()
 	elseif (section == "eptContacts") then
-		if not (ui_pda_contacts_tab.UIContacts) then
-			ui_pda_contacts_tab.UIContacts = ui_pda_contacts_tab.pda_contacts_tab()
-		else
-			ui_pda_contacts_tab.UIContacts:Reset()
-		end
-		return ui_pda_contacts_tab.UIContacts
+		return ui_pda_contacts_tab.get_ui()
 	elseif (section == "eptEncyclopedia") then
 		return ui_pda_encyclopedia_tab.get_encyclopedia_ui()
 	end
