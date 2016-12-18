@@ -8,9 +8,7 @@ local row_limit = 10
 
 SINGLETON = nil
 function get_ui()
-	if not SINGLETON then 
-		SINGLETON = pda_contacts_tab()
-	end
+	SINGLETON = SINGLETON or pda_contacts_tab()
 	SINGLETON:Reset()
 	return SINGLETON
 end

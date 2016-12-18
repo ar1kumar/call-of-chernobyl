@@ -25,7 +25,7 @@ end
 -- Jumps straight to a specific article.
 function set_article(section)
 	-- Instance of the guide object.
-	local guide = ui_pda_encyclopedia_tab.get_encyclopedia_ui()
+	local guide = ui_pda_encyclopedia_tab.get_ui()
 	
 	-- Return if no section or guide exist.
 	if not (section and guide) then
@@ -57,7 +57,7 @@ end
 -- A random one will be chosen if nothing is specified.
 function unlock_article(section)
 	-- Instance of the guide object.
-	local guide = ui_pda_encyclopedia_tab.get_encyclopedia_ui()
+	local guide = ui_pda_encyclopedia_tab.get_ui()
 	
 	-- Instance of the locked and unlocked article tables.
 	local locked_articles = guide.locked

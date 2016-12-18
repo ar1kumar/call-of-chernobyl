@@ -8,11 +8,10 @@
 
 -- Initialises (if necessary) and returns the encyclopedia interface.
 -- Used by pda.script and dxr_encyclopedia.script.
-function get_encyclopedia_ui()
-	if not (UIEncyclopedia) then
-		UIEncyclopedia = pda_encyclopedia_tab()
-	end
-	return UIEncyclopedia
+SINGLETON = nil
+function get_ui()
+	SINGLETON = SINGLETON or pda_encyclopedia_tab()
+	return SINGLETON
 end
 
 ------------------------
@@ -20,7 +19,6 @@ end
 ------------------------
 
 -- Encyclopedia interface.
-UIEncyclopedia = nil
 class "pda_encyclopedia_tab" (CUIScriptWnd)
 function pda_encyclopedia_tab:__init() super()
 	self.categories = {}
@@ -129,6 +127,7 @@ end
 function pda_encyclopedia_tab:InitCategories()
 	local item = nil
 	local section = nil
+	self.category_list:RemoveAll()
 	for i = 1, #self.categories do
 		item = pda_encyclopedia_entry()
 		section = self.categories[i].section
