@@ -149,7 +149,7 @@ function actor_on_before_death(whoID,flags)
 	se_actor:set_rank(se_obj:rank())
 	db.actor:set_character_community("actor_"..faction)
 	db.actor:set_character_reputation(se_obj:reputation())
-	db.actor:give_money(random_choice(500,1000,1500,2000,2500))
+	db.actor:give_money(10*math.random(1,250)+500)
 	
 	game_relations.set_community_goodwill_for_faction("actor_"..faction)
 	

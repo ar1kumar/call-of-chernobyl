@@ -253,16 +253,6 @@ end
 -- on_actor_before_death
 ---------------------------------------------
 function actor_on_before_death(binder,whoID)
-	-- if you want to keep actor alive, then use db.actor:set_health_ex(1) and do not use db.actor:kill(db.actor,true)
-	--db.actor:set_health_ex(1)
-	
-	-- FIXED IN ENGINE NOW AS OF 9/16/2016
-	-- This is necessary to avoid engine crash when player dies with holder
-	-- local car = db.actor and db.actor:get_attached_vehicle()
-	-- if (car) then 
-		-- db.actor:detach_vehicle()
-	-- end
-	
 	local flags = { ret_value = true }
 	SendScriptCallback("actor_on_before_death",whoID,flags)
 	if (flags.ret_value == true) then 

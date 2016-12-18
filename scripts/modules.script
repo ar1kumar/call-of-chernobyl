@@ -238,10 +238,10 @@ function reset_generic_schemes(npc,scheme,section)
 	elseif st.stype == modules.stype_item then
 		npc:set_callback(callback.use_object, nil)
 		npc:set_nonscript_usable(true)
-		if (get_clsid(npc) == clsid.car) then
-			npc:destroy_car()
-			xr_logic.mob_release(npc)
-		end
+		-- if (get_clsid(npc) == clsid.car) then
+			-- npc:destroy_car()
+			-- xr_logic.mob_release(npc)
+		-- end
 	end
 end 
 
