@@ -481,14 +481,16 @@ function faction_ui:load_icon_list()
 	
 	self.icon_list:ClearList()
 	self.icon_list:AddItem(def_icon,0)
-	self.icon_table = empty_table(self.icon_table)
+	self.icon_table = iempty_table(self.icon_table)
 	
 	local section = self.selected_faction.."_portraits"
 	local n = loc_ini:section_exist(section) and loc_ini:line_count(section) or 0
 	for i=1, n do
 		local result, id, value = loc_ini:r_line(section,i,"","" )
-		self.icon_list:AddItem(id,i)
-		table.insert(self.icon_table,id)
+		if (id ~= "") then
+			self.icon_list:AddItem(id,i)
+			table.insert(self.icon_table,id)
+		end
 	end
 	
 	self.icon_list:SetText(def_icon)
@@ -518,8 +520,10 @@ function faction_ui:OnRandomize()
 	-- set random portrait
 	if (self.icon_list and self.icon_table) then
 		local t = self.icon_table
-		self.icon_list:SetText(t[math.random(#t)])
-		self.char_icon:InitTexture(self.icon_list:GetText())
+		local icon_name = t[math.random(#t)]
+		self.icon_list:SetText(icon_name)
+		self.char_icon:InitTexture(icon_name)
+		--printf(icon_name)
 	end
 end
 

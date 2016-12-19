@@ -643,7 +643,7 @@ function iempty_table (t)
 		return {}
 	end
 	while #t > 0 do
-		t[#t] = nil
+		table.remove(t,1)
 	end
 	return t
 end
