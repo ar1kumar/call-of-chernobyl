@@ -357,7 +357,7 @@ function faction_ui:InitControls(f)
 		
 		self.ck_states = { 	["ck_survival"] = false,
 							["ck_hardcore"] = false,
-							["ck_azazel_mode"] = false ,
+							["ck_azazel_mode"] = false,
 							["ck_story"] = false
 		}
 	end
@@ -384,6 +384,9 @@ function faction_ui:InitCallBacks(f)
 	
 	self:AddCallback("list_starts", ui_events.LIST_ITEM_SELECT, self.OnSelectStartLocation, self)
 	self:AddCallback("list_icon", ui_events.LIST_ITEM_SELECT, self.OnSelectPortrait, self)
+	
+	self:AddCallback("check_story", ui_events.BUTTON_CLICKED, self.OnCheckSetStory, self)
+	self:AddCallback("check_azazel_mode", ui_events.BUTTON_CLICKED, self.OnCheckSetAzazel, self)
 	
 	for i=1,#f do
 		self:AddCallback("btn_"..f[i].."_inactive_select", ui_events.BUTTON_CLICKED, self["OnFaction_"..f[i]], self)
@@ -433,6 +436,16 @@ function faction_ui:SetHint(text,pos)
 	self.hint_wnd:SetWndPos(pos)
 	
 	FitInRect(self.hint_wnd,Frect():set(0,0,1024,768),0,100)
+end
+
+function faction_ui:OnCheckSetStory()
+	self.ck_azazel_mode:SetCheck(false)
+	self.ck_states["ck_azazel_mode"] = false
+end
+
+function faction_ui:OnCheckSetAzazel()
+	self.ck_story:SetCheck(false)
+	self.ck_states["ck_story"] = false
 end
 
 function faction_ui:OnSelectStartLocation()
