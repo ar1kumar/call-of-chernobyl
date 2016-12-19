@@ -237,20 +237,11 @@ function actor_on_before_death(whoID,flags)
 	local task_info = task_manager.get_task_manager().task_info
 	local task_ini = task_manager.task_ini
 	for task_id,tbl in pairs(task_info) do
-		--if not (tbl.storyline) then 
+		--if not (tbl.storyline) then
 			tbl.forced_status = "fail"
 			tbl.cancelled_by_actor = true
 		--end
 	end
-	
-	-- game turns into freeplay
-	give_info("story_mode_disabled")
-	give_info("yan_labx16_switcher_1_off")
-	give_info("yan_labx16_switcher_2_off")
-	give_info("yan_labx16_switcher_3_off")
-	give_info("yan_labx16_switcher_primary_off")
-	give_info("bar_deactivate_radar_done")
-	give_info("warlab_deactivate_generators_done")
 		
 	-- initiate transitition and removal of victim
 	local level_name = sim:level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id())
