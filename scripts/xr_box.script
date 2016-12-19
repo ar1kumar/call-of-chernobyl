@@ -56,10 +56,6 @@ function ph_item_box:__init()
 end
 
 function ph_item_box:spawn_items(obj,who,spawn_ini)
-	if (who and who:id() == 0) then 
-		xr_statistic.inc_counter("boxes_smashed")
-	end
-
 	local community
 	if (spawn_ini) then
 		create_obligatory_items(obj,spawn_ini)

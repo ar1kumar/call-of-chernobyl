@@ -20,9 +20,11 @@ function opt_menu_on_init(menu)
 		local language = ctrl:GetText()
 		if (language and language ~= "") then
 			local loc_ini = ini_file_ex("localization.ltx",true)
-			loc_ini:w_value("string_table","language",language)
-			loc_ini:save()
-			menu.b__require_restart = true
+			if (loc_ini:r_value("string_table","language") ~= language) then
+				loc_ini:w_value("string_table","language",language)
+				loc_ini:save()
+				menu.b__require_restart = true
+			end
 		end
 	end}
 	
