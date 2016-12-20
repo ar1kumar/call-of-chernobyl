@@ -490,10 +490,6 @@ function patriarch_rewards()
 	db.actor:give_info_portion("achieved_patriarch")
 	news_manager.send_tip(db.actor, "st_achievement_14_unlock", nil, "patriarch", nil, nil)
 	xr_statistic.inc_achievement("patriarch")
-	
-	-- Works around needing to save and reload.
-	-- Allows larger squads to be recruited immediately.
-	axr_companions.on_game_load()
 end
 
 -- Radiotherapy.
