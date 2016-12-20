@@ -79,26 +79,17 @@ function actor_on_before_death(whoID,flags)
 		["stick_bred"] = true,
 		["stick_kolbasa"] = true,
 		["stick_kolbasa_bred"] = true,
-		["wpn_knife"] = true,
-		["good_psy_helmet"] = true,
-		["bad_psy_helmet"] = true,
-		["main_story_1_quest_case"] = true,
-		["main_story_2_lab_x18_documents"] = true,
-		["main_story_3_lab_x16_documents"] = true,
-		["main_story_4_lab_x10_documents"] = true,
-		["main_story_5_lab_x8_documents"] = true,
-		["main_story_6_jup_ug_documents"] = true,
-		["main_story_7_mon_con_documents"] = true
+		["wpn_knife"] = true--,
+		-- ["good_psy_helmet"] = true,
+		-- ["bad_psy_helmet"] = true,
+		-- ["main_story_1_quest_case"] = true,
+		-- ["main_story_2_lab_x18_documents"] = true,
+		-- ["main_story_3_lab_x16_documents"] = true,
+		-- ["main_story_4_lab_x10_documents"] = true,
+		-- ["main_story_5_lab_x8_documents"] = true,
+		-- ["main_story_6_jup_ug_documents"] = true,
+		-- ["main_story_7_mon_con_documents"] = true
 	}
-	local function release_actor_item(temp, item)
-		if not (ignore_list[item:section()]) then
-			local se_item = sim:object(item:id())
-			if (se_item) then
-				sim:release(se_item,true)
-			end
-		end
-	end
-	db.actor:iterate_inventory(release_actor_item,nil)
 	
 	axr_companions.remove_all_from_actor_squad()
 	
@@ -135,6 +126,18 @@ function actor_on_before_death(whoID,flags)
 			m_data.icon_name = se_actor:character_icon()
 			m_data.visual = db.actor:get_visual_name()
 		end
+		
+		local function release_actor_item(temp, item)
+			if not (ignore_list[item:section()]) then
+				local se_item = sim:object(item:id())
+				if (se_item) then
+					local sec = se_item:section_name()
+					sim:release(se_item,true)
+					sim:create(sec,se_mimic.position,se_mimic.m_level_vertex_id,se_mimic.m_game_vertex_id,se_mimic.id)
+				end
+			end
+		end
+		db.actor:iterate_inventory(release_actor_item,nil)
 	end
 	
 	-- copy data over to player
