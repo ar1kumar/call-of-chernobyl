@@ -397,11 +397,13 @@ function options_dialog:OnApplyChanges()
     _G.b_discard_settings_shown = false
 
 	self.owner:ShowDialog(true)
-	self:HideDialog()
+	if (self:IsShown()) then
+		self:HideDialog()
+	end
 	self.owner:Show(true)
 	get_console():execute("vid_restart")
 
-	if false==self.b_restart_system_shown then
+	if not (self.b_restart_system_shown and self.message_box:IsShown()) then
 		local opt = COptionsManager()
 		if opt:NeedSystemRestart() then
 			self.b_restart_system_shown = true
