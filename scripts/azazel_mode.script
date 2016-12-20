@@ -13,7 +13,7 @@ function on_game_load()
 		SetHudMsg(strformat(game.translate_string("st_death_count"),xr_statistic.actor_statistic.deaths),8)
 		
 		-- Heal 
-		bind_stalker_ext.invulnerable_time = 30000
+		bind_stalker_ext.invulnerable_time = time_global() + 30000
 		db.actor:set_health_ex(1)
 
 		-- Transition
@@ -61,7 +61,7 @@ function actor_on_before_death(whoID,flags)
 		return
 	end
 	
-	bind_stalker_ext.invulnerable_time = 30000
+	bind_stalker_ext.invulnerable_time = time_global() + 30000
 	db.actor:set_health_ex(1)
 
 	local ignore_list = {
