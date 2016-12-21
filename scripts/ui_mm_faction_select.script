@@ -699,7 +699,7 @@ end
 function faction_ui:OnQuit()
 	self.owner:ShowDialog(true)
 	self.owner:Show(true)
-	if not (self:IsShown()) then
+	if (self:IsShown()) then
 		self:HideDialog()
 	end
 	self:Show(false)
