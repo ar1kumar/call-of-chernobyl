@@ -93,7 +93,7 @@ end
 
 function actor_on_update(binder,delta)
 	-- WISH GRANTER ZOMBIED-IMMORTALITY
-	if (db.actor:has_info("actor_made_wish_immortal") or invulnerable_time and time_global() < invulnerable_time) then 
+	if (db.actor:has_info("actor_made_wish_immortal") or invulnerable_time and invulnerable_time > time_global() + 7000) then 
 		db.actor.health = 1
 		db.actor.bleeding = 1
 		db.actor.psy_health = 1
