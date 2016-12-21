@@ -75,7 +75,6 @@ function DynamicNewsManager:__init()
 	self.spammer = {	
 		["show_about_death"] = 0,
 		["show_about_kill_wounded"] = 0,
-		["show_about_bounty"] = 0,
 		["show_about_death_mutant"] = 0
 	}
 	
@@ -106,7 +105,7 @@ function DynamicNewsManager:NewsTick()
 		return true
 	end
 	
-	ResetTimeEvent("DynamicNewsManager","NewsTick",math.random(1,5))
+	ResetTimeEvent("DynamicNewsManager","NewsTick",math.random(5,20))
 	
 	if (surge_manager.is_started()) then
 		return false
@@ -130,7 +129,7 @@ function DynamicNewsManager:TickSpecialEvent()
 		return true
 	end
 
-	ResetTimeEvent("DynamicNewsManager","ResetTickSpecialEvent",math.random(120,240))
+	ResetTimeEvent("DynamicNewsManager","TickSpecialEvent",math.random(120,240))
 	
 	self:GossipBounty()
 	
@@ -317,55 +316,47 @@ function DynamicNewsManager:GossipBounty()
 	if not (show_about_bounty) then 
 		return 
 	end
-	if (self.spammer.show_about_bounty == 0) then
-		local bounty
-		for task_id,npc_id in pairs(axr_task_manager.bounties_by_id) do
-			bounty = db.storage[npc_id] and db.storage[npc_id].object
-			if (bounty and bounty:alive()) then 
-				break 
-			end
-		end
-		
-		if not (bounty) then
-			return false
-		end
 
-		local sender = self:FindSpeakerNoVictim(bounty,false,true)
-		if not (sender) then
-			--printf("GossipBounty can't find sender")
-			return false
+	local bounty
+	for task_id,npc_id in pairs(axr_task_manager.bounties_by_id) do
+		bounty = db.storage[npc_id] and db.storage[npc_id].object
+		if (bounty and bounty:alive()) then 
+			break 
 		end
-		
-		local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
-		local sentences = {}
-		local string_count = 1
-		while true do 
-			local tr_s = game.translate_string("st_dyn_news_gossip_bounty_"..string_count)
-			if (tr_s == "st_dyn_news_gossip_bounty_"..string_count) then 
-				break 
-			else 
-				table.insert(sentences,tr_s)
-			end
-			string_count = string_count + 1
-		end
-		
-		if (#sentences == 0) then 	
-			return false
-		end
-		
-		local msg = strformat(sentences[math.random(#sentences)],bounty:character_name(),dynamic_news_helper.GetPointDescription(bounty))
-		
-		self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
-		
-		return true
 	end
 	
-	self.spammer.show_about_bounty = self.spammer.show_about_bounty + 1
-	if (self.spammer.show_about_bounty > 3) then
-		self.spammer.show_about_bounty = 0
+	if not (bounty) then
+		return false
+	end
+
+	local sender = self:FindSpeakerNoVictim(bounty,false,true)
+	if not (sender) then
+		--printf("GossipBounty can't find sender")
+		return false
 	end
 	
-	return false
+	local Se = strformat("%s, %s",sender:character_name(),dynamic_news_helper.GetCommunityDescription(sender,6))
+	local sentences = {}
+	local string_count = 1
+	while true do 
+		local tr_s = game.translate_string("st_dyn_news_gossip_bounty_"..string_count)
+		if (tr_s == "st_dyn_news_gossip_bounty_"..string_count) then 
+			break 
+		else 
+			table.insert(sentences,tr_s)
+		end
+		string_count = string_count + 1
+	end
+	
+	if (#sentences == 0) then 	
+		return false
+	end
+	
+	local msg = strformat(sentences[math.random(#sentences)],bounty:character_name(),dynamic_news_helper.GetPointDescription(bounty))
+	
+	self:PushToChannel(sender:character_community(),{Mg=msg,Ic=sender:character_icon(),Snd="news",Se=Se,It="npc"})
+	
+	return true
 end
 
 function DynamicNewsManager:RadioInHeli(sender,who)
