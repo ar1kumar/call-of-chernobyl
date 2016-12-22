@@ -34,7 +34,7 @@ function main_menu:Update()
 		self.msg_wnd_timer = self.msg_wnd_timer - 1
 		if (self.msg_wnd_timer <= 0) then
 			self.msg_wnd_timer = nil
-			self.msg_wnd:SetWndPos(vector2():set(-2048,-2048))
+			self.msg_wnd:Show(false)
 		end
 	end
 end 
@@ -57,10 +57,11 @@ function main_menu:InitControls()
 	
 	-- Message Window 
 	self.msg_wnd = xml:InitFrame("msg_wnd:background",self)
+	self.msg_wnd:SetAutoDelete(false)
 	self.msg_wnd_text = xml:InitTextWnd("msg_wnd:text",self.msg_wnd)
 	self.msg_wnd_text:SetTextAlignment(2)
 	
-	self.msg_wnd:SetWndPos(vector2():set(-2048,-2048))
+	self.msg_wnd:Show(false)
 	self.msg_wnd:SetColor(GetARGB(255,0,0,0))
 end
 
@@ -358,6 +359,7 @@ function main_menu:OnMenuReloaded()
 end
 
 function main_menu:SetMsg(text,tmr)
+	self.msg_wnd:Show(true)
 	self.msg_wnd_text:SetText(text)
 	self.msg_wnd_text:AdjustHeightToText()
 	self.msg_wnd_text:SetWndSize(vector2():set(1024,self.msg_wnd_text:GetHeight()))

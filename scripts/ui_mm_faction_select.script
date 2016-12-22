@@ -364,15 +364,17 @@ function faction_ui:InitControls(f)
 	
 	-- Hint Window
 	self.hint_wnd = xml:InitFrame("hint_wnd:background",self)
+	self.hint_wnd:SetAutoDelete(false)
 	self.hint_wnd_text = xml:InitTextWnd("hint_wnd:text",self.hint_wnd)
-	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
+	self.hint_wnd:Show(false)
 	
 	-- Message Window 
 	self.msg_wnd = xml:InitFrame("hint_wnd:background",self)
+	self.msg_wnd:SetAutoDelete(false)
 	self.msg_wnd_text = xml:InitTextWnd("hint_wnd:text",self.msg_wnd)
 	self.msg_wnd_text:SetTextAlignment(2)
 	
-	self.msg_wnd:SetWndPos(vector2():set(-2048,-2048))
+	self.msg_wnd:Show(false)
 	self.msg_wnd:SetColor(GetARGB(255,0,0,0))
 end
 
@@ -398,7 +400,7 @@ function faction_ui:Update()
 	-- Warning messages timer 
 	if (self.msg_wnd_timer and time_global() > self.msg_wnd_timer) then 
 		self.msg_wnd_timer = nil
-		self.msg_wnd:SetWndPos(vector2():set(-2048,-2048))
+		self.msg_wnd:Show(false)
 	end
 	
 	for ck_name,v in pairs(self.ck_states) do 
@@ -407,10 +409,11 @@ function faction_ui:Update()
 			return
 		end
 	end
-	self.hint_wnd:SetWndPos(vector2():set(-2048,-2048))
+	self.hint_wnd:Show(false)
 end 
 
 function faction_ui:SetMsg(text,tmr)
+	self.msg_wnd:Show(true)
 	self.msg_wnd_text:SetText(text)
 	self.msg_wnd_text:AdjustHeightToText()
 	self.msg_wnd_text:SetWndSize(vector2():set(820,self.msg_wnd_text:GetHeight()))
@@ -426,6 +429,7 @@ function faction_ui:SetHint(text,pos)
 	if (text == "") then
 		return
 	end
+	self.hint_wnd:Show(true)
 	self.hint_wnd_text:SetText(text)
 	self.hint_wnd_text:AdjustHeightToText()
 	self.hint_wnd:SetWndSize(vector2():set(self.hint_wnd:GetWidth(),self.hint_wnd_text:GetHeight()+44))
