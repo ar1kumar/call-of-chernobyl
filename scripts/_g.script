@@ -166,9 +166,9 @@ function ResetTimeEvent(ev_id,act_id,timer)
 end
 
 function ProcessEventQueue(force)
-	if (has_alife_info("sleep_active")) then
-		return false
-	end
+	-- if (has_alife_info("sleep_active")) then
+		-- return false
+	-- end
 	
 	for event_id,actions in pairs(ev_queue) do
 		for action_id,act in pairs(actions) do

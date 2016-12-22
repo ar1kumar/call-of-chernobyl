@@ -21,7 +21,7 @@ keybinds = {
 					["debug_demo_record"]			= "DIK_NUMPAD0",
 					--["debug_select_object"] 		= "DIK_NUMPAD9",
 					--["debug_attachment_ui"] 		= "DIK_INSERT",
-					--["debug_test"] 					= "DIK_NUMPADENTER",
+					["debug_test"] 					= "DIK_NUMPADENTER",
 					--["debug_reload_game"]			= "DIK_END",
 					--["debug_hold_action"]			= "DIK_NUMPAD8"
 }
@@ -196,12 +196,6 @@ function action.debug_test(p)
 		return 
 	end 
 	if (p==1) then
-	
-		local function itr(id,info)
-			printf(info)
-		end
-		alife():iterate_info(0,itr)
-	
 		--alun_utils.print_table(story_objects.get_story_objects_registry().story_id)
 		--[[ PRINT _G
 		local valid = {

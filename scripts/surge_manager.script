@@ -156,6 +156,9 @@ end
 
 function CSurgeManager:start(manual)
 	--alun_utils.debug_write("CSurgeManager:start()")
+	if not (self._state_loaded) then 
+		self:initialize()
+	end
 	
 	self.game_time_factor=level.get_time_factor()
 
@@ -213,9 +216,10 @@ function CSurgeManager:new_surge_time(reset)
 	self._delta = math_random(math.floor(freq/2)*3600, freq*3600)
 
 	local g_time = game.get_game_time()
-	local psi_manager= psi_storm_manager and psi_storm_manager.PsiStormManager
-	local psi_storm_start = psi_manager and math.floor(psi_manager._delta - g_time:diffSec(psi_manager.last_psi_storm_time)) or 0
-	local psi_storm_end = psi_manager and math.floor(psi_manager._delta+3600 - g_time:diffSec(psi_manager.last_psi_storm_time)) or 0
+	local psi_manager = psi_storm_manager and psi_storm_manager.get_psi_storm_manager()
+	local last_psi_storm_time = psi_manager and psi_manager.last_psi_storm_time or game.get_game_time()
+	local psi_storm_start = psi_manager and math.floor(psi_manager._delta - g_time:diffSec(last_psi_storm_time)) or 0
+	local psi_storm_end = psi_manager and math.floor(psi_manager._delta+3600 - g_time:diffSec(last_psi_storm_time)) or 0
 	local surge_start = math.floor(self._delta - g_time:diffSec(self.last_surge_time))
 	local surge_end = math.floor(self._delta+3600 - g_time:diffSec(self.last_surge_time))
 	if ((surge_end > psi_storm_start) and (surge_end < psi_storm_end)) then
@@ -229,6 +233,12 @@ function CSurgeManager:new_surge_time(reset)
 end
 
 function CSurgeManager:skip_surge()
+	if not (self.inited_time) then 
+		self.inited_time = game.get_game_time()
+	end
+	if not (self.last_surge_time) then 
+		self.last_surge_time = game.get_game_time()
+	end
 	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
 	Y, M, D, h, m, s, ms = self.inited_time:get(Y, M, D, h, m, s, ms)
 	self.last_surge_time:set(Y, M, D, h, m, s + self.surge_time, ms)
@@ -254,7 +264,7 @@ function CSurgeManager:skip_surge()
 	self.ui_disabled			= false
 	self.blowout_sound			= false
 	self.wave_sound 			= false
-	prev_sec				= 0
+	prev_sec					= 0
 
 	self:toggle_level_artefact_respawns()
 	self:respawn_artefacts_and_replace_anomaly_zone()
@@ -422,16 +432,27 @@ function CSurgeManager:update()
 
 	if not (self._state_loaded) then 
 		self:initialize()
+		return
 	end 
 	
 	if not (self.first_update) then 
 		self.first_update = true
 		local level_name = level.name()
-		if (level_name == "l11_hospital" or level_weathers.valid_levels[level_name] ~= true) then 
-			self:end_surge()
+		if (level_name == "l11_hospital" or level_weathers.valid_levels[level_name] ~= true) then
+			if (self.started) then
+				self:end_surge()
+			else
+				self:skip_surge()
+			end
+			return
+		end
+		local diff_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor())
+		if (diff_sec > self.surge_time)then
+			self:skip_surge()
+			return
 		end
 	end
-	
+
 	if not(self.started) then
 		local g_time = game.get_game_time()
 		if(self.time_forwarded) then
@@ -1140,12 +1161,9 @@ function CSurgeManager:kill_crows_at_pos(pos)
 	h.direction = vector():set(0,0,1)
 	h.draftsman = db.actor
 	for k,v in pairs(bind_crow.crow_storage) do
-		local obj = alife_object(v)
-		if obj then
-			local crow = level.object_by_id(obj.id)
-			if(crow and crow:alive() and pos<crow:position().z) then
-				crow:hit(h)
-			end
+		local crow = level.object_by_id(v)
+		if(crow and crow:alive() and pos<crow:position().z) then
+			crow:hit(h)
 		end
 	end
 end
@@ -1597,7 +1615,7 @@ function save_state(m_data)
 	
 	m_data.SurgeManager.finished = mgr.finished == nil and true or mgr.finished
 	m_data.SurgeManager.started = mgr.started == nil and false or mgr.started
-	m_data.SurgeManager.last_surge_time = utils.CTime_to_table(mgr.last_surge_time) or game.get_game_time()
+	m_data.SurgeManager.last_surge_time = mgr.last_surge_time and utils.CTime_to_table(mgr.last_surge_time) or game.get_game_time()
 
 	if(mgr.started) then
 		m_data.SurgeManager.inited_time = utils.CTime_to_table(mgr.inited_time) or game.get_game_time()
@@ -1622,9 +1640,9 @@ function load_state(m_data)
 	mgr:initialize()
 	mgr.finished = m_data.SurgeManager.finished
 	mgr.started = m_data.SurgeManager.started
-	mgr.last_surge_time = utils.CTime_from_table(m_data.SurgeManager.last_surge_time)
+	mgr.last_surge_time = m_data.SurgeManager.last_surge_time and utils.CTime_from_table(m_data.SurgeManager.last_surge_time) or game.get_game_time()
 	if (mgr.started == true and mgr.finished == false) then
-		mgr.inited_time = m_data.SurgeManager.inited_time and utils.CTime_from_table(m_data.SurgeManager.inited_time) or mgr.inited_time
+		mgr.inited_time = m_data.SurgeManager.inited_time and utils.CTime_from_table(m_data.SurgeManager.inited_time) or game.get_game_time()
 		mgr.task_given = m_data.SurgeManager.task_given or false
 		mgr.effector_set = m_data.SurgeManager.effector_set or false
 		mgr.second_message_given = m_data.SurgeManager.second_message_given or false

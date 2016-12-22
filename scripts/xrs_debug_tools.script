@@ -20,7 +20,7 @@ by Alundaio
 
 local toggle_hud_list = 	{
 							["top"]  = { "actor_condition_hud", "feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
-							["left"] = { "arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
+							["left"] = { "surge_hud","arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
 							["right"] = { "npc_info_hud", "actor_info_hud", "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
 							}
 --------------------------------------------------------------------------------------------------
@@ -673,6 +673,9 @@ function monster_hud_show(hud)
 		be = near:get_enemy()
 		hud:add_msg("Enemy",be and be:name())
 		
+		local ce = near:get_corpse()
+		hud:add_msg("Corpse",ce and ce:name())
+		
 		if (st.overrides and st.overrides.combat_ignore and be) then
 			hud:add_msg("CombatIgnoreCond",xr_logic.pick_section_from_condlist(be, near, st.overrides.combat_ignore.condlist))
 		end
@@ -979,6 +982,25 @@ function arena_hud_show(hud)
 		end
 	end
 	
+	hud:display()
+end
+
+function surge_hud_show(hud)
+	hud:set_header("-[Emissions Debugger]-")
+	local sm = surge_manager.get_surge_manager()
+	if (sm) then
+		hud:add_msg("Surge.first_update",sm.first_update)
+		hud:add_msg("Surge.started",sm.started)
+		hud:add_msg("Surge.finished",sm.finished)
+		hud:add_msg("Surge.last_surge_time",sm.last_surge_time and game.get_game_time():diffSec(sm.last_surge_time))
+	end
+	local pm = psi_storm_manager.get_psi_storm_manager()
+	if (pm) then
+		hud:add_msg("Psi.first_update",sm.first_update)
+		hud:add_msg("Psi.started",pm.started)
+		hud:add_msg("Psi.finished",pm.finished)
+		hud:add_msg("Psi.last_psi_storm_time",pm.last_psi_storm_time and game.get_game_time():diffSec(pm.last_psi_storm_time))
+	end
 	hud:display()
 end
 
