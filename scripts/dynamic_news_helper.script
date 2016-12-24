@@ -222,14 +222,13 @@ function GetPointDescription(obj)
 	end
 	
 	local m_point = nil
-	local m_dist = 0
 	local near_id = nil
 	local near_dist = nil
 	for key0,value in ipairs(all_points[level_name]) do
 		local pos = vector():set(value[1],value[2],value[3])
 		local dist = pos:distance_to_sqr(point)
 		if (near_dist == nil or dist < near_dist) then
-			near_dist = m_dist
+			near_dist = dist
 			near_id = key0
 			near_point = pos
 		end
