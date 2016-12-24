@@ -2781,6 +2781,16 @@ function task_giver_alive(actor,npc,p)
 	return false
 end
 
+function is_a_task_giver(actor,npc,p)
+	local tm = task_manager.get_task_manager()
+	for task_id,tsk in pairs(tm.task_info) do 
+		if (tsk.task_giver_id and tsk.task_giver_id == npc:id()) then 
+			return true 
+		end
+	end
+	return false
+end
+
 -- param1 - smart by name 
 -- param2 - community 
 -- param3 - if true, then it will check_npc_name for that faction (This is used for suitable in logic section)

@@ -113,7 +113,9 @@ local function save_state(m_data)
 	m_data.non_task_companions = non_task_companions
 	m_data.companion_squads = {}
 	for id,squad in pairs(companion_squads) do 
-		m_data.companion_squads[id] = squad and squad.commander_id and false or nil
+		if (squad and squad.commander_id) then
+			m_data.companion_squads[id] = false
+		end
 	end
 end
 
