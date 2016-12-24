@@ -20,7 +20,7 @@ by Alundaio
 
 local toggle_hud_list = 	{
 							["top"]  = { "actor_condition_hud", "feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
-							["left"] = { "surge_hud","arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
+							["left"] = { "team_squad_group_hud","surge_hud","arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
 							["right"] = { "npc_info_hud", "actor_info_hud", "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
 							}
 --------------------------------------------------------------------------------------------------
@@ -1344,6 +1344,44 @@ function stalker_info_hud_show(hud)
 	end
 
 	hud:set_header("-[Stalker Info]-")
+	hud:display()
+end
+
+function team_squad_group_hud_show(hud)
+	local function get_nearest_monster(npc)
+		local dist
+		local pos = device().cam_pos
+		local nearest_stalker = npc
+		local nearest_dist = pos:distance_to_sqr(npc:position())
+		for id,st in pairs(db.storage) do
+			local mon = st.object or level.object_by_id(id)
+			if (mon and IsMonster(mon) and mon:alive()) then
+				dist = pos:distance_to_sqr(mon:position())
+				if not (nearest_dist) then
+					nearest_dist = dist
+					nearest_stalker = mon
+				end
+
+				if (dist < nearest_dist) then
+					nearest_dist = dist
+					nearest_stalker = mon
+				end
+			end
+		end
+		return nearest_stalker,nearest_dist
+	end
+	
+	hud:set_header("-[team_squad_group Info]-")
+	local near = get_nearest_monster(get_debug_npc())
+	if (near) then 
+		local se_obj = alife_object(near:id())
+		if (se_obj) then
+			hud:add_msg("Name",strformat("%s [%s]",se_obj:name(),se_obj.id))
+			hud:add_msg("Team",se_obj.team)
+			hud:add_msg("Squad",se_obj.squad)
+			hud:add_msg("Group",se_obj.group)
+		end
+	end 
 	hud:display()
 end
 

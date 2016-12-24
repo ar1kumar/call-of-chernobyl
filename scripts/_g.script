@@ -473,38 +473,26 @@ end
 
 function action(obj,...)
 	local arg = {...}
-	local act = entity_action()
-	local i = 1
-	while true do
-		if (arg[i] ~= nil) then
-			act:set_action(arg[i])
-		else
-			break
-		end
-		i = i + 1
-	end
+	local e_act = entity_action()
+	for i=1,#arg do 
+		e_act:set_action(arg[i])
+	end 
 	if (obj ~= nil) then
-		obj:command(act,false)
+		obj:command(e_act,false)
 	end
-	return  entity_action(act)
+	return entity_action(e_act)
 end
 
 function action_first(obj,...)
 	local arg = {...}
-	local act = entity_action()
-	local i = 1
-	while true do
-		if (arg[i] ~= nil) then
-			act:set_action(arg[i])
-		else
-			break
-		end
-		i = i + 1
-	end
+	local e_act = entity_action()
+	for i=1,#arg do 
+		e_act:set_action(arg[i])
+	end 
 	if (obj ~= nil) then
-		obj:command(act,true)
+		obj:command(e_act,true)
 	end
-	return  entity_action(act)
+	return entity_action(e_act)
 end
 
 function round (value)

@@ -2225,9 +2225,9 @@ function create_squad_member(actor, obj, p)
 	local se_obj = new_member_id and alife_object(new_member_id)
 	if (se_obj) then 
 		squad_smart:register_npc(se_obj)
+		board:setup_squad_and_group(se_obj)
 	end
-
-	board:setup_squad_and_group(alife_object(new_member_id))
+	
 	--squad_smart:refresh()
 	squad:update()
 end

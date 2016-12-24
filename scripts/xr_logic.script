@@ -886,7 +886,8 @@ function cfg_get_overrides(ini, section, npc)
 	l.combat_ignore_keep_when_attacked = ini:r_bool_ex(section, "combat_ignore_keep_when_attacked",false)
 	l.combat_type       = cfg_get_condlist(ini, section, "combat_type", npc)
 	l.on_combat         = cfg_get_condlist(ini, section, "on_combat", npc)
-
+	l.allow_eat 		= ini:r_bool_ex(section, "allow_eat",true)
+	
 	local st = db.storage[npc:id()]
 	if ini:line_exist(st.section_logic, "post_combat_time") then
 		l.min_post_combat_time,l.max_post_combat_time = utils.r_2nums( ini, st.section_logic, "post_combat_time", 10, 15 )
