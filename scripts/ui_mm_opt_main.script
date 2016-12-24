@@ -377,7 +377,9 @@ function options_dialog:Update()
 		end
 		self.message_box:SetText(string.format("%s %d %s", game.translate_string("ui_mm_confirm_changes"), 15-(tg-self.timer), game.translate_string("mp_si_sec")))
 		if(tg-self.timer>=15) then
-			self.message_box:HideDialog()
+			if (self.message_box:IsShown()) then
+				self.message_box:HideDialog()
+			end
 			self:OnDiscardChanges()
 		end
 	end

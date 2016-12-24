@@ -1352,7 +1352,7 @@ function team_squad_group_hud_show(hud)
 		local dist
 		local pos = device().cam_pos
 		local nearest_stalker = npc
-		local nearest_dist = pos:distance_to_sqr(npc:position())
+		local nearest_dist = npc and pos:distance_to_sqr(npc:position())
 		for id,st in pairs(db.storage) do
 			local mon = st.object or level.object_by_id(id)
 			if (mon and IsMonster(mon) and mon:alive()) then
