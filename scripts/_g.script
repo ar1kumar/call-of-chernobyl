@@ -12,7 +12,7 @@ if (jit == nil) then
 	profiler.setup_hook	()
 end
 
-GAME_VERSION = "1.4.22"
+GAME_VERSION = "1.4.23"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -1244,7 +1244,7 @@ function set_save_marker(p, mode, check, prefix)
 			printf("ERROR set_save_marker:%s: INCORRECT LOAD dif=%s c_dif=%s", prefix, dif, c_dif)
 		end
 	end
-		save_marker_result[prefix] = nil
+	save_marker_result[prefix] = nil
 end
 
 -- переводит вектор в строку.

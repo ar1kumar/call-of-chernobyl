@@ -57,97 +57,103 @@ function motivator_binder:net_spawn(sobject)
 		return false 
 	end
 
-	self.object:enable_vision(true)
-	local visual = system_ini():r_string_ex(self.object:section(),"set_visual")
+	local npc = self.object
+	
+	npc:enable_vision(true)
+	
+	-- Enable if you need it, CoC doesn't have story for actor_visual and ini read from HDD not good
+	--[[
+	local visual = system_ini():r_string_ex(npc:section(),"set_visual")
 	if (visual and visual ~= "") then
 		if visual == "actor_visual" then
-			self.object:set_visual_name(db.actor:get_visual_name())
+			npc:set_visual_name(db.actor:get_visual_name())
 		else
-			self.object:set_visual_name(visual)
+			npc:set_visual_name(visual)
 		end
 	end
+	--]]
 	
 	-- overrides
 	local m_data = alife_storage_manager.get_se_obj_state(se_obj)
 	if (m_data) then 
 		if (m_data.visual) then 
-			self.object:set_visual_name(m_data.visual)
+			npc:set_visual_name(m_data.visual)
 		end  
 		if (m_data.icon_name) then 
-			self.object:set_character_icon(m_data.icon_name)
+			npc:set_character_icon(m_data.icon_name)
 		end
 	end
 
-	self.object:apply_loophole_direction_distance(1.0)
+	npc:apply_loophole_direction_distance(1.0)
 
-	self.object:set_callback(callback.use_object, self.use_callback, self)
-	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
-	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)
+	npc:set_callback(callback.use_object, self.use_callback, self)
+	npc:set_callback(callback.on_item_take, self.on_item_take, self)
+	npc:set_callback(callback.on_item_drop, self.on_item_drop, self)
 	
-	db.add_obj(self.object)
-	if not self.object:alive() then
-		self.object:death_sound_enabled(false)
+	db.add_obj(npc)
+	if not npc:alive() then
+		npc:death_sound_enabled(false)
 		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body...")
-		release_body_manager.get_release_body_manager():moving_dead_body(self.object,true)
+		release_body_manager.get_release_body_manager():moving_dead_body(npc,true)
 		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body done")
 		
 		if not (self.loaded) then
-			local ini = self.object:spawn_ini()
+			local ini = npc:spawn_ini()
 			local filename = ini and ini:r_string_ex("logic","cfg")
 			ini = filename and ini_file(filename) or ini
 			if (ini) then
-				xr_info.setup_known_info(self.object,ini,ini:r_string_ex("logic","known_info"))
+				xr_info.setup_known_info(npc,ini,ini:r_string_ex("logic","known_info"))
 			end
 		end
 		
 		-- fix for 'Invalid vertex for object'
-		if not (se_obj.m_level_vertex_id < 4294967295 and self.object:accessible(se_obj.m_level_vertex_id)) then
+		if not (se_obj.m_level_vertex_id < 4294967295 and npc:accessible(se_obj.m_level_vertex_id)) then
 			printf("npc %s has invalid spawning vertex, correcting",se_obj:name())
-			local v_id = self.object:accessible_nearest(level.vertex_position(se_obj.m_level_vertex_id), vector())
-			self.object:set_npc_position(level.vertex_position(v_id))
+			local v_id = npc:accessible_nearest(level.vertex_position(se_obj.m_level_vertex_id), vector())
+			npc:set_npc_position(level.vertex_position(v_id))
 		end
 		
-		--xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_stalker)
+		--xr_logic.initialize_obj(npc, self.st, self.loaded, db.actor, modules.stype_stalker)
 		return true
 	end
 	
-	self.st.state_mgr = state_mgr.bind_manager(self.object)
-	self.st.move_mgr = move_mgr.move_mgr(self.object)
+	self.st.state_mgr = state_mgr.bind_manager(npc)
+	self.st.move_mgr = move_mgr.move_mgr(npc)
 	self.st.move_mgr:initialize()
 	
-	self.object:set_patrol_extrapolate_callback(motivator_binder.extrapolate_callback, self)
-	self.object:set_callback(callback.hit, motivator_binder.hit_callback, self)
-	self.object:set_callback(callback.death, motivator_binder.death_callback, self)
-	self.object:set_callback(callback.sound, motivator_binder.hear_callback, self)
-	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
+	npc:set_patrol_extrapolate_callback(motivator_binder.extrapolate_callback, self)
+	npc:set_callback(callback.hit, motivator_binder.hit_callback, self)
+	npc:set_callback(callback.death, motivator_binder.death_callback, self)
+	npc:set_callback(callback.sound, motivator_binder.hear_callback, self)
+	npc:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
 		
-	db.add_enemy(self.object)
+	db.add_enemy(npc)
 
-	local relation = db.goodwill.relations and db.goodwill.relations[self.object:id()]
+	local relation = db.goodwill.relations and db.goodwill.relations[npc:id()]
 	if (relation and db.actor) then
-		game_relations.set_npcs_relation(self.object, db.actor, relation)
+		game_relations.set_npcs_relation(npc, db.actor, relation)
 	end
 
-	local sympathy = db.goodwill.sympathy and db.goodwill.sympathy[self.object:id()]
+	local sympathy = db.goodwill.sympathy and db.goodwill.sympathy[npc:id()]
 	if (sympathy) then
-		game_relations.set_npc_sympathy(self.object, sympathy)
+		game_relations.set_npc_sympathy(npc, sympathy)
 	end
 
-	sound_theme.init_npc_sound(self.object)
+	sound_theme.init_npc_sound(npc)
 
 	-- HACK! Not sure why this is needed now. If this isn't here then there will be
 	-- Cannot build GAME path! error
-	self.object:set_dest_game_vertex_id(self.object:game_vertex_id()) 
+	npc:set_dest_game_vertex_id(npc:game_vertex_id()) 
 	
-	xr_reach_task.add_reach_task_action(self.object)
+	xr_reach_task.add_reach_task_action(npc)
 	
 	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife_object(se_obj.group_id)
 	if (squad and axr_companions.companion_squads[squad.id]) then
-		axr_companions.setup_companion_logic(self.object,self.st,self.loaded)
+		axr_companions.setup_companion_logic(npc,self.st,self.loaded)
 	else
-		self.object:disable_info_portion("npcx_is_companion")
-		self.object:disable_info_portion("npcx_beh_cannot_dismiss")
-		smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, se_obj, modules.stype_stalker, self.loaded)
+		npc:disable_info_portion("npcx_is_companion")
+		npc:disable_info_portion("npcx_beh_cannot_dismiss")
+		smart_terrain.setup_gulag_and_logic_on_spawn(npc, self.st, se_obj, modules.stype_stalker, self.loaded)
 	end
 	
 	local id = se_obj.id
@@ -162,17 +168,17 @@ function motivator_binder:net_spawn(sobject)
 	end
 
 	if (force_set_position) then
-		self.object:set_npc_position(force_set_position)
+		npc:set_npc_position(force_set_position)
 	end
 
-	if character_community(self.object) ~= "zombied" then
-		post_combat_idle.add_post_combat_idle(self.object)
+	if character_community(npc) ~= "zombied" then
+		post_combat_idle.add_post_combat_idle(npc)
 	end
 
-	self.object:group_throw_time_interval(2000)
+	npc:group_throw_time_interval(2000)
 
 	-- start [Alundaio]
-	SendScriptCallback("npc_on_net_spawn",self.object,se_obj)
+	SendScriptCallback("npc_on_net_spawn",npc,se_obj)
 	-- End [Alundaio]
 
 	--alun_utils.debug_write(se_obj:name()..":net_spawn() end")
