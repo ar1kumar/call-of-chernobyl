@@ -84,8 +84,6 @@ function options_dialog:__init() super()
 		self.gameplay_scroll_v:AddWindow(elements[checks[i]],true) 
 		elements[checks[i]]:SetAutoDelete(false)
 	end
-
-	self.message_box = CUIMessageBoxEx()
 end
 
 function options_dialog:__finalize()
@@ -407,12 +405,9 @@ function options_dialog:OnApplyChanges()
 
 	if not (self.b_restart_system_shown and self.message_box:IsShown()) then
 		local opt = COptionsManager()
-		if opt:NeedSystemRestart() then
-			self.b_restart_system_shown = true
-			self.message_box:InitMessageBox("message_box_restart_game")
-			self.message_box:ShowDialog(true)
-		elseif (self.b__require_restart == true) then 
+		if (opt:NeedSystemRestart() or self.b__require_restart == true) then
 			self.b__require_restart = false
+			self.b_restart_system_shown = true
 			self.message_box:InitMessageBox("message_box_restart_game")
 			self.message_box:ShowDialog(true)
 		end
