@@ -272,7 +272,8 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		return
 	end
 
-	if bone_index ~= 15 and amount >= obj.health*100 then
+	-- Only wound the stalker from powerful attacks if not a head hit and not already wounded
+	if (bone_index ~= 15 and amount > 15 and amount >= obj.health*100 and not IsWounded(obj)) then
 		obj.health = 0.15
 	end
 
