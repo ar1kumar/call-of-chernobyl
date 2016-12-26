@@ -87,7 +87,7 @@ function actor_on_first_update(binder,delta)
 		surge_manager.get_surge_manager():respawn_artefacts_and_replace_anomaly_zone()
 		m_data.artefact_respawn_levels[level.name()] = false
 	end 
-	invulnerable_time = time_global() + 7000
+	invulnerable_time = invulnerable_time or time_global() + 7000
 	SendScriptCallback("actor_on_first_update",binder,delta)
 end
 
