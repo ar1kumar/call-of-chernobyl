@@ -276,12 +276,12 @@ function monster_on_actor_use_callback(obj,who)
 		return
 	end
 
-	local looted = utils.load_var(obj,"looted",nil)
+	local looted = utils.se_obj_load_var(obj:id(),obj:name(),"looted")
 	if (looted) then
 		return
 	end
 
-	utils.save_var(obj,"looted",true)
+	utils.se_obj_save_var(obj:id(),obj:name(),"looted",true)
 	xr_corpse_detection.set_valuable_loot(obj:id(),false)
 
 	local st = db.storage[obj:id()]
