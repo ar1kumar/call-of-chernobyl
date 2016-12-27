@@ -272,13 +272,22 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		return
 	end
 
-	-- Only wound the stalker from powerful attacks if not a head hit and not already wounded
-	if (bone_index ~= 15 and amount > 15 and amount >= obj.health*100 and not IsWounded(obj)) then
-		obj.health = 0.15
-	end
-
-	if(who:id()==db.actor:id()) then
+	local skip_wound
+	if (who:id() == db.actor:id()) then
 		xr_statistic.set_best_weapon(amount)
+		
+		-- Surprise attacks with knife don't force wound
+		if (self.object:target_mental_state() == anim.danger) then 
+			local active_item = who:active_item()
+			if (active_item and active_item:clsid() == clsid.wpn_knife_s) then 
+				skip_wound = true
+			end
+		end
+	end
+	
+	-- Only wound the stalker from powerful attacks if not a head hit and not already wounded
+	if (skip_wound == nil and bone_index ~= 15 and amount > 15 and amount >= obj.health*100 and not IsWounded(obj)) then
+		obj.health = 0.15
 	end
 
 	if (self.st.active_section and self.st.active_scheme) then

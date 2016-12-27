@@ -17,6 +17,7 @@ keybinds = {
 					["pda_contacts"]				= "kCUSTOM8",
 					["pda_stats"]					= "kCUSTOM9",
 					["pda_logs"]					= "kCUSTOM10",
+					["hud_cycle"]                   = "kCUSTOM11",
 					
 					["debug_demo_record"]			= "DIK_NUMPAD0",
 					--["debug_select_object"] 		= "DIK_NUMPAD9",
@@ -128,6 +129,24 @@ function action.pda_logs(p)
 	end
 end
 
+function action.hud_cycle(p)
+	if (p==1) then
+		local val = not (get_console():get_bool("hud_draw"))
+		local toggl = val and 1 or 0
+		get_console():execute("hud_draw " .. toggl)
+		axr_main.config:w_value("mm_options","enable_hud_draw",val)
+		if slot_hud.HUD then slot_hud.HUD:update_hud() end
+		-- smurth's dynamic hud --
+		if weapon_heat and weapon_heat.feature_is_active and weapon_heat.UI_BAR ~= nil then
+			weapon_heat.UI_BAR = val
+		end
+		-- mags --
+		if mag_sys and mag_sys.feature_is_active then
+			mag_sys.update_icon_on_hud()
+		end
+	end
+end
+----------------------------------------------
 function action.debug_demo_record(p)
 	if not (DEV_DEBUG) then 
 		return 

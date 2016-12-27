@@ -1,7 +1,7 @@
 --//  Shows belted artifacts on primary hud
 
-local HUD,belted_arts
-
+HUD = nil
+local belted_arts
 function activate_hud()
 	belted_arts = {}
 	RegisterScriptCallback("actor_item_to_belt",actor_item_to_belt)
@@ -101,17 +101,20 @@ end
 
 function slot_hud:update_hud(item)
 	local cnt = 0
-	for id, sec in pairs(belted_arts) do
-		cnt = cnt + 1
-		local x1 = (self.ini:r_float_ex(sec,"inv_grid_x")or 0)*50
-		local y1 = (self.ini:r_float_ex(sec,"inv_grid_y")or 0)*50
-		local x2 = x1 + 50
-		local y2 = y1 + 50
-		self.slot[cnt]:SetTextureRect(Frect():set(x1,y1,x2,y2))
-		self.slot[cnt]:Show(true)
+	if (axr_main.config:r_value("mm_options","enable_hud_draw",1,false)) then
+		for id, sec in pairs(belted_arts) do
+			cnt = cnt + 1
+			local x1 = (self.ini:r_float_ex(sec,"inv_grid_x")or 0)*50
+			local y1 = (self.ini:r_float_ex(sec,"inv_grid_y")or 0)*50
+			local x2 = x1 + 50
+			local y2 = y1 + 50
+			self.slot[cnt]:SetTextureRect(Frect():set(x1,y1,x2,y2))
+			self.slot[cnt]:Show(true)
+		end
 	end
 	for i=cnt+1,5 do
 		self.slot[i]:Show(false)
 	end
+	
 	self.static_back:Show(table.size(belted_arts) > 0)
 end
