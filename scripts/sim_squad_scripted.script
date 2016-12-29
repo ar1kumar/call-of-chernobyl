@@ -941,6 +941,10 @@ function sim_squad_scripted:can_switch_offline()
 	end
 	--]]
 	
+	if not (cse_alife_online_offline_group.can_switch_offline(self)) then 
+		return false
+	end
+	
 	if (IsSurvivalMode()) then
 		return false
 	end
@@ -949,8 +953,13 @@ function sim_squad_scripted:can_switch_offline()
 	if (axr_companions.companion_squads[self.id]) then 
 		return false 
 	end
+	
+	-- was forced online for task reasons 
+	if (self.force_online) then 
+		return false 
+	end
 
-	return cse_alife_online_offline_group.can_switch_offline(self)
+	return true
 end
 
 function sim_squad_scripted:can_switch_online()
@@ -961,17 +970,11 @@ function sim_squad_scripted:can_switch_online()
 		return false 
 	end 
 	
-	-- squad already online
-	if (self.online) then 
+	if (self.online or self.force_online or IsSurvivalMode()) then 
 		return true
 	end
 	
-	if (IsSurvivalMode()) then
-		return true
-	end
-	
-	-- companions
-	if (axr_companions.companion_squads[self.id]) then 
+	if (axr_companions.companion_squads[self.id] or get_object_story_id(self.id)) then 
 		return true 
 	end
 	
@@ -980,56 +983,46 @@ function sim_squad_scripted:can_switch_online()
 		return true
 	end
 	
-	-- was forced online for task reasons 
-	if (self.force_online) then 
-		return true 
+	if (is_squad_monster[self.player_id]) then
+	
+		-- monster doesn't have a target smart so just leave it offline
+		if (self.assigned_target_id == nil) then
+			return false
+		end
+		
+		local hour = level.get_time_hours()
+		if (self.player_id == "monster_predatory_day") then 
+			-- Monster will not come online during the hours of (9PM till 5AM)
+			if (hour <= 5 or hour >= 22) then
+				return false 
+			end
+		elseif (self.player_id == "monster_zombied_day") then 
+			-- Monster will not come online during the hours of (7PM till 5AM)
+			if (hour <= 5 or hour >= 19) then
+				return false 
+			end
+		elseif (self.player_id == "monster_predatory_night") then 
+			-- Monster will not come online during the hours of (5AM till 7PM)
+			if (hour >= 5 and hour <= 19) then
+				return false 
+			end
+		elseif (self.player_id == "monster_zombied_night") then 
+			-- Monster will not come online during the hours of (5AM till 7PM)
+			if (hour >= 5 and hour <= 19) then
+				return false 
+			end
+		end
 	end
 	
-    --alun_utils.debug_write(strformat("sim_squad_scripted:switch_online %s",self:name()))
-			
-    if (not get_object_story_id(self.id)) then
-	
-		if (is_squad_monster[self.player_id]) then
-		
-			-- monster doesn't have a target smart so just leave it offline
-			if (self.assigned_target_id == nil) then
+	if (db.actor and db.spawned_vertex_by_id[self:commander_id()] == nil) then
+		local dist = axr_main.config:r_value("mm_options","excl_dist",2) or 0
+		if (dist > 0 and not db.actor:has_info("actor_is_sleeping")) then 
+			local actor = alife():actor()
+			if (self.position:distance_to(actor.position) <= dist) then
 				return false
 			end
-			
-			local hour = level.get_time_hours()
-			if (self.player_id == "monster_predatory_day") then 
-				-- Monster will not come online during the hours of (9PM till 5AM)
-				if (hour <= 5 or hour >= 22) then
-					return false 
-				end
-			elseif (self.player_id == "monster_zombied_day") then 
-				-- Monster will not come online during the hours of (7PM till 5AM)
-				if (hour <= 5 or hour >= 19) then
-					return false 
-				end
-			elseif (self.player_id == "monster_predatory_night") then 
-				-- Monster will not come online during the hours of (5AM till 7PM)
-				if (hour >= 5 and hour <= 19) then
-					return false 
-				end
-			elseif (self.player_id == "monster_zombied_night") then 
-				-- Monster will not come online during the hours of (5AM till 7PM)
-				if (hour >= 5 and hour <= 19) then
-					return false 
-				end
-			end
 		end
-		
-		if (db.actor and db.spawned_vertex_by_id[self:commander_id()] == nil) then
-			local dist = axr_main.config:r_value("mm_options","excl_dist",2) or 0
-			if (dist > 0 and not db.actor:has_info("actor_is_sleeping")) then 
-				local actor = alife():actor()
-				if (self.position:distance_to(actor.position) <= dist) then
-					return false
-				end
-			end
-		end
-    end
+	end
     return true
 end
 function sim_squad_scripted:switch_offline()

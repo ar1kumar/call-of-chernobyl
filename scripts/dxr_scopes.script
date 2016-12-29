@@ -219,14 +219,15 @@ function detach_addon(weapon)
 		return
 	end
 	
+	local wpn_sect = weapon:section()
 	-- An addon has not been attached or none can be detached.
-	local parent_section = system_ini():r_string_ex(weapon:section(),"parent_section")
-	if (not parent_section or weapon:section() == parent_section) then return end
+	local parent_section = system_ini():r_string_ex(wpn_sect,"parent_section")
+	if (not parent_section or wpn_sect == parent_section) then return end
 	
 	-- Determine which addon is attached to the weapon.
 	-- Create the item in the actor's inventory when found.
 	for k, v in pairs(addons_table) do
-		if (string.find(weapon:section(), k)) then
+		if (k == wpn_sect:match("([%w%-]+)$")) then
 			give_object_to_actor(k)
 			break
 		end
