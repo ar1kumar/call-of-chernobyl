@@ -131,7 +131,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 					if (string.find(value,"launcher")) then 
 						bLauncher = true
 					end
-					for a,b in string.gmatch(value,"([%w_%-.]+)=([%w_%-.]+)") do
+					for a,b in string.gmatch(value,"([%w_%-.]*)=([%w_%-.]*)") do
 						if (a == "cond") then 
 							cond = tonumber(b) or 1
 						elseif (a == "prob") then 

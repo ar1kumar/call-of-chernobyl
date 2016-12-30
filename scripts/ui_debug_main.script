@@ -1672,6 +1672,7 @@ function debug_ui_attach:__init(owner, binds) super()
 	self:Register(self.attachable, "attach_list")
 	self:AddCallback("attach_list", ui_events.LIST_ITEM_SELECT,	self.OnAttachListSelect,self)
 	
+	self.attachable:ClearList()
 	local sys_ini = system_ini()
 	local t = alun_utils.parse_list(sys_ini,"stalker","attachable_items")
 	if (#t > 0) then
@@ -1708,8 +1709,9 @@ function debug_ui_attach:__init(owner, binds) super()
 	self.anim_states = xml:InitComboBox("wnd_attach_editor:form:list_states", self.form)
 	self:Register(self.anim_states, "state_list")
 	self:AddCallback("state_list", ui_events.LIST_ITEM_SELECT,	self.OnStateListSelect,self)
+	self.anim_states:SetAutoDelete(true)
 	
-	t = empty_table(t) or {}
+	t = iempty_table(t)
 	
 	for state,_ in pairs(state_lib.states) do 
 		table.insert(t,state)
@@ -1717,8 +1719,9 @@ function debug_ui_attach:__init(owner, binds) super()
 	
 	table.sort(t)
 	
+	self.anim_states:ClearList()
 	for i=1,#t do 
-		self.anim_states:AddItem(t[i],#t-1)
+		self.anim_states:AddItem(t[i],i-1)
 	end
 end
 function debug_ui_attach:__finalize()
@@ -1765,12 +1768,19 @@ function debug_ui_attach:OnStateListSelect()
 		return 
 	end
 	
+	if not (state_lib.states[state]) then 
+		printf("debug_ui_attach state %s doesn't exist",state)
+		return 
+	end 
+	
 	local npc = xrs_debug_tools.get_debug_npc()
 	if not (npc and npc:id() ~= 0) then
-		return 
+		 printf("debug_ui_attach:OnStateListSelect: debug npc not found")
+		return
 	end
 	
 	db.storage[npc:id()].debug_state = state
+	
 	state_mgr.set_state(npc, state,nil, nil, nil, { fast_set = true })
 end 
 
@@ -1948,7 +1958,7 @@ end
 function debug_ui_attach:OnAttach()
 	local npc = xrs_debug_tools.get_debug_npc()
 	if not (npc and npc:id() ~= 0) then
-		return 
+		return printf("debug_ui_attach: no npc found")
 	end
 	
 	local section = self._last == "attach" and self.attachable:GetText() or self._last == "weapon" and self.weapons:GetText() or nil
