@@ -1021,7 +1021,7 @@ function se_smart_terrain:STATE_Read(packet, size)
 		for i = 1, n do
 			local id = packet:r_stringZ()
 			local num = packet:r_u8()
-			if (id and id ~= "nil" and id ~= "") then
+			if (self.already_spawned and id and id ~= "nil" and id ~= "") then
 				-- technically it's an error but it's makes save compatible if change respawn
 				if not (self.already_spawned[id]) then 
 					self.already_spawned[id] = {}
@@ -1566,7 +1566,7 @@ function se_smart_terrain:try_respawn()
 		if (self.respawn_only_level) then
 			return
 		end
-	end 
+	end
 	
 	--alun_utils.debug_write(strformat("%s:try_respawn",self:name()))
 	
@@ -1575,8 +1575,14 @@ function se_smart_terrain:try_respawn()
 			return
 		end
 	end
+	
+	if not (self.respawn_params and self.already_spawned) then 
+		return 
+	end
 
-	if self.sim_avail ~= nil and xr_logic.pick_section_from_condlist(db.actor, self, self.sim_avail) ~= "true" then return end
+	if self.sim_avail ~= nil and xr_logic.pick_section_from_condlist(db.actor, self, self.sim_avail) ~= "true" then 
+		return 
+	end
 
 	--[[
 	local squad_count = smart_terrain_squad_count(SIMBOARD.smarts[self.id].squads)
