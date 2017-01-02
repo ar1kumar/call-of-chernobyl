@@ -210,13 +210,16 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 					end
 					local rank = tonumber(string.match(value,"rank=([%w_%-.]+)"))
 					if (rank == nil or rank >= actor_rank) then
-						-- If a level parameter exists then only allow item for this level
-						if not (level_name) then 
-							level_name = sim:level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id())
-						end
-						local l_name = string.match(value,"level=([%w_%-.]+)")
-						if (l_name == nil or l_name == level_name) then 
-							table.insert(spawn_list,spawn_sec)
+						local prob = tonumber(string.match(value,"prob=([%w_%-.]+)")) or 1 
+						if (prob == 1 or math.random() <= prob) then
+							-- If a level parameter exists then only allow item for this level
+							if not (level_name) then 
+								level_name = sim:level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id())
+							end
+							local l_name = string.match(value,"level=([%w_%-.]+)")
+							if (l_name == nil or l_name == level_name) then 
+								table.insert(spawn_list,spawn_sec)
+							end
 						end
 					end
 				end 
@@ -224,7 +227,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 		end
 		if (#spawn_list > 0) then
 			spawn_sec = spawn_list[math.random(#spawn_list)]
-			local cond,prob,count,ammo_type = 1,1,1,0
+			local cond,count,ammo_type = 1,1,0
 			local bScope, bSilencer, bLauncher
 			if (value and value ~= "") then
 				-- parse params
