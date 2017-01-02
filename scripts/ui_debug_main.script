@@ -1890,8 +1890,6 @@ function debug_ui_attach:OnAttachSave(section)
 	if (reload_system_ini) then 
 		reload_system_ini()
 	end
-	
-	self:SetMsg(strformat("Successfully saved changes to %s",section),5)
 end
 function debug_ui_attach:On_fld_attach_x()
 	self:OnEditAttach("x")
@@ -2070,5 +2068,182 @@ function anim_ui:OnKeyboard(dik, keyboard_action)
 end
 
 function anim_ui:OnQuit()
+	self:HideDialog()
+end
+----------------------------------------------------------------------------
+-- 3D UI offset Editor 
+----------------------------------------------------------------------------
+class "debug_ui_3d" (CUIScriptWnd)
+function debug_ui_3d:__init(owner, binds) super()
+	self:SetWndRect				(Frect():set(0,0,1024,768))
+	self:Enable					(true)
+
+	local xml					= CScriptXmlInit()
+	self.xml = xml
+	xml:ParseFile				("ui_debug_main.xml")
+	
+	self:SetAutoDelete(true)
+	self.owner = owner
+	self.need_save = {}
+
+	local ctrl = CUIWindow()
+	self.xml:InitWindow("wnd_attach_editor:file_item:main",0,ctrl)
+	self.form = self.xml:InitStatic("wnd_attach_editor:form",self)
+	self.xml:InitFrame("wnd_attach_editor:form:list_frame",self.form)
+	
+	ctrl = self.xml:Init3tButton("wnd_attach_editor:form:btn_save",self.form)
+	self:Register(ctrl, "btn_ui_3d")
+	self:AddCallback("btn_ui_3d", ui_events.BUTTON_CLICKED, self.OnAttach, self)
+	
+	xml:InitStatic("wnd_attach_editor:form:cap_pos", self.form)
+	xml:InitStatic("wnd_attach_editor:form:cap_angle", self.form)
+	
+	self.flds = {"x","y","z","rot_x","rot_y","rot_z"}
+	for i=1,#self.flds do
+		xml:InitStatic("wnd_attach_editor:form:cap_"..self.flds[i], self.form)
+		self["fld_attach_"..self.flds[i]] = xml:InitEditBox("wnd_attach_editor:form:fld_"..self.flds[i], self.form)
+		self:Register(self["fld_attach_"..self.flds[i]],"fld_attach_"..self.flds[i])
+		
+		self:AddCallback("fld_attach_"..self.flds[i],	  ui_events.EDIT_TEXT_COMMIT, self["On_fld_attach_"..self.flds[i]],	self)
+	end 
+	
+	self:Reset()
+end
+function debug_ui_3d:__finalize()
+
+end
+function debug_ui_3d:Reset()
+	local itm = db.actor:active_item()
+	if not (itm) then 
+		return 
+	end
+	
+	local section = itm:section()
+	local pos = alun_utils.parse_list(system_ini(),section,"hud_ui_pos")
+	local angle = alun_utils.parse_list(system_ini(),section,"hud_ui_rot")
+	
+	if not (#pos > 0) then
+		return 
+	end
+	
+	for i=1,#pos do 
+		if (self["fld_attach_"..self.flds[i]]) then 
+			self["fld_attach_"..self.flds[i]]:SetText(pos[i])
+		end
+	end
+	
+	if not (#angle > 0) then
+		return
+	end
+	
+	for i=1,#angle do 
+		if (self["fld_attach_"..self.flds[i+3]]) then 
+			self["fld_attach_"..self.flds[i+3]]:SetText(angle[i])
+		end
+	end
+end 
+function debug_ui_3d:OnAttachSave(section)
+	local fld
+	local vals = {}
+	for i=1,#self.flds do
+		fld = self["fld_attach_"..self.flds[i]]
+		if not (fld) then 
+			return 
+		end
+		
+		if not (tonumber(fld:GetText())) then 
+			return 
+		end
+		
+		vals[self.flds[i]] = tonumber(fld:GetText())
+	end 
+
+	local function file_exists(path)
+		return io.open(path) ~= nil
+	end
+
+	local function on_execute(path,filename,quit)
+		local fullpath = path.."\\"..filename
+		local ltx = io.open(fullpath,"rb")
+		if (ltx) then
+			local data = ltx:read("*all")
+			ltx:close()
+			if (data) then
+				if (string.find(data,"["..section.."]",nil,true)) then
+					ltx = alun_utils.cfg_file(fullpath)
+					if (ltx) then
+						ltx:SetValue(section,"hud_ui_pos",vals.x .. ", " .. vals.y .. ", " .. vals.z)
+						ltx:SetValue(section,"hud_ui_rot",vals.rot_x .. ", " .. vals.rot_y .. ", " .. vals.rot_z)
+						ltx:SaveExt()
+						return
+					end
+				end
+			end
+		end
+	end
+
+	local sp = getFS():update_path('$game_config$', '')
+	sp = string.sub(sp,0,string.len(sp)-1)
+	lua_extensions.recurse_subdirectories_and_execute(sp,{"ltx"},on_execute)
+
+	if (reload_system_ini) then 
+		reload_system_ini()
+	end
+	
+	-- local itm = db.actor:active_item()
+	-- if (itm and IsWeapon(itm)) then 
+		-- itm:weapon_reset_3d_ui()
+	-- end
+end
+function debug_ui_3d:On_fld_attach_x()
+	self:OnEditAttach("x")
+end 
+function debug_ui_3d:On_fld_attach_y()
+	self:OnEditAttach("y")
+end 
+function debug_ui_3d:On_fld_attach_z()
+	self:OnEditAttach("z")
+end 
+function debug_ui_3d:On_fld_attach_rot_x()
+	self:OnEditAttach("rot_x")
+end 
+function debug_ui_3d:On_fld_attach_rot_y()
+	self:OnEditAttach("rot_y")
+end 
+function debug_ui_3d:On_fld_attach_rot_z()
+	self:OnEditAttach("rot_z")
+end 
+function debug_ui_3d:OnEditAttach(fld)
+	local itm = db.actor:active_item()
+	if not (itm and IsWeapon(itm)) then
+		return 
+	end 
+	
+	self.need_save[fld] = true
+
+	--self:OnAttachSave(itm:section())
+end 
+function debug_ui_3d:OnAttach()
+	local itm = db.actor:active_item()
+	if not (itm) then
+		return 
+	end 
+
+	local hud_section = system_ini():r_string_ex(itm:section(),"hud")
+	if (hud_section) then
+		self:OnAttachSave(hud_section)
+	end
+end
+function debug_ui_3d:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_RELEASED then
+		local keybinds = self.binds or {}
+		if (dik == DIK_keys.DIK_ESCAPE) then
+			self:OnQuit()
+		end
+	end
+	return true
+end
+function debug_ui_3d:OnQuit()
 	self:HideDialog()
 end

@@ -271,7 +271,7 @@ function options_dialog:OnBtnAccept()
 	SendScriptCallback("opt_menu_on_accept",self,opt,console)
 
 	if opt:NeedVidRestart() then
-		_G.b_discard_settings_shown = true
+		self.b_discard_settings_shown = true
 		self.message_box:InitMessageBox("message_box_yes_no")
 		self.message_box:SetText(string.format("%s %d% s", game.translate_string("ui_mm_confirm_changes"), 15, game.translate_string("mp_si_sec")))
 		self.message_box:ShowDialog(true)
@@ -368,7 +368,7 @@ function options_dialog:Update()
 
 	local mm = main_menu.get_main_menu()
 
-	if(_G.b_discard_settings_shown) then
+	if(self.b_discard_settings_shown) then
 		local tg = math.floor(time_global_async()/1000)
 		if(self.timer==nil) then
 			self.timer = tg
@@ -394,7 +394,7 @@ end
 
 function options_dialog:OnApplyChanges()
     self.timer = nil
-    _G.b_discard_settings_shown = false
+    self.b_discard_settings_shown = false
 
 	self.owner:ShowDialog(true)
 	if (self:IsShown()) then
@@ -416,7 +416,7 @@ end
 
 function options_dialog:OnDiscardChanges()
     self.timer = nil
-    _G.b_discard_settings_shown = false
+    self.b_discard_settings_shown = false
 
 	local c = get_console()
    	c:execute("cfg_load tmp")
@@ -428,7 +428,7 @@ function options_dialog:OnDiscardChanges()
 end
 
 function options_dialog:OnMenuReloaded()
-	if(_G.b_discard_settings_shown) then
+	if(self.b_discard_settings_shown) then
 	    self.message_box:InitMessageBox("message_box_yes_no")
 	    self.message_box:SetText(string.format("%s %d% s", game.translate_string("ui_mm_confirm_changes"), 15, game.translate_string("mp_si_sec")))
 	    self.message_box:ShowDialog(true)

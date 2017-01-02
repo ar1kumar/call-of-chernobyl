@@ -209,15 +209,18 @@ end
 function save_state(m_data)
 	if (USE_MARSHAL) then
 		m_data.sleep_deprived = m_data.sleep_deprived or {}
-		m_data.sleep_deprived["last_sleep"] = last_sleep
-		m_data.sleep_deprived["caff"] = caff_chk
+		m_data.sleep_deprived.last_sleep = last_sleep
+		m_data.sleep_deprived.caff = caff_chk
+		m_data.sleep_deprived.last_chk = last_chk
 	end
 end
 
 function load_state(m_data)
-	if (USE_MARSHAL) then
-		last_sleep = m_data.sleep_deprived and m_data.sleep_deprived.last_sleep or 0
-		caff_chk = m_data.sleep_deprived and m_data.sleep_deprived.caff or 0
+	if (USE_MARSHAL and m_data.sleep_deprived) then
+		last_sleep = m_data.sleep_deprived.last_sleep or 0
+		caff_chk = m_data.sleep_deprived.caff or 0
+		last_chk = m_data.sleep_deprived.last_chk or game.get_game_time()
+		m_data.sleep_deprived = nil
 	end
 end
 

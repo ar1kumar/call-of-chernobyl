@@ -1340,7 +1340,6 @@ function cfg_file:SaveExt()
 	for ln in io.lines(self.fname) do
 		ln = trim(ln)
 		if (startsWith(ln,"[")) then
-			sec = string.match(trim_comment(ln),"%[(.-)%]")
 			-- inject new fields that previously didn't exist
 			if (sec and self.root[sec] and self.insert[sec]) then
 				for i=1,#self.insert[sec] do
@@ -1351,6 +1350,7 @@ function cfg_file:SaveExt()
 				end
 			end
 			
+			sec = string.match(trim_comment(ln),"%[(.-)%]")
 			str = str .. ln .. "\n"
 		elseif (sec and self.root[sec]) then
 			key = trim(trim_comment(string.match(ln,"(.-)=") or ln))
