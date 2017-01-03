@@ -218,15 +218,19 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 							end
 							local l_name = string.match(value,"level=([%w_%-.]+)")
 							if (l_name == nil or l_name == level_name) then 
-								table.insert(spawn_list,spawn_sec)
+								table.insert(spawn_list,{spawn_sec,value})
 							end
 						end
 					end
+				else
+					table.insert(spawn_list,{spawn_sec,value})
 				end 
 			end
 		end
 		if (#spawn_list > 0) then
-			spawn_sec = spawn_list[math.random(#spawn_list)]
+			local selected = spawn_list[math.random(#spawn_list)]
+			spawn_sec = selected[1]
+			value = selected[2]
 			local cond,count,ammo_type = 1,1,0
 			local bScope, bSilencer, bLauncher
 			if (value and value ~= "") then
@@ -251,39 +255,39 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 						ammo_type = tonumber(b) or 0
 					end
 				end
-				-- Create the item and set params
-				local se_item = sim:create(spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
-				if (se_item) then 
-					local cls = se_item:clsid()
-					if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
-						se_item.condition = cond
+			end
+			-- Create the item and set params
+			local se_item = sim:create(spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+			if (se_item) then 
+				local cls = se_item:clsid()
+				if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
+					se_item.condition = cond
 
-						local flags = se_item:get_addon_flags()
-						if (bScope and se_item.scope_status == cse_alife_item_weapon.eAddonAttachable) then 
-							flags:set(cse_alife_item_weapon.eWeaponAddonScope,true)
-						end
+					local flags = se_item:get_addon_flags()
+					if (bScope and se_item.scope_status == cse_alife_item_weapon.eAddonAttachable) then 
+						flags:set(cse_alife_item_weapon.eWeaponAddonScope,true)
+					end
 
-						if (bLauncher and se_item.grenade_launcher_status == cse_alife_item_weapon.eAddonAttachable) then
-							flags:set(cse_alife_item_weapon.eWeaponAddonGrenadeLauncher,true)
-						end
+					if (bLauncher and se_item.grenade_launcher_status == cse_alife_item_weapon.eAddonAttachable) then
+						flags:set(cse_alife_item_weapon.eWeaponAddonGrenadeLauncher,true)
+					end
 
-						if (bSilencer and se_item.silencer_status == cse_alife_item_weapon.eAddonAttachable) then
-							flags:set(cse_alife_item_weapon.eWeaponAddonSilencer,true)
-						end
-						
-						-- Create the ammo 
-						local ammos = alun_utils.parse_list(ini,spawn_sec,"ammo_class")
-						if not (ammo_type < #ammos) then
-							ammo_type = 0
-						end
-						
-						se_item.ammo_type = ammo_type
+					if (bSilencer and se_item.silencer_status == cse_alife_item_weapon.eAddonAttachable) then
+						flags:set(cse_alife_item_weapon.eWeaponAddonSilencer,true)
+					end
+					
+					-- Create the ammo 
+					local ammos = alun_utils.parse_list(ini,spawn_sec,"ammo_class")
+					if not (ammo_type < #ammos) then
+						ammo_type = 0
+					end
+					
+					se_item.ammo_type = ammo_type
 
-						local ammo_section = ammos[ammo_type+1]
-						if (ammo_section and sys_ini:section_exist(ammo_section)) then 
-							for k=1, count do 
-								sim:create(ammo_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
-							end
+					local ammo_section = ammos[ammo_type+1]
+					if (ammo_section and sys_ini:section_exist(ammo_section)) then 
+						for k=1, count do 
+							sim:create(ammo_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
 						end
 					end
 				end
