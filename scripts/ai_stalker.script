@@ -286,8 +286,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 
 					local ammo_section = ammos[ammo_type+1]
 					if (ammo_section and sys_ini:section_exist(ammo_section)) then 
-						--for k=1, count do
-						for k=1, 2 do
+						for k=1, count do
 							sim:create(ammo_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
 						end
 					end

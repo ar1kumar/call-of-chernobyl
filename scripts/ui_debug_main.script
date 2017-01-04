@@ -2119,8 +2119,13 @@ function debug_ui_3d:Reset()
 	end
 	
 	local section = itm:section()
-	local pos = alun_utils.parse_list(system_ini(),section,"hud_ui_pos")
-	local angle = alun_utils.parse_list(system_ini(),section,"hud_ui_rot")
+	local hud_section = system_ini():r_string_ex(section,"hud")
+	if not (hud_section) then 
+		return 
+	end 
+	
+	local pos = alun_utils.parse_list(system_ini(),hud_section,"hud_ui_pos")
+	local angle = alun_utils.parse_list(system_ini(),hud_section,"hud_ui_rot")
 	
 	if not (#pos > 0) then
 		return 
@@ -2190,10 +2195,10 @@ function debug_ui_3d:OnAttachSave(section)
 		reload_system_ini()
 	end
 	
-	-- local itm = db.actor:active_item()
-	-- if (itm and IsWeapon(itm)) then 
-		-- itm:weapon_reset_3d_ui()
-	-- end
+	local itm = db.actor:active_item()
+	if (itm) then
+		itm:reset_3d_ui()
+	end
 end
 function debug_ui_3d:On_fld_attach_x()
 	self:OnEditAttach("x")
