@@ -142,6 +142,12 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 							if not (ammos and ammo_type < #ammos) then
 								ammo_type = 0
 							end
+						elseif (a == "scope") then
+							bScope = math.random() <= (tonumber(b) or 0)
+						elseif (a == "silencer") then
+							bSilencer = math.random() <= (tonumber(b) or 0)
+						elseif (a == "launcher") then
+							bLauncher = math.random() <= (tonumber(b) or 0)
 						end
 					end
 				end
@@ -253,6 +259,12 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 						cond = tonumber(b) or 1
 					elseif (a == "ammo_type") then 
 						ammo_type = tonumber(b) or 0
+					elseif (a == "scope") then
+						bScope = math.random() <= (tonumber(b) or 0)
+					elseif (a == "silencer") then
+						bSilencer = math.random() <= (tonumber(b) or 0)
+					elseif (a == "launcher") then
+						bLauncher = math.random() <= (tonumber(b) or 0)
 					end
 				end
 			end
