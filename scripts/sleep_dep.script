@@ -147,10 +147,8 @@ function activate_feature()
 	}	
 	
 	RegisterScriptCallback("actor_on_item_use",actor_on_item_use)
-	if (USE_MARSHAL) then
-		RegisterScriptCallback("save_state",save_state)
-		RegisterScriptCallback("load_state",load_state)
-	end
+	RegisterScriptCallback("save_state",save_state)
+
 	AddUniqueCall(main_loop)
 end 
 
@@ -186,6 +184,7 @@ function on_game_start()
 		end
 	end
 	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
+	RegisterScriptCallback("load_state",load_state)
 end
 
 ----// add to bind_stalker or bind_stalker_ext save/load if used. //--
