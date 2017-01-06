@@ -159,7 +159,13 @@ function pda_contacts_tab:Reset()
 		if (id) then 
 			local npc = db.storage[id] and db.storage[id].object 
 			if (npc and db.actor:position():distance_to_sqr(npc:position()) <= radius) then 
-				table.insert(display_list, npc)
+				if self.show_all:GetCheck() then
+					if (m_data.actor_contacts and m_data.actor_contacts[id]) then
+						table.insert(display_list, npc)
+					end
+				else
+					table.insert(display_list, npc)
+				end
 			end
 		end
 	end
