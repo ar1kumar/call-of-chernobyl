@@ -628,7 +628,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 			-- Make sure current job is still available
 			if (job_avail_to_npc(npc_info,npc_info.job,self)) then
 
-				if not (npc_info.current_index) then
+				if (npc_info.current_index == nil or now) then
 					npc_info.current_index = 1
 				end
 
@@ -687,7 +687,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 	end
 
 	if not (npc_info.job) then
-		if not (npc_info.current_index) then
+		if (npc_info.current_index == nil or now) then
 			npc_info.current_index = 1
 		end
 
@@ -695,7 +695,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 		local step = 1
 		local st = db.storage[npc_info.se_obj.id]
 		local STEP_SIZE_NO_JOB = #jobs
-		while (new_job == nil and step <= (st and STEP_SIZE_NO_JOB or STEP_SIZE_OFFLINE)) do
+		while (new_job == nil and step <= (now and STEP_SIZE_NO_JOB or st and STEP_SIZE_NO_JOB or STEP_SIZE_OFFLINE)) do
 			step = step + 1
 
 			if (npc_info.current_index > STEP_SIZE_NO_JOB) then
@@ -713,8 +713,8 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 				self.npc_by_job_section[itr_job.section] = nil
 			end
 			
-			-- Check empty job
-			if (npc_id == nil and job_avail_to_npc(npc_info, itr_job, self)) then
+			-- Check empty job or re-take current job
+			if (npc_id == nil or npc_id == npc_info.se_obj.id) and (job_avail_to_npc(npc_info, itr_job, self)) then
 				new_job = itr_job
 				npc_info.current_index = 1
 			end
@@ -1376,7 +1376,7 @@ function setup_gulag_and_logic_on_spawn(obj, st, se_obj, stype, loaded)
 		local npc_info = smart.npc_info[se_obj.id]
 		if (npc_info) then 
 			if not (npc_info.job) then
-				smart:select_npc_job(smart.npc_info[se_obj.id],true)
+				smart:select_npc_job(npc_info,true)
 				local smart_task = smart.npc_info[se_obj.id].job and smart.npc_info[se_obj.id].job.alife_task
 				if (smart_task) then 
 					db.spawned_vertex_by_id[se_obj.id] = smart_task:level_vertex_id()
