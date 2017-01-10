@@ -213,9 +213,12 @@ function dream_callback2()
 	xr_effects.enable_ui(db.actor, nil)
 	if (_G.mus_vol > 0) then
 		get_console():execute("snd_volume_music "..tostring(_G.mus_vol))
+		_G.mus_vol = 0 
+	end
+	
+	if (_G.amb_vol > 0) then
 		get_console():execute("snd_volume_eff "..tostring(_G.amb_vol))
 		_G.amb_vol = 0
-		_G.mus_vol = 0
 	end
 	disable_info("tutorial_sleep")
 	disable_info("actor_is_sleeping")
