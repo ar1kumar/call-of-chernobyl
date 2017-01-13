@@ -1,44 +1,12 @@
-[inventory_box]
-GroupControlSection                      = spawn_group
-discovery_dependency                     =
-$spawn                                   = "devices\inventory box"
-class                                    = S_INVBOX
-cform                                    = skeleton
-visual                                   = dynamics\equipment_cache\equipment_box_01_case.ogf
-script_binding                           = bind_physic_object.init
+;===================================== Detector HUDs
+[detector_base_hud]:hud_base
+attach_place_idx                         = 1
 
-[hidden_box]:inventory_box
-
-[device_flare]:identity_immunities
-class                                    = D_FLARE
-visual                                   = dynamics\devices\dev_flare\dev_flare
-description                              = enc_weapons1_wpn_flare
-
-inv_weight                               = 0.2
-inv_name                                 = device_flare
-inv_name_short                           = device_flare_short
-
-inv_grid_width                           = 2
-inv_grid_height                          = 1
-inv_grid_x                               = 12
-inv_grid_y                               = 7
-
-slot                                     = 11
-cost                                     = 50
-default_to_ruck                          = true
-sprint_allowed                           = true
-control_inertion_factor                  = 1.0
-work_time_sec                            = 10000
-hud                                      = device_flare_hud
-animation_slot                           = 7
-
-working_particles                        = weapons\dev_flare_flame
-
-[device_flare_hud]:hud_base
-hands_position                           = 0.361999,-0.164000,0.106000
-hands_orientation                        = 21.000044,-1.700000,0.000000
-hands_position_16x9                      = 0,0,0
-hands_orientation_16x9                   = 0,0,0
+;--from beretta
+hands_position                           = -0.021000,-0.160000,0.002500
+hands_orientation                        = -0.500000,1.000000,1.149999
+hands_position_16x9                      = 0.033000,-0.189500,0.039000
+hands_orientation_16x9                   = 2.349998,2.749999,2.849998
 
 aim_hud_offset_pos                       = 0,0,0
 aim_hud_offset_rot                       = 0,0,0
@@ -49,22 +17,81 @@ gl_hud_offset_rot                        = 0,0,0
 lean_hud_offset_pos                      = 0,0,0
 lean_hud_offset_rot                      = 0,0,0
 
-item_position                            = -0.031455,0.017528,0.136259
-item_orientation                         = 62.783558,75.663406,-79.665085
+[detector_simple_hud]:detector_base_hud
+item_position                            = -0.072424,0.030392,-0.012213
+item_orientation                         = 324.640503,-189.627350,-183.009415
 
-item_visual                              = dynamics\devices\dev_flare\dev_flare
-attach_place_idx                         = 1
+item_visual                              = dynamics\devices\dev_detector_1\dev_detector_1_hud
 
-fire_point                               = 0.279000,-0.143000,-0.009000
-fire_bone                                = flare_point
+fire_point                               = 0,0,-0.05
+fire_bone                                = light_bone_2
+fire_point2                              = 0,0,0
+fire_bone2                               = light_bone_1
 
+anm_show                                 = dev_detector_1_draw
+anm_show_fast                            = dev_detector_1_draw	                                       ;_quick
+anm_hide                                 = dev_detector_1_holster
+anm_hide_fast                            = dev_detector_1_holster_quick
+anm_idle                                 = dev_detector_1_idle
+anm_idle_moving                          = dev_detector_1_idle_moving
+anm_idle_sprint                          = dev_detector_1_idle_moving
 
-anm_show                                 = flare_draw
-anm_hide                                 = flare_holster
-anm_idle                                 = flare_idle
-anm_drop                                 = flare_holster
+anm_show_16x9                            = dev_detector_1_draw_ws, dev_detector_1_draw
+anm_show_fast_16x9                       = dev_detector_1_draw_ws	                                       ;_quick
+anm_hide_16x9                            = dev_detector_1_holster_ws, dev_detector_1_holster
+anm_hide_fast_16x9                       = dev_detector_1_holster_ws_quick
+anm_idle_16x9                            = dev_detector_1_idle_ws, dev_detector_1_idle
+anm_idle_moving_16x9                     = dev_detector_1_idle_moving_ws, dev_detector_1_idle_moving
+anm_idle_sprint_16x9                     = dev_detector_1_idle_moving_ws, dev_detector_1_idle_moving
 
+flash_light_range                        = 0.1
+onoff_light_range                        = 0.1
 
+[detector_advanced_hud]:detector_base_hud
+
+item_position                            = -0.078949,0.039172,-0.019197
+item_orientation                         = 320.606964,-194.089020,-186.572464
+
+item_visual                              = dynamics\devices\dev_detector_2\dev_detector_2_hud
+
+anm_show                                 = dev_detector_2_draw
+anm_show_fast                            = dev_detector_2_draw	                                       ;_quick
+anm_hide                                 = dev_detector_2_holster
+anm_hide_fast                            = dev_detector_2_holster_quick
+anm_idle                                 = dev_detector_2_idle
+anm_idle_moving                          = dev_detector_2_idle_moving
+anm_idle_sprint                          = dev_detector_2_idle_moving
+
+anm_show_16x9                            = dev_detector_2_draw_ws, dev_detector_2_draw
+anm_show_fast_16x9                       = dev_detector_2_draw_ws	                                       ;_quick
+anm_hide_16x9                            = dev_detector_2_holster_ws, dev_detector_2_holster
+anm_hide_fast_16x9                       = dev_detector_2_holster_ws_quick
+anm_idle_16x9                            = dev_detector_2_idle_ws, dev_detector_2_idle
+anm_idle_moving_16x9                     = dev_detector_2_idle_moving_ws, dev_detector_2_idle_moving
+anm_idle_sprint_16x9                     = dev_detector_2_idle_moving_ws, dev_detector_2_idle_moving
+
+[detector_scientific_hud]:detector_base_hud
+item_position                            = -0.071685,0.036188,-0.009934
+item_orientation                         = 314.589233,-186.420761,-189.323669
+
+item_visual                              = dynamics\devices\dev_detector_4\dev_detector_4_hud
+
+anm_show                                 = dev_detector_3_draw
+anm_show_fast                            = dev_detector_3_draw	                                       ;_quick
+anm_hide                                 = dev_detector_3_holster
+anm_hide_fast                            = dev_detector_3_holster_quick
+anm_idle                                 = dev_detector_3_idle
+anm_idle_moving                          = dev_detector_3_idle_moving
+anm_idle_sprint                          = dev_detector_3_idle_moving
+
+anm_show_16x9                            = dev_detector_3_draw_ws, dev_detector_3_draw
+anm_show_fast_16x9                       = dev_detector_3_draw_ws	                                       ;_quick
+anm_hide_16x9                            = dev_detector_3_holster_ws, dev_detector_3_holster
+anm_hide_fast_16x9                       = dev_detector_3_holster_ws_quick
+anm_idle_16x9                            = dev_detector_3_idle_ws, dev_detector_3_idle
+anm_idle_moving_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
+anm_idle_sprint_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
+;============================================= Detectors
 [detector_simple]:identity_immunities
 GroupControlSection                      = spawn_group
 $spawn                                   = "devices\detector_simple"
@@ -157,58 +184,6 @@ auto_attach                              = false
 snd_draw                                 = weapons\ak74_draw
 snd_holster                              = weapons\generic_holster
 
-[detector_base_hud]:hud_base
-attach_place_idx                         = 1
-
-;--from beretta
-hands_position                           = -0.021000,-0.160000,0.002500
-hands_orientation                        = -0.500000,1.000000,1.149999
-hands_position_16x9                      = 0.033000,-0.189500,0.039000
-hands_orientation_16x9                   = 2.349998,2.749999,2.849998
-
-aim_hud_offset_pos                       = 0,0,0
-aim_hud_offset_rot                       = 0,0,0
-
-gl_hud_offset_pos                        = 0,0,0
-gl_hud_offset_rot                        = 0,0,0
-
-lean_hud_offset_pos                      = 0,0,0
-lean_hud_offset_rot                      = 0,0,0
-
-
-
-[detector_simple_hud]:detector_base_hud
-
-
-item_position                            = -0.072424,0.030392,-0.012213
-item_orientation                         = 324.640503,-189.627350,-183.009415
-
-item_visual                              = dynamics\devices\dev_detector_1\dev_detector_1_hud
-
-fire_point                               = 0,0,-0.05
-fire_bone                                = light_bone_2
-fire_point2                              = 0,0,0
-fire_bone2                               = light_bone_1
-
-anm_show                                 = dev_detector_1_draw
-anm_show_fast                            = dev_detector_1_draw	                                       ;_quick
-anm_hide                                 = dev_detector_1_holster
-anm_hide_fast                            = dev_detector_1_holster_quick
-anm_idle                                 = dev_detector_1_idle
-anm_idle_moving                          = dev_detector_1_idle_moving
-anm_idle_sprint                          = dev_detector_1_idle_moving
-
-anm_show_16x9                            = dev_detector_1_draw_ws, dev_detector_1_draw
-anm_show_fast_16x9                       = dev_detector_1_draw_ws	                                       ;_quick
-anm_hide_16x9                            = dev_detector_1_holster_ws, dev_detector_1_holster
-anm_hide_fast_16x9                       = dev_detector_1_holster_ws_quick
-anm_idle_16x9                            = dev_detector_1_idle_ws, dev_detector_1_idle
-anm_idle_moving_16x9                     = dev_detector_1_idle_moving_ws, dev_detector_1_idle_moving
-anm_idle_sprint_16x9                     = dev_detector_1_idle_moving_ws, dev_detector_1_idle_moving
-
-flash_light_range                        = 0.1
-onoff_light_range                        = 0.1
-
 [detector_advanced]:detector_simple
 $spawn                                   = "devices\detector_advanced"
 class                                    = DET_ADVA
@@ -271,29 +246,6 @@ af_class_24                              = af_rusty_kristall
 af_sound_24_                             = detectors\art_beep1
 af_freq_24                               = 0.05, 2
 
-[detector_advanced_hud]:detector_base_hud
-
-item_position                            = -0.078949,0.039172,-0.019197
-item_orientation                         = 320.606964,-194.089020,-186.572464
-
-item_visual                              = dynamics\devices\dev_detector_2\dev_detector_2_hud
-
-anm_show                                 = dev_detector_2_draw
-anm_show_fast                            = dev_detector_2_draw	                                       ;_quick
-anm_hide                                 = dev_detector_2_holster
-anm_hide_fast                            = dev_detector_2_holster_quick
-anm_idle                                 = dev_detector_2_idle
-anm_idle_moving                          = dev_detector_2_idle_moving
-anm_idle_sprint                          = dev_detector_2_idle_moving
-
-anm_show_16x9                            = dev_detector_2_draw_ws, dev_detector_2_draw
-anm_show_fast_16x9                       = dev_detector_2_draw_ws	                                       ;_quick
-anm_hide_16x9                            = dev_detector_2_holster_ws, dev_detector_2_holster
-anm_hide_fast_16x9                       = dev_detector_2_holster_ws_quick
-anm_idle_16x9                            = dev_detector_2_idle_ws, dev_detector_2_idle
-anm_idle_moving_16x9                     = dev_detector_2_idle_moving_ws, dev_detector_2_idle_moving
-anm_idle_sprint_16x9                     = dev_detector_2_idle_moving_ws, dev_detector_2_idle_moving
-
 [detector_elite]:detector_advanced
 $spawn                                   = "devices\detector_elite"
 class                                    = DET_ELIT
@@ -355,30 +307,6 @@ af_freq_33                               = 0.05, 2
 af_class_34                              = af_rusty_sea
 af_sound_34_                             = detectors\art_beep1
 af_freq_34                               = 0.05, 2
-
-
-
-[detector_elite_hud]:detector_base_hud
-item_position                            = -0.071685,0.036188,-0.009934
-item_orientation                         = 314.589233,-186.420761,-189.323669
-
-item_visual                              = dynamics\devices\dev_detector_3\dev_detector_3_hud
-
-anm_show                                 = dev_detector_3_draw
-anm_show_fast                            = dev_detector_3_draw	                                       ;_quick
-anm_hide                                 = dev_detector_3_holster
-anm_hide_fast                            = dev_detector_3_holster_quick
-anm_idle                                 = dev_detector_3_idle
-anm_idle_moving                          = dev_detector_3_idle_moving
-anm_idle_sprint                          = dev_detector_3_idle_moving
-
-anm_show_16x9                            = dev_detector_3_draw_ws, dev_detector_3_draw
-anm_show_fast_16x9                       = dev_detector_3_draw_ws	                                       ;_quick
-anm_hide_16x9                            = dev_detector_3_holster_ws, dev_detector_3_holster
-anm_hide_fast_16x9                       = dev_detector_3_holster_ws_quick
-anm_idle_16x9                            = dev_detector_3_idle_ws, dev_detector_3_idle
-anm_idle_moving_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
-anm_idle_sprint_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
 
 [detector_scientific]:detector_elite
 $spawn                                   = "devices\detector_scientific"
@@ -508,32 +436,3 @@ zone_freq_36                             = 0.05, 2
 zone_freq_37                             = 0.05, 2
 zone_freq_38                             = 0.05, 2
 zone_freq_39                             = 0.05, 2
-
-[detector_scientific_hud]:detector_base_hud
-item_position                            = -0.071685,0.036188,-0.009934
-item_orientation                         = 314.589233,-186.420761,-189.323669
-
-item_visual                              = dynamics\devices\dev_detector_4\dev_detector_4_hud
-
-anm_show                                 = dev_detector_3_draw
-anm_show_fast                            = dev_detector_3_draw	                                       ;_quick
-anm_hide                                 = dev_detector_3_holster
-anm_hide_fast                            = dev_detector_3_holster_quick
-anm_idle                                 = dev_detector_3_idle
-anm_idle_moving                          = dev_detector_3_idle_moving
-anm_idle_sprint                          = dev_detector_3_idle_moving
-
-anm_show_16x9                            = dev_detector_3_draw_ws, dev_detector_3_draw
-anm_show_fast_16x9                       = dev_detector_3_draw_ws	                                       ;_quick
-anm_hide_16x9                            = dev_detector_3_holster_ws, dev_detector_3_holster
-anm_hide_fast_16x9                       = dev_detector_3_holster_ws_quick
-anm_idle_16x9                            = dev_detector_3_idle_ws, dev_detector_3_idle
-anm_idle_moving_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
-anm_idle_sprint_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
-
-[inv_backpack]:inventory_box
-visual                                   = dynamics\devices\dev_rukzak\dev_rukzak.ogf
-custom_data                              = scripts\treasure_inventory_box.ltx
-radius                                   = 1
-
-[inv_actor_backpack]:inv_backpack

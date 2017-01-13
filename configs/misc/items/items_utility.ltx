@@ -1,0 +1,108 @@
+[itm_backpack]:booster
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\antirad"
+$prefetch                                = 32
+class                                    = II_ANTIR
+cform                                    = skeleton
+visual                                   = dynamics\devices\dev_rukzak\dev_rukzak.ogf
+description                              = st_itm_backpack_desc
+inv_weight                               = 1
+inv_name                                 = st_itm_backpack_name
+inv_name_short                           = st_itm_backpack_name
+inv_grid_width                           = 2
+inv_grid_height                          = 2
+inv_grid_x                               = 16
+inv_grid_y                               = 10
+cost                                     = 700
+eat_health                               = 0
+eat_satiety                              = 0
+eat_power                                = 0
+eat_radiation                            = 0
+eat_alcohol                              = 0
+wounds_heal_perc                         = 0
+animation_slot                           = 4
+hud                                      = wpn_vodka_hud
+slot                                     = -1
+;use_sound								 = interface\inv_open
+
+[test_container]:itm_backpack
+use1_functor                             = bind_container.access_inventory
+use1_text                                = st_open
+script_binding                           = bind_container.bind
+remove_after_use                         = false
+dont_stack                               = true
+
+[artefact_container]:test_container
+visual                                   = dynamics\box\konteyner_03b.ogf
+empty_weight                             = 5.0
+inv_weight                               = 5.0
+inv_name                                 = st_itm_artefact_container_name
+inv_name_short                           = st_itm_artefact_container_name
+inv_grid_width                           = 2
+inv_grid_height                          = 2
+inv_grid_x                               = 4
+inv_grid_y                               = 39
+cost                                     = 5000
+
+[itm_sleepbag]:booster
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\antirad"
+$prefetch                                = 32
+class                                    = II_ANTIR
+cform                                    = skeleton
+visual                                   = dynamics\equipments\item_sleepbag.ogf
+inv_weight                               = 1
+description                              = st_itm_sleepbag_desc
+inv_name                                 = st_itm_sleepbag_name
+inv_name_short                           = st_itm_sleepbag_name
+inv_grid_width                           = 2
+inv_grid_height                          = 2
+inv_grid_x                               = 18
+inv_grid_y                               = 10
+cost                                     = 1580
+eat_health                               = 0
+eat_satiety                              = 0
+eat_power                                = 0
+eat_radiation                            = 0
+eat_alcohol                              = 0
+wounds_heal_perc                         = 0
+animation_slot                           = 4
+hud                                      = wpn_vodka_hud
+placeable_section                        = ph_sleepbag ;Section of placeable physics object
+
+[itm_actor_backpack]:itm_backpack
+inv_name                                 = st_itm_actor_backpack_name
+inv_name_short                           = st_itm_actor_backpack_name
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 19
+inv_grid_y                               = 2
+
+[itm_deployable_mgun]:booster
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\antirad"
+$prefetch                                = 32
+class                                    = II_ANTIR
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_mounted\wpn_mounted_pkm_trenoga.ogf
+description                              = st_itm_deployable_mgun_desc
+inv_weight                               = 11.5
+inv_name                                 = st_itm_deployable_mgun_name
+inv_name_short                           = st_itm_deployable_mgun_name
+inv_grid_height                          = 2
+inv_grid_width                           = 6
+inv_grid_x                               = 6
+inv_grid_y                               = 31
+cost                                     = 23700
+eat_health                               = 0
+eat_satiety                              = 0
+eat_power                                = 0
+eat_radiation                            = 0
+eat_alcohol                              = 0
+wounds_heal_perc                         = 0
+animation_slot                           = 4
+hud                                      = wpn_vodka_hud
+slot                                     = -1
