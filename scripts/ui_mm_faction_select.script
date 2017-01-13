@@ -116,12 +116,6 @@ local function on_game_load(binder)
 		end
 		config:w_value("character_creation","new_game_story_mode") -- clear value
 		
-		-- Unlock the encyclopedia at the beginning of the game if toggled.
-		if (config:r_value("character_creation", "new_game_unlocked_guide", 1) == true) then
-			give_info("guide_cheated")
-		end
-		config:w_value("character_creation","new_game_unlocked_guide") -- clear value
-		
 		db.actor:set_character_community("actor_"..faction, 0, 0)
 		
 		-- set default goodwill for all factions vs. actor's new faction
