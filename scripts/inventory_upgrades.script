@@ -6,7 +6,7 @@
 
 
 cur_hint = nil
-local char_ini = ini_file("item_upgrades.ltx")
+
 local param_ini = ini_file("misc\\stalkers_upgrade_info.ltx")
 local cur_price_percent = 1
 
@@ -230,7 +230,7 @@ function precondition_functor_a( param1, section )
 		return ret 
 	end
 
-	local price = math.floor(char_ini:r_u32(section, "cost")*cur_price_percent)
+	local price = math.floor(system_ini():r_u32(section, "cost")*cur_price_percent)
 	local cash = db.actor:money()
 	if(cash<price) then
 		ret = 2
@@ -241,7 +241,7 @@ end
 
 function effect_functor_a( param2, section, loading ) --( string, string, int )
 	if loading == 0 then
-		local money = char_ini:r_u32(section, "cost")
+		local money = system_ini():r_u32(section, "cost")
 		db.actor:give_money(math.floor(money*-1*cur_price_percent))
 		effect_funct = true
 	end
@@ -249,7 +249,7 @@ end
 
 function get_upgrade_cost(section)
 	if db.actor then
-		local price = math.floor(char_ini:r_u32(section, "cost")*cur_price_percent)
+		local price = math.floor(system_ini():r_u32(section, "cost")*cur_price_percent)
 		return game.translate_string("st_upgr_cost")..": "..price
 	end
 	return " "
@@ -292,7 +292,7 @@ function prereq_functor_a( param3, section )
 		end
 	end
 	if(db.actor) then
-		local price = math.floor(char_ini:r_u32(section, "cost")*cur_price_percent)
+		local price = math.floor(system_ini():r_u32(section, "cost")*cur_price_percent)
 		local cash = db.actor:money()
 		if(cash<price) then
 			return str.."\\n - "..game.translate_string("st_upgr_enough_money")--.." "..price-cash.." RU"
@@ -307,7 +307,7 @@ function property_functor_a(param1, name)
 		return ""
 	end
 	
-	local prop_name = char_ini:r_string_ex(name, "name")
+	local prop_name = system_ini():r_string_ex(name, "name")
 	if(name == "prop_no_buck" or name == "prop_autofire") then
         return game.translate_string(prop_name)
 	end
@@ -332,8 +332,8 @@ function property_functor_a(param1, name)
 	
 	for i=1,#section_table do
 		if (name == "prop_night_vision") then
-			if (char_ini:line_exist(section_table[i],"nightvision_sect")) then
-				val = char_ini:r_float_ex(section_table[i], "value")
+			if (system_ini():line_exist(section_table[i],"nightvision_sect")) then
+				val = system_ini():r_float_ex(section_table[i], "value")
 				if (val) then
 					if (val > sum) then 
 						sum = val 
@@ -341,105 +341,105 @@ function property_functor_a(param1, name)
 				end
 			end
 		elseif (name == "prop_restore_bleeding") then
-			sum = sum + (char_ini:r_float_ex(section_table[i],"bleeding_restore_speed",0)/0.1*100)
+			sum = sum + (system_ini():r_float_ex(section_table[i],"bleeding_restore_speed",0)/0.1*100)
 		elseif (name == "prop_restore_health") then
-			sum = sum + (char_ini:r_float_ex(section_table[i],"health_restore_speed",0)/0.02*100)
+			sum = sum + (system_ini():r_float_ex(section_table[i],"health_restore_speed",0)/0.02*100)
 		elseif (name == "prop_power") then
-			sum = sum + (char_ini:r_float_ex(section_table[i],"power_restore_speed",0)/sysini:r_float_ex("actor_condition","max_power_restore_speed",0.01)*100)
+			sum = sum + (system_ini():r_float_ex(section_table[i],"power_restore_speed",0)/sysini:r_float_ex("actor_condition","max_power_restore_speed",0.01)*100)
 		elseif (name == "prop_artefact") then
-			sum = sum + char_ini:r_float_ex(section_table[i],"artefact_count",0)
+			sum = sum + system_ini():r_float_ex(section_table[i],"artefact_count",0)
 		elseif (name == "prop_weightoutfit" or name == "prop_weight") then
-			sum = sum + char_ini:r_float_ex(section_table[i],"inv_weight",0)
+			sum = sum + system_ini():r_float_ex(section_table[i],"inv_weight",0)
 		elseif (name == "prop_tonnage") then
-			sum = sum + char_ini:r_float_ex(section_table[i],"additional_inventory_weight",0)
+			sum = sum + system_ini():r_float_ex(section_table[i],"additional_inventory_weight",0)
 		elseif (name == "prop_damage") then
-			val = math.abs(char_ini:r_float_ex(section_table[i],"hit_fraction_actor") or 0)*100
+			val = math.abs(system_ini():r_float_ex(section_table[i],"hit_fraction_actor") or 0)*100
 			prop_damage["hit_fraction_actor"] = prop_damage["hit_fraction_actor"] and prop_damage["hit_fraction_actor"] + val or val
 		elseif (name == "prop_wound") then 
-			tmp = char_ini:r_float_ex(section_table[i],"wound_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"wound_protection") or 0
 			val = ((1*tmp)/max_protections["wound_protection"] * 100)
 			prop_damage["wound_protection"] = prop_damage["wound_protection"] and prop_damage["wound_protection"] + val or val		
 		elseif (name == "prop_strike") then 
-			tmp = char_ini:r_float_ex(section_table[i],"strike_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"strike_protection") or 0
 			val = ((1*tmp)/max_protections["strike_protection"] * 100)
 			prop_damage["strike_protection"] = prop_damage["strike_protection"] and prop_damage["strike_protection"] + val or val		
 		elseif (name == "prop_explo") then 
-			tmp = char_ini:r_float_ex(section_table[i],"explosion_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"explosion_protection") or 0
 			val = ((1*tmp)/max_protections["explosion_protection"] * 100)
 			prop_damage["explosion_protection"] = prop_damage["explosion_protection"] and prop_damage["explosion_protection"] + val or val		
 		elseif (name == "prop_chem") then
-			tmp = char_ini:r_float_ex(section_table[i],"chemical_burn_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"chemical_burn_protection") or 0
 			val = ((1*tmp)/max_protections["chemical_burn_protection"] * 100)
 			prop_damage["chemical_burn_protection"] = prop_damage["chemical_burn_protection"] and prop_damage["chemical_burn_protection"] + val or val	
 		elseif (name == "prop_radio") then
-			tmp = char_ini:r_float_ex(section_table[i],"radiation_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"radiation_protection") or 0
 			val = ((1*tmp)/max_protections["radiation_protection"] * 100)
 			prop_damage["radiation_protection"] = prop_damage["radiation_protection"] and prop_damage["radiation_protection"] + val or val	
 		elseif (name == "prop_thermo") then
-			tmp = char_ini:r_float_ex(section_table[i],"burn_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"burn_protection") or 0
 			val = ((1*tmp)/max_protections["burn_protection"] * 100)
 			prop_damage["burn_protection"] = prop_damage["burn_protection"] and prop_damage["burn_protection"] + val or val	
 		elseif (name == "prop_electro") then
-			tmp = char_ini:r_float_ex(section_table[i],"shock_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"shock_protection") or 0
 			val = ((1*tmp)/max_protections["shock_protection"] * 100)
 			prop_damage["shock_protection"] = prop_damage["shock_protection"] and prop_damage["shock_protection"] + val or val	
 		elseif (name == "prop_psy") then
-			tmp = char_ini:r_float_ex(section_table[i],"telepatic_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"telepatic_protection") or 0
 			val = ((1*tmp)/max_protections["telepatic_protection"] * 100)
 			prop_damage["telepatic_protection"] = prop_damage["telepatic_protection"] and prop_damage["telepatic_protection"] + val or val	
 		elseif (name == "prop_armor") then
-			tmp = char_ini:r_float_ex(section_table[i],"fire_wound_protection") or 0
+			tmp = system_ini():r_float_ex(section_table[i],"fire_wound_protection") or 0
 			val = ((1*tmp)/max_protections["fire_wound_protection"] * 100)
 			prop_damage["fire_wound_protection"] = prop_damage["fire_wound_protection"] and prop_damage["fire_wound_protection"] + val or val
         elseif (name == "prop_ammo_size") then
-            sum = sum + char_ini:r_float_ex(section_table[i],"ammo_mag_size",0)
+            sum = sum + system_ini():r_float_ex(section_table[i],"ammo_mag_size",0)
         elseif (name == "prop_rpm") then
-            sum = sum + math.ceil(char_ini:r_float_ex(section_table[i],"rpm",0)/10)
+            sum = sum + math.ceil(system_ini():r_float_ex(section_table[i],"rpm",0)/10)
 		elseif (name == "prop_dispersion") then
-			val = char_ini:r_float_ex(section_table[i],"fire_dispersion_base") or 0
+			val = system_ini():r_float_ex(section_table[i],"fire_dispersion_base") or 0
 			if (val ~= 0) then
 				sum = sum + (ui_wpn_params.normalize(val,1.0,0)-100)
 			end
 		elseif (name == "prop_bullet_speed") then
-			val = char_ini:r_float_ex(section_table[i],"bullet_speed") or 0
+			val = system_ini():r_float_ex(section_table[i],"bullet_speed") or 0
 			if (val ~= 0) then
 				local actual_section = "wpn_" .. section_table[i]:gsub("(.*)_","")
 				sum = sum + (val/sysini:r_float_ex(actual_section,"bullet_speed",1000)*100)
 			end
 		elseif (name == "prop_inertion") then 
-			val = char_ini:r_float_ex(section_table[i],"control_inertion_factor") or 0
+			val = system_ini():r_float_ex(section_table[i],"control_inertion_factor") or 0
 			if (val ~= 0) then
 				sum = sum + (ui_wpn_params.normalize(val,3,0)-100)/2
 			end
-			val = char_ini:r_float_ex(section_table[i],"PDM_disp_base") or 0
+			val = system_ini():r_float_ex(section_table[i],"PDM_disp_base") or 0
 			if (val ~= 0) then
 				sum = sum + (ui_wpn_params.normalize(val,2.1,0)-100)/2
 			end
 		elseif (name == "prop_recoil") then
 			local actual_section = "wpn_" .. section_table[i]:gsub("(.*)_","")
-			val = char_ini:r_float_ex(section_table[i],"zoom_cam_dispersion") or 0
+			val = system_ini():r_float_ex(section_table[i],"zoom_cam_dispersion") or 0
 			if (val ~= 0) then
 				sum = sum + (100-ui_wpn_params.normalize(val,sysini:r_float_ex(actual_section,"zoom_cam_dispersion",3),0))/2
 			end
-			val = char_ini:r_float_ex(section_table[i],"cam_dispersion") or 0
+			val = system_ini():r_float_ex(section_table[i],"cam_dispersion") or 0
 			if (val ~= 0) then				
 				sum = sum + (100-ui_wpn_params.normalize(val,sysini:r_float_ex(actual_section,"cam_dispersion",3),0))/2
 			end
 		elseif (name == "prop_reliability") then 
-			val = char_ini:r_float_ex(section_table[i],"misfire_start_prob") or 0
+			val = system_ini():r_float_ex(section_table[i],"misfire_start_prob") or 0
 			if (val ~= 0) then
 				sum = sum + (ui_wpn_params.normalize(val,0.01,0)-100)/3
 			end
-			val = char_ini:r_float_ex(section_table[i],"misfire_end_prob") or 0
+			val = system_ini():r_float_ex(section_table[i],"misfire_end_prob") or 0
 			if (val ~= 0) then
 				sum = sum + (ui_wpn_params.normalize(val,0.1,0)-100)/3
 			end
-			val = char_ini:r_float_ex(section_table[i],"condition_shot_dec") or 0
+			val = system_ini():r_float_ex(section_table[i],"condition_shot_dec") or 0
 			if (val ~= 0) then
 				sum = sum + (ui_wpn_params.normalize(val,0.005,0)-100)/3
 			end
 		else
-			sum = sum + (char_ini:r_float_ex(section_table[i], "value") or 0)
+			sum = sum + (system_ini():r_float_ex(section_table[i], "value") or 0)
 		end
 	end
 	
@@ -487,15 +487,15 @@ function property_functor_c( param1, name )
 end
 
 function issue_property( param1, name )
-	local prorerty_name = char_ini:r_string_ex(name, "name")
+	local prorerty_name = system_ini():r_string_ex(name, "name")
 	local t_prorerty_name = game.translate_string(prorerty_name)
 	local value_table = utils.parse_names(param1)
 	local section = value_table[1]
 	if section then
-		if not char_ini:line_exist(section, "value") or not char_ini:r_string_ex(section, "value") then
+		if not system_ini():line_exist(section, "value") or not system_ini():r_string_ex(section, "value") then
 			return t_prorerty_name
 		end
-		local value = char_ini:r_string_ex(section, "value")
+		local value = system_ini():r_string_ex(section, "value")
 		return t_prorerty_name.." "..string.sub(value, 2, -2)
 	else
 		return t_prorerty_name
