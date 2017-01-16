@@ -481,16 +481,16 @@ function faction_ui:load_icon_list()
 	local def_icon = "ui_inGame2_Strelok"
 	
 	self.icon_list:ClearList()
-	self.icon_list:AddItem(def_icon,0)
+	self.icon_list:AddItem(def_icon, 1)
 	self.icon_table = iempty_table(self.icon_table)
 	
 	local section = self.selected_faction.."_portraits"
 	local n = loc_ini:section_exist(section) and loc_ini:line_count(section) or 0
-	for i=1, n do
-		local result, id, value = loc_ini:r_line(section,i,"","" )
+	for i = 0, n - 1 do
+		local result, id, value = loc_ini:r_line(section, i, "", "" )
 		if (id ~= "") then
-			self.icon_list:AddItem(id,i)
-			table.insert(self.icon_table,id)
+			self.icon_list:AddItem(id, i + 2)
+			table.insert(self.icon_table, id)
 		end
 	end
 	
