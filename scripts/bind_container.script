@@ -4,6 +4,50 @@ curBoxID = nil
 function bind(obj)
     obj:bind_object(container_binder(obj))
 end
+
+local function inventory_box_can_take(obj,itm,flags)
+	local id = obj:id()
+	--printf("%s can take %s    curBoxID=%s  container_id=%s",obj:name(),itm:name(),curBoxID,curBoxID and containers[curBoxID] and containers[curBoxID].id)
+	if not (curBoxID and containers[curBoxID] and containers[curBoxID].id == id) then 
+		return 
+	end
+	
+	-- can't take item that represents self!
+	if (curBoxID == itm:id()) then 
+		flags.ret_value = false 
+		return
+	end
+	
+	local se_obj = alife_object(id)
+	if not (se_obj) then 
+		return
+	end 
+	
+	-- allow only specific item count
+	if (se_obj.allow_take_count and get_item_count(obj) >= se_obj.allow_take_count) then
+		flags.ret_value = false
+		return
+	end 
+	
+	-- allow only certain sections or clsid
+	if (se_obj.allow_take_items) then
+		local cls = itm:clsid()
+		local sec = itm:section()
+		local ret
+		for i,v in ipairs(se_obj.allow_take_items) do 
+			if (sec == v) then
+				return
+			elseif (clsid[v] and clsid[v] == cls) then 
+				return 
+			end
+		end
+		flags.ret_value = false
+	end 
+end 
+
+function on_game_start()
+	RegisterScriptCallback("inventory_box_can_take",inventory_box_can_take)
+end
 -----------------------------
 function calculate_weight(se_inv_box,base)
 	local inv_box = level.object_by_id(se_inv_box.id)
@@ -37,6 +81,18 @@ function calculate_weight(se_inv_box,base)
 	end
 	
 	return base + total_weight
+end
+
+function get_item_count(inv_box)
+	local count = 0
+	local function add_items(inv_box, item)
+		count = count + 1
+	end
+
+	-- iterate all items in the inventory box
+	inv_box:iterate_inventory_box(add_items, inv_box)
+	
+	return count
 end
 
 local function use_container(id,pid)
@@ -78,6 +134,10 @@ function access_inventory(obj)
 		alife():set_switch_offline(se_inv_box.id,false)
 		
 		containers[id].id = se_inv_box.id
+		
+		local sys_ini = system_ini()
+		se_inv_box.allow_take_count = sys_ini:r_float_ex(obj:section(),"allow_take_count")
+		se_inv_box.allow_take_items = alun_utils.parse_list(sys_ini,obj:section(),"allow_take_list") -- can be list of sections or clsids
 		
 		-- Object will come online next update so wait
 		CreateTimeEvent(id,"container",0,use_container,se_inv_box.id,id)
@@ -142,6 +202,9 @@ function container_binder:load(stpk)
 	
 	local se_inv_box = containers[id].id and alife_object(containers[id].id)
 	if (se_inv_box) then 
+		local sys_ini = system_ini()
+		se_inv_box.allow_take_count = sys_ini:r_float_ex(self.object:section(),"allow_take_count")
+		se_inv_box.allow_take_items = alun_utils.parse_list(sys_ini,self.object:section(),"allow_take_list") -- can be list of sections or clsids
 		--level.map_add_object_spot(se_inv_box.id, "ui_pda2_actor_box_location", "st_ui_pda_actor_box") -- debug
 		alife():set_switch_online(se_inv_box.id,true)
 		alife():set_switch_offline(se_inv_box.id,false)

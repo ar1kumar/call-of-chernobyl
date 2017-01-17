@@ -1357,12 +1357,17 @@ end
 ------------------------------------------------------------------------------------------------------
 -- ENGINE EXPORTS!!!
 ------------------------------------------------------------------------------------------------------
+function CInventoryBox_CanTake(obj,itm)
+	local flags = { ret_value = true }
+	SendScriptCallback("inventory_box_can_take",obj,itm,flags)
+	return flags.ret_value
+end
 -- called when an inventory item is eaten/used
 -- returning false will prevent the item from being used
 function CInventory__eat(npc,item)
-	local return_flag = true
-	SendScriptCallback("on_before_item_use",npc,item,return_flag)
-	return return_flag
+	local flags = { ret_value = true }
+	SendScriptCallback("on_before_item_use",npc,item,flags)
+	return flags.ret_value
 end
 
 -- Called before actor hit callback
