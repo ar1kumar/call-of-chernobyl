@@ -29,17 +29,17 @@ function pda_contacts_tab:InitControls()
 	xml:InitFrame("frame1", self)
 	xml:InitFrame("frame2", self)
 	
-	-- Refresh checkbox.
+	-- 'Refresh' checkbox.
 	self.auto_chk = xml:InitCheck("auto_check", self)
-	self.auto_chk:SetCheck(axr_main.config:r_value("pda_contacts", "check_refresh", 1, false))
+	self.auto_chk:SetCheck(axr_main.config:r_value("pda_contacts", "check_refresh", 1, true))
 	self:Register(self.auto_chk, "check_refresh")
 	self:AddCallback("check_refresh", ui_events.BUTTON_CLICKED, self.SaveCheckBoxSettings, self)
 	
 	-- 'Known contacts' checkbox.
-	self.show_all = xml:InitCheck("show_all", self)
-	self.show_all:SetCheck(axr_main.config:r_value("pda_contacts", "check_show_known", 1, true))
-	self:Register(self.show_all, "check_show_known")
-	self:AddCallback("check_show_known", ui_events.BUTTON_CLICKED, self.SaveCheckBoxSettings, self)
+	self.filter = xml:InitCheck("filter", self)
+	self.filter:SetCheck(axr_main.config:r_value("pda_contacts", "check_filter", 1, false))
+	self:Register(self.filter, "check_filter")
+	self:AddCallback("check_filter", ui_events.BUTTON_CLICKED, self.SaveCheckBoxSettings, self)
 	
 	-- List of contact rows.
 	self.listbox = xml:InitListBox("listbox", self)
@@ -59,7 +59,7 @@ end
 -- Save checkboxes.
 function pda_contacts_tab:SaveCheckBoxSettings()
 	axr_main.config:w_value("pda_contacts", "check_refresh",  self.auto_chk:GetCheck())
-	axr_main.config:w_value("pda_contacts", "check_show_known",  self.show_all:GetCheck())
+	axr_main.config:w_value("pda_contacts", "check_filter",  self.filter:GetCheck())
 	axr_main.config:save()
 end
 
@@ -88,7 +88,7 @@ function pda_contacts_tab:Update()
 	if self.auto_chk:GetCheck() then
 		local tg = time_global()
 		if not self._tmr or self._tmr < tg then
-			self._tmr = tg + 5000
+			self._tmr = tg + 2500
 			self:Reset()
 		end
 	end
@@ -140,7 +140,7 @@ function pda_contacts_tab:Reset()
 			local distance = db.actor:position():distance_to_sqr(npc:position()) or 0
 			if (distance <= radius) then
 				if npc:relation(db.actor) ~= game_object.enemy then
-					if self.show_all:GetCheck() then
+					if self.filter:GetCheck() then
 						if (m_data.actor_contacts and m_data.actor_contacts[db.OnlineStalkers[i]]) then
 							table.insert(display_list, npc)
 						end
@@ -159,7 +159,7 @@ function pda_contacts_tab:Reset()
 		if (id) then 
 			local npc = db.storage[id] and db.storage[id].object 
 			if (npc and db.actor:position():distance_to_sqr(npc:position()) <= radius) then 
-				if self.show_all:GetCheck() then
+				if self.filter:GetCheck() then
 					if (m_data.actor_contacts and m_data.actor_contacts[id]) then
 						table.insert(display_list, npc)
 					end
