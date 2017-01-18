@@ -204,6 +204,7 @@ function actor_binder:update(delta)
 	end
 	
 	if self.bCheckStart then -- first update after netspawn
+		self.bCheckStart = nil
 		--alun_utils.debug_write("actor first_update START")
 		bind_stalker_ext.actor_on_first_update(self,delta)
 
@@ -216,7 +217,7 @@ function actor_binder:update(delta)
 		
 		pda.fill_primary_objects()
 		self.object:activate_slot(self.loaded_active_slot or 0)
-		self.bCheckStart = nil
+		
 		db.actor.afterFirstUpdate = true
 		
 		if (self.character_icon) then 
