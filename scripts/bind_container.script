@@ -6,23 +6,33 @@ function bind(obj)
 end
 
 local function inventory_box_can_take(obj,itm,flags)
-	local id = obj:id()
-	--printf("%s can take %s    curBoxID=%s  container_id=%s",obj:name(),itm:name(),curBoxID,curBoxID and containers[curBoxID] and containers[curBoxID].id)
-	if not (curBoxID and containers[curBoxID] and containers[curBoxID].id == id) then 
+	
+	--printf("%s item=%s curBoxID=%s inv_box=%s",obj:name(),itm:name(),curBoxID,containers[curBoxID] and containers[curBoxID].id)
+	if not (curBoxID and containers[curBoxID] and containers[curBoxID].id == obj:id()) then 
 		return 
 	end
 	
+	local dummy_id = itm:id()
+	
 	-- can't take item that represents self!
-	if (curBoxID == itm:id()) then 
+	if (curBoxID == dummy_id) then 
 		flags.ret_value = false 
 		return
 	end
-	
-	local se_obj = alife_object(id)
+
+	-- can't take other containers
+	for id,inv_box_id in pairs(containers) do 
+		if (dummy_id == id) then 
+			flags.ret_value = false
+			return 
+		end
+	end
+
+	local se_obj = alife_object(obj:id())
 	if not (se_obj) then 
 		return
 	end 
-	
+
 	-- allow only specific item count
 	if (se_obj.allow_take_count and get_item_count(obj) >= se_obj.allow_take_count) then
 		flags.ret_value = false
@@ -30,7 +40,7 @@ local function inventory_box_can_take(obj,itm,flags)
 	end 
 	
 	-- allow only certain sections or clsid
-	if (se_obj.allow_take_items) then
+	if (se_obj.allow_take_items and #se_obj.allow_take_items > 0) then
 		local cls = itm:clsid()
 		local sec = itm:section()
 		local ret
@@ -42,11 +52,19 @@ local function inventory_box_can_take(obj,itm,flags)
 			end
 		end
 		flags.ret_value = false
-	end 
+		return
+	end
+end 
+
+local function on_item_use(itm)
+	if (system_ini():r_string_ex(itm:section(),"script_binding") == "bind_container.bind") then
+		access_inventory(itm)
+	end
 end 
 
 function on_game_start()
 	RegisterScriptCallback("inventory_box_can_take",inventory_box_can_take)
+	RegisterScriptCallback("actor_on_item_use", on_item_use)
 end
 -----------------------------
 function calculate_weight(se_inv_box,base)
@@ -95,24 +113,33 @@ function get_item_count(inv_box)
 	return count
 end
 
-local function use_container(id,pid)
+function use_container(id,pid)
 	local box = id and level.object_by_id(id)
 	if (box) then
 		--level.map_add_object_spot(id, "ui_pda2_actor_box_location", "st_ui_pda_actor_box") -- debug
 		curBoxID = pid
-		local hud = get_hud()
-		if (hud) then
-			hud:HideActorMenu()
-		end
+		get_hud():HideActorMenu()
 		box:use(db.actor)
 		return true -- destroy timed event
 	end 
 	return false -- repeat timed event
 end 
 
+function can_access_inventory(obj)
+	if (curBoxID == obj:id() and ActorMenu.get_menu_mode() == 4) then
+		return game.translate_string("st_close")
+	end
+	return game.translate_string("st_open")
+end 
+
 -- called from item section in items.ltx
 function access_inventory(obj)
+	if (curBoxID == obj:id() and ActorMenu.get_menu_mode() == 4) then
+		get_hud():HideActorMenu()
+		return
+	end
 	local id = obj:id()
+	curBoxID = id
 	local se_inv_box = containers[id] and containers[id].id and alife_object(containers[id].id)
 	if not (se_inv_box) then
 		-- position under map
@@ -156,7 +183,7 @@ function container_binder:update(delta)
     object_binder.update(self, delta)
 	-- If actor menu is in dead body search mode then check if it's our ID; if so calculate_weight
 	if (actor_menu.dead_body_searching and curBoxID == self.object:id()) then
-		local se_inv_box = containers[curBoxID].id and alife_object(containers[curBoxID].id)
+		local se_inv_box = containers[curBoxID] and containers[curBoxID].id and alife_object(containers[curBoxID].id)
 		if (se_inv_box) then
 			self.object:set_weight(calculate_weight(se_inv_box,system_ini():r_float_ex(self.object:section(),"inv_weight")))
 		end

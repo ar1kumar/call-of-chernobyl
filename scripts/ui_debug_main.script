@@ -1,7 +1,8 @@
 -- axr_debug_tools UI script
 -- Alundaio
-UI_ICON_EQUIPMENT_WIDTH = 1024
+UI_ICON_EQUIPMENT_WIDTH = 2048
 UI_ICON_EQUIPMENT_HEIGHT = 2048
+UI_ICON_WIDTH_SCALE = 4.4
 
 id_to_spawn_table = {
 		[1] = "Ammo",
@@ -1043,8 +1044,8 @@ function debug_ui:OnEditorTriggerSectionSelection()
 	self.fld_icon_height:SetText(tostring(inv_grid_height))
 	
 	pos = self.ui_icon_equipment:GetWndPos()
-	self.icon_square:SetWndPos(vector2():set( pos.x+x1/2.2 , pos.y+y1/3 ))
-	self.icon_square:SetWndSize(vector2():set(w/2.2,h/3))
+	self.icon_square:SetWndPos(vector2():set( pos.x+x1/UI_ICON_WIDTH_SCALE , pos.y+y1/3 ))
+	self.icon_square:SetWndSize(vector2():set(w/UI_ICON_WIDTH_SCALE,h/3))
 	
 	self.editor_icon_addon:SetTextureRect(Frect():set(0,0,0,0))
 	self.fld_addon_offset_x:SetText("")
@@ -1171,8 +1172,8 @@ function debug_ui:OnEditIcon()
 	self.editor_icon:SetWndSize(vector2():set(w*scale,h*scale))
 	
 	local pos = self.ui_icon_equipment:GetWndPos()
-	self.icon_square:SetWndPos(vector2():set( pos.x+x1/2.2 , pos.y+y1/3 ))
-	self.icon_square:SetWndSize(vector2():set(w/2.2,h/3))
+	self.icon_square:SetWndPos(vector2():set( pos.x+x1/UI_ICON_WIDTH_SCALE , pos.y+y1/3 ))
+	self.icon_square:SetWndSize(vector2():set(w/UI_ICON_WIDTH_SCALE,h/3))
 	
 	local name = self.addon_list:GetText()
 	if not (name and name ~= "" and name ~= "Select Attachment") then
@@ -1600,8 +1601,8 @@ function debug_ui_editor:InitControls(x, y, xml, owner)
 	owner.ui_icon_equipment = xml:InitStatic("ui_icon_equipment",owner)
 	
 	owner.ui_icon_equipment:InitTexture("ui\\ui_icon_equipment")
-	owner.ui_icon_equipment:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/2.2,UI_ICON_EQUIPMENT_HEIGHT/3))
-	owner.ui_icon_equipment_back:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/2.2+25,UI_ICON_EQUIPMENT_HEIGHT/3+20))
+	owner.ui_icon_equipment:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/UI_ICON_WIDTH_SCALE,UI_ICON_EQUIPMENT_HEIGHT/3))
+	owner.ui_icon_equipment_back:SetWndSize(vector2():set(UI_ICON_EQUIPMENT_WIDTH/UI_ICON_WIDTH_SCALE+25,UI_ICON_EQUIPMENT_HEIGHT/3+20))
 	
 	
 	owner.icon_square = xml:InitFrame("square",owner)
