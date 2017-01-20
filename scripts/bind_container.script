@@ -1,4 +1,6 @@
 containers = {}
+se_inv_box_containers = {}
+
 curBoxID = nil
 
 function bind(obj)
@@ -62,9 +64,20 @@ local function on_item_use(itm)
 	end
 end 
 
+local function save_state(m_data)
+	m_data.se_inv_box_containers = se_inv_box_containers
+end 
+
+local function load_state(m_data)
+	se_inv_box_containers = m_data.se_inv_box_containers or se_inv_box_containers
+	m_data.se_inv_box_containers = nil
+end
+
 function on_game_start()
 	RegisterScriptCallback("inventory_box_can_take",inventory_box_can_take)
 	RegisterScriptCallback("actor_on_item_use", on_item_use)
+	RegisterScriptCallback("save_state",save_state)
+	RegisterScriptCallback("load_state",load_state)
 end
 -----------------------------
 function calculate_weight(se_inv_box,base)
@@ -148,18 +161,14 @@ function access_inventory(obj)
 		
 		-- create inventory_box_s
 		se_inv_box = alife():create("hidden_box",pos,level.vertex_id(pos),db.actor:game_vertex_id())
+		se_inv_box_containers[se_inv_box.id] = id
 	end
 	if (se_inv_box) then
-		-- shouldn't be possible but very safe incase some sort of save corruption
-		if not (IsInvbox(nil,se_inv_box:clsid())) then
-			containers[id].id = nil
-			return 
-		end
-		
 		-- force strictly online
 		alife():set_switch_online(se_inv_box.id,true)
 		alife():set_switch_offline(se_inv_box.id,false)
 		
+		containers[id] = containers[id] or {}
 		containers[id].id = se_inv_box.id
 		
 		local sys_ini = system_ini()
@@ -203,12 +212,41 @@ function container_binder:net_spawn(sobject)
     if not(object_binder.net_spawn(self, sobject)) then
         return false
     end
-	containers[sobject.id] = containers[sobject.id] or {}
+	
+	local id = sobject.id
+	if (containers[id]) then
+		-- release inv_box not linked to an object
+		for inv_box_id,item_id in pairs(se_inv_box_containers) do
+			if (id == false) then 
+				local se_obj = alife():object(inv_box_id)
+				if (se_obj and IsInvbox(nil,se_obj:clsid())) then
+					alife():release(se_obj)
+				end
+				se_inv_box_containers[inv_box_id] = nil
+			end
+		end
+	
+		local se_inv_box = containers[id].id and alife_object(containers[id].id)
+		if (se_inv_box and IsInvbox(nil,se_inv_box:clsid())) then 
+			local sys_ini = system_ini()
+			se_inv_box.allow_take_count = sys_ini:r_float_ex(self.object:section(),"allow_take_count")
+			se_inv_box.allow_take_items = alun_utils.parse_list(sys_ini,self.object:section(),"allow_take_list") -- can be list of sections or clsids
+			--level.map_add_object_spot(se_inv_box.id, "ui_pda2_actor_box_location", "st_ui_pda_actor_box") -- debug
+			alife():set_switch_online(se_inv_box.id,true)
+			alife():set_switch_offline(se_inv_box.id,false)
+			self.object:set_weight(calculate_weight(se_inv_box,system_ini():r_float_ex(self.object:section(),"inv_weight")))
+		else
+			if (containers[id].id and se_inv_box_containers[containers[id].id]) then 
+				se_inv_box_containers[containers[id].id] = false
+			end
+			containers[id] = nil
+		end
+	end
+	
     return true
 end
 -- Net destroy
 function container_binder:net_destroy()
-	containers[self.object:id()] = nil
 	object_binder.net_destroy(self)
 end
 -- Standart function for save
@@ -218,23 +256,8 @@ end
 -- Saving container
 function container_binder:save(stpk)
 	object_binder.save(self, stpk)
-	stpk:w_stringZ(tostring(containers[self.object:id()].id))
 end
 -- Loading container
 function container_binder:load(stpk)
 	object_binder.load(self, stpk)
-	local id = self.object:id()
-	containers[id] = containers[id] or {}
-	containers[id].id = tonumber(stpk:r_stringZ())
-	
-	local se_inv_box = containers[id].id and alife_object(containers[id].id)
-	if (se_inv_box) then 
-		local sys_ini = system_ini()
-		se_inv_box.allow_take_count = sys_ini:r_float_ex(self.object:section(),"allow_take_count")
-		se_inv_box.allow_take_items = alun_utils.parse_list(sys_ini,self.object:section(),"allow_take_list") -- can be list of sections or clsids
-		--level.map_add_object_spot(se_inv_box.id, "ui_pda2_actor_box_location", "st_ui_pda_actor_box") -- debug
-		alife():set_switch_online(se_inv_box.id,true)
-		alife():set_switch_offline(se_inv_box.id,false)
-		self.object:set_weight(calculate_weight(se_inv_box,system_ini():r_float_ex(self.object:section(),"inv_weight")))
-	end
 end
