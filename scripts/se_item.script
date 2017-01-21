@@ -388,6 +388,10 @@ function se_eatable:on_register()
 	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_eatable:on_unregister()
+	if (bind_container.containers[self.id] and bind_container.containers[self.id].id and bind_container.se_inv_box_containers[bind_container.containers[self.id].id]) then 
+		bind_container.se_inv_box_containers[bind_container.containers[self.id].id] = false -- we unlink id
+	end
+	bind_container.containers[self.id] = nil
 	unregister_story_object_by_id(self.id)
 	cse_alife_item.on_unregister(self)
 end
@@ -401,6 +405,11 @@ function se_eatable:STATE_Read(stpk,size)
 	cse_alife_item.STATE_Read(self,stpk,size)
 	--printf("%s size[%s] r_tell[%s] se_eatable elapsed %s",self:section_name(),size,stpk:r_tell(),stpk:r_elapsed())
 	self.remaining_uses = stpk:r_u8()
+	local inventory_box_id = tonumber(stpk:r_stringZ())
+	if (inventory_box_id) then 
+		bind_container.containers[self.id] = { id = inventory_box_id }
+		bind_container.se_inv_box_containers[inventory_box_id] = self.id
+	end
 	--printf("self.remaining_uses = %s",self.remaining_uses)
 end
 function se_eatable:STATE_Write(stpk)
@@ -409,9 +418,10 @@ function se_eatable:STATE_Write(stpk)
 	if (obj and obj:get_max_uses() > 0) then
 		stpk:w_u8(obj:get_remaining_uses())
 		--printf("saving uses %s",obj:get_remaining_uses())
-	else 
+	else
 		stpk:w_u8(0)
 	end
+	stpk:w_stringZ(tostring(bind_container.containers[self.id] and bind_container.containers[self.id].id or nil))
 end
 function se_eatable:keep_saved_data_anyway()
 	return true 
