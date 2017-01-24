@@ -807,6 +807,83 @@ installed_upgrades                       =
 upgrade_scheme                           = upgrade_scheme_military_outfit
 character_portrait						 = ui_inGame2_Soldier_4
 
+;---------------------------------------------------------------------------------------------
+;		SKAT-9M
+;---------------------------------------------------------------------------------------------
+[commander_outfit]:outfit_base
+$spawn                                   = "outfit\commander_outfit"
+visual                                   = dynamics\outfit\stalker_skat9m_suit
+actor_visual                             = actors\stalker_skat9m.ogf
+npc_visual                               = actors\stalker_skat9m.ogf
+player_hud_section                       = actor_hud_duty_psz9d
+
+ef_equipment_type                        = 4
+
+inv_name                                 = commander_outfit_name
+inv_name_short                           = commander_outfit_name
+description                              = commander_outfit_description
+
+inv_weight                               = 12
+
+inv_grid_x                               = 28
+inv_grid_y                               = 37
+
+upgr_icon_x                              = 2200
+upgr_icon_y                              = 1240
+upgr_icon_width                          = 308
+upgr_icon_height                         = 159
+full_icon_name                           = npc_icon_commander_outfit
+
+cost                                     = 59000
+full_scale_icon                          = 14,11
+
+immunities_sect                          = sect_commander_outfit_immunities
+
+; MEDIUM RESISTANCE
+burn_protection                          = 0.0510
+shock_protection                         = 0.2100
+radiation_protection                     = 0.0100
+chemical_burn_protection                 = 0.0510
+telepatic_protection                     = 0.0
+strike_protection                        = 0.3350
+explosion_protection                     = 0.3350
+wound_protection                         = 0.3100
+
+
+hit_fraction_actor                       = 0.3
+bones_koeff_protection                   = actor_armor_skat
+
+artefact_count                           = 2
+control_inertion_factor                  = 1.75
+power_loss                               = 0.86
+
+upgrades                                 = up_gr_firstab_dolg_heavy_outfit, up_gr_seconab_dolg_heavy_outfit, up_gr_thirdab_dolg_heavy_outfit, up_gr_fourtab_dolg_heavy_outfit
+installed_upgrades                       =
+upgrade_scheme                           = upgrade_scheme_dolg_heavy_outfit
+character_portrait						 = ui_inGame2_Soldier_4
+
+[sect_commander_outfit_immunities]
+burn_immunity                            = 0.02	                                       
+strike_immunity                          = 0.0
+shock_immunity                           = 0.02
+wound_immunity                           = 0.02
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.02
+explosion_immunity                       = 0.02
+fire_wound_immunity                      = 0.01
+
+[sect_commander_outfit_immunities_add]
+burn_immunity                            = -0.01	                                       
+strike_immunity                          = -0.01
+shock_immunity                           = -0.01
+wound_immunity                           = -0.01
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = -0.01
+explosion_immunity                       = -0.01
+fire_wound_immunity                      = -0.0025
+
 [sect_military_outfit_immunities]
 burn_immunity                            = 0.04	                                       ;коэффициенты иммунитета самого костюма
 strike_immunity                          = 0.0
