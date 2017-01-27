@@ -443,8 +443,11 @@ function pda_relations_tab:CreateContextMenu(npc,id)
 	
 	action_1__1 = function()
 		if not (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion_cannot_dismiss")) then
-			npc:use(db.actor)
-			--npc:start_trade(db.actor)
+			if (db.actor:position():distance_to_sqr(se_obj.position) <= 625) then
+				npc:use(db.actor)
+			else 
+				self:SetMsg(game.translate_string("st_pda_cant_trade_dist"),3)
+			end
 		else 
 			self:SetMsg(game.translate_string("st_pda_cant_trade"),3)
 		end
