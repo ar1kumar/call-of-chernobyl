@@ -38,8 +38,8 @@ function se_artefact:STATE_Write(stpk)
 	cse_alife_item_artefact.STATE_Write(self,stpk)
 	local obj = level.object_by_id(self.id)
 	if (obj) then
-		stpk:w_u8(obj:condition())
+		stpk:w_float(obj:condition())
 	else
-		stpk:w_u8(0)
+		stpk:w_float(0)
 	end
 end

@@ -1,9 +1,6 @@
 --'******************************************************
 --'*  Биндер объекта артефакт .
 --'******************************************************
-function printf()
-end
-
 function bind(obj)
 	obj:bind_object(artefact_binder(obj))
 end
@@ -29,21 +26,15 @@ function artefact_binder:net_spawn(server_object)
 
 	self.first_call = true
 	
-	local m_data = alife_storage_manager.get_state()
-	if (m_data and m_data.artefact_condition and m_data.artefact_condition[self.object:id()]) then 
-		self.object:set_condition(tonumber(m_data.artefact_condition[self.object:id()]) or 1)
-		m_data.artefact_condition[self.object:id()] = nil
-	end
-	
-	if (server_object.offline_condition and server_object.offline_condition > 0) then 
-		self.object:set_condition(tonumber(server_object.offline_condition) or 1)
+	if (server_object.offline_condition and server_object.offline_condition > 0) then
+		self.object:set_condition(tonumber(server_object.offline_condition) or 0.999999)
 	end
 
 	return true
 end
 function artefact_binder:update(delta)
 	object_binder.update(self, delta)
-	printf("pl:art [%s] pos %s", self.object:name(), vec_to_str(self.object:position()))
+	--printf("pl:art [%s] pos %s", self.object:name(), vec_to_str(self.object:position()))
 	
     if self.first_call == true then
 		local ini = self.object:spawn_ini()
