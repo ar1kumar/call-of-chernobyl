@@ -365,11 +365,12 @@ function main_menu:SetMsg(text,tmr)
 	self.msg_wnd:Show(true)
 	self.msg_wnd_text:SetText(text)
 	self.msg_wnd_text:AdjustHeightToText()
-	self.msg_wnd_text:SetWndSize(vector2():set(1024,self.msg_wnd_text:GetHeight()+10))
-	self.msg_wnd_text:SetWndPos(vector2():set(0,20))
+	local m
+	if self.msg_wnd_text:GetHeight() < 42 then
+		m = 42
+	end
+	self.msg_wnd_text:SetWndSize(vector2():set(self.msg_wnd_text:GetWidth(), m or self.msg_wnd_text:GetHeight()))
+	self.msg_wnd:SetWndSize(vector2():set(self.msg_wnd:GetWidth(),self.msg_wnd_text:GetHeight()+40))
 	
-	self.msg_wnd:SetWndSize(vector2():set(1024,self.msg_wnd_text:GetHeight()+44))
-	self.msg_wnd:SetWndPos(vector2():set(0,80))
-
 	self.msg_wnd_timer = 100*tmr
 end
