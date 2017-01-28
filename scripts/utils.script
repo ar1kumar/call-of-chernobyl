@@ -849,3 +849,23 @@ end
 function pos_in_rect(p,r)
 	return (p.x >= r.x1) and (p.x <= r.x2) and (p.y >= r.y1) and (p.y <= r.y2)
 end
+
+-- useful to escape string before use with lua pattern matching
+function escape_lua_pattern(s)
+	local matches = {
+		["^"] = "%^",
+		["$"] = "%$",
+		["("] = "%(",
+		[")"] = "%)",
+		["%"] = "%%",
+		["."] = "%.",
+		["["] = "%[",
+		["]"] = "%]",
+		["*"] = "%*",
+		["+"] = "%+",
+		["-"] = "%-",
+		["?"] = "%?",
+		["\0"] = "%z"
+	}
+    return (s:gsub(".",matches))
+end
