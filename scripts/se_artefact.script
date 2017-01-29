@@ -40,6 +40,6 @@ function se_artefact:STATE_Write(stpk)
 	if (obj) then
 		stpk:w_float(obj:condition())
 	else
-		stpk:w_float(self.offline_condition or 0)
+		stpk:w_float(self.offline_condition or 0.9999999)
 	end
 end
