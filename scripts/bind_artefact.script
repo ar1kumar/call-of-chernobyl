@@ -26,10 +26,6 @@ function artefact_binder:net_spawn(server_object)
 
 	self.first_call = true
 	
-	if (server_object.offline_condition and server_object.offline_condition > 0) then
-		self.object:set_condition(tonumber(server_object.offline_condition) or 0.999999)
-	end
-
 	return true
 end
 function artefact_binder:update(delta)
@@ -64,4 +60,13 @@ end
 function artefact_binder:net_destroy(server_object)
 	db.del_obj(self.object)
 	object_binder.net_destroy(self)
+end
+
+function artefact_binder:load(reader)
+	object_binder.load(self, reader)
+	
+	local se_obj = alife():object(self.object:id())
+	if (se_obj and se_obj.offline_condition and se_obj.offline_condition > 0) then
+		self.object:set_condition(tonumber(se_obj.offline_condition) or 0.999999)
+	end
 end
