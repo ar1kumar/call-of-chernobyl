@@ -76,7 +76,12 @@ local function main_loop()
 			
 				if (cond_loss > 0) then
 --printf("%s Degradation: cond_loss=%s",arte:name(),cond_loss)
-					arte:set_condition(arte:condition() - (cond_loss*sysini:r_float_ex(arte:section(),"degrade_rate",1)))
+					local degrade_rate = (cond_loss*sysini:r_float_ex(arte:section(),"degrade_rate",1))
+					if (arte:condition() - degrade_rate >= 0) then
+						arte:set_condition(arte:condition() - degrade_rate)
+					else 
+						arte:set_condition(0)
+					end
 				end
 			end
 		end

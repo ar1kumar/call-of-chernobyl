@@ -33,8 +33,14 @@ function artefact_binder:update(delta)
 	--printf("pl:art [%s] pos %s", self.object:name(), vec_to_str(self.object:position()))
 	
     if self.first_call == true then
+		local se_obj = alife():object(self.object:id())
+		if (se_obj and se_obj.offline_condition) then
+			self.object:set_condition(tonumber(se_obj.offline_condition) or 0.9999999)
+		end
+	
 		local ini = self.object:spawn_ini()
 		if not (ini and ini:section_exist("fixed_bone")) then
+			self.first_call = false
 			return
 		end
 		local bone_name = ini:r_string_ex("fixed_bone", "name")
@@ -53,9 +59,9 @@ function artefact_binder:update(delta)
 			--printf("FIXING OBJECT")
 			ph_element:fix()
 		end
+		
 		self.first_call = false
     end	
-	
 end
 function artefact_binder:net_destroy(server_object)
 	db.del_obj(self.object)
@@ -64,9 +70,4 @@ end
 
 function artefact_binder:load(reader)
 	object_binder.load(self, reader)
-	
-	local se_obj = alife():object(self.object:id())
-	if (se_obj and se_obj.offline_condition and se_obj.offline_condition > 0) then
-		self.object:set_condition(tonumber(se_obj.offline_condition) or 0.999999)
-	end
 end
