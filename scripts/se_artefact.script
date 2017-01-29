@@ -32,7 +32,7 @@ end
 --------------------
 function se_artefact:STATE_Read(stpk,size)
 	cse_alife_item_artefact.STATE_Read(self,stpk,size)
-	self.offline_condition = stpk:r_u8()
+	self.offline_condition = stpk:r_float()
 end
 function se_artefact:STATE_Write(stpk)
 	cse_alife_item_artefact.STATE_Write(self,stpk)
