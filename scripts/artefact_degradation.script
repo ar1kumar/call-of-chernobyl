@@ -1,8 +1,8 @@
 --// -----------------		Artefact Degradation for CoC	 ---------------------
 --// author	: 	Nuor
---// version:	1.00
+--// version:	1.02
 --// created:	9-01-2016
---// last edit:	9-08-2016
+--// last edit:	1-29-2017
 --//------------------------------------------------------------------------------
 
 local belted_arts = {}
@@ -77,10 +77,10 @@ local function main_loop()
 				if (cond_loss > 0) then
 --printf("%s Degradation: cond_loss=%s",arte:name(),cond_loss)
 					local degrade_rate = (cond_loss*sysini:r_float_ex(arte:section(),"degrade_rate",1))
-					if (arte:condition() - degrade_rate >= 0) then
+					if (arte:condition() - degrade_rate >= 0.01) then
 						arte:set_condition(arte:condition() - degrade_rate)
 					else 
-						arte:set_condition(0)
+						arte:set_condition(0.01)
 					end
 				end
 			end
@@ -200,7 +200,10 @@ function actor_on_before_hit(s_hit)
 					if (cond_loss > 0) then
 						cond_loss = (s_hit.power * imm_mul[imm_sect] * cond_loss)
 --printf("%s Degradation: hit_power=%s cond_loss=%s",arte:name(),s_hit.power,cond_loss)
-						arte:set_condition(arte:condition() - (cond_loss*sysini:r_float_ex(arte:section(),"degrade_rate",1)))
+						
+						local temp_cond = arte:condition() - (cond_loss*sysini:r_float_ex(arte:section(),"degrade_rate",1))
+						temp_cond = temp_cond > 0.01 and temp_cond or 0.01
+						arte:set_condition(temp_cond)
 					end
 				end
 			end
