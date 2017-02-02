@@ -1,8 +1,8 @@
 [logic@lost_merc_leader]
-suitable   = {=check_npc_name(zat_b103_lost_merc_leader) !surge_started}
+suitable   = {!surge_started}
 active     = walker@leader
-prior      = 200
-on_death = death 
+prior      = 100
+on_death = death
 
 [death]
 on_info = %=stop_sound +zat_b103_merc_fight =set_squad_goodwill(zat_b103_lost_merc_squad1:enemy)%
