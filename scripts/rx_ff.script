@@ -63,7 +63,7 @@ function evaluator_dont_shoot:check_all_in_los()
 	level.ray_pick(pos,vector():sub(be_pos,pos):normalize(),pos:distance_to(be_pos)+0.1,rq_target.rqtObject,result,wpn)
 		
 	if (result.object and result.object:id() ~= self.object:id() and IsStalker(result.object) and self.object:relation(result.object) < 2) then 
-		alun_utils.debug_nearest(self.object,"%s result.object=%s range=%s element=%s",self.object:name(),result.object and result.object:name(),result.range,result.element)
+		--alun_utils.debug_nearest(self.object,"%s result.object=%s range=%s element=%s",self.object:name(),result.object and result.object:name(),result.range,result.element)
 		self.object:set_item(object.aim1,wpn)
 		return true
 	end
