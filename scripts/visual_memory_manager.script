@@ -6,9 +6,8 @@
 -- warning npc and who can be nil sometimes
 function get_visible_value(npc,who,time_delta,time_quant,luminocity,velocity_factor,velocity,distance,object_distance,always_visible_distance)
 	distance = distance <= 0 and 0.00001 or distance
-	luminocity = luminocity <= 0 and 0.0001 or luminocity
 	
-	if (level_weathers.bLevelUnderground) then 
+	if (level_weathers.bLevelUnderground or object_distance <= 15) then 
 		luminocity = luminocity + 0.35
 	end
 	

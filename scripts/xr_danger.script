@@ -84,6 +84,10 @@ local function npc_on_hear_callback(npc,who_id,s_type,dist,sound_power,sound_pos
 		return
 	end
 	
+	if (has_danger(npc)) then 
+		return 
+	end 
+	
 	if (npc:best_enemy()) then 
 		return 
 	end
@@ -94,7 +98,7 @@ local function npc_on_hear_callback(npc,who_id,s_type,dist,sound_power,sound_pos
 		return
 	end
 	
-	if (s_type == "WPN_hit" or s_type == "MST_attack" or s_type == "MST_damage") and dist < 900 then
+	if (s_type == "NPC_step" and dist <= 25) or ((s_type == "WPN_hit" or s_type == "MST_attack" or s_type == "MST_damage") and dist < 900) then
 		local who = who_id and (db.storage[who_id] and db.storage[who_id].object)
 		if not (who) then
 			return

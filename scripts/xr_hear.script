@@ -43,6 +43,8 @@ local function get_sound_type(sound_type)
 		elseif bit_and(sound_type, snd_type.monster_eat) == snd_type.monster_eat then
 			s_type = "MST_eat"
 		end
+	elseif bit_and(sound_type,snd_type.step) == snd_type.step then 
+		s_type = "NPC_step"
 	end
 	return s_type
 end
