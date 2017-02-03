@@ -7,12 +7,12 @@
 function get_visible_value(npc,who,time_delta,time_quant,luminocity,velocity_factor,velocity,distance,object_distance,always_visible_distance)
 	distance = distance <= 0 and 0.00001 or distance
 	
-	if (level_weathers.bLevelUnderground or object_distance <= 15) then 
-		luminocity = luminocity + 0.35
+	if (level_weathers.bLevelUnderground) then
+		luminocity = luminocity + 0.30
 	end
 	
 	-- unaltered formula
 	-- time_delta / time_quant * luminocity * (1 + velocity_factor*velocity) * (distance - object_distance) / (distance - always_visible_distance)
 	
-	return  time_delta / time_quant * luminocity * (1 + velocity_factor*velocity) * (distance - object_distance) / distance
+	return  time_delta / time_quant * (0.02 + luminocity) * (1 + velocity_factor*velocity) * (distance - object_distance) / distance
 end
