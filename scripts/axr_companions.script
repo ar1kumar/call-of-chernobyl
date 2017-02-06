@@ -101,11 +101,14 @@ end
 
 local function actor_on_item_drop(item)
 	if (ActorMenu.get_menu_mode() == 4) then 
-		local m_data = alife_storage_manager.get_state()
-		if not (m_data.companion_borrow_item) then
-			m_data.companion_borrow_item = {}
+		local npc = ActorMenu.get_actor_menu():GetPartner()
+		if (npc and npc:alive() and npc:has_info("npcx_is_companion")) then
+			local m_data = alife_storage_manager.get_state()
+			if not (m_data.companion_borrow_item) then
+				m_data.companion_borrow_item = {}
+			end
+			m_data.companion_borrow_item[item:id()] = true
 		end
-		m_data.companion_borrow_item[item:id()] = true
 	end
 end
 
