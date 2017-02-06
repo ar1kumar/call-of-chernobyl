@@ -296,6 +296,7 @@ function set_best_weapon(hit_amount)
 
 	-- By using this section we can have stats 'stack' for weapons regardless of attached scopes.
 	-- Of course if this section does not exist then it will just default to the weapon section name instead.
+	hit_amount = utils.clamp(hit_amount/100,0,1)
 	weapons_table[parent_section] = weapons_table[parent_section] and weapons_table[parent_section] + hit_amount or hit_amount
 
 	for sec,v in spairs(weapons_table, function(t,a,b) return t[b] < t[a] end) do
