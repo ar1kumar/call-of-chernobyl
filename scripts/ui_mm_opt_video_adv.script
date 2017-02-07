@@ -107,13 +107,11 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	ctl = xml:InitCheck("video_adv:check_r2_sun", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
 	
-	-- Grass shadow is not in COC engine
-	--[[
+	-- Grass shadow 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
-	xml:InitStatic("video_adv:cap_r2_sun_details", _st)
-	ctl = xml:InitCheck("video_adv:check_r2_sun_details", _st)
+	xml:InitStatic("video_adv:cap_r__enable_grass_shadow", _st)
+	ctl = xml:InitCheck("video_adv:check_r__enable_grass_shadow", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
-	--]]
 	
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__actor_shadow", _st)

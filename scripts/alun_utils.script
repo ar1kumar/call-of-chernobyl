@@ -153,36 +153,8 @@ function read_from_ini(ini,section,line,var_type,default,caller)
 end
 
 function trim(s)
-	return string.gsub(s, "^%s*(.-)%s*$", "%1")
+	return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
 end
-
---[[
-function string:split(pat)
-	pat = pat or '%s+'
-  local st, g = 1, self:gmatch("()("..pat..")")
-  local function getter(self, segs, seps, sep, cap1, ...)
-    st = sep and seps + #sep
-    return self:sub(segs, (seps or 0) - 1), cap1 or sep, ...
-  end
-  local function splitter(self)
-    if st then return getter(self, st, g()) end
-  end
-  return splitter, self
-end
-
-function str_explode(str,pattern)
-	local t = {}
-	if (type(str) ~= "string") then return end
-	for word, pat, start in str:split(pattern) do
-		t[#t+1] = trim(word)
-		if (start and pat == pattern) then
-		    t[#t+1] = trim(str:sub(start))
-			break
-		end
-	end
-	return t
-end
---]]
 
 function parse_ini_section_to_array(ini,section)
 	local tmp=nil
@@ -199,30 +171,13 @@ function parse_ini_section_to_array(ini,section)
 	return tmp
 end
 
-function str_explode(str,div,dont_trim)
-	if not (dont_trim) then 
-		trim(str)
-	end 
-	local t={}
-	local cpt = string.find (str, div, 1, true)
-	local a
-	if cpt then
-		repeat
-			if not dont_trim then
-				a = trim(string.sub(str, 1, cpt-1))
-				table.insert( t, a )
-			else
-				table.insert( t, string.sub(str, 1, cpt-1) )
-			end
-			str = string.sub( str, cpt+string.len(div) )
-			cpt = string.find (str, div, 1, true)
-		until cpt==nil
+function str_explode(str,sep,plain)
+	if not (sep ~= "" and string.find(str,sep,1,plain)) then
+		return { str }
 	end
-	if not dont_trim then
-		a = trim(str)
-		table.insert(t, a)
-	else
-		table.insert(t, str)
+	local t = {}
+	for s in str:gsplit(sep,plain) do 
+		table.insert(t,trim(s))
 	end
 	return t
 end

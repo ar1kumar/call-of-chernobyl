@@ -1506,6 +1506,26 @@ function give_object_to_actor(obj,count)
   end
 end
 
+function string.gsplit(s, sep, plain)
+	local start = 1
+	local done = false
+	local function pass(i, j, ...)
+		if i then
+			local seg = s:sub(start, i - 1)
+			start = j + 1
+			return seg, ...
+		else
+			done = true
+			return s:sub(start)
+		end
+	end
+	return function()
+		if done then return end
+		if sep == '' then done = true return s end
+		return pass(s:find(sep, start, plain))
+	end
+end
+
 -- INI Extensions
 local ini_cache = { [system_ini()] = {} }
 function clear_ini_cache(ini)
