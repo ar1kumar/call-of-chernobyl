@@ -84,8 +84,8 @@ function unlock_article(section)
 	end
 	
 	-- Update the required tables.
+	unlocked_articles[section] = true
 	table.remove(locked_articles, index)
-	table.insert(unlocked_articles, section)
 	
 	-- Notify the player and update the PDA selection.
 	news_manager.send_tip(db.actor, "pda_btn_encyclopedia_notify", nil, "guide_unlock", nil, nil)
