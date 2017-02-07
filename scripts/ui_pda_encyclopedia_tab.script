@@ -200,7 +200,7 @@ function pda_encyclopedia_tab:InitPlugin()
 				
 				-- Keep any unlocked articles permanently unlocked.
 				-- When a counter is added to the interface this will make things simpler.
-				if (value == "unlocked") then
+				if (has_alife_info("unlocked_guide") or value == "unlocked") then
 					unlocked_articles[section] = true
 				end
 			end
