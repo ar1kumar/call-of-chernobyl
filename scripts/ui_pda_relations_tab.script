@@ -171,13 +171,13 @@ function pda_relations_tab:autoupdate()
 		local se_obj = clist[i] and alife_object(clist[i])
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
 			local full_name = se_obj:character_name()
-			local name = string.gsub(full_name,"Junior","Jr.")
-			name = string.gsub(name,"Senior","Sr.")
-			name = string.gsub(name,"Master ","M")
-			name = string.gsub(name,"Private","PVT")
-			name = string.gsub(name,"Sergeant","SGT")
-			name = string.gsub(name,"Lieutenant","LT")
-			name = string.gsub(name,"Captain","CPT")
+			local name = string.gsub(full_name, "Junior", "Jr.")
+			name = string.gsub(name, "Senior", "Snr.")
+			name = string.gsub(name, "Master ", "M. ")
+			name = string.gsub(name, "Private", "Pvt.")
+			name = string.gsub(name, "Sergeant", "Sgt.")
+			name = string.gsub(name, "Lieutenant", "Lt.")
+			name = string.gsub(name, "Captain", "Cpt.")
 			
 			local name = string.len(name) <= 22 and name or string.sub(name, 0, 19) .. "..."
 			self.companion_info[i].id = se_obj.id 
