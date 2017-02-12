@@ -2073,3 +2073,60 @@ function cmd.pstor_test(me,txt,owner,p)
 
 	return "pstor_test:= successfully saved 2000 values to db.actor pstor"
 end
+
+
+function setup_debug_logic(npc,st,loaded)
+	local ltx_name = "scripts\\debug_npc.ltx"
+	local ltx = ini_file(ltx_name)
+	if not (ltx) then 
+		return
+	end
+	
+	local id = npc:id()
+	local sim = alife()
+	local se_npc = sim:object(id)
+	local unreg_id = se_npc and se_npc.m_smart_terrain_id
+	if (unreg_id and unreg_id ~= 65535) then
+		local unreg = sim:object(unreg_id)
+		if (unreg) then
+			unreg:unregister_npc(se_npc)
+		end
+	end
+	
+	xr_logic.configure_schemes(npc, ltx, ltx_name, modules.stype_stalker, loaded and st.loaded_section_logic or "logic", "")
+	
+	local section = loaded and st.loaded_active_section or xr_logic.determine_section_to_activate(npc, ltx, "logic", db.actor)
+	xr_logic.activate_by_section(npc, ltx, section, "", loaded)
+	--printf("setup complete")
+end 
+debug_visuals = nil
+function cmd.debug_visuals(me,txt,owner,p)
+	debug_visuals = {}
+	local gvid = db.actor:game_vertex_id()
+	local pos = db.actor:position()
+
+	local dist = 1
+	local f = getFS()
+	local flist = f:file_list_open_ex("$game_meshes$",bit_or(FS.FS_ListFiles),"*.ogf")
+	local f_cnt = flist:Size()
+	for	it=0, f_cnt-1 do
+		local file = flist:GetAt(it)
+		local visual_name = file:NameFull():sub(1,-5)
+		if (string.find(visual_name,"actors\\") == 1 and not string.find(visual_name,"trader") and not string.find(visual_name,"lesnik")) then
+			local newpos = vector():set(pos)
+			newpos:add(device().cam_dir:mul(dist))
+			newpos = vector():set(newpos.x,pos.y,newpos.z)
+			local lvid = level.vertex_id(newpos)
+			local se_obj = alife():create("sim_default_stalker_0",newpos,lvid,gvid)
+			if (se_obj) then
+				alife():create("wpn_pkm",se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,se_obj.id)
+				--printf("%s visual:= %s",se_obj:name(),visual_name)
+				debug_visuals[se_obj.id] = visual_name
+			end
+		end
+		
+		dist = dist + 1
+	end
+	
+	return "debug_visuals:= done!"
+end

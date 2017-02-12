@@ -175,6 +175,15 @@ function action.debug_test(p)
 		return 
 	end 
 	if (p==1) then
+		
+		
+		local npc = level.get_target_obj()
+		if (npc and IsStalker(npc)) then 
+			debug_visual_ltx = debug_visual_ltx or ini_file_ex("debug_visual.ltx",true)
+			debug_visual_ltx:w_value("visual_at_cursor",npc:get_visual_name())
+			printf("%s",npc:get_visual_name())
+			debug_visual_ltx:save()
+		end
 		--alun_utils.print_table(story_objects.get_story_objects_registry().story_id)
 		--[[ PRINT _G
 		local valid = {
