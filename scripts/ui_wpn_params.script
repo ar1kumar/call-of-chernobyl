@@ -44,9 +44,10 @@ function read_float(wpn_section, upgr_sections, param)
 		if param == "hit_power" then
 			local r = parse_names(ltx:r_string_ex(sect,param) or "")
 			r = tonumber(r[1]) or 0
-			if res < r then
-				res = r
-			end
+			-- if res < r then
+				-- res = r
+			-- end
+			res = res + r
 		else
 			res = res + (ltx:r_float_ex(sect,param) or 0)
 		end		
