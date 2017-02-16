@@ -179,11 +179,14 @@ function sim_squad_scripted:update()
 		self.need_to_reset_location_masks = false
 	end
 	
+	--[[
 	local tg = time_global()
 	if (self.__check_time and tg < self.__check_time) then
 		--alun_utils.debug_write("sim_squad_scripted:update END 1")
 		return
 	end
+	self.__check_time = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
+	--]]
 	
 	SendScriptCallback("squad_on_update",self)
 
@@ -191,9 +194,6 @@ function sim_squad_scripted:update()
 	local se_actor = sim:actor()
 	self.dist_to_actor = self.position:distance_to(se_actor.position)
 
-	self.__check_time = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
-
-	
 	self:check_invulnerability()
 	--simulation_objects.get_sim_obj_registry():update_avaliability(self)
 

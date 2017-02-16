@@ -216,9 +216,9 @@ function simulation_board:assign_squad_to_smart(squad, smart_id)
 	-- remove squad from old smart if exist
 	if (old_smart_id and self.smarts[old_smart_id] and self.smarts[old_smart_id].squads[squad.id]) then
 		self.smarts[old_smart_id].squads[squad.id] = nil
-		
 		-- get accurate population count excluding squads using target_smart param
 		self.smarts[old_smart_id].population = smart_terrain.smart_terrain_squad_count(SIMBOARD.smarts[old_smart_id].squads)
+		SendScriptCallback("squad_on_leave_smart",squad,self.smarts[old_smart_id].smrt)
 	end
 
 	if smart_id == nil then
@@ -236,6 +236,8 @@ function simulation_board:assign_squad_to_smart(squad, smart_id)
 			self.smarts[smart_id].population = self.smarts[smart_id].population + 1
 		end
 	end
+	
+	SendScriptCallback("squad_on_enter_smart",squad,self.smarts[smart_id].smrt)
 end
 
 local community_groups = {}
