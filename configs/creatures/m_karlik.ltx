@@ -16,10 +16,13 @@ fire_max_distance				=	0
 fire_max_power					=	5
 fire_quadratic_factor			=	0.025
 
-psy_linear_factor				=	0.05
-psy_max_distance				=	0
-psy_max_power					=	5
+psy_linear_factor				=	1
+psy_max_distance				=	25
+psy_max_power					=	0.1
+psy_pp_effector_name			=	psy_antenna
+psy_pp_highest_at				=	0.1
 psy_quadratic_factor			=	0
+psy_sound						=	monsters\karlik\karlik_psi
 
 radiation_linear_factor			=	1
 radiation_max_distance			=	0
@@ -63,12 +66,12 @@ ph_skel_shot_up_factor			=	0.25
 
 ; Speed factors						linear		angular_real	angular_path	min		max
 Velocity_Drag					=	1.0,		3.0,			3.0,			1,		1
-Velocity_RunFwdDamaged			=	1.5,  		3.0,			3.0,			0.2,	1
-Velocity_RunFwdNormal			=	1.7,		3.0,			3.0,			0.4,	1	
+Velocity_RunFwdDamaged			=	2.0,  		3.0,			3.0,			0.2,	1
+Velocity_RunFwdNormal			=	2.25,		3.0,			3.0,			0.4,	1	
 Velocity_Stand					=	0,			1.4,			1.4,			1,		1
 Velocity_Steal					=	1.5,		3.0,			3.0,			1,		1
-Velocity_WalkFwdDamaged			=	0.7,		3.0,			0.8,			0.2,	2.0	
-Velocity_WalkFwdNormal			=	0.9,		0.6,			0.6,			0.02,	2.0	
+Velocity_WalkFwdDamaged			=	1.0,		3.0,			0.8,			0.2,	2.0	
+Velocity_WalkFwdNormal			=	1.35,		0.6,			0.6,			0.02,	2.0	
 
 ; Acceleration
 Accel_Aggressive				=	7.5
@@ -124,22 +127,20 @@ Max_Satiety						=	1.0
 satiety_threshold				=	0.5
 
 ; Sounds
-sound_aggressive				=	monsters\karlik\karlik_idle_
-sound_attack_hit				=	monsters\karlik\karlik_idle_
-sound_die						=	monsters\karlik\karlik_idle_
-sound_die_in_anomaly			=	monsters\karlik\karlik_idle_
+sound_aggressive				=	monsters\karlik\karlik_attack_
+sound_attack_hit				=	monsters\karlik\karlik_attack_
+sound_die						=	monsters\karlik\karlik_die_
+sound_die_in_anomaly			=	monsters\karlik\karlik_die_
 sound_distant_idle				=	monsters\karlik\karlik_idle_
-sound_eat						=	monsters\karlik\karlik_idle_
-sound_gravi_attack				=	monsters\karlik\karlik_idle_
-sound_gravi_wave				=	monsters\karlik\karlik_idle_
-sound_growling					=	monsters\karlik\karlik_idle_
+sound_eat						=	monsters\karlik\karlik_eat_
+sound_growling					=	monsters\biting\def_
 sound_idle						=	monsters\karlik\karlik_idle_
-sound_landing					=	monsters\karlik\karlik_idle_
+sound_landing					=	monsters\biting\def_
 sound_panic						=	monsters\karlik\karlik_idle_
-sound_steal						=	monsters\karlik\karlik_idle_
-sound_take_damage				=	monsters\karlik\karlik_idle_
+sound_steal						=	monsters\biting\def_
+sound_take_damage				=	monsters\karlik\karlik_hit_
 sound_tele_attack				=	monsters\karlik\karlik_idle_
-sound_threaten					=	monsters\karlik\karlik_idle_
+sound_threaten					=	monsters\karlik\karlik_eat_
 
 ; Misc
 killer_clsids					=	Z_MINCER, Z_GALANT, ZS_BFUZZ, ZS_MBALD, ZS_GALAN, ZS_MINCE
