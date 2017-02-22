@@ -228,7 +228,7 @@ function DynamicNewsManager:PushToChannel(name,t)
 				t.Mg = string.gsub(t.Mg,s,game.translate_string(s))
 			end
 		end
-		table.insert(self.queue[name],t)
+		table.insert(self.queue[name],#t+1,t)
 	end
 end 
 

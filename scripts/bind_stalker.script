@@ -70,10 +70,6 @@ function actor_binder:net_destroy()
 	
 	xr_sound.stop_sounds_by_id(self.object:id())
 
-	if(actor_stats.remove_from_ranking~=nil)then
-		actor_stats.remove_from_ranking(self.object:id())
-	end
-	
 	if (USE_MARSHAL) then 
 		UnregisterScriptCallback("save_state",self)
 	end

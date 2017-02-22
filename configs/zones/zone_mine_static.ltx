@@ -1,4 +1,4 @@
-[zone_mine_electric]:zone_base
+[zone_mine_static]:zone_base
 GroupControlSection			=	spawn_group_zone
 $def_sphere					=	2
 $prefetch					=	16
@@ -11,7 +11,7 @@ postprocess					=	postprocess_electra_mine
 ;-----------	Anomaly	settings	-----------------------
 max_start_power				=	1.00
 attenuation					=	1
-idle_particles				=	zones_mine\zone_electric_mine_idle
+idle_particles				=	anomaly2\electra_idle
 blowout_particles			=	anomaly2\electra2_blast
 hit_small_particles			=	anomaly2\electra_entrance_small
 hit_big_particles			=	anomaly2\electra_damage_02_smoke
@@ -27,7 +27,7 @@ blowout_light				=	on
 light_color					=	0.8,0.9,1
 light_range					=	30.0
 light_time					=	1		;0.35
-light_height				=	1.5			;подъем	источника	света	на	высоту
+light_height				=	1.5		;подъем	источника	света	на	высоту
 idle_light					=	off
 hit_type					=	shock
 disable_time				=	50		;время	игнорирования	неживого	объекта	в	зоне	(-1	если	не	нужно)
@@ -46,12 +46,12 @@ blowout_wind_time_end		=	299
 blowout_wind_power			=	0.2		;сила	поднимаего	ветра	(от	0	до	1),	в	момент	blowout_wind_time_peak
 shape_transp_color			=	255,	0,	0,	60
 shape_edge_color			=	32,	32,	32,	255
-[zone_mine_electric_weak]:zone_mine_electric
-$spawn						=	"zones\mine_electric_weak"
+[zone_mine_static_weak]:zone_mine_static
+$spawn						=	"zones\scenes\mine_static_weak"
 max_start_power				=	0.8
-[zone_mine_electric_average]:zone_mine_electric
-$spawn						=	"zones\mine_electric_average"
+[zone_mine_static_average]:zone_mine_static
+$spawn						=	"zones\scenes\mine_static_average"
 max_start_power				=	0.8
-[zone_mine_electric_strong]:zone_mine_electric
-$spawn						=	"zones\mine_electric_strong"
+[zone_mine_static_strong]:zone_mine_static
+$spawn						=	"zones\scenes\mine_static_strong"
 max_start_power				=	0.8

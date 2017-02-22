@@ -748,6 +748,7 @@ end
 local monster_classes
 local weapon_classes
 local artefact_classes
+local anomaly_classes
 
 function IsOutfit(o,c)
 	if not c then
@@ -875,6 +876,38 @@ function IsMonster(o,c)
 		}
 	end
 	return c and monster_classes[c] or false
+end
+
+function IsAnomaly(o,c)
+	if not (c) then
+		c = o and o:clsid()
+	end
+	if not (anomaly_classes) then
+		anomaly_classes = {
+		[clsid.zone]				= true,
+		[clsid.zone_acid_fog]		= true,
+		[clsid.zone_bfuzz]			= true,
+		[clsid.zone_campfire]		= true,
+		[clsid.zone_dead]			= true,
+		[clsid.zone_galantine]		= true,
+		[clsid.zone_mincer]			= true,
+		[clsid.zone_mosquito_bald]	= true,
+		[clsid.zone_radioactive]	= true,
+		[clsid.zone_rusty_hair]		= true,
+		[clsid.zone_bfuzz_s]		= true,
+		[clsid.zone_mbald_s]		= true,
+		[clsid.zone_galant_s]		= true,
+		[clsid.zone_mincer_s]		= true,
+		[clsid.zone_radio_s]		= true,
+		[clsid.zone_torrid_s]		= true,
+		[clsid.zone_nograv_s]		= true,
+		}
+	end
+	return c and anomaly_classes[c] or false
+end
+
+function isLc(obj)
+	return (obj:clsid() == clsid.level_changer)
 end
 
 function IsStalker(o,c)
@@ -1243,7 +1276,7 @@ function set_save_marker(p, mode, check, prefix)
 			printf("ERROR set_save_marker:%s: INCORRECT LOAD dif=%s c_dif=%s", prefix, dif, c_dif)
 		end
 	end
-	save_marker_result[prefix] = nil
+		save_marker_result[prefix] = nil
 end
 
 -- переводит вектор в строку.
@@ -1475,9 +1508,9 @@ function CALifeUpdateManager__on_before_change_level(packet)
 		
 	if (bind_container.se_inv_box_containers) then
 		for id,v in pairs(bind_container.se_inv_box_containers) do
-			pos.y = pos.y+100
+				pos.y = pos.y+100
 			TeleportObject(id,pos,lvid,gvid)
-		end
+		end	
 	end
 end
 

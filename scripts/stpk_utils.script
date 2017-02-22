@@ -140,14 +140,15 @@ function get_object_data(sobj)
 		["ZS_MINCE"] = this.get_anom_zone_data,
 		["ZS_RADIO"] = this.get_anom_zone_data,
 		["ZS_TORRD"] = this.get_anom_zone_data,
-		["Z_RUSTYH"] = this.get_visual_zone_data,
-		["ZS_BFUZZ"] = this.get_visual_zone_data,
-		["ZS_AMEBA"] = this.get_visual_zone_data,
+		["ZS_NGRAV"] = this.get_anom_zone_data,
 		["Z_MBALD"]  = this.get_anom_zone_data,
 		["Z_RADIO"]  = this.get_anom_zone_data,
 		["Z_CFIRE"]  = this.get_anom_zone_data,
 		["Z_NOGRAV"] = this.get_anom_zone_data,
-		["Z_TORRID"] = this.get_anom_zone_data
+		["Z_TORRID"] = this.get_anom_zone_data,
+		["Z_RUSTYH"] = this.get_visual_zone_data,
+		["ZS_BFUZZ"] = this.get_visual_zone_data,
+		["ZS_AMEBA"] = this.get_visual_zone_data
 	}
 	local class = system_ini():r_string_ex(sobj:section_name(),"class")
 	if (class == nil or class == "") then 
@@ -279,13 +280,15 @@ function set_object_data(t,sobj)
 		["ZS_MINCE"] = this.set_anom_zone_data,
 		["ZS_RADIO"] = this.set_anom_zone_data,
 		["ZS_TORRD"] = this.set_anom_zone_data,
-		["ZS_BFUZZ"] = this.set_anom_zone_data,
-
+		["ZS_NGRAV"] = this.set_anom_zone_data,
 		["Z_MBALD"]  = this.set_anom_zone_data,
 		["Z_RADIO"]  = this.set_anom_zone_data,
 		["Z_CFIRE"]  = this.set_anom_zone_data,
 		["Z_NOGRAV"] = this.set_anom_zone_data,
-		["Z_TORRID"] = this.set_anom_zone_data
+		["Z_TORRID"] = this.set_anom_zone_data,
+		["Z_RUSTYH"] = this.set_visual_zone_data,
+		["ZS_BFUZZ"] = this.set_visual_zone_data,
+		["ZS_AMEBA"] = this.set_visual_zone_data
 	}
 	local class = system_ini():r_string_ex(sobj:section_name(),"class")
 	if (class == nil or class == "") then 
@@ -300,7 +303,7 @@ function get_abstract_data(stpk)
 		return
 	end
     if (stpk:w_tell() <= 2) then
-        return
+	return
     end
 
     local t = {}
@@ -311,7 +314,9 @@ function get_abstract_data(stpk)
     t.name = stpk:r_stringZ()
     t.s_gameid = stpk:r_u8()
     t.s_rp = stpk:r_u8()
+	t.position = vector()
     stpk:r_vec3(t.position)
+	t.direction = vector()
     stpk:r_vec3(t.direction)
     t.respawn_time = stpk:r_u16()
     t.object_id = stpk:r_u16()
@@ -323,10 +328,10 @@ function get_abstract_data(stpk)
     t.script_version = stpk:r_u16()
     t.unused = stpk:r_u16()
     if t.unused > 0 then
-        t.extra = {}
-        for i = 1, t.unused do
-            t.extra[i] = stpk:r_u8()
-        end
+	t.extra = {}
+	for i = 1, t.unused do
+	    t.extra[i] = stpk:r_u8()
+	end
     end
     t.spawn_id = stpk:r_u16()
     t.extended_size = stpk:r_u16()
@@ -351,9 +356,9 @@ function set_abstract_data(t,stpk)
     stpk:w_u16(t.script_version)
     stpk:w_u16(t.unused)
     if t.unused > 0 and t.extra ~= nil then
-        for i = 1, t.unused do
-            stpk:w_u8(t.extra[i])
-        end
+	for i = 1, t.unused do
+	    stpk:w_u8(t.extra[i])
+	end
     end
     stpk:w_u16(t.spawn_id)
     stpk:w_u16(t.extended_size)
@@ -902,7 +907,7 @@ function get_anom_zone_data(sobj)
 	stpk_utils.parse_cse_alife_space_restrictor_properties_packet(t,stpk)
 	stpk_utils.parse_cse_alife_custom_zone_properties_packet(t,stpk)
 	stpk_utils.parse_cse_alife_anomalous_zone_properties_packet(t,stpk)
-	stpk_utils.parse_se_zone_anom_properties_packet(t,stpk)
+	stpk_utils.parse_se_zone_properties_packet(t,stpk)
 	return t
 end
 
@@ -914,7 +919,7 @@ function set_anom_zone_data(t,sobj)
 		stpk_utils.fill_cse_alife_space_restrictor_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_custom_zone_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_anomalous_zone_properties_packet(t,stpk)
-		stpk_utils.fill_se_zone_anom_properties_packet(t,stpk)
+		stpk_utils.fill_se_zone_properties_packet(t,stpk)
 		local size = stpk:w_tell()
 		stpk:r_seek(2)
 		
@@ -940,7 +945,7 @@ function get_visual_zone_data(sobj)
 	stpk_utils.parse_cse_alife_anomalous_zone_properties_packet(t,stpk)
 	stpk_utils.parse_cse_visual_properties_packet(t,stpk)
 	stpk_utils.parse_cse_alife_zone_visual_properties_packet(t,stpk)
-	stpk_utils.parse_se_zone_visual_properties_packet(t,stpk)
+	stpk_utils.parse_se_zone_properties_packet(t,stpk)
 	return t
 end
 
@@ -954,7 +959,7 @@ function set_visual_zone_data(t,sobj)
 		stpk_utils.fill_cse_alife_anomalous_zone_properties_packet(t,stpk)
 		stpk_utils.fill_cse_visual_properties_packet(t,stpk)
 		stpk_utils.fill_cse_alife_zone_visual_properties_packet(t,stpk)
-		stpk_utils.fill_se_zone_visual_properties_packet(t,stpk)
+		stpk_utils.fill_se_zone_properties_packet(t,stpk)
 		local size = stpk:w_tell()
 		stpk:r_seek(2)
 		
@@ -1077,7 +1082,9 @@ function parse_cse_abstract_properties_packet(ret,stpk)
     t.name = stpk:r_stringZ()
     t.s_gameid = stpk:r_u8()
     t.s_rp = stpk:r_u8()
+	t.position = vector()
     stpk:r_vec3(t.position)
+	t.direction = vector()
     stpk:r_vec3(t.direction)
     t.respawn_time = stpk:r_u16()
     t.object_id = stpk:r_u16()
@@ -1089,10 +1096,10 @@ function parse_cse_abstract_properties_packet(ret,stpk)
     t.script_version = stpk:r_u16()
     t.unused = stpk:r_u16()
     if t.unused > 0 then
-        t.extra = {}
-        for i = 1, t.unused do
-            t.extra[i] = stpk:r_u8()
-        end
+	t.extra = {}
+	for i = 1, t.unused do
+	    t.extra[i] = stpk:r_u8()
+	end
     end
     t.spawn_id = stpk:r_u16()
     t.extended_size = stpk:r_u16()
@@ -1117,9 +1124,9 @@ function fill_cse_abstract_properties_packet(ret,stpk)
 	stpk:w_u16(ret.script_version)
 	stpk:w_u16(ret.unused)
 	if (ret.unused > 0 and ret.extra ~= nil) then
-        for i = 1, ret.unused do
-            stpk:w_u8(ret.extra[i])
-        end
+	for i = 1, ret.unused do
+	    stpk:w_u8(ret.extra[i])
+	end
     end
 	stpk:w_u16(ret.spawn_id)
 	stpk:w_u16(ret.extended_size)
@@ -1149,17 +1156,22 @@ end
 function parse_cse_shape_properties_packet(ret,stpk)
 	local shape_count = stpk:r_u8()
 	ret.shapes = {}
-	if (shape_count > 0) then 
+	if (shape_count > 0) then
 		for i = 1, shape_count do
 			local shape_type = stpk:r_u8()
 			ret.shapes[i] = {}
 			ret.shapes[i].shtype = shape_type
 			if shape_type == 0 then
 				-- sphere
-				stpk:r_vec3(ret.shapes[i].offset)
+				ret.shapes[i].center = vector()
+				stpk:r_vec3(ret.shapes[i].center)
 				ret.shapes[i].radius = stpk:r_float()
 			else
 				-- box
+				ret.shapes[i].v1 = vector()
+				ret.shapes[i].v2 = vector()
+				ret.shapes[i].v3 = vector()
+				ret.shapes[i].offset = vector()
 				stpk:r_vec3(ret.shapes[i].v1)
 				stpk:r_vec3(ret.shapes[i].v2)
 				stpk:r_vec3(ret.shapes[i].v3)
@@ -1178,7 +1190,7 @@ function fill_cse_shape_properties_packet(ret,stpk)
 			stpk:w_u8(ret.shapes[i].shtype)
 			if ret.shapes[i].shtype == 0 then
 				-- sphere
-				stpk:w_vec3(ret.shapes[i].offset)
+				stpk:w_vec3(ret.shapes[i].center)
 				stpk:w_float(ret.shapes[i].radius)
 			else
 				-- box
@@ -1679,7 +1691,9 @@ end
 function parse_cse_alife_level_changer_properties_packet(ret,stpk)
 	ret.dest_game_vertex_id = stpk:r_u16()
 	ret.dest_level_vertex_id = stpk:r_s32()
+	ret.dest_position = vector()
 	stpk:r_vec3(ret.dest_position)
+	ret.dest_direction = vector()
 	stpk:r_vec3(ret.dest_direction)
 	ret.dest_level_name = stpk:r_stringZ()
 	ret.dest_graph_point = stpk:r_stringZ()
@@ -1751,8 +1765,8 @@ function fill_cse_alife_anomalous_zone_properties_packet(ret,stpk)
 	stpk:w_s32(ret.artefact_position_offset)
 end
 
--- se_zone_anom_properties
-function parse_se_zone_anom_properties_packet(ret,stpk)
+-- se_zone_properties
+function parse_se_zone_properties_packet(ret,stpk)
 	if data_left(stpk) then
 		ret.last_spawn_time = stpk:r_u8()
 		if ret.last_spawn_time == 1 then
@@ -1763,7 +1777,7 @@ function parse_se_zone_anom_properties_packet(ret,stpk)
 	end
 end
 
-function fill_se_zone_anom_properties_packet(ret,stpk)
+function fill_se_zone_properties_packet(ret,stpk)
 	if ret.last_spawn_time ~= nil then
 		stpk:w_u8(ret.last_spawn_time)
 		if ret.last_spawn_time == 1 then
@@ -1783,29 +1797,6 @@ end
 function fill_cse_alife_zone_visual_properties_packet(ret,stpk)
 	stpk:w_stringZ(ret.idle_animation or "idle")
 	stpk:w_stringZ(ret.attack_animation or "blast")
-end
-
--- se_zone_visual_properties
-function parse_se_zone_visual_properties_packet(ret,stpk)
-	if data_left(stpk) then
-		ret.last_spawn_time = stpk:r_u8()
-		if ret.last_spawn_time == 1 then
-			if data_left(stpk) then
-				ret.c_time = utils.r_CTime(stpk)
-			end
-		end
-	end
-end
-
-function fill_se_zone_visual_properties_packet(ret,stpk)
-	if ret.last_spawn_time ~= nil then
-		stpk:w_u8(ret.last_spawn_time)
-		if ret.last_spawn_time == 1 then
-			utils.w_CTime(stpk, ret.c_time)
-		end
-	else
-		stpk:w_u8(0)
-	end
 end
 
 -- cse_alife_online_offline_group_properties
@@ -2036,4 +2027,55 @@ function writevu32stringZ(pk,v)
 	for i=1,len,1 do
 		pk:w_stringZ(v[i])
 	end
+end
+
+--/-------------------------------------------------------------------
+--/ Строковые функции
+--/-------------------------------------------------------------------
+--/ для правильного парсинга запрещены комментарии!!!
+function parse_custom_data(str)
+	local t = {}
+	if str then
+		for section, section_data in string.gfind(str,"%s*%[([^%]]*)%]%s*([^%[%z]*)%s*") do
+			section = string.trim(section)
+			t[section] = {}
+			for line in string.gfind(string.trim(section_data), "([^\n]*)\n*") do
+				if string.find(line,"=") ~= nil then
+					for k, v in string.gfind(line, "([^=]-)%s*=%s*(.*)") do
+						k = string.trim(k)
+						if k ~= nil and k ~= "" and v ~= nil then
+							t[section][k] = string.trim(v)
+						end
+					end
+				else
+					for k, v in string.gfind(line, "(.*)") do
+						k = string.trim(k)
+						if k ~= nil and k ~= "" then
+							t[section][k] = "<<no_value>>"
+						end
+					end
+				end
+			end
+		end
+	end
+	return t
+end
+
+function gen_custom_data(tbl)
+	local str = ""
+	for key, value in pairs(tbl) do
+		str = str.."\n["..key.."]\n"
+		for k, v in pairs(value) do
+			if v ~= "<<no_value>>" then
+				if type(v) == "table" then
+					store_table(v, "ABORT:["..key.."]>>")
+					abort("TABLE NOT ALLOWED IN PARSE TABLE")
+				end
+				str = str..k.." = "..v.."\n"
+			else
+				str = str..k.."\n"
+			end
+		end
+	end
+	return str
 end

@@ -1,4 +1,4 @@
-[zone_mine_acidic]:zone_base
+[zone_mine_chemical]:zone_base
 GroupControlSection			=	spawn_group_zone
 $def_sphere					=	2
 $prefetch					=	16
@@ -11,12 +11,12 @@ postprocess					=	postprocess_acidic_mine
 ;-----------	Anomaly	settings	-----------------------
 max_start_power				=	1.00
 attenuation					=	1
-idle_particles				=	zones_mine\zone_acidic_mine_idle
-blowout_particles			=	zones_mine\zone_acidic_mine_hit
-;hit_small_particles		=	zones_mine\zone_acidic_mine_hit
-;hit_big_particles			=	zones_mine\zone_acidic_mine_hit
-;idle_small_particles		=	zones_mine\zone_acidic_mine_idle
-;idle_big_particles			=	zones_mine\zone_acidic_mine_idle
+idle_particles				=	anomaly2\studen_idle_bottom
+blowout_particles			=	anomaly2\studen_blowout
+hit_small_particles			=	anomaly2\studen_idle_bottom_00
+hit_big_particles			=	anomaly2\studen_idle_bottom_00
+idle_small_particles		=	anomaly2\studen_idle_bottom_00
+idle_big_particles			=	anomaly2\studen_idle_bottom_00
 idle_sound					=	anomaly\buzz_idle;	bfuzz_blowout		;постоянный	звук
 blowout_sound				=	anomaly\buzz_hit;	bfuzz_hit		;во	время	выброса(удара)	в	центре	аномалии
 hit_sound					=	anomaly\buzz_hit;	bfuzz_hit		;на	персонаже,	когда	тот	получает	хит
@@ -48,41 +48,9 @@ blowout_wind_time_end		=	899
 blowout_wind_power			=	0.5			;сила	поднимаего	ветра	(от	0	до	1),	в	момент	blowout_wind_time_peak
 shape_transp_color			=	255,	0,	0,	60
 shape_edge_color			=	32,	32,	32,	255
-[zone_mine_acidic_weak]:zone_mine_acidic
-$spawn						=	"zones\mine_acidic_weak"
-max_start_power				=	0.2
-attenuation					=	1
-use_secondary_hit			=	true
-secondary_hit_power			=	0.005
-[zone_mine_acidic_average]:zone_mine_acidic
-$spawn						=	"zones\mine_acidic_average"
-max_start_power				=	0.2
-attenuation					=	1
-use_secondary_hit			=	true
-secondary_hit_power			=	0.005
-[zone_mine_acidic_strong]:zone_mine_acidic
-$spawn						=	"zones\mine_acidic_strong"
-max_start_power				=	0.2
-attenuation					=	1
-use_secondary_hit			=	true
-secondary_hit_power			=	0.005
-[zone_mine_acidic_big]:zone_mine_acidic
-$spawn						=	"zones\scenes\mine_acidic_big"
-;-----------	Anomaly	settings	-----------------------
-$def_sphere					=	7.5
-max_start_power				=	1
-idle_particles				=	
-blowout_particles			=	zones_mine\zone_acidic_mine_hit
-hit_small_particles			=	
-hit_big_particles			=	
-idle_small_particles		=	
-idle_big_particles			=	
-entrance_small_particles	=	
-entrance_big_particles		=	
-awaking_time				=	7000
-blowout_time				=	1000
-accamulate_time				=	1000
-idle_sound					=	anomaly\buzz_idle
-blowout_sound				=	anomaly\buzz_hit
-hit_sound					=	anomaly\buzz_hit
-entrance_sound				=	anomaly\buzz_hit
+[zone_mine_chemical_weak]:zone_mine_chemical
+$spawn						=	"zones\scenes\mine_chemical_weak"
+[zone_mine_chemical_average]:zone_mine_chemical
+$spawn						=	"zones\scenes\mine_chemical_average"
+[zone_mine_chemical_strong]:zone_mine_chemical
+$spawn						=	"zones\scenes\mine_chemical_strong"
