@@ -1,45 +1,4 @@
-#include "outfit_upgrades\o_novice_outfit_up.ltx"
-#include "outfit_upgrades\o_stalker_outfit_up.ltx"
-#include "outfit_upgrades\o_svoboda_light_outfit_up.ltx"
-#include "outfit_upgrades\o_scientific_outfit_up.ltx"
-#include "outfit_upgrades\o_cs_heavy_outfit_up.ltx"
-#include "outfit_upgrades\o_dolg_outfit_up.ltx"
-#include "outfit_upgrades\o_svoboda_heavy_outfit_up.ltx"
-#include "outfit_upgrades\o_specops_outfit_up.ltx"
-#include "outfit_upgrades\o_exo_outfit_up.ltx"
-#include "outfit_upgrades\o_dolg_heavy_outfit_up.ltx"
-#include "outfit_upgrades\o_military_outfit_up.ltx"
-
-#include "outfit_upgrades\helm_battle_up.ltx"
-#include "outfit_upgrades\helm_hardhat_up.ltx"
-#include "outfit_upgrades\helm_protective_up.ltx"
-#include "outfit_upgrades\helm_respirator_up.ltx"
-#include "outfit_upgrades\helm_tactic_up.ltx"
-
-#include "outfit_upgrades\o_svoboda_exo_outfit_up.ltx"
-#include "outfit_upgrades\o_dolg_exo_outfit_up.ltx"
-#include "outfit_upgrades\o_merc_exo_outfit_up.ltx"
-#include "outfit_upgrades\o_dolg_scientific_outfit_up.ltx"
-#include "outfit_upgrades\o_svoboda_scientific_outfit_up.ltx"
-#include "outfit_upgrades\o_svoboda_outfit_up.ltx"
-#include "outfit_upgrades\o_rookie_outfit_up.ltx"
-#include "outfit_upgrades\o_bandit_outfit_up.ltx"
-#include "outfit_upgrades\o_merc_outfit_up.ltx"
-#include "outfit_upgrades\o_banditmerc_outfit_up.ltx"
-#include "outfit_upgrades\helm_m40_up.ltx"
-#include "outfit_upgrades\o_monolith_exo_outfit_up.ltx"
-#include "outfit_upgrades\o_rad_outfit_up.ltx"
-#include "outfit_upgrades\o_merc_rad_outfit_up.ltx"
-#include "outfit_upgrades\o_monolith_rad_outfit_up.ltx"
-#include "outfit_upgrades\o_dolg_rad_outfit_up.ltx"
-#include "outfit_upgrades\o_svoboda_rad_outfit_up.ltx"
-#include "outfit_upgrades\o_monolith_outfit_up.ltx"
-#include "outfit_upgrades\o_cs_light_outfit_up.ltx"
-#include "outfit_upgrades\o_ecolog_light_outfit_up.ltx"
-#include "outfit_upgrades\o_ecolog_heavy_outfit_up.ltx"
-
 [outfit_base]
-; delete full_scale_icon	next update- obsolete, use  full_icon_name instead !!!
 GroupControlSection                      = spawn_group
 discovery_dependency                     =
 class                                    = EQU_STLK	;Change to E_STLK if you want to use se_item.se_outfit script binding
@@ -47,7 +6,7 @@ cform                                    = skeleton
 
 additional_inventory_weight              = 0	                                       ; +max_walk_weight
 additional_inventory_weight2             = 0	                                       ;	+40 kg
-full_icon_name                           = npc_icon_without_outfit
+full_icon_name                           = npc_icon_without_outfit						; unused
 slot                                     = 6
 
 inv_grid_width                           = 2
@@ -59,10 +18,8 @@ control_inertion_factor                  = 1
 player_hud_section                       = actor_hud_05
 
 [without_outfit]:outfit_base
-;базовый костюм сталкера - костюм новичка. Обычная одежда туриста - штормовка+сапоги
 full_scale_icon                          = 6,6
 player_hud_section                       = actor_hud_05
-
 ;---------------------------------------------------------------------------------------------
 ;		Sunrise Suit
 ;---------------------------------------------------------------------------------------------
