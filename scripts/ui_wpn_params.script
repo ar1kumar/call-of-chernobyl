@@ -29,9 +29,13 @@ function read_float(wpn_section, upgr_sections, param)
 	local ltx = system_ini()
 	local res = 0
 	
-	if (param == "hit_power") then 
-		local t = parse_names(ltx:r_string_ex(wpn_section,param) or "")
-		res = tonumber(t[1]) or 0
+	if (param == "hit_power") then
+		local t = parse_names(ltx:r_string_ex(wpn_section,"hit_power") or {})
+		res = tonumber(t[1]) or 0.3
+		local atype = parse_names(ltx:r_string_ex(wpn_section,"ammo_class"))[1] or ""
+		local a_hit = (ltx:r_float_ex(atype,"k_hit",0.5) + (ltx:r_float_ex(atype,"k_ap",1)/10)) * (ltx:r_float_ex(atype,"buck_shot",1))
+		res = math.pow(normalize(res + a_hit,0.8,3.2),0.2)/math.pow(100,0.2) or 1
+	--	printf("ammo type %s  ammo damage %s display damage %s", atype,a_hit,res)
 	else
 		res = ltx:r_float_ex(wpn_section, param) or param == "control_inertion_factor" and 1 or 0
 	end 
@@ -44,10 +48,8 @@ function read_float(wpn_section, upgr_sections, param)
 		if param == "hit_power" then
 			local r = parse_names(ltx:r_string_ex(sect,param) or "")
 			r = tonumber(r[1]) or 0
-			-- if res < r then
-				-- res = r
-			-- end
 			res = res + r
+		--	printf("upgrade display damage %s", res)
 		else
 			res = res + (ltx:r_float_ex(sect,param) or 0)
 		end		
@@ -63,19 +65,7 @@ end
 
 function GetDamage(wpn_section, upgr_sections) --' повреждение
    local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
-
-   local ltx = system_ini()
-   if ltx:line_exist(wpn_section, "ammo_class") then
-		local ammo_list = ltx:r_string(wpn_section, "ammo_class")
-		if (ammo_list) then
-			local pos = string.find(ammo_list, ",", 1)
-			local ammo = (pos ~= nil) and string.sub(ammo_list, 1, pos-1) or ammo_list
-			local k_hit = ltx:r_float_ex(ammo, "k_hit") or 1
-			hit_power = (hit_power ~= 0) and (k_hit*hit_power) or k_hit
-		end
-   end
-
-   return normalize(hit_power, 0, 1.5)
+   return normalize(hit_power, 0.5, 1.2)
 end
 
 function GetDamageMP(wpn_section, upgr_sections) -- ??? (повреждениеMP)
