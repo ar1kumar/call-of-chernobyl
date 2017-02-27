@@ -464,7 +464,7 @@ function init_ranks_reps()
 	local tbl = parse_str(ini:r_string_ex("game_relations","rating"))
 	local tbl2 = parse_str(ini:r_string_ex("game_relations","reputation"))
 	for i=2, #tbl, 2 do
-		ranks[#ranks+1] = tbl[i]
+		ranks[#ranks+1] = tonumber(tbl[i])
 	end
 	for i=2, #tbl2, 2 do
 		reputations[#reputations+1] = tonumber(tbl2[i])
