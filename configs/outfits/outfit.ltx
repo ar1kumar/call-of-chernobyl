@@ -497,8 +497,8 @@ description                              = csky_medium_outfit_description
 
 inv_weight                               = 4.5
 
-inv_grid_x                               = 28
-inv_grid_y                               = 34
+inv_grid_x                               = 18
+inv_grid_y                               = 33
 
 upgr_icon_x                              = 606
 upgr_icon_y                              = 1309
@@ -573,8 +573,8 @@ description                              = csky_3b_outfit_description
 
 inv_weight                               = 7.5
 
-inv_grid_x                               = 18
-inv_grid_y                               = 33
+inv_grid_x                               = 28
+inv_grid_y                               = 34
 
 upgr_icon_x                              = 1856
 upgr_icon_y                              = 212
@@ -1088,6 +1088,82 @@ telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = -0.01
 explosion_immunity                       = -0.01
 fire_wound_immunity                      = -0.0025
+
+;---------------------------------------------------------------------------------------------
+;		MERC SUNRISE SUIT
+;---------------------------------------------------------------------------------------------
+[merc_stalker_outfit]:outfit_base
+$spawn                                   = "outfit\merc_stalker_outfit"
+visual                                   = dynamics\outfit\merc_stalker_outfit
+actor_visual                             = actors\stalker_merc\stalker_merc_sun1.ogf
+npc_visual                               = actors\stalker_merc\stalker_merc_sun1.ogf
+player_hud_section                       = actor_hud_merc_seva
+
+ef_equipment_type                        = 3
+
+inv_name                                 = merc_stalker_outfit_name
+inv_name_short                           = merc_stalker_outfit_name
+description                              = merc_stalker_outfit_description
+
+inv_weight                               = 8.5
+
+inv_grid_x                               = 30
+inv_grid_y                               = 37
+upgr_icon_x                              = 2521
+upgr_icon_y                              = 1216
+upgr_icon_width                          = 300
+upgr_icon_height                         = 125
+
+cost                                     = 13500
+full_scale_icon                          = 14,11	                                       ;иконка сталкера в костюме в полный рост
+
+artefact_count                           = 1
+
+immunities_sect                          = sect_merc_stalker_outfit_immunities
+
+
+; LOW RESISTANCE
+burn_protection                          = 0.0433
+shock_protection                         = 0.1733
+radiation_protection                     = 0.0065
+chemical_burn_protection                 = 0.0433
+telepatic_protection                     = 0.0
+strike_protection                        = 0.1925
+explosion_protection                     = 0.1925
+wound_protection                         = 0.1925
+
+hit_fraction_actor                       = 0.75
+bones_koeff_protection                   = actor_armor_suit
+
+control_inertion_factor                  = 1.2
+power_loss                               = 0.75
+
+upgrades                                 = up_gr_firstab_stalker_outfit, up_gr_seconab_stalker_outfit, up_gr_thirdab_stalker_outfit
+installed_upgrades                       =
+upgrade_scheme                           = upgrade_scheme_stalker_outfit
+character_portrait						 = ui_inGame2_merc_sun1
+
+[sect_merc_stalker_outfit_immunities]
+burn_immunity                            = 0.03	                                       ;коэффициенты иммунитета самого костюма
+strike_immunity                          = 0.0
+shock_immunity                           = 0.03
+wound_immunity                           = 0.03
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.03
+explosion_immunity                       = 0.03
+fire_wound_immunity                      = 0.015
+
+[sect_merc_stalker_outfit_immunities_add]
+burn_immunity                            = -0.015	                                       ;коэффициенты иммунитета самого костюма
+strike_immunity                          = 0.0
+shock_immunity                           = -0.015
+wound_immunity                           = -0.015
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = -0.015
+explosion_immunity                       = -0.015
+fire_wound_immunity                      = -0.005
 
 ;---------------------------------------------------------------------------------------------
 ;		BANDITMERC SUIT
