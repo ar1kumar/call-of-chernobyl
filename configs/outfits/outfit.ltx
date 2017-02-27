@@ -259,8 +259,8 @@ fire_wound_immunity                      = -0.003
 [cs_light_novice_outfit]:outfit_base
 $spawn                                   = "outfit\cs_light_novice_outfit"
 visual                                   = dynamics\outfit\cs_light_outfit
-actor_visual                             = actors\stalker_nebo\stalker_nebo_2
-npc_visual                               = actors\stalker_nebo\stalker_nebo_2
+actor_visual                             = actors\stalker_nebo\stalker_nebo_1 ;actors\stalker_nebo\stalker_nebo_2
+npc_visual                               = actors\stalker_nebo\stalker_nebo_1 ;actors\stalker_nebo\stalker_nebo_2
 player_hud_section                       = actor_hud_cs1
 
 ef_equipment_type                        = 3
@@ -270,13 +270,13 @@ inv_name_short                           = csky_light_novice_outfit_name
 description                              = csky_light_novice_outfit_description
 inv_weight                               = 4.5
 
-inv_grid_x                               = 18
-inv_grid_y                               = 14
+inv_grid_x                               = 28
+inv_grid_y                               = 34
 
-upgr_icon_x                              = 4	;1830
-upgr_icon_y                              = 304	;215
-upgr_icon_width                          = 305	;305
-upgr_icon_height                         = 131	;131
+upgr_icon_x                              = 606
+upgr_icon_y                              = 1309
+upgr_icon_width                          = 306
+upgr_icon_height                         = 132
 
 full_icon_name                           = npc_icon_svoboda_light_outfit
 
@@ -286,16 +286,15 @@ full_scale_icon                          = 10,11	                               
 immunities_sect                          = sect_light_novice_outfit_immunities
 power_loss                               = 0.55
 
-; LOW RESISTANCE
-burn_protection                          = 0.0333
-shock_protection                         = 0.1333
-radiation_protection                     = 0.0050
-chemical_burn_protection                 = 0.0333
+; MEDIUM RESISTANCE
+burn_protection                          = 0.0533
+shock_protection                         = 0.2133
+radiation_protection                     = 0.0080
+chemical_burn_protection                 = 0.0533
 telepatic_protection                     = 0.0
-strike_protection                        = 0.1050
-explosion_protection                     = 0.1050
-wound_protection                         = 0.1050
-
+strike_protection                        = 0.1750
+explosion_protection                     = 0.1750
+wound_protection                         = 0.1750
 
 bones_koeff_protection                   = actor_armor_cs1
 hit_fraction_actor                       = 0.3
@@ -310,24 +309,24 @@ character_portrait						 = ui_inGame2_csky_1_2
 [sect_light_novice_outfit_immunities]
 burn_immunity                            = 0.04	                                       ;коэффициенты иммунитета самого костюма
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
+shock_immunity                           = 0.04
 wound_immunity                           = 0.04
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.04
 explosion_immunity                       = 0.04
-fire_wound_immunity                      = 0.02
+fire_wound_immunity                      = 0.01
 
 [sect_light_novice_outfit_immunities_add]
-burn_immunity                            = 0.02	                                       ;коэффициенты иммунитета самого костюма
-strike_immunity                          = 0.0
+burn_immunity                            = -0.01	                                       ;коэффициенты иммунитета самого костюма
+strike_immunity                          = -0.01
 shock_immunity                           = 0.0
-wound_immunity                           = 0.02
+wound_immunity                           = -0.01
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
-chemical_burn_immunity                   = 0.02
-explosion_immunity                       = 0.02
-fire_wound_immunity                      = 0.015
+chemical_burn_immunity                   = -0.01
+explosion_immunity                       = -0.01
+fire_wound_immunity                      = -0.0020
 
 ;---------------------------------------------------------------------------------------------
 ;		CS-1b Body Armor
@@ -375,7 +374,7 @@ wound_protection                         = 0.2100
 hit_fraction_actor                       = 0.45
 bones_koeff_protection                   = actor_armor_duty_suit
 
-artefact_count                           = 1
+artefact_count                           = 2
 control_inertion_factor                  = 1.5
 
 upgrades                                 = up_gr_firstab_cs_heavy_outfit, up_gr_seconab_cs_heavy_outfit, up_gr_thirdab_cs_heavy_outfit, up_gr_fourtab_cs_heavy_outfit
@@ -469,15 +468,15 @@ explosion_immunity                       = 0.04
 fire_wound_immunity                      = 0.02
 
 [sect_cs_light_outfit_immunities_add]
-burn_immunity                            = 0.02	                                       ;коэффициенты иммунитета самого костюма
+burn_immunity                            = -0.02	                                       ;коэффициенты иммунитета самого костюма
 strike_immunity                          = 0.0
 shock_immunity                           = 0.0
-wound_immunity                           = 0.02
+wound_immunity                           = -0.02
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
-chemical_burn_immunity                   = 0.02
-explosion_immunity                       = 0.02
-fire_wound_immunity                      = 0.015
+chemical_burn_immunity                   = -0.02
+explosion_immunity                       = -0.02
+fire_wound_immunity                      = -0.015
 
 
 ;---------------------------------------------------------------------------------------------
@@ -485,9 +484,9 @@ fire_wound_immunity                      = 0.015
 ;---------------------------------------------------------------------------------------------
 [cs_medium_outfit]:outfit_base
 $spawn                                   = "outfit\cs_medium_outfit"
-visual                                   = dynamics\outfit\cs_light_outfit		;cs_medium and light were switched http://stalker.wikia.com/wiki/CS-3a_body_armor_(Clear_Sky)
-actor_visual                             = actors\stalker_nebo\stalker_nebo_1
-npc_visual                               = actors\stalker_nebo\stalker_nebo_1
+visual                                   = dynamics\outfit\cs_medium_outfit
+actor_visual                             = actors\stalker_nebo\stalker_nebo_2 ;actors\stalker_nebo\stalker_nebo_1
+npc_visual                               = actors\stalker_nebo\stalker_nebo_2 ;actors\stalker_nebo\stalker_nebo_1
 player_hud_section                       = actor_hud_cs3a
 
 ef_equipment_type                        = 3
@@ -498,14 +497,13 @@ description                              = csky_medium_outfit_description
 
 inv_weight                               = 7.5
 
-inv_grid_x                               = 28
-inv_grid_y                               = 34
+inv_grid_x                               = 18
+inv_grid_y                               = 14
 
-upgr_icon_x                              = 606
-upgr_icon_y                              = 1309
-upgr_icon_width                          = 306
-upgr_icon_height                         = 132
-full_icon_name                           = npc_icon_svoboda_heavy_outfit
+upgr_icon_x                              = 4	;1830
+upgr_icon_y                              = 304	;215
+upgr_icon_width                          = 305	;305
+upgr_icon_height                         = 131	;131
 
 cost                                     = 11250
 full_scale_icon                          = 2,6	                                       ;иконка сталкера в костюме в полный рост
@@ -514,14 +512,14 @@ immunities_sect                          = sect_cs_medium_outfit_immunities
 power_loss                               = 0.75
 
 ; MEDIUM RESISTANCE
-burn_protection                          = 0.0533
-shock_protection                         = 0.2133
-radiation_protection                     = 0.0080
-chemical_burn_protection                 = 0.0533
+burn_protection                          = 0.0333
+shock_protection                         = 0.1333
+radiation_protection                     = 0.0050
+chemical_burn_protection                 = 0.0333
 telepatic_protection                     = 0.0
-strike_protection                        = 0.1750
-explosion_protection                     = 0.1750
-wound_protection                         = 0.1750
+strike_protection                        = 0.1050
+explosion_protection                     = 0.1050
+wound_protection                         = 0.1050
 
 hit_fraction_actor                       = 0.35
 bones_koeff_protection                   = actor_armor_cs3
@@ -537,13 +535,13 @@ character_portrait						 = ui_inGame2_csky_5
 [sect_cs_medium_outfit_immunities]
 burn_immunity                            = 0.04	                                       ;коэффициенты иммунитета самого костюма
 strike_immunity                          = 0.0
-shock_immunity                           = 0.04
+shock_immunity                           = 0.0
 wound_immunity                           = 0.04
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.04
 explosion_immunity                       = 0.04
-fire_wound_immunity                      = 0.01
+fire_wound_immunity                      = 0.02
 
 [sect_cs_medium_outfit_immunities_add]
 burn_immunity                            = -0.01	                                       ;коэффициенты иммунитета самого костюма
@@ -1472,15 +1470,15 @@ explosion_immunity                       = 0.04
 fire_wound_immunity                      = 0.02
 
 [sect_army_outfit_immunities_add]
-burn_immunity                            = 0.02	                                       ;коэффициенты иммунитета самого костюма
+burn_immunity                            = -0.02	                                       ;коэффициенты иммунитета самого костюма
 strike_immunity                          = 0.0
 shock_immunity                           = 0.0
-wound_immunity                           = 0.02
+wound_immunity                           = -0.02
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
-chemical_burn_immunity                   = 0.02
-explosion_immunity                       = 0.02
-fire_wound_immunity                      = 0.015
+chemical_burn_immunity                   = -0.02
+explosion_immunity                       = -0.02
+fire_wound_immunity                      = -0.015
 
 
 ;---------------------------------------------------------------------------------------------
