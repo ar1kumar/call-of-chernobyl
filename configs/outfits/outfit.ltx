@@ -256,11 +256,11 @@ fire_wound_immunity                      = -0.003
 ;---------------------------------------------------------------------------------------------
 ;		CS-1 body armor
 ;---------------------------------------------------------------------------------------------
-[cs_light_novice_outfit]:outfit_base
+[cs_light_novice_outfit]:outfit_base             ;disregard section name, cs-1 is heavy, cs-2 is medium and cs-3 is light like in vanilla
 $spawn                                   = "outfit\cs_light_novice_outfit"
-visual                                   = dynamics\outfit\cs_light_outfit
-actor_visual                             = actors\stalker_nebo\stalker_nebo_1 ;actors\stalker_nebo\stalker_nebo_2
-npc_visual                               = actors\stalker_nebo\stalker_nebo_1 ;actors\stalker_nebo\stalker_nebo_2
+visual                                   = dynamics\outfit\cs_medium_outfit
+actor_visual                             = actors\stalker_nebo\stalker_nebo_2
+npc_visual                               = actors\stalker_nebo\stalker_nebo_2
 player_hud_section                       = actor_hud_cs1
 
 ef_equipment_type                        = 3
@@ -268,19 +268,19 @@ ef_equipment_type                        = 3
 inv_name                                 = csky_light_novice_outfit_name
 inv_name_short                           = csky_light_novice_outfit_name
 description                              = csky_light_novice_outfit_description
-inv_weight                               = 4.5
+inv_weight                               = 7.5
 
-inv_grid_x                               = 28
-inv_grid_y                               = 34
+inv_grid_x                               = 18
+inv_grid_y                               = 14
 
-upgr_icon_x                              = 606
-upgr_icon_y                              = 1309
-upgr_icon_width                          = 306
-upgr_icon_height                         = 132
+upgr_icon_x                              = 4
+upgr_icon_y                              = 304
+upgr_icon_width                          = 305
+upgr_icon_height                         = 131
 
 full_icon_name                           = npc_icon_svoboda_light_outfit
 
-cost                                     = 5250
+cost                                     = 11250
 full_scale_icon                          = 10,11	                                       ;иконка сталкера в костюме в полный рост
 
 immunities_sect                          = sect_light_novice_outfit_immunities
@@ -298,7 +298,7 @@ wound_protection                         = 0.1750
 
 bones_koeff_protection                   = actor_armor_cs1
 hit_fraction_actor                       = 0.3
-artefact_count                           = 1
+artefact_count                           = 2
 control_inertion_factor                  = 1.2
 
 upgrades                                 = up_gr_firstab_cs_light_outfit, up_gr_seconab_cs_light_outfit, up_gr_thirdab_cs_light_outfit
@@ -484,9 +484,9 @@ fire_wound_immunity                      = -0.015
 ;---------------------------------------------------------------------------------------------
 [cs_medium_outfit]:outfit_base
 $spawn                                   = "outfit\cs_medium_outfit"
-visual                                   = dynamics\outfit\cs_medium_outfit
-actor_visual                             = actors\stalker_nebo\stalker_nebo_2 ;actors\stalker_nebo\stalker_nebo_1
-npc_visual                               = actors\stalker_nebo\stalker_nebo_2 ;actors\stalker_nebo\stalker_nebo_1
+visual                                   = dynamics\outfit\cs_light_outfit
+actor_visual                             = actors\stalker_nebo\stalker_nebo_1
+npc_visual                               = actors\stalker_nebo\stalker_nebo_1
 player_hud_section                       = actor_hud_cs3a
 
 ef_equipment_type                        = 3
@@ -495,17 +495,17 @@ inv_name                                 = csky_medium_outfit_name
 inv_name_short                           = csky_medium_outfit_name
 description                              = csky_medium_outfit_description
 
-inv_weight                               = 7.5
+inv_weight                               = 4.5
 
-inv_grid_x                               = 18
-inv_grid_y                               = 14
+inv_grid_x                               = 28
+inv_grid_y                               = 34
 
-upgr_icon_x                              = 4	;1830
-upgr_icon_y                              = 304	;215
-upgr_icon_width                          = 305	;305
-upgr_icon_height                         = 131	;131
+upgr_icon_x                              = 606
+upgr_icon_y                              = 1309
+upgr_icon_width                          = 306
+upgr_icon_height                         = 132
 
-cost                                     = 11250
+cost                                     = 5250
 full_scale_icon                          = 2,6	                                       ;иконка сталкера в костюме в полный рост
 
 immunities_sect                          = sect_cs_medium_outfit_immunities
@@ -524,7 +524,7 @@ wound_protection                         = 0.1050
 hit_fraction_actor                       = 0.35
 bones_koeff_protection                   = actor_armor_cs3
 
-artefact_count                           = 2
+artefact_count                           = 1
 control_inertion_factor                  = 1.5
 
 upgrades                                 = up_gr_firstab_cs_heavy_outfit, up_gr_seconab_cs_heavy_outfit, up_gr_thirdab_cs_heavy_outfit, up_gr_fourtab_cs_heavy_outfit
