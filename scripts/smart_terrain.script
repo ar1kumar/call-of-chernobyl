@@ -587,12 +587,12 @@ function se_smart_terrain:update_jobs()
 	for id,info in pairs(self.npc_info) do
 		local se_obj = info.se_obj
 		if (se_obj) then
-			if (self.level_id == gg:vertex(se_obj.m_game_vertex_id):level_id()) then
+			--if (self.level_id == gg:vertex(se_obj.m_game_vertex_id):level_id()) then
 				self:select_npc_job(info)
-			else 
-				self.arriving_npc[id] = se_obj
-				self:clear_job(id,true)
-			end
+			-- else 
+				-- self.arriving_npc[id] = se_obj
+				-- self:clear_job(id,true)
+			-- end
 		else
 			self:clear_job(id,true)
 		end
@@ -616,14 +616,16 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 		return printf("%s no job table for %s [stype = %s]",self:name(),npc_info.se_obj:name(),npc_info.stype)
 	end
 	
+	local pairs = pairs
 	local new_job
+	local npc_by_job_section = self.npc_by_job_section
 	
 	-- If the NPC has an existing job link, validate it and iterate job table
 	-- for a higher priority job according to defined STEP_SIZE
 	if (npc_info.job) then
 
 		-- Make sure current job is still available
-		if (self.npc_by_job_section[npc_info.job.section] == npc_info.se_obj.id) then
+		if (npc_by_job_section[npc_info.job.section] == npc_info.se_obj.id) then
 
 			-- Make sure current job is still available
 			if (job_avail_to_npc(npc_info,npc_info.job,self)) then
@@ -632,6 +634,7 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 					npc_info.current_index = 1
 				end
 
+				local get_job_prior = gulag_general.get_job_prior
 				local itr_job
 				local npc_id
 				local step = 1
@@ -646,13 +649,13 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 					itr_job = jobs[npc_info.current_index]
 					npc_info.current_index = npc_info.current_index + 1
 
-					npc_id = self.npc_by_job_section[itr_job.section]
+					npc_id = npc_by_job_section[itr_job.section]
 					
 					-- Check empty job
 					--if (npc_id == nil or npc_id == npc_info.se_obj.id) then
 					if (npc_id == nil) then
 						-- Find only higher priority jobs if already linked to a job
-						if (gulag_general.get_job_prior(itr_job) > gulag_general.get_job_prior(npc_info.job)) then
+						if (get_job_prior(itr_job) > get_job_prior(npc_info.job)) then
 							if (job_avail_to_npc(npc_info, itr_job, self)) then
 								-- Only take this higher priority job if when there is either no surge or if job is not in surge cover during surge; takes exclusive no matter what
 								if (itr_job.exclusive or not xr_conditions.surge_started() or not surge_manager.job_in_surge_cover(npc_info.se_obj,npc_info.job)) then 
@@ -665,9 +668,9 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 				end
 			else
 				-- Job is no longer available, unlink job info
-				for sec,npcid in pairs(self.npc_by_job_section) do 
+				for sec,npcid in pairs(npc_by_job_section) do 
 					if (npcid == npc_info.se_obj.id) then 
-						self.npc_by_job_section[sec] = nil
+						npc_by_job_section[sec] = nil
 					end
 				end
 				npc_info.job = nil
@@ -675,9 +678,9 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 			end
 		else
 			-- Job is not linked properly, npc_id doesn't match owner se_obj
-			for sec,npcid in pairs(self.npc_by_job_section) do 
+			for sec,npcid in pairs(npc_by_job_section) do 
 				if (npcid == npc_info.se_obj.id) then 
-					self.npc_by_job_section[sec] = nil
+					npc_by_job_section[sec] = nil
 				end
 			end
 		
@@ -706,11 +709,11 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 			itr_job = jobs[npc_info.current_index]
 			npc_info.current_index = npc_info.current_index + 1
 
-			npc_id = self.npc_by_job_section[itr_job.section]
+			npc_id = npc_by_job_section[itr_job.section]
 			
 			-- validate existing job link 
 			if (npc_id and not self.npc_info[npc_id]) then 
-				self.npc_by_job_section[itr_job.section] = nil
+				npc_by_job_section[itr_job.section] = nil
 			end
 			
 			-- Check empty job or re-take current job
@@ -730,14 +733,14 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 	if (new_job and new_job ~= npc_info.job) then
 		
 		-- Unassign npc_id from old job and unreference job section
-		for sec,npcid in pairs(self.npc_by_job_section) do 
+		for sec,npcid in pairs(npc_by_job_section) do 
 			if (npcid == id) then 
-				self.npc_by_job_section[sec] = nil
+				npc_by_job_section[sec] = nil
 			end
 		end
 			
 		-- setup table that references NPCs by their job section
-		self.npc_by_job_section[new_job.section] = id
+		npc_by_job_section[new_job.section] = id
 
 		-- link up NPC info and references
 		npc_info.job = new_job
@@ -1250,14 +1253,15 @@ function se_smart_terrain:update()
 	self.__check_time = tg + 500 + math.max(500, 0.025 * self.dist_to_actor)
 	
 	if (self.online) then
+		if (self.dist_to_actor <= 50) then 
+			xr_statistic.smart_terrain_mark_visited(self)
+		end
+			
 		local old_smart = nearest_to_actor_smart.id and sim:object(nearest_to_actor_smart.id)
 		local old_dist_to_actor = old_smart and old_smart.position:distance_to(se_actor.position)
 		if (old_dist_to_actor == nil or self.dist_to_actor < old_dist_to_actor) then
 			nearest_to_actor_smart.id = self.id
 			nearest_to_actor_smart.dist = self.dist_to_actor
-			if (self.dist_to_actor <= 50) then 
-				xr_statistic.smart_terrain_mark_visited(self)
-			end
 		end
 		
 		if (self.__campfire_check_time == nil or game.get_game_time():diffSec(self.__campfire_check_time) > 12000) then
@@ -1629,7 +1633,7 @@ function se_smart_terrain:try_respawn()
 					
 					if max_respawn_count > self.already_spawned[k].num then
 						size_t = size_t + 1
-						available_sects[available_sects] = k
+						available_sects[size_t] = k
 					end
 				end
 			else 

@@ -73,7 +73,9 @@ function alife_object(id)
 		printf("ALIFE OBJECT ID IS %s!",id)
 		return
 	end
-	return alife():object(id)
+	local sim = alife()
+	local object = sim.object
+	return object(sim,id)
 end
 -------------------------------------------------------------------------------------------------------
 -- 											SCRIPTED CALLBACKS
