@@ -604,14 +604,10 @@ end
 
 function parse_func_params(str)
 	local lst = {}
-	local n
+	local size_t = 0
 	for par in string.gmatch(str, "%s*([^:]+)%s*") do
-		n = tonumber(par)
-		if n then
-			lst[#lst+1] = nil
-		else
-			lst[#lst+1] = par
-		end
+		size_t = size_t + 1
+		lst[size_t] = tonumber(par) or par
 	end
 	return lst
 end
@@ -621,12 +617,12 @@ function parse_infop(rslt, str)
 	if str then
 		local infop_name, sign
 		local infop_n = 1
-		local at, params
+		local at
 		for s in string.gmatch(str, "%s*([%-%+%~%=%!][^%-%+%~%=%!%s]+)%s*") do
 			--printf("_bp: parse_infop: s=%s", utils.to_str(s))
 			sign = string.sub(s, 1, 1)
 			infop_name = string.sub(s, 2)
-			params = nil
+			local params = nil
 
 			-- парсим параметры функций
 			at = string.find(infop_name, "%(")
