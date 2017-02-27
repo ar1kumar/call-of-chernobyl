@@ -15,18 +15,18 @@ function set_npc_info(npc, ini, scheme, section)
 	end
 end
 function get_infos_from_data(npc, s)
---	printf("get_infos_from_data [%s]", utils.to_str(s))
 	local t = {}
-		if s then
+	local size_t = 0
+	if s then
 		for name in string.gmatch( s, "(%|*[^%|]+%|*)%p*" ) do
---			printf("[%s]", utils.to_str(name))
 			local condlist = xr_logic.parse_condlist(npc, "in", name, name)
 			if condlist then
-				table.insert(t, xr_logic.pick_section_from_condlist(db.actor, npc, condlist))
+				size_t = size_t + 1
+				t[size_t] = xr_logic.pick_section_from_condlist(db.actor, npc, condlist)
 			end
 		end
 	end
-		return t
+	return t
 end
 
 

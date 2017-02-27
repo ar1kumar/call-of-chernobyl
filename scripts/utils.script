@@ -607,8 +607,10 @@ end
 --' Вычитка свойств для спауна объектов.
 function parse_names(s)
 	local t = {}
+	local size_t = 0
 	for name in string.gmatch( s, "([%w_%-.\\]+)%p*" ) do
-		table.insert( t, name )
+		size_t = size_t + 1 
+		t[size_t] = name
 	end
 	return t
 end
@@ -619,6 +621,7 @@ function parse_spawns(str)
 	local n = #t
 
 	local ret_table = {}
+	local size_t = 0
 	local k = 1
 	while k <= n do
 		local spawn = {}
@@ -640,8 +643,8 @@ function parse_spawns(str)
 			spawn.prob = 1
 			k = k + 1
 		end
-		table.insert(ret_table, spawn)
-
+		size_t = size_t + 1
+		ret_table[size_t] = spawn
 	end
 	return ret_table
 end
@@ -700,7 +703,7 @@ function parse_data(npc,s)
 			if sound then
 				dat.sound = xr_logic.parse_condlist(npc, dist, sound, sound)
 			end
-			table.insert(t, dat)
+			t[#t+1] = dat
 		end
 	end
 	return t
@@ -723,7 +726,7 @@ function parse_syn_data(npc,s)
 
 			dat.state = state
 			dat.sound = sound
-			table.insert(t, dat)
+			t[#t+1] = dat
 		end
 	end
 	return t

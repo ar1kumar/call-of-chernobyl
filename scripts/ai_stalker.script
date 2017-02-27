@@ -105,6 +105,7 @@ end
 -- return false to use Engine technique, return true to ignore engine technique
 function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 	local sim = alife()
+	local create = sim.create
 	local sys_ini = system_ini()
 	local ini = create_ini_file(ini_string)
 	
@@ -153,7 +154,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 				end
 				for k=1,count do 
 					if (prob == 1 or math.random() <= prob) then 
-						local se_item = sim:create(spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+						local se_item = create(sim,spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
 						if (se_item) then 
 							local cls = se_item:clsid()
 							if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
@@ -199,114 +200,121 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 			
 			...
 	--]]
-	local level_name, actor_rank
-	local itr_count = 1
 	section = "spawn_loadout"
-	while (ini:section_exist(section)) do
+	if (ini:section_exist(section)) then
+		local level_name, actor_rank
+		local itr_count = 1
 		local spawn_list = {}
 		local result, spawn_sec, value = nil, nil, nil
-		local j = ini:line_count(section)-1
-		for i=0,j do
-			result, spawn_sec, value = ini:r_line(section,i,"","")
-			if (spawn_sec and spawn_sec ~= "" and sys_ini:section_exist(spawn_sec)) then
+			
+		while (ini:section_exist(section)) do
+			local j = ini:line_count(section)-1
+			for i=0,j do
+				iempty_table(spawn_list)
+				local size = 0
+				result, spawn_sec, value = ini:r_line(section,i,"","")
+				if (spawn_sec and spawn_sec ~= "" and sys_ini:section_exist(spawn_sec)) then
+					if (value and value ~= "") then
+						-- If a rank parameter exists, then only allow item if actor rank is greater than equal
+						if not (actor_rank) then
+							actor_rank = sim:actor():rank()
+						end
+						local rank = tonumber(string.match(value,"rank=([%w_%-%.]+)"))
+						if (rank == nil or rank >= actor_rank) then
+							local prob = tonumber(string.match(value,"prob=([%w_%-%.]+)")) or 1 
+							if (prob == 1 or math.random() <= prob) then
+								-- If a level parameter exists then only allow item for this level
+								-- if not (level_name) then 
+									-- level_name = sim:level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id())
+								-- end
+								-- local l_name = string.match(value,"level=([%w_%-.]+)")
+								-- if (l_name == nil or l_name == level_name) then
+									size = size + 1
+									spawn_list[size] = {spawn_sec,value}
+								-- end
+							end
+						end
+					else
+						size = size + 1
+						spawn_list[size] = {spawn_sec,value}
+					end 
+				end
+			end
+			if (#spawn_list > 0) then
+				local selected = spawn_list[math.random(#spawn_list)]
+				spawn_sec = selected[1]
+				value = selected[2]
+				local cond,count,ammo_type = 1,1,0
+				local bScope, bSilencer, bLauncher
 				if (value and value ~= "") then
-					-- If a rank parameter exists, then only allow item if actor rank is greater than equal
-					if not (actor_rank) then
-						actor_rank = sim:actor():rank()
+					-- parse params
+					local _a,_b = string.find(value,",") 
+					if (_a) then 
+						count = tonumber(string.sub(value,1,_a-1)) or 1
 					end
-					local rank = tonumber(string.match(value,"rank=([%w_%-%.]+)"))
-					if (rank == nil or rank >= actor_rank) then
-						local prob = tonumber(string.match(value,"prob=([%w_%-%.]+)")) or 1 
-						if (prob == 1 or math.random() <= prob) then
-							-- If a level parameter exists then only allow item for this level
-							-- if not (level_name) then 
-								-- level_name = sim:level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id())
-							-- end
-							-- local l_name = string.match(value,"level=([%w_%-.]+)")
-							-- if (l_name == nil or l_name == level_name) then 
-								table.insert(spawn_list,{spawn_sec,value})
-							-- end
+					if (string.find(value,"scope")) then 
+						bScope = true
+					end 
+					if (string.find(value,"silencer")) then 
+						bSilencer = true
+					end
+					if (string.find(value,"launcher")) then 
+						bLauncher = true
+					end
+					for a,b in string.gmatch(value,"([%w_%-%s%.]+)=([%w_%-%s%.]+)") do
+						if (a == "cond") then 
+							cond = tonumber(b) or 1
+						elseif (a == "ammo_type") then 
+							ammo_type = tonumber(b) or 0
+						elseif (a == "scope") then
+							bScope = math.random() <= (tonumber(b) or 0)
+						elseif (a == "silencer") then
+							bSilencer = math.random() <= (tonumber(b) or 0)
+						elseif (a == "launcher") then
+							bLauncher = math.random() <= (tonumber(b) or 0)
 						end
 					end
-				else
-					table.insert(spawn_list,{spawn_sec,value})
-				end 
-			end
-		end
-		if (#spawn_list > 0) then
-			local selected = spawn_list[math.random(#spawn_list)]
-			spawn_sec = selected[1]
-			value = selected[2]
-			local cond,count,ammo_type = 1,1,0
-			local bScope, bSilencer, bLauncher
-			if (value and value ~= "") then
-				-- parse params
-				local _a,_b = string.find(value,",") 
-				if (_a) then 
-					count = tonumber(string.sub(value,1,_a-1)) or 1
 				end
-				if (string.find(value,"scope")) then 
-					bScope = true
-				end 
-				if (string.find(value,"silencer")) then 
-					bSilencer = true
-				end
-				if (string.find(value,"launcher")) then 
-					bLauncher = true
-				end
-				for a,b in string.gmatch(value,"([%w_%-%s%.]+)=([%w_%-%s%.]+)") do
-					if (a == "cond") then 
-						cond = tonumber(b) or 1
-					elseif (a == "ammo_type") then 
-						ammo_type = tonumber(b) or 0
-					elseif (a == "scope") then
-						bScope = math.random() <= (tonumber(b) or 0)
-					elseif (a == "silencer") then
-						bSilencer = math.random() <= (tonumber(b) or 0)
-					elseif (a == "launcher") then
-						bLauncher = math.random() <= (tonumber(b) or 0)
-					end
-				end
-			end
-			-- Create the item and set params
-			local se_item = sim:create(spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
-			if (se_item) then 
-				local cls = se_item:clsid()
-				if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
-					se_item.condition = cond
+				-- Create the item and set params
+				local se_item = create(sim,spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+				if (se_item) then 
+					local cls = se_item:clsid()
+					if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
+						se_item.condition = cond
 
-					local flags = se_item:get_addon_flags()
-					if (bScope and se_item.scope_status == cse_alife_item_weapon.eAddonAttachable) then 
-						flags:set(cse_alife_item_weapon.eWeaponAddonScope,true)
-					end
+						local flags = se_item:get_addon_flags()
+						if (bScope and se_item.scope_status == cse_alife_item_weapon.eAddonAttachable) then 
+							flags:set(cse_alife_item_weapon.eWeaponAddonScope,true)
+						end
 
-					if (bLauncher and se_item.grenade_launcher_status == cse_alife_item_weapon.eAddonAttachable) then
-						flags:set(cse_alife_item_weapon.eWeaponAddonGrenadeLauncher,true)
-					end
+						if (bLauncher and se_item.grenade_launcher_status == cse_alife_item_weapon.eAddonAttachable) then
+							flags:set(cse_alife_item_weapon.eWeaponAddonGrenadeLauncher,true)
+						end
 
-					if (bSilencer and se_item.silencer_status == cse_alife_item_weapon.eAddonAttachable) then
-						flags:set(cse_alife_item_weapon.eWeaponAddonSilencer,true)
-					end
-					
-					-- Create the ammo 
-					local ammos = alun_utils.parse_list(sys_ini,spawn_sec,"ammo_class")
-					if not (ammo_type < #ammos) then
-						ammo_type = 0
-					end
-					
-					se_item.ammo_type = ammo_type
+						if (bSilencer and se_item.silencer_status == cse_alife_item_weapon.eAddonAttachable) then
+							flags:set(cse_alife_item_weapon.eWeaponAddonSilencer,true)
+						end
+						
+						-- Create the ammo 
+						local ammos = alun_utils.parse_list(sys_ini,spawn_sec,"ammo_class")
+						if not (ammo_type < #ammos) then
+							ammo_type = 0
+						end
+						
+						se_item.ammo_type = ammo_type
 
-					local ammo_section = ammos[ammo_type+1]
-					if (ammo_section and sys_ini:section_exist(ammo_section)) then 
-						for k=1, count do
-							sim:create(ammo_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+						local ammo_section = ammos[ammo_type+1]
+						if (ammo_section and sys_ini:section_exist(ammo_section)) then 
+							for k=1, count do
+								sim:create(ammo_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+							end
 						end
 					end
 				end
 			end
+			itr_count = itr_count + 1
+			section = "spawn_loadout"..itr_count
 		end
-		itr_count = itr_count + 1
-		section = "spawn_loadout"..itr_count
 	end
 	return true
 end

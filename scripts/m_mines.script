@@ -24,12 +24,12 @@ local m_mine_table = 	{
 
 
 function add_actor_mine(m)
-	table.insert(actor_placed_mines, m:id())
+	actor_placed_mines[#actor_placed_mines+1] = m:id()
 	m_mine_table.recently_placed = m:id()
 end
 
 function add_neutral_mine(m)
-	table.insert(neutral_placed_mines, m:id())
+	neutral_placed_mines[#neutral_placed_mines+1] = m:id()
 end
 
 

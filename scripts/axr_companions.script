@@ -204,12 +204,14 @@ end
 -- includes task companions too
 function list_actor_squad_by_id()
 	local t = {}
+	local size_t = 0
 	for id,squad in spairs(companion_squads, function(t,a,b) return a < b end) do 
 		if (squad and squad.commander_id) then
 			if not (xrs_kill_wounded.hostage_list[squad:commander_id()]) then
 				for k in squad:squad_members() do
 					--printf("member %s",k.id)
-					table.insert(t,k.id)
+					size_t = size_t + 1
+					t[size_t] = k.id
 				end
 			end
 		end

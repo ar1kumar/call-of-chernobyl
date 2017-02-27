@@ -185,10 +185,10 @@ function CCampManager:update()
 		local talkers = {}
 		for k,v in pairs(self.npc) do
 			npc_count = npc_count + 1
-			table.insert(talkers, k)
+			talkers[npc_count] = k
 		end
-		if(npc_count~=0) then
-			self.idle_talker = talkers[math.random(#talkers)]
+		if(npc_count > 0) then
+			self.idle_talker = talkers[math.random(npc_count)]
 			xr_sound.set_sound_play(self.idle_talker, "state")
 		end
 	end

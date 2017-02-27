@@ -644,9 +644,9 @@ function action_beh:increment_waypoint_index()
 end
 
 function action_beh:fill_approved_actions(state)
-	for i=#self.st.approved_actions, 1, -1 do
-		self.st.approved_actions[i] = nil
-	end
+	local app_act = self.st.approved_actions
+	iempty_table(app_act)
+	local size_t = 0
 
 	if (state == "sit_knee") then
 		state = "sit_ass"
@@ -657,7 +657,8 @@ function action_beh:fill_approved_actions(state)
 	local t = { "eat_bread", "drink_energy", "drink_vodka", "eat_kolbasa", "guitar", "harmonica", "weapon" }
 	for i=1, 6 do
 		if (axr_beh["can_"..t[i]] and axr_beh["can_"..t[i]](self.object)) then
-			table.insert(self.st.approved_actions, { name = state.."_"..t[i] })
+			size_t = size_t + 1
+			app_act[size_t] = { name = state.."_"..t[i] }
 		end
 	end
 end

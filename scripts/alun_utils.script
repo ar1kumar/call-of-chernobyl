@@ -21,6 +21,8 @@ function print_table(node,header,format_only)
 	local depth = 1
 	local output_str = header and ("-- " .. tostring(header) .. "\n{\n") or "{\n"
 	local output = {}
+	local size_t = 0
+	local size_stack = 0 
 	while true do
 		local size = 0
 		for k,v in pairs(node) do
@@ -36,7 +38,8 @@ function print_table(node,header,format_only)
 					output_str = output_str .. "\n"
 				end
 				
-				table.insert(output,output_str)
+				size_t = size_t + 1
+				output[size_t] = output_str
 				output_str = ""
 
 				local key
@@ -50,8 +53,10 @@ function print_table(node,header,format_only)
 					output_str = output_str .. tab(depth) .. key .. " = "..tostring(v)
 				elseif (type(v) == "table") then
 					output_str = output_str .. tab(depth) .. key .. " = {\n"
-					table.insert(stack,node)
-					table.insert(stack,v)
+					size_stack = size_stack + 1
+					stack[size_stack] = node
+					size_stack = size_stack + 1
+					stack[size_stack] = v
 					cache[node] = cur_index+1
 					break
 				elseif (type(v) == "userdata") then
@@ -85,16 +90,19 @@ function print_table(node,header,format_only)
 			output_str = output_str .. "\n" .. tab(depth-1) .. "}"
 		end
 
-		if (#stack > 0) then
-			node = stack[#stack]
-			stack[#stack] = nil
+		if (size_stack > 0) then
+			node = stack[size_stack]
+			stack[size_stack] = nil
+			size_stack = size_stack - 1
 			depth = cache[node] == nil and depth + 1 or depth - 1
 		else
 			break
 		end
 	end
    
-	table.insert(output,output_str)
+	size_t = size_t + 1
+	output[size_t] = output_str
+
 	output_str = table.concat(output)
 	
    	if (format_only) then
@@ -176,8 +184,10 @@ function str_explode(str,sep,plain)
 		return { str }
 	end
 	local t = {}
+	local size = 0
 	for s in str:gsplit(sep,plain) do 
-		table.insert(t,trim(s))
+		size = size + 1
+		t[size] = trim(s)
 	end
 	return t
 end
@@ -354,7 +364,7 @@ function get_rank_list()
 	ranks = {}
 	for i,rn in ipairs(tmp) do
 		if not tonumber(rn) then
-			table.insert(ranks,rn)
+			ranks[#ranks+1] = rn
 		end
 	end
 	return ranks
@@ -384,7 +394,7 @@ function get_communities_list()
 	communities = {}
 	for i,cn in ipairs(tmp) do
 		if not tonumber(cn) then
-			table.insert(communities,cn)
+			communities[#communities+1] = cn
 		end
 	end
 	return communities
@@ -864,7 +874,7 @@ function collect_section(ini,section,keytable)
 					end
 					_t[id] = val or true
 				else
-					table.insert(_t,id)
+					_t[#_t+1] = id
 				end
 			end
 		end
@@ -1007,10 +1017,10 @@ function npc_in_cover(npc)
 --				rx_ai.printf("npc_in_cover[%s]:add enemy[%s]",npc:character_name(),obj:name())
 				if (IsStalker(obj) and npc:relation(obj) == game_object.enemy and obj:alive()) then
 					if (obj:id() ~= 0 or not obj:wounded()) then 
-						table.insert(enemies,obj)
+						enemies[#enemies+1] = obj
 					end
 				elseif (IsMonster(obj) and npc:relation(obj) == game_object.enemy and obj:alive()) then
-					table.insert(enemies,obj)
+					enemies[#enemies+1] = obj
 				end
 				tt[id] = true
 			end
@@ -1022,10 +1032,10 @@ function npc_in_cover(npc)
 				if obj then
 					if (IsStalker(obj) and npc:relation(obj) == game_object.enemy and obj:alive()) then
 						if (obj:id() ~= 0 or not obj:wounded()) then 
-							table.insert(enemies,obj)
+							enemies[#enemies+1] = obj
 						end
 					elseif (IsMonster(obj) and npc:relation(obj) == game_object.enemy and obj:alive()) then
-						table.insert(enemies,obj)
+						enemies[#enemies+1] = obj
 					end
 				end
 			end
@@ -1272,7 +1282,8 @@ function cfg_file:SetValue(sec,key,val)
 		if not (self.insert[sec]) then 
 			self.insert[sec] = {}
 		end
-		table.insert(self.insert[sec],key)
+		local t = self.insert[sec]
+		t[#t+1] = key
 	end
 
 	self.root[sec][key] = val == nil and "" or tostring(val)
@@ -1306,7 +1317,7 @@ function cfg_file:SaveExt()
 		local padding = {}
 		local l = string.len(s)
 		for i=1,n-l do 
-			table.insert(padding," ")
+			padding[#padding+1] = " "
 		end 
 		return s .. table.concat(padding)
 	end
@@ -1360,12 +1371,12 @@ function cfg_file:Save()
 	_s.__order = {}
 	
 	for section,tbl in pairs(self.root) do
-		table.insert(_s.__order,section)
+		_s.__order[#_s.__order+1] = section
 		if not (_s[section]) then 
 			_s[section] = {}
 		end
 		for k,v in pairs(tbl) do 
-			table.insert(_s[section],k)
+			_s[section][#_s[section]+1] = k
 		end
 	end
 	

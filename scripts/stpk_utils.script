@@ -1997,34 +1997,31 @@ function write_chunk(stpk, tab, c_type)
 		end
 	end
 end
-function readvu8uN(stpk,n)
+function readvu8uN(stpk,cnt)
 	local v = {}
-	for i=1,n,1 do
-		table.insert(v,stpk:r_u8())
+	for i=1,cnt do
+		v[i] = stpk:r_u8()
 	end
 	return v
 end
 function writevu8uN(stpk,v)
-	local len = table.getn(v)
-	for i=1,len,1 do
+	for i=1,#v,1 do
 		stpk:w_u8(v[i])
 	end
 end
 function readvu32stringZ(stpk)
 	local v = {}
-	local len = stpk:r_s32()
-	for i=1,len,1 do
-		table.insert(v,stpk:r_stringZ())
+	local cnt = stpk:r_s32()
+	for i=1,cnt do
+		v[i] = stpk:r_stringZ()
 	end
 	return v
 end
 function writevu32stringZ(pk,v)
-	if v == nil then
-		v = {}
-	end
+	v = v or {}
 	local len = #v
 	pk:w_s32(len)
-	for i=1,len,1 do
+	for i=1,len do
 		pk:w_stringZ(v[i])
 	end
 end

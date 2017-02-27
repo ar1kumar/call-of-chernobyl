@@ -558,7 +558,7 @@ function parse_names( s )
 	local t = {}
 	--for name in string.gmatch( s, "([%w_\\]+)%p*" ) do
 	for name in string.gmatch( s, "([%w_%-.\\]+)%p*" ) do
-		table.insert( t, name )
+		t[#t+1] = name
 	end
 	return t
 end
@@ -583,7 +583,7 @@ end
 function parse_nums( s )
 	local t = {}
 	for entry in string.gmatch( s, "([%-%d%.]+)%,*" ) do
-		table.insert( t, tonumber( entry ) )
+		t[#t+1] = tonumber(entry)
 	end
 	return t
 end
@@ -1218,8 +1218,7 @@ function create_ammo(section, position, lvi, gvi, pid, num)
 	local num_in_box = ini:r_u32(section, "box_size")
 	local t = {}
 	while num > num_in_box do
-		local obj = alife():create_ammo(section, position, lvi,	gvi, pid, num_in_box)
-		table.insert(t, obj)
+		t[#t+1] = alife():create_ammo(section, position, lvi,	gvi, pid, num_in_box)
 		num = num - num_in_box
 	end
 	local obj = alife():create_ammo(section, position, lvi,	gvi, pid, num)
@@ -1725,7 +1724,7 @@ function ini_file_ex:get_sections(keytable)
 		if (keytable) then
 			t[section] = true
 		else
-			table.insert(t,section)
+			t[#t+1] = section
 		end
 	end
 	self.ini:section_for_each(itr)

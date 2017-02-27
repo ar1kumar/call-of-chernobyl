@@ -214,6 +214,7 @@ function on_game_start()
 		["rx_gl.script"] = true
 	}
 	local t = {}
+	local size_t = 0
 	local f	= getFS()
 	local flist = f:file_list_open_ex("$game_scripts$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*.script")
 	local f_cnt = flist:Size()
@@ -224,7 +225,8 @@ function on_game_start()
 		if (file:Size() > 0 and ignore[file_name] ~= true) then
 			file_name = file_name:sub(0,file_name:len()-7)
 			if (_G[file_name] and _G[file_name].on_game_start) then
-				table.insert(t,file_name) -- load all scripts first
+				size_t = size_t + 1 
+				t[size_t] = file_name -- load all scripts first
 			end
 		end
 	end

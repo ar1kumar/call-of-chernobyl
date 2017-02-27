@@ -120,7 +120,7 @@ function init_nimble_tables()
 			local value = ini:r_string_ex(sec,"item"..n)
 			if (value) then
 				local item_list = value ~= "" and alun_utils.str_explode(value,",") or {}
-				table.insert(t,{item=item_list})
+				t[#t+1] = {item=item_list}
 			end
 		end
 		
@@ -145,7 +145,7 @@ function esc_2_12_randomize_item(first_speaker, second_speaker)
 			local esc_2_12_available_items_table = {}
 			for j = 1, item_count_by_category[i] do
 				if not has_alife_info("esc_2_12_done_item_"..tostring(i).."_"..tostring(j)) then
-					table.insert(esc_2_12_available_items_table, j)
+					esc_2_12_available_items_table[#esc_2_12_available_items_table+1] = j
 				end
 			end
 			give_info("esc_2_12_ordered_item_"..tostring(i).."_"..tostring(esc_2_12_available_items_table[math.random(1,#esc_2_12_available_items_table)]))

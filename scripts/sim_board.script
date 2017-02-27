@@ -206,7 +206,8 @@ function simulation_board:assign_squad_to_smart(squad, smart_id)
 		if self.tmp_assigned_squad[smart_id] == nil then
 			self.tmp_assigned_squad[smart_id] = {}
 		end
-		table.insert(self.tmp_assigned_squad[smart_id], squad)
+		local t = self.tmp_assigned_squad[smart_id]
+		t[#t+1] = squad
 		return
 	end
 	

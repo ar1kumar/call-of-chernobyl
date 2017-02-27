@@ -1258,10 +1258,10 @@ function CSurgeManager:get_objects_to_kill()
 				local obj = sim:object(kk)
 				if(obj and not(get_object_story_id(obj.id))) then
 					if(check_squad_smart_props(squad.id)) then
-						table.insert(self.objects_to_kill, obj.id)
+						self.objects_to_kill[#self.objects_to_kill+1] = obj.id
 					else
 						if not (self:pos_in_cover(obj.position)) then
-							table.insert(self.objects_to_kill, obj.id)
+							self.objects_to_kill[#self.objects_to_kill+1] = obj.id
 						end
 					end
 				end

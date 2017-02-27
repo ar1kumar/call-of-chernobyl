@@ -1734,15 +1734,17 @@ function anomaly_has_artefact(actor, npc, p)
 	if af_name == nil then
 		local af_table = {}
 		for k,v in pairs(anomal_zone.artefact_ways_by_id) do
-			if alife_object(tonumber(k)) then
-				table.insert(af_table, alife_object(tonumber(k)):section_name())
+			local se_obj = alife_object(tonumber(k))
+			if (se_obj) then
+				af_table[#af_table+1] = se_obj:section_name()
 			end
 		end
 		return true, af_table
 	end
 
 	for k,v in pairs(anomal_zone.artefact_ways_by_id) do
-		if alife_object(tonumber(k)) and af_name == alife_object(tonumber(k)):section_name() then
+		local se_obj = alife_object(tonumber(k))
+		if (se_obj and se_obj:section_name() == af_name) then 
 			return true
 		end
 	end

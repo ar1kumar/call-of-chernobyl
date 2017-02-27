@@ -227,17 +227,19 @@ function animpoint:fill_approved_actions()
 
 	-- Если задан авеил анимейшнз, то мы игнорим ассоциации с нашим смарткавером.
 	if self.st.avail_animations ~= nil then
+		local t = self.st.approved_actions
 		-- animations are set from custom_data?
 		for k, v in pairs(self.st.avail_animations) do
-			table.insert(self.st.approved_actions, {predicate = function() return true end, name = v})
+			t[#t+1] = {predicate = function() return true end, name = v}
 		end
 	else
 		if self.avail_actions ~= nil then
+			local t = self.st.approved_actions
 			for k,v in pairs(self.avail_actions) do
 				-- Убираем те действия, которые не подходят по прекондишну
 				--printf("checking approved actions %s", self.npc_id)
 				if v.predicate(self.npc_id, is_in_camp)==true then
-					table.insert(self.st.approved_actions, v)
+					t[#t+1] = v
 				end
 			end
 		end
@@ -302,6 +304,7 @@ function animpoint:get_action()
 	return self.current_action
 end
 
+local tmp_actions
 function animpoint:update()
 	if not (self.vertex_position) then
 		return
@@ -310,7 +313,10 @@ function animpoint:update()
 		printf("Trying to use destroyed object!")
 		return
 	end
-		local tmp_actions = {}
+	
+	tmp_actions = iempty_table(tmp_actions)
+	local size_t = 0
+
 	local descr = self.st.description
 
 	if (self.camp == nil or self.st.use_camp ~= true) then
@@ -321,15 +327,17 @@ function animpoint:update()
 			end
 
 			for k,v in pairs(self.st.approved_actions) do
-				table.insert(tmp_actions, v.name)
+				size_t = size_t + 1
+				tmp_actions[size_t] = v.name
 			end
 		else
 			for k,v in pairs(self.st.avail_animations) do
-				table.insert(tmp_actions, v)
+				size_t = size_t + 1
+				tmp_actions[size_t] = v
 			end
 		end
 
-		self.current_action = tmp_actions[math.random(#tmp_actions)]
+		self.current_action = tmp_actions[math.random(size_t)]
 		return
 	end
 
@@ -357,17 +365,19 @@ function animpoint:update()
 		for i = 1, #tbl do
 			if(descr..tbl[i]==v.name) then
 				--printf("    approved %s", tostring(v.name))
-				table.insert(tmp_actions, v.name)
+				size_t = size_t + 1
+				tmp_actions[size_t] = v.name
 				found = true
 			end
 		end
 	end
 
 	if not found then
-		table.insert(tmp_actions, descr)
+		size_t = size_t + 1
+		tmp_actions[size_t] = descr
 	end
 
-	local rnd = math.random(#tmp_actions)
+	local rnd = math.random(size_t)
 	local action = tmp_actions[rnd]
 
 	--action - выбранный экшн из доступных
@@ -378,7 +388,7 @@ function animpoint:update()
 
 		if(action==descr.."_weapon") and (self.st.base_action==descr) then
 			table.remove(tmp_actions, rnd)
-			action = tmp_actions[math.random(#tmp_actions)]
+			action = tmp_actions[math.random(size_t-1)]
 		end
 	else
 		if(action==descr.."_weapon") then

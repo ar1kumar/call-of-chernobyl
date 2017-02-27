@@ -87,10 +87,12 @@ function calculate_weight(se_inv_box,base)
 	end
 	
 	local transfer = {}
+	local size_t = 0
 	local total_weight = 0
 	local function add_items(inv_box, item)
 		if (containers[item:id()] and containers[item:id()].id) then
-			table.insert(transfer,item)
+			size_t = size_t + 1
+			transfer[size_t] = item
 		else
 			-- add weight to total
 			total_weight = total_weight + (item:weight() or 0)
@@ -100,7 +102,7 @@ function calculate_weight(se_inv_box,base)
 	-- iterate all items in the inventory box
 	inv_box:iterate_inventory_box(add_items, inv_box)
 	
-	if (#transfer > 0) then
+	if (size_t > 0) then
 		for i,item in ipairs(transfer) do
 			inv_box:transfer_item(item,db.actor)
 		end

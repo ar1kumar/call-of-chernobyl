@@ -100,11 +100,8 @@ end
 -- m_trader (ie. Sidorovich) use npc:name() instead
 function generate_available_tasks(npc,is_sim)
 	local id = npc:id()
-	if not (available_tasks[id]) then 
-		available_tasks[id] = {}
-	else
-		empty_table(available_tasks[id])
-	end
+	available_tasks[id] = iempty_table(available_tasks[id])
+	local size_t = 0
 	
     local tm = task_manager.get_task_manager()
     local task_info = tm.task_info
@@ -146,14 +143,16 @@ function generate_available_tasks(npc,is_sim)
 					end
 					
 					if (st.dyn_quest_rand == task_id) then
-						table.insert(available_tasks[id],task_id)
+						size_t = size_t + 1
+						available_tasks[id][size_t] = task_id
 						return
 					elseif (st.dyn_quest_rand == nil) then
-						table.insert(t,task_id)
+						t[#t+1] = task_id
 					end
 				end
 			else
-				table.insert(available_tasks[id],task_id)
+				size_t = size_t + 1
+				available_tasks[id][size_t] = task_id
 			end
         end
         count = count + 1
@@ -163,17 +162,15 @@ function generate_available_tasks(npc,is_sim)
 	-- randomize available tasks from sim npcs and only offer 1 job; remembing this job until NPC go offline
 	if (t and #t > 0) then
 		st.dyn_quest_rand = t[math.random(#t)]
-		table.insert(available_tasks[id],st.dyn_quest_rand)
+		size_t = size_t + 1
+		available_tasks[id][size_t] = st.dyn_quest_rand
 	end
 end
 
 function generate_ongoing_tasks(npc,is_sim)
 	local id = npc:id()
-	if not (ongoing_tasks[id]) then 
-		ongoing_tasks[id] = {}
-	else
-		empty_table(ongoing_tasks[id])
-	end
+	ongoing_tasks[id] = iempty_table(ongoing_tasks[id])
+	local size_t = 0
 	
     local tm = task_manager.get_task_manager()
     local task_info = tm.task_info
@@ -202,11 +199,13 @@ function generate_ongoing_tasks(npc,is_sim)
 					if (is_sim) then
 						if (task_info[task_id].task_giver_id) then
 							if (npc:id() == task_info[task_id].task_giver_id) then
-								table.insert(ongoing_tasks[id],task_id)
+								size_t = size_t + 1
+								ongoing_tasks[id][size_t] = task_id
 							end
 						end
 					else
-						table.insert(ongoing_tasks[id],task_id)
+						size_t = size_t + 1
+						ongoing_tasks[id][size_t] = task_id
 					end
 				end
 			end
@@ -218,11 +217,8 @@ end
 
 function generate_finished_tasks(npc,is_sim)
 	local id = npc:id()
-	if not (finished_tasks[id]) then 
-		finished_tasks[id] = {}
-	else
-		empty_table(finished_tasks[id])
-	end
+	finished_tasks[id] = iempty_table(finished_tasks[id])
+	local size_t = 0
 	
 	local tm = task_manager.get_task_manager()
 	local task_info = tm.task_info
@@ -250,11 +246,13 @@ function generate_finished_tasks(npc,is_sim)
 				if (is_sim) then 
 					if (task_info[task_id].task_giver_id) then 
 						if (npc:id() == task_info[task_id].task_giver_id) then 
-							table.insert(finished_tasks[id],task_id)
+							size_t = size_t + 1
+							finished_tasks[id][size_t] = task_id
 						end 
 					end
-				else 
-					table.insert(finished_tasks[id],task_id)
+				else
+					size_t = size_t + 1
+					finished_tasks[id][size_t] = task_id
 				end
 			end
 		end

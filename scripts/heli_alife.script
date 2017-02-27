@@ -71,24 +71,25 @@ end
 local available_targets = {}
 local function get_smart_terrain_target(se_obj)
 	empty_table(available_targets)
+	local size_t = 0
 
 	local most_priority_task = nil
 	local max_prior = 0
 	local curr_prior = 0
 	local target_tbl
-	local size = 0
+
 	for k,v in pairs(simulation_objects.get_sim_obj_registry().objects)	do
 		curr_prior = evaluate_prior(v,se_obj)
 		if (curr_prior > 0 and v.props and v.props[se_obj.player_id] and v.props[se_obj.player_id] > 0) then
 			target_tbl = {prior = curr_prior, target = v}
-			table.insert(available_targets, target_tbl)
-			size = size + 1
+			size_t = size_t + 1
+			available_targets[size_t] = target_tbl
 		end
 	end
 
-	if size > 0 then
+	if size_t > 0 then
 		table.sort(available_targets, function(a,b) return a.prior > b.prior end)
-		most_priority_task = available_targets[math.random(size)].target
+		most_priority_task = available_targets[math.random(size_t)].target
 	end
 
 	if not (most_priority_task) then

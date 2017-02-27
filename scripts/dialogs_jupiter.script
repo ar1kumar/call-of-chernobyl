@@ -7,7 +7,7 @@ function dm_ashot_and_yar_generate_dialog(a,b)
 	
 	if (sid == "jup_b19_freedom_yar") then 
 		for i=1,5 do 
-			table.insert(text,"st_jup_yar_reply_"..i)
+			text[#text+1] = "st_jup_yar_reply_"..i
 		end
 		target_name = game.translate_string("jup_a6_freedom_trader_ashot_name")
 		
@@ -17,7 +17,7 @@ function dm_ashot_and_yar_generate_dialog(a,b)
 		end
 	elseif (sid == "jup_a6_freedom_trader_ashot") then 
 		for i=1,5 do 
-			table.insert(text,"st_jup_ashot_reply_"..i)
+			text[#text+1] = "st_jup_ashot_reply_"..i
 		end
 		target_name = game.translate_string("jup_b19_freedom_yar_name")
 		

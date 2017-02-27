@@ -26,14 +26,14 @@ function action_walker_activity:__init (npc, action_name, storage) super(nil, ac
 
 	self.st.description = "walker_camp"
 	self.avail_actions = xr_animpoint_predicates.associations[self.st.description]
-	self.st.approved_actions = {}
-
+	local t = {}
 	for k,v in pairs(self.avail_actions) do
 		-- Убираем те действия, которые не подходят по прекондишну
 		if v.predicate(npc:id())==true then
-			table.insert(self.st.approved_actions, v)
+			t[#t+1] = v
 		end
 	end
+	self.st.approved_actions = t
 end
 function action_walker_activity:initialize()
 	action_base.initialize(self)

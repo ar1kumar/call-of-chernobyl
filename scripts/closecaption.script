@@ -201,7 +201,7 @@ function sound(_sound, showtime, sender, sender_faction, sender_id, delay_sound)
 									if delay_sound < 0 then delay_sound = -delay_sound - 501 end
 								else
 									local gt = time_global() + 500
-									table.insert(delayed_cc, {_sound, showtime, sender, sender_faction, sender_id, -delay_sound - 1, dt = gt})
+									delayed_cc[#delayed_cc+1] = {_sound, showtime, sender, sender_faction, sender_id, -delay_sound - 1, dt = gt}
 									RegisterScriptCallback("actor_on_update", on_actor_update_cc)
 									return true
 								end

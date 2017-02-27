@@ -23,7 +23,7 @@ end
 --' Зарегистрировать НПС.
 function sound_manager:register_npc(npc_id)
 	--printf("Register sm npc [%s]:[%s]", self.id, npc_id)
-	table.insert(self.npc, {npc_id = npc_id})
+	self.npc[#self.npc+1] = {npc_id = npc_id}
 	--print_table(self.npc)
 end
 --' Отрегистрировать нпс

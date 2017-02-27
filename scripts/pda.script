@@ -381,11 +381,13 @@ function calculate_rankings()
 	end
 	
 	coc_ranking_list = iempty_table(coc_ranking_list)
+	local size_t = 0
 	-- sort by highest rank first
 	for id,rank in spairs(t, function(t,a,b) return t[a] > t[b] end) do
-		table.insert(coc_ranking_list,id)
+		size_t = size_t + 1 
+		coc_ranking_list[size_t] = id
 		if (id == 0) then
-			actor_rank_place = #coc_ranking_list
+			actor_rank_place = size_t
 		end
 	end
 	

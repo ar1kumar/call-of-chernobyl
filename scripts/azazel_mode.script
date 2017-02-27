@@ -43,11 +43,11 @@ function actor_on_before_death(whoID,flags)
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and se_obj:community() ~= "zombied" and se_obj:community() ~= "trader" and se_obj.group_id ~= 65535) then 
 			if (IsSurvivalMode() or get_object_story_id(se_obj.group_id) == nil) then
 				if (axr_companions.companion_squads[se_obj.group_id]) then 
-					table.insert(squad_mates,se_obj.id)
+					squad_mates[#squad_mates+1] = se_obj.id
 				--elseif (se_obj:community() == character_community(db.actor):sub(7)) then 
 					--table.insert(faction_mates,se_obj.id)
 				else
-					table.insert(avail_entities,se_obj.id)
+					avail_entities[#avail_entities+1] = se_obj.id
 				end
 			end
 		end

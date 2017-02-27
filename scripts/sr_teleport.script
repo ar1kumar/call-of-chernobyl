@@ -89,7 +89,7 @@ function set_scheme(obj, ini, scheme, section, gulag_name)
 		if t.point == "none" or t.look == "none" then
 			break
 		end
-		table.insert(st.points, t)
+		st.points[#st.points+1] = t
 	end
 	if #st.points == 0 then
 		abort("Wrong point nums in sr_teleport [%s]", tostring(section))

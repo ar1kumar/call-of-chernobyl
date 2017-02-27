@@ -21,7 +21,7 @@ function opt_menu_on_init(menu)
 	local flist = getFS():file_list_open("$game_text$",bit_or(FS.FS_ListFolders,FS.FS_RootOnly))
 	local f_cnt = flist:Size()
 	for	it=0, f_cnt-1 do
-		table.insert(localization_list,flist:GetAt(it):sub(1,-2))
+		localization_list[#localization_list+1] = flist:GetAt(it):sub(1,-2)
 	end
 	menu.gameplay_options["localization"] = {default="eng", debug_only=false, typ="list", list=localization_list, on_accept=function(handler,optMgr,ctrl)
 		local language = ctrl:GetText()
@@ -235,10 +235,10 @@ function get_character_icon_list()
 	local ini = ini_file("plugins\\faction_portraits.ltx")
 	local section = faction.."_portraits"
 	local n = ini:section_exist(section) and ini:line_count(section) or 0
+	local result, id, value = nil,nil,nil
 	for i=0, n-1 do
-		local result, id, value = ini:r_line(section,i,"","" )
-		table.insert(t,id)
+		result, id, value = ini:r_line(section,i,"","" )
+		t[#t+1] = id
 	end
-
 	return t
 end

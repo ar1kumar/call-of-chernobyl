@@ -137,6 +137,7 @@ function on_init_bounty_hunt(actor,npc,p)
 	axr_task_manager.bounties_by_id[p[1]] = nil 
 	
 	local valid_targets = {}
+	local size_t = 0
 	local sim = alife()
 	local comm
 	local sfind = string.find
@@ -152,18 +153,18 @@ function on_init_bounty_hunt(actor,npc,p)
 		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and sfind(se_obj:section_name(),"sim_default") and get_object_story_id(i) == nil) and (se_obj.group_id == nil or se_obj.group_id == 65535 or get_object_story_id(se_obj.group_id) == nil) then
 			comm = alife_character_community(se_obj)
 			if (faction_lookup[comm] == true) then 
-				table.insert(valid_targets,i)
+				size_t = size_t + 1 
+				valid_targets[size_t] = i
 			end
 		end
 	end
 	
-	local size = #valid_targets
-	if (size <= 0) then
+	if (size_t <= 0) then
 		printf("on_init_bounty_hunt failed, no targets")
 		return 
 	end
 	
-	local target_id = valid_targets[math.random(size)]
+	local target_id = valid_targets[math.random(size_t)]
 	if not(target_id) then
 		return 
 	end
@@ -287,7 +288,7 @@ end
 function setup_task_target_anomaly(actor,npc,p)
 	local targets = {}
 	for k,v in pairs(db.anomaly_by_name) do 
-		table.insert(targets,k)
+		targets[#targets+1] = k
 	end
 	
 	if (#targets <= 0) then 
@@ -3116,10 +3117,10 @@ function jup_b202_inventory_box_relocate(actor, npc)
 	local inv_box_in = get_story_object("jup_b202_snag_treasure")
 	local items_to_relocate = {}
 	local function relocate(inv_box_out, item)
-		table.insert(items_to_relocate, item)
+		items_to_relocate[#items_to_relocate+1] = item
 	end
 	inv_box_out:iterate_inventory_box	(relocate, inv_box_out)
-	for k,v in pairs(items_to_relocate) do
+	for k,v in ipairs(items_to_relocate) do
 		inv_box_out:transfer_item(v, inv_box_in)
 	end
 end
@@ -3136,7 +3137,7 @@ function clear_box(actor, npc, p)
 	local items_table = {}
 
 	local function add_items(inv_box, item)
-		table.insert(items_table, item)
+		items_table[#items_table+1] = item
 	end
 
 	inv_box:iterate_inventory_box(add_items, inv_box)
@@ -3418,7 +3419,7 @@ function zat_b202_spawn_random_loot(actor, npc, p)
 			end
 		until (prap) and ((max_weight - weight_table[n]) >= 0)
 		max_weight = max_weight - weight_table[n]
-		table.insert(spawned_item,n)
+		spawned_item[#spawned_item+1] = n
 		local item = math.random(1, #si_table[n])
 		for k,v in pairs(si_table[n][item].item) do
 			spawn_object_in(actor, npc, {tostring(v),"jup_b202_snag_treasure"})

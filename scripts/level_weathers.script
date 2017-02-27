@@ -574,7 +574,7 @@ function WeatherManager:get_state_as_string()
 		--local curs=self:pack_state(self.curr_weather)
 		--local nexs=self:pack_state(self.next_weather)
 		local grn=self:pack_graph_name(st.graph_name)
-		table.insert(lvlstrings,grn.."="..curs..","..nexs)
+		lvlstrings[#lvlstrings+1] = grn.."="..curs..","..nexs
 	end
 	--self.debugMessages[10]:SetText("saved string="..tostring(table.concat(lvlstrings,";")))
 	return table.concat(lvlstrings,";")

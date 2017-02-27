@@ -127,7 +127,6 @@ local function find_valid_target(npc,st,bw)
 
 	local size = #st.memory
 	if (size == 0) then
-		local i = 0
 		local obj,cls
 
 		-- Create a list of valid targets to iterate through one index per update
@@ -137,22 +136,20 @@ local function find_valid_target(npc,st,bw)
 			if (obj) then
 				cls = obj.clsid and obj:clsid()
 				if (cls) and (IsStalker(nil,cls) or IsMonster(nil,cls)) and (obj:alive()) then
-					i = i + 1
-					table.insert(st.memory,obj:id())
+					size = size + 1
+					st.memory[size] = obj:id()
 				end
 			end
 		end
 		st.overflowdetect = nil
-		if (i==0) then
+		if (size==0) then
 			return current_target ~= nil
 		end
-
-		size = i
 	end
 
 	if (size == 0 or st.index > size) then
 		st.index = 1
-		empty_table(st.memory)
+		iempty_table(st.memory)
 		return current_target ~= nil
 	end
 

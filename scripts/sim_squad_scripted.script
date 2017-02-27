@@ -637,7 +637,7 @@ function sim_squad_scripted:create_npc(spawn_smart,pos,lvid,gvid)
 		for k,v in pairs(spawn_sections) do
 			local id = self:add_squad_member(v, base_spawn_position, base_lvi, base_gvi,k)
 			if (id) then
-				table.insert(npcs_list,id)
+				npcs_list[#npcs_list+1] = id
 			end
 		end
 	end
@@ -659,7 +659,7 @@ function sim_squad_scripted:create_npc(spawn_smart,pos,lvid,gvid)
 			random_id = math.random(1, #random_spawn)
 			local id = self:add_squad_member(random_spawn[random_id], base_spawn_position, base_lvi, base_gvi)
 			if (id) then
-				table.insert(npcs_list,id)
+				npcs_list[#npcs_list+1] = id
 			end
 		end
 	elseif #spawn_sections == 0 then

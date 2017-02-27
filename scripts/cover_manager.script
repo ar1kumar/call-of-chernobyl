@@ -39,21 +39,20 @@ function CCover_manager:calculate_covers(position)
 		local squad = alife_object(k)
 		for kk in squad:squad_members() do
 			if db.storage[kk.id] ~= nil then
-				local npc_object = db.storage[kk.id].object
-				table.insert(npc_table, npc_object)
+				npc_table[#npc_table+1] = db.storage[kk.id].object
 			end
 		end
 	end
 
-	for k,v in pairs(npc_table) do
+	for k,v in ipairs(npc_table) do
 		v:register_in_combat()
 	end
 
 	self.cover_table = {}
-	for k,v in pairs(npc_table) do
+	for k,v in ipairs(npc_table) do
 		v:find_best_cover(position)
 	end
-	for k,v in pairs(npc_table) do
+	for k,v in ipairs(npc_table) do
 		local cover = v:find_best_cover(position)
 		if cover ~= nil then
 			--printf("!!! %s: %s [%s]", v:name(), cover:level_vertex_id(), tostring(cover:is_smart_cover()))
@@ -64,7 +63,7 @@ function CCover_manager:calculate_covers(position)
 		end
 	end
 
-	for k,v in pairs(npc_table) do
+	for k,v in ipairs(npc_table) do
 		v:unregister_in_combat()
 	end
 end

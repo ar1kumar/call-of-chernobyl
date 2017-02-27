@@ -108,7 +108,7 @@ function give_repaired_items(a,b)
 				npc:transfer_item(itm,db.actor)
 				news_manager.relocate_item(db.actor, "in", itm:section(), 1)
 				process_list[id] = index
-				table.insert(process_list,id)
+				process_list[#process_list+1] = id
 			end
 		end
 	end
@@ -160,10 +160,9 @@ function dm_repair_not_done(a,b)
 
 		local inv_name = game.translate_string(system_ini():r_string_ex(itm_sec,"inv_name") or "")
 
-		-- TODO: replace with translatable strings
 		local text = {}
 		for i=1,9 do 
-			table.insert(text,"st_inventory_upgrade_reply_"..i)
+			text[#text+1] = "st_inventory_upgrade_reply_"..i
 		end
 
 		local function set_text(str,...)

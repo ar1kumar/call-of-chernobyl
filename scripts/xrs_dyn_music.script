@@ -119,6 +119,7 @@ function initialize_themes()
 	for k,v in pairs(xrs_dynamic_music_themes.themes) do
 		if not(v.maps) or (v.maps=="") or (string.find(v.maps,lname)) then
 			table.insert(new_table,v.files)
+			new_table[#new_table+1] = v.files
 		end
 	end
 	themes = new_table

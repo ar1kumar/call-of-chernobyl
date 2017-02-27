@@ -1604,7 +1604,8 @@ function se_smart_terrain:try_respawn()
 	if self.last_respawn_update == nil or curr_time:diffSec(self.last_respawn_update) > self.respawn_idle then
 		self.last_respawn_update = curr_time
 		
-		empty_table(available_sects)
+		iempty_table(available_sects)
+		local size_t = 0
 		
 		-- check self.faction
 		if not (self.faction) then 
@@ -1627,7 +1628,8 @@ function se_smart_terrain:try_respawn()
 					end
 					
 					if max_respawn_count > self.already_spawned[k].num then
-						table.insert(available_sects,k)
+						size_t = size_t + 1
+						available_sects[available_sects] = k
 					end
 				end
 			else 
@@ -1635,8 +1637,8 @@ function se_smart_terrain:try_respawn()
 			end
 		end
 		
-		if #available_sects > 0 then
-			local sect_to_spawn = available_sects[math.random(1,#available_sects)]
+		if size_t > 0 then
+			local sect_to_spawn = available_sects[math.random(1,size_t)]
 			local sect_to_spawn_params = self.respawn_params[sect_to_spawn]
 			
 			if (sect_to_spawn_params.squads) then

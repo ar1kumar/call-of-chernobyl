@@ -105,7 +105,8 @@ function action_patrol:reset_scheme()
 						if self.a.scan_table[i] == nil then
 							self.a.scan_table[i] = {}
 						end
-						table.insert(self.a.scan_table[i], {key = k, pos = path:point(k)})
+						local t = self.a.scan_table[i]
+						t[#t+1] = {key = k, pos = path:point(k)}
 					end
 				end
 			end
