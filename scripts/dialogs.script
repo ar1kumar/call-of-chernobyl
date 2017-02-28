@@ -208,10 +208,10 @@ function free_trade_with_npc(a,b)
 			if (db.actor:position():distance_to_sqr(se_obj.position) <= 625) then
 				npc:use(db.actor)
 			else 
-				self:SetMsg(game.translate_string("st_pda_cant_trade_dist"),3)
+				SetHudMsg(game.translate_string("st_pda_cant_trade_dist"),3)
 			end
 		else 
-			self:SetMsg(game.translate_string("st_pda_cant_trade"),3)
+			SetHudMsg(game.translate_string("st_pda_cant_trade"),3)
 		end
 	end
 end
