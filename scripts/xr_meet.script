@@ -735,11 +735,23 @@ function process_npc_usability(npc)
 		else
 			npc:enable_talk()
 		end
-	elseif (use == "false") then
+		return
+	end 
+	
+	-- check if a task giver then force allow talk
+	local id = npc:id()
+	local task_info = task_manager.get_task_manager().task_info
+	for k,v in pairs(task_info) do
+		if (v.task_giver_id and v.task_giver_id == id) then
+			npc:enable_talk()
+			return
+		end 
+	end
+	
+	if (use == "false") then
 		npc:disable_talk()
 		if npc:is_talking() then
 			npc:stop_talk()
 		end
 	end
-
 end
