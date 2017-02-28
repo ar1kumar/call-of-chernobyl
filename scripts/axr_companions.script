@@ -194,11 +194,7 @@ end
 
 -- doesn't include task companions
 function get_companion_count()
-	local count = 0
-	for id,v in pairs(non_task_companions) do
-		count = count + 1
-	end
-	return count
+	return table.size(non_task_companions)
 end
 
 -- includes task companions too

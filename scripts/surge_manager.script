@@ -1172,7 +1172,8 @@ function CSurgeManager:kill_objects_at_pos(pos)
 	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
 		return 
 	end
-	for i,id in ipairs(self.objects_to_kill) do
+	for i=1,#self.objects_to_kill do 
+		local id = self.objects_to_kill[i]
         local npc = db.storage[id] and db.storage[id].object
 		if (npc) then 
 			if (npc:position().z > pos and npc:alive()) then 

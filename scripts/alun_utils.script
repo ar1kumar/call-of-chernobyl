@@ -24,11 +24,7 @@ function print_table(node,header,format_only)
 	local size_t = 0
 	local size_stack = 0 
 	while true do
-		local size = 0
-		for k,v in pairs(node) do
-			size = size + 1
-		end
-
+		local size = table.size(node)
 		local cur_index = 1
 		for k,v in pairs(node) do
 			if (cache[node] == nil) or (cur_index >= cache[node]) then
@@ -168,9 +164,8 @@ function parse_ini_section_to_array(ini,section)
 	local tmp=nil
 	if ini and ini:section_exist(section) then
 		tmp={}
-		local result, id, value = nil, nil, nil
 		for a=0,ini:line_count(section)-1 do
-			result, id, value = ini:r_line(section,a,"","")
+			local result, id, value = ini:r_line(section,a,"","")
 			if id~=nil and trim(id)~="" and trim(id)~=nil then
 				tmp[trim(id)]=trim(value)
 			end
@@ -279,14 +274,11 @@ function parse_list(ini,key,val,convert)
 		error(strformat("alun_utils.parse_list ini is nil for key=%s val=%s",key,val))
 	end
 	local str = ini:r_string_ex(key,val)
-	local t = str and str ~= "" and str_explode(str,",")
-	if not (t) then
-		return {}
-	end
+	local t = str and str ~= "" and str_explode(str,",") or {}
 	if (convert and #t > 0) then
 		local l = {}
-		for i,v in ipairs(t) do
-			l[v] = true
+		for i=1,#t do
+			l[t[i]] = true
 		end
 		return l
 	end
@@ -336,7 +328,8 @@ end
 
 function collect_sections(ini,sections)
 	local r,p = {},{}
-	for k,v in ipairs(sections) do
+	for k=1,#sections do
+		local v = sections[k]
 		if ini:section_exist(v) then
 			local n = ini:line_count(v)
 			if n > 0 then
@@ -348,8 +341,6 @@ function collect_sections(ini,sections)
 				end
 			end
 			p[k] = n
-		else
-			p[k] = 0
 		end
 	end
 	return r,p
@@ -677,27 +668,6 @@ function debug_nearest(npc,msg,...)
 	if (id and dbg and id == dbg:id()) then
 		printf("nearest=%s |"..msg,npc:name(),...)
 	end
-end 
-
-function printf(msg,...)
-	if not (msg) then return end
-	local fmt = tostring(msg)
-
-	if (select('#',...) >= 1) then
-		local i = 0
-		local p = {...}
-		local function sr(a)
-			i = i + 1
-			if (type(p[i]) == 'userdata') then
-				return 'userdata'
-			end
-			return tostring(p[i])
-		end
-		fmt = string.gsub(fmt,"%%s",sr)
-	end
-	get_console():execute("load ~#debug msg:"..fmt)
-	--get_console():execute("flush")
-	--debug_write(fmt,true)
 end
 
 local debug_file
@@ -2264,44 +2234,5 @@ function vec_intersects_line(a,b,c)
 		elseif (within(a.y,c.y,b.y)) then
 			return vec_collinear(a,b,c)
 		end
-	end
-end 
-
---/----------------------------------------------------------------------------
---/ Sandbox ( http://www.amk-team.ru/forum/index.php?showtopic=6458#entry258260 )
---/----------------------------------------------------------------------------
-function sandbox(file_name, function_name, ...)
-	local status, result = pcall(sandbox_exec, file_name, function_name, ...)
-	if status == false then
-		printf("(%s:sandbox) call failed, result = [%s]", self_name, result)
-		return
-	else
-		return result
-	end
-end
-
---/ execute script in sandbox
-function sandbox_exec(file_name, function_name, ...)
-	if not (file_name) then 
-		return
-	end 
-	
-	if not _G[file_name] then 
-		printf("script %s is not found", file_name) 
-		return
-	end 
-	
-	local result = assert(loadfile(getFS():update_path('$game_scripts$', '')..file_name..'.script'))
-	if type(result) == "function" then
-		if function_name then
-			result()
-			local f = loadstring("return "..function_name)
-			f(...)
-		else
-			result()
-		end
-	else
-		printf("(%s:sandbox) exec failed. function is not available: result = [%s]", self_name, type(result))
-		return
 	end
 end

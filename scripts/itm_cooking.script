@@ -42,7 +42,8 @@ function try_to_cook(itm)
 	get_hud():HideActorMenu() -- Necessary or crash!
 	
 	local sim = alife()
-	for i,_id in ipairs(items_to_remove) do 
+	for i=1,size_t do
+		local _id = items_to_remove[i]
 		local se_obj = sim:object(_id)
 		if (se_obj) then 
 			sim:release(se_obj)
@@ -50,7 +51,8 @@ function try_to_cook(itm)
 	end
 	
 	-- create cooked
-	for i,new_section in ipairs(items_to_create) do
+	for i=1,size_t do
+		local new_section = items_to_create[i]
 		sim:create(new_section,inv_box:position(),inv_box:level_vertex_id(),inv_box:game_vertex_id(),inv_box:id())
 	end
 	

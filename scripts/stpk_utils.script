@@ -1329,10 +1329,7 @@ end
 
 function fill_se_smart_cover_properties_packet(ret,stpk)
 	stpk:w_stringZ(ret.last_description)
-	local n = 0
-	for k,v in pairs (ret.loopholes) do
-		n = n + 1
-	end
+	local n = table.size(ret.loopholes)
 	stpk:w_u8(n)
 	for k,v in pairs (ret.loopholes) do
 		stpk:w_stringZ(k)

@@ -5,11 +5,7 @@ function command_get_list()
 end
 
 function command_get_count()
-	local count = 0
-	for k,v in pairs(cmd) do
-		count = count + 1
-	end
-	return count
+	return table.size(cmd)
 end
 
 function command_exists(name)

@@ -955,11 +955,7 @@ function pstor_save_all(obj, packet)
 		db.storage[npc_id].pstor = pstor
 	end
 
-	local ctr = 0
-	for k, v in pairs(pstor) do
-		ctr = ctr + 1
-	end
-
+	local ctr = table.size(pstor)
 	packet:w_u32(ctr)
 
 	for k, v in pairs(pstor) do
@@ -986,11 +982,7 @@ function pstor_save_all(obj, packet)
 		db.storage[npc_id].pstor_ctime = pstor
 	end
 	
-	ctr = 0
-	for k, v in pairs(pstor) do
-		ctr = ctr + 1
-	end
-
+	ctr = table.size(pstor)
 	packet:w_u32(ctr)
 	
 	for k,v in pairs(pstor) do

@@ -217,19 +217,25 @@ function GetPointDescription(obj)
 	
 	local m_s = game.translate_string("st_dyn_news_"..level_name)
 	local point = type(obj.position) == "function" and obj:position() or obj.position
-	if not (point and all_points[level_name]) then 
+	if not (point) then 
 		return m_s
+	end
+	
+	local all_points = all_points[level_name]
+	if not (all_points[level_name]) then
+		return m_s 
 	end
 	
 	local m_point = nil
 	local near_id = nil
 	local near_dist = nil
-	for key0,value in ipairs(all_points[level_name]) do
+	for i=1,#all_points do
+		local value = all_points[i]
 		local pos = vector():set(value[1],value[2],value[3])
 		local dist = pos:distance_to_sqr(point)
 		if (near_dist == nil or dist < near_dist) then
 			near_dist = dist
-			near_id = key0
+			near_id = i
 			near_point = pos
 		end
 		if (near_dist <= 30) then -- pointless to process further

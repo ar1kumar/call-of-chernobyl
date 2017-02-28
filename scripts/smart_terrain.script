@@ -616,7 +616,6 @@ function se_smart_terrain:select_npc_job(npc_info,now,surge_started)
 		return printf("%s no job table for %s [stype = %s]",self:name(),npc_info.se_obj:name(),npc_info.stype)
 	end
 	
-	local pairs = pairs
 	local new_job
 	local npc_by_job_section = self.npc_by_job_section
 	
@@ -901,11 +900,7 @@ function se_smart_terrain:STATE_Write(packet)
 	--set_save_marker(packet, "save", false, "se_smart_terrain")
 
 	-- Информацию о НПС, идущих в смарт
-	local n = 0
-	for k,v in pairs(self.arriving_npc) do
-		n = n + 1
-	end
-
+	local n = table.size(self.arriving_npc)
 	alun_utils.w_stpk(packet,"u8",n,"arriving_npc count")
 	for k,v in pairs(self.arriving_npc) do
 		alun_utils.w_stpk(packet,"u16",k,"arriving_npc id")
@@ -913,11 +908,7 @@ function se_smart_terrain:STATE_Write(packet)
 
 
 	-- Информацию о НПС в смарте
-	n = 0
-	for k,v in pairs(self.npc_info) do
-		n = n + 1
-	end
-
+	n = table.size(self.npc_info)
 	--printf("%s:STATE_Write   JobCount=%s",self:name(),n)
 	alun_utils.w_stpk(packet,"u8",n,"npc_info count")
 	for id,info in pairs(self.npc_info) do
@@ -942,10 +933,7 @@ function se_smart_terrain:STATE_Write(packet)
 
 	if self.respawn_point then
 		alun_utils.w_stpk(packet,"bool",true,"respawn_point")
-		local n = 0
-		for k,v in pairs(self.already_spawned) do
-			n = n + 1
-		end
+		local n = table.size(self.already_spawned)
 
 		alun_utils.w_stpk(packet,"u8",n,"already_spawned count")
 		for k,v in pairs(self.already_spawned) do
@@ -1185,7 +1173,6 @@ function se_smart_terrain:hide()
 end
 
 local function is_only_monsters_on_jobs(npc_info)
-	local pairs = pairs
 	for k,v in pairs(npc_info) do
 		if not (v.stype == 1) then
 			return false
@@ -1466,7 +1453,6 @@ end
 
 function smart_terrain_squad_count(board_smart_squads)
 	local count = 0
-	local pairs = pairs
 	for k,v in pairs(board_smart_squads) do
 		if v:get_script_target() == nil then
 			count = count + 1

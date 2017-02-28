@@ -925,9 +925,7 @@ function af_opt_weather:InitControls(x, y, xml, handler)
 		aspectRatio = 0.8
 	end
 	
-	local k = 0
 	for level_name,v in pairs(level_weathers.valid_levels) do
-		k = k + 1
 		_st = xml:InitStatic("weather_dialog:templ_item", nil)
 		_el=xml:InitStatic("weather_dialog:div_1", _st)
 		_el:SetWndPos(vector2():set(0,0))

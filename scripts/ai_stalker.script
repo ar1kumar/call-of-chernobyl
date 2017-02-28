@@ -202,23 +202,18 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 	--]]
 	section = "spawn_loadout"
 	if (ini:section_exist(section)) then
-		local level_name, actor_rank
+		local actor_rank = sim:actor():rank()
 		local itr_count = 1
 		local spawn_list = {}
-		local result, spawn_sec, value = nil, nil, nil
-			
 		while (ini:section_exist(section)) do
 			local j = ini:line_count(section)-1
 			for i=0,j do
 				iempty_table(spawn_list)
-				local size = 0
-				result, spawn_sec, value = ini:r_line(section,i,"","")
+				local size_t = 0
+				local result, spawn_sec, value = ini:r_line(section,i,"","")
 				if (spawn_sec and spawn_sec ~= "" and sys_ini:section_exist(spawn_sec)) then
 					if (value and value ~= "") then
 						-- If a rank parameter exists, then only allow item if actor rank is greater than equal
-						if not (actor_rank) then
-							actor_rank = sim:actor():rank()
-						end
 						local rank = tonumber(string.match(value,"rank=([%w_%-%.]+)"))
 						if (rank == nil or rank >= actor_rank) then
 							local prob = tonumber(string.match(value,"prob=([%w_%-%.]+)")) or 1 
@@ -229,21 +224,21 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 								-- end
 								-- local l_name = string.match(value,"level=([%w_%-.]+)")
 								-- if (l_name == nil or l_name == level_name) then
-									size = size + 1
-									spawn_list[size] = {spawn_sec,value}
+									size_t = size_t + 1
+									spawn_list[size_t] = {spawn_sec,value}
 								-- end
 							end
 						end
 					else
-						size = size + 1
-						spawn_list[size] = {spawn_sec,value}
+						size_t = size_t + 1
+						spawn_list[size_t] = {spawn_sec,value}
 					end 
 				end
 			end
-			if (#spawn_list > 0) then
-				local selected = spawn_list[math.random(#spawn_list)]
-				spawn_sec = selected[1]
-				value = selected[2]
+			if (size_t > 0) then
+				local selected = spawn_list[math.random(size_t)]
+				local create_section = selected[1]
+				local value = selected[2]
 				local cond,count,ammo_type = 1,1,0
 				local bScope, bSilencer, bLauncher
 				if (value and value ~= "") then
@@ -276,7 +271,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 					end
 				end
 				-- Create the item and set params
-				local se_item = create(sim,spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+				local se_item = create(sim,create_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
 				if (se_item) then 
 					local cls = se_item:clsid()
 					if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
@@ -296,7 +291,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 						end
 						
 						-- Create the ammo 
-						local ammos = alun_utils.parse_list(sys_ini,spawn_sec,"ammo_class")
+						local ammos = alun_utils.parse_list(sys_ini,create_section,"ammo_class")
 						if not (ammo_type < #ammos) then
 							ammo_type = 0
 						end

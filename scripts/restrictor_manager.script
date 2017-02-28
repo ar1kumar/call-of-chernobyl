@@ -46,8 +46,8 @@ function Crestrictor_manager:reset_restrictions(st, section)
 		end
 	end
 	
-	for k,v in ipairs(restr_tbl) do
-		self.object:remove_restrictions(v, "")
+	for i=1,size_t do
+		self.object:remove_restrictions(restr_tbl[i],"")
 	end
 	
 	-- New out restrictions
@@ -68,8 +68,8 @@ function Crestrictor_manager:reset_restrictions(st, section)
 		end
 	end
 
-	for k,v in ipairs(restr_tbl) do
-		self.object:add_restrictions(v, "")
+	for i=1,size_t do
+		self.object:add_restrictions(restr_tbl[i],"")
 	end
 
 	-- IN RESTRICTIONS
@@ -95,8 +95,8 @@ function Crestrictor_manager:reset_restrictions(st, section)
 		end
 	end
 	
-	for k,v in ipairs(restr_tbl) do
-		self.object:remove_restrictions("", v)
+	for i=1,size_t do
+		self.object:remove_restrictions("",restr_tbl[i])
 	end
 	
 	-- New in restrictions
@@ -117,8 +117,8 @@ function Crestrictor_manager:reset_restrictions(st, section)
 		end
 	end
 
-	for k,v in ipairs(restr_tbl) do
-		self.object:add_restrictions("", v)
+	for i=1,size_t do
+		self.object:add_restrictions("",restr_tbl[i])
 	end
 end
 

@@ -173,7 +173,8 @@ function pda_contacts_tab:Reset()
 	add_by_sid("red_tech_forester")
 	
 	-- Loop through all stalkers to display.
-	for index,stalker in ipairs(display_list) do
+	for index=1,#display_list do 
+		local stalker = display_list[index]
 		-- Retrieve required information.
 		local stalker_comm = stalker:character_community()
 		local stalker_icon = stalker:character_icon()

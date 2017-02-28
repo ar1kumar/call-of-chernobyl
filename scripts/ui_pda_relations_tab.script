@@ -207,10 +207,7 @@ function pda_relations_tab:autoupdate()
 			
 			-- Set color code
 			if not (id_to_code[se_obj.group_id]) then 
-				local n = 1
-				for k,v in pairs(id_to_code) do 
-					n = n + 1
-				end
+				local n = table.size(id_to_code)+1
 				id_to_code[se_obj.group_id] = self.color_codes[n] or self.color_codes[1]
 			end
 			self.companion_info[i].leader_wnd:SetTextureColor(id_to_code[se_obj.group_id])

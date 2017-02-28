@@ -13,10 +13,7 @@ function CRandomTask:save(packet)
 	end 
 	
 	set_save_marker(packet, "save", false, "CRandomTask")
-	local n = 0
-	for k,v in pairs(self.task_info) do
-		n = n + 1
-	end
+	local n = table.size(self.task_info)
 	packet:w_u16(n)
 	for k,v in pairs(self.task_info) do
 		packet:w_stringZ(k)
