@@ -632,13 +632,10 @@ function sim_squad_scripted:create_npc(spawn_smart,pos,lvid,gvid)
 	end 
 	
 	local npcs_list = {}
-	
-	if #spawn_sections ~= 0 then
-		for k,v in pairs(spawn_sections) do
-			local id = self:add_squad_member(v, base_spawn_position, base_lvi, base_gvi,k)
-			if (id) then
-				npcs_list[#npcs_list+1] = id
-			end
+	for ind=1,#spawn_sections do
+		local id = self:add_squad_member(spawn_sections[ind], base_spawn_position, base_lvi, base_gvi,ind)
+		if (id) then
+			npcs_list[#npcs_list+1] = id
 		end
 	end
 

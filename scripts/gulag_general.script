@@ -234,14 +234,10 @@ local function precond_collector(se_obj, smart, job)
 		return false
 	end
 
-	local detectors = { "detector_simple", "detector_advanced", "detector_elite", "detector_scientific" }
+	if (npc:object("detector_simple") or npc:object("detector_advanced") or npc:object("detector_elite") or npc:object("detector_scientific")) then 
+		return true 
+	end 
 
-	for k,v in pairs(detectors) do
-		local obj = npc:object(v)
-		if obj ~= nil then
-			return true
-		end
-	end
 	return false
 end
 

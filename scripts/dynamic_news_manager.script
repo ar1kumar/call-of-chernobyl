@@ -111,12 +111,12 @@ function DynamicNewsManager:NewsTick()
 		return false
 	end
 	
-	local c
-	for k,v in pairs(self.queue) do
-		c = #v
-		if (c > 0) then
-			dynamic_news_helper.send_tip(v[c].Mg,v[c].Se, nil, nil,v[c].Ic,v[c].Snd,v[c].It)
-			v[c] = nil
+	for ch,messages in pairs(self.queue) do
+		local c = #messages
+		local message = messages[c]
+		if (message) then
+			dynamic_news_helper.send_tip(message.Mg,message.Se, nil, nil,message.Ic,message.Snd,message.It)
+			messages[c] = nil
 			return false
 		end
 	end
@@ -222,16 +222,17 @@ end
 
 ------------------------ utility
 function DynamicNewsManager:PushToChannel(name,t,fifo)
-	if (self.queue[name]) then
+	local q = self.queue[name]
+	if (q) then
 		if (t.Mg) then 
 			for s in string.gmatch(t.Mg,"(st_dyn_news_ch_[%w%d_]*)") do
 				t.Mg = string.gsub(t.Mg,s,game.translate_string(s))
 			end
 		end
 		if (fifo) then
-			table.insert(self.queue[name],t)
+			q[#q+1] = t
 		else
-			table.insert(self.queue[name],#t+1,t)
+			table.insert(q,1,t)
 		end
 	end
 end 
