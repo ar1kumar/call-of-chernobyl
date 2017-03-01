@@ -206,10 +206,10 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 		local itr_count = 1
 		local spawn_list = {}
 		while (ini:section_exist(section)) do
+			iempty_table(spawn_list)
+			local size_t = 0
 			local j = ini:line_count(section)-1
 			for i=0,j do
-				iempty_table(spawn_list)
-				local size_t = 0
 				local result, spawn_sec, value = ini:r_line(section,i,"","")
 				if (spawn_sec and spawn_sec ~= "" and sys_ini:section_exist(spawn_sec)) then
 					if (value and value ~= "") then
@@ -235,8 +235,8 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 					end 
 				end
 			end
-			if (#spawn_list > 0) then
-				local selected = spawn_list[math.random(#spawn_list)]
+			if (size_t > 0) then
+				local selected = spawn_list[math.random(size_t)]
 				local create_section = selected[1]
 				local value = selected[2]
 				local cond,count,ammo_type = 1,1,0
