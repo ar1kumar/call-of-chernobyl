@@ -221,16 +221,16 @@ function GetPointDescription(obj)
 		return m_s
 	end
 	
-	local all_points = all_points[level_name]
-	if not (all_points[level_name]) then
+	local points = all_points[level_name]
+	if not (points) then
 		return m_s 
 	end
 	
 	local m_point = nil
 	local near_id = nil
 	local near_dist = nil
-	for i=1,#all_points do
-		local value = all_points[i]
+	for i=1,#points do
+		local value = points[i]
 		local pos = vector():set(value[1],value[2],value[3])
 		local dist = pos:distance_to_sqr(point)
 		if (near_dist == nil or dist < near_dist) then
