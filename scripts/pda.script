@@ -327,7 +327,8 @@ function fill_primary_objects()
 		"pri_room27_sleep_id",
 		"zat_a2_sr_sleep_id",
 		"jup_a6_sr_sleep_id",
-		"pri_a16_sr_sleep_id"
+		"pri_a16_sr_sleep_id",
+		"pripyat_secret_sleep_sr"
 	}
 	for i=1,#sleep_zones_tbl do
 		local obj_id = get_story_object_id(sleep_zones_tbl[i])
@@ -521,9 +522,4 @@ function coc_rankings_set_icon(index)
 		return icon_name and icon_name ~= "" and icon_name or "ui\\ui_noise"
 	end
 	return ""
-end
-
-function coc_rankings_show_border(index)
-	local se_obj = coc_ranking_list[index] ~= nil and alife_object(coc_ranking_list[index])
-	return se_obj and se_obj.id == 0 or false
 end

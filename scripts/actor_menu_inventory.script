@@ -44,6 +44,11 @@ function CUIActorMenu_OnItemFocusReceive(itm)
 end
 
 -- called from engine!
+function CUIActorMenu_OnItemFocusLost(itm)
+	SendScriptCallback("CUIActorMenu_OnItemFocusLost",itm)
+end
+
+-- called from engine!
 -- useful for when doing npc:use(db.actor) when NPC is alive
 -- basically what is available in the corpse loot menu while npc is alive
 function CInventory_ItemAvailableToTrade(npc,item)
