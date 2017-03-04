@@ -99,7 +99,7 @@ function generic_object_binder:update(delta)
 	end
 	
 	if (squad and squad.current_action and squad.current_action == 0) then
-		local squad_target = squad.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
+		local squad_target = squad.assigned_target_id and simulation_objects.get_server_entity(squad.assigned_target_id)
 		if not (squad_target) then
 			xr_logic.mob_release(self.object)
 			return

@@ -8,10 +8,6 @@
 		Such thing is 'okay' in db.storage, but that is because on net_destroy db.storage[id] is set nil. So if you are keeping track of objects directly in a table, instead of ID 
 		then you absolutely must rid of every single reference to the userdata so that it can be destroy and garbage collected. Otherwise you end up with undetectable issues.
 --]]
-if (jit == nil) then
-	profiler.setup_hook	()
-end
-
 GAME_VERSION = "1.4.23"
 
 if string.find(command_line(), "-dbg") then
@@ -25,7 +21,7 @@ USE_INI_MEMOIZE = true
 
 -- Improves performance if true, by disabling update methods for squads and smart terrains on levels not linked in configs\ai_tweaks\simulation_objects.ltx
 -- But this means simulation will only be active on actor level and linked levels everything else will remain in an idle state
-DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = true
+DEACTIVATE_SIM_ON_NON_LINKED_LEVELS = false
 
 -------------------------------------------------------------------------------------------------
 -- Use marshal library for saving persistent data (like xr_logic pstor)
@@ -62,20 +58,21 @@ function start_game_callback()
 	--xr_sound.start_game_callback()
 	dialog_manager.fill_phrase_table()
 
-	sim_objects.clear()
 	sr_light.clean_up ()
 	pda.add_quick_slot_items_on_game_start()
 end
 
+local alife_sim
 function alife_object(id)
 	if (id == nil or id >= 65535) then
 		callstack()
 		printf("ALIFE OBJECT ID IS %s!",id)
 		return
 	end
-	local sim = alife()
-	local object = sim.object
-	return object(sim,id)
+	if not (alife_sim) then 
+		alife_sim = alife()
+	end
+	return alife_sim:object(id)
 end
 -------------------------------------------------------------------------------------------------------
 -- 											SCRIPTED CALLBACKS

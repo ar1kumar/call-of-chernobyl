@@ -332,27 +332,30 @@ end
 local priority_tasks = {}
 function simulation_board:get_squad_target(squad)
 	local size_t = 0
-	local object_registry = simulation_objects.get_sim_obj_registry().objects
-	for k,v in pairs(object_registry) do
-		if v.id ~= squad.id and not v.locked == true then
-			local curr_prior = v:evaluate_prior(squad)
-			if (curr_prior > 0 and v:target_precondition(squad)) then
+	
+	local object_registry = simulation_objects.object_registry
+	local is_available = simulation_objects.available_by_id
+	for index=1,simulation_objects.object_registry_size do 
+		local se_target = object_registry[index]
+		if (not se_target.locked and se_target.id ~= squad.id and is_available[se_target.id]) then 
+			local curr_prior = se_target:evaluate_prior(squad)
+			if (curr_prior > 0 and se_target:target_precondition(squad)) then
 				-- Prioritize 5 potential targets
 				if (size_t < 5) then 
 					size_t = size_t + 1
-					priority_tasks[size_t] = {v,curr_prior}
+					priority_tasks[size_t] = {se_target,curr_prior}
 				elseif (curr_prior > priority_tasks[size_t][2]) then 
 					for i=1,size_t do 
 						if (curr_prior > priority_tasks[i][2]) then 
 							priority_tasks[i][2] = curr_prior
-							priority_tasks[i][1] = v
+							priority_tasks[i][1] = se_target
 							break
 						end
 					end
 				end
 			end
 		end
-	end
+	end 
 
 	if (size_t > 0) then
 		local target = priority_tasks[math.random(size_t)][1]

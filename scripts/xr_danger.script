@@ -538,14 +538,14 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 	local bdo = best_danger_object or dependent_object
 
 	local dst = db.storage[bdo:id()]
-	local killer = dependent_object or dst and dst.death_by_id and (db.storage[dst.death_by_id] and db.storage[dst.death_by_id].object or level.object_by_id(dst.death_by_id))
+	local killer = dependent_object or dst and dst.death_by_id and (db.storage[dst.death_by_id] and db.storage[dst.death_by_id].object)
 
 	-- force hostile to killer
 	if (st.stage >= 4 and killer and killer:id() == 0 and killer:alive() and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
 		local squad = get_object_squad(npc)
 		if (squad) then
 			for k in squad:squad_members() do
-				npc = db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id)
+				npc = db.storage[k.id] and db.storage[k.id].object
 				if(npc) then
 					npc:force_set_goodwill( -1000, killer)
 				end

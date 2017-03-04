@@ -250,14 +250,13 @@ function action_reach_task_location:commander_execute(squad)
 		return self:fake_target(squad) -- this is for squads who can't find open smart
 	end
 	
-	local squad_target = simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
+	local squad_target = simulation_objects.get_server_entity(squad.assigned_target_id)
 	if squad_target == nil and squad:get_script_target() ~= nil then
 	 	squad_target = alife_object(squad.assigned_target_id)
 	end
 	
 	if (squad_target == nil) then 
-		npc:set_movement_type(move.stand)
-		return
+		return self:fake_target(squad) -- this is for squads who can't find open smart
 	end
 	
 	npc:set_sight(look.path_dir,nil,0)
@@ -335,7 +334,7 @@ function action_reach_task_location:soldier_execute(squad)
 		return
 	end
 	
-	local squad_target = simulation_objects.get_sim_obj_registry().objects[squad.assigned_target_id]
+	local squad_target = simulation_objects.get_server_entity(squad.assigned_target_id)
 	if squad_target == nil and squad:get_script_target() ~= nil then
 		squad_target = alife_object(squad.assigned_target_id)
 	end

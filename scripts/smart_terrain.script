@@ -81,6 +81,7 @@ function se_smart_terrain:on_before_register()
 	--alun_utils.debug_write(strformat("%s:%s:on_before_register AFTER",self:name(),self.id))
 end
 
+actor_level = nil
 function se_smart_terrain:on_register()
 	--alun_utils.debug_write(strformat("%s:%s:ON_REGISTER start",self:name(),self.id))
 	cse_alife_smart_zone.on_register(self)
@@ -88,9 +89,8 @@ function se_smart_terrain:on_register()
 
 	local sim = alife()
 	local gg = game_graph()
-	local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
+	actor_level = actor_level or sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
 	local smart_level = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
-	
 	self.is_on_actor_level = actor_level == smart_level or nil
 	self.smart_alife_task = CALifeSmartTerrainTask(self.m_game_vertex_id, self.m_level_vertex_id)
 	
@@ -107,7 +107,7 @@ function se_smart_terrain:on_register()
 	end
 	
 	story_objects.check_spawn_ini_for_story_id(self)
-	simulation_objects.get_sim_obj_registry():register(self)
+	simulation_objects.register(self)
 	
 	self:load_jobs()
 	self.b_registred = true
@@ -128,7 +128,7 @@ end
 function se_smart_terrain:on_unregister()
 	SIMBOARD:unregister_smart(self)
 	unregister_story_object_by_id(self.id)
-	simulation_objects.get_sim_obj_registry():unregister(self)
+	simulation_objects.unregister(self)
 	db.del_smart_terrain(self)
 	--if (USE_MARSHAL) then 
 	--	UnregisterScriptCallback("save_state",self)
@@ -1226,7 +1226,6 @@ function se_smart_terrain:update()
 	
 	--alun_utils.debug_write(strformat("%s:update ",self:name()))
 	
-	simulation_objects.get_sim_obj_registry():update_avaliability(self)
 	self:update_jobs()
 	
 	if self.respawn_params ~= nil then

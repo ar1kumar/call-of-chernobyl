@@ -1278,9 +1278,8 @@ function squad_has_enemy(actor, npc, p)
 		return false
 	end
 
-	local obj_by_id = level.object_by_id
 	for k in squad:squad_members() do
-		local npc_obj = k.id and object_by_id(k.id)
+		local npc_obj = k.id and db.storage[k.id] and db.storage[k.id].object
 		if (npc_obj and npc_obj:best_enemy() ~= nil) then 
 			return true 
 		end
@@ -2187,10 +2186,8 @@ function npc_squad_has_enemy(actor,npc,p)
 		return false
 	end
 
-	local o
-	local object_by_id = level.object_by_id
 	for k in squad:squad_members() do
-		o = k.id and object_by_id(k.id)
+		local o = k.id and db.storage[k.id] and db.storage[k.id].object
 		if (o and o:best_enemy()) then
 			return true
 		end
@@ -2252,11 +2249,10 @@ function squad_hit_by_smart(actor,npc,p)
 		return false
 	end
 
-	local who,smart
-	local object_by_id = level.object_by_id
+	local storage = db.storage
 	for k in squad:squad_members() do
-		who = k.id and db.storage[k.id].hitted_by and object_by_id(db.storage[k.id].hitted_by)
-		smart = who and xr_gulag.get_npc_smart(who)
+		local who = k.id and storage[k.id] and storage[k.id].hitted_by and storage[storage[k.id].hitted_by] and storage[storage[k.id].hitted_by].object
+		local smart = who and xr_gulag.get_npc_smart(who)
 		if (smart and smart:name() == p[1]) then
 			return true
 		end
@@ -2326,9 +2322,9 @@ function job_on_point(actor,npc,p)
 	-- p[1] = smart_name p[2] = logic p[3] = index p[4] = less_than_equal_to Distance p[5] = return true if object is dead or doesn't exist
 	local board = SIMBOARD
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
-	local obj = smart and smart.npc_by_job_section["logic@"..p[2]]
-	local st = db.storage[obj]
-	obj = obj and (st and st.object or level.object_by_id(obj))
+	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
+	local st = id and db.storage[id]
+	local obj = st and st.object
 	if not (obj) then
 		return p[5] == "true"
 	end
@@ -2380,7 +2376,7 @@ function obj_on_job(actor,npc,p)
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
 	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
 	local st = id and db.storage[id]
-	local obj = id and (st and st.object or level.object_by_id(id))
+	local obj = st and st.object
 	--printf("obj=%s",obj and obj:name())
 	if not (p[3]) then
 		return obj and obj:alive() or false
@@ -2394,8 +2390,8 @@ end
 function see_obj_on_job(actor,npc,p)
 	local board = SIMBOARD
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
-	local obj = smart and smart.npc_by_job_section["logic@"..p[2]]
-	obj = obj and (db.storage[obj] and db.storage[obj].object or level.object_by_id(obj))
+	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
+	local obj = id and db.storage[id] and db.storage[id].object
 	return obj and obj:alive() and npc:memory_time(obj) < 5000 or false
 end
 
@@ -2405,9 +2401,9 @@ end
 function obj_on_job_danger(actor,npc,p)
 	local board = SIMBOARD
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
-	local obj = smart and smart.npc_by_job_section["logic@"..p[2]]
-	obj = obj and (db.storage[obj] and db.storage[obj].object or level.object_by_id(obj))
-	return obj and db.storage[obj:id()].danger_flag or false
+	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
+	local obj = id and db.storage[id] and db.storage[id].object
+	return obj and db.storage[id].danger_flag or false
 end
 
 -- Returns true if a NPC on a given job was hit by calling NPC
@@ -2416,14 +2412,14 @@ end
 function obj_on_job_hit_by(actor,npc,p)
 	local board = SIMBOARD
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
-	local obj = smart and smart.npc_by_job_section["logic@"..p[2]]
-	obj = obj and (db.storage[obj] and db.storage[obj].object or level.object_by_id(obj))
+	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
+	local obj = id and db.storage[id] and db.storage[id].object
 	if (not obj and not obj:alive()) then
 		return false
 	end
 
-	local id = db.storage[obj:id()].hitted_by
-	return id and id == npc:id() or false
+	local who_id = db.storage[id].hitted_by
+	return who_id and who_id == npc:id() or false
 end
 
 -- Returns true if a NPC's on a given job has a given active section
@@ -2433,10 +2429,9 @@ end
 function job_active_section(actor,npc,p)
 	local board = SIMBOARD
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
-	local obj = smart and smart.npc_by_job_section["logic@"..p[2]]
-	obj = obj and (db.storage[obj] and db.storage[obj].object or level.object_by_id(obj))
-	local st = obj and db.storage[obj:id()]
-	return st and st.active_section == p[3] or false
+	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
+	local obj = id and db.storage[id] and db.storage[id].object
+	return obj and db.storage[id].active_section == p[3] or false
 end
 
 -- Returns true if ONLY monster-type NPC's occupy a given smart

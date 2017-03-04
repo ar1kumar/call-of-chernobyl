@@ -349,9 +349,11 @@ function pick_section_from_condlist(actor, npc, condlist, p)
 		end
 	end
 
-	for n, cond in pairs(condlist) do
+	for n=1,#condlist do
+		local cond = condlist[n]
 		infop_conditions_met = true -- изначально считаем, что все условия переключения удовлетворены
-		for inum, infop in pairs(cond.infop_check) do
+		for inum=1,#cond.infop_check do
+			local infop = cond.infop_check[inum]
 			if infop.prob then
 				if infop.prob < math.random(100) then
 					infop_conditions_met = false -- инфопоршен есть, но он не должен присутствовать

@@ -73,7 +73,7 @@ local function main_loop()
 	local left_hud = toggle_hud_list["left"][toggle_left_key]
 	local right_hud = toggle_hud_list["right"][toggle_right_key]
 
-	if not(top_hud) or not(left_hud) then return end
+	if not(top_hud) or not(left_hud) then return false end
 
 	_G["xrs_debug_tools"][top_hud.."_show"](hud_display_top)
 	_G["xrs_debug_tools"][left_hud.."_show"](hud_display_left)

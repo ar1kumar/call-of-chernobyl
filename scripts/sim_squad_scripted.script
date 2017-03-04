@@ -155,7 +155,7 @@ function sim_squad_scripted:update()
 								--SIMBOARD.tmp_entered_squad[self.smart_id] = nil
 								SIMBOARD.tmp_assigned_squad[self.smart_id] = nil
 							end
-							simulation_objects.get_sim_obj_registry():unregister(self)
+							--simulation_objects.unregister(self)
 							self.disabled = true
 							--printf("%s disabled",self:name())
 							--alun_utils.debug_write("sim_squad_scripted:update END 3")
@@ -195,7 +195,6 @@ function sim_squad_scripted:update()
 	self.dist_to_actor = self.position:distance_to(se_actor.position)
 
 	self:check_invulnerability()
-	--simulation_objects.get_sim_obj_registry():update_avaliability(self)
 
 	local script_target_id = self:get_script_target()
 	if (script_target_id) then
@@ -295,8 +294,7 @@ function sim_squad_scripted:generic_update()
 	self.assigned_target_id = get_help_target_id(self) or self.assigned_target_id or self.current_target_id
 	
 	if (self.current_action) then
-		local se_target = self.assigned_target_id and simulation_objects.get_sim_obj_registry().objects[self.assigned_target_id]
-
+		local se_target = simulation_objects.get_server_entity(self.assigned_target_id)
 		-- Evaluate current assigned target; make sure it is still valid
 		if (se_target and se_target:target_precondition(self,true)) then
 			-- If current action is not finished, then return
@@ -907,7 +905,7 @@ function sim_squad_scripted:on_register()
 	cse_alife_online_offline_group.on_register( self )
 	story_objects.check_spawn_ini_for_story_id(self)
 	sim_board.get_sim_board().squads[self.id] = self
-	simulation_objects.get_sim_obj_registry():register(self)
+	--simulation_objects.register(self)
 	SendScriptCallback("squad_on_register",self)
 	--alun_utils.debug_write( strformat("%s:on_register end",self:name()) )
 end
@@ -917,7 +915,7 @@ function sim_squad_scripted:on_unregister()
 	unregister_story_object_by_id(self.id)
 	SIMBOARD.squads[self.id] = nil
 	SIMBOARD:assign_squad_to_smart(self, nil)
-	simulation_objects.get_sim_obj_registry():unregister(self)
+	--simulation_objects.unregister(self)
 	if self.respawn_point_id ~= nil then
 		local smart = alife_object(self.respawn_point_id)
 		if smart == nil then
@@ -1201,11 +1199,13 @@ local smarts_by_no_assault_zones = {
 }
 
 function sim_squad_scripted:sim_available()
+	return false 
+	--[[
 	if self.smart_id == nil then
 		return true
 	end
 
-	local smart = simulation_objects.get_sim_obj_registry().objects[self.smart_id]
+	local smart = simulation_objects.get_server_entity(self.smart_id)
 	if not (smart) then
 		return false
 	end
@@ -1216,6 +1216,7 @@ function sim_squad_scripted:sim_available()
 	end
 
 	return true
+	--]]
 end
 
 function sim_squad_scripted:target_precondition(squad)

@@ -25,7 +25,10 @@ function crow_binder:update(delta)
 	if not (self.object:alive()) then
 		if (self.body_timer<=time_global()-120000) and (self.body_timer~=0) then
 			printf("releasing object ["..self.object:name().."]")
-			alife():release(alife_object(self.object:id()), true)
+			local se_obj = alife_object(self.object:id())
+			if (se_obj) then
+				alife():release(se_obj)
+			end
 		end
 		--Alundaio
 		local looted = utils.load_var(self.object,"looted",nil)

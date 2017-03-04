@@ -78,7 +78,7 @@ function remove_task_companion(actor,npc,p)
 	axr_companions.companion_squads[squad.id] = nil
 	
 	for k in squad:squad_members() do
-		local npc = k.id and (db.storage[k.id] and db.storage[k.id].object or level.object_by_id(k.id))
+		local npc = k.id and db.storage[k.id] and db.storage[k.id].object
 		if (npc) then
 			axr_logic.restore_scheme_and_logic(npc)
 			npc:disable_info_portion("npcx_is_companion")
@@ -1340,7 +1340,7 @@ function hit_by_killer(actor, npc, p)
 		return false
 	end
 
-	local killer = db.storage[t.killer].object or level.object_by_id(t.killer)
+	local killer = db.storage[t.killer] and db.storage[t.killer].object
 	if not (killer) then
 		return false
 	end
@@ -2689,7 +2689,7 @@ function make_actor_visible_to_squad(actor,npc,p)
 	local squad = get_story_squad(story_id)
 	if squad == nil then printf("There is no squad with id[%s]", story_id) end
 	for k in squad:squad_members() do
-		local obj = level.object_by_id(k.id)
+		local obj = db.storage[k.id] and db.storage[k.id].object
 		if obj ~= nil then
 			obj:make_object_visible_somewhen( db.actor )
 		end
@@ -4315,8 +4315,8 @@ end
 function kill_obj_on_job(actor,npc,p)
 	local board = SIMBOARD
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
-	local obj = smart and smart.npc_by_job_section["logic@"..p[2]]
-	obj = obj and level.object_by_id(obj)
+	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
+	local obj = id and db.storage[id] and db.storage[id].object
 	if not obj or not obj:alive() then
 		return false
 	end
@@ -4334,8 +4334,8 @@ end
 function obj_at_job_switch_section(actor,npc,p)
 	local board = SIMBOARD
 	local smart = p[1] and board and board.smarts_by_names[p[1]]
-	local obj = smart and smart.npc_by_job_section["logic@"..p[2]]
-	obj = obj and level.object_by_id(obj)
+	local id = smart and smart.npc_by_job_section["logic@"..p[2]]
+	local obj = id and db.storage[id] and db.storage[id].object
 	if not obj or not obj:alive() then
 		return
 	end
