@@ -15,7 +15,7 @@ function find_smart_under_faction_control(actor,npc,p)
 	
 	local target_id
 	for name,smart in pairs(SIMBOARD.smarts_by_names) do 
-		if (smart.online) and (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then 
+		if (smart.online) and (simulation_objects.available_by_id[smart.id] == true) then 
 			local smrt = SIMBOARD.smarts[smart.id]
 			if (smrt) then 
 				for k,squad in pairs(smrt.squads) do
@@ -45,7 +45,7 @@ function find_smart_under_faction_control_ex(actor,npc,p)
 		
 	local target_id
 	for name,smart in pairs(SIMBOARD.smarts_by_names) do 
-		if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then 
+		if (simulation_objects.available_by_id[smart.id] == true) then 
 			local smrt = SIMBOARD.smarts[smart.id]
 			if (smrt) then 
 				local smart_level = alife():level_name(game_graph():vertex(smart.m_game_vertex_id):level_id())

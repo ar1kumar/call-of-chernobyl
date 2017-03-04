@@ -26,7 +26,8 @@ function check_smart_under_faction_control(tsk,task_id)
 	end 
 	
 	--in case sim_avail is set true during the player's tsk
-	if not(smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then 
+	-- with simulation_objects.available_by_id[smart.id] nil means unprocess, false is absolutely not avail
+	if (simulation_objects.available_by_id[smart.id] == false) then
 		return "fail"
 	end
 	
@@ -40,21 +41,19 @@ function check_smart_under_faction_control(tsk,task_id)
 	
 	utils.save_var(db.actor,task_id.."_target_id",nil)
 	
-	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
-		for id,squad in pairs(SIMBOARD.squads) do
-			if (squad) and simulation_objects.is_on_the_same_level(squad, smart) then
-				if not (squad.first_update) then 
-					return -- not all squads are loaded yet!
-				end
-				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
-					for i=1,#faction_list do
-						if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
-							utils.save_var(db.actor,task_id.."_target_id",squad.id)
-							squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
-							squad.force_online = true
-							--printf("task_id = %s squad_id = %s",task_id,squad.id)
-							return
-						end
+	for id,squad in pairs(SIMBOARD.squads) do
+		if (squad) and simulation_objects.is_on_the_same_level(squad, smart) then
+			if not (squad.first_update) then 
+				return -- not all squads are loaded yet!
+			end
+			if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
+				for i=1,#faction_list do
+					if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
+						utils.save_var(db.actor,task_id.."_target_id",squad.id)
+						squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+						squad.force_online = true
+						--printf("task_id = %s squad_id = %s",task_id,squad.id)
+						return
 					end
 				end
 			end
@@ -107,7 +106,7 @@ function specific_check_smart_under_faction_control(tsk,task_id)
 	end 
 	
 	--in case sim_avail is set true during the player's tsk
-	if not(smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then 
+	if (simulation_objects.available_by_id[smart.id] == false) then 
 		return "fail"
 	end
 	
@@ -119,21 +118,19 @@ function specific_check_smart_under_faction_control(tsk,task_id)
 	
 	utils.save_var(db.actor,task_id.."_target_id",nil)
 	
-	if (smart.sim_avail == nil or xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true") then
-		for id,squad in pairs(SIMBOARD.squads) do
-			if (squad) and simulation_objects.is_on_the_same_level(squad, smart) then
-				if not (squad.first_update) then 
-					return -- not all squads are loaded yet!
-				end
-				if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
-					for i=2,#p do
-						if (p[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == p[i]) then
-							utils.save_var(db.actor,task_id.."_target_id",squad.id)
-							squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
-							squad.force_online = true
-							--printf("task_id = %s squad_id = %s",task_id,squad.id)
-							return
-						end
+	for id,squad in pairs(SIMBOARD.squads) do
+		if (squad) and simulation_objects.is_on_the_same_level(squad, smart) then
+			if not (squad.first_update) then 
+				return -- not all squads are loaded yet!
+			end
+			if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
+				for i=2,#p do
+					if (p[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == p[i]) then
+						utils.save_var(db.actor,task_id.."_target_id",squad.id)
+						squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+						squad.force_online = true
+						--printf("task_id = %s squad_id = %s",task_id,squad.id)
+						return
 					end
 				end
 			end

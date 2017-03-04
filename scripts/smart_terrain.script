@@ -1569,7 +1569,8 @@ function se_smart_terrain:try_respawn()
 		return 
 	end
 
-	if self.sim_avail ~= nil and xr_logic.pick_section_from_condlist(db.actor, self, self.sim_avail) ~= "true" then 
+	-- simulation_objects.available_by_id[self.id]  nil is unprocessed false is unavail
+	if (simulation_objects.available_by_id[self.id] == false) then 
 		return 
 	end
 

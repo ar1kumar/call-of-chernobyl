@@ -203,7 +203,7 @@ function sim_avail(actor,npc,p)
 	if not (smart) then 
 		return false 
 	end 
-	return smart.sim_avail == nil or smart.sim_avail and xr_logic.pick_section_from_condlist(actor, smart, smart.sim_avail) == "true" or false
+	return simulation_objects.available_by_id[smart.id] == true
 end 
 
 -- param 1 = smart
@@ -2562,7 +2562,7 @@ end
 function all_avail_smart_stayed_squad_count_ge_by_faction(actor,npc,p)
 	if (#p >= 4) then
 		for name,v in pairs(SIMBOARD.smarts_by_names) do
-			if (v.online) and (v.sim_avail == nil or v.sim_avail and xr_logic.pick_section_from_condlist(actor, v, v.sim_avail) == "true") then
+			if (v.online) and (simulation_objects.available_by_id[v.id] == true) then
 				if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,unpack(p)}) == true) then 
 					return true 
 				end
@@ -2581,7 +2581,7 @@ function all_avail_smart_stayed_squad_count_ge_by_faction_ex(actor,npc,p)
 		local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
 
 		for name,v in pairs(SIMBOARD.smarts_by_names) do
-			if (v.sim_avail == nil or v.sim_avail and xr_logic.pick_section_from_condlist(actor, v, v.sim_avail) == "true") then
+			if (simulation_objects.available_by_id[v.id] == true) then
 				local smart_level = alife():level_name(game_graph():vertex(v.m_game_vertex_id):level_id())
 				if (v.online or DEACTIVATE_SIM_ON_NON_LINKED_LEVELS ~= true or string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),smart_level)) then
 					if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,unpack(p)}) == true) then 
