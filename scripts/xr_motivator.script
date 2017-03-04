@@ -46,16 +46,16 @@ function motivator_binder:reinit()
 	--alun_utils.debug_write(self.object:name()..":motivator_reinit() end")
 end
 ----------------------------------------------------------------------------------------------------------------------
-function motivator_binder:net_spawn(sobject)
+function motivator_binder:net_spawn(se_obj)
 	--alun_utils.debug_write(strformat("\n----%s:net_spawn()---%s visual=%s",self.object:name(),self.object:character_name(),self.object:get_visual_name()),true)
-	if not object_binder.net_spawn(self, sobject) then
+	if not object_binder.net_spawn(self, se_obj) then
 		return false
 	end
 	
-	local se_obj = alife_object(self.object:id())
-	if not (se_obj) then 
-		return false 
-	end
+	-- local se_obj = alife_object(self.object:id())
+	-- if not (se_obj) then 
+		-- return false 
+	-- end
 
 	local npc = self.object
 	

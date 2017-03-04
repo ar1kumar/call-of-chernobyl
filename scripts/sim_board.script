@@ -359,7 +359,7 @@ function simulation_board:get_squad_target(squad)
 
 	if (size_t > 0) then
 		local target = priority_tasks[math.random(size_t)][1]
-		printf("squad=%s size=%s target=%s",squad:name(),size_t,target:name())
+		--printf("squad=%s size=%s target=%s",squad:name(),size_t,target:name())
 		iempty_table(priority_tasks) -- It is better to reuse table to avoid GC
 		return target
 	end
