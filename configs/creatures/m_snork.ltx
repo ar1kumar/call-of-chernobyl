@@ -38,13 +38,13 @@ radiation_pp_highest_at		= 	0.02
 ;---OFFLINE ALIFE------------------------------------------------------------------
 Scheduled						= on			; option for ALife Simulator
 Human		     				= off			; option for ALife Simulator
-Health							= 350			; option for ALife Simulator
+Health							= 300			; option for ALife Simulator
 MinSpeed						= 1.0			; option for ALife Simulator
 MaxSpeed						= 5.0			; option for ALife Simulator
 going_speed						= 3;4.5			; option for ALife Simulator
 current_level_going_speed		= 3;2					; option for ALife Simulator
 search_speed					= 1.5			; option for ALife Simulator
-
+MaxHealthValue					= 300			; range [0..200]
 smart_terrain_choose_interval	= 00:15:00
 ;-----------------------------------------------------------------------------------
 
@@ -242,10 +242,10 @@ critical_wound_decrease_quant	= 0.
 
 LegsCount				= 2
 
-DayTime_Begin			= 3			; ýð¢ðûð ôý  ôû  üþý¸ª¨ð
-DayTime_End				= 22		; úþýõ¡ ôý  ôû  üþý¸ª¨ð
-Min_Satiety				= 0.00055		; üøý. ýþ¨üð ¸vªþ¸ªø (üõý¹°õ - ºöõ óþûþôývù)
-Max_Satiety				= 0.9		; üðú¸. ýþ¨üð ¸vªþ¸ªø (ñþû¹°õ - þ¢õý¹ ¸vªvù)
+DayTime_Begin			= 0			; ýð¢ðûð ôý  ôû  üþý¸ª¨ð
+DayTime_End				= 21		; úþýõ¡ ôý  ôû  üþý¸ª¨ð
+Min_Satiety				= 0.4		; üøý. ýþ¨üð ¸vªþ¸ªø (üõý¹°õ - ºöõ óþûþôývù)
+Max_Satiety				= 1.0		; üðú¸. ýþ¨üð ¸vªþ¸ªø (ñþû¹°õ - þ¢õý¹ ¸vªvù)
 
 distance_to_corpse		= 1.2		; ôø¸ª. ôþ ª¨ºÿð, ÿ¨ø úþªþ¨þù þý ÿõ¨õ¿þôøª ò ¸þ¸ªþ ýøõ õôv
 
@@ -263,7 +263,7 @@ protections_sect 			= snork_protections
 ; Vision
 ;-------------------------------------------------------------------------
 eye_fov						= 110	;140
-eye_range					= 100	;50
+eye_range					= 50	;50
 
 vision_free_section			= snork_vision_free
 vision_danger_section		= snork_vision_danger
@@ -296,6 +296,7 @@ transparency_threshold	 	= 0.3				;Low value = easier to see through objects (if
 still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 [snork_protections]
 
+skin_armor = 0.5
 hit_fraction_monster = 0.3
 
 ;=================================================================================

@@ -1151,17 +1151,13 @@ end
 -- called from engine
 function sim_squad_scripted:get_current_task()
 	--alun_utils.debug_write("sim_self_scripted:get_current_task")
-	local se_target = self.assigned_target_id and alife_object(self.assigned_target_id)
+	local se_target = self.assigned_target_id and simulation_objects.get_server_entity(self.assigned_target_id)
 	if (se_target) then
-		if (se_target:clsid() == clsid.smart_terrain) then
-			local npc_info = se_target.npc_info and se_target.npc_info[self:commander_id()]
-			if (npc_info and npc_info.job) then
-				return npc_info.job.alife_task or se_target:get_alife_task() or self:get_alife_task()
-			end
+		local npc_info = se_target.npc_info and se_target.npc_info[self:commander_id()]
+		if (npc_info and npc_info.job) then
+			return npc_info.job.alife_task or se_target:get_alife_task() or self:get_alife_task()
 		end
-		if (se_target.get_alife_task) then 
-			return se_target:get_alife_task()
-		end
+		return se_target:get_alife_task()
 	end
 	return self:get_alife_task()
 end

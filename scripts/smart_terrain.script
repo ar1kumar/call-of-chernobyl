@@ -402,19 +402,6 @@ function se_smart_terrain:clear_dead(obj)
 	--printf("clear_dead():self.npc_info[obj.id] = nil !!! obj.id=%s  [%s]", obj.id,obj:name())
 end
 
-function se_smart_terrain:task(obj)
-	--alun_utils.debug_write(strformat("%s:task %s",self:name(),obj and obj:name()))
-	if (self.disabled or not self.is_on_actor_level) then
-		return self.smart_alife_task
-	end
-
-	if self.arriving_npc[obj.id] ~= nil then
-		return self.smart_alife_task
-	end
-
-	return self.npc_info[obj.id] and self.npc_info[obj.id].job and self.npc_info[obj.id].job.alife_task or self.smart_alife_task
-end
-
 local function validate_patrol_path(path_name,gg)
 	local p = patrol(path_name)
 	local ret = true
@@ -426,6 +413,9 @@ local function validate_patrol_path(path_name,gg)
 				ret = false
 			end
 		end
+	else 
+		printf("validate_patrol_path ERROR: %s: path does not exist",path_name)
+		return false
 	end
 	return ret
 end 
