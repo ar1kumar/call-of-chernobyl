@@ -105,13 +105,15 @@ function add_fuel(stove_obj,fuel_obj)
 	if not (fuel_obj) then 
 		local function find_fuel(temp, item)
 			if (item:section() == "charcoal") then
-				fuel_obj = item
+				if (fuel_obj == nil or fuel_obj:get_remaining_uses() > item:get_remaining_uses()) then
+					fuel_obj = item
+				end
 			end
 		end
 		db.actor:iterate_inventory(find_fuel,nil)
 	end
 	if not (fuel_obj) then
-		return 
+		return
 	end
 	if (stove_obj:get_remaining_uses()+1 <= stove_obj:get_max_uses() and fuel_obj:get_remaining_uses() > 0) then 
 		stove_obj:set_remaining_uses(stove_obj:get_remaining_uses()+1)

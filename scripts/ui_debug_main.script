@@ -25,58 +25,180 @@ id_to_spawn_table = {
 		[18] = "Phantom"
 }
 
+local spawn_table_list
 function get_spawn_table(name)
-	local ini = ini_file("plugins\\debug_spawner.ltx")
-	local tbl = {}
-	local sec = nil
+	if (spawn_table_list and spawn_table_list[name]) then 
+		return spawn_table_list[name]
+	end 
 	
-	-- Will tidy this later.
-	if (name == "Phantom") then
-		sec = "debug_spawner_phantom"
-	elseif (name == "Anomaly") then
-		sec = "debug_spawner_anomaly"
-	elseif (name == "Artefacts") then
-		sec = "debug_spawner_artefact"
-	elseif (name == "Outfits") then
-		sec = "debug_spawner_outfit"
-	elseif (name == "Items (Misc.)") then
-		sec = "debug_spawner_item_misc"
-	elseif (name == "Items (Consumable)") then
-		sec = "debug_spawner_item_consumable"
-	elseif (name == "Weapons (Addons)") then
-		sec = "debug_spawner_weapon_addon"
-	elseif (name == "Weapons (Pistol)") then
-		sec = "debug_spawner_weapon_pistol"
-	elseif (name == "Weapons (Rifle)") then
-		sec = "debug_spawner_weapon_rifle"
-	elseif (name == "Weapons (Misc.)") then
-		sec = "debug_spawner_weapon_misc"
-	elseif (name == "Items (Quest)") then
-		sec = "debug_spawner_item_quest"
-	elseif (name == "Ammo") then
-		sec = "debug_spawner_ammo"
-	elseif (name == "NPC (Stalker)") then
-		sec = "debug_spawner_npc_stalker"
-	elseif (name == "NPC (Mutant)") then
-		sec = "debug_spawner_npc_mutant"
-	elseif (name == "Squads (Stalker)") then
-		sec = "debug_spawner_squad_stalker"
-	elseif (name == "Squads (Mutant)") then
-		sec = "debug_spawner_squad_mutant"
-	elseif (name == "Vehicles") then
-		sec = "debug_spawner_vehicle"
-	elseif (name == "Physic (Misc.)") then
-		sec = "debug_spawner_physic_misc"
-	else return tbl end
+	spawn_table_list = {
+		["Ammo"] 				= {},
+		["Artefacts"] 			= {},
+		["Items (Consumable)"] 	= {},
+		["Items (Misc.)"] 		= {},
+		["Items (Quest)"] 		= {},
+		["NPC (Mutant)"] 		= {},				
+		["NPC (Stalker)"] 		= {},				
+		["Outfits"] 			= {},
+		["Physic (Misc.)"] 		= {},				
+		["Squads (Mutant)"] 	= {},			
+		["Squads (Stalker)"] 	= {},			
+		["Weapons (Addons)"] 	= {},
+		["Weapons (Misc.)"] 	= {},
+		["Weapons (Pistol)"] 	= {},
+		["Weapons (Rifle)"] 	= {},
+		["Vehicles"] 			= {},
+		["Anomaly"]			 	= {},
+		["Phantom"] 			= {}
+	}	
 	
-	-- Fill the table.
-	local n = ini:section_exist(sec) and ini:line_count(sec) or 0
-	for i=0, n-1 do
-		local result, id, value = ini:r_line(sec, i, "", "")
-		table.insert(tbl, id)
+	local m_classes =
+	{
+		["AI_STL_S"] = "NPC (Stalker)",
+		["AI_TRD_S"] = "NPC (Stalker)",
+
+		["SM_BLOOD"] = "NPC (Mutant)",
+		["SM_BOARW"] = "NPC (Mutant)",
+		["SM_BURER"] = "NPC (Mutant)",
+		["SM_CAT_S"] = "NPC (Mutant)",
+		["SM_CHIMS"] = "NPC (Mutant)",
+		["SM_CONTR"] = "NPC (Mutant)",
+		["SM_DOG_S"] = "NPC (Mutant)",
+		["SM_FLESH"] = "NPC (Mutant)",
+		["SM_IZLOM"] = "NPC (Mutant)",
+		["SM_GIANT"] = "NPC (Mutant)",
+		["AI_PHANT"] = "Phantom",
+		["SM_POLTR"] = "NPC (Mutant)",
+		["SM_P_DOG"] = "NPC (Mutant)",
+		["SM_DOG_P"] = "NPC (Mutant)",
+		["SM_DOG_F"] = "NPC (Mutant)",
+		["SM_SNORK"] = "NPC (Mutant)",
+		["SM_TUSHK"] = "NPC (Mutant)",
+		["SM_ZOMBI"] = "NPC (Mutant)",
+		["SM_RAT"]	 = "NPC (Mutant)",
+
+		["C_HLCP_S"] 	= "Vehicles",
+		["C_NIVA"] 		= "Vehicles",
+		["SCRPTCAR"] 	= "Vehicles",
+
+		["ARTEFACT"] = "Artefacts",
+		["SCRPTART"] = "Artefacts",
+
+		["ON_OFF_S"] = "Squads",
+
+		["II_ATTCH"] = "Items (Misc.)",
+		["II_BTTCH"] = "Items (Misc.)",
+
+		["II_DOC"]   = "Items (Misc.)",
+
+		["O_PHYSIC"] = "Physic (Misc.)",
+		["O_DSTRBL"] = "Physic (Misc.)",
+		
+		["O_PHYS_S"] = "Physic (Misc.)",
+		["O_DSTR_S"] = "Physic (Misc.)",
+
+		["S_INVBOX"] = "Physic (Misc.)",
+		["O_INVBOX"] = "Physic (Misc.)",
+
+		["DET_SIMP"] = "Items (Misc.)",
+		["DET_ADVA"] = "Items (Misc.)",
+		["DET_ELIT"] = "Items (Misc.)",
+		["DET_SCIE"] = "Items (Misc.)",
+
+		["E_STLK"]   = "Outfits",
+		["E_HLMET"]  = "Outfits",
+		["EQU_STLK"]   = "Outfits",
+		["EQU_HLMET"]  = "Outfits",
+		
+		["II_BANDG"] = "Items (Consumable)",
+		["II_MEDKI"] = "Items (Consumable)",
+		["II_ANTIR"] = "Items (Consumable)",
+		["II_BOTTL"] = "Items (Consumable)",
+		["II_FOOD"]  = "Items (Consumable)",
+		["S_FOOD"]   = "Items (Consumable)",
+
+		["S_PDA"]    = "Items (Misc.)",
+		["D_PDA"]    = "Items (Misc.)",
+
+		["WP_AK74"] = "Weapons (Rifle)",
+		["WP_ASHTG"] = "Weapons (Rifle)",
+		["WP_BINOC"] = "Weapons (Misc.)",
+		["WP_BM16"] = "Weapons (Rifle)",
+		["WP_GROZA"] = "Weapons (Rifle)",
+		["WP_HPSA"] = "Weapons (Pistol)",
+		["WP_KNIFE"] = "Weapons (Misc.)",
+		["WP_LR300"] = "Weapons (Rifle)",
+		["WP_PM"] = "Weapons (Pistol)",
+		["WP_RG6"] = "Weapons (Rifle)",
+		["WP_RPG7"] = "Weapons (Rifle)",
+		["WP_SVD"] = "Weapons (Rifle)",
+		["WP_SVU"] = "Weapons (Rifle)",
+		["WP_VAL"] = "Weapons (Rifle)",
+
+		["S_EXPLO"]  = "Physic (Misc.)",
+		["II_EXPLO"]  = "Physic (Misc.)",
+
+		["AMMO"]   = "Ammo",
+		["AMMO_S"]   = "Ammo",
+		["S_OG7B"]   = "Ammo",
+		["S_VOG25"]  = "Ammo",
+		["S_M209"]   = "Ammo",
+
+		["G_F1_S"]   = "Weapons (Misc.)",
+		["G_RGD5_S"] = "Weapons (Misc.)",
+		["G_F1"] 	 = "Weapons (Misc.)",
+		["G_RGD5"] 	 = "Weapons (Misc.)",
+
+		["WP_SCOPE"] = "Weapons (Addons)",
+		["WP_SILEN"] = "Weapons (Addons)",
+		["WP_GLAUN"] = "Weapons (Addons)",
+
+		["ZS_MBALD"] = "Anomaly",
+		["ZS_GALAN"] = "Anomaly",
+		["ZS_MINCE"] = "Anomaly",
+		["ZS_RADIO"] = "Anomaly",
+		["ZS_TORRD"] = "Anomaly",
+		["ZS_NGRAV"] = "Anomaly",
+		["Z_MBALD"]  = "Anomaly",
+		["Z_RADIO"]  = "Anomaly",
+		["Z_CFIRE"]  = "Anomaly",
+		["Z_NOGRAV"] = "Anomaly",
+		["Z_TORRID"] = "Anomaly",
+		["Z_RUSTYH"] = "Anomaly",
+		["ZS_BFUZZ"] = "Anomaly",
+		["ZS_AMEBA"] = "Anomaly"
+	}
+	
+	local ltx = ini_file("plugins\\debug_spawner.ltx")
+	local ini = system_ini()
+	ini:section_for_each(function(section)
+		if not (ltx:line_exist("ignore_sections",section)) then
+			local class = ini:r_string_ex(section,"class")
+			if (class) then 
+				local typ = m_classes[class]
+				if (typ) then
+					if (typ == "Squads") then 
+						local is_monster = ini:r_string_ex(section,"faction") or ""
+						if (string.find(is_monster,"monster")) then 
+							typ = typ .. " (Mutant)"
+						else 
+							typ = typ .. " (Stalker)"
+						end
+					elseif (string.find(typ,"Items")) then 
+						if (ini:r_bool_ex(section,"quest_item",false) == true) then 
+							typ = "Items (Quest)"
+						end
+					end
+					if (spawn_table_list[typ]) then
+						spawn_table_list[typ][#spawn_table_list[typ]+1] = section
+					end
+				end
+			end
+		end
 	end
+	)	
 	
-	return tbl
+	return spawn_table_list[name]
 end
 
 ------------------------------------------------------------

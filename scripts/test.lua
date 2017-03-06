@@ -1,2 +1,0 @@
-
-printf('Test without errors')
