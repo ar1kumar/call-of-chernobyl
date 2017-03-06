@@ -2582,11 +2582,8 @@ function all_avail_smart_stayed_squad_count_ge_by_faction_ex(actor,npc,p)
 
 		for name,v in pairs(SIMBOARD.smarts_by_names) do
 			if (simulation_objects.available_by_id[v.id] == true) then
-				local smart_level = alife():level_name(game_graph():vertex(v.m_game_vertex_id):level_id())
-				if (v.online or DEACTIVATE_SIM_ON_NON_LINKED_LEVELS ~= true or string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),smart_level)) then
-					if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,unpack(p)}) == true) then 
-						return true 
-					end
+				if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,unpack(p)}) == true) then 
+					return true 
 				end
 			end
 		end

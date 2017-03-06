@@ -124,48 +124,6 @@ end
 function sim_squad_scripted:update()
 	--alun_utils.debug_write("sim_squad_scripted:update START")
 	cse_alife_online_offline_group.update(self)
-	if not (self.first_update) then
-		self.first_update = true
-		local skip = false
-		local sim = alife()
-		local se_actor = sim:actor()
-		local se_obj = self:commander_id() and alife_object(self:commander_id())
-		if (se_obj) then
-			if (utils.se_obj_load_var(se_obj.id,se_obj:name(),"companion")) then
-				skip = true
-			elseif (utils.se_obj_load_var(se_obj.id,se_obj:name(),"do_not_deactivate")) then 
-				skip = true 
-			end
-		end
-		
-		if (skip ~= true) then
-			local gg = game_graph()
-
-			--printf("m_game_vertex_id=%s actor.m_game_vertex_id=%s",self.m_game_vertex_id,se_actor.m_game_vertex_id)
-			if (se_actor and gg:valid_vertex_id(self.m_game_vertex_id) and gg:valid_vertex_id(se_actor.m_game_vertex_id)) then
-				local level_name = sim:level_name(gg:vertex(self.m_game_vertex_id):level_id())
-				local actor_level = sim:level_name(gg:vertex(se_actor.m_game_vertex_id):level_id())
-
-				-- Disable any squad that is not on actor's level and not linked to actor's level through ai_tweaks\simulation_objects.ltx
-				if (level_name ~= actor_level) and (self:commander_id() and not sim:has_info(self:commander_id(),"npcx_is_companion")) then
-					if not (string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),level_name)) then
-						if (DEACTIVATE_SIM_ON_NON_LINKED_LEVELS) then
-							SIMBOARD.squads[self.id] = nil
-							if (self.smart_id) then
-								--SIMBOARD.tmp_entered_squad[self.smart_id] = nil
-								SIMBOARD.tmp_assigned_squad[self.smart_id] = nil
-							end
-							--simulation_objects.unregister(self)
-							self.disabled = true
-							--printf("%s disabled",self:name())
-							--alun_utils.debug_write("sim_squad_scripted:update END 3")
-							return
-						end
-					end
-				end
-			end
-		end
-	end
 
 	self:refresh()
 	
@@ -178,15 +136,6 @@ function sim_squad_scripted:update()
 		self:set_location_types()
 		self.need_to_reset_location_masks = false
 	end
-	
-	--[[
-	local tg = time_global()
-	if (self.__check_time and tg < self.__check_time) then
-		--alun_utils.debug_write("sim_squad_scripted:update END 1")
-		return
-	end
-	self.__check_time = tg + 1000 + math.max(500, 0.025 * self.dist_to_actor)
-	--]]
 	
 	SendScriptCallback("squad_on_update",self)
 

@@ -48,15 +48,12 @@ function find_smart_under_faction_control_ex(actor,npc,p)
 		if (simulation_objects.available_by_id[smart.id] == true) then 
 			local smrt = SIMBOARD.smarts[smart.id]
 			if (smrt) then 
-				local smart_level = alife():level_name(game_graph():vertex(smart.m_game_vertex_id):level_id())
-				if (smart.online or DEACTIVATE_SIM_ON_NON_LINKED_LEVELS ~= true or string.find(simulation_objects.config:r_value(actor_level,"target_maps",0,""),smart_level)) then
-					for k,squad in pairs(smrt.squads) do
-						if (squad and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
-							for i=2,#p do
-								if (p[i] == "monster" and is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
-									utils.save_var(db.actor,p[1],smart.id)
-									return
-								end
+				for k,squad in pairs(smrt.squads) do
+					if (squad and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
+						for i=2,#p do
+							if (p[i] == "monster" and is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
+								utils.save_var(db.actor,p[1],smart.id)
+								return
 							end
 						end
 					end
