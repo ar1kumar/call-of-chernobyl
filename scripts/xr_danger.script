@@ -49,8 +49,7 @@ function set_script_danger(npc,time,who_id,pos)
 end
 
 function has_danger(npc)
-	local id = npc:id()
-	local st = db.storage[id]
+	local st = db.storage[npc:id()]
 	return st and st.danger_flag == true
 end
 -----------------------------------------------------------------------------
