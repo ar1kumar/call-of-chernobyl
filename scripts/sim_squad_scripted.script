@@ -225,7 +225,7 @@ function sim_squad_scripted:specific_update(script_target_id)
 	self.current_action = 0
 	
 	for k in self:squad_members() do
-		local se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object -- or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 		end
@@ -290,7 +290,7 @@ function sim_squad_scripted:generic_update()
 	
 	local sim = alife()
 	for k in self:squad_members() do
-		local se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object --or k.id and sim:object(k.id)
 		if (se_obj) then
 			SIMBOARD:setup_squad_and_group(se_obj)
 		end
@@ -427,7 +427,7 @@ function sim_squad_scripted:assign_smart(smart,old_smart_id)
 	
 	local sim = alife()
 	for k in self:squad_members() do
-		local se_obj = k.object or k.id and sim:object(k.id)
+		local se_obj = k.object --or k.id and sim:object(k.id)
 		if (se_obj) then
 			if (old_smart) then
 				if (smart == nil or smart.id ~= old_smart_id) then

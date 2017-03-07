@@ -32,7 +32,7 @@ local function map_spot_menu_property_clicked(property_ui,id,level_name,prop)
 		
 		-- Prevent fast travel while overloaded 
 		local suit = db.actor:item_in_slot(7)
-		local diff = db.actor:get_total_weight() - db.actor:get_actor_max_walk_weight() - (suit and suit:get_additional_max_weight() or 0)
+		local diff = db.actor:get_total_weight() - db.actor:get_actor_max_walk_weight() - (suit and suit:get_additional_max_weight() or 0) - (artefact_degradation.art_weight_add or 0)
 		if diff > 0 then
 			get_hud():HidePdaMenu()
 			SetHudMsg(game.translate_string("st_travel_overloaded"),4)
