@@ -13,10 +13,8 @@ function evaluator_end:evaluate()
 	--alun_utils.debug_write("xr_camper:eva_end")
 	local object = self.object
 	local db_st = db.storage[object:id()]
-	if (db_st) and (db_st.corpse_detection and db_st.corpse_detection.selected_corpse_id) then 
-		return false 
-	end
-	if (IsWounded(object)) then 
+	if ((db_st) and (db_st.corpse_detection and db_st.corpse_detection.selected_corpse_id)) or
+		IsWounded(object) then 
 		return false 
 	end
 	return not xr_logic.is_active(object, self.st)
@@ -316,9 +314,10 @@ function action_patrol:scan(flag)
 		local look_pos = self.look_position
 		local dest_position = self.dest_position
 		local scandelta = st.scandelta
-		self.look_point = vector():set(look_pos.x + st.cur_look_point * (dest_position.x - look_pos.x) / scandelta,
-										 look_pos.y + st.cur_look_point * (dest_position.y - look_pos.y) / scandelta,
-										 look_pos.z + st.cur_look_point * (dest_position.z - look_pos.z) / scandelta)
+		local st_cur_look_point = st.cur_look_point
+		self.look_point = vector():set(look_pos.x + st_cur_look_point * (dest_position.x - look_pos.x) / scandelta,
+										look_pos.y + st_cur_look_point * (dest_position.y - look_pos.y) / scandelta,
+										look_pos.z + st_cur_look_point * (dest_position.z - look_pos.z) / scandelta)
 		local look_point = self.look_point
 		local npc = self.object
 		local tg = time_global()
@@ -542,12 +541,12 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 
 	st.radius = ini:r_float_ex(section,"radius") or 20
 	st.suggested_state = {}
-	local suggested_state = st.suggested_state
-	suggested_state.moving = ini:r_string_ex(section,"def_state_moving")
-	suggested_state.moving_fire = ini:r_string_ex(section,"def_state_moving_fire")
-	suggested_state.campering = ini:r_string_ex(section,"def_state_campering")
-	suggested_state.standing = ini:r_string_ex(section,"def_state_standing") or suggested_state.campering
-	suggested_state.campering_fire = ini:r_string_ex(section,"def_state_campering_fire")
+	local st_suggested_state = st.suggested_state
+	st_suggested_state.moving = ini:r_string_ex(section,"def_state_moving")
+	st_suggested_state.moving_fire = ini:r_string_ex(section,"def_state_moving_fire")
+	st_suggested_state.campering = ini:r_string_ex(section,"def_state_campering")
+	st_suggested_state.standing = ini:r_string_ex(section,"def_state_standing") or suggested_state.campering
+	st_suggested_state.campering_fire = ini:r_string_ex(section,"def_state_campering_fire")
 	st.scantime_free = ini:r_float_ex(section,"scantime_free") or 60000
 	st.attack_sound = ini:r_string_ex(section,"attack_sound") or "fight_attack"
 

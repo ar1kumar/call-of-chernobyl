@@ -100,8 +100,7 @@ function create_obligatory_items(obj, spawn_ini)
 	local items = parse_names(spawn_ini:r_string_ex("drop_box", "items"))
 	local size_t = #items
 	if (size_t > 0) then
-		local obj_pos = obj:position()
-		local position = vector():set(obj_pos)
+		local position = vector():set(obj:position())
 		position.y = position.y + 0.3
 		local sys_ini = system_ini()
 		for i=1, size_t do

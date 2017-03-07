@@ -134,8 +134,19 @@ end
 -- Вызывается при активации схемы
 function animpoint:initialize()
 	local st = self.st
-	st.base_action, st.description, self.camp, self.current_action, self.vertex_position, self.position, self.smart_direction, self.look_position, self.cover_name, self.started = nil, nil, nil, nil, nil, nil, nil, nil, nil, false
-	st.approved_actions, self.avail_actions = {}, {}
+	st.base_action			= nil
+	st.description			= nil
+	st.approved_actions		= {}
+	
+	self.camp				= nil
+	self.current_action		= nil
+	self.vertex_position	= nil
+	self.position			= nil
+	self.smart_direction	= nil
+	self.look_position		= nil
+	self.cover_name			= nil
+	self.started			= false
+	self.avail_actions		= {}
 end
 
 function animpoint:activate_scheme(loading, npc, switching_scheme)
@@ -195,10 +206,10 @@ end
 
 -- Возвращает достиг ли персонаж точки начала работы схемы
 function animpoint:position_riched()
-	local db_st = db.storage[self.npc_id]
-	local npc = db_st and db_st.object
+	local st = db.storage[self.npc_id]
+	local npc = st and st.object
 	local position = self.position
-	if not (npc or position) then
+	if not npc or not position then
 		return false
 	end
 	local dist = npc:position():distance_to_sqr(position)
@@ -229,7 +240,6 @@ function animpoint:position_riched()
 end
 
 function animpoint:fill_approved_actions()
-	local is_in_camp = self.camp ~= nil
 	-- Если задан авеил анимейшнз, то мы игнорим ассоциации с нашим смарткавером.
 	local st = self.st
 	local st_approved_actions = st.approved_actions
@@ -242,6 +252,7 @@ function animpoint:fill_approved_actions()
 	else
 		local avail_actions = self.avail_actions
 		if avail_actions ~= nil then
+			local is_in_camp = self.camp ~= nil
 			for k,v in pairs(avail_actions) do
 				-- Убираем те действия, которые не подходят по прекондишну
 				--printf("checking approved actions %s", self.npc_id)
@@ -318,14 +329,8 @@ function animpoint:get_action()
 end
 
 function animpoint:update()
-	if (self.npc_id==nil) or not (self.vertex_position) then
+	if (self.npc_id == nil) or not (self.vertex_position) then
 		return
-	end
-	local function copy_tbl(_in, _out)
-		for k,v in pairs(_in) do
-			size_t = size_t + 1
-			_out[size_t] = v.name
-		end
 	end
 	tmp_actions = iempty_table(tmp_actions)
 	local size_t = 0
@@ -340,9 +345,15 @@ function animpoint:update()
 				printf("animpoint not in camp and approved_actions is nil. Name [%s]", st.cover_name)
 				return
 			end
-			copy_tbl(st_approved_actions, tmp_actions)
-		else	-- ???
-			copy_tbl(st_approved_actions, tmp_actions)
+			for k,v in pairs(st_approved_actions) do
+				size_t = size_t + 1
+				tmp_actions[size_t] = v.name
+			end
+		else
+			for k,v in pairs(st_avail_animations) do
+				size_t = size_t + 1
+				tmp_actions[size_t] = v
+			end
 		end
 		self.current_action = tmp_actions[math.random(size_t)]
 		return
@@ -354,7 +365,7 @@ function animpoint:update()
 		tbl = assoc_tbl[camp_action].director
 		self.__dtimer = time_global()
 	else
-		self.__dtimer = not (self.__dtimer and time_global() + math.random(10000,15000)) or self.__dtimer
+		self.__dtimer = not self.__dtimer and time_global() + math.random(10000,15000) or self.__dtimer
 		if (self.current_action and time_global() < self.__dtimer) then
 			return
 		end
@@ -410,7 +421,7 @@ end
 --------------------------------------------------------------------------------
 function add_to_binder(npc, ini, scheme, section, storage)
 	local manager = npc:motivation_action_manager()
- 	-- evaluators
+	-- evaluators
 	manager:add_evaluator(xr_evaluators_id.animpoint_property + 1, this.evaluator_need_animpoint(storage, "animpoint_need"))
 	manager:add_evaluator(xr_evaluators_id.animpoint_property + 2, this.evaluator_reach_animpoint(storage, "animpoint_reach"))
 
