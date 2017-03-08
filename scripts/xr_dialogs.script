@@ -1,7 +1,6 @@
 --[[------------------------------------------------------------------------------------------------------------------
 Управление диалогами групп сталкеров
 Чугай Саша
-
 Сделать:
 
 Описание:
@@ -10,16 +9,12 @@ disable и диалог не начнётся. Для начала диалога выбирается любой член команды, 
 не начнётся. Для повторных реплик выбирается любой член команды (кроме только что говорившего) из числа тех, кто нахо-
 дится рядом с последним говорившим; если таких нету, то диалог прерывается.
 --------------------------------------------------------------------------------------------------------------------]]
-
-local teams = {}  -- группы сталкеров, сгруппированных для диалога
-local snd = { themes = {} }
-
 local idle_min, idle_max = 20, 60 -- пределы периода молчанки между диалогами в секундах
 local pause_min, pause_max = 1, 2 -- пределы величины паузы между фразаим в секундах
 local dist_max = 100              -- квадрат максимального расстояния между собеседниками
-
 local avail = {}
-
+local teams = {}  -- группы сталкеров, сгруппированных для диалога
+local snd = { themes = {} }
 ----------------------------------------------------------------------------------------------------------------------
 -- деревья диалогов
 ----------------------------------------------------------------------------------------------------------------------
@@ -27,57 +22,48 @@ local dialogs = {
 	place = {
 		[1] = { snd = "place1", next = 2 },
 		[2] = { snd = "place2" }
-	},
+	}
 }
-
 ----------------------------------------------------------------------------------------------------------------------
 -- класс управления диалогами (только звуками)
 ----------------------------------------------------------------------------------------------------------------------
 class "dialog_mgr"
-
 function dialog_mgr:__init()
 end
 
 function dialog_mgr:reset( npc, team )
 	self.object = npc
-
 	if self.team ~= team then
-		-- если сталкер в команде
-		if self.team then
-			-- убрать из текущей команды
-			self:finalize()
+		if self.team then	-- если сталкер в команде
+			self:finalize()	-- убрать из текущей команды
 		end
-
 		self.team = team
-
 		if team then
 			if not teams[team] then
 				teams[team] = { npcs = {}, npcs_num = 0, idle_end = 0 }
 			end
-
-			self.a = teams[team]
---			self.a.npcs[npc:id()] = npc
-			table.insert( self.a.npcs, npc )
-
---			printf( "[dialogs] adding %s to dlgteam %s", npc:name(), team )
+			local st = self.st
+			st = teams[team]
+			local st_npcs = st.npcs
+			-- st.npcs[npc:id()] = npc
+			st_npcs[#st_npcs + 1] = npc
+			-- printf( "[dialogs] adding %s to dlgteam %s", npc:name(), team )
 		end
 	end
 end
 
 function dialog_mgr:finalize()
 	if self.team then
-		-- убрать сталкера из списка
-		for i, v in pairs(self.a.npcs) do
+		local st = self.st
+		local st_npcs = st.npcs
+		for i, v in pairs(st_npcs) do	-- убрать сталкера из списка
 			if v:id() == self.object:id() then
-				table.remove( self.a.npcs, i )
+				table.remove(st_npcs, i )
 				break
 			end
 		end
-
 		self.team = nil
-
-		-- если никого не осталось, сбросить диалог
-		if #self.a.npcs == 0 then
+		if #st_npcs == 0 then	-- если никого не осталось, сбросить диалог
 			self:reset_dialog()
 		end
 	end
@@ -86,163 +72,138 @@ end
 -- включить возможность начала диалога
 function dialog_mgr:enable( dlgs )
 	if self.team then
-		self.a.dlgs = dlgs
+		self.st.dlgs = dlgs
 	end
 end
 
 -- выключить возможность начала диалога
 function dialog_mgr:disable()
 	if self.team then
-		self.a.dlgs = nil
+		self.st.dlgs = nil
 	end
 end
 
 -- текущий активный диалог
 function dialog_mgr:active()
-	return self.team and self.a.cur_dlg
+	return self.team and self.st.cur_dlg
 end
 
--- начало нового диалога
+-- начало/выбор нового диалога
 function dialog_mgr:new_dialog()
-	-- выбор нового диалога
-	if #self.a.dlgs > 1 then
-		local r = math.random( 1, #self.a.dlgs - 1 )
-		if self.a.dlgs[r] == self.a.last_dlg then
+	local st = self.st
+	local st_dlgs = st.dlgs
+	if #st_dlgs > 1 then
+		local r = math.random( 1, #st_dlgs - 1 )
+		if st_dlgs[r] == st.last_dlg then
 			r = r + 1
 		end
-
-		self.a.cur_dlg = self.a.dlgs[r]
+		st.cur_dlg = st_dlgs[r]
 	else
-		self.a.cur_dlg = self.a.dlgs[1]
+		st.cur_dlg = st_dlgs[1]
 	end
-
-	self.a.last_dlg = self.a.cur_dlg
-
---	printf( "!!!!! NEW_DIALOG="..self.a.cur_dlg )
-	-- попробовать выбрать первую фразу
-	if not self:new_phrase() then
-		-- если не смогли, то диалог начаться не может
-		self:reset_dialog()
-		-- следующую проверку возможности начала диалога отложить на небольшое время
-		self.a.idle_end = time_global() + 5000
+	st.last_dlg = st.cur_dlg
+	-- printf( "!!!!! NEW_DIALOG="..st.cur_dlg )
+	if not self:new_phrase() then	-- попробовать выбрать первую фразу
+		self:reset_dialog()	-- если не смогли, то диалог начаться не может
+		st.idle_end = time_global() + 5000	-- следующую проверку возможности начала диалога отложить на небольшое время
 	end
 end
 
 -- сбросить диалог
 function dialog_mgr:reset_dialog()
-	self.a.dlgs             = nil
-	self.a.cur_dlg          = nil
-	self.a.cur_phrase       = nil
-	self.a.cur_npc          = nil
-
-	-- следующий диалог может начаться лишь по истечению периода молчанки
-	self.a.idle_end   = time_global() + math.random( idle_min, idle_max ) * 1000
-
---	printf( "reset dialog" )
+	local st = self.st
+	st.dlgs             = nil
+	st.cur_dlg          = nil
+	st.cur_phrase       = nil
+	st.cur_npc          = nil
+	st.idle_end = time_global() + math.random( idle_min, idle_max ) * 1000	-- следующий диалог может начаться лишь по истечению периода молчанки
+	-- printf( "reset dialog" )
 end
 
 -- отменить текущий период молчанки между диалогами
 function dialog_mgr:reset_idle()
 	if self.team then
-		self.a.idle_end = 0
+		self.st.idle_end = 0
 	end
 end
 
 -- подготовка новой фразы
 function dialog_mgr:new_phrase()
 	empty_table( avail )
-
+	local st = self.st
 	-- если диалог уже был начат (т.е. есть текущий говорящий)
-	if self.a.cur_npc then
-		-- выбрать того, кто ответит. он должен быть недалеко от предыдущего говорящего
-		for i, v in pairs(self.a.npcs) do
-			if v:id() ~= self.a.cur_npc:id() and self.a.cur_npc:position():distance_to_sqr( v:position() ) <= dist_max then
-				table.insert( avail, v )
+	local st_cur_npc = st.cur_npc
+	local st_npcs = st.npcs
+	if st_cur_npc then
+		local st_cur_npc_pos = st_cur_npc:position()
+		local st_cur_npc_id = st_cur_npc:id()
+		for i, v in pairs(st_npcs) do	-- выбрать того, кто ответит. он должен быть недалеко от предыдущего говорящего
+			if v:id() ~= st_cur_npc_id and st_cur_npc_pos:distance_to_sqr( v:position() ) <= dist_max then
+				avail[#avail + 1] = v
 			end
 		end
-
 		if #avail == 0 then
-			-- если отвечать некому, то фраза не выбрана
-			return false
+			return false	-- если отвечать некому, то фраза не выбрана
 		end
-
-		-- выбор нового говорящего
-		self.a.cur_npc = avail[math.random( 1, #avail )]
-	else
-		-- попытка выбора нового говорящего
-		self.a.cur_npc = self.a.npcs[math.random( 1, #self.a.npcs )]
-
+		st.cur_npc = avail[math.random( 1, #avail )]	-- выбор нового говорящего
+	else	-- попытка выбора нового говорящего
+		st_cur_npc = st_npcs[math.random( 1, #st_npcs )]
+		st.cur_npc = st_cur_npc
 		-- посмотреть, может ли кто-то потенциально продолжить диалог
+		local st_cur_npc_pos = st_cur_npc:position()
+		local st_cur_npc_id = st_cur_npc:id()
 		local flg
-
-		for i, v in pairs(self.a.npcs) do
-			if v:id() ~= self.a.cur_npc:id() and self.a.cur_npc:position():distance_to_sqr( v:position() ) <= dist_max then
+		for i, v in pairs(st_npcs) do
+			if v:id() ~= st_cur_npc_id and st_cur_npc_pos:distance_to_sqr( v:position() ) <= dist_max then
 				flg = true
 				break
 			end
 		end
-
 		if not flg then
-			-- если нет, то даже и не начинать диалог
-			return false
+			return false	-- если нет, то даже и не начинать диалог
 		end
 	end
-
-	-- выбор новой фразы
-	if not self.a.cur_phrase then
-		printf( self.a.cur_dlg )
-		self.a.cur_phrase = dialogs[self.a.cur_dlg][1]
+	local st_cur_phrase = st.cur_phrase
+	if not st_cur_phrase then	-- выбор новой фразы
+		-- printf( st.cur_dlg )
+		st.cur_phrase = dialogs[st.cur_dlg][1]
 	else
-		local p = self.a.cur_phrase.next
+		local p = st_cur_phrase.next
 		if not p then
-			-- следующей фразы нету
-			return false
+			return false	-- следующей фразы нету
 		end
-
 		if type( p ) == "table" then
 			p = p[math.random( 1, #p )]
 		end
-
-		self.a.cur_phrase = dialogs[self.a.cur_dlg][p]
+		st.cur_phrase = dialogs[st.cur_dlg][p]
 	end
-
-	-- установить задержку перед новой фразой
-	self.a.phrase_delay_end = time_global() + math.random( pause_min, pause_max ) * 1000
-	self.a.phrase_playing   = false
-
---	printf( "phrase selected" )
+	st.phrase_delay_end = time_global() + math.random( pause_min, pause_max ) * 1000	-- установить задержку перед новой фразой
+	st.phrase_playing   = false
+	-- printf( "phrase selected" )
 	return true
 end
 
 -- обновление
 function dialog_mgr:update()
-	-- если сталкер не состоит в команде для диалогов
-	if not self.team then
+	if not self.team then	-- если сталкер не состоит в команде для диалогов
 		return
 	end
-
-	if self.a.cur_dlg then	-- активен ли диалог?
-		if self.object:id() == self.a.cur_npc:id() then	-- обновление текущего говорящего?
-			if self.a.phrase_delay_end < time_global() then -- окончилась ли необходимая задержка перед фразой?
-				if self.a.phrase_playing then	-- начали ли уже играть звук?
-					if self.a.cur_npc:active_sound_count() == 0 then	-- звук закончился?
-						if not self:new_phrase() then
-							-- если новая фраза не выбрана, то наступил конец диалога
-							self:reset_dialog()
-						end
-					end
-				else
-				-- произнести фразу
-					snd.themes[1] = self.a.cur_phrase.snd
-					xr_sound.sound_update( self.a.cur_npc, snd, true )
-					self.a.phrase_playing = true
+	local st = self.st
+	local tg = time_global()
+	if st.cur_dlg then	-- активен ли диалог?
+		local st_cur_npc = st.cur_npc
+		if self.object:id() == st_cur_npc:id() and st.phrase_delay_end < tg then	-- обновление текущего говорящего? окончилась ли необходимая задержка перед фразой?
+			if st.phrase_playing and st_cur_npc:active_sound_count() == 0 and not self:new_phrase() then	-- начали ли уже играть звук? звук закончился?
+					self:reset_dialog()	-- если новая фраза не выбрана, то наступил конец диалога
+			else
+				snd.themes[1] = st.cur_phrase.snd
+				xr_sound.sound_update(st_cur_npc, snd, true )	-- произнести фразу
+				st.phrase_playing = true
 				-- printf( "SNDSNDNSNDND = " .. snd.themes[1] )	
-				end
 			end
 		end
 	else
-		-- если можно, начать диалог и у нас не один говорящий
-		if self.a.dlgs and self.a.idle_end < time_global() and #self.a.npcs > 1 then
+		if st.dlgs and st.idle_end < tg and #st.npcs > 1 then	-- если можно, начать диалог и у нас не один говорящий
 			self:new_dialog()
 		end
 	end
