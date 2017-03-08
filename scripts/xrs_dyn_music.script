@@ -8,7 +8,6 @@ VOLUME_DELTA = 0					-- sound volume fade delta (is set on initialize)
 -- global variables (used from other scripts)
 npc_table = {}
 -- local variables (reinit on initialize())
-themes = {}
 ambient_vol = get_console():get_float("snd_volume_music")
 m_ambient_vol = 0
 FadeTo_ambient = 0
@@ -26,6 +25,29 @@ local prev_fade_time = 0
 local force_fade = false
 local was_in_silence = false
 local _tmr
+
+local combat_themes ={
+	{
+		"music\\combat\\theme1_part_1",
+		"music\\combat\\theme1_part_2",
+		"music\\combat\\theme1_part_3"
+	},
+	{
+		"music\\combat\\theme2_part_1",
+		"music\\combat\\theme2_part_2",
+		"music\\combat\\theme2_part_3"
+	},
+	{
+		"music\\combat\\theme3_part_1",
+		"music\\combat\\theme3_part_2",
+		"music\\combat\\theme3_part_3"
+	},
+	{
+		"music\\combat\\theme4_part_1",
+		"music\\combat\\theme4_part_2",
+		"music\\combat\\theme4_part_3"
+	}
+}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -110,24 +132,6 @@ function on_game_start()
 end
 
 function initialize_themes()
-	if not(xrs_dynamic_music_themes) or not(xrs_dynamic_music_themes.themes) then
-		init_failed = true
-		return
-	end
-	local new_table = {}
-	local lname = level.name()
-	for k,v in pairs(xrs_dynamic_music_themes.themes) do
-		if not(v.maps) or (v.maps=="") or (string.find(v.maps,lname)) then
-			table.insert(new_table,v.files)
-			new_table[#new_table+1] = v.files
-		end
-	end
-	themes = new_table
-	if(#themes==0) then
-		init_failed = true
-		return
-	end
-
 	m_ambient_vol = ambient_vol
 	m_theme_volume = ambient_vol
 	FadeTo_theme = ambient_vol
@@ -273,12 +277,12 @@ function start_theme()
 
 	m_theme_volume = ambient_vol
 
-	cur_theme_number = math.random(1, #themes)
-	cur_track_number = math.random(1, #themes[cur_theme_number])
+	cur_theme_number = math.random(1, #combat_themes)
+	cur_track_number = math.random(1, #combat_themes[cur_theme_number])
 	if(theme==nil) then
 		theme = xrs_stereo.stereo_sound()
 	end
-	theme:initialize(themes[cur_theme_number][cur_track_number], m_theme_volume)
+	theme:initialize(combat_themes[cur_theme_number][cur_track_number], m_theme_volume)
 	next_track_start_time = theme:play() - TRACK_SWITCH_DELTA
 	theme:update(m_theme_volume)
 	--alun_utils.debug_write("xrs_dyn_music:start_theme end")
@@ -338,8 +342,8 @@ function fade_ambient()
 end
 
 function select_next_track()
-	if (cur_theme_number==nil or themes[cur_theme_number]==nil) then
-		print_table(themes)
+	if (cur_theme_number==nil or combat_themes[cur_theme_number]==nil) then
+		print_table(combat_themes)
 		log("-------->cur_theme_number="..tostring(cur_theme_number))
 		log("-------->cur_track_number="..tostring(cur_track_number))
 		log("-------->theme="..tostring(theme~=nil))
@@ -349,13 +353,13 @@ function select_next_track()
 		log("-------->cur_state="..tostring(get_theme_state()))
 		printf("wrong theme number")
 	end
-	if (cur_track_number<#themes[cur_theme_number]) then
+	if (cur_track_number<#combat_themes[cur_theme_number]) then
 		cur_track_number = cur_track_number + 1
 	else
 		cur_track_number = 1
 	end
 	if (theme) then
-		next_track_start_time = theme:play_at_time(next_track_start_time + TRACK_SWITCH_DELTA,themes[cur_theme_number][cur_track_number],m_theme_volume) - TRACK_SWITCH_DELTA
+		next_track_start_time = theme:play_at_time(next_track_start_time + TRACK_SWITCH_DELTA,combat_themes[cur_theme_number][cur_track_number],m_theme_volume) - TRACK_SWITCH_DELTA
 	end
 end
 
