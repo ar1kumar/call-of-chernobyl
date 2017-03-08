@@ -102,7 +102,7 @@ function motivator_binder:net_spawn(se_obj)
 			local filename = ini and ini:r_string_ex("logic","cfg")
 			ini = filename and ini_file(filename) or ini
 			if (ini) then
-				xr_info.setup_known_info(npc,ini,ini:r_string_ex("logic","known_info"))
+				self:setup_known_info(npc,ini,ini:r_string_ex("logic","known_info"))
 			end
 		end
 		
@@ -336,7 +336,7 @@ function motivator_binder:death_callback(victim, who)
 	
 	local known_info = self.st.ini and self.st.section_logic and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
 	if (known_info) then
-		xr_info.setup_known_info(self.object,self.st.ini,known_info)
+		self:setup_known_info(self.object,self.st.ini,known_info)
 	end
 	
 	trade_manager.on_npc_death(self.object)
@@ -621,4 +621,16 @@ function motivator_binder:load_state()
 		state.pstor_ctime = nil
 	end
 	--alun_utils.debug_write(strformat("motivator_binder:load_state %s AFTER",id))
+end
+
+----------------------------------
+function motivator_binder:setup_known_info(npc,char_ini,known_info)
+	known_info = known_info or "known_info"
+	if char_ini:section_exist(known_info) then
+		local n = char_ini:line_count(known_info)
+		for i=0,n-1 do
+			local result, id, value = char_ini:r_line(known_info,i,"","")
+			npc:give_info_portion(id)
+		end
+	end
 end

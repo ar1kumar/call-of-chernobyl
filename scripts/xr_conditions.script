@@ -362,7 +362,7 @@ end
 
 function pure_enemy_dist_le(actor,npc,p)
 	local st = db.storage[npc:id()]
-	local enemy = st and st.enemy_id and (b.storage[st.enemy_id] and db.storage[st.enemy_id].object
+	local enemy = st and st.enemy_id and db.storage[st.enemy_id] and db.storage[st.enemy_id].object
 	return enemy and enemy:alive() and enemy:position():distance_to_sqr(npc:position()) <= p[1]^2 or false
 end
 
