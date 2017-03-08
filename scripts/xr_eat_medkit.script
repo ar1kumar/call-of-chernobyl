@@ -11,7 +11,6 @@ function on_game_start()
 	local enabled = ini:r_bool_ex("plugin","enable",false)
 	if not (enabled) then ini = nil return end
 	RegisterScriptCallback("npc_on_update",npc_update)
-
 	local sect = "plugin"
 	--eating.exc_comms = alun_utils.parse_list(ini,sect,"excluded_communities",true)
 	eating.ic = ini:r_bool_ex(sect,"in_combat",false)
@@ -20,38 +19,33 @@ function on_game_start()
 	eating.min_b = ini:r_float_ex(sect,"bandage_bleeding") or 0.2
 	eating.medkits = alun_utils.parse_list(ini,sect,"medkits")
 	eating.bandages = alun_utils.parse_list(ini,sect,"bandages")
-	eating.medkit_delay = {}
-	eating.bandage_delay = {}
+	eating.medkits_delay = {}
+	eating.bandages_delay = {}
 	local ranks = alun_utils.get_rank_list()
 	for i=1,#ranks do 
 		local rn = ranks[i]
-		eating.medkit_delay[rn] = alun_utils.parse_list(ini,rn,"medkit_delay")
-		eating.bandage_delay[rn] = alun_utils.parse_list(ini,rn,"bandage_delay")
+		eating.medkits_delay[rn] = alun_utils.parse_list(ini,rn,"medkit_delay")
+		eating.bandages_delay[rn] = alun_utils.parse_list(ini,rn,"bandage_delay")
 	end
 	ini = nil
 end
 
 function npc_update(npc,st)
-	if not (enabled) then
-		return
-	end
-
-	if not  (npc:alive()) then 
+	if not (enabled) and not (npc:alive()) then 
 		return 
-	end 
-	
-	if not (st.eat_medkit) then
-		st.eat_medkit = eat_medkit(npc,st)
+	end
+	local st_eat_medkit = st.eat_medkit
+	if not (st_eat_medkit) then
+		st_eat_medkit = eat_medkit(npc,st)
+		st.eat_medkit = st_eat_medkit
 	else
 		local comm = npc:character_community()
 		if (comm == "trader" or comm == "zombied") then
 			return
 		end
-
-		st.eat_medkit:update(npc)
+		st_eat_medkit:update(npc)
 	end
 end
-
 
 class "eat_medkit"
 function eat_medkit:__init(object,storage)
@@ -61,51 +55,47 @@ end
 
 function eat_medkit:update(npc)
 	local stage = self.stage or 0
-
+	local tg = time_global()
 	if (stage == 0) then
 		if (IsWounded(npc)) then 
 			self.item = nil
 			self.timer = nil
 			return
 		end 
-		
 		local enemy = npc:best_enemy()
-		if (eating.oc and not eating.ic and enemy) or (eating.ic and not eating.oc and not enemy) then
+		local eating_ic = eating.ic
+		local eating_oc = eating.oc
+		if (eating_oc and not eating_ic and enemy) or (eating_ic and not eating_oc and not enemy) then
 			self.item = nil
 			self.timer = nil
 			return
 		end
-
-		if (npc.health < eating.max_h and not IsWounded(npc)) then
-			for i=1,#eating.medkits do
-				local medkit = npc:object(eating.medkits[i])
-				if (medkit) then
-					local d_min = eating.medkit_delay[self.rank][1] or 10000
-					local d_max = eating.medkit_delay[self.rank][2] or 15000
-					self.timer = time_global()+math.random(d_min,d_max)
-					self.item = eating.medkits[i]
+		local rank = self.rank
+		local function check(item)
+			local eating_item = eating[item]
+			for i=1,#eating_item do
+				local eating_item_i = eating_item[i]
+				if (npc:object(eating_item_i)) then
+					local eating_item_delay_rank = eating[item..'_delay'][rank]
+					self.timer = tg + math.random(eating_item_delay_rank[1] or 10000, eating_item_delay_rank[2] or 15000)
+					self.item = eating_item_i
 					self.stage = 1
 					return
 				end
 			end
+		end
+		if (npc.health < eating.max_h and not IsWounded(npc)) then
+			check('medkits')
 		end
 		if (npc.bleeding > eating.min_b) then
-			for i=1, #eating.bandages do
-				local bandage = npc:object(eating.bandages[i])
-				if (bandage) then
-					local d_min = eating.bandage_delay[self.rank][1] or 10000
-					local d_max = eating.bandage_delay[self.rank][2] or 15000
-					self.timer = time_global()+math.random(d_min,d_max)
-					self.item = eating.bandages[i]
-					self.stage = 1
-					return
-				end
-			end
+			check('bandages')
 		end
 	elseif (stage == 1) then
-		if (self.timer and time_global() > self.timer) then
-			if (self.item) then
-				local med = npc:object(self.item)
+		local timer = self.timer
+		if (timer and tg > timer) then
+			local item = self.item
+			if (item) then
+				local med = npc:object(item)
 				if med then
 					consume_medkit(npc,med)
 					--printf("%s[%s]: Used medical supplies",npc:name(),npc:character_name())
@@ -125,9 +115,9 @@ function consume_medkit(npc,medkit)
 	local health_restore = ini:r_float_ex(ms,"boost_health_restore") or 0
 	local bleeding_restore = ini:r_float_ex(ms,"boost_bleeding_restore") or 0
 	if (health_restore) then
-		npc.health = health_restore*time*10
+		npc.health = health_restore * time * 10
 	end
 	if (bleeding_restore) then
-		npc.bleeding = bleeding_restore*time*10
+		npc.bleeding = bleeding_restore * time * 10
 	end
 end
