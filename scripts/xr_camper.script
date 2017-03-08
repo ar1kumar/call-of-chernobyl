@@ -545,7 +545,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st_suggested_state.moving = ini:r_string_ex(section,"def_state_moving")
 	st_suggested_state.moving_fire = ini:r_string_ex(section,"def_state_moving_fire")
 	st_suggested_state.campering = ini:r_string_ex(section,"def_state_campering")
-	st_suggested_state.standing = ini:r_string_ex(section,"def_state_standing") or suggested_state.campering
+	st_suggested_state.standing = ini:r_string_ex(section,"def_state_standing") or st_suggested_state.campering
 	st_suggested_state.campering_fire = ini:r_string_ex(section,"def_state_campering_fire")
 	st.scantime_free = ini:r_float_ex(section,"scantime_free") or 60000
 	st.attack_sound = ini:r_string_ex(section,"attack_sound") or "fight_attack"

@@ -92,6 +92,10 @@ function actor_on_first_update(binder,delta)
 end
 
 function actor_on_update(binder,delta)
+	if not (db.actor:alive()) then
+		return
+	end
+	
 	-- WISH GRANTER ZOMBIED-IMMORTALITY
 	if (db.actor:has_info("actor_made_wish_immortal") or invulnerable_time and invulnerable_time > time_global() + 7000) then 
 		db.actor.health = 1

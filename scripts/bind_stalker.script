@@ -195,6 +195,9 @@ end
 function actor_binder:update(delta)
 	object_binder.update(self, delta)
 	--alun_utils.debug_write("actor update START")
+	
+	bind_stalker_ext.actor_on_update(self,delta)
+	
 	if not (db.actor:alive()) then
 		return
 	end
@@ -261,8 +264,6 @@ function actor_binder:update(delta)
 	if sr_psy_antenna.psy_antenna then
 		sr_psy_antenna.psy_antenna:update(delta)
 	end
-
-	bind_stalker_ext.actor_on_update(self,delta)
 	
 	--alun_utils.debug_write("actor update END 2")
 end

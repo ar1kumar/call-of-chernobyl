@@ -356,13 +356,13 @@ end
 -------------------------------
 function see_pure_enemy(actor,npc)
 	local st = db.storage[npc:id()]
-	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
+	local enemy = st and st.enemy_id and db.storage[st.enemy_id] and db.storage[st.enemy_id].object
 	return enemy and enemy:alive() and npc:see(enemy) or false
 end
 
 function pure_enemy_dist_le(actor,npc,p)
 	local st = db.storage[npc:id()]
-	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
+	local enemy = st and st.enemy_id and (b.storage[st.enemy_id] and db.storage[st.enemy_id].object
 	return enemy and enemy:alive() and enemy:position():distance_to_sqr(npc:position()) <= p[1]^2 or false
 end
 
@@ -371,7 +371,7 @@ end
 -- param 2 is the smart name. If it's empty it will default to calling NPC's smart
 function is_enemy_on_job(actor, npc, p)
 	local st = db.storage[npc:id()]
-	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
+	local enemy = st and st.enemy_id and db.storage[st.enemy_id] and db.storage[st.enemy_id].object
 	if (enemy == nil or not enemy:alive()) then
 		return false
 	end
@@ -396,7 +396,7 @@ end
 -- param 1 is the smart name
 function enemy_smart(actor, npc, p)
 	local st = db.storage[npc:id()]
-	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
+	local enemy = st and st.enemy_id and db.storage[st.enemy_id] and db.storage[st.enemy_id].object
 	if (enemy == nil or not enemy:alive()) then
 		return false
 	end
@@ -411,7 +411,7 @@ end
 
 function has_pure_enemy(actor, npc)
 	local st = db.storage[npc:id()]
-	local enemy = st and st.enemy_id and (db.storage[st.enemy_id] and db.storage[st.enemy_id].object or level.object_by_id(st.enemy_id))
+	local enemy = st and st.enemy_id and db.storage[st.enemy_id] and db.storage[st.enemy_id].object
 	return enemy and enemy:alive() or false
 end
 
