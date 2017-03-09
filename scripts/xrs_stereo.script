@@ -1,6 +1,7 @@
 --[[
 xStream 02.2008
 ]]
+
 class "stereo_sound"
 function stereo_sound:__init()
 	self.both = nil
@@ -23,10 +24,9 @@ end
 function stereo_sound:play()
     if not db.actor then
 		return
-	end
-	local both = self.both
-	both:play(db.actor,0, sound_object.s2d)
-	self.end_time = time_global() + both:length()
+	end	
+	self.both:play(db.actor,0, sound_object.s2d)
+	self.end_time = time_global() + self.both:length()	
 	return self.end_time
 end
 
@@ -36,19 +36,17 @@ function stereo_sound:play_at_time(time, sound, lvl)
 	if lvl then
 		self:set_volume(lvl)
 	end
-	local both_tail = sound_object(sound)
-	self.both_tail = both_tail
-	if not both_tail then
+	self.both_tail = sound_object(sound)
+	if not self.both_tail then
 		abort("stereo_sound:initialize: Cannot open sound file "..sound)
 		return
 	end
-	self.end_time = time + both_tail:length()
+	self.end_time = time + self.both_tail:length()	
 	return self.end_time
 end
 
 function stereo_sound:playing()
-	local both = self.both
-	return both and both:playing()
+	return self.both and self.both:playing()
 end
 
 function stereo_sound:update(vol)
@@ -56,16 +54,13 @@ function stereo_sound:update(vol)
 end
 
 function stereo_sound:stop()
-	local both = self.both
-	if both and both:playing() then both:stop() end
+	if self.both and self.both:playing() then self.both:stop() end
 end
 
 function stereo_sound:length()
-	local both = self.both
-	return both and both:length() or 1
+	return self.both and self.both:length() or 1
 end
 
 function stereo_sound:set_volume(num)
-	local both = self.both
-	if both then both.volume=num end
+	if self.both then self.both.volume=num end
 end

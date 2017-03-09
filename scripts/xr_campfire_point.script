@@ -5,70 +5,62 @@
 	
 	Auto-generated point_jobs around smart_terrain bound campfires for gulag_general
 --]]
+
 -- TODO: Fix use_camp. It spams animations. use_camp manually set = false in add_to_binder.
 -- Need to make it independent of sr_camp.script so that it doesn't require space_restrictors
+
 evaid = 17000
 actid = 17000
-local used_vids = {}
-local alife, vector, level, mrand = alife, vector, level, math.random
 
+local used_vids = {}
+
+------------------------------------------------------------------------------------
+local alife, vector, level, mrand = alife, vector, level, math.random
+------------------------------------------------------------------------------------
 local assoc_tbl = 	{
-	idle = {
-		director = {"sit"},
-		listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}
-	},
-	harmonica = {
-		director = {"play_harmonica"},
-		listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}
-	},
-	guitar = {
-		director = {"play_guitar"},
-		listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}
-	},
-	story = {
-		director = {"sit"},
-		listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}
-	},
-}
+						idle = {director = {"sit"}, listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}},
+						harmonica = {director = {"play_harmonica"}, listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}},
+						guitar = {director = {"play_guitar"}, listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}},
+						story = {director = {"sit"}, listener = {"sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}},
+					}
+
 -----------------------------Private-----------------
 local function get_rand_vertex(npc,vo,minD,maxD)
 	local dir = vector():set(npc:position()):sub(vo:position())
 	dir = vector_rotate_y(dir,mrand(360))
 	return vo:vertex_in_direction(vo:level_vertex_id(),dir,mrand(minD,maxD))
 end
+
 -----------------------------------------------------
+
 class "evaluator_need_job" (property_evaluator)
 function evaluator_need_job:__init(storage, name) super(nil, name)
   	self.st = storage
 end
-
 function evaluator_need_job:evaluate()
   	return xr_logic.is_active(self.object, self.st) or false
 end
 
+----------------------------------------------------------------------------------------------------------------------
 class "action_point_campfire" (action_base)
 function action_point_campfire:__init (npc_name, action_name, storage) super(nil, action_name)
 	self.st = storage
-	-- wrong table??? Maybe this self.st.avail_animations?
-	self.st.approved_actions = {"play_harmonica","play_guitar","sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa"}
+	self.st.approved_actions = {"play_harmonica","play_guitar","sit","sit_ass","sit_knee","sit_ass_weapon","sit_ass_eat_bread","sit_ass_drink_vodka","sit_ass_drink_energy","sit_ass_eat_kolbasa" }
 end
 
 function action_point_campfire:initialize()
 	action_base.initialize(self)
-	local object = self.object
-	object:set_desired_position()
-	object:set_desired_direction()
-	object:set_path_type(game_object.level_path)
+	self.object:set_desired_position()
+	self.object:set_desired_direction()
+	self.object:set_path_type(game_object.level_path)
 end
 
 function action_point_campfire:activate_scheme()
 	local vid,look
-	local st = self.st
-	local st_smart = st.smart
-	local object = self.object
-	if (st_smart) then
- 		local fires = db.campfire_table_by_smart_names[st_smart]
+	if (self.st.smart) then
+ 		local fires = db.campfire_table_by_smart_names[self.st.smart]
 		if (fires and not is_empty(fires)) then
+			local campfire
 			local t = {}
 			local function create_campfire_point(pos,dir)
 				local radius = 8
@@ -91,13 +83,12 @@ function action_point_campfire:activate_scheme()
 				return vertex_id
 			end
 			for id,binder in pairs(fires) do
-				local binder_object = binder.object
-				if (binder_object) then 
-					local dir = vector():set(binder_object:direction())
-					local pos = binder_object:position()
-					t[#t + 1] = pos
-					for i = 1,6 do
-						vid = create_campfire_point(pos,vector_rotate_y(dir, i * 60))
+				if (binder.object) then 
+					local dir = vector():set(binder.object:direction())
+					local pos = binder.object:position()
+					t[#t+1] = pos
+					for i=1,6 do
+						vid = create_campfire_point(pos,vector_rotate_y(dir,i*60))
 						look = pos
 						if (vid and vid < 4294967295 and not used_vids[vid]) then 
 							break 
@@ -108,136 +99,137 @@ function action_point_campfire:activate_scheme()
 					break 
 				end
 			end
+			
 			-- fallback no camp or all space is taken
 			if (vid == nil or vid >= 4294967295 or used_vids[vid]) then
-				local pos = t and #t > 0 and t[math.random(#t)] or object:position()
-				vid = alun_utils.find_random_cover(object,pos,5,15)
+				local pos = t and #t > 0 and t[math.random(#t)] or self.object:position()
+				vid = alun_utils.find_random_cover(self.object,pos,5,15)
 				look = pos
 			end
 		end
 	end
+	
 	-- fallback if no campfires
 	if (vid == nil or vid >= 4294967295 or used_vids[vid]) then
-		local smart = st_smart and SIMBOARD:get_smart_by_name(st_smart) or xr_gulag.get_npc_smart(object)
-		local pos = smart and smart.position or object:position()
-		vid = alun_utils.find_random_cover(object,pos,5,15)
+		local smart = self.st.smart and SIMBOARD:get_smart_by_name(self.st.smart) or xr_gulag.get_npc_smart(self.object)
+		local pos = smart and smart.position or self.object:position()
+		vid = alun_utils.find_random_cover(self.object,pos,5,15)
 		look = pos
 	end
-	st.signals = {}
-	st.look_position = look
-	st.vid = utils.send_to_nearest_accessible_vertex(object, vid or object:level_vertex_id())
-	state_mgr.set_state(object,xr_logic.pick_section_from_condlist(db.actor, object, st.reach_movement))
-	used_vids[st.vid] = true
+	
+	self.st.signals = {}
+	self.st.look_position = look
+	self.st.vid = utils.send_to_nearest_accessible_vertex(self.object,vid or self.object:level_vertex_id())
+	state_mgr.set_state(self.object,xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.reach_movement))
+	
+	used_vids[self.st.vid] = true
 end
 
 function action_point_campfire:execute()
 	action_base.execute(self)
-	local st = self.st
-	local st_vid = st.vid
-	if not (st_vid) then 
+
+	if not (self.st.vid) then 
 		return 
 	end 
-	local object = self.object
-	local db_actor = db.actor
-	if not (object:level_vertex_id() == st_vid) then
-		local game_object_level_path = game_object.level_path
-		if (object:path_type() ~= game_object_level_path) then 
-			object:set_path_type(game_object_level_path)
+	
+	local npc = self.object
+	if not (npc:level_vertex_id() == self.st.vid) then
+		if (npc:path_type() ~= game_object.level_path) then 
+			npc:set_path_type(game_object.level_path)
 		end
-		st.vid = utils.send_to_nearest_accessible_vertex(object,st_vid,"xr_campfire_point")
-		state_mgr.set_state(object,xr_logic.pick_section_from_condlist(db_actor, object, st.reach_movement))
+		self.st.vid = utils.send_to_nearest_accessible_vertex(npc,self.st.vid,"xr_campfire_point")
+		state_mgr.set_state(npc,xr_logic.pick_section_from_condlist(db.actor, npc, self.st.reach_movement))
 		return
 	end
-	local state = state_mgr.get_state(object)
-	local object_pos = object:position()
-	local camp = sr_camp.get_current_camp(object_pos)
-	local object_id = object:id()
-	local st_use_camp = st.use_camp
+
+	local state = state_mgr.get_state(self.object)
+	local camp = sr_camp.get_current_camp(npc:position())
 	if (camp) then 
-		if (st_use_camp == true and state ~= "sleep" and state ~= "sleep_sit") then 
-			st.camp = camp
-			camp:register_npc(object_id)
+		if (self.st.use_camp == true and state ~= "sleep" and state ~= "sleep_sit") then 
+			self.st.camp = camp
+			camp:register_npc(npc:id())
 			self.in_camp = true
-		elseif (st_use_camp ~= true or state == "sleep" or state == "sleep_sit") then
+		elseif (self.st.use_camp ~= true or state == "sleep" or state == "sleep_sit") then
 			if (self.in_camp) then 
-				camp:unregister_npc(object_id)
+				camp:unregister_npc(npc:id())
 				self.in_camp = nil
-				st.camp = nil
+				self.st.camp = nil
 			end
 		end
-	elseif (self.in_camp == true and not st.camp) then
-		st.camp:unregister_npc(object_id)
+	elseif (self.in_camp == true and not self.st.camp) then
+		self.st.camp:unregister_npc(npc:id())
 		self.in_camp = nil
-		st.camp = nil
+		self.st.camp = nil
 	end
-	if (st.camp) then
-		if (st_use_camp ~= true or state == "sleep" or state == "sleep_sit") then
-			st.camp:unregister_npc(object_id)
+	
+	if (self.st.camp) then
+		if (self.st.use_camp ~= true or state == "sleep" or state == "sleep_sit") then
+			self.st.camp:unregister_npc(npc:id())
 		end
-	elseif (st_use_camp and state ~= "sleep" and state ~= "sleep_sit" and not st.camp_checked) then
-		st.camp_checked = true
-		local camp = sr_camp.get_current_camp(object_pos)
+	elseif (self.st.use_camp and state ~= "sleep" and state ~= "sleep_sit" and not self.st.camp_checked) then
+		self.st.camp_checked = true
+		local camp = sr_camp.get_current_camp(npc:position())
 		if (camp) then
-			st.camp = camp
-			camp:register_npc(object_id)
+			self.st.camp = camp
+			camp:register_npc(npc:id())
 		end		
 	end
-	local tg = time_global()
-	local st_sound_idle = st.sound_idle
-	if (not st.camp and st_sound_idle) then
-		st.__sound_idle = st.__sound_idle or tg + mrand(10000,30000)
 
-		if (tg > st.__sound_idle) then
-			xr_sound.set_sound_play(object_id, st_sound_idle)
-			st.__sound_idle = nil
+	local tg = time_global()
+
+	if (not self.st.camp and self.st.sound_idle) then
+		self.st.__sound_idle = self.st.__sound_idle or tg + mrand(10000,30000)
+
+		if (tg > self.st.__sound_idle) then
+			xr_sound.set_sound_play(self.object:id(), self.st.sound_idle)
+			self.st.__sound_idle = nil
 		end
 	end
-	local anm = self:get_camp_action() or xr_logic.pick_section_from_condlist(db_actor, object, st.anm)
-	state_mgr.set_state(object, anm, nil, nil, {look_position = st.look_position})
+
+	local anm = self:get_camp_action() or xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.anm)
+	state_mgr.set_state(self.object, anm, nil, nil, {look_position = self.st.look_position})
 end
 
 function action_point_campfire:get_camp_action()
-	local st = self.st
-	local st_camp = st.camp
-	if not (st_camp) then
+	if not (self.st.camp) then
 		return
 	end
-	local camp_action, is_director = st_camp:get_camp_action(self.object:id())
+
+	local camp_action, is_director = self.st.camp:get_camp_action(self.object:id())
 	if not (camp_action) then 
 		return 
 	end
-	local current_action = self.current_action
-	if (current_action and current_action ~= "play_guitar" and current_action ~= "play_harmonica") then 
-		local tg = time_global()
-		local __dtimer = self.__dtimer
-		self.__dtimer = not __dtimer and tg + math.random(10000,15000) or __dtimer
-		if (tg < self.__dtimer) then
+	
+	if (self.current_action and self.current_action ~= "play_guitar" and self.current_action ~= "play_harmonica") then 
+		self.__dtimer = not self.__dtimer and time_global() + math.random(10000,15000) or self.__dtimer
+		if (time_global() < self.__dtimer) then
 			return
 		end
 	end 
+	
 	local role = is_director and "director" or "listener"
 	local tbl = assoc_tbl[camp_action][role]
+	
 	self.current_action = tbl and tbl[mrand(#tbl)] or "sit_ass"
+
 	return self.current_action
 end
 
 function action_point_campfire:finalize()
 	action_base.finalize(self)
-	local st = self.st
-	local st_camp = st.camp
-	if (st_camp) then
-		st_camp:unregister_npc(self.object:id())
+	if (self.st.camp) then
+		self.st.camp:unregister_npc(self.object:id())
 	end
-	st.camp_checked = nil
-	local st_vid = st.vid
-	if (st_vid) then
-		used_vids[st_vid] = nil
+	self.st.camp_checked = nil
+	if (self.st.vid) then
+		used_vids[self.st.vid] = nil
 	end
 end
 
 function action_point_campfire:position_riched()
 	return self.cover_position:distance_to_sqr(self.object:position()) <= 0.4
 end
+
 ----------------------------------------------------------------------------------------------------------------------
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
