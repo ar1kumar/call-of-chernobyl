@@ -46,16 +46,18 @@ function motivator_binder:reinit()
 	--alun_utils.debug_write(self.object:name()..":motivator_reinit() end")
 end
 ----------------------------------------------------------------------------------------------------------------------
-function motivator_binder:net_spawn(se_obj)
+-- Note: Do not make mistake in thinking that se_abstract is the same as se_obj. It is casted as cse_abstract and not cse_alife_human_stalker!!!
+-- Therefore cse_alife_human_stalker specific properties are not available from it, like group_id
+function motivator_binder:net_spawn(se_abstract)
 	--alun_utils.debug_write(strformat("\n----%s:net_spawn()---%s visual=%s",self.object:name(),self.object:character_name(),self.object:get_visual_name()),true)
-	if not object_binder.net_spawn(self, se_obj) then
+	if not object_binder.net_spawn(self, se_abstract) then
 		return false
 	end
 	
-	-- local se_obj = alife_object(self.object:id())
-	-- if not (se_obj) then 
-		-- return false 
-	-- end
+	local se_obj = alife_object(self.object:id())
+	if not (se_obj) then
+		return false 
+	end
 
 	local npc = self.object
 	
@@ -147,9 +149,12 @@ function motivator_binder:net_spawn(se_obj)
 	
 	xr_reach_task.add_reach_task_action(npc)
 	
+	printf("squad id =%s",se_obj.group_id)
 	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife_object(se_obj.group_id)
 	if (squad and axr_companions.companion_squads[squad.id]) then
+		printf("Before companion %s",self.object:name())
 		axr_companions.setup_companion_logic(npc,self.st,self.loaded)
+		printf("AFTER")
 	elseif (debug_cmd_list.debug_visuals and debug_cmd_list.debug_visuals[npc:id()]) then
 		npc:set_visual_name(debug_cmd_list.debug_visuals[npc:id()])
 		debug_cmd_list.setup_debug_logic(npc,self.st,self.loaded)

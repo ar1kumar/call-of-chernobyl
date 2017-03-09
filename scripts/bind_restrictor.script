@@ -28,8 +28,8 @@ function restrictor_binder:reinit()
 	self.st = db.storage[self.object:id()]
 end
 
-function restrictor_binder:net_spawn(data)
-	if not object_binder.net_spawn( self,data ) then
+function restrictor_binder:net_spawn(se_abstract)
+	if not object_binder.net_spawn( self,se_abstract ) then
 		return false
 	end
 

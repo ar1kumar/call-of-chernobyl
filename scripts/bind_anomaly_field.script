@@ -21,8 +21,8 @@ function anomaly_field_binder:reinit()
 	self.st = db.storage[self.object:id()]
 end
 
-function anomaly_field_binder:net_spawn(server_object)
-	if not object_binder.net_spawn(self, server_object) then
+function anomaly_field_binder:net_spawn(se_abstract)
+	if not object_binder.net_spawn(self, se_abstract) then
 		return false
 	end
 	db.add_zone(self.object)

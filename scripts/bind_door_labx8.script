@@ -71,8 +71,8 @@ function door_binder_labx8:__init(obj) super(obj)
 	self.anim_time = 0
 end
 
-function door_binder_labx8:net_spawn(server_object)
-	if not(object_binder.net_spawn(self, server_object)) then
+function door_binder_labx8:net_spawn(se_abstract)
+	if not(object_binder.net_spawn(self, se_abstract)) then
 		return false
 	end
 	db.add_anim_obj(self.object, self)

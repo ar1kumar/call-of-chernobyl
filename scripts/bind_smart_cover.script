@@ -10,8 +10,8 @@ end
 class "smart_cover_binder" (object_binder)
 function smart_cover_binder:__init(obj) super(obj)
 end
-function smart_cover_binder:net_spawn(server_object)
-	if not object_binder.net_spawn(self, server_object) then
+function smart_cover_binder:net_spawn(se_abstract)
+	if not object_binder.net_spawn(self, se_abstract) then
 		return false
 	end
 	local name = self.object:name()

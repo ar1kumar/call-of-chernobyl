@@ -98,13 +98,14 @@ function heli_binder:update( delta )
 	--alun_utils.debug_write("heli update end")
 end
 
-function heli_binder:net_spawn( sobject )
-	if not object_binder.net_spawn( self, sobject ) then
+function heli_binder:net_spawn( se_abstract )
+	if not object_binder.net_spawn( self, se_abstract ) then
 		return false
 	end
 	
-	if (sobject.m_smart_terrain_id) then
-		smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, sobject, modules.stype_heli, self.loaded)
+	local se_obj = alife_object(se_abstract.id)
+	if (se_obj.m_smart_terrain_id) then
+		smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, se_obj, modules.stype_heli, self.loaded)
 	end
 
 	db.add_obj(self.object)

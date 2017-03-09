@@ -46,8 +46,8 @@ function campfire_binder:reinit()
 	object_binder.reinit(self)
 end
 
-function campfire_binder:net_spawn(server_object)
-	if not object_binder.net_spawn(self, server_object) then
+function campfire_binder:net_spawn(se_abstract)
+	if not object_binder.net_spawn(self, se_abstract) then
 		return false
 	end
 
@@ -89,7 +89,7 @@ function campfire_binder:net_spawn(server_object)
 	return true
 end
 
-function campfire_binder:net_destroy(server_object)
+function campfire_binder:net_destroy(se_abstract)
 	local smart_name = string.gsub(self.object:name(), "_campfire_%d*", "")
 	if SIMBOARD.smarts_by_names[smart_name] then
 		if (db.campfire_table_by_smart_names[smart_name]) then 

@@ -253,17 +253,17 @@ function generic_object_binder:use_callback(obj, who)
 	-- Alundaio
 end
 
-function generic_object_binder:net_spawn(se_obj)
+function generic_object_binder:net_spawn(se_abstract)
 	--alun_utils.debug_write("\n----"..sobject:name()..":net_spawn()----",true)
-	if not object_binder.net_spawn(self, se_obj) then
+	if not object_binder.net_spawn(self, se_abstract) then
 		--alun_utils.debug_write(se_obj:name()..":net_spawn()  FAILURE FAILURE object_binder.net_spawn returned false!!!")
 		return false
 	end
 	
-	-- local se_obj = alife_object(self.object:id())
-	-- if not (se_obj) then 
-		-- return false 
-	-- end
+	local se_obj = alife_object(self.object:id())
+	if not (se_obj) then 
+		return false 
+	end
 
 	-- Alundaio
 	SendScriptCallback("monster_on_net_spawn",self.object,se_obj)

@@ -24,17 +24,18 @@ function actor_binder:__init (obj) super(obj)
 end
 
 ----------------------------------------------------------------------------------------------------------------------
-function actor_binder:net_spawn(data)
+function actor_binder:net_spawn(se_abstract)
 	--alun_utils.debug_write("actor net spawn start")
+	
+	if object_binder.net_spawn(self,se_abstract) == false then
+		return false
+	end
 	
 	level.show_indicators()
 	self.bCheckStart = true
 	self.weapon_hide = false
 	self.weapon_hide_in_dialog = false
-
-	if object_binder.net_spawn(self,data) == false then
-		return false
-	end
+	
 	db.add_actor(self.object)
 	db.add_enemy(self.object)
 
