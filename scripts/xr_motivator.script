@@ -149,12 +149,9 @@ function motivator_binder:net_spawn(se_abstract)
 	
 	xr_reach_task.add_reach_task_action(npc)
 	
-	printf("squad id =%s",se_obj.group_id)
 	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife_object(se_obj.group_id)
 	if (squad and axr_companions.companion_squads[squad.id]) then
-		printf("Before companion %s",self.object:name())
 		axr_companions.setup_companion_logic(npc,self.st,self.loaded)
-		printf("AFTER")
 	elseif (debug_cmd_list.debug_visuals and debug_cmd_list.debug_visuals[npc:id()]) then
 		npc:set_visual_name(debug_cmd_list.debug_visuals[npc:id()])
 		debug_cmd_list.setup_debug_logic(npc,self.st,self.loaded)
