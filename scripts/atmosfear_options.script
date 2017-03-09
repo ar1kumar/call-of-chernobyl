@@ -658,7 +658,7 @@ end
 
 function af_options_dialog:OnWeatherBalancePresets()
 	local selected = self:GetComboValue("weather_balance_presets")
-	local parameters = config:collect_section("atmosfear_preset_"..selected)
+	local parameters = self.default_settings:collect_section("atmosfear_preset_"..selected)
 	if parameters~=nil then
 		for option, name in pairs(parameters) do
 			self:SetComboValue(option,name)
@@ -668,7 +668,7 @@ end
 
 function af_options_dialog:OnWeatherLengthPresets()
 	local selected = self:GetComboValue("weather_length_presets")
-	local parameters = config:collect_section("atmosfear_preset_"..selected)
+	local parameters = self.default_settings:collect_section("atmosfear_preset_"..selected)
 	if parameters~=nil then
 		for option, name in pairs(parameters) do
 			self:SetRadioValue(option,name)
@@ -691,8 +691,11 @@ function af_options_dialog:OnBtnAccept()
 	for level,v in pairs(level_weathers.valid_levels) do
 		self:SetComboOption(level.."_period_good",false)
 		self:SetComboOption(level.."_period_bad",false)
-
-		if (not update_period) and (config:r_value("atmosfear_current_parameters",level.."_period_good_length") ~= tonumber(self:GetRadioValue(level.."_period_good_length")) or config:r_value("atmosfear_current_parameters",level.."_period_bad_length") ~= tonumber(self:GetRadioValue(level.."_period_bad_length"))) then
+		
+		self:SetRadioOption(level.."_period_good_length",false)
+		self:SetRadioOption(level.."_period_bad_length",false)
+		
+		if (not update_period) and (config:r_value("atmosfear_current_parameters",level.."_period_good_length") ~= self:GetRadioValue(level.."_period_good_length") or config:r_value("atmosfear_current_parameters",level.."_period_bad_length") ~= self:GetRadioValue(level.."_period_bad_length")) then
 			update_period = true
 		end
 	end
