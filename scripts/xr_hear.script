@@ -1,39 +1,40 @@
 
+local t1 = {
+	weapon = 'WPN',
+	item = 'ITM',
+	monster = 'MST',
+	step = 'NPC_step'
+}
+local t2 = {
+	weapon = {
+		weapon_shoot = 'shoot',
+		weapon_empty = 'empty',
+		weapon_bullet_hit = 'hit',
+		weapon_reload = 'reload',
+		[-1065353216] = 'show',
+		[-1056964608] = 'hide',
+	},
+	item = {
+		item_pick_up = 'pckup',
+		item_drop = 'drop',
+		item_hide = 'hide',
+		item_take = 'take',
+		item_use = 'use',
+	},
+	monster = {
+		monster_die = 'die',
+		monster_injure = 'damage',
+		monster_step = 'step',
+		monster_talk = 'talk',
+		monster_attack = 'attack',
+		monster_eat = 'eat',
+	},
+	step = {
+		-- empty
+	}
+}
+
 local function get_sound_type(sound_type)
-	local t1 = {
-		weapon = 'WPN',
-		item = 'ITM',
-		monster = 'MST',
-		step = 'NPC_step'
-	}
-	local t2 = {
-		weapon = {
-			weapon_shoot = 'shoot',
-			weapon_empty = 'empty',
-			weapon_bullet_hit = 'hit',
-			weapon_reload = 'reload',
-			[-1065353216] = 'show',
-			[-1056964608] = 'hide',
-		},
-		item = {
-			item_pick_up = 'pckup',
-			item_drop = 'drop',
-			item_hide = 'hide',
-			item_take = 'take',
-			item_use = 'use',
-		},
-		monster = {
-			monster_die = 'die',
-			monster_injure = 'damage',
-			monster_step = 'step',
-			monster_talk = 'talk',
-			monster_attack = 'attack',
-			monster_eat = 'eat',
-		},
-		step = {
-			-- empty
-		}
-	}
 	local function check_bit_and(snd_type_name)
 		if bit_and(sound_type, snd_type_name) == snd_type_name then
 			return true
