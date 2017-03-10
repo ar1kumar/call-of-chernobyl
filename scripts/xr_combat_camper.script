@@ -3,13 +3,18 @@
 Просто сидеть и стрелять, если враг дальше какого-то расстояния
 Чугай Александр
 ------------------------------------------------------------------------------------------------------------]]
-local base = xr_evaluators_id.combat_camper_base
-local prop_enable		= base
-local prop_see			= base + 1
-local act_shoot			= base
-local act_look_around	= base + 1
 
+local base = xr_evaluators_id.combat_camper_base
+local prop_enable = base + 0
+local prop_see    = base + 1
+
+base = xr_actions_id.combat_camper_base
+local act_shoot       = base + 0
+local act_look_around = base + 1
+
+--------------------------------------------------------------------------------------------------------------
 class "evaluator_combat_camper" ( property_evaluator )
+
 function evaluator_combat_camper:__init( name, storage ) super ( nil, name )
 	self.st = storage
 end
@@ -18,15 +23,17 @@ function evaluator_combat_camper:evaluate()
 	return db.storage[self.object:id()].script_combat_type == "camper"
 end
 
+--------------------------------------------------------------------------------------------------------------
 class "evaluator_see" ( property_evaluator )
+
 function evaluator_see:__init( name, storage ) super ( nil, name )
 	self.st = storage
 end
 
 function evaluator_see:evaluate()
-	local object = self.object
-	local be = object:best_enemy()
-	if object:alive() and be and object:see( be ) then
+	local be = self.object:best_enemy()
+
+	if self.object:alive() and be and self.object:see( be ) then
 		self.st.last_seen_pos = be:position()
 		return true
 	else
@@ -34,15 +41,18 @@ function evaluator_see:evaluate()
 	end
 end
 
+--------------------------------------------------------------------------------------------------------------
 class "action_shoot" ( action_base )
+
 function action_shoot:__init( name, storage )  super ( nil, name )
 	self.st = storage
 end
 
 function action_shoot:initialize()
 	action_base.initialize( self )
-	local object = self.object
-	state_mgr.set_state(object, "hide_fire", nil, nil, {look_object = object:best_enemy()})
+
+	state_mgr.set_state( self.object, "hide_fire", nil, nil, { look_object = self.object:best_enemy() } )
+
 	self.st.camper_combat_action = true
 end
 
@@ -52,79 +62,89 @@ end
 
 function action_shoot:finalize()
 	action_base.finalize( self )
+
 	self.st.camper_combat_action = false
 end
 
+--------------------------------------------------------------------------------------------------------------
 class "action_look_around" ( action_base )
+
 function action_look_around:__init( name, storage )  super ( nil, name )
 	self.st = storage
 end
 
 function action_look_around:initialize()
 	action_base.initialize( self )
+
 	self.st.camper_combat_action = true
+
 	self:reset()
 end
 
 function action_look_around:reset()
 	self.forget_time     = device():time_global() + 30000
 	self.change_dir_time = device():time_global() + 15000
-	local st = self.st
+
 	-- если врага мы ещё не видели вообще, то всё равно повернуться к нему
-	local object = self.object
-	local object_best_enemy = object:best_enemy()
-	if not st.last_seen_pos and object_best_enemy ~= nil then
-		st.last_seen_pos = object_best_enemy:position()
+	if not self.st.last_seen_pos and self.object:best_enemy() ~= nil then
+		self.st.last_seen_pos = self.object:best_enemy():position()
 	end
-	state_mgr.set_state(object, "hide", nil, nil, {look_position = st.last_seen_pos})
+
+	state_mgr.set_state( self.object, "hide", nil, nil, { look_position = self.st.last_seen_pos } )
 end
 
 function action_look_around:execute()
 	action_base.execute( self )
-	local device_tg = device():time_global()
-	local st = self.st
-	if self.forget_time < device_tg then
+
+	if self.forget_time < device():time_global() then
 		printf("pl:Disabling_memory_object[8]")
-		-- self.object:enable_memory_object( self.object:best_enemy(), false )
-		st.last_seen_pos = nil
+--		self.object:enable_memory_object( self.object:best_enemy(), false )
+
+		self.st.last_seen_pos = nil
+
 		return
 	end
-	local last_seen_pos = st.last_seen_pos
-	local object = self.object
-	if self.change_dir_time < device_tg then
-		self.change_dir_time = device_tg + math.random(2000, 4000)
-		if last_seen_pos == nil then
-			abort("report this error to STALKER-829 bug [%s]", object:name())
+
+	if self.change_dir_time < device():time_global() then
+		self.change_dir_time = device():time_global() + math.random( 2000, 4000 )
+
+		local ang = math.random( 0, 120 ) - 60
+		if self.st.last_seen_pos == nil then
+			abort("report this error to STALKER-829 bug [%s]", self.object:name())
 		end
-		local object_pos = object:position()
-		local dir = vector_rotate_y(vector():set(last_seen_pos):sub(object_pos), math.random(0, 120) - 60)
-		state_mgr.set_state(object, "hide", nil, nil, {look_position = object_pos:add(dir)})
+		local dir = vector():set( self.st.last_seen_pos ):sub( self.object:position() )
+		dir = vector_rotate_y( dir, ang )
+
+		state_mgr.set_state( self.object, "hide", nil, nil, { look_position = self.object:position():add( dir ) } )
 	end
 end
 
 function action_look_around:finalize()
 	action_base.finalize( self )
-	local st = self.st
-	st.last_seen_pos = nil
-	st.camper_combat_action = false
+
+	self.st.last_seen_pos = nil
+
+	self.st.camper_combat_action = false
 end
 
 -- Внимание: вызывается во всех actions
 function action_look_around:hit_callback( obj, amount, local_direction, who, bone_index )
-	local st = self.st
-	if who == nil or not st.camper_combat_action then
+	if who == nil or not self.st.camper_combat_action then
 		return
 	end
-	local object = self.object
-	local be = object and object:best_enemy()
+
+	local be = self.object and self.object:best_enemy()
+
 	-- если получили хит от текущего врага, то мы знаем, где он; поворачивамся к нему
 	if be and who:id() == be:id() then
-		-- printf( "HIT CALLBACK!!!!!!!!!" )
-		st.last_seen_pos = be:position()
+--		printf( "HIT CALLBACK!!!!!!!!!" )
+
+		self.st.last_seen_pos = be:position()
 		self:reset()
 	end
 end
 
+--------------------------------------------------------------------------------------------------------------
 function add_to_binder(npc,ini,st,planner,temp)
 	local properties  = {}
 	properties["state_mgr_logic_active"] 	= xr_evaluators_id.state_mgr + 4

@@ -2,7 +2,9 @@
 --Actions
 ----------------------------------------------------------------------------------------------------------------------
 -- Обычное поведение
+
 class "action_process_death"
+
 function action_process_death:__init(obj, storage)
 	self.object = obj
 	self.st = storage
@@ -16,16 +18,18 @@ function action_process_death:death_callback(victim, who)
 		printf("[%s] killed by [Unknown]", victim:name())
 		db.storage[victim:id()].death.killer = -1
 	end
+
 	if db.actor then
-		local st = self.st
-		if st.info then
-			xr_logic.pick_section_from_condlist(db.actor, self.object, st.info)
+		if self.st.info then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.info)
 		end
-		if st.info2 then
-			xr_logic.pick_section_from_condlist(db.actor, self.object, st.info2)
+
+		if self.st.info2 then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.info2)
 		end
 	end
 end
+
 ----------------------------------------------------------------------------------------------------------------------
 -- binder
 ----------------------------------------------------------------------------------------------------------------------
