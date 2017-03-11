@@ -567,6 +567,10 @@ function story_obj_in_zone_by_name (actor, npc, p)
 	return false
 end
 
+function actor_inside_me(actor,zone,p)
+	return zone:inside(actor:position())
+end
+
 function actor_in_zone(actor, npc, p)
 	if not (db.actor) then 
 		return false 

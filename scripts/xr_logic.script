@@ -498,6 +498,11 @@ function try_switch_to_another_section(npc, st, actor)
 			if see_actor(npc) and distance_between(actor, npc) <= c.v1 then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
 			end
+		elseif (c.name == "on_first_update") then
+			if not (st.try_switch_first_update) then
+				st.try_switch_first_update = true
+				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
+			end
 		elseif (c.name == "on_actor_dist_le_nvis") then
 			if distance_between(actor, npc) <= c.v1 then
 				switched = switch_to_section(npc, st.ini, pick_section_from_condlist(actor, npc, c.condlist))
@@ -855,6 +860,8 @@ function cfg_get_switch_conditions(ini, section, npc)
 			lst[#lst+1] = cfg_get_number_and_condlist(ini,section,id,npc,cond_name)
 		elseif (cond_name == "on_signal") then
 			lst[#lst+1] = cfg_get_string_and_condlist(ini,section,id,npc,cond_name)
+		elseif (cond_name == "on_first_update") then 
+			lst[#lst+1] = cfg_get_condlist(ini,section,id,npc,cond_name)
 		elseif (cond_name == "on_info") then
 			lst[#lst+1] = cfg_get_condlist(ini,section,id,npc,cond_name)	
 		elseif (cond_name == "on_timer") then
