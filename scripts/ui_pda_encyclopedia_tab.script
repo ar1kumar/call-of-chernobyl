@@ -31,6 +31,10 @@ function pda_encyclopedia_tab:__init() super()
 	self:InitCategories()
 end
 
+function pda_encyclopedia_tab:__finalize()
+	SINGLETON = nil 
+end
+
 -- Article and category items.
 class "pda_encyclopedia_entry" (CUIListBoxItem)
 function pda_encyclopedia_entry:__init() super(22)

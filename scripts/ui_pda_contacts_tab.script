@@ -19,6 +19,10 @@ function pda_contacts_tab:__init() super()
 	self:InitControls()
 end
 
+function pda_contacts_tab:__finalize()
+	SINGLETON = nil 
+end
+
 -- Initialise the interface.
 function pda_contacts_tab:InitControls()
 	self:SetWndRect(Frect():set(0, 0, 1024, 768))

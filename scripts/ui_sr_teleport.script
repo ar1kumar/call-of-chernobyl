@@ -3,7 +3,6 @@
 
 local ini = ini_file("sr_teleport_sections.ltx")
 
-
 class "msg_box_ui" (CUIScriptWnd)
 function msg_box_ui:__init(obj,disable_msg,item) super()
 	self:SetWndRect(Frect():set(0,0,1024,768))
@@ -49,6 +48,7 @@ function msg_box_ui:__init(obj,disable_msg,item) super()
 end
 
 function msg_box_ui:__finalize()
+	SINGLETON = nil
 end
 
 function msg_box_ui:InitCallBacks()
