@@ -3,6 +3,35 @@
 
 local ini = ini_file("sr_teleport_sections.ltx")
 
+local SINGLETON = nil
+function create(obj,disable_msg,item)
+	SINGLETON = SINGLETON or msg_box_ui(obj,disable_msg,item)
+	SINGLETON:Reset()
+	return SINGLETON
+end
+
+
+local old_pos
+function on_update()
+	if not (SINGLETON) then
+		return true 
+	end 
+	
+	if (old_pos) then
+		local pos = db.actor:position()
+		if (old_pos:similar(pos,0.5) == 0) then
+			SINGLETON:OnMsgCancel()
+			return true
+		end
+		old_pos.x = pos.x
+		old_pos.y = pos.y 
+		old_pos.z = pos.z
+	else 
+		old_pos = utils.vector_copy_by_val(db.actor:position())
+	end
+	return false
+end
+------------------------------------------------------------------------------------
 class "msg_box_ui" (CUIScriptWnd)
 function msg_box_ui:__init(obj,disable_msg,item) super()
 	self:SetWndRect(Frect():set(0,0,1024,768))
@@ -48,7 +77,16 @@ function msg_box_ui:__init(obj,disable_msg,item) super()
 end
 
 function msg_box_ui:__finalize()
+	SINGLETON = nil
+	RemoveUniqueCall(on_update)
+end
 
+function msg_box_ui:Reset()
+	if (self.message_box and self.message_box:IsShown()) then 
+		self.message_box:HideDialog()
+	end
+	old_pos = nil
+	self:InitControls()
 end
 
 function msg_box_ui:InitCallBacks()
@@ -59,6 +97,9 @@ function msg_box_ui:InitCallBacks()
 end
 
 function msg_box_ui:OnMsgOk()
+	old_pos = nil
+	RemoveUniqueCall(on_update)
+	
 	local pos = ini:r_string_ex(self.name,"position")
 	local path = pos == nil and ini:r_string_ex(self.name,"path")
 	local point = path and patrol(path)
@@ -113,6 +154,13 @@ function msg_box_ui:OnMsgOk()
 end
 
 function msg_box_ui:OnMsgCancel()
+	old_pos = nil
+	RemoveUniqueCall(on_update)
+
+	if (self.message_box and self.message_box:IsShown()) then 
+		self.message_box:HideDialog()
+	end
+	
 	local pos = ini:r_string_ex(self.name,"reject")
 	local path = pos == nil and ini:r_string_ex(self.name,"reject_path")
 	local point = path and patrol(path)
@@ -124,12 +172,17 @@ function msg_box_ui:OnMsgCancel()
 	local p = pos and alun_utils.str_explode(pos,",")
 	pos = p and vector():set(tonumber(p[1]) or 0,tonumber(p[2]) or 0,tonumber(p[3]) or 0)
 
-	db.actor:set_actor_position(pos or point and point:point(0) or db.actor:position())
-	if (pos and p[4]) then
-		db.actor:set_actor_direction(tonumber(p[4]) or 0)
-		return
+	local car = db.actor:get_attached_vehicle()
+	if (car) then
+		car:force_set_position(pos or point and point:point(0) or db.actor:position())
+	else
+		db.actor:set_actor_position(pos or point and point:point(0) or db.actor:position())
+		if (pos and p[4]) then
+			db.actor:set_actor_direction(tonumber(p[4]) or 0)
+			return
+		end
+		db.actor:set_actor_direction(-device().cam_dir:getH())
 	end
-	db.actor:set_actor_direction(-device().cam_dir:getH())
 end
 
 function msg_box_ui:InitControls()
@@ -141,9 +194,19 @@ function msg_box_ui:InitControls()
 		end
 		return
 	end
+	
+	local vehicle = db.actor:get_attached_vehicle()
+	if (vehicle) then
+		local car = vehicle:get_car()
+		if (car and car:IsActiveEngine()) then
+			car:StopEngine()
+		end
+	end
 
 	self.message_box:InitMessageBox("message_box_yes_no")
 	self.message_box:ShowDialog(true)
 	local str = game.translate_string(ini:r_string_ex(self.name,"text") or "")
 	self.message_box:SetText(str)
+	
+	AddUniqueCall(on_update)
 end
