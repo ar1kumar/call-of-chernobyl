@@ -152,45 +152,11 @@ local function precond_safe_job_sleeper(se_obj, smart, job)
 		return false
 	end
 
-	if smart.smart_alarm_time == nil then
-		return true
-	end
-
-	if smart.safe_restr == nil then
-		return true
-	end
-	
-	if not (job.precondition_params) then 
-		return true 
-	end
-
-	-- should probably remove, irrelevant in 1.6
-	-- if job.precondition_params.is_safe_job == nil then
-		-- job.precondition_params.is_safe_job = xr_gulag.job_in_restrictor(smart, smart.safe_restr, string.gsub(job.section,"logic@","",1))
-	-- end
-
-	return job.precondition_params.is_safe_job ~= false
+	return smart.smart_alarm_time == nil
 end
 
 local function precond_safe_job(se_obj, smart, job)
-	if smart.smart_alarm_time == nil then
-		return true
-	end
-
-	if smart.safe_restr == nil then
-		return true
-	end
-	
-	if not (job.precondition_params) then 
-		return true 
-	end
-
-	-- should probably remove, irrelevant in 1.6
-	-- if job.precondition_params.is_safe_job == nil then
-		-- job.precondition_params.is_safe_job = xr_gulag.job_in_restrictor(smart, smart.safe_restr, string.gsub(job.section,"logic@","",1))
-	-- end
-
-	return job.precondition_params.is_safe_job ~= false
+	return smart.smart_alarm_time == nil
 end
 
 local function precond_safe_job_patrol(se_obj, smart, job)
@@ -202,31 +168,14 @@ local function precond_safe_job_patrol(se_obj, smart, job)
 		return false
 	end
 
-	if smart.smart_alarm_time == nil then
-		return true
-	end
-
-	if smart.safe_restr == nil then
-		return true
-	end
-
-	if not (job.precondition_params) then 
-		return true 
-	end
-
-	-- should probably remove, irrelevant in 1.6
-	-- if job.precondition_params.is_safe_job == nil then
-		-- job.precondition_params.is_safe_job = xr_gulag.job_in_restrictor(smart, smart.safe_restr, string.gsub(job.section,"logic@","",1))
-	-- end
-
-	return job.precondition_params.is_safe_job ~= false
+	return smart.smart_alarm_time == nil
 end
 
 local function precond_collector(se_obj, smart, job)
 	local st = db.storage[se_obj.id]
-	local npc = st and st.object or level.object_by_id(se_obj.id)
+	local npc = st and st.object
 
-	if npc == nil then
+	if not (npc) then
 		return false
 	end
 
@@ -251,24 +200,7 @@ local function precond_animpoint(se_obj, smart, job)
 end
 
 local function precond_safe_job_guard(se_obj, smart, job)
-	if smart.smart_alarm_time == nil then
-		return true
-	end
-
-	if smart.safe_restr == nil then
-		return true
-	end
-
-	if not (job.precondition_params) then 
-		return true 
-	end 
-	
-	-- should probably remove, irrelevant in 1.6
-	-- if job.precondition_params.is_safe_job == nil then
-		-- job.precondition_params.is_safe_job = xr_gulag.job_in_restrictor(smart, smart.safe_restr, string.gsub(job.section,"logic@","",1))
-	-- end
-
-	return job.precondition_params.is_safe_job ~= false
+	return smart.smart_alarm_time == nil
 end
 
 local function precond_guard_follower(se_obj, smart, job, npc_info)
@@ -1252,6 +1184,7 @@ end
 -- LOAD SMART JOBS
 -- called in smart_terrain.script
 ---------------------------------------------------------------------------------------
+local str_builder = {}
 function load_job(smart)
 	-- Reset Unique ID counter for each smart_terrain
 	ids = 0
@@ -1262,9 +1195,8 @@ function load_job(smart)
 
 	local gname = smart:name()
 	
-	ltx_size = 0
-	local ltx = {}
-	ltx[1] = [[
+	ltx_size = 1
+	str_builder[1] = [[
 [meet@generic_lager]
 close_distance                 = {=is_wounded} 0, {!is_squad_commander} 0, {!after_first_meet !actor_friend =actor_has_weapon} 3, 3
 close_anim                     = {=is_wounded} nil, {!is_squad_commander} nil, {=actor_has_weapon} nil, talk_default
@@ -1309,26 +1241,26 @@ use_text                       = nil
 	local heli_jobs = {}
 
 	-- create heli jobs 
-	init_heli_move_jobs(smart,heli_jobs,gname,ltx)
-	init_heli_move_point_jobs(smart,heli_jobs,gname,ltx)
-	init_heli_hide_jobs(smart,heli_jobs,gname,ltx)
+	init_heli_move_jobs(smart,heli_jobs,gname,str_builder)
+	init_heli_move_point_jobs(smart,heli_jobs,gname,str_builder)
+	init_heli_hide_jobs(smart,heli_jobs,gname,str_builder)
 	
 	-- create stalker jobs
-	init_campfire_point_jobs(smart,stalker_jobs,gname,ltx)
-	init_generic_point_jobs(smart,stalker_jobs,gname,ltx)
-	init_surge_jobs(smart,stalker_jobs,gname,ltx)
-	init_sleep_jobs(smart,stalker_jobs,gname,ltx)
-	init_collector_jobs(smart,stalker_jobs,gname,ltx)
-	init_walker_jobs(smart,stalker_jobs,gname,ltx)
-	init_patrol_jobs(smart,stalker_jobs,gname,ltx)
-	init_animpoint_jobs(smart,stalker_jobs,gname,ltx)
-	init_guard_jobs(smart,stalker_jobs,gname,ltx)
-	init_sniper_jobs(smart,stalker_jobs,gname,ltx)
-	init_camper_jobs(smart,stalker_jobs,gname,ltx)
-	init_beh_jobs(smart,stalker_jobs,gname,ltx)
+	init_campfire_point_jobs(smart,stalker_jobs,gname,str_builder)
+	init_generic_point_jobs(smart,stalker_jobs,gname,str_builder)
+	init_surge_jobs(smart,stalker_jobs,gname,str_builder)
+	init_sleep_jobs(smart,stalker_jobs,gname,str_builder)
+	init_collector_jobs(smart,stalker_jobs,gname,str_builder)
+	init_walker_jobs(smart,stalker_jobs,gname,str_builder)
+	init_patrol_jobs(smart,stalker_jobs,gname,str_builder)
+	init_animpoint_jobs(smart,stalker_jobs,gname,str_builder)
+	init_guard_jobs(smart,stalker_jobs,gname,str_builder)
+	init_sniper_jobs(smart,stalker_jobs,gname,str_builder)
+	init_camper_jobs(smart,stalker_jobs,gname,str_builder)
+	init_beh_jobs(smart,stalker_jobs,gname,str_builder)
 
 	-- create monster jobs
-	init_monster_jobs(smart,monster_jobs,gname,ltx)
+	init_monster_jobs(smart,monster_jobs,gname,str_builder)
 
 	-- reference newly created job tables
 	smart.stalker_jobs = stalker_jobs
@@ -1359,7 +1291,9 @@ use_text                       = nil
 	table.sort(smart.heli_jobs,		function(a,b) return get_job_prior(a) > get_job_prior(b) end)
 
 	-- generate the INI file
-	db.dynamic_ltx[gname] = create_ini_file(table.concat(ltx,"\n"))
+	db.dynamic_ltx[gname] = create_ini_file(table.concat(str_builder,"\n"))
 	smart.ltx = db.dynamic_ltx[gname]
 	smart.ltx_name = "*"..gname
+	
+	iempty_table(str_builder)
 end
