@@ -272,7 +272,7 @@ local function init_campfire_point_jobs(smart,stalker_jobs,gname,ltx)
 	local max_jobs = smart.max_population > 0 and smart.max_population*3 or 1
 	for i=1, max_jobs do
 		local name = gname.."_campfire_point_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 0})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 0}
 		
 		local job_ltx = [[
 [logic@%s]
@@ -304,7 +304,7 @@ local function init_generic_point_jobs(smart,stalker_jobs,gname,ltx)
 	local max_jobs = smart.max_population > 0 and smart.max_population*3 or 1
 	for i=1, max_jobs do
 		local name = gname.."_point_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 1})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 1}
 		
 		local job_ltx = [[
 [logic@%s]
@@ -338,7 +338,7 @@ anim = {!npc_community(zombied)} sit_ass, guard
 	local i = 1
 	while level.patrol_path_exists(gname.."_surge_"..i.."_walk") do
 		local name = gname.."_surge_"..i.."_walk"
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 2})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 2}
 
 		local job_ltx = [[
 [logic@%s]
@@ -380,7 +380,7 @@ def_state_moving = {=dist_to_job_point_ge(25)} sprint, {=dist_to_job_point_ge(5)
 	local i = 1
 	while level.patrol_path_exists(gname.."_sleep_"..i) do
 		local name = gname.."_sleep_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 3})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 3}
 
 		local job_ltx = [[
 [logic@%s]
@@ -414,7 +414,7 @@ local function init_collector_jobs(smart,stalker_jobs,gname,ltx)
 	local i = 1
 	while level.patrol_path_exists(gname.."_collector_"..i.."_walk") do
 		local name = gname.."_collector_"..i.."_walk"
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 4})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 4}
 
 		local job_ltx = [[
 [logic@%s]
@@ -456,7 +456,7 @@ local function init_walker_jobs(smart,stalker_jobs,gname,ltx)
 	local i = 1
 	while level.patrol_path_exists(gname.."_walker_"..i.."_walk") do
 		local name = gname.."_walker_"..i.."_walk"
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name,	job_type_id = 5})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name,	job_type_id = 5}
 
 		local job_ltx = [[
 [logic@%s]
@@ -507,7 +507,7 @@ local function init_patrol_jobs(smart,stalker_jobs,gname,ltx)
 		end
 
 		for n = 1, job_count do
-			rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 6})
+			stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 6}
 		end
 
 		local job_ltx = [[
@@ -549,7 +549,7 @@ local function init_animpoint_jobs(smart,stalker_jobs,gname,ltx)
 	local i = 1
 	while se_smart_cover.registered_smartcovers[gname.."_animpoint_"..i] ~= nil do
 		local name = gname.."_animpoint_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 7})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 7}
 
 		local job_ltx = [[
 [logic@%s]
@@ -583,7 +583,7 @@ cover_name = %s
 	i = 1
 	while se_smart_cover.registered_smartcovers[gname.."_surge_animpoint_"..i] ~= nil do
 		local name = gname.."_surge_animpoint_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 8})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 8}
 
 		local job_ltx = [[
 [logic@%s]
@@ -619,8 +619,8 @@ local function init_guard_jobs(smart,stalker_jobs,gname,ltx)
 	local guard_timeout
 	while level.patrol_path_exists(gname.."_guard_"..i.."_walk") do
 		local name = gname.."_guard_"..i.."_walk"
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name,	job_type_id = 9})
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@follower_"..name, job_type_id = 10}) --, precondition_params = { changing_job = "logic@"..name }, precondition_function = precond_guard_follower})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name,	job_type_id = 9}
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@follower_"..name, job_type_id = 10} --, precondition_params = { changing_job = "logic@"..name }, precondition_function = precond_guard_follower})
 
 		local job_ltx = [[
 [logic@%s]
@@ -750,7 +750,7 @@ local function init_sniper_jobs(smart,stalker_jobs,gname,ltx)
 	local i = 1
 	while level.patrol_path_exists(gname.."_sniper_"..i.."_walk") do
 		local name = gname.."_sniper_"..i.."_walk"
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 11})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 11}
 
 		ptr = patrol(name)
 		wp_prop = utils.parse_waypoint_data(name, ptr:flags(0), ptr:name(0))
@@ -814,7 +814,7 @@ local function init_camper_jobs(smart,stalker_jobs,gname,ltx)
 	local i = 1
 	while level.patrol_path_exists(gname.."_camper_"..i.."_walk") do
 		local name = gname.."_camper_"..i.."_walk"
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 12})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 12}
 
 		ptr = patrol(name)
 		wp_prop = utils.parse_waypoint_data(name, ptr:flags(0), ptr:name(0))
@@ -879,7 +879,7 @@ local function init_beh_jobs(smart,stalker_jobs,gname,ltx)
 	local i = 1
 	while beh_ini:section_exist(gname.."_beh_"..i) do
 		local name = gname.."_beh_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 13})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 13}
 
 		local job_ltx = [[
 [logic@%s]
@@ -906,7 +906,7 @@ meet = meet@generic_lager
 	i = 1
 	while beh_ini:section_exist(gname.."_beh_surge_"..i) do
 		local name = gname.."_beh_surge_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 14})
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 14}
 
 		local job_ltx = [[
 [logic@%s]
@@ -931,8 +931,8 @@ meet = meet@generic_lager
 	i = 1
 	while beh_ini:section_exist(gname.."_beh_trade_"..i) do
 		local name = gname.."_beh_trade_"..i
-		rawset(stalker_jobs,#stalker_jobs+1,{section = "logic@"..name, job_type_id = 15})
-
+		stalker_jobs[#stalker_jobs+1] = {section = "logic@"..name, job_type_id = 15}
+		
 		local job_ltx = [[
 [logic@%s]
 active = beh@%s
@@ -957,7 +957,7 @@ local function init_monster_jobs(smart,monster_jobs,gname,ltx)
 	local max_jobs = smart.max_population > 0 and smart.max_population*4 or 1
 	for i=1, max_jobs do
 		local name = gname.."_home_"..i
-		rawset(monster_jobs,#monster_jobs+1,{section = "logic@"..name, job_type_id = 16})
+		monster_jobs[#monster_jobs+1] = {section = "logic@"..name, job_type_id = 16}
 
 		local job_ltx = [[
 [logic@%s]
@@ -985,7 +985,7 @@ local function init_heli_move_jobs(smart,heli_jobs,gname,ltx)
 	local i = 1
 	while level.patrol_path_exists(gname.."_heli_"..i.."_fly") do
 		local name = gname.."_heli_"..i.."_fly"
-		rawset(heli_jobs,#heli_jobs+1,{section = "logic@"..name, job_type_id = 17})
+		heli_jobs[#heli_jobs+1] = {section = "logic@"..name, job_type_id = 17}
 
 		local job_ltx = [[
 [logic@%s]
@@ -1043,8 +1043,7 @@ mute 			  = true
 	-- increase if you want more then 1 heli hide job per smart
 	for i=1, 1 do
 		local name = gname.."_heli_"..i.."_hide"
-
-		rawset(heli_jobs,#heli_jobs+1,{section = "logic@"..name, job_type_id = 18})
+		heli_jobs[#heli_jobs+1] = {section = "logic@"..name, job_type_id = 18}
 
 		local job_ltx = [[
 [logic@%s]
@@ -1077,7 +1076,7 @@ local function init_heli_move_point_jobs(smart,heli_jobs,gname,ltx)
 	-- default heli job for all smarts 
 	local i = 1
 	local name = gname.."_heli_"..i.."_point"
-	rawset(heli_jobs,#heli_jobs+1,{section = "logic@"..name, job_type_id = 19})
+	heli_jobs[#heli_jobs+1] = {section = "logic@"..name, job_type_id = 19}
 
 	local job_ltx = [[
 [logic@%s]
@@ -1196,7 +1195,7 @@ function load_job(smart)
 	local gname = smart:name()
 	
 	ltx_size = 1
-	str_builder[1] = [[
+	str_builder[ltx_size] = [[
 [meet@generic_lager]
 close_distance                 = {=is_wounded} 0, {!is_squad_commander} 0, {!after_first_meet !actor_friend =actor_has_weapon} 3, 3
 close_anim                     = {=is_wounded} nil, {!is_squad_commander} nil, {=actor_has_weapon} nil, talk_default
