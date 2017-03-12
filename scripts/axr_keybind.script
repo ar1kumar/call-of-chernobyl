@@ -315,7 +315,7 @@ end
 -------------------------------------------
 -- callbacks
 -------------------------------------------
-local function on_key_release(key)
+function on_key_release(key)
 	for k,v in pairs(keybinds) do 
 		if (action[k]) then 
 			if (key_bindings[v]) then 
@@ -329,7 +329,7 @@ local function on_key_release(key)
 	end 
 end
 
-local function on_key_press(key)
+function on_key_press(key)
 	--printf("kCUSTOM1=%s key=%s dik_to_bind=%s",key_bindings.kCUSTOM1,key,dik_to_bind(key))
 	for k,v in pairs(keybinds) do 
 		if (action[k]) then 
@@ -344,7 +344,7 @@ local function on_key_press(key)
 	end 
 end
 
-local function on_key_hold(key)
+function on_key_hold(key)
 	for k,v in pairs(keybinds) do 
 		if (action[k]) then 
 			if (key_bindings[v]) then 
