@@ -389,22 +389,20 @@ function move_mgr:update_movement_state()
 		return
 	end
 
-	--[[
 	--printf("%s UPDATE movement state to %s", self.object:name(), self.cur_state_moving)
-	if (not self.__climb_enabled and self.current_point_index and self.current_point_index > 0) then
+	--[[
+	if (self.current_point_index and self.current_point_index > 0) then
 		local a = self.patrol_walk:point(self.current_point_index)
-		local b = self.patrol_walk:point(self.current_point_index-1)
+		local b = a and self.patrol_walk:point(self.current_point_index-1)
 		if (a and b) then
-			local angle = alun_utils.angle_diff(b,a)
+			local angle = utils.angle_diff(b,a)
 			--printf("angle=%s",angle)
-			if (angle >= 90) then
+			if (angle >= 85) then
 				state_mgr.set_state(self.object,"climb")
-				self.__climb_enabled = true
 				return
 			end
 		end
 	end
-	self.__climb_enabled = nil
 	--]]
 
 	state_mgr.set_state(self.object, self.cur_state_moving,nil, nil, nil, { fast_set = true})

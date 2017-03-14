@@ -2268,7 +2268,7 @@ function actor_look_away(actor,npc)
 	if not (db.actor) then 
 		return false 
 	end
-	if (not db.actor:see(npc) or (alun_utils.angle_diff(db.actor:direction(), db.actor:position():sub(npc:position()))<90 and npc:position():distance_to(db.actor:position()) > 2.5) or npc:position():distance_to(db.actor:position())>100) then
+	if (not db.actor:see(npc) or (utils.angle_diff(db.actor:direction(), db.actor:position():sub(npc:position()))<90 and npc:position():distance_to(db.actor:position()) > 2.5) or npc:position():distance_to(db.actor:position())>100) then
 		return true
 	end
 	return false

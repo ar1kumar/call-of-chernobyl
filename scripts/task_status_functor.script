@@ -7,6 +7,7 @@
 ----------------------------------------------------------------------------------------------
 -- checks smart from pstor variable
 function check_smart_under_faction_control(tsk,task_id)
+	--printf("task_id = %s",task_id)
 	if not (db.actor) then 
 		return 
 	end
@@ -72,18 +73,7 @@ function check_smart_under_faction_control(tsk,task_id)
 	--]]
 	
 	if (smart.faction_controlled) then
-		local a_to_f = {	["actor_stalker"] = "stalker",
-							["actor_bandit"] = "bandit",
-							["actor_ecolog"] = "ecolog",
-							["actor_dolg"] = "dolg",
-							["actor_freedom"] = "freedom",
-							["actor_monolith"] = "monolith",
-							["actor_army"] = "army",
-							["actor_killer"] = "killer",
-							["actor_csky"] = "csky"
-		}
-		
-		smart.faction = a_to_f[character_community(db.actor)] or smart.faction
+		smart.faction = character_community(db.actor):sub(7)
 	end
 	
 	return "complete"	

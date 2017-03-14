@@ -18,19 +18,19 @@ Notes:
 -----------------------------------------------------
    Job                  |   Prior
 -----------------------------------------------------
-surge                     			60
+animpoint                  			15
+beh                        			30
 beh_surge                  			60
 camper                     			45
-sniper                     			30
-beh                        			30
+campfire_point						10
 collector                  			25
+cover 								3
 guard                     			25
 patrol                     			25 (-1 per follower)
 sleep                     			20
+sniper                     			30
+surge                     			60
 walker                     			15
-animpoint                  			15
-campfire_point						10
-cover 								3
 
 So if you want an exclusive job to ignore the priority of all other jobs set prior at 61+
 If you want an exclusive job to take priority over all other jobs except surge jobs, set prior at 50.
@@ -38,11 +38,32 @@ Exclusive jobs should be used for jobs you want everyone else locked out of, suc
 They are also useful for filling up jobs with a specific character or squad type. Like a faction smart.
 
 
-2. Never use the same logic section names (ie. 'logic@walker_1') between exclusive jobs and auto-generated jobs for each smart.
+2. Never use the same logic section names (ex. 'logic@walker_1') between exclusive jobs and auto-generated jobs for each smart.
 There is a table that a smart_terrain uses called 'npc_by_job_section' which would require that every logic section is uniquely named.
 To avoid this simply give exclusive jobs a prefix, like 'logic@exclusive_walker_1_walk_1'
 
 3. Squad smart max population should be based on sim squad count multiplied by 3. Do not count jobs for squads with target_smart as a field in squad descriptions.
+--]]
+
+-- Naming Conventions for dynamic gulag jobs
+--[[
+	animpoint		- <smart>_animpoint_<index>   		(ex. yan_smart_terrain_4_6_animpoint_1)
+	animpoint_surge - <smart>_surge_animpoint_<index>	(ex. yan_smart_terrain_4_6_surge_animpoint_1)
+	beh 			- <smart>_beh_<index>				(ex. esc_smart_terrain_1_5_beh_1)
+	beh_surge 		- <smart>_beh_surge_<index>			(ex. esc_smart_terrain_1_5_beh_surge_1)
+	beh_trader 		- <smart>_beh_trade_<index>			(ex. esc_smart_terrain_1_5_beh_trade_1)
+	camper 			- <smart>_camper_<index>_walk		(ex. yan_smart_terrain_4_6_camper_1_walk)			look path: yan_smart_terrain_4_6_camper_1_look
+	campfire_point 	- <smart>_campfire_point_<index>	(ex. yan_smart_terrain_4_6_campfire_point_1)
+	cover 			- <smart>_point_<index>				(ex. yan_smart_terrain_4_6_point_1)
+	collector 		- <smart>_collector_<index>_walk 	(ex. yan_smart_terrain_4_6_collector_1_walk) 		look path: yan_smart_terrain_4_6_collector_1_look
+	guard			- <smart>_guard_<index>_walk 		(ex. yan_smart_terrain_4_6_guard_1_walk) 			look path: yan_smart_terrain_4_6_guard_1_look
+	mob_home		- <smart>_home_<index>				(ex. yan_smart_terrain_4_6_home_1)
+	patrol 			- <smart>_patrol_<index>_walk		(ex. yan_smart_terrain_4_6_patrol_1_walk) 			look path: yan_smart_terrain_4_6_patrol_1_look
+	point 			- <smart>_point_<index> 	 		(ex. yan_smart_terrain_4_6_point_1)
+	sleeper			- <smart>_sleep_<index> 			(ex. yan_smart_terrain_4_6_sleep_1)
+	sniper			- <smart>_sniper_<index>_walk		(ex. yan_smart_terrain_4_6_sniper_1_walk) 			look path: yan_smart_terrain_4_6_sniper_1_look	 
+	surge 			- <smart>_surge_<index>_walk		(ex. yan_smart_terrain_4_6_surge_1_walk) 			look path: yan_smart_terrain_4_6_surge_1_look		
+	walker 			- <smart>_walker_<index>_walk		(ex. yan_smart_terrain_4_6_walker_1_walk) 			look path: yan_smart_terrain_4_6_walker_1_look
 --]]
 
 -- HOW TO ADD HELI JOBS:
@@ -72,21 +93,20 @@ local ltx_size = 0
 local beh_ini
 local ids = 0
 local job_type_by_scheme = {
-	["walker"]      	= "path_job",
-	["camper"]      	= "path_job",
-	["patrol"]      	= "path_job",
 	["animpoint"]   	= "smartcover_job",
-	["smartcover"]  	= "smartcover_job",
-	["remark"]      	= "point_job",
+	["beh"]         	= "point_job",
+	["camper"]      	= "path_job",
+	["companion"]   	= "point_job",
 	["cover"]       	= "point_job",
-	["sleeper"]     	= "path_job",
-	["mob_walker"]  	= "path_job",
+	["heli_move"]		= "heli_path_job",
 	["mob_home"]    	= "path_job",
 	["mob_jump"]    	= "point_job",
-	["companion"]   	= "point_job",
-	["beh"]         	= "point_job",
-	["campfire_point"] 	= "point_job",
-	["heli_move"]		= "heli_path_job"
+	["mob_walker"]  	= "path_job",
+	["patrol"]      	= "path_job",
+	["remark"]      	= "point_job",
+	["sleeper"]     	= "path_job",
+	["smartcover"]  	= "smartcover_job",
+	["walker"]      	= "path_job"
 }
 
 function get_job_prior(job)

@@ -651,16 +651,6 @@ function switch_offline(id)
 	end
 end
 
--------------------
-function angle_diff(a1, a2)
-  local b1=a1:normalize()
-  local b2=a2:normalize()
-  local dotp=b1:dotproduct(b2)
-  return utils.rad2deg(math.acos(dotp))
-end
-
-
-
 -------------------------------------------------------- DEBUG FUNCTION -------------------------------------------------
 function debug_nearest(npc,msg,...)
 	local dbg = xrs_debug_tools.get_debug_npc()

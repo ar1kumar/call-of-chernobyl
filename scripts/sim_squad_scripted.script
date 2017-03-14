@@ -36,6 +36,7 @@ function sim_squad_scripted:__init(section) super (section)
 	--if (USE_MARSHAL) then
 	--	RegisterScriptCallback("save_state",self.save_state,self)
 	--end
+	self.first_update 		= false
 end
 
 function sim_squad_scripted:init_squad()
@@ -124,6 +125,11 @@ end
 function sim_squad_scripted:update()
 	--alun_utils.debug_write("sim_squad_scripted:update START")
 	cse_alife_online_offline_group.update(self)
+	
+	if not (self.first_update) then 
+		self.first_update = true 
+		
+	end
 
 	self:refresh()
 	
