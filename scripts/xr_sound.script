@@ -11,13 +11,17 @@ sound_table = {}
 function set_sound_play(npc_id, sound, faction, point)
 	if not (sound and sound_theme.theme[sound]) then
 		callstack()
-		printf("set_sound_play. Wrong sound theme [%s], npc[%s]", tostring(sound), npc_id)
+		printf("set_sound_play. Wrong sound theme [%s], npc[%s]",sound,npc_id)
 		return
 	end
 	
 	local snd_theme = sound_theme.theme[sound]
 	if snd_theme.class_id == "looped_sound" then
 		printf("You trying to play sound [%s] which type is looped", sound)
+	end
+	
+	if (snd_theme.class_id == "npc_sound" and npc_id == 0) or (snd_theme.class_id == "actor_sound" and npc_id ~= 0) then 
+		printf("set_sound_play. Trying to play wrong type. %s is %s",sound,snd_theme.class_id)
 	end
 	
 	if sound_table[npc_id] == nil or snd_theme.play_always == true then

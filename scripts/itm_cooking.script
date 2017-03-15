@@ -105,7 +105,7 @@ function add_fuel(stove_obj,fuel_obj)
 	if not (fuel_obj) then 
 		local function find_fuel(temp, item)
 			if (item:section() == "charcoal") then
-				if (fuel_obj == nil or fuel_obj:get_remaining_uses() > item:get_remaining_uses()) then
+				if (fuel_obj == nil or item:get_remaining_uses() <= fuel_obj:get_remaining_uses()) then
 					fuel_obj = item
 				end
 			end
@@ -124,6 +124,7 @@ function add_fuel(stove_obj,fuel_obj)
 				alife():release(se_obj,true)
 			end
 		end
+		get_hud():UpdateActorMenu()
 	end
 end
 
