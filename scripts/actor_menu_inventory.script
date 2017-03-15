@@ -55,10 +55,12 @@ function CInventory_ItemAvailableToTrade(npc,item)
 	-- if (xr_corpse_detection.lootable_table[item:section()]) then 
 		-- return true
 	-- end
-	if (npc:has_info("npcx_is_companion") and actor_menu.dead_body_searching == true) then
-		local m_data = alife_storage_manager.get_state()
-		if (m_data and m_data.companion_borrow_item and m_data.companion_borrow_item[item:id()]) then
-			return true
+	if (npc:has_info("npcx_is_companion")) then
+		if (ActorMenu.get_menu_mode() == 4) then
+			local m_data = alife_storage_manager.get_state()
+			if (m_data and m_data.companion_borrow_item and m_data.companion_borrow_item[item:id()]) then
+				return true
+			end
 		end
 		return false
 	else
@@ -71,7 +73,7 @@ end
 function CUIActorMenu_CanMoveToPartner(obj,itm,actor_weight,partner_weight,item_weight,partner_total_weight,partner_max_carry_weight)
 	--printf("%s [%s actor_weight=%s partner_weight=%s item_weight=%s partner_total_weight=%s partner_max_carry_weight=%s]",obj:name(),itm:name(),actor_weight,partner_weight,item_weight,partner_total_weight,partner_max_carry_weight)
 	
-	if (actor_menu.dead_body_searching and IsStalker(obj) and obj:has_info("npcx_is_companion") and partner_total_weight >= 100) then 
+	if (ActorMenu.get_menu_mode() == 4 and IsStalker(obj) and obj:has_info("npcx_is_companion") and partner_total_weight >= 100) then 
 		return false
 	end
 	

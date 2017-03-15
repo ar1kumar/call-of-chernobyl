@@ -193,7 +193,7 @@ end
 function container_binder:update(delta)
     object_binder.update(self, delta)
 	-- If actor menu is in dead body search mode then check if it's our ID; if so calculate_weight
-	if (actor_menu.dead_body_searching and curBoxID == self.object:id()) then
+	if (ActorMenu.get_menu_mode() == 4 and curBoxID == self.object:id()) then
 		local se_inv_box = containers[curBoxID] and containers[curBoxID].id and alife_object(containers[curBoxID].id)
 		if (se_inv_box) then
 			self.object:set_weight(calculate_weight(se_inv_box,system_ini():r_float_ex(self.object:section(),"inv_weight")))
