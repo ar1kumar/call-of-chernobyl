@@ -867,8 +867,10 @@ function debug_ui:FillList(name)
 			if (is_squad) then
 				_itm.no_id = true
 				_itm.squad = true
+				_itm.spawn_at_look = true
 			elseif (cant_spawn_actor) then
 				_itm.no_id = true
+				_itm.spawn_at_look = true
 			elseif (is_veh) then 
 				_itm.no_id = true
 				_itm.spawn_at_look = true
@@ -978,18 +980,17 @@ function debug_ui:OnButton_create_clicked()
 	end
 
 	local pos, lvid, gvid
-	
-	if (item.spawn_at_look) then 
+	if (self.spawn_pos) then
+		pos = self.spawn_pos
+		lvid = self.spawn_lvid
+		gvid = self.spawn_gvid
+	elseif (item.spawn_at_look) then 
 		gvid = db.actor:game_vertex_id()
 		local r = level.get_target_dist and level.get_target_dist() or 3
 		pos = vector():set(db.actor:position())
 		pos:add(device().cam_dir:mul(r))
 		pos = vector():set(pos.x,db.actor:position().y,pos.z)
 		lvid = level.vertex_id(pos)
-	elseif (self.spawn_pos) then
-		pos = self.spawn_pos
-		lvid = self.spawn_lvid
-		gvid = self.spawn_gvid
 	else
 		pos = db.actor:position()
 		lvid = db.actor:level_vertex_id()
