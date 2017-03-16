@@ -849,8 +849,7 @@ function WeatherManager:save_state(m_data)
 	m_data.weather_manager.period = self.period
 	m_data.weather_manager.last_period_change_hour = self.last_period_change_hour
 	m_data.weather_manager.next_period_change_hour = self.next_period_change_hour
-	--TODO: Load as table but it will require newgame
-	m_data.weather_manager.state = self:get_state_as_string() or ""
+	m_data.weather_manager.state = self.state --self:get_state_as_string() or ""
 	m_data.weather_manager.update_time = self.update_time
 	
 	if (level.is_wfx_playing()) then
@@ -872,8 +871,7 @@ function WeatherManager:load_state(m_data)
 	self.period = m_data.weather_manager.period
 	self.last_period_change_hour = m_data.weather_manager.last_period_change_hour
 	self.next_period_change_hour = m_data.weather_manager.next_period_change_hour
-	--TODO: Store as table but it will require newgame
-	self:set_state_as_string(m_data.weather_manager.state or "")
+	self.state = m_data.weather_manager.state or self.state or {}
 	self.update_time = m_data.weather_manager.update_time
 	self.weather_fx = m_data.weather_manager.weather_fx
 	self.wfx_time = m_data.weather_manager.weather_fx_time or 0
