@@ -1466,7 +1466,7 @@ function se_smart_terrain:target_precondition(squad, ignore_population, skip_pro
 			end
 	
 			-- surge
-			if (xr_conditions.surge_started()) then
+			if (squad.player_id ~= "monolith" and xr_conditions.surge_started()) then
 				if (self.props.surge > 0) then 
 					return true 
 				end

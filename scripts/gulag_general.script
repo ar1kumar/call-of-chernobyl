@@ -157,7 +157,7 @@ local function precond_heli(se_obj,smart,job)
 end
 
 local function precond_surge(se_obj, smart, job)
-	if se_obj:community() == "zombied" then
+	if se_obj:community() == "zombied" or se_obj:community() == "monolith" then
 		return false
 	end
 	return xr_conditions.surge_started()

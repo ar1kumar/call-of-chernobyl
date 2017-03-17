@@ -182,7 +182,7 @@ function action_reach_task_location:single_execute(se_obj)
 	end
 end
 
-function action_reach_task_location:fake_target(squad)
+function action_reach_task_location:fake_target(squad,is_monolith)
 	
 	if (self.st.timer and time_global() < self.st.timer) then 
 		return 
@@ -224,9 +224,14 @@ function action_reach_task_location:fake_target(squad)
 	
 	self.st.animation = self.st.animation or state_mgr_animation.animation(npc, { animstate = { states = {anim_marker = nil } } }, "state_mgr_animation_list")
 	
-	local anims = {"idle","hide","idle_chasovoy","caution"}
-	local state = anims[math.random(#anims)]
-	
+	local state 
+	if (is_monolith) then 
+		state = "trans_0"
+	else 
+		local anims = {"idle","hide","idle_chasovoy","caution"}
+		state = anims[math.random(#anims)]
+	end
+
 	self.st.animation:set_state(nil,true)
 	self.st.animation:set_control()	
 	self.st.animation:set_state(state)
@@ -261,6 +266,35 @@ function action_reach_task_location:commander_execute(squad)
 	
 	npc:set_sight(look.path_dir,nil,0)
 	
+	local mov_type = 0
+	if (squad.player_id ~= "zombied") then
+		if (xr_conditions.surge_started()) then
+			if not(db.storage[npc:id()].surge_timer) then
+				db.storage[npc:id()].surge_timer = time_global() + math.random(3000,10000)
+			end
+			if (db.storage[npc:id()].surge_timer and time_global() > db.storage[npc:id()].surge_timer) then
+				if (squad.player_id == "monolith") then
+					self:fake_target(squad,true)
+					return
+				end
+				mov_type = 2
+			elseif (squad.player_id ~= "monolith") then
+				mov_type = 1
+			end
+		else
+			db.storage[npc:id()].surge_timer = nil
+		end
+
+		if (squad_target:clsid() == clsid.online_offline_group_s) then
+			mov_type = 3
+		elseif (squad_target:clsid() == clsid.smart_terrain and SIMBOARD.smarts[squad_target.id] and SIMBOARD.smarts[squad_target.id].population > 0) then
+			if (squad.player_id == "dolg" and squad_target.props and squad_target.props.freedom > 0)
+			or (squad.player_id == "freedom" and squad_target.props and squad_target.props.dolg > 0) then
+				mov_type = 3
+			end
+		end
+	end
+	
 	local pos, lv_id, gv_id = squad_target:get_location()
 	if npc:game_vertex_id() ~= gv_id then
 		npc:set_path_type(game_object.game_path)
@@ -270,45 +304,20 @@ function action_reach_task_location:commander_execute(squad)
 		utils.send_to_nearest_accessible_vertex(npc,lv_id,"xr_reach_task:2")
 		npc:set_desired_position(pos)
 	end
-	
-	if (character_community(npc) ~= "zombied") then
-		if (xr_conditions.surge_started()) then
-			if not(db.storage[npc:id()].surge_timer) then
-				db.storage[npc:id()].surge_timer = time_global() + math.random(3000,10000)
-			end
-			if (db.storage[npc:id()].surge_timer and time_global() > db.storage[npc:id()].surge_timer) then
-				npc:set_mental_state(anim.panic)
-			else
-				npc:set_mental_state(anim.danger)
-			end
-			npc:set_movement_type(move.run)
-			return
-		else
-			db.storage[npc:id()].surge_timer = nil
-		end
 
-		local rush_to_target
-		if (squad_target:clsid() == clsid.online_offline_group_s) then
-			rush_to_target = true
-		elseif (squad_target:clsid() == clsid.smart_terrain and SIMBOARD.smarts[squad_target.id] and SIMBOARD.smarts[squad_target.id].population > 0) then
-			if (squad.player_id == "dolg" and squad_target.props and squad_target.props.freedom > 0)
-			or (squad.player_id == "freedom" and squad_target.props and squad_target.props.dolg > 0) then
-				rush_to_target = true
-			end
-		end
-	end
-
-	if squad.rush_to_target ~= nil then
-		rush_to_target = squad.rush_to_target
-	end
-
-	if (rush_to_target) then
+	if (mov_type == 3 or squad.rush_to_target) then 
 		npc:set_movement_type(move.run)
 		if (squad_target.position:distance_to_sqr(npc:position()) <= 10000) then
 			npc:set_mental_state(anim.danger)
 		else
 			npc:set_mental_state(anim.free)
 		end
+	elseif (mov_type == 2) then
+		npc:set_mental_state(anim.panic)
+		npc:set_movement_type(move.run)
+	elseif (mov_type == 1) then 
+		npc:set_mental_state(anim.danger)
+		npc:set_movement_type(move.run)
 	else
 		npc:set_movement_type(move.walk)
 		npc:set_mental_state(anim.free)
@@ -327,6 +336,10 @@ function action_reach_task_location:soldier_execute(squad)
 	if not (commander) then
 		npc:set_movement_type(move.stand)
 		return 
+	end
+	
+	if (state_mgr.get_state(commander) == "trans_0") then 
+		return self:fake_target(squad,true)
 	end
 	
 	if (commander:movement_type() == move.stand) then
