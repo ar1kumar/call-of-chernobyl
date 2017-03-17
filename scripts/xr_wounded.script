@@ -366,15 +366,9 @@ function reset_generic_scheme(npc,scheme,section,stype,st)
 	end
 end
 -- Функция чтения настроек. В нее передается секция, откуда их нужно читать.
-local wounded_by_state = {
-	[0] = "wounded_heavy",
-	[1] = "wounded_heavy_2",
-	[2] = "wounded_heavy_3"
-}
 
 function init_wounded(npc, ini, section, st, scheme)
 	--'printf("WOUNDED SECTION [%s][%s]", tostring(section), tostring(scheme))
-
 	if tostring(section) == st.wounded_section and
 		 tostring(section) ~= "nil"
 	then
@@ -386,7 +380,8 @@ function init_wounded(npc, ini, section, st, scheme)
 	local def = {}
 	local npc_community = character_community(npc)
 	if (npc_community == "monolith") then
-		local state = wounded_by_state[math.mod(npc:id(), 3)]
+		local wounded_by_state = {"wounded","wounded_heavy","wounded_heavy_2","wounded_heavy_3"}
+		local state = wounded_by_state[math.random(#wounded_by_state)]
 		def.hp_state			= "20|"..state.."@nil"
 		def.hp_state_see		= "20|"..state.."@nil"
 		def.psy_state			= ""
@@ -399,7 +394,6 @@ function init_wounded(npc, ini, section, st, scheme)
 		def.use_medkit			= true
 		def.enable_talk			= true
 		def.not_for_help		= false
-
 	elseif npc_community == "zombied" then
 		def.hp_state			= "40|wounded_zombie@nil"
 		def.hp_state_see		= "40|wounded_zombie@nil"
@@ -414,7 +408,8 @@ function init_wounded(npc, ini, section, st, scheme)
 		def.enable_talk			= true
 		def.not_for_help		= true
 	else
-		local state = wounded_by_state[math.mod(npc:id(), 3)]
+		local wounded_by_state = {"wounded","wounded_heavy","wounded_heavy_2","wounded_heavy_3"}
+		local state = wounded_by_state[math.random(#wounded_by_state)]
 		def.hp_state			= "20|"..state.."@help_heavy"
 		def.hp_state_see		= "20|"..state.."@help_heavy"
 		def.psy_state			= "20|{=best_pistol}psy_armed,psy_pain@wounded_psy|20|{=best_pistol}psy_shoot,psy_pain@{=best_pistol}wounded_psy_shoot,wounded_psy"

@@ -35,12 +35,17 @@ local function on_game_load()
 	if (caches_count > 0) then
 		return
 	end
+	
+	local ignore_list = {
+		["bar_inv_box"] = true,
+		["bar_inventory_box_2"] = true
+	}
 
 	local sim = alife()
 	for i=1, 65534 do
 		local se_obj = sim:object(i)
 		if (se_obj) then
-			if (IsInvbox(nil,se_obj:clsid())) then
+			if (IsInvbox(nil,se_obj:clsid()) and not ignore_list[se_obj:name()]) then
 				caches[se_obj.id] = false
 				caches_count = caches_count + 1
 			--elseif (se_obj:spawn_ini() and se_obj:spawn_ini():section_exist("drop_box")) then 
