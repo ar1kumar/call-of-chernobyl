@@ -84,7 +84,7 @@ function slot_hud:__init() super()
 	self.slot = {}
 	self.ini = system_ini()
 	
-	
+-- //	companions on hud
 	self.companion_info = {}
 	self._tmr 			= time_global()
 	self.color_codes = {
@@ -100,7 +100,7 @@ function slot_hud:__init() super()
 		GetARGB(255,0,0,255),
 		GetARGB(255,128,0,255),
 	}
-	
+--//	
 	self:InitControls()
 end
 
@@ -116,17 +116,25 @@ function slot_hud:InitControls()
 		self.slot[i]:InitTexture("ui\\ui_icon_equipment")
 	end
 	
+-- //	companions on hud
 	self.companion_listbox = xml:InitListBox("companion_wnd",self)
 	self.companion_listbox:SetFixedScrollBar(false)
 	self.companion_listbox:SetItemHeight(84)
 	local row_form = ui_companion_hud_row(self,xml)
 	row_form:SetWndSize(vector2():set(600,84))
 	self.companion_listbox:AddExistingItem(row_form)
+--//
+end
+
+function slot_hud:clear(cnt)
+	for i=cnt+1,5 do
+		self.slot[i]:Show(false)
+	end
 end
 
 function slot_hud:update_hud(item)
 	local cnt = 0
-	if (axr_main.config:r_value("mm_options","enable_hud_draw",1,false)) then
+	if (axr_main.config:r_value("mm_options","enable_hud_draw",1,false))==true then
 		for id, sec in pairs(belted_arts) do
 			cnt = cnt + 1
 			local x1 = (self.ini:r_float_ex(sec,"inv_grid_x")or 0)*50
@@ -137,10 +145,8 @@ function slot_hud:update_hud(item)
 			self.slot[cnt]:Show(true)
 		end
 	end
-	for i=cnt+1,5 do
-		self.slot[i]:Show(false)
-	end
-	
+	self:clear(cnt)
+
 	self.static_back:Show(cnt > 0)
 end
 
@@ -155,9 +161,9 @@ function slot_hud:Update()
 	CUIScriptWnd.Update(self)
 	local id_to_code = {}
 	local clist = axr_companions.list_actor_squad_by_id()
-	for i=1,6 do -- should be row*col from ui_companion_row
+	for i=1,8 do -- should be row*col from ui_companion_row
 		local se_obj = clist[i] and alife_object(clist[i])
-		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) then
+		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) and (axr_main.config:r_value("mm_options","enable_hud_draw",1,false)) == true then
 			local full_name = se_obj:character_name()
 			local name = string.gsub(full_name,"Junior","Jr.")
 			name = string.gsub(name,"Senior","Snr.")
@@ -180,7 +186,7 @@ function slot_hud:Update()
 			self.companion_info[i].icon_wnd:Show(true)
 			
 			self.companion_info[i].name_wnd:SetText(name)
-			self.companion_info[i].dist_wnd:SetText(string.format("%.2f", se_obj.position:distance_to(db.actor:position())))
+			self.companion_info[i].dist_wnd:SetText(string.format("%.2f M", se_obj.position:distance_to(db.actor:position())))
 
 			-- leader and relation status
 			local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife_object(se_obj.group_id)
@@ -220,6 +226,14 @@ function slot_hud:Update()
 			self.companion_info[i].dist_wnd:SetText("")
 		end
 	end
+	
+	if (axr_main.config:r_value("mm_options","enable_hud_draw",1,false)) == false then
+		if table.size(belted_arts) > 0 then
+			self:clear(0)
+--			deactivate_hud()
+		end
+	end
+	
 end
 
 class "ui_companion_hud_row" (CUIListBoxItem)
@@ -234,8 +248,8 @@ function ui_companion_hud_row:__init(owner,xml) super(owner,xml)
         ["icon_wnd"]        = {64,64,0,0,"ui\\ui_noise"},
         ["leader_wnd"]      = {is_widescreen and 8 or 10,10,0,0,"ui_minimap_squad_leader"},
 		["health_wnd"]      = {50,10,50,55,GetFontSmall()},
-		["dist_wnd"]        = {50,10,0,55,GetFontSmall()},
-        ["name_wnd"]        = {100,20,0,60,GetFontMedium()},
+		["dist_wnd"]        = {50,10,0,55,GetFontMedium()},
+        ["name_wnd"]        = {80,20,0,60,GetFontMedium()},
     }
     local function add_wnd(element)
         for wnd, v in pairs(wind) do
@@ -250,7 +264,7 @@ function ui_companion_hud_row:__init(owner,xml) super(owner,xml)
         end
     end
 --
-    for i=1,6 do
+    for i=1,8 do
         owner.companion_info[i] = {
             ["id"]              = nil,
             ["icon_wnd"]        = self:AddIconField(1),
@@ -262,7 +276,6 @@ function ui_companion_hud_row:__init(owner,xml) super(owner,xml)
  
 		add_wnd(i)
 
-		x = x + (is_widescreen and 125 or 150)
+		x = x + (is_widescreen and 84 or 100)
 	end
 end
-	

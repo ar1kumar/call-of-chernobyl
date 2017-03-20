@@ -6,7 +6,7 @@ local ini = ini_file("sr_teleport_sections.ltx")
 local SINGLETON = nil
 function create(obj,disable_msg,item)
 	SINGLETON = SINGLETON or msg_box_ui(obj,disable_msg,item)
-	SINGLETON:Reset()
+	SINGLETON:Reset(obj,disable_msg,item)
 	return SINGLETON
 end
 
@@ -31,43 +31,11 @@ function msg_box_ui:__init(obj,disable_msg,item) super()
 	self:SetWndRect(Frect():set(0,0,1024,768))
 	self:SetAutoDelete(true)
 	
-	self.name = obj and obj:name()
-	self.disable_msg = disable_msg
-	self.item = item
-
-	if (string.find(self.name,obj:id())) then
-		local story_name = story_objects.get_story_objects_registry():get_story_id(obj:id())
-		self.name = story_name or self.name
-	end
-
-	if (not self.name or not ini:section_exist(self.name)) then
-		printf("sr_teleport_sections.ltx: section doesn't exist %s",obj and obj:name())
-		return
-	end
-
-	local enable = ini:r_string_ex(self.name,"enable")
-	enable = enable and xr_logic.pick_section_from_condlist(db.actor,obj,xr_logic.parse_condlist(obj,"enable",self.name,enable))
-
-	if (enable ~= "true") then
-		local reject_on_disable = ini:r_bool_ex(self.name,"reject_on_disabled",false)
-		if (reject_on_disable) then
-			local warning = ini:r_string_ex(self.name,"warning")
-			if (warning) then
-				SetHudMsg(game.translate_string(warning),5)
-			end
-			self:InitCallBacks()
-			self:OnMsgCancel()
-		end
-		return
-	end
-	
-	self.obj = obj
-
 	self.message_box = CUIMessageBoxEx()
 	self:Register(self.message_box, "msg_box")
 
 	self:InitCallBacks()
-	self:InitControls()
+	self:InitControls(obj,disable_msg,item)
 end
 
 function msg_box_ui:__finalize()
@@ -75,11 +43,11 @@ function msg_box_ui:__finalize()
 	RemoveUniqueCall(on_update)
 end
 
-function msg_box_ui:Reset()
+function msg_box_ui:Reset(obj,disable_msg,item)
 	if (self.message_box and self.message_box:IsShown()) then 
 		self.message_box:HideDialog()
 	end
-	self:InitControls()
+	self:InitControls(obj,disable_msg,item)
 end
 
 function msg_box_ui:InitCallBacks()
@@ -176,7 +144,37 @@ function msg_box_ui:OnMsgCancel()
 	end
 end
 
-function msg_box_ui:InitControls()
+function msg_box_ui:InitControls(obj,disable_msg,item)
+	self.obj = obj
+	self.name = obj and obj:name()
+	self.disable_msg = disable_msg
+	self.item = item
+
+	if (string.find(self.name,obj:id())) then
+		local story_name = story_objects.get_story_objects_registry():get_story_id(obj:id())
+		self.name = story_name or self.name
+	end
+
+	if (not self.name or not ini:section_exist(self.name)) then
+		printf("sr_teleport_sections.ltx: section doesn't exist %s",obj and obj:name())
+		return
+	end
+
+	local enable = ini:r_string_ex(self.name,"enable")
+	enable = enable and xr_logic.pick_section_from_condlist(db.actor,obj,xr_logic.parse_condlist(obj,"enable",self.name,enable))
+
+	if (enable ~= "true") then
+		local reject_on_disable = ini:r_bool_ex(self.name,"reject_on_disabled",false)
+		if (reject_on_disable) then
+			local warning = ini:r_string_ex(self.name,"warning")
+			if (warning) then
+				SetHudMsg(game.translate_string(warning),5)
+			end
+			self:OnMsgCancel()
+		end
+		return
+	end
+	
 	if (self.disable_msg) then
 		if (not self.item or db.actor:object(self.item)) then
 			self:OnMsgOk()
