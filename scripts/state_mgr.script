@@ -11,7 +11,7 @@ combat_action_ids = {
 						-- basically if your scheme sets body/movement states manually and doesn't use set_state, then you need it here
 						[stalker_ids.action_combat_planner] = true,
 						[stalker_ids.action_danger_planner] = true,
-						[stalker_ids.action_anomaly_planner] = true,
+						--[stalker_ids.action_anomaly_planner] = true,
 						[xrs_facer.actid_facer] = true,
 						[xrs_facer.actid_steal_up_facer] = true,
 						[xr_danger.actid] = true
@@ -585,11 +585,9 @@ function bind_manager(object)
 	local combat_action_planner = cast_planner(action)
 	combat_action_planner:remove_action(stalker_ids.action_kill_enemy_if_not_visible)
 
-	action = manager:action(stalker_ids.action_anomaly_planner)
-	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
-
-	--local anomaly_action_planner = cast_planner(action)
-	--anomaly_action_planner:remove_action(stalker_ids.detect_anomaly)
+	-- Alun: As of Mar 3 2017 Anomaly Planner removed from engine
+	-- Remove anomaly_action_planner
+	-- manager:remove_action(stalker_ids.action_anomaly_planner)
 	 
 	action = manager:action(stalker_ids.action_danger_planner)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))

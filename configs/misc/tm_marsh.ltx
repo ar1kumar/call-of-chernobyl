@@ -109,14 +109,14 @@ descr = mar_base_stalker_barmen_task_3_text
 descr_functor = general_fetch_task
 job_descr = mar_base_stalker_barmen_task_3_about
 fetch_descr = mar_base_stalker_barmen_task_3_fetch_about
-fetch_func = %=setup_generic_fetch_task(mar_base_stalker_barmen_task_3_fetch:12:mutant_part_boar_chop:mutant_part_dog_meat:mutant_part_flesh_meat:mutant_part_psevdodog_meat:mutant_part_tushkano_meat)%
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_barmen_task_3_fetch:5:mutant_part_boar_chop:mutant_part_dog_meat:mutant_part_flesh_meat:mutant_part_psevdodog_meat:mutant_part_tushkano_meat)%
 stage_complete = 1
 ; precondition = true
-repeat_timeout = 86400
+repeat_timeout = 43200
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mar_base_stalker_barmen_task_3_fetch_finish
-on_complete = %=complete_task_inc_goodwill(50:csky) =reward_stash(true) =reward_item_cost_mult_and_remove(mar_base_stalker_barmen_task_3_fetch:12:12) =inc_task_stage(mar_base_stalker_barmen_task_3)%
+on_complete = %=complete_task_inc_goodwill(50:csky) =reward_stash(true) =reward_item_cost_mult_and_remove(mar_base_stalker_barmen_task_3_fetch:5:5) =inc_task_stage(mar_base_stalker_barmen_task_3)%
 
 
 ;--------------------------------------------------------------------------------------------------

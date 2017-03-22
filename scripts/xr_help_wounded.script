@@ -372,7 +372,6 @@ function add_to_binder(npc,char_ini,scheme,section,st,temp)
 
 	temp.action = action_help_wounded (npc:name(),"action_help_wounded", st)
 	temp.action:add_precondition(wp(stalker_ids.property_alive, true))
-	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
 	
 	temp.action:add_effect(wp(xr_evaluators_id.wounded_exist, false))
 	

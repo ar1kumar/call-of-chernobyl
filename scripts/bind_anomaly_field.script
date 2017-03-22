@@ -39,7 +39,7 @@ function anomaly_field_binder:net_spawn(se_abstract)
 	--]]
 	-- don't enable unless you realize that engine AI schemes to deal with anomalies is stupid and will not be supported
 	-- MAY CAUSE HUGE FPS DROP ON COP MAPS
-	--[[
+	
 	if (get_console():get_bool("ai_die_in_anomaly") == true) then
 		-- It causes HUGE fps drop on COP maps which is why it was probably cut
 		local ignore = { 
@@ -51,8 +51,7 @@ function anomaly_field_binder:net_spawn(se_abstract)
 			self.object:set_restrictor_type(4)
 		end
 	end
-	--]]
-	
+		
 	return true
 end
 

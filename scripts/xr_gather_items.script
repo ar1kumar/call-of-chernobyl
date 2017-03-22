@@ -521,33 +521,6 @@ function act_gather_itm:finalize()
 	action_base.finalize(self)
 end
 
-
-
-----------------------------------------------------------------------------------------------------------------------
--- Default EVALUATOR
-----------------------------------------------------------------------------------------------------------------------
-class "evaluator_gather_items" (property_evaluator)
-function evaluator_gather_items:__init(name, storage, npc) super (nil, name)
-	self.st = storage
-end
-function evaluator_gather_items:evaluate()
-	if true then 
-		return false 
-	end 
-	
-	local enabled = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.gather_items_enabled)
-	if (enabled ~= "true") then
-		return false
-	end
-
-	if (xr_conditions.surge_started() == true) then
-		return false
-	end
-
-	local items_to_pickup = self.object:is_there_items_to_pickup()
-	return items_to_pickup
-end
-
 ----------------------------------------------------------------------------------------------------------------------
 -- BINDER
 ----------------------------------------------------------------------------------------------------------------------
@@ -559,11 +532,6 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager()
 	
 	local wp = world_property
-
-	manager:remove_evaluator(stalker_ids.property_items)
-	manager:add_evaluator(stalker_ids.property_items,evaluator_gather_items("gather_items",st,npc))
-	--manager:add_evaluator(stalker_ids.property_items, property_evaluator_const(false))
-	
 	if (npc:character_community() == "zombied" or npc:section() == "actor_visual_stalker") then
 		manager:add_evaluator(evaid,property_evaluator_const(false))
 		--temp.needs_configured = false
@@ -575,7 +543,6 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	temp.action:add_precondition(wp(stalker_ids.property_alive,true))
 	temp.action:add_precondition(wp(stalker_ids.property_enemy,	false))
 	temp.action:add_precondition(wp(stalker_ids.property_danger,false))
-	temp.action:add_precondition(wp(stalker_ids.property_anomaly,false))
 	temp.action:add_precondition(wp(evaid,true))
 	
 	temp.action:add_effect(wp(evaid, false))

@@ -339,7 +339,6 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	temp.action = action_fight_from_cover(npc,"act_fight_from_cover",storage)
 	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
 	temp.action:add_precondition(world_property(stalker_ids.property_danger, false))
-	temp.action:add_precondition(world_property(stalker_ids.property_anomaly,false))
 	temp.action:add_precondition(world_property(evaid,true))
 	temp.action:add_effect(world_property(evaid,false))
 	

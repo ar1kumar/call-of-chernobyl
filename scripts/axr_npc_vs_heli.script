@@ -372,7 +372,6 @@ function add_to_binder(npc,ini,scheme,section,storage,temp)
 	temp.action = action_npc_vs_heli(npc,"act_npc_vs_heli",storage)
 	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
 	temp.action:add_precondition(world_property(stalker_ids.property_danger, false))
-	temp.action:add_precondition(world_property(stalker_ids.property_anomaly,false))
 	temp.action:add_precondition(world_property(evaid,true))
 	
 	temp.action:add_effect(world_property(evaid,false))
