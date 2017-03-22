@@ -275,7 +275,7 @@ repeat_timeout = 86400
 status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1
-on_init = %=on_init_bounty_hunt(simulation_task_11:killer:army:bandit)%
+on_job_descr = %=on_init_bounty_hunt(simulation_task_11:killer:army:bandit)%
 on_complete = %=reward_random_money(5000:7000) =reward_stash(true) =inc_task_stage(simulation_task_11) =complete_task_inc_goodwill(50:stalker)%
 on_fail = %=fail_task_dec_goodwill(25:stalker)%
 condlist_0 = {!task_giver_alive(simulation_task_11)} fail
@@ -298,7 +298,7 @@ repeat_timeout = 86400
 status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1
-on_init = %=on_init_bounty_hunt(simulation_task_12:bandit)%
+on_job_descr = %=on_init_bounty_hunt(simulation_task_12:bandit)%
 on_complete = %=inc_task_stage(simulation_task_12) =reward_stash(true) =complete_task_inc_goodwill(50:stalker)%
 on_fail = %=fail_task_dec_goodwill(25:stalker)%
 condlist_0 = {!task_giver_alive(simulation_task_12)} fail
@@ -431,7 +431,7 @@ repeat_timeout = 86400
 status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1
-on_init = %=on_init_bounty_hunt(simulation_task_17:bandit:freedom:csky)%
+on_job_descr = %=on_init_bounty_hunt(simulation_task_17:bandit:freedom:csky)%
 on_complete = %=reward_random_money(5000:7000) =inc_task_stage(simulation_task_17) =reward_stash(true) =complete_task_inc_goodwill(50:army)%
 on_fail = %=fail_task_dec_goodwill(25:army)%
 condlist_0 = {!task_giver_alive(simulation_task_17)} fail
@@ -454,7 +454,7 @@ repeat_timeout = 86400
 status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1
-on_init = %=on_init_bounty_hunt(simulation_task_18:stalker:army:dolg)%
+on_job_descr = %=on_init_bounty_hunt(simulation_task_18:stalker:army:dolg)%
 on_complete = %=reward_random_money(5000:7000) =reward_stash(true) =inc_task_stage(simulation_task_18)%
 condlist_0 = {!task_giver_alive(simulation_task_18)} fail
 

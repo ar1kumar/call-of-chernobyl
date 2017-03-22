@@ -541,7 +541,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 	local killer = dependent_object or dst and dst.death_by_id and (db.storage[dst.death_by_id] and db.storage[dst.death_by_id].object)
 
 	-- force hostile to killer
-	if (st.stage >= 4 and killer and killer:id() == 0 and killer:alive() and npc:relation(killer) < game_object.enemy and npc:see(killer)) then
+	if (st.stage >= 4 and killer and killer:id() == 0 and killer:alive() and npc:relation(killer) == game_object.neutral and npc:see(killer) and killer:position():distance_to_sqr(npc:position()) <= 2500) then
 		local squad = get_object_squad(npc)
 		if (squad) then
 			for k in squad:squad_members() do
