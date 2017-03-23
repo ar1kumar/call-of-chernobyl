@@ -412,7 +412,7 @@ function init_wounded(npc, ini, section, st, scheme)
 	else
 		local wounded_by_state 		= {"wounded","wounded_heavy","wounded_heavy_2","wounded_heavy_3"}
 		local state 				= wounded_by_state[math.random(#wounded_by_state)]
-		local psy_wounded_by_state 	= {"{=best_pistol}psy_shoot,psy_pain@wounded_psy_shoot","{=best_pistol}psy_shoot,psy_pain@wounded_psy_shoot"}
+		local psy_wounded_by_state 	= {"{=best_pistol}psy_armed,psy_pain@wounded_psy","{=best_pistol}psy_shoot,psy_pain@wounded_psy_shoot"}
 		local psy_state 			= psy_wounded_by_state[math.random(#psy_wounded_by_state)]
 		def.hp_state			= "20|"..state.."@help_heavy"
 		def.hp_state_see		= "20|"..state.."@help_heavy"
