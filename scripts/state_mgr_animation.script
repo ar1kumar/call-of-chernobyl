@@ -550,3 +550,25 @@ function animation:process_special_action(action_table)
 		action_table.f(self.npc)
 	end
 end
+
+function suicide(npc)
+	local target_state = state_mgr.get_state(npc)
+	local wpn = state_mgr_weapon.get_weapon(npc, target_state)
+	if (wpn) then 
+		local h = hit()
+		h.power = 1000
+		h.direction = vector_rotate_y(npc:direction(), 90)
+		h.draftsman = npc
+		h.impulse = 200
+		h.type = hit.wound
+		npc:hit(h)
+		
+		local path = system_ini():r_string_ex(wpn:section(),"snd_shoot")
+		if (path) then
+			local sound=xr_sound.get_safe_sound_object(path)
+			if (sound) then
+				sound:play_at_pos(npc,npc:position())
+			end
+		end
+	end
+end

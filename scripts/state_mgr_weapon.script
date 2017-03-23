@@ -17,7 +17,7 @@ function eva_state_mgr_weapon:evaluate()
 		return true
 	end
 	
-	local bestweapon = self.object:best_weapon()
+	local bestweapon = get_weapon(self.object, self.st.target_state) --self.object:best_weapon()
 	if not (bestweapon) then
 		return false 
 	end 
@@ -60,10 +60,10 @@ function weapon_locked(npc)
 		return false 
 	end
 	
-	local s = bw:get_state()
-	if (s == 5 or s == 6) then 
-		return true -- gun is firing!
-	end
+	-- local s = bw:get_state()
+	-- if (s == 5 or s == 6) then 
+		-- return true -- gun is firing!
+	-- end
 
 	local weapon_strapped = npc:weapon_strapped()
 	local weapon_unstrapped = npc:weapon_unstrapped()
@@ -96,7 +96,7 @@ class "eva_state_mgr_weapon_strapped_now" (property_evaluator)
 function eva_state_mgr_weapon_strapped_now:__init(name) super (nil, name)
 end
 function eva_state_mgr_weapon_strapped_now:evaluate()
-	local best_weapon = self.object:best_weapon()
+	local best_weapon = get_weapon(self.object,self.st.target_state) --self.object:best_weapon()
 	if not (best_weapon) then 
 		return true 
 	end 
@@ -128,7 +128,7 @@ function eva_state_mgr_weapon_unstrapped_now:evaluate()
 		return false 
 	end 
 	
-	local best_weapon = self.object:best_weapon()
+	local best_weapon = get_weapon(self.object,self.st.target_state) -- self.object:best_weapon()
 	if not (best_weapon) then 
 		return false 
 	end 
@@ -276,6 +276,7 @@ function strappable_weapon(obj)
 end
 
 local state_queue_params = {
+	psy_shoot		   = {0, 0, 0},
 	barricade_0_attack = {5, 300, 0},
 	barricade_1_attack = {5, 300, 0},
 	barricade_2_attack = {5, 300, 0},

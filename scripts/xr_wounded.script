@@ -115,7 +115,7 @@ function action_wounded:execute()
 	local id = npc:id()
 	local pid = db.storage[id].victim_surrender
 	local po = pid and pid < 65534 and db.storage[pid] and db.storage[pid].object
-	if (po and not utils.load_var(npc,"victim_surrender")) then
+	if (po and not utils.load_var(npc,"victim_surrender") and npc.psy_health > 0.15) then
 		local rndd = math.random(1,100)
 		if (rndd < 25) then 
 			state_mgr.set_state(npc,"wounded_hail",nil,nil,nil,{fast_set = true})
@@ -410,11 +410,13 @@ function init_wounded(npc, ini, section, st, scheme)
 		def.enable_talk			= true
 		def.not_for_help		= true
 	else
-		local wounded_by_state = {"wounded","wounded_heavy","wounded_heavy_2","wounded_heavy_3"}
-		local state = wounded_by_state[math.random(#wounded_by_state)]
+		local wounded_by_state 		= {"wounded","wounded_heavy","wounded_heavy_2","wounded_heavy_3"}
+		local state 				= wounded_by_state[math.random(#wounded_by_state)]
+		local psy_wounded_by_state 	= {"{=best_pistol}psy_shoot,psy_pain@wounded_psy_shoot","{=best_pistol}psy_shoot,psy_pain@wounded_psy_shoot"}
+		local psy_state 			= psy_wounded_by_state[math.random(#psy_wounded_by_state)]
 		def.hp_state			= "20|"..state.."@help_heavy"
 		def.hp_state_see		= "20|"..state.."@help_heavy"
-		def.psy_state			= "20|{=best_pistol}psy_armed,psy_pain@wounded_psy|20|{=best_pistol}psy_shoot,psy_pain@{=best_pistol}wounded_psy_shoot,wounded_psy"
+		def.psy_state			= "20|"..psy_state
 		def.hp_victim			= "20|nil"
 		def.hp_cover			= "20|false"
 		def.hp_fight			= "20|false"
@@ -463,56 +465,49 @@ function init_wounded(npc, ini, section, st, scheme)
 end
 
 function unlock_medkit(npc)
-	if db.storage[npc:id()].wounded ~= nil then
-		db.storage[npc:id()].wounded.wound_manager:unlock_medkit()
+	local st = db.storage[npc:id()]
+	if (st and st.wounded) then
+		st.wounded.wound_manager:unlock_medkit()
 	end
 end
 
 function eat_medkit(npc)
-	if db.storage[npc:id()].wounded ~= nil then
-		db.storage[npc:id()].wounded.wound_manager:eat_medkit()
+	local st = db.storage[npc:id()]
+	if (st and st.wounded) then
+		st.wounded.wound_manager:eat_medkit()
 	end
 end
 
 
 function is_wounded(npc)
-	local npc_storage = db.storage[npc:id()]
-	if npc_storage == nil then
-		return false
-	end
-
-	if npc_storage.wounded ~= nil then
---'		if npc:object("medkit") ~= nil and
---'		   npc_storage.wounded.wound_manager.can_use_medkit == true
---'		then
---'			return false
---'		end
-
-		return tostring(npc_storage.wounded.wound_manager.state) ~= "nil"
+	local st = db.storage[npc:id()]
+	if (st and st.wounded) then
+		return tostring(st.wounded.wound_manager.state) ~= "nil"
 	end
 	return false
 end
 
 function hit_callback(npc_id) -- Тут может не быть стораджа.
-	if db.storage[npc_id].wounded ~= nil then
-		db.storage[npc_id].wounded.wound_manager:hit_callback()
+	local st = db.storage[npc_id]
+	if st and st.wounded then
+		st.wounded.wound_manager:hit_callback()
 	end
 end
 
 
 function is_heavy_wounded_by_id(npc_id)
-	if db.storage[npc_id].wounded ~= nil then
-		return tostring(db.storage[npc_id].wounded.wound_manager.state) ~= "nil"
+	local st = db.storage[npc_id]
+	if st and st.wounded then
+		local st_wound_state = tostring(st.wounded.wound_manager.state)
+		return st_wound_state ~= "nil"
 	end
 	return false
 end
 function is_psy_wounded_by_id(npc_id)
-	if db.storage[npc_id].wounded ~= nil then
-		return db.storage[npc_id].wounded.wound_manager.state == "psy_pain" or
-				 db.storage[npc_id].wounded.wound_manager.state == "psy_armed" or
-				 db.storage[npc_id].wounded.wound_manager.state == "psy_shoot" or
-				 db.storage[npc_id].wounded.wound_manager.state == "psycho_pain" or
-				 db.storage[npc_id].wounded.wound_manager.state == "psycho_shoot"
+	local st = db.storage[npc_id]
+	if st and st.wounded then
+		local st_wound_state = tostring(st.wounded.wound_manager.state)
+		return st_wound_state == "psy_pain" or st_wound_state == "psy_armed" or st_wound_state == "psy_shoot"
 	end
 	return false
 end

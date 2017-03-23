@@ -4837,10 +4837,3 @@ function force_always_online(actor,npc,p)
 	alife():set_switch_offline(squad.id,false)
 	alife():set_switch_online(squad.id,true)
 end
-
-function pull_trigger(actor,npc,p)
-	local wpn = npc:active_item()
-	if (wpn and IsWeapon(wpn)) then
-		self.object:set_item(object.fire1,wpn,1,30)
-	end
-end

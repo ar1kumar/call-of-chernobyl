@@ -879,6 +879,15 @@ states = {
 				animstate = nil,
 				animation = "wounded_zombie"
 			},
+	wounded_hail = {	
+				weapon = "none",
+				movement = move.stand,
+				mental = anim.danger,
+				bodystate = move.crouch,
+				direction = look.cur_dir,
+				animstate = nil,
+				animation = "wounded_hail"
+			},			
 	trans_0 = {	weapon = "strapped",
 				movement = move.stand,
 				mental = anim.free,
@@ -913,21 +922,25 @@ states = {
 	psy_pain = {weapon = "none",
 				movement = move.stand,
 				mental = anim.free,
+				direction = look.cur_dir,
 				bodystate = move.standing,
 				animstate = nil,
 				animation = "psy_armed"
 			},
 	psy_armed = {weapon = "unstrapped",
+				weapon_slot = 2,
 				movement = move.stand,
 				mental = anim.free,
+				direction = look.cur_dir,
 				bodystate = move.standing,
 				animstate = nil,
 				animation = "psy_armed"
 			},
 	psy_shoot = {weapon = "fire",
-				weapon_slot = 1,
+				weapon_slot = 2,
 				movement = move.stand,
 				mental = anim.free,
+				direction = CSightParams.eSightTypeAnimationDirection,
 				bodystate = move.standing,
 				animstate = nil,
 				animation = "psy_shoot"

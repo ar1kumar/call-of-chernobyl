@@ -712,12 +712,7 @@ end
 
 -- Проверка, что лучшее оружие персонажа - пистолет
 function best_pistol(actor, npc)
-	local pistol = npc:item_in_slot(1)
-	if pistol ~= nil then
-		return true
-	else
-		return false
-	end
+	return npc:item_in_slot(2) ~= nil
 end
 
 -- Проверка, что персонажу нанесли смертельный хит. Проверять ТОЛЬКО на on_hit

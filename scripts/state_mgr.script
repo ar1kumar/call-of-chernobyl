@@ -306,17 +306,17 @@ function act_state_mgr_end:execute()
 		end
 	end
 	
-	local t = state_lib.states[self.st.target_state].weapon
-	local wpn = self.object:best_weapon()
-
+	local wpn = state_mgr_weapon.get_weapon(self.object,self.st.target_state) --self.object:best_weapon()
 	if not IsWeapon(wpn) then
 		return
 	end
 	
+	local t = state_lib.states[self.st.target_state].weapon
+	
 	if (t == "sniper_fire" or t == "fire") then
 		-- local o = self.st.look_object and db.storage[self.st.look_object] and db.storage[self.st.look_object].object
 		-- if (o == nil or o:alive()) then
-			if (self.st.planner:evaluator(state_mgr_goap.properties["direction"]):evaluate()) then
+			if (self.st.look_object == nil or self.st.planner:evaluator(state_mgr_goap.properties["direction"]):evaluate()) then
 				if (t == "sniper_fire") then
 					local aim = math.random(500,1500)
 					self.st.npc:set_item(object.fire1, wpn, 1, aim)

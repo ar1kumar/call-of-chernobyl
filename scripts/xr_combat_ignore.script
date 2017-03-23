@@ -76,6 +76,19 @@ function is_enemy(obj,enemy,no_memory)
 		end
 	end
 	
+	-- controlled
+	local psy_influenced_npc = bind_monster.psy_influenced_npc
+	if (psy_influenced_npc[ene_id] and psy_influenced_npc[ene_id][1] == id) then 
+		return false
+	elseif (psy_influenced_npc[id] and psy_influenced_npc[id][1] == ene_id) then 
+		return false
+	elseif (obj:clsid() == clsid.controller_s and enemy:clsid() == clsid.script_stalker) then 
+		local state = state_mgr.get_state(enemy)
+		if (state == "psy_shoot") then 
+			return false 
+		end
+	end
+	
 	local obj_is_stalker = IsStalker(obj)
 	-- Ignore long unseen/unheard enemies
 	if (obj_is_stalker) then

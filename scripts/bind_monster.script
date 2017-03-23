@@ -1,6 +1,8 @@
 -----------------------------------------------------------------------------------
 -- Monster binding
 -----------------------------------------------------------------------------------
+psy_influenced_npc = {}
+psy_recovered = {}
 
 function bind(obj)
 	obj:bind_object(generic_object_binder(obj))
@@ -45,6 +47,63 @@ function generic_object_binder:use_kick(obj, who)
 	obj:hit(h)
 end
 
+
+function generic_object_binder:psy_influence_radius(victim)
+	local obj = self.object
+	local id = obj:id()
+	
+	-- make controller enemy the enemy of controlled npc
+	if (psy_influenced_npc[id]) then
+		local st_controlled = db.storage[psy_influenced_npc[id][1]]
+		local controlled = st_controlled and st_controlled.object 
+			
+		if (controlled) then
+			-- force enemy
+			if (victim and IsStalker(victim) and psy_influenced_npc[id][1] ~= victim:id()) then
+				if not (psy_influenced_npc[id][2][victim:id()]) then
+					psy_influenced_npc[id][2][victim:id()] = controlled:relation(victim)
+					victim:set_relation(game_object.enemy,controlled)
+					controlled:set_relation(game_object.enemy,victim)
+				end
+			end
+			
+			-- try recover
+			if (victim == nil) then
+				for oid,rel in pairs(psy_influenced_npc[id][2]) do 
+					local obj = db.storage[oid] and db.storage[oid].object 
+					if (obj) then 
+						controlled:set_relation(rel,obj)
+						obj:set_relation(rel,controlled)
+					end
+				end
+				psy_influenced_npc[id] = nil
+				psy_recovered[controlled:id()] = true
+			end
+		else 
+			psy_influenced_npc[id] = nil
+		end 
+	end
+	
+	if not (victim and victim:clsid() == clsid.script_stalker) then
+		return 
+	end 
+	
+	local sor = story_objects.get_story_objects_registry()
+	if (sor:get_story_id(victim:id())) then 
+		return
+	end
+		
+	-- do psy damage
+	victim.psy_health = -0.020
+	
+	if (victim.psy_health <= 0.01 and victim:character_rank() < 6000 and not psy_recovered[victim:id()]) then
+		if (psy_influenced_npc[id] == nil) then
+			psy_influenced_npc[id] = {victim:id(),{}}
+			victim.psy_health = 0.15 -- faster recovery
+		end
+	end
+end
+
 function generic_object_binder:update(delta)
 	--alun_utils.debug_write(strformat("%s:update  loaded=%s",self.object and self.object:name(),self.loaded))
 	object_binder.update(self, delta)
@@ -87,7 +146,12 @@ function generic_object_binder:update(delta)
 		squad:update()
 	end
 
-	if self.object:get_enemy() then
+	local enemy = self.object:get_enemy()
+	if (cls == clsid.controller_s) then
+		self:psy_influence_radius(enemy)
+	end
+		
+	if enemy then
 		xr_logic.mob_release(self.object)
 		return
 	else
@@ -164,6 +228,23 @@ function generic_object_binder:death_callback(victim, who)
 	--alun_utils.debug_write(strformat("%s:death_callback killer=%s",victim and victim:name(),who and who:name()))
 	local id = self.object:id()
 	xr_combat_ignore.fighting_with_actor_npcs[id] = nil
+	
+	-- controller
+	if (psy_influenced_npc[id]) then
+		local st_controlled = db.storage[psy_influenced_npc[id][1]]
+		local controlled = st_controlled and st_controlled.object
+		if (controlled) then
+			for oid,rel in pairs(psy_influenced_npc[id][2]) do 
+				local obj = db.storage[oid] and db.storage[oid].object 
+				if (obj) then 
+					controlled:set_relation(rel,obj)
+					obj:set_relation(rel,controlled)
+				end
+			end
+			psy_recovered[controlled:id()] = true
+		end 
+		psy_influenced_npc[id] = nil
+	end
 	
 	db.delete_enemy(victim)
 
