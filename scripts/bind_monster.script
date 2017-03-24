@@ -338,9 +338,9 @@ function generic_object_binder:use_callback(obj, who)
 end
 
 function generic_object_binder:net_spawn(se_abstract)
-	--alun_utils.debug_write("\n----"..sobject:name()..":net_spawn()----",true)
+	--alun_utils.debug_write("\n----"..se_abstract:name()..":net_spawn()----",true)
 	if not object_binder.net_spawn(self, se_abstract) then
-		--alun_utils.debug_write(se_obj:name()..":net_spawn()  FAILURE FAILURE object_binder.net_spawn returned false!!!")
+		--alun_utils.debug_write(se_abstract:name()..":net_spawn()  FAILURE FAILURE object_binder.net_spawn returned false!!!")
 		return false
 	end
 	
