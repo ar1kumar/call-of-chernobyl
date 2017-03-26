@@ -44,7 +44,7 @@ local function npc_on_item_take(npc,item)
 	
 	-- ATTACH WEAPON ADDONS
 	local wpn = npc:best_weapon()
-	if (wpn and item) then
+	if (wpn and IsWeapon(wpn)) then
 		wpn:weapon_addon_attach(item)
 	end
 	
@@ -73,22 +73,6 @@ local function actor_on_item_take(item)
 	if (Items and item) then
 		Items[item:id()] = nil
 	end
-end
-
-local function get_best_detector(npc)
-	local detectors = { "detector_simple", "detector_advanced", "detector_elite", "detector_scientific" }
-	for i=1, #detectors do
-		local obj = npc:object(detectors[i])
-		if obj ~= nil then
-			return obj
-		end
-	end
-end
-
-local function get_rand_vertex(npc,vo)
-	local dir = npc:position():sub(vo:position())
-	dir = vector_rotate_y(dir,math.random(5,45))
-	return vo:vertex_in_direction(vo:level_vertex_id(),dir,1)
 end
 
 ---------------------------------------

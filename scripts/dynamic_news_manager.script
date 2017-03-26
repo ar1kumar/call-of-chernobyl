@@ -270,7 +270,7 @@ function DynamicNewsManager:FindSpeaker(victim,who,same_as_victim,same_as_who,no
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
 			local st = db.storage[db.OnlineStalkers[i]]
-			local npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
+			local npc = st and st.object
 			if (npc and IsStalker(npc,npc:clsid()) and npc:alive() and not get_object_story_id(db.OnlineStalkers[i])) then
 				if (not_in_combat == nil) or (not_in_combat == true and not npc:best_enemy()) or (not_in_combat ~= true) then
 					comm_sender = npc:character_community()
@@ -299,7 +299,7 @@ function DynamicNewsManager:FindSpeakerWithEnemy(victim,who,same_as_victim,same_
 	for i=1, #db.OnlineStalkers do
 		if (db.OnlineStalkers[i] ~= who_id) then
 			local st = db.storage[db.OnlineStalkers[i]]
-			local npc = st and st.object or level.object_by_id(db.OnlineStalkers[i])
+			local npc = st and st.object
 			if (npc and IsStalker(npc,npc:clsid()) and npc:alive() and not get_object_story_id(db.OnlineStalkers[i]) and npc:best_enemy()) then
 				comm_sender = npc:character_community()
 				if (same_as_victim == nil) or (same_as_victim == true and comm_sender == comm) or (same_as_victim == false and comm_sender ~= comm) then
@@ -424,7 +424,7 @@ function DynamicNewsManager:GossipDeathByStalker(victim,who)
 		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,false,nil,true)
+	local sender = self:FindSpeaker(victim,who,false,nil,true,true)
 	if not (sender) then
 		--printf("GossipDeathByStalker can't find sender")
 		return false
@@ -497,7 +497,7 @@ function DynamicNewsManager:SeenDeathOfStalker(victim,who,comm)
 		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,false,false,true)
+	local sender = self:FindSpeaker(victim,who,false,false,true,true)
 	if not (sender) then
 		--printf("SeenDeathOfStalker can't find sender")
 		return false
@@ -535,7 +535,7 @@ function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,nil,false,true)
+	local sender = self:FindSpeaker(victim,who,nil,false,true,true)
 	if not (sender) then
 		--printf("SeenDeathOfMutant can't find sender")
 		return false
@@ -568,7 +568,7 @@ function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 end
 
 function DynamicNewsManager:SeenDeathByMutant(victim,who,comm)
-	local sender = self:FindSpeaker(victim,who,false,nil,true)
+	local sender = self:FindSpeaker(victim,who,false,nil,true,true)
 	if not (sender) then
 		--printf("SeenDeathByMutant can't find sender")
 		return false
@@ -629,7 +629,7 @@ function DynamicNewsManager:GossipDeathOfMutant(victim,who,comm)
 		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,nil,false,true)
+	local sender = self:FindSpeaker(victim,who,nil,false,true,true)
 	if not (sender) then
 		--printf("GossipDeathByStalker can't find sender")
 		return false
