@@ -33,6 +33,19 @@ local bd_types = {
 	[danger_object.visual]			= "visual"
 }
 
+local type_by_prior = {
+	[danger_object.grenade] 		= 11,
+	[danger_object.entity_corpse] 	= 9,
+	[danger_object.entity_attacked] = 8,
+	[danger_object.attacked] 		= 10,
+	[danger_object.bullet_ricochet] = 5,
+	[danger_object.enemy_sound] 	= 6,
+	[danger_object.attack_sound] 	= 4,
+	[danger_object.entity_death] 	= 3,
+	[danger_object.hit]				= 2,
+	[danger_object.sound]			= 1,
+	[danger_object.visual]			= 7
+}
 -----------------------------------------------------------------------------
 -- 																PUBLIC
 -----------------------------------------------------------------------------
@@ -250,7 +263,7 @@ end
 -- 															ON GAME START
 -----------------------------------------------------------------------------
 function on_game_start()
-	RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
+	--RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
 	RegisterScriptCallback("npc_on_hear_callback",npc_on_hear_callback)
 	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
 end
@@ -274,28 +287,37 @@ local function eval_danger(self)
 	local id = npc:id()
 	local tg = time_global()
 	local bd_type = danger:type()
-
+	local new_danger_time = get_danger_time(danger,npc)
+	
 	if (self.a.inertion and self.a.danger_time) then
-		if (self.a.type ~= bd_type and get_danger_time(danger,npc) > self.a.danger_time) then
-
-		else
+		local do_check = true -- false to recalculate inertion
+		if (self.a.type ~= bd_type) then 
+			if (type_by_prior[self.a.type] < type_by_prior[bd_type]) then 
+				do_check = false
+			end
+		end 
+		
+		if (new_danger_time > self.a.danger_time) then 
+			do_check = false
+		end
+		
+		if not (do_check and is_danger(npc,danger)) then 
+			do_check = true 
+		end
+		
+		if (do_check) then 
 			if (tg < self.a.danger_time + self.a.inertion) then
 				return true
-			elseif (get_danger_time(danger,npc) <= self.a.danger_time) then
-				return false
 			end
 		end
+	elseif not (is_danger(npc,danger)) then 
+		return false
 	end
 
 	local src = DangerInertion[ bd_types[bd_type] ]
 	local inertion = tonumber(xr_logic.pick_section_from_condlist(db.actor,npc,xr_logic.parse_condlist(npc,bd_types[bd_type],"danger_intertion_time",src))) or 0
-	local danger_time = get_danger_time(danger,npc)
 
-	if (tg >= danger_time + inertion) then
-		return false
-	end
-
-	if not(is_danger(npc,danger)) then
+	if (tg >= new_danger_time + inertion) then
 		return false
 	end
 
@@ -307,7 +329,7 @@ local function eval_danger(self)
 	end
 	--]]
 
-	self.a.danger_time = danger_time
+	self.a.danger_time = new_danger_time
 	self.a.inertion = inertion
 	self.a.type = bd_type
 

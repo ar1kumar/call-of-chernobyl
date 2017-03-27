@@ -44,7 +44,7 @@ local function npc_on_item_take(npc,item)
 	
 	-- ATTACH WEAPON ADDONS
 	local wpn = npc:best_weapon()
-	if (wpn and IsWeapon(wpn)) then
+	if (wpn and wpn:cast_WeaponMagazined()) then
 		wpn:weapon_addon_attach(item)
 	end
 	

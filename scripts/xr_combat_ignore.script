@@ -377,6 +377,7 @@ function action_process_enemy:enemy_callback(npc, enemy)
 end
 
 function action_process_enemy:hit_callback(obj, amount, local_direction, who, bone_index)
+	--printf("%s hit by %s",obj:name(),who and who:name())
 	if (utils.load_var(obj,"xr_combat_ignore_enabled") == false) then 
 		return 
 	end
@@ -389,18 +390,20 @@ function action_process_enemy:hit_callback(obj, amount, local_direction, who, bo
 				-- disable combat ignore for entire squad if attacked by actor
 				for k in squad:squad_members() do 
 					local st = db.storage[k.id]
-					if (st) then
+					if (st and st.object) then
 						if (st.overrides == nil or st.overrides.combat_ignore_keep_when_attacked ~= true) then
 							--st.combat_ignore.enabled = false
 							utils.save_var(st.object,"xr_combat_ignore_enabled",false)
+							--printf("squad xr_combat_ignore_enabled set false")
 						end
 					end
 				end
 			else 
 				local overrides = db.storage[obj:id()] and db.storage[obj:id()].overrides
-				if not overrides or not overrides.combat_ignore_keep_when_attacked then
+				if (overrides == nil or overrides.combat_ignore_keep_when_attacked ~= true) then
 					--self.st.enabled = false
 					utils.save_var(obj,"xr_combat_ignore_enabled",false)
+					--printf("xr_combat_ignore_enabled set false")
 				end
 			end
 		end

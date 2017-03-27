@@ -488,7 +488,7 @@ function state_manager:update()
 	local id = self.planner:current_action_id()
 
 	while id and id ~= lid and id ~= state_mgr_goap.operators["end"] and id ~= state_mgr_goap.operators["locked"] do
-		--alun_utils.debug_write("current_action_id = "..(xrs_debug_tools.actions_by_stalker_ids[id] or id),true)
+		--alun_utils.debug_write("current_action_id = "..(xrs_debug_tools.actions_by_stalker_ids and xrs_debug_tools.actions_by_stalker_ids[id] or id),true)
 		self.planner:update()
 		
 		lid = id

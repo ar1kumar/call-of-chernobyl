@@ -51,6 +51,7 @@ end
 local function squad_on_register(squad)
 	if (companion_squads[squad.id] ~= nil) then 
 		companion_squads[squad.id] = squad
+		squad:set_squad_relation("friend")
 		squad.scripted_target = "actor"
 	end
 	
