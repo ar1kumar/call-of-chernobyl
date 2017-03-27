@@ -116,11 +116,14 @@ function action_wounded:execute()
 	local pid = db.storage[id].victim_surrender
 	local po = pid and pid < 65534 and db.storage[pid] and db.storage[pid].object
 	if (po and not utils.load_var(npc,"victim_surrender") and npc.psy_health > 0.15) then
-		local rndd = math.random(1,100)
-		if (rndd < 25) then 
-			state_mgr.set_state(npc,"wounded_hail",nil,nil,nil,{fast_set = true})
-		else
-			state_mgr.set_state(npc,"prisoner",nil,nil,nil,{fast_set = true})
+		local cur_state = state_mgr.get_state(npc)
+		if (cur_state ~= "prisoner" and cur_state ~= "wounded_hail") then
+			local rndd = math.random(1,100)
+			if (rndd < 35) then 
+				state_mgr.set_state(npc,"wounded_hail",nil,nil,nil,{fast_set = true})
+			else
+				state_mgr.set_state(npc,"prisoner",nil,nil,nil,{fast_set = true})
+			end
 		end
 		return
 	end
