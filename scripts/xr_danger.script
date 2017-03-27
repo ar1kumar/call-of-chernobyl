@@ -558,7 +558,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 
 	--printf("stage = %s",st.stage)
 	if (st.stage == 1) then
-		if (math.random(1,100) < 65) then 
+		if (math.random(1,100) < 50) then 
 			st.stage = 3
 		end
 	end 
@@ -582,12 +582,12 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 			local rnd = math_random(100)
 			if (rnd <= 33) then
 				xr_sound.set_sound_play(npc:id(),"search")
-				state_mgr.set_state(npc,"threat_danger",nil,nil,{look_position = dst and dst.killer_last_known_position})
+				state_mgr.set_state(npc,"check_corpse",nil,nil,{look_position = dst and dst.killer_last_known_position})
 				st.dtimer = time_global() + math_random(3000,5000)
 			elseif (dist <= 5 and not st.searched) then
 				st.searched = true
-				state_mgr.set_state(npc,"search")
-				st.dtimer = time_global() + math_random(3000,5000)
+				state_mgr.set_state(npc,"kick_corpse")
+				st.dtimer = time_global() + 3000
 			else
 				state_mgr.set_state(npc,"raid",nil,nil,{look_position = dst and dst.killer_last_known_position})
 			end

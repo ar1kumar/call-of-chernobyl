@@ -478,7 +478,12 @@ function action_search_corpse:execute()
 			-- moved from xr_motivator to here and xr_motivator use_callback
 			death_manager.create_release_item(corpse)
 		end
-		state_mgr.set_state(npc,"search_corpse",nil,nil,{look_position = look_pos})
+		
+		if (npc:active_item() and npc:best_weapon() and npc:weapon_unstrapped()) then
+			state_mgr.set_state(npc,"search_corpse",nil,nil,{look_position = look_pos})
+		else
+			state_mgr.set_state(npc,"search_corpse_holstered",nil,nil,{look_position = look_pos})
+		end
 	else
 	
 		if (self.a.analse_mode == "true" and not self.a.mutant_analysed) then 
