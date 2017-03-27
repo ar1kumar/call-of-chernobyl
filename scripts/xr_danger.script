@@ -17,9 +17,16 @@ DangerInertion = alun_utils.collect_section(ini,"danger_inertion",true)
 DangerIgnore = alun_utils.collect_section(ini,"danger_object",true)
 ini = nil
 
+
+--[[
+danger:danger_perceive_type()
+	[danger_object.hit]				= "hit",
+	[danger_object.sound]			= "sound",
+	[danger_object.visual]			= "visual"
+--]]
+
 local script_danger = {}
 local bd_types = {
-
 	[danger_object.grenade] 		= "grenade",
 	[danger_object.entity_corpse] 	= "entity_corpse",
 	[danger_object.entity_attacked] = "entity_attacked",
@@ -27,24 +34,7 @@ local bd_types = {
 	[danger_object.bullet_ricochet] = "bullet_ricochet",
 	[danger_object.enemy_sound] 	= "enemy_sound",
 	[danger_object.attack_sound] 	= "attack_sound",
-	[danger_object.entity_death] 	= "entity_death",
-	[danger_object.hit]				= "hit",
-	[danger_object.sound]			= "sound",
-	[danger_object.visual]			= "visual"
-}
-
-local type_by_prior = {
-	[danger_object.grenade] 		= 11,
-	[danger_object.entity_corpse] 	= 9,
-	[danger_object.entity_attacked] = 8,
-	[danger_object.attacked] 		= 10,
-	[danger_object.bullet_ricochet] = 5,
-	[danger_object.enemy_sound] 	= 6,
-	[danger_object.attack_sound] 	= 4,
-	[danger_object.entity_death] 	= 3,
-	[danger_object.hit]				= 2,
-	[danger_object.sound]			= 1,
-	[danger_object.visual]			= 7
+	[danger_object.entity_death] 	= "entity_death"
 }
 -----------------------------------------------------------------------------
 -- 																PUBLIC
@@ -284,33 +274,23 @@ local function eval_danger(self)
 		return false
 	end
 
-	local id = npc:id()
 	local tg = time_global()
 	local bd_type = danger:type()
-	local new_danger_time = get_danger_time(danger,npc)
 	
-	if (self.a.inertion and self.a.danger_time) then
-		local do_check = true -- false to recalculate inertion
-		if (self.a.type ~= bd_type) then 
-			if (type_by_prior[self.a.type] < type_by_prior[bd_type]) then 
-				do_check = false
-			end
-		end 
-		
-		if (new_danger_time > self.a.danger_time) then 
-			do_check = false
-		end
-		
-		if (do_check == true or not is_danger(npc,danger)) then 
+	if (self.a.inertion) then
+		if (self.a.type == bd_type) then 
 			if (tg < self.a.danger_time + self.a.inertion) then
 				return true
 			end
 		end
 	end
+	
+	self.a.inertion = nil
 
 	local src = DangerInertion[ bd_types[bd_type] ]
-	local inertion = tonumber(xr_logic.pick_section_from_condlist(db.actor,npc,xr_logic.parse_condlist(npc,bd_types[bd_type],"danger_intertion_time",src))) or 0
+	local inertion = tonumber(xr_logic.pick_section_from_condlist(db.actor,npc,xr_logic.parse_condlist(npc,bd_types[bd_type],"danger_inertion_time",src))) or 0
 
+	local new_danger_time = get_danger_time(danger,npc)
 	if (tg >= new_danger_time + inertion) then
 		return false
 	end
@@ -578,6 +558,12 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 
 	--printf("stage = %s",st.stage)
 	if (st.stage == 1) then
+		if (math.random(1,100) < 65) then 
+			st.stage = 3
+		end
+	end 
+	
+	if (st.stage == 1) then
 		st.lvid = bdo:level_vertex_id()
 		st.lvid = utils.send_to_nearest_accessible_vertex(npc,st.lvid)
 
@@ -586,7 +572,7 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 
 		st.stage = 2
 	elseif (st.stage == 2) then
-		if not (st.rnd and  st.lvid) then
+		if not (st.rnd and st.lvid) then
 			st.stage = 1
 			return 
 		end 
