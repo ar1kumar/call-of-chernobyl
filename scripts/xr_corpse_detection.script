@@ -479,7 +479,7 @@ function action_search_corpse:execute()
 			death_manager.create_release_item(corpse)
 		end
 		
-		if (npc:active_item() and npc:best_weapon() and npc:weapon_unstrapped()) then
+		if (npc:active_item() and npc:best_weapon() and npc:weapon_unstrapped() and npc:active_slot() == 3) then
 			state_mgr.set_state(npc,"search_corpse",nil,nil,{look_position = look_pos})
 		else
 			state_mgr.set_state(npc,"search_corpse_holstered",nil,nil,{look_position = look_pos})
