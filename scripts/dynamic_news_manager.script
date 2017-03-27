@@ -424,7 +424,7 @@ function DynamicNewsManager:GossipDeathByStalker(victim,who)
 		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,false,nil,true,false)
+	local sender = self:FindSpeaker(victim,who,false,nil,true)
 	if not (sender) then
 		--printf("GossipDeathByStalker can't find sender")
 		return false
@@ -497,7 +497,7 @@ function DynamicNewsManager:SeenDeathOfStalker(victim,who,comm)
 		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,false,false,true,true)
+	local sender = self:FindSpeaker(victim,who,false,false,true)
 	if not (sender) then
 		--printf("SeenDeathOfStalker can't find sender")
 		return false
@@ -535,7 +535,7 @@ function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,nil,false,true,true)
+	local sender = self:FindSpeaker(victim,who,nil,false,true)
 	if not (sender) then
 		--printf("SeenDeathOfMutant can't find sender")
 		return false
@@ -568,7 +568,7 @@ function DynamicNewsManager:SeenDeathOfMutant(victim,who)
 end
 
 function DynamicNewsManager:SeenDeathByMutant(victim,who,comm)
-	local sender = self:FindSpeaker(victim,who,false,nil,true,true)
+	local sender = self:FindSpeaker(victim,who,false,nil,true)
 	if not (sender) then
 		--printf("SeenDeathByMutant can't find sender")
 		return false
@@ -629,7 +629,7 @@ function DynamicNewsManager:GossipDeathOfMutant(victim,who,comm)
 		return false
 	end
 	
-	local sender = self:FindSpeaker(victim,who,nil,false,true,true)
+	local sender = self:FindSpeaker(victim,who,nil,false,true)
 	if not (sender) then
 		--printf("GossipDeathByStalker can't find sender")
 		return false
