@@ -301,17 +301,11 @@ local function eval_danger(self)
 			do_check = false
 		end
 		
-		if not (do_check and is_danger(npc,danger)) then 
-			do_check = true 
-		end
-		
-		if (do_check) then 
+		if (do_check == true or not is_danger(npc,danger)) then 
 			if (tg < self.a.danger_time + self.a.inertion) then
 				return true
 			end
 		end
-	elseif not (is_danger(npc,danger)) then 
-		return false
 	end
 
 	local src = DangerInertion[ bd_types[bd_type] ]
@@ -319,6 +313,10 @@ local function eval_danger(self)
 
 	if (tg >= new_danger_time + inertion) then
 		return false
+	end
+	
+	if not (is_danger(npc,danger)) then 
+		return false 
 	end
 
 	--[[
