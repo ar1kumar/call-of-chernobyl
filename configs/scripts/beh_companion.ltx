@@ -14,8 +14,8 @@ walk_dist = 100
 jog_dist = 220
 wait_anim = guard
 walk_anim = patrol
-jog_anim = patrol
-run_anim = rush
+jog_anim = rush
+run_anim = panic
 delay_anim = guard
 meet = meet
 combat_ignore_cond = {=actor_enemy =check_enemy_name(actor)} false, true
@@ -37,15 +37,14 @@ behavior_state = {+npcx_beh_wait} beh_wait, beh_move
 target = {!is_squad_commander} commander, {=is_squad_commander +npcx_beh_patrol_mode} waypoint, actor_squad
 walk_dist = {+npcx_beh_patrol_mode} 90, 4
 jog_dist = {+npcx_beh_patrol_mode} 150, 8
-run_dist = {+npcx_beh_patrol_mode} 250, {=surge_started} 40, 90
+run_dist = {+npcx_beh_patrol_mode} 250, 50
 keep_distance = {+npcx_beh_distance_far} far, near
 near_desired_dist = {+npcx_beh_patrol_mode =is_squad_commander} 1, {!is_squad_commander} 3, 3
 far_desired_dist = {+npcx_beh_patrol_mode =is_squad_commander} 1, {!is_squad_commander} 8, 10
 wait_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} hide, guard
-walk_anim = {=is_wounded} nil, {+npcx_beh_patrol_mode -npcx_beh_substate_stealth} patrol,{+npcx_beh_substate_stealth} sneak, patrol
-jog_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} sneak_run, rush
-run_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} assault, assault
-sprint_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} sprint, sprint
+walk_anim = {=is_wounded} nil, {+npcx_beh_patrol_mode -npcx_beh_substate_stealth} patrol,{+npcx_beh_substate_stealth} sneak, rush
+jog_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} sneak_run, assault
+run_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} panic, panic
 delay_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} hide, random_animation
 out_restr = zat_a2_sr_noweap, jup_a6_sr_noweap, jup_b41_sr_noweap
 
