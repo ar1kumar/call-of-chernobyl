@@ -13,11 +13,13 @@ end
 
 function evaluator_camper:evaluate()
 	if (xr_logic.is_active(self.object, self.st)) then
-		-- TODO: figure out why combat planner doesn't take over if return false
-		-- local be = self.object:best_enemy()
-		-- if (be and self.object:position():distance_to_sqr(be:position()) <= self.st.radius) then
-			-- --alun_utils.debug_nearest(self.object,"%s",self.object:name())
-			-- return false
+		-- if not (self.st.locked) then
+			-- local be = self.object:best_enemy()
+			-- if (be and self.object:position():distance_to_sqr(be:position()) <= self.st.radius) then
+				-- self.st.locked = true
+				-- --alun_utils.debug_nearest(self.object,"%s",self.object:name())
+				-- return false
+			-- end
 		-- end
 		
 		local st = db.storage[self.object:id()]
@@ -86,7 +88,7 @@ function action_patrol:activate_scheme()
 	self:reset_scheme()
 end
 function action_patrol:can_shoot()
-	return self.st.shoot == "always" or self.st.shoot == "terminal" and self.move_mgr:standing_on_terminal_waypoint() or false
+	return (self.st.shoot == "always" or self.st.shoot == "terminal" and self.move_mgr:standing_on_terminal_waypoint()) or false
 end
 function action_patrol:execute()
 	--alun_utils.debug_write("action_patrol:execute")
@@ -127,12 +129,17 @@ function action_patrol:execute()
 	
 	if (npc:see(be) and self:can_shoot()) then
 		if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
-			local dir = vector():sub(be:position(),npc:position())
-			self.__keep_body_state_until = tg+3000
+			local dir = vector():sub(alun_utils.safe_bone_pos(be,"bip01_spine"),npc:position()):normalize()
+			self.__keep_body_state_until = tg+math.random(3000,4000)
 			if (npc:body_state() ~= move.crouch) then
 				--if not (math.abs(be:position().y-npc:position().y) > 3.5) then
 					if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
 						self.stand = false
+					else 
+						local bw = npc:best_weapon()
+						if (bw and bw:get_state() == 7) then 
+							self.stand = false
+						end
 					end
 				--end
 			else
@@ -142,13 +149,42 @@ function action_patrol:execute()
 			end
 		end
 		
+		state_mgr.set_state(npc,"threat_na") -- hack so we can force anim state and sight dir manually
+		npc:set_mental_state(anim.danger)
+		npc:set_movement_type(move.stand)
+		
 		if (self.stand) then 
-			state_mgr.set_state(npc,self.st.sniper and "threat_sniper_fire" or "threat_fire", nil, nil, {look_object = be}, {fast_set = true})
+			npc:set_body_state(move.standing)
+			--state_mgr.set_state(npc,self.st.sniper and "threat_sniper_fire" or "threat_fire", nil, nil, {look_object = be}, {fast_set = true})
 		else 
-			state_mgr.set_state(npc,self.st.sniper and "hide_sniper_fire" or "hide_fire", nil, nil, {look_object = be}, {fast_set = true})
+			npc:set_body_state(move.crouch)
+			--state_mgr.set_state(npc,self.st.sniper and "hide_sniper_fire" or "hide_fire", nil, nil, {look_object = be}, {fast_set = true})
 		end
 		
-		--xr_sound.set_sound_play(self.object:id(), self.st.attack_sound)
+		local bw = npc:best_weapon()
+		if (bw) then
+			local be_pos = alun_utils.safe_bone_pos(be,"bip01_spine")
+			npc:set_sight(look.fire_point,be_pos)
+			if (npc:is_body_turning()) then
+				npc:set_item(object.aim1,bw)
+				return
+			else
+				local pos = bw:bone_position("wpn_body")
+				local result = rq_result()
+				level.ray_pick(pos,vector():sub(be_pos,pos):normalize(),pos:distance_to(be_pos)+0.1,rq_target.rqtObject,result,npc)
+				--printf("result=%s",result.object and result.object:name())
+				if (result.object and result.object:id() ~= npc:id()) then 
+					-- tries avoid friendly fire
+					if (IsStalker(result.object) == false or npc:relation(result.object) == game_object.enemy) then
+						npc:set_item(object.fire1,bw,3,math.random(0,2000))
+						return
+					end
+				end
+			end
+			npc:set_item(object.aim1,bw)
+		end
+		
+		--xr_sound.set_sound_play(npc:id(), self.st.attack_sound)
 		return
 	end
 	
@@ -171,42 +207,60 @@ function action_patrol:execute()
 	end
 	
 	if (self:on_place()) then
-		if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
-			local dir = self.enemy_position and vector():sub(self.enemy_position,npc:position()) or npc:direction()
-			self.__keep_body_state_until = tg+3000
-			if (npc:body_state() ~= move.crouch) then
-				--if not (math.abs(self.enemy_position.y-npc:position().y) > 3.5) then
-					if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
-						self.stand = false
-					end
-				--end
-			else
-				if ( (self.enemy_position and math.abs(self.enemy_position.y-npc:position().y) > 3.5)) or (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
-					self.stand = true 
-				end
+		if (tg - npc:memory_time(be) > self.st.idle and not self.move_mgr:standing_on_terminal_waypoint()) then
+			self.scantime = self.scantime or tg+self.st.post_enemy_wait
+			if (self.scantime and tg > self.scantime) then
+				self.move_mgr:continue()
+				self.move_mgr:update()
+				return
 			end
 		end
 		
-		if (tg - npc:memory_time(be) < 3000) then
+		if (tg - npc:memory_time(be) < 6000) then
+			local ene_pos = self.enemy_position and vector():set(self.enemy_position.x,self.enemy_position.y-0.5,self.enemy_position.z)
+			if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
+				self.__keep_body_state_until = tg+math.random(3000,4000)
+				if (ene_pos == nil or ene_pos:distance_to_sqr(npc:position()) <= 100) then 
+					self.stand = true
+				else
+					local dir = ene_pos and vector():sub(ene_pos,npc:position()):normalize() or npc:direction()
+					if (npc:body_state() ~= move.crouch) then
+						--if not (math.abs(ene_pos.y-npc:position().y) > 3.5) then
+							if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.16) then 
+								self.stand = false
+							end
+						--end
+					else
+						if ( (ene_pos and math.abs(ene_pos.y-npc:position().y) > 3.5)) or (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.16) then 
+							self.stand = true 
+						end
+					end
+				end
+			end
+		
+			state_mgr.set_state(npc,"threat_na") -- hack so we can force anim state and sight dir manually
+			npc:set_mental_state(anim.danger)
+			npc:set_movement_type(move.stand)
+		
 			if (self.stand) then 
-				state_mgr.set_state(npc, "threat_na", nil, nil, {look_position = self.enemy_position})
+				--state_mgr.set_state(npc, "threat_na", nil, nil, {look_position = ene_pos}) -- commented because it's not accurate
+				npc:set_body_state(move.standing)
 			else 
-				state_mgr.set_state(npc, "hide_na", nil, nil, {look_position = self.enemy_position})
+				--state_mgr.set_state(npc, "hide_na", nil, nil, {look_position = ene_pos})
+				npc:set_body_state(move.crouch)
+			end
+			
+			local bw = npc:best_weapon()
+			if (bw) then
+				if (ene_pos) then
+					npc:set_sight(look.fire_point,ene_pos)
+				end
+				npc:set_item(object.aim1,bw)
 			end
 		else
 			self:scan(-1)
 		end
 		
-		if (tg - npc:memory_time(be) > self.st.idle) then
-			if not (self.move_mgr:standing_on_terminal_waypoint()) then
-				self.scantime = self.scantime or tg+self.st.post_enemy_wait
-				if (self.scantime and tg > self.scantime) then
-					self.move_mgr:continue()
-					self.move_mgr:update()
-				end 
-			end
-		end
-	
 		return
 	end
 
@@ -218,6 +272,10 @@ function action_patrol:execute()
 end
 
 function action_patrol:process_danger()
+	if (self.object:best_enemy()) then 
+		return false 
+	end 
+	
 	local best_danger = self.object:best_danger()
 	if best_danger == nil then
 		return false
@@ -241,14 +299,14 @@ function action_patrol:process_danger()
 
 	local bd_pos = urgent_danger and best_danger_object:position() or best_danger:position()
 	if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
-		local dir = bd_pos and vector():sub(bd_pos,self.object:position()) or self.object:direction()
+		local dir = bd_pos and vector():sub(bd_pos,self.object:position()):normalize() or self.object:direction()
 		self.__keep_body_state_until = tg+3000
 		if (self.object:body_state() ~= move.crouch) then
-			if (level.high_cover_in_direction(self.object:level_vertex_id(),dir) < 0.2) then 
+			if (level.high_cover_in_direction(self.object:level_vertex_id(),dir) >= 0.16) then 
 				self.stand = false
 			end	
 		else
-			if (level.high_cover_in_direction(self.object:level_vertex_id(),dir) >= 0.2) then 
+			if (level.high_cover_in_direction(self.object:level_vertex_id(),dir) < 0.16) then 
 				self.stand = true 
 			end
 		end
@@ -298,12 +356,13 @@ function action_patrol:scan(flag)
 		if (self.__keep_body_state_until==nil or tg > self.__keep_body_state_until) then
 			local dir = self.look_point and vector():sub(self.look_point,npc:position()) or npc:direction()
 			self.__keep_body_state_until = tg+3000
+			--alun_utils.debug_nearest(npc,"h_cover=%s l_cover=%s",level.high_cover_in_direction(npc:level_vertex_id(),dir),level.low_cover_in_direction(npc:level_vertex_id(),dir))
 			if (npc:body_state() ~= move.crouch) then
-				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.2) then 
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.16) then 
 					self.stand = false
 				end	
 			else
-				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) >= 0.2) then 
+				if (level.high_cover_in_direction(npc:level_vertex_id(),dir) < 0.16) then 
 					self.stand = true 
 				end
 			end
@@ -403,16 +462,11 @@ function add_to_binder(object, ini, scheme, section, storage)
 	
 	action:add_effect(wp(xr_evaluators_id.stohe_camper_base+1,false))
 	action:add_effect(wp(xr_evaluators_id.state_mgr+4,false))	
+	action:add_effect(wp(stalker_ids.property_enemy,false))
 	
 	manager:add_action(xr_actions_id.stohe_camper_base,action)
 	
-	--action = manager:action(xr_actions_id.alife)
-	--action:add_precondition(wp(xr_evaluators_id.stohe_camper_base+1,false))
-
-	action = manager:action(xr_actions_id.state_mgr+2)
-	action:add_precondition(wp(xr_evaluators_id.stohe_camper_base+1,false))
-	
-	action = manager:action(stalker_ids.action_combat_planner)
+	action = manager:action(xr_actions_id.state_mgr+1)
 	action:add_precondition(wp(xr_evaluators_id.stohe_camper_base+1,false))
 end
 
