@@ -271,11 +271,20 @@ function action_patrol:execute()
 	end
 end
 
-function action_patrol:process_danger()
-	if (self.object:best_enemy()) then 
-		return false 
-	end 
+function action_patrol:hit_callback(obj,amount,local_direction,who,bone_index)
+	if (amount <= 0 or bone_index == "from_death_callback") then 
+		return 
+	end
 	
+	if (who) then
+		local cls = who:clsid()
+		if (IsStalker(nil,cls) or IsMonster(nil,cls)) then
+			obj:enable_memory_object(who,true)
+		end 
+	end
+end 
+
+function action_patrol:process_danger()
 	local best_danger = self.object:best_danger()
 	if best_danger == nil then
 		return false
@@ -285,7 +294,7 @@ function action_patrol:process_danger()
 	local tg = time_global()
 	local passed_time = tg - best_danger:time()
 	
-	local urgent_danger = best_danger_object and (IsMonster(best_danger_object) or (IsStalker(best_danger_object) and self.object:relation(best_danger_object) >= game_object.enemy)) and (bd_type == danger_object.attacked) and passed_time < 3000
+	local urgent_danger = best_danger_object and (not IsStalker(best_danger_object) or self.object:relation(best_danger_object) >= game_object.enemy) and (bd_type == danger_object.attacked) and passed_time < 3000
 	if not (urgent_danger) then 
 		if not (xr_danger.has_danger(self.object)) then
 			return false
@@ -454,6 +463,7 @@ function add_to_binder(object, ini, scheme, section, storage)
 	manager:add_evaluator(xr_evaluators_id.stohe_camper_base+1,evaluator_camper("eva_camper_patrol",storage))
 
 	local action = action_patrol(object,"action_camper_patrol",storage)
+	xr_logic.subscribe_action_for_events(object, storage, action)
 	action:add_precondition(wp(stalker_ids.property_alive, true))
 	action:add_precondition(wp(xr_evaluators_id.stohe_camper_base+1,true))
 	action:add_precondition(wp(xr_evaluators_id.stohe_meet_base+1,false))
