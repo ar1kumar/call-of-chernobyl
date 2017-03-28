@@ -489,7 +489,7 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 		_G.abort("ERROR: NPC [%s] Section [%s]. No_retreat not available for SNIPER.", npc:name(), section)
 	end
 
-	st.radius = ini:r_float_ex(section,"radius")^2 or 100
+	st.radius = ini:r_float_ex(section,"radius") and ini:r_float_ex(section,"radius")^2 or 100
 	st.suggested_state = {}
 	st.suggested_state.moving = ini:r_string_ex(section,"def_state_moving")
 	st.suggested_state.moving_fire = ini:r_string_ex(section,"def_state_moving_fire")
