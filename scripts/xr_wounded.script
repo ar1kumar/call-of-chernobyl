@@ -302,8 +302,8 @@ function Cwound_manager:get_key_from_distance(t, hp)
 	end
 	return key
 end
-function Cwound_manager:hit_callback()
-	if self.npc:alive() == false then
+function Cwound_manager:hit_callback(obj,amt,dir,who,bone_index)
+	if bone_index == "from_death_callback" or self.npc:alive() == false then
 		return
 	end
 
@@ -491,7 +491,7 @@ function is_wounded(npc)
 end
 
 function hit_callback(npc_id) -- Тут может не быть стораджа.
-	local st = db.storage[npc_id]
+	local st = npc_id and db.storage[npc_id]
 	if st and st.wounded then
 		st.wounded.wound_manager:hit_callback()
 	end

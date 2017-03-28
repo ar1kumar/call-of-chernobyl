@@ -60,9 +60,7 @@ function motivator_binder:net_spawn(se_abstract)
 	end
 
 	local npc = self.object
-	
-	npc:enable_vision(true)
-	
+
 	-- Enable if you need it, CoC doesn't have story for actor_visual and ini read from HDD not good
 	--[[
 	local visual = system_ini():r_string_ex(npc:section(),"set_visual")
@@ -118,6 +116,8 @@ function motivator_binder:net_spawn(se_abstract)
 		--xr_logic.initialize_obj(npc, self.st, self.loaded, db.actor, modules.stype_stalker)
 		return true
 	end
+	
+	npc:enable_vision(true)
 	
 	self.st.state_mgr = state_mgr.bind_manager(npc)
 	self.st.move_mgr = move_mgr.move_mgr(npc)
@@ -272,9 +272,10 @@ function motivator_binder:net_destroy()
 end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
-	--alun_utils.debug_write(strformat("motivator_binder:hit_callback %s",obj and obj:name()))
+	--alun_utils.debug_write(strformat("START motivator_binder:hit_callback %s",obj and obj:name()))
 	if (amount <= 0) then
-		return
+		--alun_utils.debug_write(strformat("END motivator_binder:hit_callback %s",obj and obj:name()))
+		return 
 	end
 
 	local skip_wound
@@ -326,15 +327,20 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 	-- start [Alundaio]
 	SendScriptCallback("npc_on_hit_callback",obj,amount,local_direction,who,bone_index)
 	-- end [Alundaio]
+	
+	--alun_utils.debug_write(strformat("END motivator_binder:hit_callback %s",obj and obj:name()))
 end
 
 function motivator_binder:death_callback(victim, who)
-	--alun_utils.debug_write(strformat("motivator_binder:death_callback %s",victim and victim:name()))
+	--alun_utils.debug_write(strformat("START motivator_binder:death_callback %s",victim and victim:name()))
 	if (self.object == nil and victim == nil) then
 		callstack()
 		abort(strformat("CRITICAL ERROR: motivator_binder:death_callback : Game Object is nil and binder is not! %s",self.name),2)
-		return
+		--alun_utils.debug_write(strformat("END motivator_binder:death_callback %s",victim and victim:name()))
+		return 
 	end
+	
+	self.object:enable_vision(false)
 	
 	local known_info = self.st.ini and self.st.section_logic and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
 	if (known_info) then
@@ -399,6 +405,8 @@ function motivator_binder:death_callback(victim, who)
 	victim:set_callback(callback.death,nil)
 	victim:set_callback(callback.sound,nil)
 	victim:set_patrol_extrapolate_callback(nil)
+	
+	--alun_utils.debug_write(strformat("END motivator_binder:death_callback %s",victim and victim:name()))
 end
 
 function motivator_binder:use_callback(obj, who)
@@ -528,7 +536,7 @@ function motivator_binder:save(packet)
 	set_save_marker(packet, "save", false, "motivator_binder")
 	object_binder.save(self, packet)
 	set_save_marker(packet, "save", true, "motivator_binder")
-		if (USE_MARSHAL) then
+	if (USE_MARSHAL) then
 		return
 	end
 	--alun_utils.debug_write("\n-------motivator save start------ "..self.object:name(),true)
@@ -543,8 +551,8 @@ function motivator_binder:load(reader)
 	set_save_marker(reader, "load", false, "motivator_binder")
 	object_binder.load(self, reader)
 	set_save_marker(reader, "load", true, "motivator_binder")
-		self.loaded = true
-		if (USE_MARSHAL) then
+	self.loaded = true
+	if (USE_MARSHAL) then
 		if (self.object) then
 			self:load_state() -- fake because binder not ready when real load_state made
 		end

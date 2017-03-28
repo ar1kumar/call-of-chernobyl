@@ -93,7 +93,7 @@ end
 
 -- Внимание: вызывается во всех actions
 function action_fight_close:hit_callback( obj, amount, local_direction, who, bone_index )
-	if who == nil then
+	if who == nil or bone_index == "from_death_callback" then
 		return
 	end
 

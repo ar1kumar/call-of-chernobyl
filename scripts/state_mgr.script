@@ -573,6 +573,7 @@ function bind_manager(object)
 
 	action = manager:action(xr_actions_id.alife)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
+	--action:add_effect(wp(xr_evaluators_id.state_mgr + 2,false))
 
 	--[[
 	action = manager:action(stalker_ids.action_gather_items)
@@ -581,9 +582,10 @@ function bind_manager(object)
 
 	action = manager:action(stalker_ids.action_combat_planner)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
+	--action:add_effect(wp(xr_evaluators_id.state_mgr + 1,false))
 	
-	local combat_action_planner = cast_planner(action)
-	combat_action_planner:remove_action(stalker_ids.action_kill_enemy_if_not_visible)
+	--local combat_action_planner = cast_planner(action)
+	--combat_action_planner:remove_action(stalker_ids.action_kill_enemy_if_not_visible)
 
 	-- Alun: As of Mar 3 2017 Anomaly Planner removed from engine
 	-- Remove anomaly_action_planner
@@ -591,7 +593,8 @@ function bind_manager(object)
 	 
 	action = manager:action(stalker_ids.action_danger_planner)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
-
+	--action:add_effect(wp(xr_evaluators_id.state_mgr + 1,false))
+	
 	return state_manager
 end
 

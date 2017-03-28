@@ -131,14 +131,6 @@ local function npc_on_death_callback(npc,who)
 	end
 end
 
-local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
-	if (bone_index == "from_death_callback") then
-		return
-	end 
-	
-	set_script_danger(npc,7000,who_id,who and vector():set(who:position()))
-end
-
 local function get_rand_vertex(npc,vo)
 	local dir = npc:position():sub(vo:position())
 	dir = vector_rotate_y(dir,math_random(MinVectorRotateY,MaxVectorRotateY))
@@ -253,7 +245,6 @@ end
 -- 															ON GAME START
 -----------------------------------------------------------------------------
 function on_game_start()
-	--RegisterScriptCallback("npc_on_hit_callback",npc_on_hit_callback)
 	RegisterScriptCallback("npc_on_hear_callback",npc_on_hear_callback)
 	RegisterScriptCallback("npc_on_death_callback",npc_on_death_callback)
 end

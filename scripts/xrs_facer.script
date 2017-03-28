@@ -137,7 +137,7 @@ function hit_callback(obj,amount,dir,who,bone_index)
 	if not (Enabled) then
 		return
 	end
-
+	if (bone_index == "from_death_callback") then return end
 	if not(db.storage[obj:id()].facer) then return end
 	if (who and IsStalker(who) and IsMonster(who) and who:alive() and check_enemy(who,obj)) then
 		local target_id = utils.load_var(obj,"facer_target",nil)

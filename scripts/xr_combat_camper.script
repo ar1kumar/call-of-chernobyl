@@ -129,7 +129,7 @@ end
 
 -- Внимание: вызывается во всех actions
 function action_look_around:hit_callback( obj, amount, local_direction, who, bone_index )
-	if who == nil or not self.st.camper_combat_action then
+	if who == nil or not self.st.camper_combat_action or bone_index == "from_death_callback" then
 		return
 	end
 

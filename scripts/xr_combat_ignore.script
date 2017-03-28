@@ -379,7 +379,7 @@ end
 function action_process_enemy:hit_callback(obj, amount, local_direction, who, bone_index)
 	--printf("%s hit by %s",obj:name(),who and who:name())
 	if (utils.load_var(obj,"xr_combat_ignore_enabled") == false) then 
-		return 
+		return
 	end
 	if (amount > 0 and who and who:id() == db.actor:id()) then
 		local sim = alife()
