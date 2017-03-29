@@ -19,9 +19,9 @@ by Alundaio
 ---------------------------------------------------------------------------------------------------------
 
 local toggle_hud_list = 	{
-							["top"]  = { "actor_condition_hud", "feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
+							["top"]  = { "actor_inside_zone_hud", "actor_condition_hud", "feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
 							["left"] = { "team_squad_group_hud","surge_hud","arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
-							["right"] = { "npc_info_hud", "actor_info_hud", "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
+							["right"] = { "space_restrictor_hud","npc_memory_hud","npc_info_hud", "actor_info_hud", "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
 							}
 --------------------------------------------------------------------------------------------------
 
@@ -395,6 +395,16 @@ function get_target_at_cursor()
 		return level.get_target_obj()
 	end
 end
+
+function space_restrictor_hud_show(hud)
+	for k,v in pairs(db.storage) do 
+		if (v.object and tostring(v.active_section) ~= "nil") then 
+			hud:add_msg(v.object:name(),strformat("ID=%s Section=%s",v.object:id(),v.active_section))
+		end
+	end
+	hud:set_header("-[SpaceRestrictors]-")
+	hud:display()
+end 
 
 function simboard_hud_show(hud)
 	local populations = {}
@@ -781,6 +791,21 @@ function actor_feel_touch_hud_show(hud)
 	hud:display()
 end 
 
+function actor_inside_zone_hud_show(hud)
+	hud:set_header("-[ACTOR INSIDE ZONE INFO]-")
+	if (db.actor and db.actor:alive()) then
+		local itr = function(id)
+			local st = id and db.storage[id]
+			local o = st and st.object 
+			if (o and o:cast_SpaceRestrictor()) then
+				hud:add_msg(o:name(),strformat("ID=%s Section=%s",id,st.active_section))
+			end
+		end
+		db.actor:iterate_feel_touch(itr)
+	end
+	hud:display()
+end 
+
 local stalker_id
 local stalker_data = {}
 
@@ -1036,6 +1061,26 @@ function npc_info_hud_show(hud)
 			hud:add_msg("",info)
 		end
 		alife():iterate_info(near:id(),itr)
+	end
+	
+	hud:display()
+end
+
+function npc_memory_hud_show(hud)
+	hud:set_header("-[NPC Memory]-")
+
+	local near = get_debug_npc()
+	if (near and near:alive()) then
+		hud:add_msg("","-------Visual-------")
+		for o in near:memory_visible_objects() do
+			local obj = o:object()
+			hud:add_msg("",obj and obj:name())
+		end
+		hud:add_msg("","-------Sound-------")
+		for o in near:memory_visible_objects() do
+			local obj = o:object()
+			hud:add_msg("",obj and obj:name())
+		end
 	end
 	
 	hud:display()
