@@ -66,7 +66,7 @@ ph_skel_shot_up_factor        = 0.25
 SoundThreshold		 = 0.06						; range [0..1]
 
 
-eye_fov				 = 110
+eye_fov				 = 90
 eye_range			 = 90
 
 max_hear_dist		 = 100
@@ -150,12 +150,12 @@ eat_slice						=	0.01	; єтхышўхэшх ёvЄюёЄш яЁш 1 єъєёх
 eat_slice_weight				=	10.0	; єьхэ№°хэшх хфv є ЄЁєяр
 
 ; Morale
-Morale_Hit_Quant				= 0.02
+Morale_Hit_Quant				= 0.2
 Morale_Attack_Success_Quant		= 0.1
 Morale_Take_Heart_Speed			= 0.1
 Morale_Despondent_Speed			= 0.1
-Morale_Stable_Speed				= 0.05
-Morale_Despondent_Threashold	= 0.5
+Morale_Stable_Speed				= 0.01
+Morale_Despondent_Threashold	= 0.4
 
 
 ; Sounds
@@ -196,18 +196,6 @@ distant_idle_sound_range	= 100.0
 DamagedThreshold		= 0.2
 
 material				= creatures\medium
-
-min_view_distance   		= 0.8				; коэффициент, который множится на eye_range, в зависимости от угла
-max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
-visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
-always_visible_distance 	= 0.3
-time_quant					= 0.001
-decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
-velocity_factor		     	= 0.5
-luminocity_factor			= 1.5 				; фактор освещения (только для Актёра)
-transparency_threshold		= 0.25
-
-
 DynamicObjectsCount		= 32
 
 squad_attack_algorithm	= 1
@@ -238,27 +226,28 @@ terrain = cat_terrain
 
 
 [cat_vision_free]
-min_view_distance   		= 0.5				; коэффициент, который множится на eye_range, в зависимости от угла
-max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
-visibility_threshold	 	= 80.0			; значение, при достижении суммой которого объект считается видимым
-always_visible_distance 	= 0.2
-time_quant					= 0.005
-decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
-velocity_factor		     	= 1.0
-luminocity_factor			= 0.7 				; фактор освещения (только для Актёра)
-transparency_threshold		= 0.4
+min_view_distance   		= 0.1				; min range of cone based on eye_range
+max_view_distance	 		= 0.5				; max range of cone based on eye_range
+visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.005				;step increment to for sight calculations
+decrease_value				= 0.1 				;Decrease over time to overall threshold
+velocity_factor		     	= 0.4				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.70				;Low value = easier to see at night
+transparency_threshold	 	= 0.6 			    ;Low value = easier to see through objects
+still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 [cat_vision_danger]
-min_view_distance   		= 0.7				; коэффициент, который множится на eye_range, в зависимости от угла
-max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
-visibility_threshold	 	= 40.0				; значение, при достижении суммой которого объект считается видимым
-always_visible_distance 	= 0.2
-time_quant					= 0.001
-decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
-velocity_factor		     	= 1.0
-luminocity_factor			= 0.7 				; фактор освещения (только для Актёра)
-transparency_threshold		= 0.4
-
+min_view_distance   		= 0.5				; min range of cone based on eye_range
+max_view_distance	 		= 1.0				; max range of cone based on eye_range
+visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.0054			;step increment to for sight calculations
+decrease_value				= 0.1				;Decrease over time to overall threshold
+velocity_factor		     	= 0.5				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.70				;Low value = easier to see at night
+transparency_threshold	 	= 0.6				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
+still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 [cat_test_damage]
 ;bone_name		 = <hit_scale>,-1,<wound_scale>
