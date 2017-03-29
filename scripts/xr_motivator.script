@@ -475,6 +475,10 @@ function motivator_binder:update(delta)
 		self.st.state_mgr:update()
 	end
 	
+	-- Start [Alundaio]
+	SendScriptCallback("npc_on_update",object,db.storage[id])
+	-- End [Alundaio]
+	
 	local tg = time_global()
 	if (self.__tmr and tg < self.__tmr) then
 		--alun_utils.debug_write(strformat("motivator_bind:update %s END 2",self.object and self.object:name()))
@@ -518,9 +522,6 @@ function motivator_binder:update(delta)
 	end
 	--alun_utils.debug_write(strformat("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name()))
 
-	-- Start [Alundaio]
-	SendScriptCallback("npc_on_update",object,db.storage[id])
-	-- End [Alundaio]
 	--alun_utils.debug_write(strformat("motivator_bind:update %s END 3 AFTER AXR_MAIN",self.object and self.object:name()))
 end
 

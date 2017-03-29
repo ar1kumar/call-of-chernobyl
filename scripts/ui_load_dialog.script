@@ -50,6 +50,7 @@ function load_dialog:InitControls()
 	xml:InitStatic			("background",self)
 
 	ctrl					= CUIWindow()
+	ctrl:SetAutoDelete(true)
 	xml:InitWindow			("file_item:main",0,ctrl)
 
 	self.file_item_main_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())

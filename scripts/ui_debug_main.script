@@ -1767,6 +1767,7 @@ function debug_ui_attach:__init(owner, binds) super()
 	self.need_save = {}
 
 	local ctrl = CUIWindow()
+	ctrl:SetAutoDelete(true)
 	self.xml:InitWindow("wnd_attach_editor:file_item:main",0,ctrl)
 	self.form = self.xml:InitStatic("wnd_attach_editor:form",self)
 	self.xml:InitFrame("wnd_attach_editor:form:list_frame",self.form)
@@ -2212,6 +2213,7 @@ function debug_ui_3d:__init(owner, binds) super()
 	self.need_save = {}
 
 	local ctrl = CUIWindow()
+	ctrl:SetAutoDelete(true)
 	self.xml:InitWindow("wnd_attach_editor:file_item:main",0,ctrl)
 	self.form = self.xml:InitStatic("wnd_attach_editor:form",self)
 	self.xml:InitFrame("wnd_attach_editor:form:list_frame",self.form)
