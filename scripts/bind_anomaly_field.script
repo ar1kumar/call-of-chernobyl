@@ -2,6 +2,8 @@
 --'*  Биндер объекта поля аномалий.
 --'******************************************************
 fields_by_names = {}
+fields_all = {}
+
 function bind(obj)
 	obj:bind_object(anomaly_field_binder(obj))
 end
@@ -28,6 +30,7 @@ function anomaly_field_binder:net_spawn(se_abstract)
 	db.add_zone(self.object)
 	db.add_obj(self.object)
 	fields_by_names[self.object:name()] = self
+	fields_all[#fields_all+1] = self.object
 	return true
 end
 
@@ -36,6 +39,13 @@ function anomaly_field_binder:net_destroy()
 	db.del_obj(self.object)
 	db.storage[self.object:id()] = nil
 	fields_by_names[self.object:name()] = nil
+	local id = self.object:id()
+	for i=#fields_all,1 do 
+		if (fields_all[i]:id() == id) then 
+			table.remove(fields_all,i)
+			break
+		end
+	end
 	object_binder.net_destroy(self)
 end
 

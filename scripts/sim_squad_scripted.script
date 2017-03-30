@@ -372,14 +372,22 @@ function sim_squad_scripted:remove_npc(npc_id)
 	end
 end
 
-function sim_squad_scripted:on_npc_death(npc,killer)
+function sim_squad_scripted:on_npc_death(se_npc,se_killer)
 	--alun_utils.debug_write(strformat("%s:on_npc_death %s",self:name(),npc and npc:name()))
 	--printf("Squad %s. Killed member %s", tostring(self.id), npc.id)
 	--self.sound_manager:unregister_npc(npc.id)
 		
-	self:unregister_member(npc.id)
+	local npc = db.storage[se_npc.id] and db.storage[se_npc.id].object 
+	if (npc) then
+		local npc_binder = npc:binded_object()
+		if (npc_binder) then 
+			npc_binder.squad = nil
+		end
+	end 
+	
+	self:unregister_member(se_npc.id)
 
-	SendScriptCallback("squad_on_npc_death",self,npc,killer)
+	SendScriptCallback("squad_on_npc_death",self,se_npc,se_killer)
 
 	if self:npc_count() > 0 then
 		self:refresh()

@@ -1075,13 +1075,13 @@ end
 
 function se_smart_terrain:get_smart_props()
 	if (self.disabled) then
-		return "deactivated\\n\\n"..self:name().."  ["..self.id.."]\\n".."squad_id = "..tostring(self.id)
+		return "deactivated\\n\\n"..self:name().."  ["..self.id.."]\\n".."squad_id = "..tostring(self.squad_id)
 	end
 
 	local props = (not self.disabled) and smart_names.get_smart_terrain_name(self)
 	if(props==nil) or (DEV_DEBUG and axr_main.config:r_value("mm_options","enable_debug_hud",1,false) == true) then
 		if (self.disabled) then
-			return "deactivated\\n\\n"..self:name().."  ["..self.id.."]\\n".."squad_id = "..tostring(self.id)
+			return "deactivated\\n\\n"..self:name().."  ["..self.id.."]\\n".."squad_id = "..tostring(self.squad_id)
 		end
 
 		local board = SIMBOARD
@@ -1091,9 +1091,10 @@ function se_smart_terrain:get_smart_props()
 		
 		if (self.faction_controlled) then 
 			props = props .. "Faction_controlled=" .. tostring(self.faction_controlled) .. "\\nFaction_war_in_progress=" .. tostring(self.faction_war_in_progress) .. "\\n"
+			props = props .. "Controlling_faction=".. tostring(self.faction) .. "\\n"
 		end 
 		
-		props = props .. "Controlling_faction=".. tostring(self.faction) .. "\\n".."squad_id = "..tostring(self.id).."\\n".."Capacity="..squad_count.." of "..tostring(self.max_population).."\\n"
+		props = props .. "squad_id = "..tostring(self.squad_id).."\\n".."SimCapacity="..squad_count.." of "..tostring(self.max_population).."\\n"
 
 		if self.respawn_point and self.already_spawned then
 			props = props.."\\nAlready_spawned :\n"

@@ -147,6 +147,11 @@ function motivator_binder:net_spawn(se_abstract)
 	-- Cannot build GAME path! error
 	npc:set_dest_game_vertex_id(npc:game_vertex_id()) 
 	
+	-- hack!
+	npc:set_movement_type(move.walk)
+	npc:set_body_state(move.standing)
+	npc:set_mental_state(anim.free)
+	
 	xr_reach_task.add_reach_task_action(npc)
 	
 	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife_object(se_obj.group_id)
@@ -273,9 +278,15 @@ end
 
 function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
 	--alun_utils.debug_write(strformat("START motivator_binder:hit_callback %s",obj and obj:name()))
-	if (amount <= 0) then
+	if (amount <= 0 or who == nil) then
 		--alun_utils.debug_write(strformat("END motivator_binder:hit_callback %s",obj and obj:name()))
 		return 
+	end
+	
+	-- friendly fire
+	if (who and who:cast_Stalker() and obj:relation(who) < game_object.enemy) then
+		obj.health = obj.health + (amount/100)
+		return
 	end
 
 	local skip_wound
