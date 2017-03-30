@@ -51,7 +51,7 @@ function PsyAntenna:__init				()
 	self.no_mumble 						= false
 	self.hit_type	 					= "wound"
 	self.hit_freq 						= 5000
-
+	self.global_state 					= state_void
 end
 function PsyAntenna:destroy				()
 	self.sound_obj_right:stop()
@@ -61,8 +61,6 @@ function PsyAntenna:destroy				()
 	if (hud) then
 		hud:enable_fake_indicators(false)
 	end
-end
-function PsyAntenna:construct			()
 end
 function PsyAntenna:update_psy_hit(dt)
 	local hud = get_hud()
@@ -123,9 +121,6 @@ function PsyAntenna:update_psy_hit(dt)
 	end
 end
 function PsyAntenna:generate_phantoms()
-	if (sr_psy_antenna.psy_antenna.global_state ~= 1) then 
-		return 
-	end
 	if (db.actor:is_talking()) then 
 		return 
 	end
@@ -180,7 +175,9 @@ function PsyAntenna:update(dt)
 	if (db.actor == nil or device().precache_frame > 1) then
 		return 
 	end 
-	
+	if (self.global_state ~= 1) then 
+		return 
+	end	
 	self.eff_time					= self.eff_time + dt
 
 	local function update_intensity(intensity_base, intensity)
@@ -447,8 +444,6 @@ function load(p)
 		end
 
 		psy_antenna = PsyAntenna()
-		psy_antenna:construct()
-
 		psy_antenna:load(p)
 	end
 	set_save_marker(p, "load", true, "sr_psy_antenna")
@@ -459,7 +454,6 @@ function add_to_binder(npc, ini, scheme, section, storage)
 
 	if not psy_antenna then
 		psy_antenna = PsyAntenna()
-		psy_antenna:construct()
 		psy_antenna.global_state = state_void
 	end
 
