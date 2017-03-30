@@ -148,13 +148,13 @@ function action_reach_task_location:execute()
 	local squad = self.object:binded_object().squad
 	if (squad) then
 		if (squad:commander_id() == self.object:id() or not (db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object))then
-			alun_utils.debug_nearest(self.object,"i am commander")
+			--alun_utils.debug_nearest(self.object,"i am commander")
 			self:commander_execute(squad)
 		else
 			self:soldier_execute(squad)
 		end
 	else 
-		alun_utils.debug_nearest(self.object,"squad is nil")
+		--alun_utils.debug_nearest(self.object,"squad is nil")
 		local se_obj = alife_object(self.object:id())
 		if not (se_obj) then
 			return 
