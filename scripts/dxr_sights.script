@@ -169,12 +169,16 @@ end
 
 -- Called to attach a scope to the primary weapon.
 function context_functor_sight_primary(sight)
-	return context_functor_sight(sight, 3)
+	if IsWeapon(db.actor:item_in_slot(3)) then
+		return context_functor_sight(sight, 3)
+	end
 end
 
 -- Called to attach a scope to the secondary weapon.
 function context_functor_sight_secondary(sight)
-	return context_functor_sight(sight, 2)
+	if IsWeapon(db.actor:item_in_slot(2)) then
+		return context_functor_sight(sight, 2)
+	end
 end
 
 ---------------------
