@@ -158,9 +158,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 								if (math.random() <= (tonumber(b) or 0)) then
 									sight = sights[math.random(#sights)]
 									sight_variant = create_section .. "_" .. sight
-									printf("Variant: " .. sight_variant)
 									if (sys_ini:section_exist(sight_variant)) then
-										printf("4. sections exists!")
 										create_section = sight_variant
 									end
 								end
@@ -292,15 +290,12 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 								if (math.random() <= (tonumber(b) or 0)) then
 									sight = sights[math.random(#sights)]
 									sight_variant = create_section .. "_" .. sight
-									printf("Variant: " .. sight_variant)
 									if (sys_ini:section_exist(sight_variant)) then
-										printf("4. sections exists!")
 										create_section = sight_variant
 									end
 								end
 							end
 						end
-						
 					end
 				end
 				-- Create the item and set params
