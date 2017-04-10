@@ -118,6 +118,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 			if (spawn_sec and spawn_sec ~= "" and sys_ini:section_exist(spawn_sec)) then 
 				local cond,prob,count,ammo_type = 1,1,1,0
 				local bScope, bSilencer, bLauncher
+				local sight, sights, sight_variant
 				if (value and value ~= "") then
 					local _a,_b = string.find(value,",") 
 					if (_a) then 
@@ -149,6 +150,21 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 							bSilencer = math.random() <= (tonumber(b) or 0)
 						elseif (a == "launcher") then
 							bLauncher = math.random() <= (tonumber(b) or 0)
+							
+						-- For CWP & AO3 weapon variants.
+						elseif (a == "sight") then
+							if (sys_ini:line_exist(create_section, "sights")) then
+								sights = alun_utils.parse_list(sys_ini, create_section, "sights")
+								if (math.random() <= (tonumber(b) or 0)) then
+									sight = sights[math.random(#sights)]
+									sight_variant = create_section .. "_" .. sight
+									printf("Variant: " .. sight_variant)
+									if (sys_ini:section_exist(sight_variant)) then
+										printf("4. sections exists!")
+										create_section = sight_variant
+									end
+								end
+							end
 						end
 					end
 				end
@@ -241,6 +257,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 				local value = selected[2]
 				local cond,count,ammo_type = 1,1,0
 				local bScope, bSilencer, bLauncher
+				local sight, sights, sight_variant
 				if (value and value ~= "") then
 					-- parse params
 					local _a,_b = string.find(value,",") 
@@ -267,7 +284,23 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 							bSilencer = math.random() <= (tonumber(b) or 0)
 						elseif (a == "launcher") then
 							bLauncher = math.random() <= (tonumber(b) or 0)
+							
+						-- For CWP & AO3 weapon variants.
+						elseif (a == "sight") then
+							if (sys_ini:line_exist(create_section, "sights")) then
+								sights = alun_utils.parse_list(sys_ini, create_section, "sights")
+								if (math.random() <= (tonumber(b) or 0)) then
+									sight = sights[math.random(#sights)]
+									sight_variant = create_section .. "_" .. sight
+									printf("Variant: " .. sight_variant)
+									if (sys_ini:section_exist(sight_variant)) then
+										printf("4. sections exists!")
+										create_section = sight_variant
+									end
+								end
+							end
 						end
+						
 					end
 				end
 				-- Create the item and set params
