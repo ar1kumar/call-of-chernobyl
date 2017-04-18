@@ -117,12 +117,15 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 			result, spawn_sec, value = ini:r_line(section,i,"","")
 			if (spawn_sec and spawn_sec ~= "" and sys_ini:section_exist(spawn_sec)) then 
 				local cond,prob,count,ammo_type = 1,1,1,0
-				local bScope, bSilencer, bLauncher
+				local bLauncher, bScope, bSight, bSilencer
 				local sight, sights, variant_section
 				if (value and value ~= "") then
 					local _a,_b = string.find(value,",") 
 					if (_a) then 
 						count = tonumber(string.sub(value,1,_a-1)) or 1
+					end
+					if (string.find(value,"launcher")) then 
+						bLauncher = true
 					end
 					if (string.find(value,"scope")) then 
 						bScope = true
@@ -130,8 +133,8 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 					if (string.find(value,"silencer")) then 
 						bSilencer = true
 					end
-					if (string.find(value,"launcher")) then 
-						bLauncher = true
+					if (string.find(value,"sight")) then 
+						bSight = true
 					end
 					for a,b in string.gmatch(value,"([%w_%-%s%.]*)=([%w_%-%s%.]*)") do
 						if (a == "cond") then 
@@ -144,40 +147,43 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 							if not (ammos and ammo_type < #ammos) then
 								ammo_type = 0
 							end
+						elseif (a == "launcher") then
+							bLauncher = math.random() <= (tonumber(b) or 0)
 						elseif (a == "scope") then
 							bScope = math.random() <= (tonumber(b) or 0)
 						elseif (a == "silencer") then
 							bSilencer = math.random() <= (tonumber(b) or 0)
-						elseif (a == "launcher") then
-							bLauncher = math.random() <= (tonumber(b) or 0)
-							
-						-- Arsenal Overhaul & Chernobyl Weapon Pack only.
-						-- Allows random selection of a sighted variant if found.
 						elseif (a == "sight") then
-							if (sys_ini:line_exist(create_section, "sights")) then
-								sights = alun_utils.parse_list(sys_ini, create_section, "sights")
-								if (sights and #sights > 0 and math.random() <= (tonumber(b) or 0)) then
-									sight = sights[math.random(#sights)]
-									variant_section = create_section .. "_" .. sight
-									if (sys_ini:section_exist(variant_section)) then
-										create_section = variant_section
-									end
-								end
-							end
-						
-						-- Arsenal Overhaul & Chernobyl Weapon Pack only.
-						-- Allows random selection of a reskinned variant if found.
-						-- Note that this doesn't use a percentage; rather the number of reskins.
+							bSight = math.random() <= (tonumber(b) or 0)
 						elseif (a == "skins") then
+							-- Number of skins, not the % of spawning.
 							skins = math.random(0, (tonumber(b) or 0))
-							variant_section = (skins > 0 and create_section .. "_sk" .. skins or create_section)
-							if (sys_ini:section_exist(variant_section)) then
-								create_section = variant_section
-							end
 						end
-						
 					end
 				end
+				
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
+				-- Switches the weapon to a reskinned variant if available.
+				if (skins and skins > 0) then
+					variant_section = create_section .. "_sk" .. skins
+					if (sys_ini:section_exist(variant_section)) then
+						create_section = variant_section
+					end
+				end
+				
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
+				-- Switches the weapon to a sighted variant if available.
+				if (bSight) then
+					sights = alun_utils.parse_list(sys_ini, create_section, "sights")
+					if (#sights > 0) then
+						sight = sights[math.random(#sights)]
+						variant_section = create_section .. "_" .. sight
+						if (sys_ini:section_exist(variant_section)) then
+							create_section = variant_section
+						end
+					end
+				end
+				
 				for k=1,count do 
 					if (prob == 1 or math.random() <= prob) then 
 						local se_item = create(sim,spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
@@ -266,7 +272,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 				local create_section = selected[1]
 				local value = selected[2]
 				local cond,count,ammo_type = 1,1,0
-				local bScope, bSilencer, bLauncher
+				local bLauncher, bScope, bSight, bSilencer
 				local sight, sights, skins, variant_section
 				if (value and value ~= "") then
 					-- parse params
@@ -274,54 +280,61 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 					if (_a) then 
 						count = tonumber(string.sub(value,1,_a-1)) or 1
 					end
+					if (string.find(value,"launcher")) then 
+						bLauncher = true
+					end
 					if (string.find(value,"scope")) then 
 						bScope = true
 					end 
 					if (string.find(value,"silencer")) then 
 						bSilencer = true
 					end
-					if (string.find(value,"launcher")) then 
-						bLauncher = true
+					if (string.find(value,"sight")) then 
+						bSight = true
 					end
 					for a,b in string.gmatch(value,"([%w_%-%s%.]+)=([%w_%-%s%.]+)") do
 						if (a == "cond") then 
 							cond = tonumber(b) or 1
 						elseif (a == "ammo_type") then 
 							ammo_type = tonumber(b) or 0
+						elseif (a == "launcher") then
+							bLauncher = math.random() <= (tonumber(b) or 0)
 						elseif (a == "scope") then
 							bScope = math.random() <= (tonumber(b) or 0)
 						elseif (a == "silencer") then
 							bSilencer = math.random() <= (tonumber(b) or 0)
-						elseif (a == "launcher") then
-							bLauncher = math.random() <= (tonumber(b) or 0)
-							
-						-- Arsenal Overhaul & Chernobyl Weapon Pack only.
-						-- Allows random selection of a sighted variant if found.
 						elseif (a == "sight") then
-							if (sys_ini:line_exist(create_section, "sights")) then
-								sights = alun_utils.parse_list(sys_ini, create_section, "sights")
-								if (sights and #sights > 0 and math.random() <= (tonumber(b) or 0)) then
-									sight = sights[math.random(#sights)]
-									variant_section = create_section .. "_" .. sight
-									if (sys_ini:section_exist(variant_section)) then
-										create_section = variant_section
-									end
-								end
-							end
-						
-						-- Arsenal Overhaul & Chernobyl Weapon Pack only.
-						-- Allows random selection of a reskinned variant if found.
-						-- Note that this doesn't use a percentage; rather the number of reskins.
+							bSight = math.random() <= (tonumber(b) or 0)
 						elseif (a == "skins") then
+							-- Number of skins, not the % of spawning.
 							skins = math.random(0, (tonumber(b) or 0))
-							variant_section = (skins > 0 and create_section .. "_sk" .. skins or create_section)
-							if (sys_ini:section_exist(variant_section)) then
-								create_section = variant_section
-							end
 						end
-						
 					end
 				end
+				
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
+				-- Switches the weapon to a reskinned variant if available.
+				if (skins and skins > 0) then
+					variant_section = create_section .. "_sk" .. skins
+					if (sys_ini:section_exist(variant_section)) then
+						create_section = variant_section
+					end
+				end
+				
+				
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
+				-- Switches the weapon to a sighted variant if available.
+				if (bSight) then
+					sights = alun_utils.parse_list(sys_ini, create_section, "sights")
+					if (#sights > 0) then
+						sight = sights[math.random(#sights)]
+						variant_section = create_section .. "_" .. sight
+						if (sys_ini:section_exist(variant_section)) then
+							create_section = variant_section
+						end
+					end
+				end
+				
 				-- Create the item and set params
 				local se_item = create(sim,create_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
 				if (se_item) then 
