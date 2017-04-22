@@ -153,6 +153,14 @@ function action_npc_vs_box:finalize()
 	self.object:set_sight(look.direction, self.object:direction() , 0)
 	self.object:set_desired_position()
 	self.object:set_desired_direction()
+	
+	local wpn = self.object:object("wpn_knife")
+	if (wpn) then
+		local se_obj = alife_object(wpn:id())
+		if (se_obj) then
+			alife():release(se_obj,true)
+		end
+	end
 end
 
 ---------------------------------------------------------
