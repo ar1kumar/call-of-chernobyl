@@ -53,10 +53,13 @@ function evaluator_npc_vs_box:evaluate()
 	return ret
 end
 
-function get_weapon(npc)
-	local wpn = npc:object("wpn_knife")
-	if not (wpn) then
-		alife():create("wpn_knife",vector(),0,0,npc:id())
+function get_weapon(npc,st)
+	if not (st.spawned_knife) then
+		local wpn = npc:object("wpn_knife")
+		if not (wpn) then
+			alife():create("wpn_knife",vector(),0,0,npc:id())
+			st.spawned_knife = true
+		end
 	end
 	return wpn or npc:best_weapon()
 end
@@ -72,7 +75,7 @@ function action_npc_vs_box:initialize()
 	local npc = self.object
 	npc:set_desired_position()
 	npc:set_desired_direction()
-	local bw = get_weapon(npc)
+	local bw = get_weapon(npc,self.st)
 	if (bw) then
 		self.object:set_item(object.aim1,bw)
 	end
@@ -133,7 +136,7 @@ function action_npc_vs_box:execute()
 	self.object:set_body_state(move.crouch)
 	self.object:set_movement_type(move.stand)
 	self.object:set_sight(look.fire_point,pos)
-	local bw = get_weapon(self.object)
+	local bw = get_weapon(self.object,self.st)
 	if (bw) then
 		if (self.object:is_body_turning()) then
 			self.object:set_item(object.aim1,bw)
@@ -154,12 +157,15 @@ function action_npc_vs_box:finalize()
 	self.object:set_desired_position()
 	self.object:set_desired_direction()
 	
-	local wpn = self.object:object("wpn_knife")
-	if (wpn) then
-		local se_obj = alife_object(wpn:id())
-		if (se_obj) then
-			alife():release(se_obj,true)
+	if (self.st.spawned_knife) then
+		local wpn = self.object:object("wpn_knife")
+		if (wpn) then
+			local se_obj = alife_object(wpn:id())
+			if (se_obj) then
+				alife():release(se_obj,true)
+			end
 		end
+		self.st.spawned_knife = nil
 	end
 end
 
