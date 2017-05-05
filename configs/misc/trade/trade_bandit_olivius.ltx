@@ -1,11 +1,10 @@
-#include "trade_discounts.ltx"
 #include "profiles\profiles.ltx"
 
 [trader]
 buy_condition                                      = buy_condition_generic
 buy_item_condition_factor                          = 0.7
-buy_supplies                                       = supplies_generic
-discounts                                          = discount_0
+buy_supplies                                       = {=actor_goodwill_ge(bandit:1500)} supplies_special, supplies_generic
+discounts                                          = {=actor_goodwill_ge(bandit:2000)} discount_10, {=actor_goodwill_ge(bandit:1800)} discount_9, {=actor_goodwill_ge(bandit:1600)} discount_8, {=actor_goodwill_ge(bandit:1400)} discount_7, {=actor_goodwill_ge(bandit:1200)} discount_6, {=actor_goodwill_ge(bandit:1000)} discount_5, {=actor_goodwill_ge(bandit:800)} discount_4, {=actor_goodwill_ge(bandit:600)} discount_3, {=actor_goodwill_ge(bandit:400)} discount_2, {=actor_goodwill_ge(bandit:200)} discount_1, discount_0
 sell_condition                                     = sell_condition_generic
 
 [supplies_generic]
@@ -62,15 +61,12 @@ ammo_og-7b                                         = 4, 0.4
 ammo_pkm_100                                       = 4, 0.4
 ammo_vog-25                                        = 4, 0.4
 
-;Grenades
-grenade_f1                                         = 3, 0.5
-grenade_gd-05                                      = 3, 0.5
-
 ;Devices
 detector_simple                                    = 1, 1
 
 ;Medical
 medkit                                             = 5, 0.5
+medkit_army                                        = 2, 0.5
 antirad                                            = 3, 0.5
 bandage                                            = 3, 0.5
 
@@ -90,18 +86,64 @@ wood_stove										   = 1, 0.3
 charcoal										   = 2, 0.4
 
 ;Outfits
-exo_outfit                                         = 1, 0.2
-exo_proto_outfit                                   = 1, 0.1
-merc_outfit                                        = 1, 0.2
-specops_outfit                                     = 1, 0.2
-stalker_outfit                                     = 1, 0.8
-nbc_outfit                                         = 1, 0.1
-novice_2_outfit                                    = 1, 0.6
-novice_outfit                                      = 1, 1
-radiation_outfit                                   = 1, 0.1
-scientific_heavy_outfit                            = 1, 0.1
-scientific_outfit                                  = 1, 0.4
-merc_stalker_outfit								   = 1, 0.5
+bandit_novice_outfit                               = 1, 1
+bandit_specops_outfit                              = 1, 0.3
+banditmerc_outfit                                  = 1, 0.7
+trenchcoat_outfit                                  = 1, 0.6
+trenchcoat_brown_outfit                            = 1, 0.4
+
+;Helmets
+helm_facemask                                      = 1, 0.5
+helm_hardhat                                       = 1, 0.5
+helm_protective                                    = 1, 0.5
+helm_respirator                                    = 1, 0.5
+
+[supplies_special]:supplies_generic
+;Weapons
+wpn_abakan                                         = 1, 0.4
+wpn_ak74                                           = 1, 0.4
+wpn_ak74u                                          = 1, 0.4
+wpn_beretta                                        = 1, 0.4
+wpn_binoc                                          = 1, 0.4
+wpn_bm16                                           = 1, 0.4
+wpn_colt1911                                       = 1, 0.4
+wpn_desert_eagle                                   = 1, 0.4
+wpn_fn2000                                         = 1, 0.4
+wpn_fort                                           = 1, 0.4
+wpn_g36                                            = 1, 0.4
+wpn_gauss                                          = 1, 0.4
+wpn_groza                                          = 1, 0.4
+wpn_hpsa                                           = 1, 0.4
+wpn_knife                                          = 1, 0.4
+wpn_l85                                            = 1, 0.4
+wpn_lr300                                          = 1, 0.4
+wpn_mine                                           = 8, 0.4
+wpn_mp5                                            = 1, 0.4
+wpn_pb                                             = 1, 0.4
+wpn_pkm                                            = 1, 0.4
+wpn_pm                                             = 1, 0.4
+wpn_protecta                                       = 1, 0.4
+wpn_rg-6                                           = 1, 0.4
+wpn_rpg7                                           = 1, 0.4
+wpn_sig220                                         = 1, 0.4
+wpn_sig550                                         = 1, 0.4
+wpn_spas12                                         = 1, 0.4
+wpn_svd                                            = 1, 0.4
+wpn_svu                                            = 1, 0.4
+wpn_toz34                                          = 1, 0.4
+wpn_usp                                            = 1, 0.4
+wpn_val                                            = 1, 0.4
+wpn_vintorez                                       = 1, 0.4
+wpn_walther                                        = 1, 0.4
+
+;Devices
+detector_elite                                     = 1, 1
+
+;Outfits
+bandit_exo_outfit                                  = 1, 0.8
+radiation_outfit                                   = 1, 0.6
+scientific_heavy_outfit                            = 1, 0.6
+scientific_outfit                                  = 1, 0.6
 
 ;Helmets
 helm_battle                                        = 1, 0.4

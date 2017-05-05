@@ -1,12 +1,13 @@
-#include "trade_discounts.ltx"
 #include "profiles\profiles.ltx"
 
 [trader]
-buy_condition                                      = buy_condition_generic
+buy_condition                                      = buy_condition_duty_trader
 buy_item_condition_factor                          = 0.7
-buy_supplies                                       = {=actor_goodwill_ge(csky:1500)} supplies_special, supplies_generic
-discounts                                          = {=actor_goodwill_ge(csky:2000)} discount_10, {=actor_goodwill_ge(csky:1800)} discount_9, {=actor_goodwill_ge(csky:1600)} discount_8, {=actor_goodwill_ge(csky:1400)} discount_7, {=actor_goodwill_ge(csky:1200)} discount_6, {=actor_goodwill_ge(csky:1000)} discount_5, {=actor_goodwill_ge(csky:800)} discount_4, {=actor_goodwill_ge(csky:600)} discount_3, {=actor_goodwill_ge(csky:400)} discount_2, {=actor_goodwill_ge(csky:200)} discount_1, discount_0
+buy_supplies                                       = {=actor_goodwill_ge(dolg:1500)} supplies_special, supplies_generic
+discounts                                          = {=actor_goodwill_ge(dolg:2000)} discount_10, {=actor_goodwill_ge(dolg:1800)} discount_9, {=actor_goodwill_ge(dolg:1600)} discount_8, {=actor_goodwill_ge(dolg:1400)} discount_7, {=actor_goodwill_ge(dolg:1200)} discount_6, {=actor_goodwill_ge(dolg:1000)} discount_5, {=actor_goodwill_ge(dolg:800)} discount_4, {=actor_goodwill_ge(dolg:600)} discount_3, {=actor_goodwill_ge(dolg:400)} discount_2, {=actor_goodwill_ge(dolg:200)} discount_1, discount_0
 sell_condition                                     = sell_condition_generic
+
+[buy_condition_duty_trader]:buy_condition_generic,buy_mutant_parts
 
 [supplies_generic]
 ;Weapons
@@ -62,12 +63,16 @@ ammo_og-7b                                         = 4, 0.4
 ammo_pkm_100                                       = 4, 0.4
 ammo_vog-25                                        = 4, 0.4
 
+;Grenades
+grenade_f1                                         = 3, 0.5
+grenade_gd-05                                      = 3, 0.5
+
 ;Devices
 detector_simple                                    = 1, 1
 
 ;Medical
 medkit                                             = 5, 0.5
-medkit_army                                        = 2, 0.5
+medkit_army                                        = 8, 0.5
 antirad                                            = 3, 0.5
 bandage                                            = 3, 0.5
 
@@ -81,44 +86,26 @@ vodka                                              = 4, 0.4
 ;Misc
 itm_backpack                                       = 8, 0.3
 itm_sleepbag                                       = 1, 0.5
-itm_gunsmith_toolkit                               = 1, 0.5
-itm_outfit_toolkit                                 = 1, 0.5
+itm_gunsmith_toolkit                               = 2, 0.5
+itm_outfit_toolkit                                 = 2, 0.5
 wood_stove										   = 1, 0.3
 charcoal										   = 2, 0.4
 
 ;Outfits
-cs_heavy_outfit                                    = 1, 0.3
-cs_light_novice_outfit                             = 1, 0.5
-cs_light_outfit                                    = 1, 0.5
-cs_medium_outfit                                   = 1, 0.4
-cs_3b_outfit									   = 1, 0.35
-cs_nbc_outfit                                      = 1, 0.4
-cs_novice_outfit                                   = 1, 1
-cs_scientific_outfit                               = 1, 0.5
-cs_stalker_outfit                                  = 1, 0.7
-
-;Helmets
-helm_facemask                                      = 1, 0.5
-helm_hardhat                                       = 1, 0.5
-helm_protective                                    = 1, 0.5
-helm_respirator                                    = 1, 0.5
-
-[supplies_special]:supplies_generic
-;Devices
-detector_elite                                     = 1, 1
-
-;Outfits
-cs_exo_outfit                                      = 1, 0.8
+dolg_heavy_outfit                                  = 1, 0.6
+dolg_novice_outfit                                 = 1, 1
+dolg_outfit                                        = 1, 0.8
+dolg_radiation_outfit                              = 1, 0.3
+dolg_scientific_outfit                             = 1, 0.3
 
 ;Helmets
 helm_battle                                        = 1, 0.4
-helm_facemask                                      = 1, 0.4
 helm_hardhat                                       = 1, 0.4
 helm_m40                                           = 1, 0.4
 helm_protective                                    = 1, 0.4
-helm_respirator                                    = 1, 0.4
-helm_respirator_2                                  = 1, 0.4
-helm_respirator_gp5                                = 1, 0.4	
-helm_respirator_half                               = 1, 0.4
 helm_tactic                                        = 1, 0.4
 helm_tactic_2                                      = 1, 0.4
+
+[supplies_special]:supplies_generic
+;Outfits
+dolg_exo_outfit                                    = 1, 0.8
