@@ -8,7 +8,7 @@
 		Such thing is 'okay' in db.storage, but that is because on net_destroy db.storage[id] is set nil. So if you are keeping track of objects directly in a table, instead of ID 
 		then you absolutely must rid of every single reference to the userdata so that it can be destroy and garbage collected. Otherwise you end up with undetectable issues.
 --]]
-GAME_VERSION = "1.4.23"
+GAME_VERSION = "1.5"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true

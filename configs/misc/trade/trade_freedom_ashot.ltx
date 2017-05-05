@@ -1,36 +1,48 @@
-#include "trade_discounts.ltx"
 #include "profiles\profiles.ltx"
 
 [trader]
 buy_condition                                      = buy_condition_generic
 buy_item_condition_factor                          = 0.7
-buy_supplies                                       = {=actor_goodwill_ge(army:1500)} supplies_heavy_pockets, supplies_generic
-discounts                                          = {=actor_goodwill_ge(army:2000)} discount_10, {=actor_goodwill_ge(army:1800)} discount_9, {=actor_goodwill_ge(army:1600)} discount_8, {=actor_goodwill_ge(army:1400)} discount_7, {=actor_goodwill_ge(army:1200)} discount_6, {=actor_goodwill_ge(army:1000)} discount_5, {=actor_goodwill_ge(army:800)} discount_4, {=actor_goodwill_ge(army:600)} discount_3, {=actor_goodwill_ge(army:400)} discount_2, {=actor_goodwill_ge(army:200)} discount_1, discount_0
+buy_supplies                                       = {=actor_goodwill_ge(freedom:1500)} supplies_special, supplies_generic
+discounts                                          = {=actor_goodwill_ge(freedom:2000)} discount_10, {=actor_goodwill_ge(freedom:1800)} discount_9, {=actor_goodwill_ge(freedom:1600)} discount_8, {=actor_goodwill_ge(freedom:1400)} discount_7, {=actor_goodwill_ge(freedom:1200)} discount_6, {=actor_goodwill_ge(freedom:1000)} discount_5, {=actor_goodwill_ge(freedom:800)} discount_4, {=actor_goodwill_ge(freedom:600)} discount_3, {=actor_goodwill_ge(freedom:400)} discount_2, {=actor_goodwill_ge(freedom:200)} discount_1, discount_0
 sell_condition                                     = sell_condition_generic
 
 [supplies_generic]
 ;Weapons
-wpn_abakan                                         = 1, 0.3
+wpn_abakan                                         = 1, 0.4
 wpn_ak74                                           = 1, 0.5
 wpn_ak74u                                          = 1, 0.7
+wpn_beretta                                        = 1, 0.6
 wpn_binoc                                          = 1, 0.4
-wpn_fort                                           = 1, 0.7
+wpn_bm16                                           = 1, 0.4
+wpn_colt1911                                       = 1, 0.5
+wpn_desert_eagle                                   = 1, 0.6
+wpn_fn2000                                         = 1, 0.2
+wpn_fort                                           = 1, 0.4
+wpn_g36                                            = 1, 0.2
 wpn_groza                                          = 1, 0.4
+wpn_hpsa                                           = 1, 0.6
 wpn_knife                                          = 1, 0.4
+wpn_l85                                            = 1, 0.4
+wpn_lr300                                          = 1, 0.4
 wpn_mine                                           = 8, 0.4
-wpn_mp5                                            = 1, 0.7
+wpn_mp5                                            = 1, 0.8
 wpn_pb                                             = 1, 0.7
-wpn_pkm                                            = 1, 0.4
-wpn_pm                                             = 1, 0.7
+wpn_pkm                                            = 1, 0.2
+wpn_pm                                             = 1, 0.6
 wpn_protecta                                       = 1, 0.7
 wpn_rg-6                                           = 1, 0.4
 wpn_rpg7                                           = 1, 0.4
-wpn_spas12                                         = 1, 0.4
+wpn_sig220                                         = 1, 0.6
+wpn_sig550                                         = 1, 0.4
+wpn_spas12                                         = 1, 0.5
 wpn_svd                                            = 1, 0.2
-wpn_svu                                            = 1, 0.4
-wpn_toz34                                          = 1, 0.7
-wpn_val                                            = 1, 0.4
-wpn_vintorez                                       = 1, 0.4
+wpn_svu                                            = 1, 0.2
+wpn_toz34                                          = 1, 0.5
+wpn_usp                                            = 1, 0.6
+wpn_val                                            = 1, 0.2
+wpn_vintorez                                       = 1, 0.2
+wpn_walther                                        = 1, 0.7
 
 ;Weapon Addons
 wpn_addon_grenade_launcher                         = 1, 0.3
@@ -71,7 +83,6 @@ detector_simple                                    = 1, 1
 
 ;Medical
 medkit                                             = 5, 0.5
-medkit_army                                        = 8, 0.5
 antirad                                            = 3, 0.5
 bandage                                            = 3, 0.5
 
@@ -85,25 +96,26 @@ vodka                                              = 4, 0.4
 ;Misc
 itm_backpack                                       = 8, 0.3
 itm_sleepbag                                       = 1, 0.5
-itm_gunsmith_toolkit                               = 1, 0.5
-itm_outfit_toolkit                                 = 1, 0.5
+itm_gunsmith_toolkit                               = 2, 0.5
+itm_outfit_toolkit                                 = 2, 0.5
 wood_stove										   = 1, 0.3
 charcoal										   = 2, 0.4
 
 ;Outfits
-military_outfit                                    = 1, 0.7
-specops_outfit                                     = 1, 0.2
-army_outfit                                        = 1, 0.7
+svoboda_heavy_outfit                               = 1, 0.3
+svoboda_heavy_outfit_2                             = 1, 0.2
+svoboda_light_outfit                               = 1, 0.8
+svoboda_novice_outfit                              = 1, 1
+svoboda_radiation_outfit                           = 1, 0.3
+svoboda_scientific_outfit                          = 1, 0.4
 
 ;Helmets
+helm_facemask                                      = 1, 0.4
 helm_battle                                        = 1, 0.4
 helm_hardhat                                       = 1, 0.4
 helm_m40                                           = 1, 0.4
 helm_protective                                    = 1, 0.4
-helm_tactic                                        = 1, 0.4
-helm_tactic_2                                      = 1, 0.4
 
-[supplies_heavy_pockets]:supplies_generic
+[supplies_special]:supplies_generic
 ;Outfits
-commander_outfit                                   = 1, 0.8
-military_exo_outfit                                = 1, 0.8
+svoboda_exo_outfit                                 = 1, 0.8

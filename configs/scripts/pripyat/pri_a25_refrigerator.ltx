@@ -9,8 +9,7 @@ not_for_npc = true
 snd_open_start = 
 snd_close_start = 
 snd_close_stop = 
-on_use = {+pri_a25_check_freezer_knock} ph_door@open %+pri_a25_freezer_can_talk%
-on_info = {+pri_a25_wood_board_hit -pri_a25_once_refrigerator_door_open} ph_door@open
+on_use = ph_door@open
 
 [ph_door@open]
 locked = false
@@ -20,4 +19,4 @@ not_for_npc = true
 snd_open_start = 
 snd_close_start = 
 snd_close_stop = 
-on_info = {-pri_a25_once_refrigerator_door_open} ph_door@closed %+pri_a25_once_refrigerator_door_open%
+on_use = ph_door@closed
