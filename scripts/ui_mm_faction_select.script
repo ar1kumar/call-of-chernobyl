@@ -559,7 +559,7 @@ function faction_ui:OnFactionSelect(faction)
 				self.default_loadout[w] = 1
 				local ammo = sys_ini:r_string_ex(w,"ammo_class")
 				ammo = alun_utils.str_explode(ammo,",")
-				ammo = ammo[math.random(#ammo)]
+				ammo = ammo[1] --ammo[math.random(#ammo)]
 				self.default_loadout[ammo] = 2
 			end
 		end
@@ -570,7 +570,7 @@ function faction_ui:OnFactionSelect(faction)
 
 		local ammo = sys_ini:r_string_ex(weapon,"ammo_class")
 		ammo = alun_utils.str_explode(ammo,",")
-		ammo = ammo[math.random(#ammo)]
+		ammo = ammo[1] --ammo[math.random(#ammo)]
 
 		self.default_loadout[weapon] = 1
 		self.default_loadout[ammo] = 2
