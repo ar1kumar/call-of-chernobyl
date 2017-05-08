@@ -1,6 +1,9 @@
+; This plugin determines whether Nimble acts through dialog or through trade.
+; This plugin also determines which items he offers when using the traditional system.
+
 [settings]
-nimble_trade_instead = false  	; Set true if you want nimble to open trade window instead (see: configs\misc\trade\trade_loner_nimble.ltx)
-item_count = 7 					; Set this to how many categories you have
+item_count = 7
+nimble_trade_instead = false
 
 [item_count]
 category_1 = 3
@@ -11,7 +14,8 @@ category_5 = 1
 category_6 = 1
 category_7 = 1
 
-[costs_table] ;prepay_agreed, prepay_refused, cost
+; Usage: Prepay (Agreed), Prepay (Refused), Cost.
+[costs_table]
 category_1 = 700, 1400, 2800
 category_2 = 2000, 4000, 8000
 category_3 = 4000,8000, 16000
@@ -20,33 +24,41 @@ category_5 = 8000,16000, 32000
 category_6 = 6000,12000, 24000
 category_7 = 12000, 24000, 48000
 
-;	Possible to give more than a single item by listing them as value separated by comma
-;	item1 = item1, item2, item3, item4
+; Potential items which can be received depending on selection.
+; Multiple items can be given at once if you separate them with a comma.
+
+; Pistols.
 [buy_item_table_1]
 item1 = wpn_desert_eagle_nimble
 item2 = wpn_sig220_nimble
 item3 = wpn_usp_nimble
 
+; Sub-machine guns.
 [buy_item_table_2]
 item1 = wpn_mp5_nimble
 item2 = wpn_spas12_nimble
 item3 = wpn_protecta_nimble
 
+; Assault rifles.
 [buy_item_table_3]
 item1 = wpn_groza_nimble
 item2 = wpn_g36_nimble
 item3 = wpn_fn2000_nimble
 
+; Sniper rifles.
 [buy_item_table_4]
 item1 = wpn_vintorez_nimble
 item2 = wpn_svu_nimble
 item3 = wpn_svd_nimble
 
+; Headgear.
 [buy_item_table_5]
-item1 = helm_hardhat,cs_heavy_outfit
+item1 = helm_hardhat, cs_heavy_outfit
 
+; Scientific outfits.
 [buy_item_table_6]
 item1 = scientific_outfit
 
+; Exoskeleton outfits.
 [buy_item_table_7]
 item1 = exo_outfit
