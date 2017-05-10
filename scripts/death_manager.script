@@ -103,9 +103,33 @@ function create_release_item(npc)
 	for sec,v in pairs(spawn_items) do
 		if (v > 0 and item_count[sec] and not utils.is_ammo(sec) and not grenade_classes[sec]) then
 			local number = math.random(item_count[sec][1], item_count[sec][2])
-			create_items(npc, sec, number, v)
+			
+			-- Check if guide is fully unlocked; don't spawn useless memory sticks.
+			local ignore_item = nil
+			if (sec == "itm_guide_usb_1" or sec == "itm_guide_usb_2") then
+				local guide = ui_pda_encyclopedia_tab.get_ui()
+				local locked_articles = guide.locked or 0
+				if (#locked_articles == 0) then
+					ignore_item = true
+				end
+			end
+			
+			if not ignore_item then
+				create_items(npc, sec, number, v)
+			end
 		end
 	end
+	
+	--[[
+	local guide = ui_pda_encyclopedia_tab.get_ui()
+	local locked_articles = guide.locked or 0
+	if (#locked_articles > 0 and math.random() >= 0.05) then
+		local section = random_choice("itm_guide_usb_1", "itm_guide_usb_2")
+		if (system_ini():section_exist(section)) then
+			create_items(npc, section, 1, 100)
+		end
+	end
+	]]
 end
 
 function try_spawn_ammo(npc,spawn_items)

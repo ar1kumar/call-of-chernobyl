@@ -18,6 +18,35 @@ function on_item_use(item)
 	end
 end
 
+---------------------------
+----- Context Options -----
+---------------------------
+
+-- Action performed by USB memory sticks.
+function context_action_functor(item)
+	local item_object = alife_object(item:id())
+	alife():release(item_object, true)
+	unlock_article()
+end
+
+-- Text displayed for USB memory sticks.
+function context_functor(item)
+	-- Return if the weapon is invalid.
+	if (not item) then
+		return
+	end
+	
+	-- Return if there are no articles to unlock.
+	local guide = ui_pda_encyclopedia_tab.get_ui()
+	local locked_articles = guide.locked or 0
+	if (#locked_articles == 0) then
+		return
+	end
+	
+	-- Return the context option to detach a sight.
+	return game.translate_string("ui_inv_download")
+end
+
 --------------------------------
 ----- Article Manipulation -----
 --------------------------------
@@ -54,13 +83,13 @@ function set_article(section)
 end
 
 -- Unlocks an article for the player.
--- A random one will be chosen if nothing is specified.
+-- A random one will be chosen if none is specified.
 function unlock_article(section)
 	-- Instance of the guide object.
 	local guide = ui_pda_encyclopedia_tab.get_ui()
 	
 	-- Instance of the locked and unlocked article tables.
-	local locked_articles = guide.locked
+	local locked_articles = guide.locked or 0
 	local unlocked_articles = xr_statistic.actor_statistic.guide_articles
 	
 	-- Return if all articles have been unlocked.

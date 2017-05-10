@@ -104,17 +104,17 @@ end
 ----- Context Actions -----
 ---------------------------
 
--- Called to display text for detaching a scope.
+-- Called to detach a sight from a weapon.
 function context_action_functor(weapon)
 	detach_sight(weapon)
 end
 
--- Called to display text for attaching a scope to primary slot.
+-- Called to attach a sight to primary weapon.
 function context_action_functor_sight_primary(sight)
 	attach_sight(sight, get_weapon(3))
 end
 
--- Called to display text for attaching a scope to secondary slot.
+-- Called to attach a sight to secondary weapon.
 function context_action_functor_sight_secondary(sight)
 	attach_sight(sight, get_weapon(2))
 end
@@ -123,7 +123,7 @@ end
 ----- Context Functors -----
 ----------------------------
 
--- Called to detach a scope from a weapon.
+-- Called to display text for detaching a sight.
 function context_functor(weapon)
 	-- Return if the weapon is invalid.
 	if (not weapon) then
@@ -146,7 +146,7 @@ function context_functor(weapon)
 	return game.translate_string("st_detach_scope")
 end
 
--- Called to attach a scope to a weapon.
+-- Called to display text for attaching a sight.
 function context_functor_sight(sight, slot)
 	-- Return if the sight or weapon is invalid.
 	local weapon = get_weapon(slot)
@@ -167,14 +167,14 @@ function context_functor_sight(sight, slot)
 	return game.translate_string("st_attach_scope_to_pistol") .. " " .. alun_utils.get_inv_name(weapon:section())
 end
 
--- Called to attach a scope to the primary weapon.
+-- Called to attach a sight to the primary weapon.
 function context_functor_sight_primary(sight)
 	if IsWeapon(db.actor:item_in_slot(3)) then
 		return context_functor_sight(sight, 3)
 	end
 end
 
--- Called to attach a scope to the secondary weapon.
+-- Called to attach a sight to the secondary weapon.
 function context_functor_sight_secondary(sight)
 	if IsWeapon(db.actor:item_in_slot(2)) then
 		return context_functor_sight(sight, 2)
