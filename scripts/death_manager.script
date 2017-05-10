@@ -119,17 +119,6 @@ function create_release_item(npc)
 			end
 		end
 	end
-	
-	--[[
-	local guide = ui_pda_encyclopedia_tab.get_ui()
-	local locked_articles = guide.locked or 0
-	if (#locked_articles > 0 and math.random() >= 0.05) then
-		local section = random_choice("itm_guide_usb_1", "itm_guide_usb_2")
-		if (system_ini():section_exist(section)) then
-			create_items(npc, section, 1, 100)
-		end
-	end
-	]]
 end
 
 function try_spawn_ammo(npc,spawn_items)
