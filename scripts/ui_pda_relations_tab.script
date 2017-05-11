@@ -106,7 +106,7 @@ function pda_relations_tab:InitControls()
 	self:AddCallback("list_companion",ui_events.LIST_ITEM_CLICKED,self.OnSelectCompanionList,self)
 	
 	self.auto_chk = xml:InitCheck("auto_check",self)
-	self.auto_chk:SetCheck(false)
+	self.auto_chk:SetCheck(true)
 	
 	for row=1,4 do
 		local row_form = ui_companion_row(self,row,xml)
@@ -136,7 +136,7 @@ function pda_relations_tab:Update()
 	if self.auto_chk:GetCheck() then
 		local tg = time_global()
 		if self._tmr < tg then
-			self._tmr = tg + 2000
+			self._tmr = tg + 2500
 			self:autoupdate()
 		end
 	end
