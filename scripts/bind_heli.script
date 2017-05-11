@@ -101,7 +101,7 @@ function heli_binder:update( delta )
 	-- Kills off any remaining strong helicopters.
 	if (has_alife_info("achieved_down_to_earth")) then
 		local autokill = system_ini():r_bool_ex(self.object:section(), "kill_with_achievement", false)
-		if (not self.st.immortal and autokill and autokill == true) then
+		if (not self.st.heliObject.m_dead and not self.st.immortal and autokill == true) then
 			heli_die(self.object)
 		end
 	end
