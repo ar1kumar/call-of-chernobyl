@@ -208,13 +208,13 @@ end
 function inc_achievement(achievement)
 	inc_counter("achievements")
 	inc_actor_rank(rank_rep[achievement].rnk)
-	inc_actor_rank(rank_rep[achievement].rpt)
+	inc_actor_reputation(rank_rep[achievement].rpt)
 end
 
 function inc_counter(statistic)
 	actor_statistic[statistic] = actor_statistic[statistic] + 1
 	inc_actor_rank(rank_rep[statistic].rnk)
-	inc_actor_rank(rank_rep[statistic].rpt)
+	inc_actor_reputation(rank_rep[statistic].rpt)
 end
 
 function inc_counter_artefacts(art_id)
