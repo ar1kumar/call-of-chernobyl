@@ -143,7 +143,7 @@ end
 ----------------------------------------------------------------------------
 local primary_objects_tbl = nil
 function fill_primary_objects()
-	if not primary_object then
+	if not primary_objects_tbl then
 		primary_objects_tbl = {}
 		local ini = ini_file("plugins\\pda_map_spots.ltx")
 		local line_count = ini:line_count("pda_map_spots") or 0
