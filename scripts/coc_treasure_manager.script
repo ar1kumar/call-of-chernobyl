@@ -7,7 +7,7 @@ This script spawns loot, randomly, inside all INVBOX class objects. Loot is dete
 within the .scoc as a string. When the cache is opened, the loot is spawned.
 
 A list of all valid item sections is generated automatically by parsing all of system_ini(). From this list, loot can be obtained. If you do not 
-want a certain section from being spawned, put it in 'plugins\coc_treasure_manager.ltx' 'ignore_sections'.
+want a certain section from being spawned, put it in 'plugins\treasure_blacklist' 'ignore_sections'.
 
 A valid item section is determined by several factors:
 1. It must have can_trade = true
@@ -26,7 +26,7 @@ will find the <filename>.lua in your savegame folder. Search the file for 'cache
 caches = {}
 local caches_count = 0
 
-local ltx = ini_file("plugins\\coc_treasure_manager.ltx")
+local ltx = ini_file("plugins\\treasure_blacklist")
 local valid_item_list = nil
 ------------------------------------------------------------------------------------------------------------------
 --							PRIVATE

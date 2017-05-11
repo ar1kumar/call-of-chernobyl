@@ -170,7 +170,7 @@ function get_spawn_table(name)
 		["ZS_AMEBA"] = "Anomaly"
 	}
 	
-	local ltx = ini_file("plugins\\debug_spawner.ltx")
+	local ltx = ini_file("plugins\\spawner_blacklist.ltx")
 	local ini = system_ini()
 	ini:section_for_each(function(section)
 		if not (ltx:line_exist("ignore_sections",section)) then

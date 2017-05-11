@@ -241,7 +241,7 @@ end
 function get_character_icon_list()
 	local t = {"ui_inGame2_Strelok"}
 	local faction = character_community(db.actor):sub(7)
-	local ini = ini_file("plugins\\faction_portraits.ltx")
+	local ini = ini_file("plugins\\player_portraits.ltx")
 	local section = faction.."_portraits"
 	local n = ini:section_exist(section) and ini:line_count(section) or 0
 	local result, id, value = nil,nil,nil

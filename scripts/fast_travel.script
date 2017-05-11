@@ -2,7 +2,7 @@
 -- Fast Travel system
 -- author: Alundaio
 ------------------------------
-local enabled = false 			-- change under settings in plugins\faction_quick_travel.ltx
+local enabled = false 			-- change under settings in plugins\quick_travel.ltx
 quick_travel_smarts = nil
 
 local function map_spot_menu_add_property(property_ui,id,level_name)
@@ -84,7 +84,7 @@ local function map_spot_menu_property_clicked(property_ui,id,level_name,prop)
 end
 
 local function on_game_load()
-	local pini = ini_file("plugins\\faction_quick_travel.ltx")
+	local pini = ini_file("plugins\\quick_travel.ltx")
 	enabled = pini:r_bool_ex("settings","enable",false)
 
 	if not (enabled) then 
