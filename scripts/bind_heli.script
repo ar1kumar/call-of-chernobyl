@@ -84,6 +84,7 @@ function heli_binder:update( delta )
 	if active_section then
 		self.object:info_add('section -- ' .. active_section)
 	end
+	
 	self:check_health()
 
 	xr_sound.update(self.object:id())
@@ -95,6 +96,16 @@ function heli_binder:update( delta )
 			heli_alife.update(self.object,se_obj,self.st.heliObject)
 		end
 	end
+	
+	-- Down to Earth achievement
+	-- Kills off any remaining strong helicopters.
+	if (has_alife_info("achieved_down_to_earth")) then
+		local autokill = system_ini():r_bool_ex(self.object:section(), "kill_with_achievement", false)
+		if (not self.st.immortal and autokill and autokill == true) then
+			heli_die(self.object)
+		end
+	end
+	
 	--alun_utils.debug_write("heli update end")
 end
 
@@ -227,18 +238,13 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 		self.last_hit_snd_timeout = time_global() + math.random( 4000, 8000 )
 	end
 	
-	if (get_heli_health(self.st.heliObject,self.st) < 0.005) then
-		xr_statistic.inc_counter("heli_kills")
-	end
-	
 	-- Down to Earth achievement
-	if (db.actor and enemy:id() == 0) then
-		local itm = db.actor:active_item()
-		if (itm and itm:section() == "wpn_rpg7") then
-			local health = get_heli_health(self.st.heliObject,self.st)
-			if (health <= 0.005) then
-				xr_statistic.inc_counter("heli_rocket_kills")
-			end
+	local helicopter_health = get_heli_health(self.st.heliObject,self.st)
+	local weapon = db.actor:active_item()
+	if (enemy:id() == 0 and helicopter_health <= 0.005) then
+		xr_statistic.inc_counter("heli_kills")
+		if (IsLauncher(weapon)) then
+			xr_statistic.inc_counter("heli_rocket_kills")
 		end
 	end
 	
