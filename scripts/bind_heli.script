@@ -100,9 +100,9 @@ function heli_binder:update( delta )
 	-- Down to Earth achievement
 	-- Kills off any remaining strong helicopters.
 	if (has_alife_info("achieved_down_to_earth")) then
-		local autokill = system_ini():r_bool_ex(self.object:section(), "kill_with_achievement", false)
-		if (not self.st.heliObject.m_dead and not self.st.immortal and autokill == true) then
-			heli_die(self.object)
+		local self_destruct = system_ini():r_bool_ex(self.object:section(), "kill_with_achievement", false)
+		if (not self.st.heliObject.m_dead and self_destruct == true) then
+			self.self_destruct = true
 		end
 	end
 	
@@ -172,14 +172,16 @@ function heli_binder:check_health()
 	if not heli.m_dead then
 		local health = get_heli_health(heli,self.st)
 
-		if health < self.flame_start_health and not heli.m_flame_started then
+		if health < self.flame_start_health and not heli.m_flame_started and not self.self_destruct then
 			heli_start_flame( self.object )
 			xr_sound.set_sound_play(self.object:id(), self.snd_damage)
 		end
 
-		if health <= 0.005 and not self.st.immortal then
+		if (self.self_destruct or health <= 0.005) and not self.st.immortal then
 			heli_die( self.object )
-			xr_sound.set_sound_play(self.object:id(), self.snd_down)
+			if not self.self_destruct then
+				xr_sound.set_sound_play(self.object:id(), self.snd_down)
+			end
 			
 			local se_obj = alife_object(self.object:id())
 			if (se_obj) then 

@@ -303,6 +303,21 @@ function cmd.community(me,txt,owner,p)
 	end
 	return "community:= invalid community"
 end
+
+-- Name
+function cmd.name(me,txt,owner,p)
+	local wrd = check_and_set_help(me,txt,owner,"<name>")
+	if (wrd) then
+		local se_actor = alife():actor()
+		wrd = wrd:gsub("(%l)(%w*)", function(a,b) return string.upper(a)..b end)
+		wrd = wrd:gsub("_", " ")
+		se_actor:set_character_name(wrd)
+		return "name:= actor name changed to "..wrd
+	end
+	
+	return "name:= invalid name"
+end
+
 -- SPAWN
 --[[
 example usage:
