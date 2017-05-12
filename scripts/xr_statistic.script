@@ -218,10 +218,10 @@ end
 function inc_counter(statistic)
 	if actor_statistic[statistic] and type(actor_statistic[statistic]) == "number" then
 		actor_statistic[statistic] = actor_statistic[statistic] + 1
-		if rank_rep[statistic] then
-			inc_actor_rank(rank_rep[statistic].rnk)
-			inc_actor_reputation(rank_rep[statistic].rpt)
-		end
+	end
+	if rank_rep[statistic] then
+		inc_actor_rank(rank_rep[statistic].rnk)
+		inc_actor_reputation(rank_rep[statistic].rpt)
 	end
 end
 
