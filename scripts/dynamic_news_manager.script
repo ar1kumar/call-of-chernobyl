@@ -330,7 +330,7 @@ function DynamicNewsManager:GossipBounty()
 		end
 	end
 	
-	if not (bounty) then
+	if not (bounty and bounty:alive()) then
 		return false
 	end
 
