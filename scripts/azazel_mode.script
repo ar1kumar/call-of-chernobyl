@@ -163,6 +163,10 @@ function actor_on_before_death(whoID,flags)
 	
 	game_relations.set_community_goodwill_for_faction("actor_"..faction)
 	
+	-- Force update of xr_statistic records.
+	xr_statistic.check_actor_rank_change(true)
+	xr_statistic.check_actor_reputation_change(true)
+	
 	-- copy all items except ignored
 	for i=1,65534 do 
 		local se_item = sim:object(i)

@@ -194,7 +194,7 @@ function pda_encyclopedia_tab:InitPlugin()
 			for k = 0, line_count - 1 do
 				local junk1, section, value = ini:r_line(self.categories[i].section, k, "", "")
 				-- Unlocked articles table must exist, and must not contain this article.
-				if (unlocked_articles and unlocked_articles[section] == nil) then
+				if (unlocked_articles and not unlocked_articles[section]) then
 					-- Guide cheat infoportion must not exist, and article must not have "unlocked" tag.
 					if (not has_alife_info("unlocked_guide") and not (value == "unlocked")) then
 						table.insert(self.locked, section)

@@ -38,7 +38,7 @@ function context_functor(item)
 	
 	-- Return if there are no articles to unlock.
 	local guide = ui_pda_encyclopedia_tab.get_ui()
-	local locked_articles = guide.locked or 0
+	local locked_articles = guide.locked or {}
 	if (#locked_articles == 0) then
 		return
 	end
@@ -50,6 +50,23 @@ end
 --------------------------------
 ----- Article Manipulation -----
 --------------------------------
+
+-- Counts how many articles are locked.
+function get_locked_articles_count()
+	local guide = ui_pda_encyclopedia_tab.get_ui()
+	local locked_articles = guide.locked or {}
+	return #locked_articles
+end
+
+-- Counts how many articles are unlocked.
+function get_unlocked_articles_count()
+	local guide = ui_pda_encyclopedia_tab.get_ui()
+	local count = 0
+	for k, v in pairs(xr_statistic.actor_statistic.guide_articles) do
+		count = count + 1
+	end
+	return count
+end
 
 -- Jumps straight to a specific article.
 function set_article(section)
@@ -89,7 +106,7 @@ function unlock_article(section)
 	local guide = ui_pda_encyclopedia_tab.get_ui()
 	
 	-- Instance of the locked and unlocked article tables.
-	local locked_articles = guide.locked or 0
+	local locked_articles = guide.locked or {}
 	local unlocked_articles = xr_statistic.actor_statistic.guide_articles
 	
 	-- Return if all articles have been unlocked.
@@ -118,5 +135,6 @@ function unlock_article(section)
 	
 	-- Notify the player and update the PDA selection.
 	news_manager.send_tip(db.actor, "pda_btn_encyclopedia_notify", nil, "guide_unlock", nil, nil)
+	xr_statistic.inc_counter("guide_articles")
 	set_article(section)
 end
