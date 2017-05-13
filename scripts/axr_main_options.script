@@ -37,7 +37,7 @@ function opt_menu_on_init(menu)
 	
 	-- slot Hud
 	if (slot_hud) then
-		menu.gameplay_ui_options["slot_hud"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
+		menu.gameplay_ui_options["slot_hud"]		= {default=true, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
 			if (level.present() and slot_hud) then
 				if (ctrl:GetCheck()) then
 					slot_hud.activate_hud()
