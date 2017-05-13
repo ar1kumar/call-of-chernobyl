@@ -104,13 +104,15 @@ end
 -- Add all of the required articles to a list box.
 -- Called when selecting a category, do not call via constructor.
 function pda_encyclopedia_tab:InitArticles(category)
+	-- Blank the article list before changing category.
+	self.article_list:RemoveAll()
+	
 	-- Return if the articles table cannot be retrieved.
 	local articles = category and category.articles or nil
 	if not (articles) then return end
 	
 	local item = nil
 	local section = nil
-	self.article_list:RemoveAll()
 	for i = 1, #articles do
 		item = pda_encyclopedia_entry()
 		section = articles[i]
@@ -182,6 +184,7 @@ function pda_encyclopedia_tab:InitPlugin()
 	line_count = ini:line_count(self.section) or 0
 	for i = 0, line_count - 1 do
 		local junk1, section, junk2 = ini:r_line(self.section, i, "", "")
+--		printf("FOUND CATEGORY : " .. section)
 		self.categories[i + 1] = { section = section }
 	end
 	
@@ -193,6 +196,7 @@ function pda_encyclopedia_tab:InitPlugin()
 			self.categories[i].articles = {}
 			for k = 0, line_count - 1 do
 				local junk1, section, value = ini:r_line(self.categories[i].section, k, "", "")
+--				printf("FOUND ARTICLE : " .. section)
 				-- Unlocked articles table must exist, and must not contain this article.
 				if (unlocked_articles and not unlocked_articles[section]) then
 					-- Guide cheat infoportion must not exist, and article must not have "unlocked" tag.
