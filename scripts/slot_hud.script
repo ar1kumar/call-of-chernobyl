@@ -134,7 +134,7 @@ end
 
 function slot_hud:update_hud(item)
 	local cnt = 0
-	if (axr_main.config:r_value("mm_options","enable_hud_draw",1,false))==true then
+	if (axr_main.config:r_value("mm_options","enable_hud_draw",1,true))==true then
 		for id, sec in pairs(belted_arts) do
 			cnt = cnt + 1
 			local x1 = (self.ini:r_float_ex(sec,"inv_grid_x")or 0)*50
@@ -163,7 +163,7 @@ function slot_hud:Update()
 	local clist = axr_companions.list_actor_squad_by_id()
 	for i=1,8 do -- should be row*col from ui_companion_row
 		local se_obj = clist[i] and alife_object(clist[i])
-		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) and (axr_main.config:r_value("mm_options","enable_hud_draw",1,false)) == true then
+		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()) and (axr_main.config:r_value("mm_options","enable_hud_draw",1,true) == true) then
 			local full_name = se_obj:character_name()
 			local name = string.gsub(full_name,"Junior","Jr.")
 			name = string.gsub(name,"Senior","Snr.")
@@ -227,7 +227,7 @@ function slot_hud:Update()
 		end
 	end
 	
-	if (axr_main.config:r_value("mm_options","enable_hud_draw",1,false)) == false then
+	if (axr_main.config:r_value("mm_options","enable_hud_draw",1,true)) == false then
 		if table.size(belted_arts) > 0 then
 			self:clear(0)
 --			deactivate_hud()
