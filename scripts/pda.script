@@ -127,13 +127,13 @@ function get_stat(index) -- index= int        return string
 	elseif(index==14) then 
 		return tostring(xr_statistic.actor_statistic.field_dressings)
 	elseif(index==15) then 
-		return xr_statistic.get_best_weapon()
+		return (dxr_encyclopedia.get_unlocked_articles_count() .. "/" .. dxr_encyclopedia.get_articles_count())
 	elseif(index==16) then 
-		return tostring(xr_statistic.actor_statistic.achievements) .. "/" .. tostring(dxr_achievements.get_achievements_available())
+		return (xr_statistic.actor_statistic.achievements .. "/" .. dxr_achievements.get_achievements_available())
 	elseif(index==17) then 
-		return tostring(xr_statistic.get_levels_visited_count()) .. "/" .. tostring(32)
+		return (xr_statistic.get_levels_visited_count() .. "/32")
 	elseif(index==18) then 
-		return tostring(db.actor:money()) .. " RU"
+		return (db.actor:money() .. " RU")
 	end
 	return ""
 end
