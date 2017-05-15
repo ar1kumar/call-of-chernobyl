@@ -73,7 +73,7 @@ local function actor_on_item_take_from_box(box,itm)
 	if (caches[box:id()] == true) then
 		-- Mark the cache as looted, but not fully.
 		local id = alife_object(box:id()).id
-		level.map_add_object_spot(id, "treasure_searched", game.translate_string("st_ui_pda_secret_searched"))
+		level.map_add_object_spot_ser(id, "treasure_searched", game.translate_string("st_ui_pda_secret_searched"))
 		
 		-- Remove all other map spots from the cache.
 		local map_spots = { "treasure", "treasure_player", "treasure_unique" }
