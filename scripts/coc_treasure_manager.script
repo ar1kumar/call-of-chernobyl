@@ -88,7 +88,7 @@ local function actor_on_item_take_from_box(box,itm)
 	end
 	
 	-- Un-mark the cache when fully looted.
-	if box:is_inv_box_empty() and not level.map_has_object_spot(box:id(), "treasure_player") then
+	if box:is_inv_box_empty() then
 		if level.map_has_object_spot(box:id(), "treasure_searched") then
 			level.map_remove_object_spot(box:id(), "treasure_searched")
 		end
