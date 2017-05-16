@@ -31,6 +31,7 @@ function pda_encyclopedia_tab:__init() super()
 	self:InitCategories()
 end
 
+-- Finalize.
 function pda_encyclopedia_tab:__finalize()
 	SINGLETON = nil 
 end
@@ -104,13 +105,15 @@ end
 -- Add all of the required articles to a list box.
 -- Called when selecting a category, do not call via constructor.
 function pda_encyclopedia_tab:InitArticles(category)
+	-- Blank the article list before changing category.
+	self.article_list:RemoveAll()
+	
 	-- Return if the articles table cannot be retrieved.
 	local articles = category and category.articles or nil
 	if not (articles) then return end
 	
 	local item = nil
 	local section = nil
-	self.article_list:RemoveAll()
 	for i = 1, #articles do
 		item = pda_encyclopedia_entry()
 		section = articles[i]

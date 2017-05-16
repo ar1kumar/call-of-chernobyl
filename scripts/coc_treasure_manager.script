@@ -28,6 +28,12 @@ local caches_count = 0
 
 local ltx = ini_file("plugins\\treasure_blacklist.ltx")
 local valid_item_list = nil
+local valid_map_spots = {
+	["treasure"] = true,
+	["treasure_player"] = true,
+	["treasure_searched"] = true,
+	["treasure_unique"] = true,
+}
 ------------------------------------------------------------------------------------------------------------------
 --							PRIVATE
 ------------------------------------------------------------------------------------------------------------------
@@ -71,15 +77,29 @@ end
 
 local function actor_on_item_take_from_box(box,itm)
 	if (caches[box:id()] == true) then
-		caches[box:id()] = false
-		local hud = get_hud()
-		if (hud and box:is_inv_box_empty()) then
-			hud:HideActorMenu()
+		-- Remove all existing map spots from the cache.
+		-- Remember that this will only apply to randomly generated stashes.
+		for k, v in pairs(valid_map_spots) do
+			level.map_remove_object_spot(box:id(), k)
 		end
-		level.map_remove_object_spot(box:id(), "treasure")
+
+		-- Mark the stash as "partially looted".
+		local id = alife_object(box:id()).id
+		level.map_add_object_spot_ser(id, "treasure_searched", game.translate_string("st_ui_pda_secret_searched"))
+		
+		-- Remove the cache from the treasure manager.
+		caches[box:id()] = false
 		xr_statistic.inc_counter("stashes_found")
 		news_manager.send_treasure(1)
 	end
+	
+	-- If no items remain; remove the "partially looted" marker.
+	if box:is_inv_box_empty() then
+		if level.map_has_object_spot(box:id(), "treasure_searched") then
+			level.map_remove_object_spot(box:id(), "treasure_searched")
+		end
+	end
+	
 end
 
 local function save_state(data)
@@ -127,7 +147,9 @@ end
 -------------------------------------------------------------------------------------------------------------------
 
 last_secret = nil
-function create_random_stash(no_spot,hint,bonus_items)
+function create_random_stash(no_spot,hint,bonus_items, map_spot)
+	map_spot = valid_map_spots[map_spot] and map_spot or "treasure"
+	
 	last_secret = nil
 
 	if (caches_count <= 0) then
@@ -274,8 +296,14 @@ function create_random_stash(no_spot,hint,bonus_items)
 	
 	if (#spawned_item > 0) then
 		-- create map spot
-		if (no_spot ~= true and level.map_has_object_spot(id,"treasure") == 0) then
-			level.map_add_object_spot_ser(id, "treasure", hint or "")
+		local ignore = nil
+		for k, v in pairs(valid_map_spots) do
+			if (level.map_has_object_spot(id,k) ~= 0) then
+				ignore = true
+			end
+		end
+		if (no_spot ~= true and not ignore) then
+			level.map_add_object_spot_ser(id, map_spot or "treasure", hint or game.translate_string("st_ui_pda_secret"))
 			news_manager.send_treasure(0)
 		end
 		caches[id] = table.concat(spawned_item,",")

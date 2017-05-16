@@ -51,6 +51,11 @@ end
 ----- Article Manipulation -----
 --------------------------------
 
+-- Counts how many articles currently exist.
+function get_articles_count()
+	return get_locked_articles_count() + get_unlocked_articles_count()
+end
+
 -- Counts how many articles are locked.
 function get_locked_articles_count()
 	local guide = ui_pda_encyclopedia_tab.get_ui()

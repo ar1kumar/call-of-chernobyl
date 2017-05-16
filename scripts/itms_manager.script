@@ -7,7 +7,7 @@ local ini = ini_file("plugins\\item_mods.ltx")
 	--Backpack stash mod
 	local BackPackStashEnable = ini:r_bool_ex("backpack_stash","enable",false)
 	local BackPackStashAllowInBase = BackPackStashEnable and ini:r_bool_ex("backpack_stash","allow_in_base",false)
-	local BackPackStashSpot = BackPackStashEnable and ini:r_string_ex("backpack_stash","map_spot") or "treasure" 
+	local BackPackStashSpot = BackPackStashEnable and ini:r_string_ex("backpack_stash","map_spot") or "treasure_player" 
 	local BackPackStashEnableTip = BackPackStashEnable and ini:r_bool_ex("backpack_stash","enable_news_tip",false)
 	local BackPackStashEnableUi = BackPackStashEnable and ini:r_bool_ex("backpack_stash","enable_ui",false)
 
@@ -21,7 +21,7 @@ local ini = ini_file("plugins\\item_mods.ltx")
 
 	-- Actor backpack mod
 	local ActorBackPackEnable = ini:r_bool_ex("actor_backpack","enable",false)
-	local ActorBackPackSpot = ActorBackPackEnable and ini:r_string_ex("actor_backpack","map_spot") or "treasure"
+	local ActorBackPackSpot = ActorBackPackEnable and ini:r_string_ex("actor_backpack","map_spot") or "treasure_player"
 	local ActorBackPackSlot = ActorBackPackEnable and ini:r_string_ex("actor_backpack","quick_slot") or "slot_3"
 	local ActorBackPackKeep = ActorBackPackEnable and alun_utils.collect_section(ini,"actor_backpack_keep_items",true)
 	local ActorBackPackForced = ActorBackPackEnable and ini:r_bool_ex("actor_backpack","actor_backpack_always_have",false)
@@ -369,6 +369,7 @@ function actor_on_item_use(obj)
 		if (SleepBagPlaceable) then
 			local ph_sec = system_ini():r_string_ex(sec,"placeable_section")
 			local se_obj = alife():create(ph_sec or "ph_sleepbag",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+			level.map_add_object_spot_ser(se_obj.id, "ui_pda2_actor_sleep_location", game.translate_string("st_itm_sleepbag_name"))
 		else
 			local se_obj = alife():create(sec,db.actor:position(),0,0,0)
 			local hud = get_hud()
