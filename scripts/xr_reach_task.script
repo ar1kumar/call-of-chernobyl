@@ -81,7 +81,8 @@ function evaluator_reached_task_location:evaluate()
 		return false 
 	end 
 
-	local squad = self.object:binded_object().squad
+	local binder = self.object:binded_object()
+	local squad = binder and binder.squad
 	if (squad) then 
 		local target = squad.assigned_target_id and alife_object(squad.assigned_target_id)
 		if not (target) then
@@ -145,7 +146,8 @@ end
 
 function action_reach_task_location:execute()
 	action_base.execute(self)
-	local squad = self.object:binded_object().squad
+	local binder = self.object:binded_object()
+	local squad = binder and binder.squad
 	if (squad) then
 		if (squad:commander_id() == self.object:id() or not (db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object))then
 			--alun_utils.debug_nearest(self.object,"i am commander")
