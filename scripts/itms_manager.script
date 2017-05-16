@@ -369,6 +369,7 @@ function actor_on_item_use(obj)
 		if (SleepBagPlaceable) then
 			local ph_sec = system_ini():r_string_ex(sec,"placeable_section")
 			local se_obj = alife():create(ph_sec or "ph_sleepbag",db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id())
+			level.map_add_object_spot_ser(se_obj.id, "ui_pda2_actor_sleep_location", game.translate_string("st_itm_sleepbag_name"))
 		else
 			local se_obj = alife():create(sec,db.actor:position(),0,0,0)
 			local hud = get_hud()
