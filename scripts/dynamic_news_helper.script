@@ -293,20 +293,6 @@ function GetPointDescription(obj)
 	return strformat("%s %s %s",m_s,game.translate_string("st_dyn_news_close"),m_str)
 end
 
-local tips_icons = {
-	dolg     	= "ui_icon_news_news_dolg",
-	freedom  	= "ui_icon_news_news_svoboda",
-	army     	= "ui_icon_news_news_voen_stalk",
-	stalker  	= "ui_iconsTotal_grouping",
-	csky  		= "ui_iconsTotal_grouping",
-    killer   	= "ui_icon_news_news_naim",
-    bandit   	= "ui_icon_news_news_bandos",
-	deth	 	= "ui_icon_news_deth",
-	all		 	= "ui_icon_news_all",
-	signal		="ui_inGame2_Istoriya_dolga",
-	surge 		= "ui_inGame2_Vibros",
-	default		="ui_iconsTotal_grouping"
-}
 function send_tip(msg, header, timeout, showtime, sender, sound,icon_by)
 	if not (msg and db.actor) then 
 		return false
@@ -329,11 +315,11 @@ function send_tip(msg, header, timeout, showtime, sender, sound,icon_by)
 	player:play(db.actor,timeout,sound_object.s2d)
   
 	if icon_by=="gr" then
-		ui_sender = tips_icons[sender]
+		ui_sender = news_manager.tips_icons[sender]
 	elseif  icon_by=="npc" then
 		ui_sender = sender
 	elseif icon_by==nil then
-		ui_sender = tips_icons[sender]
+		ui_sender = news_manager.tips_icons[sender]
 	end
   
 	if not (ui_sender) then
