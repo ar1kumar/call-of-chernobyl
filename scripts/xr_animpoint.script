@@ -179,6 +179,12 @@ function animpoint:calculate_position()
 
 	-- Также получаем дескриптор позиции, и формируем список доступных действий.
 	local description_name = smartcover:description()
+	
+	-- make them interchangable for variety
+	if (description_name == "animpoint_sit_ass" or description_name == "animpoint_sit_knee") then 
+		description_name = math.random(1,100) < 50 and "animpoint_sit_ass" or "animpoint_sit_knee"
+	end  
+	
 	if xr_animpoint_predicates.associations[description_name] == nil then
 		if self.st.avail_animations == nil then
 			printf("Wrong animpoint smart_cover description %s, name %s", tostring(description_name), smartcover:name())
