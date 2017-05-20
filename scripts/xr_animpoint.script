@@ -181,8 +181,9 @@ function animpoint:calculate_position()
 	local description_name = smartcover:description()
 	
 	-- make them interchangable for variety
-	if (description_name == "animpoint_sit_ass" or description_name == "animpoint_sit_knee") then 
-		description_name = math.random(1,100) < 50 and "animpoint_sit_ass" or "animpoint_sit_knee"
+	if (description_name == "animpoint_sit_ass" or description_name == "animpoint_sit_knee" or description_name == "animpoint_sit") then 
+		local r = math.random(1,100)
+		description_name = r > 66 and "animpoint_sit_ass" or r > 33 and "animpoint_sit_knee" or "animpoint_sit"
 	end  
 	
 	if xr_animpoint_predicates.associations[description_name] == nil then
