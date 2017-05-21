@@ -281,7 +281,11 @@ function monster_on_actor_use_callback(obj,who)
 		return
 	end
 
-	utils.se_obj_save_var(obj:id(),obj:name(),"looted",true)
+	if (obj:clsid() == clsid.crow) then
+		utils.save_var(obj, "looted", true)
+	else
+		utils.se_obj_save_var(obj:id(),obj:name(),"looted",true)
+	end
 	xr_corpse_detection.set_valuable_loot(obj:id(),false)
 
 	local st = db.storage[obj:id()]

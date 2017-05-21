@@ -20,7 +20,7 @@ function crow_binder:__init(obj) super(obj)
 end
 -- Class update
 function crow_binder:update(delta)
--- standart update
+-- standard update
     object_binder.update(self, delta)
 	if not (self.object:alive()) then
 		if (self.body_timer<=time_global()-120000) and (self.body_timer~=0) then
