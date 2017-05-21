@@ -229,6 +229,7 @@ function reward_random_item(actor,npc,p)
 		local section = p[math.random(#p)]
 		if (system_ini():section_exist(section)) then
 			alife():create(section,vector(),0,0,0)
+			news_manager.relocate_item(db.actor, "in", section)
 		end
 	end
 end
