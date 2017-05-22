@@ -177,8 +177,9 @@ function CSurgeManager:start(manual)
 		return
 	end
 	
-	if (level_name == "l13_generators" or level_name == "l11_hospital") then
-		self.skip_message = false
+	-- Generators is emission source and Deserted Hospital has nowhere to hide (almost all the map is inside anyway).
+	if (level_name == "l13_generators" or level_name == "l11_hospital" or has_alife_info("bar_arena_fight")) then
+		self.skip_message = true
 		self:skip_surge()
 		return
 	end
@@ -438,7 +439,8 @@ function CSurgeManager:update()
 	if not (self.first_update) then 
 		self.first_update = true
 		local level_name = level.name()
-		if (level_name == "l11_hospital" or level_weathers.valid_levels[level_name] ~= true) then
+		if (level_name == "l13_generators" or level_name == "l11_hospital"
+		or has_alife_info("bar_arena_fight") or level_weathers.valid_levels[level_name] ~= true) then
 			if (self.started) then
 				self:end_surge()
 			-- else
@@ -1447,11 +1449,13 @@ function CSurgeManager:kill_all_unhided()
 	end
 	
 	if(db.actor and db.actor:alive() and not self.actor_in_cover) then
+		--[[
 		if has_alife_info("anabiotic_in_process") then
 			local counter_name = "actor_marked_by_zone_cnt"
 			local cnt_value = utils.load_var(db.actor, counter_name, 0)
 			utils.save_var(db.actor, counter_name, cnt_value + 1)
 		end
+		]]
 		if not(atmosfear_options.config:r_value("atmosfear_current_parameters","opt_god_mode",1,false)) then
 			xr_effects.disable_ui_only(db.actor, nil)
 		end
@@ -1783,6 +1787,7 @@ function is_actor_immune()
 		return true
 	end
 	
+	-- Marked by the Zone.
 	if (utils.load_var(db.actor,"surge_immuned",false) == true) then 
 		return true 
 	end
@@ -1794,7 +1799,7 @@ function is_actor_immune()
 	end
 	-- 'Radiotherapy' achievement has been unlocked.
 	if (has_alife_info("achieved_radiotherapy")) then
-		if ((math.random(1,100)/100) < 0.25) then
+		if (math.random(1,100) < 25) then
 			return true
 		end
 	end
