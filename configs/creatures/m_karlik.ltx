@@ -10,8 +10,8 @@ $spawn							=	"monsters\karlik\karlik"
 corpse_visual					=	monsters\karlik\karlik_green
 visual							=	monsters\karlik\karlik_green
 
-spawn_phantom 					= m_phantom_karlik
-can_spawn_phantom 				= false
+spawn_phantom 					=	m_phantom_karlik
+can_spawn_phantom 				=	true
 
 ; Influences.
 fire_linear_factor				=	0
@@ -20,7 +20,7 @@ fire_max_power					=	5
 fire_quadratic_factor			=	0.025
 
 psy_linear_factor				=	1
-psy_max_distance				=	25
+psy_max_distance				=	15
 psy_max_power					=	0.1
 psy_pp_effector_name			=	psy_antenna
 psy_pp_highest_at				=	0.1
@@ -212,18 +212,14 @@ eye_range			 			=	50
 vision_free_section				=	karlik_vision_free
 vision_danger_section			=	karlik_vision_danger
 
-;-------------------------------------------------------------------------
-; Shield Ability
-;-------------------------------------------------------------------------
+; Shield ability
 shield_cooldown					=	3000
 shield_time						=	5000
-shield_keep_particle			=   anomaly2\heat_03_electra
+shield_keep_particle			=	anomaly2\burer_shield_01
 shield_keep_particle_period		=	300
-Particle_Shield					= 	anomaly2\heat_03_electra
+Particle_Shield					=	anomaly2\burer_shield_01
 
-;-------------------------------------------------------------------------
-; Anti-aim Ability
-;-------------------------------------------------------------------------
+; Anti-aim ability
 anti_aim_timeout				=	5 ;1.5 ; sec
 anti_aim_effectors				=	effector_monster_hit_1, effector_monster_hit_2, effector_monster_hit_3, effector_monster_hit_4
 anti_aim_animation				=	stand_stamina_attack_
@@ -234,61 +230,52 @@ weapon_drop_velocity			=	8
 weapon_drop_stamina_k			=	0.7   ;IF player stamina < stamina_hit*inv_weight(weapon param)*weapon_drop_stamina_k THEN weapon is dropped
 weight_to_stamina_hit			=	0.27 ;0.25 ;kg to stamina %
 
-;-------------------------------------------------------------------------
-; Gravi Ability
-;-------------------------------------------------------------------------
-Gravi_Cooldown				= 10000  ; milisec
-Gravi_MinDist				= 1     ; meter
-Gravi_MaxDist				= 25    ; meter
-Gravi_Speed					= 76	; meter/sec
-Gravi_Step					= 2		; meter
-Gravi_Time_To_Hold			= 1200	; milisec
-Gravi_Radius				= 3.0
-Gravi_Impulse_To_Objects	= 60.0
-Gravi_Impulse_To_Enemy		= 1500.0
-Gravi_Hit_Power				= 0.6
+; Gravi ability
+Gravi_Cooldown					=	10000
+Gravi_MinDist					=	1
+Gravi_MaxDist					=	25
+Gravi_Speed						=	76
+Gravi_Step						=	2
+Gravi_Time_To_Hold				=	1200
+Gravi_Radius					=	3.0
+Gravi_Impulse_To_Objects		=	60.0
+Gravi_Impulse_To_Enemy			=	1500.0
+Gravi_Hit_Power					=	0.6
 
-sound_gravi_attack				= 	monsters\karlik\karlik_attack_
-sound_gravi_wave				= 	anomaly\electra_blast
+sound_gravi_attack				=	monsters\karlik\karlik_attack_
+sound_gravi_wave				=	monsters\burer\burer_gravi_wave_0
 
-;-------------------------------------------------------------------------
-; Tele Ability
-;-------------------------------------------------------------------------
-Tele_Max_Handled_Objects = 1;
-Tele_Max_Time			 = 7000;  // (s) max time to be in telekinesis
-Tele_Time_To_Hold		 = 600
-Tele_Object_Min_Mass	 = 100
-Tele_Object_Max_Mass	 = 1000.0
-Tele_Find_Radius		 = 35.0
-Tele_Min_Distance		 = 5
-Tele_Max_Distance		 = 50
-Tele_Raise_Speed		 = 8
-Tele_Fly_Velocity		 = 80 ;50
-Tele_Object_Height		 = 4  ;2
+; Tele ability
+Tele_Max_Handled_Objects 		=	1;
+Tele_Max_Time			 		=	7000
+Tele_Time_To_Hold		 		=	600
+Tele_Object_Min_Mass	 		=	100
+Tele_Object_Max_Mass	 		=	1000.0
+Tele_Find_Radius		 		=	35.0
+Tele_Min_Distance		 		=	5
+Tele_Max_Distance		 		=	50
+Tele_Raise_Speed		 		=	8
+Tele_Fly_Velocity		 		=	80
+Tele_Object_Height		 		=	4
 
-sound_tele_attack		=	monsters\karlik\karlik_idle_
-sound_tele_hold			= 	monsters\burer\burer_tele_hold
-sound_tele_throw		= 	monsters\burer\burer_tele_throw
+sound_tele_attack				=	monsters\karlik\karlik_idle_
+sound_tele_hold					=	monsters\burer\burer_tele_hold
+sound_tele_throw				=	monsters\burer\burer_tele_throw
 
-
-;-------------------------------------------------------------------------
 ; Scanner
-;-------------------------------------------------------------------------
-scan_critical_value		= 25.0	; граничное значение
-scan_radius				= 50.0  ; радиус сканирования
-scan_velocity_threshold	= 4.0	; The boundary velocity to which the actor's movement is ignored
-scan_decrease_value		= 0.3	; Decrease the current amount per second
-scan_trace_time_freq	= 2		; частота трейса скорости (for programmer only) (1 = 2 раза в сек)
+scan_critical_value				=	25.0
+scan_radius						=	50.0
+scan_velocity_threshold			=	4.0
+scan_decrease_value				=	0.3
+scan_trace_time_freq			=	2
 
-scan_sound				= monsters\burer\burer_scan_affect_0
-scan_effector_section	= m_burer_scan_effector
+scan_sound						=	monsters\burer\burer_scan_affect_0
+scan_effector_section			=	m_burer_scan_effector
 
-;-------------------------------------------------------------------------
 ; Particles
-;-------------------------------------------------------------------------
-Particle_Tele_Object	= anomaly2\electra_idle
-Particle_Gravi_Wave		= anomaly2\electra2_blast
-Particle_Gravi_Prepare	= artefact\af_electra_hide
+Particle_Tele_Object			=	static\fire_distort
+Particle_Gravi_Wave				=	anomaly2\burer_wave
+Particle_Gravi_Prepare			=	anomaly2\burer_prepare
 
 [m_karlik_attack_effector]
 blur							=	0.01
@@ -341,12 +328,12 @@ bip01_spine1 					=	1.0,		-1,		0.5
 burn_immunity					=	1.0				 
 strike_immunity					=	0.5
 shock_immunity					=	0.5
-wound_immunity					=	1.0
+wound_immunity					=	0.75
 radiation_immunity				=	0.0
 telepatic_immunity				=	0.0
-chemical_burn_immunity			=	0.0
-explosion_immunity				=	1.0
-fire_wound_immunity				=	1.0
+chemical_burn_immunity			=	0.5
+explosion_immunity				=	0.75
+fire_wound_immunity				=	0.75
 
 [karlik_vision_free]
 min_view_distance   			=	0.7
@@ -374,22 +361,35 @@ transparency_threshold			=	0.25
 [karlik_blue]:m_karlik_e
 corpse_visual					=	monsters\karlik\karlik_blue
 visual							=	monsters\karlik\karlik_blue
-can_spawn_phantom 				=   true
+
+sound_gravi_wave				=	anomaly\electra_blast
+
+Particle_Tele_Object			=	anomaly2\electra_idle
+Particle_Gravi_Wave				=	anomaly2\electra2_blast
+Particle_Gravi_Prepare			=	artefact\af_electra_hide
+
+shield_keep_particle			=	anomaly2\heat_03_electra
+Particle_Shield					=	anomaly2\heat_03_electra
+
 
 ; Karlik (Green jacket)
 [karlik_green]:m_karlik_e
 corpse_visual					=	monsters\karlik\karlik_green
 visual							=	monsters\karlik\karlik_green
-can_spawn_phantom 				=   true
 
 ; Karlik (Grey jacket)
 [karlik_grey]:m_karlik_e
 corpse_visual					=	monsters\karlik\karlik_grey
 visual							=	monsters\karlik\karlik_grey
-can_spawn_phantom 				=   true
 
 ; Karlik (Orange jacket)
 [karlik_orange]:m_karlik_e
 corpse_visual					=	monsters\karlik\karlik_orange
 visual							=	monsters\karlik\karlik_orange
-can_spawn_phantom 				=   true
+
+Particle_Tele_Object			=	weapons\flame_rocket
+Particle_Gravi_Wave				=	monsters\polter_flame_fire
+Particle_Gravi_Prepare			=	monsters\polter_hidden
+
+shield_keep_particle			=	artefact\af_thermal_hide
+Particle_Shield					=	artefact\af_thermal_hide
