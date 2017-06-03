@@ -223,8 +223,10 @@ local function is_danger(npc,best_danger,script)
 		return false
 	end
 
-	if not (best_danger_object:alive() and xr_combat_ignore.is_enemy(npc, best_danger_object,true)) then
-		return false
+	if (best_danger_object and (IsMonster(best_danger_object) or IsStalker(best_danger_object))) then
+		if not (best_danger_object:alive() and xr_combat_ignore.is_enemy(npc, best_danger_object,true)) then
+			return false
+		end
 	end
 
 	return danger_in_radius(npc,best_danger,bd_type)
