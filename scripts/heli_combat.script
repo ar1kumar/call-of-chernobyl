@@ -81,7 +81,11 @@ end
 
 function heli_combat:is_enemy(obj)
 	--alun_utils.debug_write(strformat("heli_combat:is_enemy",obj and obj:name()))
-	if (obj:alive() ~= true) then 
+	if not (IsStalker(obj) or IsMonster(obj)) then 
+		return false 
+	end
+	
+	if not (obj:alive()) then 
 		return false 
 	end
 	
@@ -228,7 +232,7 @@ function heli_combat:find_valid_target()
 			end
 		end
 	
-		if (self:is_enemy(target)) then
+		if (target and self:is_enemy(target)) then
 			if (current_target and current_target_visible) then
 				local pos = self.object:position()
 				local dist = pos:distance_to_sqr(target_pos)

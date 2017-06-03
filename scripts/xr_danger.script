@@ -76,7 +76,7 @@ end
 function get_danger_time(danger,npc)
 	if (danger:type() == danger_object.entity_corpse) then
 		local corpse_object = danger:object()
-		return corpse_object and corpse_object:death_time() or 0
+		return corpse_object and IsStalker(corpse_object) and corpse_object:death_time() or 0
 	end
 
 	return danger:time()

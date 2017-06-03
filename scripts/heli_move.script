@@ -1,7 +1,7 @@
 --[[------------------------------------------------------------------------------------------------
 Helicopter movement
 Андрущенко Иван
-
+-- NOTE: Needs rewritten to track enemy by ID, reference is BAD!
 --------------------------------------------------------------------------------------------------]]
 local state_move = 0
 ----------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ function heli_move:reset_scheme( loading )
 		self.was_callback                   = false
 		self._flag_to_wp_callback           = false
         self.heli_fire.enemy_               = self.a.enemy_
-        self.heli_fire.enemy                = nil
+        self.heli_fire.enemy_id             = nil
         self.heli_fire.flag_by_enemy        = true
         if self.a.fire_point then
 			local pat = patrol(self.a.fire_point)

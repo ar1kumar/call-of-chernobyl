@@ -214,8 +214,7 @@ function heli_binder:on_hit( power, impulse, hit_type, enemy_id )
 		return 
 	end 
 	
-	self.heli_fire.enemy = enemy
-	--self.heli_fire:update_hit()
+	self.heli_fire.enemy_id = enemy:id()
 	
 	if self.st.hit then
 		xr_logic.issue_event( self.object, self.st.hit, "hit_callback", self.object, power, nil, enemy, nil )
