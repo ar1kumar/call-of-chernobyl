@@ -61,7 +61,7 @@ local function map_spot_menu_property_clicked(property_ui,id,level_name,prop)
 			return
 		end
 		
-		local dist = db.actor:position():distance_to(se_obj.position)
+		local dist = se_obj.online and db.actor:position():distance_to(se_obj.position) or 1000
 		if (dist <= 50) then 
 			SetHudMsg(game.translate_string("st_travel_already_here"),4)
 			get_hud():HidePdaMenu()
